@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="qspgui" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="..\_release\qspgui.exe" prefix_auto="0" extension_auto="0" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectResourceIncludeDirsRelation="0" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
+					<Add option="-O3" />
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-DwxUSE_UNICODE=0" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="wxmsw29_aui" />
+					<Add library="wxmsw29_html" />
+					<Add library="wxmsw29_adv" />
+					<Add library="wxmsw29_core" />
+					<Add library="wxbase29" />
+					<Add library="wxtiff" />
+					<Add library="wxjpeg" />
+					<Add library="wxpng" />
+					<Add library="wxzlib" />
+					<Add library="comctl32" />
+					<Add library="oleaut32" />
+					<Add library="ole32" />
+					<Add library="uuid" />
+					<Add library="fmodexp" />
+					<Add library="qsp" />
+					<Add directory="misc\win32\libs" />
+					<Add directory="..\_release" />
+				</Linker>
+			</Target>
+			<Target title="Release Unicode">
+				<Option output="..\_release\qspgui.exe" prefix_auto="0" extension_auto="0" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectResourceIncludeDirsRelation="0" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
+					<Add option="-O3" />
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+					<Add option="-D_WINDOWS" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_UNICODE" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="wxmsw29u_aui" />
+					<Add library="wxmsw29u_html" />
+					<Add library="wxmsw29u_adv" />
+					<Add library="wxmsw29u_core" />
+					<Add library="wxbase29u" />
+					<Add library="wxtiff" />
+					<Add library="wxjpeg" />
+					<Add library="wxpng" />
+					<Add library="wxzlib" />
+					<Add library="comctl32" />
+					<Add library="oleaut32" />
+					<Add library="ole32" />
+					<Add library="uuid" />
+					<Add library="fmodexp" />
+					<Add library="qsp" />
+					<Add directory="misc\win32\libs" />
+					<Add directory="..\_release" />
+				</Linker>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="Release;" />
+		</VirtualTargets>
+		<Unit filename="misc\win32\rsc\res.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="src\animwin.cpp" />
+		<Unit filename="src\animwin.h" />
+		<Unit filename="src\app.cpp" />
+		<Unit filename="src\app.h" />
+		<Unit filename="src\callbacks_gui.cpp" />
+		<Unit filename="src\callbacks_gui.h" />
+		<Unit filename="src\comtools.cpp" />
+		<Unit filename="src\comtools.h" />
+		<Unit filename="src\fmod.h" />
+		<Unit filename="src\fmod_codec.h" />
+		<Unit filename="src\fmod_dsp.h" />
+		<Unit filename="src\fmod_errors.h" />
+		<Unit filename="src\frame.cpp" />
+		<Unit filename="src\frame.h" />
+		<Unit filename="src\imgcanvas.cpp" />
+		<Unit filename="src\imgcanvas.h" />
+		<Unit filename="src\initevent.cpp" />
+		<Unit filename="src\initevent.h" />
+		<Unit filename="src\inputbox.cpp" />
+		<Unit filename="src\inputbox.h" />
+		<Unit filename="src\inputdlg.cpp" />
+		<Unit filename="src\inputdlg.h" />
+		<Unit filename="src\keyevent.cpp" />
+		<Unit filename="src\keyevent.h" />
+		<Unit filename="src\listbox.cpp" />
+		<Unit filename="src\listbox.h" />
+		<Unit filename="src\qsp.h" />
+		<Unit filename="src\textbox.cpp" />
+		<Unit filename="src\textbox.h" />
+		<Unit filename="src\transhelper.cpp" />
+		<Unit filename="src\transhelper.h" />
+		<Unit filename="src\wheelevent.cpp" />
+		<Unit filename="src\wheelevent.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

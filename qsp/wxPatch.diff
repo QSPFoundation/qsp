@@ -1,0 +1,406 @@
+diff -u -r e:/wxWidgets/Makefile.in c:/wx_qsp/Makefile.in
+--- e:/wxWidgets/Makefile.in	Wed Mar 26 21:24:34 2008
++++ c:/wx_qsp/Makefile.in	Thu Mar 27 22:26:23 2008
+@@ -14127,8 +14127,8 @@
+ monodll_win32.o: $(srcdir)/src/univ/themes/win32.cpp $(MONODLL_ODEP)
+ 	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/univ/themes/win32.cpp
+ 
+-monodll_animate.o: $(srcdir)/src/gtk/animate.cpp $(MONODLL_ODEP)
+-	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/gtk/animate.cpp
++monodll_animate.o: $(srcdir)/src/generic/animateg.cpp $(MONODLL_ODEP)
++	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/generic/animateg.cpp
+ 
+ monodll_hyperlink.o: $(srcdir)/src/gtk/hyperlink.cpp $(MONODLL_ODEP)
+ 	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/gtk/hyperlink.cpp
+@@ -18645,8 +18645,8 @@
+ monolib_win32.o: $(srcdir)/src/univ/themes/win32.cpp $(MONOLIB_ODEP)
+ 	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/univ/themes/win32.cpp
+ 
+-monolib_animate.o: $(srcdir)/src/gtk/animate.cpp $(MONOLIB_ODEP)
+-	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/gtk/animate.cpp
++monolib_animate.o: $(srcdir)/src/generic/animateg.cpp $(MONOLIB_ODEP)
++	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/generic/animateg.cpp
+ 
+ monolib_hyperlink.o: $(srcdir)/src/gtk/hyperlink.cpp $(MONOLIB_ODEP)
+ 	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/gtk/hyperlink.cpp
+@@ -30492,8 +30492,8 @@
+ advdll_version_rc.o: $(srcdir)/src/msw/version.rc $(ADVDLL_ODEP)
+ 	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_54)  $(__EXCEPTIONS_DEFINE_p_53) $(__RTTI_DEFINE_p_53) $(__THREAD_DEFINE_p_53)   --define WXBUILDING --define WXDLLNAME=$(WXDLLNAMEPREFIXGUI)$(WXUNICODEFLAG)$(WXDEBUGFLAG)$(WX_LIB_FLAVOUR)_adv$(WXCOMPILER)$(VENDORTAG)$(WXDLLVERSIONTAG) $(__RCDEFDIR_p) --include-dir $(top_srcdir)/include $(__INC_TIFF_BUILD_p_54) $(__INC_TIFF_p_54) $(__INC_JPEG_p_54) $(__INC_PNG_p_53) $(__INC_ZLIB_p_55) $(__INC_REGEX_p_53) $(__INC_EXPAT_p_53) --define WXUSINGDLL --define WXMAKINGDLL_ADV
+ 
+-advdll_animate.o: $(srcdir)/src/gtk/animate.cpp $(ADVDLL_ODEP)
+-	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/gtk/animate.cpp
++advdll_animate.o: $(srcdir)/src/generic/animateg.cpp $(ADVDLL_ODEP)
++	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/generic/animateg.cpp
+ 
+ advdll_hyperlink.o: $(srcdir)/src/gtk/hyperlink.cpp $(ADVDLL_ODEP)
+ 	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/gtk/hyperlink.cpp
+@@ -30750,8 +30750,8 @@
+ @COND_TOOLKIT_WINCE_WXUNIV_0@advdll_datectrl.o: $(srcdir)/src/msw/datectrl.cpp $(ADVDLL_ODEP)
+ @COND_TOOLKIT_WINCE_WXUNIV_0@	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/msw/datectrl.cpp
+ 
+-advlib_animate.o: $(srcdir)/src/gtk/animate.cpp $(ADVLIB_ODEP)
+-	$(CXXC) -c -o $@ $(ADVLIB_CXXFLAGS) $(srcdir)/src/gtk/animate.cpp
++advlib_animate.o: $(srcdir)/src/generic/animateg.cpp $(ADVLIB_ODEP)
++	$(CXXC) -c -o $@ $(ADVLIB_CXXFLAGS) $(srcdir)/src/generic/animateg.cpp
+ 
+ advlib_hyperlink.o: $(srcdir)/src/gtk/hyperlink.cpp $(ADVLIB_ODEP)
+ 	$(CXXC) -c -o $@ $(ADVLIB_CXXFLAGS) $(srcdir)/src/gtk/hyperlink.cpp
+diff -u -r e:/wxWidgets/include/wx/animate.h c:/wx_qsp/include/wx/animate.h
+--- e:/wxWidgets/include/wx/animate.h	Tue Dec 18 01:05:53 2007
++++ c:/wx_qsp/include/wx/animate.h	Thu Mar 27 22:19:07 2008
+@@ -113,11 +113,15 @@
+ // include the platform-specific version of the wxAnimationCtrl class
+ // ----------------------------------------------------------------------------
+ 
++// HzD_Byte's hack
++/*
+ #if defined(__WXGTK20__) && !defined(__WXUNIVERSAL__)
+     #include "wx/gtk/animate.h"
+ #else
+     #include "wx/generic/animate.h"
+ #endif
++*/
++#include "wx/generic/animate.h"
+ 
+ #endif // wxUSE_ANIMATIONCTRL
+ 
+diff -u -r e:/wxWidgets/include/wx/animdecod.h c:/wx_qsp/include/wx/animdecod.h
+--- e:/wxWidgets/include/wx/animdecod.h	Tue Dec 18 01:05:53 2007
++++ c:/wx_qsp/include/wx/animdecod.h	Thu Mar 27 22:19:07 2008
+@@ -123,6 +123,9 @@
+     // the transparent colour for this frame if any or wxNullColour.
+     virtual wxColour GetTransparentColour(unsigned int frame) const = 0;
+ 
++    // HzD_Byte's hack
++    bool IsAnimation() const { return m_nFrames > 1; }
++
+     // get global data
+     wxSize GetAnimationSize() const { return m_szAnimation; }
+     wxColour GetBackgroundColour() const { return m_background; }
+diff -u -r e:/wxWidgets/include/wx/generic/animate.h c:/wx_qsp/include/wx/generic/animate.h
+--- e:/wxWidgets/include/wx/generic/animate.h	Sun Mar 23 00:22:53 2008
++++ c:/wx_qsp/include/wx/generic/animate.h	Thu Mar 27 22:19:07 2008
+@@ -27,8 +27,13 @@
+     wxAnimation(const wxString &name, wxAnimationType type = wxANIMATION_TYPE_ANY)
+         { LoadFile(name, type); }
+ 
++    // HzD_Byte's hack
++    /*
+     virtual bool IsOk() const
+         { return m_refData != NULL; }
++    */
++    virtual bool IsOk() const
++        { return m_refData != NULL && wx_static_cast(wxAnimationDecoder *, m_refData)->IsAnimation(); }
+ 
+     virtual unsigned int GetFrameCount() const;
+     virtual int GetDelay(unsigned int i) const;
+@@ -167,7 +172,11 @@
+ 
+     wxBitmap      m_backingStore;     // The frames are drawn here and then blitted
+                                       // on the screen
+-
++    // HzD_Byte's hack
++    int m_scalePosX;
++    int m_scalePosY;
++    int m_scaleWidth;
++    int m_scaleHeight;
+ private:
+     typedef wxAnimationCtrlBase base_type;
+     DECLARE_DYNAMIC_CLASS(wxAnimationCtrl)
+diff -u -r e:/wxWidgets/include/wx/gifdecod.h c:/wx_qsp/include/wx/gifdecod.h
+--- e:/wxWidgets/include/wx/gifdecod.h	Tue Jul 24 22:56:52 2007
++++ c:/wx_qsp/include/wx/gifdecod.h	Thu Mar 27 22:19:07 2008
+@@ -66,8 +66,11 @@
+     virtual long GetDelay(unsigned int frame) const;
+ 
+     // GIFs can contain both static images and animations
++    // HzD_Byte's hack
++    /*
+     bool IsAnimation() const
+         { return m_nFrames > 1; }
++    */
+ 
+     // load function which returns more info than just Load():
+     wxGIFErrorCode LoadGIF( wxInputStream& stream );
+diff -u -r e:/wxWidgets/include/wx/htmllbox.h c:/wx_qsp/include/wx/htmllbox.h
+--- e:/wxWidgets/include/wx/htmllbox.h	Wed Mar  5 19:45:13 2008
++++ c:/wx_qsp/include/wx/htmllbox.h	Thu Mar 27 22:19:07 2008
+@@ -91,6 +91,11 @@
+     // this function may be overridden to decorate HTML returned by OnGetItem()
+     virtual wxString OnGetItemMarkup(size_t n) const;
+ 
++    // HzD_Byte's hack
++    virtual wxHtmlOpeningStatus OnOpeningURL(wxHtmlURLType WXUNUSED(type),
++        const wxString& WXUNUSED(url),
++        wxString *WXUNUSED(redirect)) const
++    { return wxHTML_OPEN; }
+ 
+     // this method allows to customize the selection appearance: it may be used
+     // to specify the colour of the text which normally has the given colour
+@@ -129,6 +134,14 @@
+ 
+     // ensure that the given item is cached
+     void CacheItem(size_t n) const;
++
++    // HzD_Byte's hack
++    void CreateHTMLParser() const;
++    void SetFonts(wxString normal_face, wxString fixed_face,
++        const int *sizes = NULL);
++    void SetStandardFonts(int size = -1,
++        const wxString& normal_face = wxEmptyString,
++        const wxString& fixed_face = wxEmptyString);
+ 
+ private:
+     // wxHtmlWindowInterface methods:
+diff -u -r e:/wxWidgets/src/aui/framemanager.cpp c:/wx_qsp/src/aui/framemanager.cpp
+--- e:/wxWidgets/src/aui/framemanager.cpp	Wed Mar  5 19:42:14 2008
++++ c:/wx_qsp/src/aui/framemanager.cpp	Thu Mar 27 22:19:07 2008
+@@ -2586,6 +2586,8 @@
+                 p.window->Refresh();
+                 p.window->Update();
+             }
++            // HzD_Byte's hack
++            p.BestSize(p.rect.GetSize());
+         }
+     }
+ 
+diff -u -r e:/wxWidgets/src/generic/animateg.cpp c:/wx_qsp/src/generic/animateg.cpp
+--- e:/wxWidgets/src/generic/animateg.cpp	Fri Dec 14 15:34:35 2007
++++ c:/wx_qsp/src/generic/animateg.cpp	Thu Mar 27 22:19:07 2008
+@@ -278,6 +278,8 @@
+     m_currentFrame = 0;
+     m_looped = false;
+     m_isPlaying = false;
++    // HzD_Byte's hack
++    m_scalePosX = m_scalePosY = m_scaleWidth = m_scaleHeight = 0;
+ 
+     // use the window background colour by default to be consistent
+     // with the GTK+ native version
+@@ -332,6 +334,10 @@
+ 
+     // set new animation even if it's wxNullAnimation
+     m_animation = animation;
++    // HzD_Byte's hack
++    wxSizeEvent e;
++    OnSize(e);
++
+     if (!m_animation.IsOk())
+     {
+         DisplayStaticImage();
+@@ -433,6 +439,8 @@
+ {
+     // if we've not created the backing store yet or it's too
+     // small, then recreate it
++    // HzD_Byte's hack
++    /*
+     wxSize sz = m_animation.GetSize(),
+            winsz = GetClientSize();
+     int w = wxMin(sz.GetWidth(), winsz.GetWidth());
+@@ -444,6 +452,15 @@
+         if (!m_backingStore.Create(w, h))
+             return false;
+     }
++    */
++    wxSize sz = m_animation.GetSize();
++    int w = sz.GetWidth(), h = sz.GetHeight();
++    if (!m_backingStore.IsOk() ||
++        m_backingStore.GetWidth() != w || m_backingStore.GetHeight() != h)
++    {
++        if (!m_backingStore.Create(w, h))
++            return false;
++    }
+ 
+     wxMemoryDC dc;
+     dc.SelectObject(m_backingStore);
+@@ -576,7 +593,10 @@
+     wxASSERT( m_backingStore.IsOk() );
+ 
+     // m_backingStore always contains the current frame
+-    dc.DrawBitmap(m_backingStore, 0, 0, true /* use mask in case it's present */);
++    // HzD_Byte's hack
++    // dc.DrawBitmap(m_backingStore, 0, 0, true /* use mask in case it's present */);
++    wxBitmap bitmap(m_backingStore.ConvertToImage().Scale(m_scaleWidth, m_scaleHeight));
++    dc.DrawBitmap(bitmap, m_scalePosX, m_scalePosY, true);
+ }
+ 
+ void wxAnimationCtrl::DisposeToBackground()
+@@ -624,7 +644,10 @@
+         // NOTE: we draw the bitmap explicitely ignoring the mask (if any);
+         //       i.e. we don't want to combine the backing store with the 
+         //       possibly wrong preexisting contents of the window!
+-        dc.DrawBitmap(m_backingStore, 0, 0, false /* no mask */);
++        // HzD_Byte's hack
++        // dc.DrawBitmap(m_backingStore, 0, 0, false /* no mask */);
++        wxBitmap bitmap(m_backingStore.ConvertToImage().Scale(m_scaleWidth, m_scaleHeight));
++        dc.DrawBitmap(bitmap, m_scalePosX, m_scalePosY, false);
+     }
+     else
+     {
+@@ -684,6 +707,20 @@
+             if (!RebuildBackingStoreUpToFrame(m_currentFrame))
+                 Stop();     // in case we are playing
+         }
++        // HzD_Byte's hack
++        int w, h, srcW, srcH;
++        wxSize srcSize = m_animation.GetSize();
++        GetClientSize(&w, &h);
++        srcW = srcSize.GetWidth();
++        srcH = srcSize.GetHeight();
++        m_scaleWidth = srcW * h / srcH;
++        m_scaleHeight = srcH * w / srcW;
++        if (m_scaleWidth > w)
++            m_scaleWidth = w;
++        else
++            m_scaleHeight = h;
++        m_scalePosX = (w - m_scaleWidth) / 2;
++        m_scalePosY = (h - m_scaleHeight) / 2;
+     }
+ }
+ 
+diff -u -r e:/wxWidgets/src/generic/htmllbox.cpp c:/wx_qsp/src/generic/htmllbox.cpp
+--- e:/wxWidgets/src/generic/htmllbox.cpp	Wed Mar  5 19:42:25 2008
++++ c:/wx_qsp/src/generic/htmllbox.cpp	Thu Mar 27 22:19:07 2008
+@@ -301,6 +301,8 @@
+ {
+     if ( !m_cache->Has(n) )
+     {
++        // HzD_Byte's hack
++        /*
+         if ( !m_htmlParser )
+         {
+             wxHtmlListBox *self = wxConstCast(this, wxHtmlListBox);
+@@ -315,6 +317,8 @@
+             // use system's default GUI font by default:
+             m_htmlParser->SetStandardFonts();
+         }
++        */
++        CreateHTMLParser();
+ 
+         wxHtmlContainerCell *cell = (wxHtmlContainerCell *)m_htmlParser->
+                 Parse(OnGetItemMarkup(n));
+@@ -330,6 +334,39 @@
+     }
+ }
+ 
++// HzD_Byte's hack
++void wxHtmlListBox::CreateHTMLParser() const
++{
++    if (!m_htmlParser)
++    {
++        wxHtmlListBox *self = wxConstCast(this, wxHtmlListBox);
++        self->m_htmlParser = new wxHtmlWinParser(self);
++        m_htmlParser->SetDC(new wxClientDC(self));
++        m_htmlParser->SetFS(&self->m_filesystem);
++#if !wxUSE_UNICODE
++        if (GetFont().Ok())
++            m_htmlParser->SetInputEncoding(GetFont().GetEncoding());
++#endif
++        m_htmlParser->SetStandardFonts();
++    }
++}
++
++void wxHtmlListBox::SetFonts(wxString normal_face, wxString fixed_face, const int *sizes)
++{
++    CreateHTMLParser();
++    m_htmlParser->SetFonts(normal_face, fixed_face, sizes);
++    RefreshAll();
++}
++
++void wxHtmlListBox::SetStandardFonts(int size,
++                                     const wxString& normal_face,
++                                     const wxString& fixed_face)
++{
++    CreateHTMLParser();
++    m_htmlParser->SetStandardFonts(size, normal_face, fixed_face);
++    RefreshAll();
++}
++
+ void wxHtmlListBox::OnSize(wxSizeEvent& event)
+ {
+     // we need to relayout all the cached cells
+@@ -456,12 +493,22 @@
+     GetEventHandler()->ProcessEvent(event);
+ }
+ 
++// HzD_Byte's hack
++/*
+ wxHtmlOpeningStatus
+ wxHtmlListBox::OnHTMLOpeningURL(wxHtmlURLType WXUNUSED(type),
+                                 const wxString& WXUNUSED(url),
+                                 wxString *WXUNUSED(redirect)) const
+ {
+     return wxHTML_OPEN;
++}
++*/
++wxHtmlOpeningStatus
++wxHtmlListBox::OnHTMLOpeningURL(wxHtmlURLType type,
++                                const wxString& url,
++                                wxString *redirect) const
++{
++    return OnOpeningURL(type, url, redirect);
+ }
+ 
+ wxPoint wxHtmlListBox::HTMLCoordsToWindow(wxHtmlCell *cell,
+diff -u -r e:/wxWidgets/src/html/htmlwin.cpp c:/wx_qsp/src/html/htmlwin.cpp
+--- e:/wxWidgets/src/html/htmlwin.cpp	Tue Mar 18 19:43:14 2008
++++ c:/wx_qsp/src/html/htmlwin.cpp	Thu Mar 27 22:19:07 2008
+@@ -442,7 +442,8 @@
+     // ...and run the parser on it:
+     wxClientDC *dc = new wxClientDC(this);
+     dc->SetMapMode(wxMM_TEXT);
+-    SetBackgroundColour(wxColour(0xFF, 0xFF, 0xFF));
++    // HzD_Byte's hack
++    // SetBackgroundColour(wxColour(0xFF, 0xFF, 0xFF));
+     SetBackgroundImage(wxNullBitmap);
+ 
+     m_Parser->SetDC(dc);
+diff -u -r e:/wxWidgets/src/html/winpars.cpp c:/wx_qsp/src/html/winpars.cpp
+--- e:/wxWidgets/src/html/winpars.cpp	Sun Mar 23 00:22:30 2008
++++ c:/wx_qsp/src/html/winpars.cpp	Thu Mar 27 22:19:07 2008
+@@ -296,6 +296,8 @@
+     {
+         wxString myfullurl(myurl);
+ 
++        // HzD_Byte's hack
++        /*
+         // consider url as absolute path first
+         wxURI current(myurl);
+         myfullurl = current.BuildUnescapedURI();
+@@ -324,6 +326,7 @@
+                 }
+             }
+         }
++        */
+ 
+         wxString redirect;
+         status = m_windowInterface->OnHTMLOpeningURL(type, myfullurl, &redirect);
+diff -u -r e:/wxWidgets/src/msw/menu.cpp c:/wx_qsp/src/msw/menu.cpp
+--- e:/wxWidgets/src/msw/menu.cpp	Wed Mar  5 19:42:23 2008
++++ c:/wx_qsp/src/msw/menu.cpp	Thu Mar 27 22:19:07 2008
+@@ -446,10 +446,14 @@
+     if ( pItem->IsOwnerDrawn() )
+     {
+         // is the item owner-drawn just because of the [checked] bitmap?
++        // HzD_Byte's hack
++        /*
+         if ( (pItem->GetBitmap(false).Ok() || pItem->GetBitmap(true).Ok()) &&
+                 !pItem->GetTextColour().Ok() &&
+                     !pItem->GetBackgroundColour().Ok() &&
+                         !pItem->GetFont().Ok() )
++        */
++        if (false)
+         {
+             // try to use InsertMenuItem() as it's guaranteed to look correct
+             // while our owner-drawn code is not
+diff -u -r e:/wxWidgets/src/msw/ownerdrw.cpp c:/wx_qsp/src/msw/ownerdrw.cpp
+--- e:/wxWidgets/src/msw/ownerdrw.cpp	Wed Mar  5 19:42:23 2008
++++ c:/wx_qsp/src/msw/ownerdrw.cpp	Thu Mar 27 22:19:07 2008
+@@ -293,6 +293,8 @@
+ 
+     // add a 4-pixel separator, otherwise menus look cluttered
+     *pwidth += 4;
++    // HzD_Byte's hack
++    *pheight += 4;
+ 
+     // make sure that this item is at least as tall as the system menu height
+     const size_t heightStd = wxMSWSystemMenuFontModule::GetSystemMenuHeight();

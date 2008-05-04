@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="qsp">
+		<Project filename="qsp\win32_qsp.cbp" />
+		<Project filename="qspgui\win32_qspgui.cbp" active="1">
+			<Depends filename="qsp\win32_qsp.cbp" />
+		</Project>
+	</Workspace>
+</CodeBlocks_workspace_file>

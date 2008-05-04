@@ -1,0 +1,27 @@
+/* XPM */
+static char *statusopen_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 5 1",
+". c Black",
+"X c #FFFFFF",
+"O c #999966",
+"  c None",
+"o c #D4BEDE",
+/* pixels */
+"                ",
+".........       ",
+".XXXXXXX.       ",
+".ooooooo.       ",
+".XXXXXXX.  .    ",
+".ooooooo. .O.   ",
+".XXXXXXX.  .O.  ",
+".oooooo......O. ",
+".XXXXXX.OOOOOOO.",
+".oooooo......O. ",
+".XXXXXXX.  .O.  ",
+".ooooooo. .O.   ",
+".XXXXXXX.  .    ",
+".ooooooo.       ",
+".........       ",
+"                "
+};

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="qspgui" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="../_release/qspgui" prefix_auto="0" extension_auto="0" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectResourceIncludeDirsRelation="0" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
+					<Add option="-O3" />
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+					<Add option="-D__WXGTK__" />
+					<Add option="-DNDEBUG" />
+					<Add directory="/home/byte/wx_qsp/_build_release/lib/wx/include/gtk2-ansi-release-static-2.9" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="../misc/linux_x86/libfmodexp.so" />
+					<Add option="../_release/libqsp.so" />
+					<Add library="wx_gtk2_aui-2.9" />
+					<Add library="wx_gtk2_html-2.9" />
+					<Add library="wx_gtk2_adv-2.9" />
+					<Add library="wx_gtk2_core-2.9" />
+					<Add library="wx_base-2.9" />
+					<Add library="jpeg" />
+					<Add library="tiff" />
+					<Add library="Xxf86vm" />
+					<Add library="SM" />
+					<Add library="pthread" />
+					<Add library="gthread-2.0" />
+					<Add library="gtk-x11-2.0" />
+				</Linker>
+			</Target>
+			<Target title="Release Unicode">
+				<Option output="../_release/qspgui" prefix_auto="0" extension_auto="0" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectResourceIncludeDirsRelation="0" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
+					<Add option="-O3" />
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+					<Add option="-D__WXGTK__" />
+					<Add option="-D_UNICODE" />
+					<Add option="-DNDEBUG" />
+					<Add directory="/home/byte/wx_qsp/_build_release_unicode/lib/wx/include/gtk2-unicode-release-static-2.9" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="../misc/linux_x86/libfmodexp.so" />
+					<Add option="../_release/libqsp.so" />
+					<Add library="wx_gtk2u_aui-2.9" />
+					<Add library="wx_gtk2u_html-2.9" />
+					<Add library="wx_gtk2u_adv-2.9" />
+					<Add library="wx_gtk2u_core-2.9" />
+					<Add library="wx_baseu-2.9" />
+					<Add library="jpeg" />
+					<Add library="tiff" />
+					<Add library="Xxf86vm" />
+					<Add library="SM" />
+					<Add library="pthread" />
+					<Add library="gthread-2.0" />
+					<Add library="gtk-x11-2.0" />
+				</Linker>
+			</Target>
+			<Target title="Debug">
+				<Option output="../_debug/qspgui" prefix_auto="0" extension_auto="0" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectResourceIncludeDirsRelation="0" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-D__WXGTK__" />
+					<Add option="-D_DEBUG" />
+					<Add directory="/home/byte/wx_qsp/_build_debug/lib/wx/include/gtk2-ansi-debug-static-2.9" />
+				</Compiler>
+				<Linker>
+					<Add option="../misc/linux_x86/libfmodexp.so" />
+					<Add option="../_debug/libqsp.so" />
+					<Add library="wx_gtk2d_aui-2.9" />
+					<Add library="wx_gtk2d_html-2.9" />
+					<Add library="wx_gtk2d_adv-2.9" />
+					<Add library="wx_gtk2d_core-2.9" />
+					<Add library="wx_based-2.9" />
+					<Add library="jpeg" />
+					<Add library="tiff" />
+					<Add library="Xxf86vm" />
+					<Add library="SM" />
+					<Add library="pthread" />
+					<Add library="gthread-2.0" />
+					<Add library="gtk-x11-2.0" />
+				</Linker>
+			</Target>
+			<Target title="Debug Unicode">
+				<Option output="../_debug/qspgui" prefix_auto="0" extension_auto="0" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectResourceIncludeDirsRelation="0" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-D__WXGTK__" />
+					<Add option="-D_UNICODE" />
+					<Add option="-D_DEBUG" />
+					<Add directory="/home/byte/wx_qsp/_build_debug_unicode/lib/wx/include/gtk2-unicode-debug-static-2.9" />
+				</Compiler>
+				<Linker>
+					<Add option="../misc/linux_x86/libfmodexp.so" />
+					<Add option="../_debug/libqsp.so" />
+					<Add library="wx_gtk2ud_aui-2.9" />
+					<Add library="wx_gtk2ud_html-2.9" />
+					<Add library="wx_gtk2ud_adv-2.9" />
+					<Add library="wx_gtk2ud_core-2.9" />
+					<Add library="wx_baseud-2.9" />
+					<Add library="jpeg" />
+					<Add library="tiff" />
+					<Add library="Xxf86vm" />
+					<Add library="SM" />
+					<Add library="pthread" />
+					<Add library="gthread-2.0" />
+					<Add library="gtk-x11-2.0" />
+				</Linker>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="Release;" />
+		</VirtualTargets>
+		<Unit filename="src/animwin.cpp" />
+		<Unit filename="src/animwin.h" />
+		<Unit filename="src/app.cpp" />
+		<Unit filename="src/app.h" />
+		<Unit filename="src/callbacks_gui.cpp" />
+		<Unit filename="src/callbacks_gui.h" />
+		<Unit filename="src/comtools.cpp" />
+		<Unit filename="src/comtools.h" />
+		<Unit filename="src/fmod.h" />
+		<Unit filename="src/fmod_codec.h" />
+		<Unit filename="src/fmod_dsp.h" />
+		<Unit filename="src/fmod_errors.h" />
+		<Unit filename="src/frame.cpp" />
+		<Unit filename="src/frame.h" />
+		<Unit filename="src/imgcanvas.cpp" />
+		<Unit filename="src/imgcanvas.h" />
+		<Unit filename="src/initevent.cpp" />
+		<Unit filename="src/initevent.h" />
+		<Unit filename="src/inputbox.cpp" />
+		<Unit filename="src/inputbox.h" />
+		<Unit filename="src/inputdlg.cpp" />
+		<Unit filename="src/inputdlg.h" />
+		<Unit filename="src/keyevent.cpp" />
+		<Unit filename="src/keyevent.h" />
+		<Unit filename="src/listbox.cpp" />
+		<Unit filename="src/listbox.h" />
+		<Unit filename="src/qsp.h" />
+		<Unit filename="src/textbox.cpp" />
+		<Unit filename="src/textbox.h" />
+		<Unit filename="src/transhelper.cpp" />
+		<Unit filename="src/transhelper.h" />
+		<Unit filename="src/wheelevent.cpp" />
+		<Unit filename="src/wheelevent.h" />
+		<Extensions>
+			<code_completion />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

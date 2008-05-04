@@ -1,0 +1,38 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qspgui", "qspgui\win32_qspgui.vcproj", "{40B3607A-EA2B-483F-8B4C-C9145A2F1903}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC} = {9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qsp", "qsp\win32_qsp.vcproj", "{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Unicode|Win32 = Debug Unicode|Win32
+		Debug|Win32 = Debug|Win32
+		Release Unicode|Win32 = Release Unicode|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40B3607A-EA2B-483F-8B4C-C9145A2F1903}.Debug Unicode|Win32.ActiveCfg = Debug Unicode|Win32
+		{40B3607A-EA2B-483F-8B4C-C9145A2F1903}.Debug Unicode|Win32.Build.0 = Debug Unicode|Win32
+		{40B3607A-EA2B-483F-8B4C-C9145A2F1903}.Debug|Win32.ActiveCfg = Debug|Win32
+		{40B3607A-EA2B-483F-8B4C-C9145A2F1903}.Debug|Win32.Build.0 = Debug|Win32
+		{40B3607A-EA2B-483F-8B4C-C9145A2F1903}.Release Unicode|Win32.ActiveCfg = Release Unicode|Win32
+		{40B3607A-EA2B-483F-8B4C-C9145A2F1903}.Release Unicode|Win32.Build.0 = Release Unicode|Win32
+		{40B3607A-EA2B-483F-8B4C-C9145A2F1903}.Release|Win32.ActiveCfg = Release|Win32
+		{40B3607A-EA2B-483F-8B4C-C9145A2F1903}.Release|Win32.Build.0 = Release|Win32
+		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}.Debug Unicode|Win32.ActiveCfg = Debug Unicode|Win32
+		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}.Debug Unicode|Win32.Build.0 = Debug Unicode|Win32
+		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}.Debug|Win32.Build.0 = Debug|Win32
+		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}.Release Unicode|Win32.ActiveCfg = Release Unicode|Win32
+		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}.Release Unicode|Win32.Build.0 = Release Unicode|Win32
+		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}.Release|Win32.ActiveCfg = Release|Win32
+		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
