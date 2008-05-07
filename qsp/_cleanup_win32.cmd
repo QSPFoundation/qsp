@@ -1,9 +1,9 @@
 rd /s /q _debug
 rd /s /q _release
-xcopy misc\win32 _debug /E /I
-xcopy misc\win32 _release /E /I
-xcopy misc\common _debug /E /I
-xcopy misc\common _release /E /I
+xcopy misc\win32 _debug /E /I /EXCLUDE:_excludes_win32.txt
+xcopy misc\win32 _release /E /I /EXCLUDE:_excludes_win32.txt
+xcopy misc\common _debug /E /I /EXCLUDE:_excludes_win32.txt
+xcopy misc\common _release /E /I /EXCLUDE:_excludes_win32.txt
 rem ---------------------------------
 rd /s /q qsp\.objs
 del qsp\win32_qsp.layout
