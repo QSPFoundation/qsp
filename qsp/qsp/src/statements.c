@@ -593,8 +593,7 @@ QSP_BOOL qspStatementGoTo(QSPVariant *args, long count, QSP_CHAR **jumpTo, char 
 QSP_BOOL qspStatementJump(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	free(*jumpTo);
-	*jumpTo = qspDelSpc(args[0].Str);
-	qspUpperStr(*jumpTo);
+	qspUpperStr(*jumpTo = qspDelSpc(args[0].Str));
 	return QSP_FALSE;
 }
 
@@ -650,16 +649,16 @@ QSP_BOOL qspStatementRefInt(QSPVariant *args, long count, QSP_CHAR **jumpTo, cha
 
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_CHAR *imgPath, *str, *str2;
-	long i, len, pos, pos2, varInd = qspVarIndex(args[0].Str, QSP_FALSE);
+	QSP_CHAR *imgPath, *str, *pos, *pos2, *endPos;
+	long i, varInd = qspVarIndex(args[0].Str, QSP_FALSE);
 	if (varInd < 0) return QSP_FALSE;
 	qspClearMenu(QSP_FALSE);
 	qspCallDeleteMenu();
 	for (i = 0; i < qspVars[varInd].ValsCount; ++i)
 	{
 		if (!((str = qspVars[varInd].TextValue[i]) && qspIsAnyString(str))) break;
-		pos2 = qspInStrRChar(str, QSP_MENUDELIM[0], -1);
-		if (pos2 < 0)
+		pos2 = qspInStrRChar(str, QSP_MENUDELIM[0], 0);
+		if (!pos2)
 		{
 			qspSetError(QSP_ERR_COLONNOTFOUND);
 			return QSP_FALSE;
@@ -669,30 +668,24 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 			qspSetError(QSP_ERR_CANTADDMENUITEM);
 			return QSP_FALSE;
 		}
-		len = (long)QSP_STRLEN(str);
+		endPos = qspStrEnd(str);
 		pos = qspInStrRChar(str, QSP_MENUDELIM[0], pos2);
-		if (pos < 0)
+		if (!pos)
 		{
 			pos = pos2;
-			pos2 = len;
+			pos2 = endPos;
 		}
-		qspCurMenuLocs[qspCurMenuItems++] = qspGetNewText(str + pos + 1, pos2 - pos - 1);
-		if (pos2 < len)
+		qspCurMenuLocs[qspCurMenuItems++] = qspGetNewText(pos + 1, (long)(pos2 - pos) - 1);
+		if (pos2 < endPos && qspIsAnyString(++pos2))
 		{
-			str2 = str + pos2 + 1;
-			if (qspIsAnyString(str2))
-			{
-				imgPath = qspGetNewText(qspQstPath, qspQstPathLen);
-				imgPath = qspGetAddText(imgPath, str2, qspQstPathLen, len - pos2 - 1);
-			}
-			else
-				imgPath = 0;
+			imgPath = qspGetNewText(qspQstPath, qspQstPathLen);
+			imgPath = qspGetAddText(imgPath, pos2, qspQstPathLen, (long)(endPos - pos2));
 		}
 		else
 			imgPath = 0;
-		str[pos] = 0;
+		*pos = 0;
 		qspCallAddMenuItem(str, imgPath);
-		str[pos] = QSP_MENUDELIM[0];
+		*pos = QSP_MENUDELIM[0];
 		if (imgPath) free(imgPath);
 	}
 	qspCallShowMenu();
@@ -735,8 +728,5 @@ QSP_BOOL qspStatementExec(QSPVariant *args, long count, QSP_CHAR **jumpTo, char 
 
 QSP_BOOL qspStatementDynamic(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_CHAR *jumpToFake = qspGetNewText(QSP_FMT(""), 0);
-	qspExecString(args[0].Str, &jumpToFake);
-	free(jumpToFake);
-	return QSP_FALSE;
+	return qspExecString(args[0].Str, jumpTo);
 }

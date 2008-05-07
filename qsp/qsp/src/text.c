@@ -108,8 +108,7 @@ QSP_CHAR *qspDelSpc(QSP_CHAR *s)
 
 QSP_BOOL qspIsAnyString(QSP_CHAR *s)
 {
-	QSP_CHAR *str = qspSkipSpaces(s);
-	return (*str != 0);
+	return (*qspSkipSpaces(s) != 0);
 }
 
 void qspLowerStr(QSP_CHAR *str)
@@ -130,17 +129,13 @@ QSP_BOOL qspIsEqual(QSP_CHAR *str1, QSP_CHAR *str2, long maxLen)
 	return (delta == 0);
 }
 
-long qspInStrRChar(QSP_CHAR *str, QSP_CHAR ch, long end)
+QSP_CHAR *qspInStrRChar(QSP_CHAR *str, QSP_CHAR ch, QSP_CHAR *end)
 {
-	QSP_CHAR *pos;
-	if (end < 0)
-		pos = qspStrEnd(str);
-	else if (end > 0)
-		pos = str + end - 1;
-	else
-		return -1;
-	while (pos != str && *pos != ch) --pos;
-	return (*pos == ch) ? (long)(pos - str) : -1;
+	if (!end) end = qspStrEnd(str);
+	if (end == str) return 0;
+	--end;
+	while (end != str && *end != ch) --end;
+	return (*end == ch) ? end : 0;
 }
 
 QSP_CHAR *qspJoinStrs(QSP_CHAR **s, long count, QSP_CHAR *delim)

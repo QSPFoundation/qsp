@@ -166,9 +166,8 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	FILE *f;
 	QSP_BOOL isOldFormat, isUCS2, isAddLoc;
 	long i, j, ind, fileSize, dataSize, crc, count, locsCount, actsCount, start, end;
-	char **strs, *buf;
-	QSP_CHAR *data;
-	char *file = qspFromQSPString(fileName);
+	QSP_CHAR *data, *delim;
+	char **strs, *buf, *file = qspFromQSPString(fileName);
 	if (!(f = fopen(file, "rb")))
 	{
 		qspSetError(QSP_ERR_FILENOTFOUND);
@@ -268,7 +267,8 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	else
 	{
 		qspQstFullPath = qspGetAddText(qspQstFullPath, fileName, 0, -1);
-		qspQstPathLen = qspInStrRChar(qspQstFullPath, QSP_PATHDELIM[0], -1) + 1;
+		delim = qspInStrRChar(qspQstFullPath, QSP_PATHDELIM[0], 0);
+		qspQstPathLen = delim ? (long)(delim - qspQstFullPath) + 1 : 0;
 		qspQstPath = qspGetAddText(qspQstPath, qspQstFullPath, 0, qspQstPathLen);
 		qspQstCRC = crc;
 	}

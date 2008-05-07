@@ -131,14 +131,15 @@ void qspInitMath()
 
 long qspGetNumber(QSP_CHAR **expr)
 {
-	QSP_CHAR buf[11];
 	long i = 0;
-	while (QSP_ISDIGIT(**expr))
+	QSP_CHAR buf[11], *pos = *expr;
+	while (QSP_ISDIGIT(*pos))
 	{
-		if (i < QSP_LEN(buf)) buf[i] = **expr;
+		if (i < QSP_LEN(buf)) buf[i] = *pos;
 		++i;
-		++(*expr);
+		++pos;
 	}
+	*expr = pos;
 	if (i > QSP_LEN(buf)) return LONG_MAX;
 	buf[i] = 0;
 	return qspStrToNum(buf, 0);
