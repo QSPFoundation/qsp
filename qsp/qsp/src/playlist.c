@@ -38,30 +38,28 @@ void qspPlayFile(QSP_CHAR *s, long volume, QSP_BOOL isAddToPlayList)
 	}
 }
 
-long qspSearchPlayList(QSP_CHAR *file)
+QSP_CHAR *qspSearchPlayList(QSP_CHAR *file)
 {
 	QSP_CHAR *uName, *playList, *pos;
-	long length;
-	if (!qspPlayListLen) return -1;
-	length = (long)QSP_STRLEN(file);
-	qspUpperStr(uName = qspGetNewText(file, length));
+	long len = (long)QSP_STRLEN(file);
+	qspUpperStr(uName = qspGetNewText(file, len));
 	qspUpperStr(playList = qspGetNewText(qspPlayList, qspPlayListLen));
 	pos = QSP_STRSTR(playList, uName);
 	while (pos)
 	{
-		if ((pos == playList || *(pos - 1) == QSP_PLFILEDELIM[0]) && pos[length] == QSP_PLVOLUMEDELIM[0])
+		if ((pos == playList || *(pos - 1) == QSP_PLFILEDELIM[0]) && pos[len] == QSP_PLVOLUMEDELIM[0])
 			break;
 		pos = QSP_STRSTR(QSP_STRCHR(pos + 1, QSP_PLFILEDELIM[0]) + 1, uName);
 	}
 	free(playList);
 	free(uName);
-	return pos ? (long)(pos - playList) : -1;
+	return pos ? (pos - playList + qspPlayList) : 0;
 }
 
 void qspPlayPLFiles()
 {
-	QSP_CHAR **s, *str, *pos;
-	long i, count, volume;
+	long i, count;
+	QSP_CHAR **s, *pos;
 	if (!qspPlayListLen) return;
 	count = qspSplitStr(qspPlayList, QSP_PLFILEDELIM, &s);
 	for (i = 0; i < count; ++i)
@@ -69,16 +67,12 @@ void qspPlayPLFiles()
 		pos = QSP_STRCHR(s[i], QSP_PLVOLUMEDELIM[0]);
 		if (pos)
 		{
-			volume = qspStrToNum(pos + 1, 0);
-			str = qspGetNewText(s[i], (long)(pos - s[i]));
+			*pos = 0;
+			qspPlayFile(s[i], qspStrToNum(pos + 1, 0), QSP_FALSE);
+			*pos = QSP_PLVOLUMEDELIM[0];
 		}
 		else
-		{
-			volume = 100;
-			str = qspGetNewText(s[i], -1);
-		}
-		qspPlayFile(str, volume, QSP_FALSE);
-		free(str);
+			qspPlayFile(s[i], 100, QSP_FALSE);
 		free(s[i]);
 	}
 	free(s);
@@ -100,7 +94,7 @@ void qspRefreshPlayList()
 		{
 			file = qspGetNewText(qspQstPath, qspQstPathLen);
 			file = qspGetAddText(file, str, qspQstPathLen, len);
-			if (qspSearchPlayList(str) < 0 && qspCallIsPlayingFile(file))
+			if (!qspSearchPlayList(str) && qspCallIsPlayingFile(file))
 			{
 				qspPlayListLen = qspAddText(&qspPlayList, s[i], qspPlayListLen, -1, QSP_FALSE);
 				qspPlayListLen = qspAddText(&qspPlayList, QSP_PLFILEDELIM, qspPlayListLen, 1, QSP_FALSE);
@@ -122,13 +116,13 @@ QSP_BOOL qspStatementPlayFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 
 QSP_BOOL qspStatementCloseFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long pos;
-	QSP_CHAR *temp, *end;
+	long len;
+	QSP_CHAR *temp, *end, *pos;
 	if (!qspPlayListLen) return QSP_FALSE;
 	if (count == 1 && qspIsAnyString(args[0].Str))
 	{
 		pos = qspSearchPlayList(args[0].Str);
-		if (pos >= 0)
+		if (pos)
 		{
 			temp = qspGetNewText(qspQstPath, qspQstPathLen);
 			temp = qspGetAddText(temp, args[0].Str, qspQstPathLen, -1);
@@ -136,13 +130,14 @@ QSP_BOOL qspStatementCloseFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 			free(temp);
 			do
 			{
-				end = QSP_STRCHR(qspPlayList + pos + 1, QSP_PLFILEDELIM[0]);
-				temp = qspGetNewText(qspPlayList, pos);
-				qspPlayListLen = qspAddText(&temp, end + 1, pos, qspPlayListLen - (long)(end - qspPlayList) - 1, QSP_FALSE);
+				end = QSP_STRCHR(pos + 1, QSP_PLFILEDELIM[0]);
+				len = (long)(pos - qspPlayList);
+				temp = qspGetNewText(qspPlayList, len);
+				qspPlayListLen = qspAddText(&temp, end + 1, len, qspPlayListLen - (long)(end - qspPlayList) - 1, QSP_FALSE);
 				free(qspPlayList);
 				qspPlayList = temp;
 				pos = qspSearchPlayList(args[0].Str);
-			} while (pos >= 0);
+			} while (pos);
 		}
 	}
 	else
