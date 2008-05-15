@@ -228,17 +228,18 @@ long qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 void qspSetVarValueByIndex(long varIndex, long ind, QSPVariant val, QSP_BOOL isToString)
 {
 	QSP_BOOL convErr = QSP_FALSE;
-	long i, count, oldCount = qspVars[varIndex].ValsCount;
+	long count, oldCount = qspVars[varIndex].ValsCount;
 	if (ind >= oldCount)
 	{
 		count = ind + 1;
 		qspVars[varIndex].ValsCount = count;
 		qspVars[varIndex].Value = (long *)realloc(qspVars[varIndex].Value, count * sizeof(long));
 		qspVars[varIndex].TextValue = (QSP_CHAR **)realloc(qspVars[varIndex].TextValue, count * sizeof(QSP_CHAR *));
-		for (i = oldCount; i < count; ++i)
+		while (oldCount < count)
 		{
-			qspVars[varIndex].Value[i] = 0;
-			qspVars[varIndex].TextValue[i] = 0;
+			qspVars[varIndex].Value[oldCount] = 0;
+			qspVars[varIndex].TextValue[oldCount] = 0;
+			++oldCount;
 		}
 	}
 	val = qspConvertVariantTo(val, isToString, QSP_FALSE, &convErr);
@@ -298,7 +299,7 @@ QSPVariant qspGetVar(QSP_CHAR *name)
 
 long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 {
-	long i, count, varInd, num;
+	long count, varInd, num;
 	QSP_CHAR emptyStr[1], *str;
 	OnigUChar *tempBeg, *tempEnd;
 	regex_t *onigExp;
@@ -329,13 +330,13 @@ long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 		}
 	}
 	*emptyStr = 0;
-	i = start >= 0 ? start : 0;
+	if (start < 0) start = 0;
 	count = qspVars[varInd].ValsCount;
-	while (i <= count)
+	while (start <= count)
 	{
 		if (val.IsStr)
 		{
-			if (!(i < count && (str = qspVars[varInd].TextValue[i]))) str = emptyStr;
+			if (!(start < count && (str = qspVars[varInd].TextValue[start]))) str = emptyStr;
 			if (isRegExp)
 			{
 				onigReg = onig_region_new();
@@ -346,22 +347,22 @@ long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 					free(val.Str);
 					onig_region_free(onigReg, 1);
 					onig_free(onigExp);
-					return i;
+					return start;
 				}
 				onig_region_free(onigReg, 1);
 			}
 			else if (!QSP_STRCMP(str, val.Str))
 			{
 				free(val.Str);
-				return i;
+				return start;
 			}
 		}
 		else
 		{
-			num = (i < count ? qspVars[varInd].Value[i] : 0);
-			if (num == val.Num) return i;
+			num = (start < count ? qspVars[varInd].Value[start] : 0);
+			if (num == val.Num) return start;
 		}
-		++i;
+		++start;
 	}
 	if (val.IsStr) free(val.Str);
 	if (isRegExp) onig_free(onigExp);
@@ -398,7 +399,7 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 QSP_BOOL qspStatementCopyArr(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSP_CHAR *str;
-	long i, arrInd1, arrInd2, itemsCount;
+	long arrInd1, arrInd2, itemsCount;
 	/* Get index of the first array */
 	str = qspDelSpc(args[0].Str);
 	arrInd1 = qspVarIndex(str, QSP_TRUE);
@@ -417,11 +418,11 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 	{
 		qspVars[arrInd1].Value = (long *)malloc(itemsCount * sizeof(long));
 		qspVars[arrInd1].TextValue = (QSP_CHAR **)malloc(itemsCount * sizeof(QSP_CHAR *));
-		for (i = 0; i < itemsCount; ++i)
+		while (--itemsCount >= 0)
 		{
-			qspVars[arrInd1].Value[i] = qspVars[arrInd2].Value[i];
-			str = qspVars[arrInd2].TextValue[i];
-			qspVars[arrInd1].TextValue[i] = str ? qspGetNewText(str, -1) : 0;
+			qspVars[arrInd1].Value[itemsCount] = qspVars[arrInd2].Value[itemsCount];
+			str = qspVars[arrInd2].TextValue[itemsCount];
+			qspVars[arrInd1].TextValue[itemsCount] = str ? qspGetNewText(str, -1) : 0;
 		}
 	}
 	else

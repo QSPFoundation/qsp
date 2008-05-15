@@ -196,12 +196,13 @@ long qspSplitStr(QSP_CHAR *str, QSP_CHAR *delim, QSP_CHAR ***res)
 
 void qspCopyStrs(QSP_CHAR ***dest, QSP_CHAR **src, long start, long end)
 {
-	long i, j, count = end - start;
+	long i, count = end - start;
 	if (src && count)
 	{
 		*dest = (QSP_CHAR **)malloc(count * sizeof(QSP_CHAR *));
-		for (i = start, j = 0; i < end; ++i, ++j)
-			qspAddText(*dest + j, src[i], 0, -1, QSP_TRUE);
+		i = 0;
+		while (start < end)
+			qspAddText(*dest + i++, src[start++], 0, -1, QSP_TRUE);
 	}
 	else
 		*dest = 0;
@@ -209,16 +210,15 @@ void qspCopyStrs(QSP_CHAR ***dest, QSP_CHAR **src, long start, long end)
 
 void qspFreeStrs(void **strs, long count, QSP_BOOL isVerify)
 {
-	long i;
 	if (strs)
 	{
 		if (isVerify)
 		{
-			for (i = 0; i < count; ++i)
-				if (strs[i]) free(strs[i]);
+			while (--count >= 0)
+				if (strs[count]) free(strs[count]);
 		}
 		else
-			for (i = 0; i < count; ++i) free(strs[i]);
+			while (--count >= 0) free(strs[count]);
 		free(strs);
 	}
 }
@@ -264,7 +264,7 @@ QSP_CHAR *qspNumToStr(QSP_CHAR *buf, long val)
 
 QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 {
-	QSP_BOOL isQuot, isBreak;
+	QSP_BOOL isLastDelim;
 	long strLen, c1, c2;
 	QSP_CHAR quot, *txtEnd, *pos = QSP_STRSTR(txt, str);
 	if (!pos) return 0;
@@ -272,6 +272,7 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 	strLen = (long)QSP_STRLEN(str);
 	txtEnd = qspStrEnd(txt) - strLen + 1;
 	c1 = c2 = 0;
+	isLastDelim = QSP_TRUE;
 	while (txt < txtEnd)
 	{
 		if (qspIsInList(QSP_QUOTS, *txt))
@@ -279,11 +280,9 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 			quot = *txt;
 			while (++txt < txtEnd)
 				if (*txt == quot && *(++txt) != quot) break;
-			if (txt == txtEnd) return 0;
-			isQuot = QSP_TRUE;
+			if (txt >= txtEnd) return 0;
+			isLastDelim = QSP_TRUE;
 		}
-		else
-			isQuot = QSP_FALSE;
 		if (*txt == QSP_LRBRACK[0])
 			++c1;
 		else if (*txt == QSP_RRBRACK[0])
@@ -296,21 +295,12 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 		{
 			if (isIsolated)
 			{
-				if (isQuot || qspIsInList(QSP_DELIMS, *txt))
+				if (qspIsInList(QSP_DELIMS, *txt))
+					isLastDelim = QSP_TRUE;
+				else if (isLastDelim)
 				{
-					isBreak = QSP_FALSE;
-					while (txt < txtEnd && qspIsInList(QSP_DELIMS, *txt))
-					{
-						if (qspIsInList(QSP_QUOTS QSP_LRBRACK QSP_LSBRACK, *txt))
-						{
-							isBreak = QSP_TRUE;
-							break;
-						}
-						++txt;
-					}
-					if (isBreak) continue;
-					if (txt == txtEnd) return 0;
 					if (qspIsInListEOL(QSP_DELIMS, txt[strLen]) && qspIsEqual(txt, str, strLen)) return txt;
+					isLastDelim = QSP_FALSE;
 				}
 			}
 			else if (qspIsEqual(txt, str, strLen))

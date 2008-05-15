@@ -164,76 +164,73 @@ long qspGetStatCode(QSP_CHAR *s, QSP_CHAR **pos)
 
 long qspSearchElse(QSP_CHAR **s, long start, long end)
 {
-	long i, statCode, c = 1;
-	for (i = start; i < end; ++i)
+	long c = 1;
+	while (start < end)
 	{
-		statCode = qspGetStatCode(s[i], 0);
-		switch (statCode)
+		switch (qspGetStatCode(s[start], 0))
 		{
 		case qspStatAct:
 		case qspStatIf:
-			if (*(qspStrEnd(s[i]) - 1) == QSP_COLONDELIM[0]) ++c;
+			if (*(qspStrEnd(s[start]) - 1) == QSP_COLONDELIM[0]) ++c;
+			break;
+		case qspStatElse:
+			if (c == 1) return start;
 			break;
 		case qspStatEnd:
-			--c;
+			if (!(--c)) return -1;
 			break;
 		}
-		switch (c)
-		{
-		case 1:
-			if (statCode == qspStatElse) return i;
-			break;
-		case 0:
-			return -1;
-		}
+		++start;
 	}
 	return -1;
 }
 
 long qspSearchEnd(QSP_CHAR **s, long start, long end)
 {
-	long i, c = 1;
-	for (i = start; i < end; ++i)
+	long c = 1;
+	while (start < end)
 	{
-		switch (qspGetStatCode(s[i], 0))
+		switch (qspGetStatCode(s[start], 0))
 		{
 		case qspStatAct:
 		case qspStatIf:
-			if (*(qspStrEnd(s[i]) - 1) == QSP_COLONDELIM[0]) ++c;
+			if (*(qspStrEnd(s[start]) - 1) == QSP_COLONDELIM[0]) ++c;
 			break;
 		case qspStatEnd:
-			--c;
+			if (!(--c)) return start;
 			break;
 		}
-		if (!c) return i;
+		++start;
 	}
 	return -1;
 }
 
 long qspSearchLabel(QSP_CHAR **s, long start, long end, QSP_CHAR *str)
 {
-	long i;
 	QSP_CHAR *buf, *pos;
-	for (i = start; i < end; ++i)
-		if (*s[i] == QSP_LABEL[0])
+	while (start < end)
+	{
+		if (*s[start] == QSP_LABEL[0])
 		{
-			pos = QSP_STRCHR(s[i], QSP_STATDELIM[0]);
+			pos = QSP_STRCHR(s[start], QSP_STATDELIM[0]);
 			if (pos)
 			{
 				*pos = 0;
-				buf = qspDelSpc(s[i] + 1);
+				buf = qspDelSpc(s[start] + 1);
 				*pos = QSP_STATDELIM[0];
 			}
 			else
-				buf = qspDelSpc(s[i] + 1);
+				buf = qspDelSpc(s[start] + 1);
 			qspUpperStr(buf);
 			if (!QSP_STRCMP(buf, str))
 			{
 				free(buf);
-				return i;
+				return start;
 			}
 			free(buf);
 		}
+		++start;
+	}
 	return -1;
 }
 

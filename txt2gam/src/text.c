@@ -82,16 +82,15 @@ QSP_BOOL qspIsEqual(QSP_CHAR *str1, QSP_CHAR *str2, long maxLen)
 
 void qspFreeStrs(void **strs, long count, QSP_BOOL isVerify)
 {
-	long i;
 	if (strs)
 	{
 		if (isVerify)
 		{
-			for (i = 0; i < count; ++i)
-				if (strs[i]) free(strs[i]);
+			while (--count >= 0)
+				if (strs[count]) free(strs[count]);
 		}
 		else
-			for (i = 0; i < count; ++i) free(strs[i]);
+			while (--count >= 0) free(strs[count]);
 		free(strs);
 	}
 }

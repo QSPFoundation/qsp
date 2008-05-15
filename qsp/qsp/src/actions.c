@@ -132,14 +132,18 @@ void qspStatementAddAct(QSP_CHAR *s)
 
 QSP_BOOL qspStatementDelAct(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long i, actInd = qspActIndex(args[0].Str);
+	long actInd = qspActIndex(args[0].Str);
 	if (actInd < 0) return QSP_FALSE;
 	if (qspCurSelAction >= actInd) qspCurSelAction = -1;
 	if (qspCurActions[actInd].Image) free(qspCurActions[actInd].Image);
 	free(qspCurActions[actInd].Desc);
 	qspFreeStrs(qspCurActions[actInd].OnPressLines, qspCurActions[actInd].OnPressLinesCount, QSP_FALSE);
 	--qspCurActionsCount;
-	for (i = actInd; i < qspCurActionsCount; ++i) qspCurActions[i] = qspCurActions[i + 1];
+	while (actInd < qspCurActionsCount)
+	{
+		qspCurActions[actInd] = qspCurActions[actInd + 1];
+		++actInd;
+	}
 	qspIsActionsChanged = QSP_TRUE;
 	return QSP_FALSE;
 }

@@ -76,77 +76,73 @@ char qspReverseConvertUC(wchar_t ch, wchar_t *table)
 
 QSP_CHAR *qspCodeReCode(QSP_CHAR *str, QSP_BOOL isCode)
 {
-	long i, offset, lStr = (long)QSP_STRLEN(str);
-	QSP_CHAR *buf = (QSP_CHAR *)malloc((lStr + 1) * sizeof(QSP_CHAR));
+	long offset, len = (long)QSP_STRLEN(str);
+	QSP_CHAR *buf = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
 	offset = isCode ? -QSP_CODREMOV : QSP_CODREMOV;
-	for (i = 0; i < lStr; ++i)
-		buf[i] = (QSP_CHAR)(str[i] + offset);
-	buf[lStr] = 0;
+	buf[len] = 0;
+	while (--len >= 0)
+		buf[len] = (QSP_CHAR)(str[len] + offset);
 	return buf;
 }
 
 char *qspFromQSPString(QSP_CHAR *s)
 {
-	char *ret;
 	long len = (long)QSP_WCSTOMBSLEN(s) + 1;
-	ret = (char *)malloc(len);
+	char *ret = (char *)malloc(len);
 	QSP_WCSTOMBS(ret, s, len);
 	return ret;
 }
 
 QSP_CHAR *qspToQSPString(char *s)
 {
-	QSP_CHAR *ret;
-	long i, len = (long)strlen(s);
-	ret = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
-	for (i = 0; i < len; ++i)
-		ret[i] = QSP_TO_OS_CHAR(s[i]);
+	long len = (long)strlen(s);
+	QSP_CHAR *ret = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
 	ret[len] = 0;
+	while (--len >= 0)
+		ret[len] = QSP_TO_OS_CHAR(s[len]);
 	return ret;
 }
 
 char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 {
-	char *ret;
 	unsigned short *ptr;
-	long i, len, offset = isCode ? -QSP_CODREMOV : 0;
-	len = (long)QSP_STRLEN(s);
-	ret = (char *)malloc((len + 1) * (isUCS2 ? 2 : 1));
+	long offset, len = (long)QSP_STRLEN(s);
+	char *ret = (char *)malloc((len + 1) * (isUCS2 ? 2 : 1));
+	offset = isCode ? -QSP_CODREMOV : 0;
 	if (isUCS2)
 	{
 		ptr = (unsigned short *)ret;
-		for (i = 0; i < len; ++i)
-			ptr[i] = (unsigned short)(QSP_BTOWC(s[i]) + offset);
 		ptr[len] = 0;
+		while (--len >= 0)
+			ptr[len] = (unsigned short)(QSP_BTOWC(s[len]) + offset);
 	}
 	else
 	{
-		for (i = 0; i < len; ++i)
-			ret[i] = (char)(QSP_FROM_OS_CHAR(s[i]) + offset);
 		ret[len] = 0;
+		while (--len >= 0)
+			ret[len] = (char)(QSP_FROM_OS_CHAR(s[len]) + offset);
 	}
 	return ret;
 }
 
 QSP_CHAR *qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded)
 {
-	QSP_CHAR *ret;
 	unsigned short *ptr;
-	long i, len, offset = isCoded ? QSP_CODREMOV : 0;
-	len = isUCS2 ? qspUCS2StrLen(s) : (long)strlen(s);
-	ret = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
+	long offset, len = isUCS2 ? qspUCS2StrLen(s) : (long)strlen(s);
+	QSP_CHAR *ret = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
+	offset = isCoded ? QSP_CODREMOV : 0;
+	ret[len] = 0;
 	if (isUCS2)
 	{
 		ptr = (unsigned short *)s;
-		for (i = 0; i < len; ++i)
-			ret[i] = QSP_WCTOB((wchar_t)(ptr[i] + offset));
+		while (--len >= 0)
+			ret[len] = QSP_WCTOB((wchar_t)(ptr[len] + offset));
 	}
 	else
 	{
-		for (i = 0; i < len; ++i)
-			ret[i] = QSP_TO_OS_CHAR((char)(s[i] + offset));
+		while (--len >= 0)
+			ret[len] = QSP_TO_OS_CHAR((char)(s[len] + offset));
 	}
-	ret[len] = 0;
 	return ret;
 }
 
@@ -190,10 +186,9 @@ long qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSP_CHAR *delim, char ***res)
 
 long qspAddGameText(char **dest, char *val, QSP_BOOL isUCS2, long destLen, long valLen, QSP_BOOL isCreate)
 {
-	long charSize, ret;
 	char *destPtr;
 	unsigned short *destUCS2, *valUCS2;
-	charSize = isUCS2 ? 2 : 1;
+	long ret, charSize = isUCS2 ? 2 : 1;
 	if (valLen < 0) valLen = isUCS2 ? qspUCS2StrLen(val) : (long)strlen(val);
 	if (!isCreate && *dest)
 	{

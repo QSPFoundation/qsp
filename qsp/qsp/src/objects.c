@@ -88,13 +88,17 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 
 QSP_BOOL qspStatementDelObj(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long i, objInd = qspObjIndex(args[0].Str);
+	long objInd = qspObjIndex(args[0].Str);
 	if (objInd < 0) return QSP_FALSE;
 	if (qspCurSelObject >= objInd) qspCurSelObject = -1;
 	if (qspCurObjects[objInd].Image) free(qspCurObjects[objInd].Image);
 	free(qspCurObjects[objInd].Desc);
 	--qspCurObjectsCount;
-	for (i = objInd; i < qspCurObjectsCount; ++i) qspCurObjects[i] = qspCurObjects[i + 1];
+	while (objInd < qspCurObjectsCount)
+	{
+		qspCurObjects[objInd] = qspCurObjects[objInd + 1];
+		++objInd;
+	}
 	qspIsObjectsChanged = QSP_TRUE;
 	return QSP_FALSE;
 }

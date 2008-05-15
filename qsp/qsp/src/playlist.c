@@ -80,29 +80,29 @@ void qspPlayPLFiles()
 
 void qspRefreshPlayList()
 {
-	long i, count, len;
+	long count, len;
 	QSP_CHAR **s, *file, *str, *pos;
 	if (!qspPlayListLen) return;
 	count = qspSplitStr(qspPlayList, QSP_PLFILEDELIM, &s);
 	qspClearText(&qspPlayList, &qspPlayListLen);
-	for (i = count - 1; i >= 0; --i)
+	while (--count >= 0)
 	{
-		pos = QSP_STRCHR(s[i], QSP_PLVOLUMEDELIM[0]);
-		len = (long)(pos ? (pos - s[i]) : QSP_STRLEN(s[i]));
-		str = qspGetNewText(s[i], len);
+		pos = QSP_STRCHR(s[count], QSP_PLVOLUMEDELIM[0]);
+		len = (long)(pos ? (pos - s[count]) : QSP_STRLEN(s[count]));
+		str = qspGetNewText(s[count], len);
 		if (qspIsAnyString(str))
 		{
 			file = qspGetNewText(qspQstPath, qspQstPathLen);
 			file = qspGetAddText(file, str, qspQstPathLen, len);
 			if (!qspSearchPlayList(str) && qspCallIsPlayingFile(file))
 			{
-				qspPlayListLen = qspAddText(&qspPlayList, s[i], qspPlayListLen, -1, QSP_FALSE);
+				qspPlayListLen = qspAddText(&qspPlayList, s[count], qspPlayListLen, -1, QSP_FALSE);
 				qspPlayListLen = qspAddText(&qspPlayList, QSP_PLFILEDELIM, qspPlayListLen, 1, QSP_FALSE);
 			}
 			free(file);
 		}
 		free(str);
-		free(s[i]);
+		free(s[count]);
 	}
 	free(s);
 }
