@@ -19,6 +19,7 @@
 
 long qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isFill)
 {
+	char *name;
 	QSP_CHAR *locCode, *line, *pos, quot = 0;
 	long bufSize, codeLen, curLoc = 0;
 	QSP_BOOL isInLoc = QSP_FALSE;
@@ -97,6 +98,9 @@ long qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isF
 					}
 					else
 						qspLocs[curLoc].Name = qspDelSpc(line);
+					name = qspFromQSPString(qspLocs[curLoc].Name);
+					printf("Location: %s\n", name);
+					free(name);
 					codeLen = 0;
 					bufSize = 512;
 					locCode = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
