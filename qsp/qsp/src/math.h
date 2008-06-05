@@ -84,6 +84,7 @@
 		qspOpIsPlay,
 		qspOpDesc,
 		qspOpTrim,
+		qspOpGetObj,
 		qspOpStrComp,
 		qspOpStrFind,
 		qspOpStrPos,

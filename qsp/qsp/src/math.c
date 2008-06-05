@@ -28,6 +28,7 @@ void qspFunctionMid(QSPVariant *, long, QSPVariant *);
 void qspFunctionRand(QSPVariant *, long, QSPVariant *);
 void qspFunctionInput(QSPVariant *, long, QSPVariant *);
 void qspFunctionDesc(QSPVariant *, long, QSPVariant *);
+void qspFunctionGetObj(QSPVariant *, long, QSPVariant *);
 void qspFunctionIsPlay(QSPVariant *, long, QSPVariant *);
 void qspFunctionInstr(QSPVariant *, long, QSPVariant *);
 
@@ -119,6 +120,7 @@ void qspInitMath()
 	qspAddOperation(qspOpIsPlay, QSP_FMT("ISPLAY"), 0, 30, qspFunctionIsPlay, 2, 1, 1, 1);
 	qspAddOperation(qspOpDesc, QSP_FMT("DESC"), QSP_STRCHAR QSP_FMT("DESC"), 30, qspFunctionDesc, 1, 1, 1, 1);
 	qspAddOperation(qspOpTrim, QSP_FMT("TRIM"), QSP_STRCHAR QSP_FMT("TRIM"), 30, 0, 1, 1, 1, 1);
+	qspAddOperation(qspOpGetObj, QSP_FMT("GETOBJ"), QSP_STRCHAR QSP_FMT("GETOBJ"), 30, qspFunctionGetObj, 1, 1, 1, 2);
 	qspAddOperation(qspOpStrComp, QSP_FMT("STRCOMP"), 0, 30, qspFunctionStrComp, 2, 2, 2, 1, 1);
 	qspAddOperation(qspOpStrFind, QSP_FMT("STRFIND"), QSP_STRCHAR QSP_FMT("STRFIND"), 30, qspFunctionStrFind, 1, 3, 3, 1, 1, 2);
 	qspAddOperation(qspOpStrPos, QSP_FMT("STRPOS"), 0, 30, qspFunctionStrPos, 2, 3, 3, 1, 1, 2);
@@ -794,6 +796,18 @@ void qspFunctionDesc(QSPVariant *args, long count, QSPVariant *tos)
 	desc = qspFormatText(qspLocs[index].Desc);
 	if (qspErrorNum) return;
 	tos->Str = desc;
+}
+
+void qspFunctionGetObj(QSPVariant *args, long count, QSPVariant *tos)
+{
+	long ind = args[0].Num;
+	if (ind <= qspCurObjectsCount)
+	{
+		if (ind < 1) ind = 1;
+		tos->Str = qspGetNewText(qspCurObjects[ind - 1].Desc, -1);
+	}
+	else
+		tos->Str = qspGetNewText(QSP_FMT(""), 0);
 }
 
 void qspFunctionIsPlay(QSPVariant *args, long count, QSPVariant *tos)

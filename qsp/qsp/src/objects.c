@@ -83,6 +83,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 	obj->Image = imgPath;
 	obj->Desc = qspGetNewText(args[0].Str, -1);
 	qspIsObjectsChanged = QSP_TRUE;
+	qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONOBJADD"));
 	return QSP_FALSE;
 }
 
