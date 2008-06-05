@@ -751,11 +751,11 @@ void qspFunctionRGB(QSPVariant *args, long count, QSPVariant *tos)
 
 void qspFunctionMid(QSPVariant *args, long count, QSPVariant *tos)
 {
-	long len, beg = args[1].Num;
-	if (beg < 1) beg = 1;
+	long len, beg = args[1].Num - 1;
+	if (beg < 0) beg = 0;
 	len = (long)QSP_STRLEN(args[0].Str);
-	if (beg <= len && (count == 2 || args[2].Num > 0))
-		tos->Str = qspGetNewText(args[0].Str + beg - 1, count == 3 ? args[2].Num : len - beg + 1);
+	if (beg < len && (count == 2 || args[2].Num > 0))
+		tos->Str = qspGetNewText(args[0].Str + beg, count == 3 ? args[2].Num : len - beg);
 	else
 		tos->Str = qspGetNewText(QSP_FMT(""), 0);
 }
@@ -797,10 +797,10 @@ void qspFunctionDesc(QSPVariant *args, long count, QSPVariant *tos)
 
 void qspFunctionGetObj(QSPVariant *args, long count, QSPVariant *tos)
 {
-	long ind = args[0].Num;
-	if (ind < 1) ind = 1;
-	if (ind <= qspCurObjectsCount)
-		tos->Str = qspGetNewText(qspCurObjects[ind - 1].Desc, -1);
+	long ind = args[0].Num - 1;
+	if (ind < 0) ind = 0;
+	if (ind < qspCurObjectsCount)
+		tos->Str = qspGetNewText(qspCurObjects[ind].Desc, -1);
 	else
 		tos->Str = qspGetNewText(QSP_FMT(""), 0);
 }
@@ -822,11 +822,11 @@ void qspFunctionIsPlay(QSPVariant *args, long count, QSPVariant *tos)
 void qspFunctionInstr(QSPVariant *args, long count, QSPVariant *tos)
 {
 	QSP_CHAR *pos;
-	long beg = args[0].Num;
-	if (beg < 1) beg = 1;
-	if (beg <= (long)QSP_STRLEN(args[1].Str))
+	long beg = args[0].Num - 1;
+	if (beg < 0) beg = 0;
+	if (beg < (long)QSP_STRLEN(args[1].Str))
 	{
-		pos = QSP_STRSTR(args[1].Str + beg - 1, args[2].Str);
+		pos = QSP_STRSTR(args[1].Str + beg, args[2].Str);
 		tos->Num = pos ? (long)(pos - args[1].Str) + 1 : 0;
 	}
 	else
