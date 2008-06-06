@@ -292,7 +292,6 @@ QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	QSP_CHAR *pos, *paramPos;
 	s = qspSkipSpaces(s);
 	if (!(*s)) return QSP_FALSE;
-	oldRefreshCount = qspRefreshCount;
 	pos = qspStrPos(s, QSP_STATDELIM, QSP_FALSE);
 	statCode = qspGetStatCode(s, &paramPos);
 	if (pos)
@@ -304,6 +303,7 @@ QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
 		case qspStatIf:
 			break;
 		default:
+			oldRefreshCount = qspRefreshCount;
 			*pos = 0;
 			isExit = qspExecString(s, jumpTo);
 			*pos = QSP_STATDELIM[0];
@@ -543,16 +543,16 @@ QSP_BOOL qspStatementClear(QSPVariant *args, long count, QSP_CHAR **jumpTo, char
 		qspCallSetInputStrText(0);
 		break;
 	case 5:
-		qspClearObjects(QSP_FALSE);
+		qspClearObjectsWithNotify();
 		break;
 	case 6:
 		qspClearVars(QSP_FALSE);
 		qspInitVars();
 		break;
 	case 7:
-		qspClearObjects(QSP_FALSE);
 		qspClearVars(QSP_FALSE);
 		qspInitVars();
+		qspClearObjectsWithNotify();
 		break;
 	case 8:
 		qspClearIncludes(QSP_FALSE);

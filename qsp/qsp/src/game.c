@@ -277,7 +277,7 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 void qspSaveGameStatus(QSP_CHAR *fileName)
 {
 	FILE *f;
-	long i, j, len;
+	long i, j, len, oldRefreshCount;
 	QSP_CHAR *temp, *buf;
 	char *file = qspFromQSPString(fileName);
 	if (!(f = fopen(file, "wb")))
@@ -287,8 +287,9 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 		return;
 	}
 	free(file);
+	oldRefreshCount = qspRefreshCount;
 	qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONGSAVE"));
-	if (qspErrorNum)
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
 		fclose(f);
 		return;

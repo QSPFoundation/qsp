@@ -337,6 +337,7 @@
 	QSPVariant qspExprValue(QSP_CHAR *);
 	/* ---------------------------------------------------------------- objects.c */
 	void qspClearObjects(QSP_BOOL);
+	void qspClearObjectsWithNotify();
 	long qspObjIndex(QSP_CHAR *);
 	/* -- */
 	QSP_BOOL qspStatementAddObject(QSPVariant *, long, QSP_CHAR **, char);
@@ -379,6 +380,7 @@
 	void qspClearVars(QSP_BOOL);
 	void qspInitVars();
 	long qspVarIndex(QSP_CHAR *, QSP_BOOL);
+	void qspSetVarValueByIndex(long, long, QSPVariant, QSP_BOOL);
 	QSPVariant qspGetVarValueByName(QSP_CHAR *);
 	QSPVariant qspGetVar(QSP_CHAR *);
 	long qspArrayPos(QSP_CHAR *, long, QSPVariant, QSP_BOOL);

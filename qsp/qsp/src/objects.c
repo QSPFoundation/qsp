@@ -33,6 +33,37 @@ void qspClearObjects(QSP_BOOL isFirst)
 	qspCurSelObject = -1;
 }
 
+void qspClearObjectsWithNotify()
+{
+	QSPVariant v;
+	QSP_CHAR **objs;
+	long i, varInd, oldRefreshCount, oldCount = qspCurObjectsCount;
+	if (oldCount)
+	{
+		objs = (QSP_CHAR **)malloc(oldCount * sizeof(QSP_CHAR *));
+		for (i = 0; i < oldCount; ++i)
+			qspAddText(objs + i, qspCurObjects[i].Desc, 0, -1, QSP_TRUE);
+		qspClearObjects(QSP_FALSE);
+		varInd = qspVarIndex(QSP_FMT("LASTOBJ"), QSP_TRUE);
+		if (varInd < 0)
+		{
+			qspFreeStrs(objs, oldCount, QSP_FALSE);
+			return;
+		}
+		v.IsStr = QSP_TRUE;
+		oldRefreshCount = qspRefreshCount;
+		for (i = 0; i < oldCount; ++i)
+		{
+			v.Str = objs[i];
+			qspSetVarValueByIndex(varInd, 0, v, QSP_TRUE);
+			if (qspErrorNum) break;
+			qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONOBJDEL"));
+			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+		}
+		qspFreeStrs(objs, oldCount, QSP_FALSE);
+	}
+}
+
 long qspObjIndex(QSP_CHAR *name)
 {
 	long i, objNameLen, bufSize;
@@ -65,6 +96,7 @@ long qspObjIndex(QSP_CHAR *name)
 
 QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
+	long varInd;
 	QSPObj *obj;
 	QSP_CHAR *imgPath;
 	if (qspCurObjectsCount == QSP_MAXOBJECTS)
@@ -83,13 +115,17 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 	obj->Image = imgPath;
 	obj->Desc = qspGetNewText(args[0].Str, -1);
 	qspIsObjectsChanged = QSP_TRUE;
+	varInd = qspVarIndex(QSP_FMT("LASTOBJ"), QSP_TRUE);
+	if (varInd < 0) return QSP_FALSE;
+	qspSetVarValueByIndex(varInd, 0, args[0], QSP_TRUE);
+	if (qspErrorNum) return QSP_FALSE;
 	qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONOBJADD"));
 	return QSP_FALSE;
 }
 
 QSP_BOOL qspStatementDelObj(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long objInd = qspObjIndex(args[0].Str);
+	long varInd, objInd = qspObjIndex(args[0].Str);
 	if (objInd < 0) return QSP_FALSE;
 	if (qspCurSelObject >= objInd) qspCurSelObject = -1;
 	if (qspCurObjects[objInd].Image) free(qspCurObjects[objInd].Image);
@@ -101,6 +137,11 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, long count, QSP_CHAR **jumpTo, cha
 		++objInd;
 	}
 	qspIsObjectsChanged = QSP_TRUE;
+	varInd = qspVarIndex(QSP_FMT("LASTOBJ"), QSP_TRUE);
+	if (varInd < 0) return QSP_FALSE;
+	qspSetVarValueByIndex(varInd, 0, args[0], QSP_TRUE);
+	if (qspErrorNum) return QSP_FALSE;
+	qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONOBJDEL"));
 	return QSP_FALSE;
 }
 
