@@ -137,7 +137,7 @@ void qspRefresh(QSP_BOOL isChangeDesc)
 	++qspRefreshCount;
 	if (isChangeDesc) ++qspFullRefreshCount;
 	oldRefreshCount = qspRefreshCount;
-	qspExecLocByName(qspLocs[qspCurLoc].Name, isChangeDesc);
+	qspExecLocByIndex(qspCurLoc, isChangeDesc);
 	if (qspErrorNum) return;
 	if (qspRefreshCount == oldRefreshCount)
 		qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONNEWLOC"));

@@ -80,16 +80,11 @@ long qspLocIndex(QSP_CHAR *name)
 	return -1;
 }
 
-void qspExecLocByName(QSP_CHAR *name, QSP_BOOL isChangeDesc)
+void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 {
 	QSPVariant args[QSP_STATMAXARGS];
 	QSP_CHAR *str, **code;
-	long i, count, oldLoc, oldWhere, locInd = qspLocIndex(name);
-	if (locInd < 0)
-	{
-		qspSetError(QSP_ERR_LOCNOTFOUND);
-		return;
-	}
+	long i, count, oldLoc, oldWhere;
 	oldLoc = qspRealCurLoc;
 	oldWhere = qspRealWhere;
 	qspRealCurLoc = locInd;
@@ -153,6 +148,17 @@ void qspExecLocByName(QSP_CHAR *name, QSP_BOOL isChangeDesc)
 	qspFreeStrs(code, count, QSP_FALSE);
 	qspRealWhere = oldWhere;
 	qspRealCurLoc = oldLoc;
+}
+
+void qspExecLocByName(QSP_CHAR *name, QSP_BOOL isChangeDesc)
+{
+	long locInd = qspLocIndex(name);
+	if (locInd < 0)
+	{
+		qspSetError(QSP_ERR_LOCNOTFOUND);
+		return;
+	}
+	qspExecLocByIndex(locInd, isChangeDesc);
 }
 
 void qspExecLocByVarName(QSP_CHAR *name)
