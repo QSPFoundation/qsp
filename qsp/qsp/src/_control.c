@@ -359,7 +359,7 @@ QSP_BOOL QSPExecLocationCode(QSP_CHAR *name, QSP_BOOL isRefresh)
 	qspWait(QSP_TRUE);
 	qspResetError();
 	qspPrepareExecution();
-	qspExecLoc(name, QSP_FALSE);
+	qspExecLocByName(name, QSP_FALSE);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -521,7 +521,7 @@ QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh)
 /* Ф-я предназначена только для вызова из CallBack'а QSP_CALL_SHOWMENU */
 void QSPSelectMenuItem(long index)
 {
-	if (index >= 0 && index < qspCurMenuItems) qspExecLoc(qspCurMenuLocs[index], QSP_FALSE);
+	if (index >= 0 && index < qspCurMenuItems) qspExecLocByName(qspCurMenuLocs[index], QSP_FALSE);
 }
 /* ------------------------------------------------------------ */
 /* Установка CALLBACK'ов */

@@ -570,7 +570,7 @@ QSP_BOOL qspStatementExit(QSPVariant *args, long count, QSP_CHAR **jumpTo, char 
 
 QSP_BOOL qspStatementGoSub(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	qspExecLoc(args[0].Str, QSP_FALSE);
+	qspExecLocByName(args[0].Str, QSP_FALSE);
 	return QSP_FALSE;
 }
 

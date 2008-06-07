@@ -80,7 +80,7 @@ long qspLocIndex(QSP_CHAR *name)
 	return -1;
 }
 
-void qspExecLoc(QSP_CHAR *name, QSP_BOOL isChangeDesc)
+void qspExecLocByName(QSP_CHAR *name, QSP_BOOL isChangeDesc)
 {
 	QSPVariant args[QSP_STATMAXARGS];
 	QSP_CHAR *str, **code;
@@ -158,6 +158,6 @@ void qspExecLoc(QSP_CHAR *name, QSP_BOOL isChangeDesc)
 void qspExecLocByVarName(QSP_CHAR *name)
 {
 	QSPVariant v = qspGetVarValueByName(name);
-	if (qspIsAnyString(v.Str)) qspExecLoc(v.Str, QSP_FALSE);
+	if (qspIsAnyString(v.Str)) qspExecLocByName(v.Str, QSP_FALSE);
 	free(v.Str);
 }
