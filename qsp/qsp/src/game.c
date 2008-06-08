@@ -288,7 +288,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 	}
 	free(file);
 	oldRefreshCount = qspRefreshCount;
-	qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONGSAVE"));
+	qspExecLocByVarName(QSP_FMT("ONGSAVE"));
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
 		fclose(f);
@@ -376,7 +376,7 @@ QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 	if (QSP_STRCMP(strs[0], QSP_SAVEDGAMEID) ||
 		QSP_STRCOLL(strs[1], QSP_GAMEMINVER) < 0 ||
 		QSP_STRCOLL(strs[1], QSP_VER) > 0) return QSP_FALSE;
-	if (!qspGetVarValueByName(QSP_FMT("DEBUG")).Num &&
+	if (!qspGetVarNumValue(QSP_FMT("DEBUG")) &&
 		qspReCodeGetIntVal(strs[2]) != qspQstCRC) return QSP_FALSE;
 	selAction = qspReCodeGetIntVal(strs[4]);
 	selObject = qspReCodeGetIntVal(strs[5]);
@@ -546,7 +546,7 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	qspPlayPLFiles();
 	qspOpenIncludes();
 	if (qspErrorNum) return;
-	qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONGLOAD"));
+	qspExecLocByVarName(QSP_FMT("ONGLOAD"));
 }
 
 QSP_BOOL qspStatementOpenQst(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)

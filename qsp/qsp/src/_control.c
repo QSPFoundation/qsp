@@ -174,7 +174,7 @@ QSP_BOOL QSPSetSelActionIndex(long ind, QSP_BOOL isRefresh)
 		qspCurSelAction = ind;
 		qspResetError();
 		qspPrepareExecution();
-		qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONACTSEL"));
+		qspExecLocByVarName(QSP_FMT("ONACTSEL"));
 		if (qspErrorNum)
 		{
 			qspIsMustWait = QSP_FALSE;
@@ -230,7 +230,7 @@ QSP_BOOL QSPSetSelObjectIndex(long ind, QSP_BOOL isRefresh)
 		qspCurSelObject = ind;
 		qspResetError();
 		qspPrepareExecution();
-		qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONOBJSEL"));
+		qspExecLocByVarName(QSP_FMT("ONOBJSEL"));
 		if (qspErrorNum)
 		{
 			qspIsMustWait = QSP_FALSE;
@@ -377,7 +377,7 @@ QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh)
 		qspIsMustWait = QSP_TRUE;
 		qspResetError();
 		qspPrepareExecution();
-		qspExecLocByVarName(QSP_STRCHAR QSP_FMT("COUNTER"));
+		qspExecLocByVarName(QSP_FMT("COUNTER"));
 		if (qspErrorNum)
 		{
 			qspIsMustWait = QSP_FALSE;
@@ -394,7 +394,7 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh)
 	qspWait(QSP_TRUE);
 	qspResetError();
 	qspPrepareExecution();
-	qspExecLocByVarName(QSP_STRCHAR QSP_FMT("USERCOM"));
+	qspExecLocByVarName(QSP_FMT("USERCOM"));
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;

@@ -83,15 +83,13 @@ long qspLocIndex(QSP_CHAR *name)
 long qspLocIndexByVarName(QSP_CHAR *name)
 {
 	long locInd;
-	QSPVariant v = qspGetVarValueByName(name);
-	if (qspIsAnyString(v.Str))
+	QSP_CHAR *locName = qspGetVarStrValue(name);
+	if (qspIsAnyString(locName))
 	{
-		locInd = qspLocIndex(v.Str);
-		free(v.Str);
+		locInd = qspLocIndex(locName);
 		if (locInd < 0) qspSetError(QSP_ERR_LOCNOTFOUND);
 		return locInd;
 	}
-	free(v.Str);
 	return -1;
 }
 
@@ -178,7 +176,6 @@ void qspExecLocByName(QSP_CHAR *name, QSP_BOOL isChangeDesc)
 
 void qspExecLocByVarName(QSP_CHAR *name)
 {
-	QSPVariant v = qspGetVarValueByName(name);
-	if (qspIsAnyString(v.Str)) qspExecLocByName(v.Str, QSP_FALSE);
-	free(v.Str);
+	QSP_CHAR *locName = qspGetVarStrValue(name);
+	if (qspIsAnyString(locName)) qspExecLocByName(locName, QSP_FALSE);
 }

@@ -383,7 +383,8 @@
 	void qspInitVars();
 	long qspVarIndex(QSP_CHAR *, QSP_BOOL);
 	void qspSetVarValueByIndex(long, long, QSPVariant, QSP_BOOL);
-	QSPVariant qspGetVarValueByName(QSP_CHAR *);
+	QSP_CHAR *qspGetVarStrValue(QSP_CHAR *);
+	long qspGetVarNumValue(QSP_CHAR *);
 	QSPVariant qspGetVar(QSP_CHAR *);
 	long qspArrayPos(QSP_CHAR *, long, QSPVariant, QSP_BOOL);
 	long qspGetVarsCount();

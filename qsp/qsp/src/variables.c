@@ -281,11 +281,24 @@ QSPVariant qspGetVarValueByIndex(long varIndex, long ind, QSP_BOOL isStringType)
 	return qspGetEmptyVariant(isStringType);
 }
 
-QSPVariant qspGetVarValueByName(QSP_CHAR *name)
+QSP_CHAR *qspGetVarStrValue(QSP_CHAR *name)
+{
+	QSP_CHAR *text;
+	long varIndex = qspVarIndex(name, QSP_FALSE);
+	if (varIndex >= 0 && qspVars[varIndex].ValsCount)
+	{
+		text = qspVars[varIndex].TextValue[0];
+		if (text) return text;
+	}
+	return QSP_FMT("");
+}
+
+long qspGetVarNumValue(QSP_CHAR *name)
 {
 	long varIndex = qspVarIndex(name, QSP_FALSE);
-	if (varIndex < 0) return qspGetEmptyVariant(QSP_FALSE);
-	return qspGetVarValueByIndex(varIndex, 0, *name == QSP_STRCHAR[0]);
+	if (varIndex >= 0 && qspVars[varIndex].ValsCount)
+		return qspVars[varIndex].Value[0];
+	return 0;
 }
 
 QSPVariant qspGetVar(QSP_CHAR *name)

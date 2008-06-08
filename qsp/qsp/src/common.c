@@ -140,15 +140,15 @@ void qspRefresh(QSP_BOOL isChangeDesc)
 	qspExecLocByIndex(qspCurLoc, isChangeDesc);
 	if (qspErrorNum) return;
 	if (qspRefreshCount == oldRefreshCount)
-		qspExecLocByVarName(QSP_STRCHAR QSP_FMT("ONNEWLOC"));
+		qspExecLocByVarName(QSP_FMT("ONNEWLOC"));
 }
 
 QSP_CHAR *qspFormatText(QSP_CHAR *txt)
 {
+	QSPVariant val;
 	QSP_CHAR *newTxt, *lPos, *rPos;
 	long len, txtLen, oldTxtLen, bufSize;
-	QSPVariant val = qspGetVarValueByName(QSP_FMT("DISABLESUBEX"));
-	if (val.Num) return qspGetNewText(txt, -1);
+	if (qspGetVarNumValue(QSP_FMT("DISABLESUBEX"))) return qspGetNewText(txt, -1);
 	bufSize = 256;
 	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	txtLen = oldTxtLen = 0;
