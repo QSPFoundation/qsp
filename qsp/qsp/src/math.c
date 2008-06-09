@@ -122,8 +122,8 @@ void qspInitMath()
 	qspAddOperation(qspOpTrim, QSP_FMT("TRIM"), QSP_STRCHAR QSP_FMT("TRIM"), 30, 0, 1, 1, 1, 1);
 	qspAddOperation(qspOpGetObj, QSP_FMT("GETOBJ"), QSP_STRCHAR QSP_FMT("GETOBJ"), 30, qspFunctionGetObj, 1, 1, 1, 2);
 	qspAddOperation(qspOpStrComp, QSP_FMT("STRCOMP"), 0, 30, qspFunctionStrComp, 2, 2, 2, 1, 1);
-	qspAddOperation(qspOpStrFind, QSP_FMT("STRFIND"), QSP_STRCHAR QSP_FMT("STRFIND"), 30, qspFunctionStrFind, 1, 3, 3, 1, 1, 2);
-	qspAddOperation(qspOpStrPos, QSP_FMT("STRPOS"), 0, 30, qspFunctionStrPos, 2, 3, 3, 1, 1, 2);
+	qspAddOperation(qspOpStrFind, QSP_FMT("STRFIND"), QSP_STRCHAR QSP_FMT("STRFIND"), 30, qspFunctionStrFind, 1, 2, 3, 1, 1, 2);
+	qspAddOperation(qspOpStrPos, QSP_FMT("STRPOS"), 0, 30, qspFunctionStrPos, 2, 2, 3, 1, 1, 2);
 	qspAddOperation(qspOpMid, QSP_FMT("MID"), QSP_STRCHAR QSP_FMT("MID"), 30, qspFunctionMid, 1, 2, 3, 1, 2, 2);
 	qspAddOperation(qspOpArrPos, QSP_FMT("ARRPOS"), 0, 30, 0, 2, 3, 3, 2, 1, 0);
 	qspAddOperation(qspOpArrComp, QSP_FMT("ARRCOMP"), 0, 30, 0, 2, 3, 3, 2, 1, 0);
@@ -693,7 +693,7 @@ void qspFunctionStrFind(QSPVariant *args, long count, QSPVariant *tos)
 		onigReg = onig_region_new();
 		tempBeg = (OnigUChar *)args[0].Str;
 		tempEnd = (OnigUChar *)qspStrEnd(args[0].Str);
-		pos = args[2].Num >= 0 ? args[2].Num : 0;
+		pos = (count == 3 && args[2].Num >= 0) ? args[2].Num : 0;
 		if (onig_search(onigExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0 &&
 			pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
 		{
@@ -723,7 +723,7 @@ void qspFunctionStrPos(QSPVariant *args, long count, QSPVariant *tos)
 		onigReg = onig_region_new();
 		tempBeg = (OnigUChar *)args[0].Str;
 		tempEnd = (OnigUChar *)qspStrEnd(args[0].Str);
-		pos = args[2].Num >= 0 ? args[2].Num : 0;
+		pos = (count == 3 && args[2].Num >= 0) ? args[2].Num : 0;
 		if (onig_search(onigExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0 &&
 			pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
 			tos->Num = onigReg->beg[pos] / sizeof(QSP_CHAR) + 1;
