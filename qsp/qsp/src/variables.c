@@ -285,19 +285,28 @@ QSP_CHAR *qspGetVarStrValue(QSP_CHAR *name)
 {
 	QSP_CHAR *text;
 	long varIndex = qspVarIndex(name, QSP_FALSE);
-	if (varIndex >= 0 && qspVars[varIndex].ValsCount)
+	if (varIndex >= 0)
 	{
-		text = qspVars[varIndex].TextValue[0];
-		if (text) return text;
+		if (qspVars[varIndex].ValsCount)
+		{
+			text = qspVars[varIndex].TextValue[0];
+			if (text) return text;
+		}
 	}
+	else
+		qspErrorNum = 0;
 	return QSP_FMT("");
 }
 
 long qspGetVarNumValue(QSP_CHAR *name)
 {
 	long varIndex = qspVarIndex(name, QSP_FALSE);
-	if (varIndex >= 0 && qspVars[varIndex].ValsCount)
-		return qspVars[varIndex].Value[0];
+	if (varIndex >= 0)
+	{
+		if (qspVars[varIndex].ValsCount) return qspVars[varIndex].Value[0];
+	}
+	else
+		qspErrorNum = 0;
 	return 0;
 }
 
