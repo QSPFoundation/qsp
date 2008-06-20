@@ -95,7 +95,7 @@ QSP_BOOL QSPGetExprValue(QSP_CHAR *expr, QSP_BOOL *isString, long *numVal, QSP_C
 {
 	QSPVariant v;
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	v = qspExprValue(expr);
 	if (qspErrorNum)
 	{
@@ -150,7 +150,7 @@ QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh)
 	qspWait(QSP_TRUE);
 	if (qspCurSelAction >= 0)
 	{
-		qspResetError();
+		qspResetError(QSP_TRUE);
 		qspPrepareExecution();
 		qspExecAction(qspCurSelAction);
 		if (qspErrorNum)
@@ -172,7 +172,7 @@ QSP_BOOL QSPSetSelActionIndex(long ind, QSP_BOOL isRefresh)
 	if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
 	{
 		qspCurSelAction = ind;
-		qspResetError();
+		qspResetError(QSP_TRUE);
 		qspPrepareExecution();
 		qspExecLocByVarName(QSP_FMT("ONACTSEL"));
 		if (qspErrorNum)
@@ -228,7 +228,7 @@ QSP_BOOL QSPSetSelObjectIndex(long ind, QSP_BOOL isRefresh)
 	if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
 	{
 		qspCurSelObject = ind;
-		qspResetError();
+		qspResetError(QSP_TRUE);
 		qspPrepareExecution();
 		qspExecLocByVarName(QSP_FMT("ONOBJSEL"));
 		if (qspErrorNum)
@@ -285,7 +285,7 @@ QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, long *count)
 {
 	long varInd;
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	varInd = qspVarIndex(name, QSP_FALSE);
 	if (qspErrorNum)
 	{
@@ -301,7 +301,7 @@ QSP_BOOL QSPGetVarValues(QSP_CHAR *name, long ind, long *numVal, QSP_CHAR **strV
 {
 	long varInd;
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	varInd = qspVarIndex(name, QSP_FALSE);
 	if (qspErrorNum)
 	{
@@ -339,7 +339,7 @@ QSP_BOOL QSPExecString(QSP_CHAR *s, QSP_BOOL isRefresh)
 {
 	QSP_CHAR *jumpToFake;
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	qspPrepareExecution();
 	jumpToFake = qspGetNewText(QSP_FMT(""), 0);
 	qspExecString(s, &jumpToFake);
@@ -357,7 +357,7 @@ QSP_BOOL QSPExecString(QSP_CHAR *s, QSP_BOOL isRefresh)
 QSP_BOOL QSPExecLocationCode(QSP_CHAR *name, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	qspPrepareExecution();
 	qspExecLocByName(name, QSP_FALSE);
 	if (qspErrorNum)
@@ -375,7 +375,7 @@ QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh)
 	if (!qspIsMustWait)
 	{
 		qspIsMustWait = QSP_TRUE;
-		qspResetError();
+		qspResetError(QSP_TRUE);
 		qspPrepareExecution();
 		qspExecLocByVarName(QSP_FMT("COUNTER"));
 		if (qspErrorNum)
@@ -392,7 +392,7 @@ QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh)
 QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	qspPrepareExecution();
 	qspExecLocByVarName(QSP_FMT("USERCOM"));
 	if (qspErrorNum)
@@ -459,7 +459,7 @@ QSP_CHAR *QSPGetErrorDesc(long errorNum)
 QSP_BOOL QSPLoadGameWorld(QSP_CHAR *fileName)
 {
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	qspOpenQuest(fileName, QSP_FALSE);
 	if (qspErrorNum)
 	{
@@ -473,7 +473,7 @@ QSP_BOOL QSPLoadGameWorld(QSP_CHAR *fileName)
 QSP_BOOL QSPSaveGame(QSP_CHAR *fileName)
 {
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	qspPrepareExecution();
 	qspSaveGameStatus(fileName);
 	if (qspErrorNum)
@@ -488,7 +488,7 @@ QSP_BOOL QSPSaveGame(QSP_CHAR *fileName)
 QSP_BOOL QSPOpenSavedGame(QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	qspPrepareExecution();
 	qspOpenGameStatus(fileName);
 	if (qspErrorNum)
@@ -504,7 +504,7 @@ QSP_BOOL QSPOpenSavedGame(QSP_CHAR *fileName, QSP_BOOL isRefresh)
 QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	qspPrepareExecution();
 	qspNewGame(QSP_TRUE);
 	if (qspErrorNum)
@@ -543,7 +543,7 @@ void QSPInit()
 	qspLocs = 0;
 	qspLocsCount = 0;
 	setlocale(LC_ALL, QSP_LOCALE);
-	qspResetError();
+	qspResetError(QSP_TRUE);
 	qspPrepareExecution();
 	qspMemClear(QSP_TRUE);
 	qspClearIncludes(QSP_TRUE);

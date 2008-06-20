@@ -72,12 +72,18 @@ void qspSetError(long num)
 	}
 }
 
-void qspResetError()
+void qspResetError(QSP_BOOL isFull)
 {
 	qspErrorNum = 0;
-	qspErrorLoc = qspRealCurLoc = -1;
-	qspErrorWhere = qspRealWhere = QSP_AREA_NONE;
-	qspErrorLine = qspRealLine = 0;
+	qspErrorLoc = -1;
+	qspErrorWhere = QSP_AREA_NONE;
+	qspErrorLine = 0;
+	if (isFull)
+	{
+		qspRealCurLoc = -1;
+		qspRealWhere = QSP_AREA_NONE;
+		qspRealLine = 0;
+	}
 }
 
 void qspPrepareExecution()

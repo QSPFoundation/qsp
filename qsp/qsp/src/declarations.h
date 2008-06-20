@@ -311,7 +311,7 @@
 	long qspCodeWriteVal(QSP_CHAR **, long, QSP_CHAR *, QSP_BOOL);
 	/* ---------------------------------------------------------------- common.c */
 	void qspSetError(long);
-	void qspResetError();
+	void qspResetError(QSP_BOOL);
 	void qspPrepareExecution();
 	void qspClearMenu(QSP_BOOL);
 	void qspMemClear(QSP_BOOL);
