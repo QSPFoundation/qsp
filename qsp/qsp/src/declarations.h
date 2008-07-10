@@ -330,7 +330,6 @@
 	/* ---------------------------------------------------------------- locations.c */
 	void qspCreateWorld(long, long);
 	long qspLocIndex(QSP_CHAR *);
-	long qspLocIndexByVarName(QSP_CHAR *);
 	void qspExecLocByIndex(long, QSP_BOOL);
 	void qspExecLocByName(QSP_CHAR *, QSP_BOOL);
 	void qspExecLocByVarName(QSP_CHAR *);

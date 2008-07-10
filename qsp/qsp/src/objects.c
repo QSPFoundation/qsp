@@ -37,15 +37,9 @@ void qspClearObjectsWithNotify()
 {
 	QSPVariant v;
 	QSP_CHAR **objs;
-	long i, varInd, locInd, oldRefreshCount, oldCount = qspCurObjectsCount;
+	long i, varInd, oldRefreshCount, oldCount = qspCurObjectsCount;
 	if (oldCount)
 	{
-		locInd = qspLocIndexByVarName(QSP_FMT("ONOBJDEL"));
-		if (locInd < 0)
-		{
-			qspClearObjects(QSP_FALSE);
-			return;
-		}
 		objs = (QSP_CHAR **)malloc(oldCount * sizeof(QSP_CHAR *));
 		for (i = 0; i < oldCount; ++i)
 			qspAddText(objs + i, qspCurObjects[i].Desc, 0, -1, QSP_TRUE);
@@ -63,7 +57,7 @@ void qspClearObjectsWithNotify()
 			v.Str = objs[i];
 			qspSetVarValueByIndex(varInd, 0, v, QSP_TRUE);
 			if (qspErrorNum) break;
-			qspExecLocByIndex(locInd, QSP_FALSE);
+			qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		}
 		qspFreeStrs(objs, oldCount, QSP_FALSE);

@@ -80,19 +80,6 @@ long qspLocIndex(QSP_CHAR *name)
 	return -1;
 }
 
-long qspLocIndexByVarName(QSP_CHAR *name)
-{
-	long locInd;
-	QSP_CHAR *locName = qspGetVarStrValue(name);
-	if (qspIsAnyString(locName))
-	{
-		locInd = qspLocIndex(locName);
-		if (locInd < 0) qspSetError(QSP_ERR_LOCNOTFOUND);
-		return locInd;
-	}
-	return -1;
-}
-
 void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 {
 	QSPVariant args[QSP_STATMAXARGS];
