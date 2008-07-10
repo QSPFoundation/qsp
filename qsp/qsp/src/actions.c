@@ -97,9 +97,10 @@ void qspExecAction(long ind)
 {
 	QSPCurAct *act;
 	QSP_CHAR **code;
-	long count, oldLoc, oldWhere;
+	long count, oldLoc, oldWhere, oldLine;
 	oldLoc = qspRealCurLoc;
 	oldWhere = qspRealWhere;
+	oldLine = qspRealLine;
 	act = qspCurActions + ind;
 	qspRealCurLoc = act->Location;
 	qspRealWhere = act->Where;
@@ -107,6 +108,7 @@ void qspExecAction(long ind)
 	qspCopyStrs(&code, act->OnPressLines, 0, count);
 	qspExecCode(code, 0, count, act->StartLine, 0, QSP_TRUE);
 	qspFreeStrs(code, count, QSP_FALSE);
+	qspRealLine = oldLine;
 	qspRealWhere = oldWhere;
 	qspRealCurLoc = oldLoc;
 }

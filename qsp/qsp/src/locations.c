@@ -97,15 +97,17 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 {
 	QSPVariant args[QSP_STATMAXARGS];
 	QSP_CHAR *str, **code;
-	long i, count, oldLoc, oldWhere;
+	long i, count, oldLoc, oldWhere, oldLine;
 	oldLoc = qspRealCurLoc;
 	oldWhere = qspRealWhere;
+	oldLine = qspRealLine;
 	qspRealCurLoc = locInd;
 	qspRealWhere = QSP_AREA_ONLOCVISIT;
 	qspRealLine = 0;
 	str = qspFormatText(qspLocs[locInd].Desc);
 	if (qspErrorNum)
 	{
+		qspRealLine = oldLine;
 		qspRealWhere = oldWhere;
 		qspRealCurLoc = oldLoc;
 		return;
@@ -130,6 +132,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		str = qspFormatText(str);
 		if (qspErrorNum)
 		{
+			qspRealLine = oldLine;
 			qspRealWhere = oldWhere;
 			qspRealCurLoc = oldLoc;
 			return;
@@ -149,6 +152,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		free(args[0].Str);
 		if (qspErrorNum)
 		{
+			qspRealLine = oldLine;
 			qspRealWhere = oldWhere;
 			qspRealCurLoc = oldLoc;
 			return;
@@ -159,6 +163,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 	qspCopyStrs(&code, qspLocs[locInd].OnVisitLines, 0, count);
 	qspExecCode(code, 0, count, 1, 0, QSP_TRUE);
 	qspFreeStrs(code, count, QSP_FALSE);
+	qspRealLine = oldLine;
 	qspRealWhere = oldWhere;
 	qspRealCurLoc = oldLoc;
 }

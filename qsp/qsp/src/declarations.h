@@ -107,7 +107,7 @@
 		#define QSP_PATHDELIM QSP_FMT("/")
 	#endif
 
-	#define QSP_VER QSP_FMT("5.4.0")
+	#define QSP_VER QSP_FMT("5.4.1")
 	#define QSP_GAMEMINVER QSP_FMT("5.4.0")
 	#define QSP_STRSDELIM QSP_FMT("\r\n")
 	#define QSP_LOCALE "russian"
