@@ -38,6 +38,8 @@ unsigned char qspRand8[256] =
 	0xEA, 0x91, 0x34, 0xF6, 0x88, 0x43, 0x99, 0xD6, 0x89, 0x9B, 0x08, 0xF1, 0x5E, 0x1C, 0xB1, 0x13
 };
 
+void qspSetVarValueByIndex(long, long, QSPVariant);
+
 void qspClearVars(QSP_BOOL isFirst)
 {
 	long i;
@@ -106,7 +108,7 @@ void qspRefreshVar(long varIndex)
 	default:
 		return;
 	}
-	qspSetVarValueByIndex(varIndex, 0, v, v.IsStr);
+	qspSetVarValueByIndex(varIndex, 0, v);
 }
 
 void qspInitSpecialVar(long type, QSP_CHAR *name)
@@ -223,9 +225,8 @@ long qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 	return qspVarIndex(s, isCreate);
 }
 
-void qspSetVarValueByIndex(long varIndex, long ind, QSPVariant val, QSP_BOOL isToString)
+void qspSetVarValueByIndex(long varIndex, long ind, QSPVariant val)
 {
-	QSP_BOOL convErr = QSP_FALSE;
 	long count, oldCount = qspVars[varIndex].ValsCount;
 	if (ind >= oldCount)
 	{
@@ -240,26 +241,33 @@ void qspSetVarValueByIndex(long varIndex, long ind, QSPVariant val, QSP_BOOL isT
 			++oldCount;
 		}
 	}
-	val = qspConvertVariantTo(val, isToString, QSP_FALSE, &convErr);
+	if (val.IsStr)
+		qspVars[varIndex].TextValue[ind] = qspGetAddText(qspVars[varIndex].TextValue[ind], val.Str, 0, -1);
+	else
+		qspVars[varIndex].Value[ind] = val.Num;
+}
+
+void qspSetVarValueByName(QSP_CHAR *name, long ind, QSPVariant val)
+{
+	long varIndex = qspVarIndex(name, QSP_TRUE);
+	if (varIndex < 0) return;
+	qspSetVarValueByIndex(varIndex, ind, val);
+}
+
+void qspSetVar(QSP_CHAR *name, QSPVariant val)
+{
+	QSP_BOOL convErr;
+	long index, varIndex = qspGetVarData(name, QSP_TRUE, &index);
+	if (varIndex < 0) return;
+	convErr = QSP_FALSE;
+	val = qspConvertVariantTo(val, *name == QSP_STRCHAR[0], QSP_FALSE, &convErr);
 	if (convErr)
 	{
 		qspSetError(QSP_ERR_TYPEMISMATCH);
 		return;
 	}
-	if (val.IsStr)
-	{
-		qspVars[varIndex].TextValue[ind] = qspGetAddText(qspVars[varIndex].TextValue[ind], val.Str, 0, -1);
-		free(val.Str);
-	}
-	else
-		qspVars[varIndex].Value[ind] = val.Num;
-}
-
-void qspSetVar(QSP_CHAR *name, QSPVariant val)
-{
-	long index, varIndex = qspGetVarData(name, QSP_TRUE, &index);
-	if (varIndex < 0) return;
-	qspSetVarValueByIndex(varIndex, index, val, *name == QSP_STRCHAR[0]);
+	qspSetVarValueByIndex(varIndex, index, val);
+	if (val.IsStr) free(val.Str);
 }
 
 QSPVariant qspGetVarValueByIndex(long varIndex, long ind, QSP_BOOL isStringType)
