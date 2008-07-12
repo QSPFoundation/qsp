@@ -56,7 +56,6 @@ void qspClearObjectsWithNotify()
 		{
 			v.Str = objs[i];
 			qspSetVarValueByIndex(varInd, 0, v, QSP_TRUE);
-			if (qspErrorNum) break;
 			qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		}
@@ -118,7 +117,6 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 	varInd = qspVarIndex(QSP_FMT("LASTOBJ"), QSP_TRUE);
 	if (varInd < 0) return QSP_FALSE;
 	qspSetVarValueByIndex(varInd, 0, args[0], QSP_TRUE);
-	if (qspErrorNum) return QSP_FALSE;
 	qspExecLocByVarName(QSP_FMT("ONOBJADD"));
 	return QSP_FALSE;
 }
@@ -140,7 +138,6 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, long count, QSP_CHAR **jumpTo, cha
 	varInd = qspVarIndex(QSP_FMT("LASTOBJ"), QSP_TRUE);
 	if (varInd < 0) return QSP_FALSE;
 	qspSetVarValueByIndex(varInd, 0, args[0], QSP_TRUE);
-	if (qspErrorNum) return QSP_FALSE;
 	qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
 	return QSP_FALSE;
 }
