@@ -46,8 +46,8 @@ void qspAddOperation(long opCode,
 	va_list marker;
 	qspOps[opCode].Names[0] = opName;
 	qspOps[opCode].Names[1] = opAltName;
-	qspOps[opCode].NamesLens[0] = opName ? (long)QSP_STRLEN(opName) : 0;
-	qspOps[opCode].NamesLens[1] = opAltName ? (long)QSP_STRLEN(opAltName) : 0;
+	qspOps[opCode].NamesLens[0] = (opName ? (long)QSP_STRLEN(opName) : 0);
+	qspOps[opCode].NamesLens[1] = (opAltName ? (long)QSP_STRLEN(opAltName) : 0);
 	qspOps[opCode].Priority = priority;
 	qspOps[opCode].Func = func;
 	qspOps[opCode].ResType = resType;
@@ -431,7 +431,7 @@ void qspCompileExprPushOpCode(long *opStack, long *opSp, long *argStack, long *a
 		return;
 	}
 	opStack[++(*opSp)] = opCode;
-	argStack[++(*argSp)] = opCode < qspOpFirst_Function ? qspOps[opCode].MinArgsCount : 0;
+	argStack[++(*argSp)] = (opCode < qspOpFirst_Function ? qspOps[opCode].MinArgsCount : 0);
 }
 
 void qspAppendToCompiled(long opCode, long *itemsCount, QSPVariant *compValues, long *compOpCodes, long *compArgsCounts, long argsCount, QSPVariant v)
@@ -693,7 +693,7 @@ void qspFunctionStrFind(QSPVariant *args, long count, QSPVariant *tos)
 		onigReg = onig_region_new();
 		tempBeg = (OnigUChar *)args[0].Str;
 		tempEnd = (OnigUChar *)qspStrEnd(args[0].Str);
-		pos = (count == 3 && args[2].Num >= 0) ? args[2].Num : 0;
+		pos = ((count == 3 && args[2].Num >= 0) ? args[2].Num : 0);
 		if (onig_search(onigExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0 &&
 			pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
 		{
@@ -723,7 +723,7 @@ void qspFunctionStrPos(QSPVariant *args, long count, QSPVariant *tos)
 		onigReg = onig_region_new();
 		tempBeg = (OnigUChar *)args[0].Str;
 		tempEnd = (OnigUChar *)qspStrEnd(args[0].Str);
-		pos = (count == 3 && args[2].Num >= 0) ? args[2].Num : 0;
+		pos = ((count == 3 && args[2].Num >= 0) ? args[2].Num : 0);
 		if (onig_search(onigExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0 &&
 			pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
 			tos->Num = onigReg->beg[pos] / sizeof(QSP_CHAR) + 1;
@@ -764,7 +764,7 @@ void qspFunctionRand(QSPVariant *args, long count, QSPVariant *tos)
 {
 	long min, max;
 	min = args[0].Num;
-	max = count == 2 ? args[1].Num : 0;
+	max = (count == 2 ? args[1].Num : 0);
 	if (min > max)
 	{
 		min = max;
@@ -827,7 +827,7 @@ void qspFunctionInstr(QSPVariant *args, long count, QSPVariant *tos)
 	if (beg < (long)QSP_STRLEN(args[1].Str))
 	{
 		pos = QSP_STRSTR(args[1].Str + beg, args[2].Str);
-		tos->Num = pos ? (long)(pos - args[1].Str) + 1 : 0;
+		tos->Num = (pos ? (long)(pos - args[1].Str) + 1 : 0);
 	}
 	else
 		tos->Num = 0;

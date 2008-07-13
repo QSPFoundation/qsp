@@ -89,7 +89,7 @@ void qspAddAction(QSPVariant *args, long count, QSP_CHAR **code, long start, lon
 	act->OnPressLinesCount = end - start;
 	act->Location = qspRealCurLoc;
 	act->Where = qspRealWhere;
-	act->StartLine = isMultiline ? qspRealLine + 1 : qspRealLine;
+	act->StartLine = (isMultiline ? qspRealLine + 1 : qspRealLine);
 	qspIsActionsChanged = QSP_TRUE;
 }
 

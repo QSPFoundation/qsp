@@ -135,7 +135,7 @@ QSP_CHAR *qspInStrRChar(QSP_CHAR *str, QSP_CHAR ch, QSP_CHAR *end)
 	if (end == str) return 0;
 	--end;
 	while (end != str && *end != ch) --end;
-	return (*end == ch) ? end : 0;
+	return (*end == ch ? end : 0);
 }
 
 QSP_CHAR *qspJoinStrs(QSP_CHAR **s, long count, QSP_CHAR *delim)

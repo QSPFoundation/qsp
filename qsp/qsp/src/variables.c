@@ -88,22 +88,22 @@ void qspRefreshVar(long varIndex)
 	case qspVarUserText:
 		*emptyStr = 0;
 		v.IsStr = QSP_TRUE;
-		v.Str = qspCurInput ? qspCurInput : emptyStr;
+		v.Str = (qspCurInput ? qspCurInput : emptyStr);
 		break;
 	case qspVarCurLoc:
 		*emptyStr = 0;
 		v.IsStr = QSP_TRUE;
-		v.Str = qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : emptyStr;
+		v.Str = (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : emptyStr);
 		break;
 	case qspVarSelObj:
 		*emptyStr = 0;
 		v.IsStr = QSP_TRUE;
-		v.Str = qspCurSelObject >= 0 ? qspCurObjects[qspCurSelObject].Desc : emptyStr;
+		v.Str = (qspCurSelObject >= 0 ? qspCurObjects[qspCurSelObject].Desc : emptyStr);
 		break;
 	case qspVarSelAct:
 		*emptyStr = 0;
 		v.IsStr = QSP_TRUE;
-		v.Str = qspCurSelAction >= 0 ? qspCurActions[qspCurSelAction].Desc : emptyStr;
+		v.Str = (qspCurSelAction >= 0 ? qspCurActions[qspCurSelAction].Desc : emptyStr);
 		break;
 	default:
 		return;
@@ -218,7 +218,7 @@ long qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 			free(ind.Str);
 		}
 		else
-			*index = ind.Num >= 0 ? ind.Num : 0;
+			*index = (ind.Num >= 0 ? ind.Num : 0);
 		return varIndex;
 	}
 	*index = 0;
@@ -280,7 +280,7 @@ QSPVariant qspGetVarValueByIndex(long varIndex, long ind, QSP_BOOL isStringType)
 		if (ret.IsStr = isStringType)
 		{
 			text = qspVars[varIndex].TextValue[ind];
-			ret.Str = qspGetNewText(text ? text : QSP_FMT(""), -1);
+			ret.Str = (text ? qspGetNewText(text, -1) : qspGetNewText(QSP_FMT(""), 0));
 		}
 		else
 			ret.Num = qspVars[varIndex].Value[ind];
@@ -450,7 +450,7 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 		{
 			qspVars[arrInd1].Value[itemsCount] = qspVars[arrInd2].Value[itemsCount];
 			str = qspVars[arrInd2].TextValue[itemsCount];
-			qspVars[arrInd1].TextValue[itemsCount] = str ? qspGetNewText(str, -1) : 0;
+			qspVars[arrInd1].TextValue[itemsCount] = (str ? qspGetNewText(str, -1) : 0);
 		}
 	}
 	else

@@ -283,28 +283,28 @@ void QSPFrame::ApplyParams()
 	int setFontSize;
 	bool isRefresh = false;
 	// --------------
-	setBackColor = QSPCallBacks::GetVarValue(QSP_FMT("BCOLOR"), &numVal, &strVal) && numVal ? numVal : m_backColor;
+	setBackColor = ((QSPCallBacks::GetVarValue(QSP_FMT("BCOLOR"), &numVal, &strVal) && numVal) ? numVal : m_backColor);
 	if (setBackColor != m_desc->GetBackgroundColour())
 	{
 		ApplyBackColor(setBackColor);
 		isRefresh = true;
 	}
 	// --------------
-	setFontColor = QSPCallBacks::GetVarValue(QSP_FMT("FCOLOR"), &numVal, &strVal) && numVal ? numVal : m_fontColor;
+	setFontColor = ((QSPCallBacks::GetVarValue(QSP_FMT("FCOLOR"), &numVal, &strVal) && numVal) ? numVal : m_fontColor);
 	if (setFontColor != m_desc->GetForegroundColour())
 	{
 		ApplyFontColor(setFontColor);
 		isRefresh = true;
 	}
 	// --------------
-	setFontSize = QSPCallBacks::GetVarValue(QSP_FMT("FSIZE"), &numVal, &strVal) && numVal ? numVal : m_fontSize;
+	setFontSize = ((QSPCallBacks::GetVarValue(QSP_FMT("FSIZE"), &numVal, &strVal) && numVal) ? numVal : m_fontSize);
 	if (setFontSize != m_desc->GetTextFont().GetPointSize())
 	{
 		ApplyFontSize(setFontSize);
 		isRefresh = true;
 	}
 	// --------------
-	setFontName = QSPCallBacks::GetVarValue(QSP_FMT("FNAME"), &numVal, &strVal) && strVal && *strVal ? wxString(strVal) : m_fontName;
+	setFontName = ((QSPCallBacks::GetVarValue(QSP_FMT("FNAME"), &numVal, &strVal) && strVal && *strVal) ? wxString(strVal) : m_fontName);
 	if (setFontName != m_desc->GetTextFont().GetFaceName())
 	{
 		ApplyFontName(setFontName);
@@ -359,7 +359,7 @@ void QSPFrame::ShowError()
 		wxMessage = wxString::Format(
 			_("Location: %s\nArea: %s\nLine: %ld\nCode: %ld\nDesc: %s"),
 			loc,
-			where == QSP_AREA_ONLOCVISIT ? _("on visit") : _("on action"),
+			(where == QSP_AREA_ONLOCVISIT ? _("on visit") : _("on action")),
 			line,
 			code,
 			wxGetTranslation(desc)

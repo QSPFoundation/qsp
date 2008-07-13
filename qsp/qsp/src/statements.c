@@ -52,7 +52,7 @@ void qspAddStatement(long statCode,
 	qspStats[statCode].Names[0] = statName;
 	qspStats[statCode].Names[1] = statAltName;
 	qspStats[statCode].NamesLens[0] = (long)QSP_STRLEN(statName);
-	qspStats[statCode].NamesLens[1] = statAltName ? (long)QSP_STRLEN(statAltName) : 0;
+	qspStats[statCode].NamesLens[1] = (statAltName ? (long)QSP_STRLEN(statAltName) : 0);
 	qspStats[statCode].ExtArg = extArg;
 	qspStats[statCode].Func = func;
 	qspStats[statCode].MinArgsCount = minArgs;
@@ -319,7 +319,7 @@ QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	case qspStatEnd:
 		return QSP_FALSE;
 	case qspStatUnknown:
-		statCode = qspStrPos(s, QSP_EQUAL, QSP_FALSE) ? qspStatSet : qspStatMPL;
+		statCode = (qspStrPos(s, QSP_EQUAL, QSP_FALSE) ? qspStatSet : qspStatMPL);
 		paramPos = s;
 	default:
 		switch (statCode)

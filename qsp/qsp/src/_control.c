@@ -55,7 +55,7 @@ QSP_CHAR *QSPGetCurLoc()
 {
 	QSP_CHAR *ret;
 	qspWait(QSP_TRUE);
-	ret = qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : 0;
+	ret = (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : 0);
 	qspIsMustWait = QSP_FALSE;
 	return ret;
 }
@@ -412,7 +412,7 @@ void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorWhere, 
 {
 	qspWait(QSP_TRUE);
 	*errorNum = qspErrorNum;
-	*errorLoc = qspErrorLoc >= 0 ? qspLocs[qspErrorLoc].Name : 0;
+	*errorLoc = (qspErrorLoc >= 0 ? qspLocs[qspErrorLoc].Name : 0);
 	*errorWhere = qspErrorWhere;
 	*errorLine = qspErrorLine;
 	qspIsMustWait = QSP_FALSE;

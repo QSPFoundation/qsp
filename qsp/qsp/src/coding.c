@@ -222,7 +222,7 @@ int qspStrCmpSB(char *s1, char *s2, unsigned char *table)
 char qspDirectConvertSB(char ch, unsigned char *table)
 {
 	unsigned char ch2 = (unsigned char)ch;
-	return ch2 >= 0x80 ? table[ch2 - 0x80] : ch;
+	return (ch2 >= 0x80 ? table[ch2 - 0x80] : ch);
 }
 
 char qspReverseConvertSB(char ch, unsigned char *table)
@@ -238,7 +238,7 @@ char qspReverseConvertSB(char ch, unsigned char *table)
 wchar_t qspDirectConvertUC(char ch, wchar_t *table)
 {
 	unsigned char ch2 = (unsigned char)ch;
-	return ch2 >= 0x80 ? table[ch2 - 0x80] : ch;
+	return (ch2 >= 0x80 ? table[ch2 - 0x80] : ch);
 }
 
 char qspReverseConvertUC(wchar_t ch, wchar_t *table)
@@ -254,7 +254,7 @@ QSP_CHAR *qspCodeReCode(QSP_CHAR *str, QSP_BOOL isCode)
 {
 	long offset, len = (long)QSP_STRLEN(str);
 	QSP_CHAR *buf = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
-	offset = isCode ? -QSP_CODREMOV : QSP_CODREMOV;
+	offset = (isCode ? -QSP_CODREMOV : QSP_CODREMOV);
 	buf[len] = 0;
 	while (--len >= 0)
 		buf[len] = (QSP_CHAR)(str[len] + offset);
@@ -274,7 +274,7 @@ char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 	unsigned short *ptr;
 	long offset, len = (long)QSP_STRLEN(s);
 	char *ret = (char *)malloc((len + 1) * (isUCS2 ? 2 : 1));
-	offset = isCode ? -QSP_CODREMOV : 0;
+	offset = (isCode ? -QSP_CODREMOV : 0);
 	if (isUCS2)
 	{
 		ptr = (unsigned short *)ret;
@@ -294,9 +294,9 @@ char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 QSP_CHAR *qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded)
 {
 	unsigned short *ptr;
-	long offset, len = isUCS2 ? qspUCS2StrLen(s) : (long)strlen(s);
+	long offset, len = (isUCS2 ? qspUCS2StrLen(s) : (long)strlen(s));
 	QSP_CHAR *ret = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
-	offset = isCoded ? QSP_CODREMOV : 0;
+	offset = (isCoded ? QSP_CODREMOV : 0);
 	ret[len] = 0;
 	if (isUCS2)
 	{
@@ -316,10 +316,10 @@ long qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSP_CHAR *delim, char ***res)
 {
 	char *delimStr, *newStr, **ret, *found, *curPos = str;
 	long charSize, delimSize, allocChars, count = 0, bufSize = 8;
-	charSize = isUCS2 ? 2 : 1;
+	charSize = (isUCS2 ? 2 : 1);
 	delimSize = (long)QSP_STRLEN(delim) * charSize;
 	delimStr = qspQSPToGameString(delim, isUCS2, QSP_FALSE);
-	found = isUCS2 ? qspUCS2StrStr(str, delimStr) : strstr(str, delimStr);
+	found = (isUCS2 ? qspUCS2StrStr(str, delimStr) : strstr(str, delimStr));
 	ret = (char **)malloc(bufSize * sizeof(char *));
 	while (found)
 	{
@@ -337,10 +337,10 @@ long qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSP_CHAR *delim, char ***res)
 		}
 		ret[count - 1] = newStr;
 		curPos = found + delimSize;
-		found = isUCS2 ? qspUCS2StrStr(curPos, delimStr) : strstr(curPos, delimStr);
+		found = (isUCS2 ? qspUCS2StrStr(curPos, delimStr) : strstr(curPos, delimStr));
 	}
 	free(delimStr);
-	allocChars = isUCS2 ? (qspUCS2StrLen(curPos) + 1) * charSize : (long)strlen(curPos) + 1;
+	allocChars = (isUCS2 ? (qspUCS2StrLen(curPos) + 1) * charSize : (long)strlen(curPos) + 1);
 	newStr = (char *)malloc(allocChars);
 	memcpy(newStr, curPos, allocChars);
 	if (++count > bufSize)

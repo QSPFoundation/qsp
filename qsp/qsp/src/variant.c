@@ -41,7 +41,7 @@ QSPVariant qspConvertVariantTo(QSPVariant val, QSP_BOOL isToString, QSP_BOOL isF
 	if (val.IsStr)
 	{
 		if (isToString)
-			res.Str = isFreeStr ? val.Str : qspGetNewText(val.Str, -1);
+			res.Str = (isFreeStr ? val.Str : qspGetNewText(val.Str, -1));
 		else
 		{
 			res.Num = qspStrToNum(val.Str, &temp);
@@ -112,6 +112,6 @@ int qspAutoConvertCompare(QSPVariant v1, QSPVariant v2)
 		if (isFree2) free(v2.Str);
 	}
 	else
-		res = (v1.Num > v2.Num ? 1 : v1.Num < v2.Num ? -1 : 0);
+		res = (v1.Num > v2.Num ? 1 : (v1.Num < v2.Num ? -1 : 0));
 	return res;
 }

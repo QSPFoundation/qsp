@@ -121,7 +121,7 @@ void qspCallSleep(long msecs)
 long qspCallGetMSCount()
 {
 	/* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
-	return qspCallBacks[QSP_CALL_GETMSCOUNT] ? qspCallBacks[QSP_CALL_GETMSCOUNT]() : 0;
+	return (qspCallBacks[QSP_CALL_GETMSCOUNT] ? qspCallBacks[QSP_CALL_GETMSCOUNT]() : 0);
 }
 
 void qspCallCloseFile(QSP_CHAR *file)

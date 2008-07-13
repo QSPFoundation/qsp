@@ -136,10 +136,10 @@ QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
 	QSP_CHAR *data = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
 	isOldFormat = QSP_STRCMP(data, QSP_GAMEID) != 0;
 	free(data);
-	ind = isOldFormat ? 30 : 4;
+	ind = (isOldFormat ? 30 : 4);
 	if (ind > count) return QSP_FALSE;
-	data = isOldFormat ?
-		qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE);
+	data = (isOldFormat ?
+		qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE));
 	locsCount = qspStrToNum(data, 0);
 	free(data);
 	if (locsCount <= 0) return QSP_FALSE;
@@ -200,8 +200,8 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	data = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
 	isOldFormat = QSP_STRCMP(data, QSP_GAMEID) != 0;
 	free(data);
-	data = isOldFormat ?
-		qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE);
+	data = (isOldFormat ?
+		qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE));
 	locsCount = qspStrToNum(data, 0);
 	free(data);
 	if (isAddLocs)
@@ -219,7 +219,7 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	qspCreateWorld(start, end);
 	qspLocsCount = locsCount;
 	locsCount = start;
-	ind = isOldFormat ? 30 : 4;
+	ind = (isOldFormat ? 30 : 4);
 	for (i = start; i < end; ++i)
 	{
 		data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
@@ -248,7 +248,7 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 		{
 			for (j = 0; j < actsCount; ++j)
 			{
-				qspLocs[locsCount].Actions[j].Image = isOldFormat ? 0 : qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
+				qspLocs[locsCount].Actions[j].Image = (isOldFormat ? 0 : qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE));
 				qspLocs[locsCount].Actions[j].Desc = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
 				data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
 				qspLocs[locsCount].Actions[j].OnPressLinesCount = qspPreprocessData(data, &qspLocs[locsCount].Actions[j].OnPressLines);
@@ -268,7 +268,7 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	{
 		qspQstFullPath = qspGetAddText(qspQstFullPath, fileName, 0, -1);
 		delim = qspInStrRChar(qspQstFullPath, QSP_PATHDELIM[0], 0);
-		qspQstPathLen = delim ? (long)(delim - qspQstFullPath) + 1 : 0;
+		qspQstPathLen = (delim ? (long)(delim - qspQstFullPath) + 1 : 0);
 		qspQstPath = qspGetAddText(qspQstPath, qspQstFullPath, 0, qspQstPathLen);
 		qspQstCRC = crc;
 	}
@@ -520,7 +520,7 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 			for (j = 0; j < valsCount; ++j)
 			{
 				qspVars[varInd].Value[j] = qspReCodeGetIntVal(strs[ind++]);
-				qspVars[varInd].TextValue[j] = *strs[ind] ? qspCodeReCode(strs[ind], QSP_FALSE) : 0;
+				qspVars[varInd].TextValue[j] = (*strs[ind] ? qspCodeReCode(strs[ind], QSP_FALSE) : 0);
 				++ind;
 			}
 		}

@@ -53,7 +53,7 @@ QSP_CHAR *qspSearchPlayList(QSP_CHAR *file)
 	}
 	free(playList);
 	free(uName);
-	return pos ? (pos - playList + qspPlayList) : 0;
+	return (pos ? (pos - playList + qspPlayList) : 0);
 }
 
 void qspPlayPLFiles()
@@ -109,7 +109,7 @@ void qspRefreshPlayList()
 
 QSP_BOOL qspStatementPlayFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long volume = count == 2 ? args[1].Num : 100;
+	long volume = (count == 2 ? args[1].Num : 100);
 	qspPlayFile(args[0].Str, volume, QSP_TRUE);
 	return QSP_FALSE;
 }
