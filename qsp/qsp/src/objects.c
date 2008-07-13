@@ -49,7 +49,7 @@ void qspClearObjectsWithNotify()
 		for (i = 0; i < oldCount; ++i)
 		{
 			v.Str = objs[i];
-			qspSetVarValueByName(QSP_FMT("LASTOBJ"), 0, v);
+			qspSetVarValueByName(QSP_FMT("LASTOBJ"), v);
 			if (qspErrorNum) break;
 			qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
@@ -108,7 +108,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 	obj->Image = imgPath;
 	obj->Desc = qspGetNewText(args[0].Str, -1);
 	qspIsObjectsChanged = QSP_TRUE;
-	qspSetVarValueByName(QSP_FMT("LASTOBJ"), 0, args[0]);
+	qspSetVarValueByName(QSP_FMT("LASTOBJ"), args[0]);
 	if (qspErrorNum) return QSP_FALSE;
 	qspExecLocByVarName(QSP_FMT("ONOBJADD"));
 	return QSP_FALSE;
@@ -128,7 +128,7 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, long count, QSP_CHAR **jumpTo, cha
 		++objInd;
 	}
 	qspIsObjectsChanged = QSP_TRUE;
-	qspSetVarValueByName(QSP_FMT("LASTOBJ"), 0, args[0]);
+	qspSetVarValueByName(QSP_FMT("LASTOBJ"), args[0]);
 	if (qspErrorNum) return QSP_FALSE;
 	qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
 	return QSP_FALSE;

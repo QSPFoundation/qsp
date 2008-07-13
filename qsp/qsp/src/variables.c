@@ -169,6 +169,16 @@ long qspVarIndex(QSP_CHAR *name, QSP_BOOL isCreate)
 	return -1;
 }
 
+long qspVarIndexWithSpaces(QSP_CHAR *name, QSP_BOOL isCreate, QSP_BOOL *isString)
+{
+	long varIndex;
+	QSP_CHAR *varName = qspDelSpc(name);
+	if (isString) *isString = (*varName == QSP_STRCHAR[0]);
+	varIndex = qspVarIndex(varName, isCreate);
+	free(varName);
+	return varIndex;
+}
+
 long qspGetVarTextIndex(long varIndex, QSP_CHAR *str, QSP_BOOL isCreate)
 {
 	QSP_CHAR *uStr;
@@ -247,11 +257,11 @@ void qspSetVarValueByIndex(long varIndex, long ind, QSPVariant val)
 		qspVars[varIndex].Value[ind] = val.Num;
 }
 
-void qspSetVarValueByName(QSP_CHAR *name, long ind, QSPVariant val)
+void qspSetVarValueByName(QSP_CHAR *name, QSPVariant val)
 {
 	long varIndex = qspVarIndex(name, QSP_TRUE);
 	if (varIndex < 0) return;
-	qspSetVarValueByIndex(varIndex, ind, val);
+	qspSetVarValueByIndex(varIndex, 0, val);
 }
 
 void qspSetVar(QSP_CHAR *name, QSPVariant val)
@@ -327,23 +337,19 @@ QSPVariant qspGetVar(QSP_CHAR *name)
 
 long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 {
-	long count, varInd, num;
 	QSP_CHAR emptyStr[1], *str;
 	OnigUChar *tempBeg, *tempEnd;
 	regex_t *onigExp;
 	OnigRegion *onigReg;
 	OnigErrorInfo onigInfo;
-	QSP_BOOL convErr = QSP_FALSE;
-	val = qspConvertVariantTo(val, isRegExp || *name == QSP_STRCHAR[0], QSP_FALSE, &convErr);
+	QSP_BOOL convErr, isString;
+	long count, num, varInd = qspVarIndexWithSpaces(name, QSP_FALSE, &isString);
+	if (varInd < 0) return -1;
+	convErr = QSP_FALSE;
+	val = qspConvertVariantTo(val, isRegExp || isString, QSP_FALSE, &convErr);
 	if (convErr)
 	{
 		qspSetError(QSP_ERR_TYPEMISMATCH);
-		return -1;
-	}
-	varInd = qspVarIndex(name, QSP_FALSE);
-	if (varInd < 0)
-	{
-		if (val.IsStr) free(val.Str);
 		return -1;
 	}
 	if (isRegExp)
@@ -429,14 +435,10 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 	QSP_CHAR *str;
 	long arrInd1, arrInd2, itemsCount;
 	/* Get index of the first array */
-	str = qspDelSpc(args[0].Str);
-	arrInd1 = qspVarIndex(str, QSP_TRUE);
-	free(str);
+	arrInd1 = qspVarIndexWithSpaces(args[0].Str, QSP_TRUE, 0);
 	if (arrInd1 < 0) return QSP_FALSE;
 	/* Get index of the second array */
-	str = qspDelSpc(args[1].Str);
-	arrInd2 = qspVarIndex(str, QSP_FALSE);
-	free(str);
+	arrInd2 = qspVarIndexWithSpaces(args[1].Str, QSP_FALSE, 0);
 	if (arrInd2 < 0 || arrInd1 == arrInd2) return QSP_FALSE;
 	/* --- */
 	if (qspVars[arrInd1].Value) free(qspVars[arrInd1].Value);

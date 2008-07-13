@@ -647,7 +647,7 @@ QSP_BOOL qspStatementRefInt(QSPVariant *args, long count, QSP_CHAR **jumpTo, cha
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSP_CHAR *imgPath, *str, *pos, *pos2, *endPos;
-	long i, varInd = qspVarIndex(args[0].Str, QSP_FALSE);
+	long i, varInd = qspVarIndexWithSpaces(args[0].Str, QSP_FALSE, 0);
 	if (varInd < 0) return QSP_FALSE;
 	qspClearMenu(QSP_FALSE);
 	qspCallDeleteMenu();
