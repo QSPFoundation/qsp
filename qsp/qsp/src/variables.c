@@ -169,7 +169,7 @@ long qspVarIndex(QSP_CHAR *name, QSP_BOOL isCreate)
 	return -1;
 }
 
-long qspVarIndexWithSpaces(QSP_CHAR *name, QSP_BOOL isCreate, QSP_BOOL *isString)
+long qspVarIndexWithType(QSP_CHAR *name, QSP_BOOL isCreate, QSP_BOOL *isString)
 {
 	long varIndex;
 	QSP_CHAR *varName = qspDelSpc(name);
@@ -343,7 +343,7 @@ long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 	OnigRegion *onigReg;
 	OnigErrorInfo onigInfo;
 	QSP_BOOL convErr, isString;
-	long count, num, varInd = qspVarIndexWithSpaces(name, QSP_FALSE, &isString);
+	long count, num, varInd = qspVarIndexWithType(name, QSP_FALSE, &isString);
 	if (varInd < 0) return -1;
 	convErr = QSP_FALSE;
 	val = qspConvertVariantTo(val, isRegExp || isString, QSP_FALSE, &convErr);
@@ -435,10 +435,10 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 	QSP_CHAR *str;
 	long arrInd1, arrInd2, itemsCount;
 	/* Get index of the first array */
-	arrInd1 = qspVarIndexWithSpaces(args[0].Str, QSP_TRUE, 0);
+	arrInd1 = qspVarIndexWithType(args[0].Str, QSP_TRUE, 0);
 	if (arrInd1 < 0) return QSP_FALSE;
 	/* Get index of the second array */
-	arrInd2 = qspVarIndexWithSpaces(args[1].Str, QSP_FALSE, 0);
+	arrInd2 = qspVarIndexWithType(args[1].Str, QSP_FALSE, 0);
 	if (arrInd2 < 0 || arrInd1 == arrInd2) return QSP_FALSE;
 	/* --- */
 	if (qspVars[arrInd1].Value) free(qspVars[arrInd1].Value);
