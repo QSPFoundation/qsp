@@ -373,18 +373,23 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 				if (endPos < 0)
 				{
 					qspSetError(QSP_ERR_ENDNOTFOUND);
-					break;
+					i = endLine;
+					continue;
 				}
 				*pos = 0;
 				count = qspGetStatArgs(paramPos, statCode, args);
 				*pos = QSP_COLONDELIM[0];
-				if (qspErrorNum) break;
+				if (qspErrorNum)
+				{
+					i = endLine;
+					continue;
+				}
 				switch (statCode)
 				{
 				case qspStatAct:
 					qspAddAction(args, count, s, i + 1, endPos, QSP_TRUE);
 					qspFreeVariants(args, count);
-					i = endPos;
+					i = (qspErrorNum ? endLine : endPos);
 					break;
 				case qspStatIf:
 					elsePos = qspSearchElse(s, ++i, endLine);
@@ -416,7 +421,6 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 			}
 			break;
 		}
-		if (qspErrorNum) break;
 		**jumpTo = 0;
 		isExit = qspExecString(s[i], jumpTo);
 		if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
