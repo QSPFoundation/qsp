@@ -369,7 +369,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 			pos = qspStrEnd(s[i]) - 1;
 			if (*pos == QSP_COLONDELIM[0]) /* Multiline */
 			{
-				endPos = qspSearchEnd(s, i + 1, endLine);
+				endPos = qspSearchEnd(s, ++i, endLine);
 				if (endPos < 0)
 				{
 					qspSetError(QSP_ERR_ENDNOTFOUND);
@@ -387,12 +387,12 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 				switch (statCode)
 				{
 				case qspStatAct:
-					qspAddAction(args, count, s, i + 1, endPos, QSP_TRUE);
+					qspAddAction(args, count, s, i, endPos, QSP_TRUE);
 					qspFreeVariants(args, count);
 					i = (qspErrorNum ? endLine : endPos);
 					break;
 				case qspStatIf:
-					elsePos = qspSearchElse(s, ++i, endLine);
+					elsePos = qspSearchElse(s, i, endLine);
 					if (args[0].Num)
 					{
 						if (elsePos >= 0)

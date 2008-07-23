@@ -158,7 +158,6 @@ QSP_CHAR *qspGetName(QSP_CHAR **expr)
 			if (!rPos)
 			{
 				qspSetError(QSP_ERR_BRACKNOTFOUND);
-				*expr = pos;
 				return 0;
 			}
 			pos = rPos + 1;
@@ -224,7 +223,6 @@ QSP_CHAR *qspGetString(QSP_CHAR **expr)
 		if (!(*(++pos)))
 		{
 			qspSetError(QSP_ERR_QUOTNOTFOUND);
-			*expr = pos;
 			free(buf);
 			return 0;
 		}
