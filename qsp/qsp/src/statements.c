@@ -137,16 +137,17 @@ void qspInitStats()
 	qspAddStatement(qspStatXGoTo, QSP_FMT("XGOTO"), QSP_FMT("XGT"), 0, qspStatementGoTo, 1, 1, 1);
 }
 
-long qspGetStatCode(QSP_CHAR *s, QSP_CHAR **pos)
+long qspGetStatCode(QSP_CHAR *s, QSP_BOOL isMultiline, QSP_CHAR **pos)
 {
-	long i, j, len;
+	long i, j, len, last;
 	QSP_CHAR *uStr;
 	if (!(*s)) return qspStatUnknown;
 	if (*s == QSP_LABEL[0]) return qspStatLabel;
 	if (*s == QSP_COMMENT[0]) return qspStatComment;
 	/* ------------------------------------------------------------------ */
+	last = (isMultiline ? qspStatFirst_NotMultilineStatement : qspStatLast_Statement);
 	qspUpperStr(uStr = qspGetNewText(s, -1));
-	for (i = qspStatFirst_Statement; i < qspStatLast_Statement; ++i)
+	for (i = qspStatFirst_Statement; i < last; ++i)
 		for (j = 0; j < 2; ++j)
 			if (qspStats[i].Names[j])
 			{
@@ -167,7 +168,7 @@ long qspSearchElse(QSP_CHAR **s, long start, long end)
 	long c = 1;
 	while (start < end)
 	{
-		switch (qspGetStatCode(s[start], 0))
+		switch (qspGetStatCode(s[start], QSP_TRUE, 0))
 		{
 		case qspStatAct:
 		case qspStatIf:
@@ -190,7 +191,7 @@ long qspSearchEnd(QSP_CHAR **s, long start, long end)
 	long c = 1;
 	while (start < end)
 	{
-		switch (qspGetStatCode(s[start], 0))
+		switch (qspGetStatCode(s[start], QSP_TRUE, 0))
 		{
 		case qspStatAct:
 		case qspStatIf:
@@ -293,7 +294,7 @@ QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	s = qspSkipSpaces(s);
 	if (!(*s)) return QSP_FALSE;
 	pos = qspStrPos(s, QSP_STATDELIM, QSP_FALSE);
-	statCode = qspGetStatCode(s, &paramPos);
+	statCode = qspGetStatCode(s, QSP_FALSE, &paramPos);
 	if (pos)
 	{
 		switch (statCode)
@@ -361,11 +362,9 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 	while (i < endLine)
 	{
 		qspRealLine = i + codeOffset;
-		statCode = qspGetStatCode(s[i], &paramPos);
-		switch (statCode)
+		statCode = qspGetStatCode(s[i], QSP_TRUE, &paramPos);
+		if (statCode == qspStatAct || statCode == qspStatIf)
 		{
-		case qspStatAct:
-		case qspStatIf:
 			pos = qspStrEnd(s[i]) - 1;
 			if (*pos == QSP_COLONDELIM[0]) /* Multiline */
 			{
@@ -373,17 +372,12 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 				if (endPos < 0)
 				{
 					qspSetError(QSP_ERR_ENDNOTFOUND);
-					i = endLine;
-					continue;
+					break;
 				}
 				*pos = 0;
 				count = qspGetStatArgs(paramPos, statCode, args);
 				*pos = QSP_COLONDELIM[0];
-				if (qspErrorNum)
-				{
-					i = endLine;
-					continue;
-				}
+				if (qspErrorNum) break;
 				switch (statCode)
 				{
 				case qspStatAct:
@@ -419,7 +413,6 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 				}
 				continue;
 			}
-			break;
 		}
 		**jumpTo = 0;
 		isExit = qspExecString(s[i], jumpTo);
