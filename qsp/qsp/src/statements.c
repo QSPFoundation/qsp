@@ -378,30 +378,31 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 				count = qspGetStatArgs(paramPos, statCode, args);
 				*pos = QSP_COLONDELIM[0];
 				if (qspErrorNum) break;
-				switch (statCode)
+				if (statCode == qspStatAct)
 				{
-				case qspStatAct:
 					qspAddAction(args, count, s, i, endPos, QSP_TRUE);
 					qspFreeVariants(args, count);
-					i = (qspErrorNum ? endLine : endPos);
-					break;
-				case qspStatIf:
+					if (qspErrorNum) break;
+					i = endPos;
+				}
+				else if (statCode == qspStatIf)
+				{
 					elsePos = qspSearchElse(s, i, endLine);
 					if (args[0].Num)
 					{
 						if (elsePos >= 0)
 						{
 							isExit = qspExecCode(s, i, elsePos, 1, jumpTo, QSP_FALSE);
-							if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum)
-								i = endLine;
-							else if (**jumpTo)
+							if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+							if (**jumpTo)
 							{
 								i = qspSearchLabel(s, startLine, endLine, *jumpTo);
 								if (i < 0)
 								{
 									if (uLevel) qspSetError(QSP_ERR_LABELNOTFOUND);
-									i = endLine;
+									break;
 								}
+								**jumpTo = 0;
 							}
 							else
 								i = endPos;
@@ -409,12 +410,10 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 					}
 					else
 						i = (elsePos < 0 ? endPos : elsePos);
-					break;
 				}
 				continue;
 			}
 		}
-		**jumpTo = 0;
 		isExit = qspExecString(s[i], jumpTo);
 		if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		if (**jumpTo)
@@ -425,6 +424,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 				if (uLevel) qspSetError(QSP_ERR_LABELNOTFOUND);
 				break;
 			}
+			**jumpTo = 0;
 			continue;
 		}
 		++i;
