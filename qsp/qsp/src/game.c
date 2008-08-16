@@ -15,7 +15,24 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "game.h"
+#include "actions.h"
+#include "callbacks.h"
+#include "codetools.h"
+#include "coding.h"
+#include "common.h"
+#include "errors.h"
+#include "locations.h"
+#include "objects.h"
+#include "playlist.h"
+#include "text.h"
+#include "time.h"
+#include "variables.h"
+
+QSP_CHAR *qspQstPath = 0;
+long qspQstPathLen = 0;
+QSP_CHAR *qspQstFullPath = 0;
+long qspQstCRC = 0;
 
 QSP_CHAR *qspCurIncFiles[QSP_MAXINCFILES];
 long qspCurIncFilesCount = 0;
@@ -111,11 +128,11 @@ void qspNewGame(QSP_BOOL isReset)
 	}
 	if (isReset)
 	{
+		qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
 		srand((unsigned int)time(0));
-		qspClearIncludes(QSP_FALSE);
 		qspMemClear(QSP_FALSE);
 		qspInitVars();
-		qspCallGetMSCount();
+		qspResetTime(0);
 		qspCallShowWindow(QSP_WIN_ACTS, QSP_TRUE);
 		qspCallShowWindow(QSP_WIN_OBJS, QSP_TRUE);
 		qspCallShowWindow(QSP_WIN_VARS, QSP_TRUE);
@@ -126,7 +143,7 @@ void qspNewGame(QSP_BOOL isReset)
 		qspCallSetTimer(QSP_DEFTIMERINTERVAL);
 	}
 	qspCurLoc = 0;
-	qspRefresh(QSP_TRUE);
+	qspRefreshCurLoc(QSP_TRUE);
 }
 
 QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
@@ -296,11 +313,10 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 	}
 	buf = 0;
 	qspRefreshPlayList();
-	if ((qspMSCount += qspCallGetMSCount()) < 0) qspMSCount = 0;
 	len = qspCodeWriteVal(&buf, 0, QSP_SAVEDGAMEID, QSP_FALSE);
 	len = qspCodeWriteVal(&buf, len, QSP_VER, QSP_FALSE);
 	len = qspCodeWriteIntVal(&buf, len, qspQstCRC, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, qspMSCount, QSP_TRUE);
+	len = qspCodeWriteIntVal(&buf, len, qspGetTime(), QSP_TRUE);
 	len = qspCodeWriteIntVal(&buf, len, qspCurSelAction, QSP_TRUE);
 	len = qspCodeWriteIntVal(&buf, len, qspCurSelObject, QSP_TRUE);
 	len = qspCodeWriteVal(&buf, len, qspPlayList, QSP_TRUE);
@@ -455,9 +471,8 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	}
 	++qspRefreshCount;
 	++qspFullRefreshCount;
-	qspClearIncludes(QSP_FALSE);
 	qspMemClear(QSP_FALSE);
-	qspMSCount = qspReCodeGetIntVal(strs[3]);
+	qspResetTime(qspReCodeGetIntVal(strs[3]));
 	qspCurSelAction = qspReCodeGetIntVal(strs[4]);
 	qspCurSelObject = qspReCodeGetIntVal(strs[5]);
 	if (*strs[6]) qspPlayListLen = (long)QSP_STRLEN(qspPlayList = qspCodeReCode(strs[6], QSP_FALSE));
@@ -534,7 +549,6 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	}
 	qspFreeStrs(strs, count, QSP_FALSE);
 	qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_TRUE;
-	qspCallGetMSCount();
 	qspInitVars();
 	qspCallShowWindow(QSP_WIN_ACTS, qspCurIsShowActs);
 	qspCallShowWindow(QSP_WIN_OBJS, qspCurIsShowObjs);

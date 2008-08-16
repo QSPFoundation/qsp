@@ -15,8 +15,20 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
 #include "statements.h"
+#include "actions.h"
+#include "callbacks.h"
+#include "common.h"
+#include "errors.h"
+#include "game.h"
+#include "locations.h"
+#include "math.h"
+#include "menu.h"
+#include "objects.h"
+#include "playlist.h"
+#include "text.h"
+#include "variables.h"
+#include "variant.h"
 
 QSPStatement qspStats[qspStatLast_Statement];
 
@@ -32,7 +44,6 @@ QSP_BOOL qspStatementWait(QSPVariant *, long, QSP_CHAR **, char);
 QSP_BOOL qspStatementSetTimer(QSPVariant *, long, QSP_CHAR **, char);
 QSP_BOOL qspStatementShowWin(QSPVariant *, long, QSP_CHAR **, char);
 QSP_BOOL qspStatementRefInt(QSPVariant *, long, QSP_CHAR **, char);
-QSP_BOOL qspStatementShowMenu(QSPVariant *, long, QSP_CHAR **, char);
 QSP_BOOL qspStatementView(QSPVariant *, long, QSP_CHAR **, char);
 QSP_BOOL qspStatementMsg(QSPVariant *, long, QSP_CHAR **, char);
 QSP_BOOL qspStatementExec(QSPVariant *, long, QSP_CHAR **, char);
@@ -580,7 +591,7 @@ QSP_BOOL qspStatementGoTo(QSPVariant *args, long count, QSP_CHAR **jumpTo, char 
 		return QSP_FALSE;
 	}
 	qspCurLoc = locInd;
-	qspRefresh(extArg);
+	qspRefreshCurLoc(extArg);
 	return QSP_FALSE;
 }
 
@@ -638,51 +649,6 @@ QSP_BOOL qspStatementRefInt(QSPVariant *args, long count, QSP_CHAR **jumpTo, cha
 	qspIsMustWait = QSP_FALSE;
 	qspCallRefreshInt(QSP_TRUE);
 	qspIsMustWait = prevIsMustWait;
-	return QSP_FALSE;
-}
-
-QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
-{
-	QSP_CHAR *imgPath, *str, *pos, *pos2, *endPos;
-	long i, varInd = qspVarIndexWithType(args[0].Str, QSP_FALSE, 0);
-	if (varInd < 0) return QSP_FALSE;
-	qspClearMenu(QSP_FALSE);
-	qspCallDeleteMenu();
-	for (i = 0; i < qspVars[varInd].ValsCount; ++i)
-	{
-		if (!((str = qspVars[varInd].TextValue[i]) && qspIsAnyString(str))) break;
-		pos2 = qspInStrRChar(str, QSP_MENUDELIM[0], 0);
-		if (!pos2)
-		{
-			qspSetError(QSP_ERR_COLONNOTFOUND);
-			return QSP_FALSE;
-		}
-		if (qspCurMenuItems == QSP_MAXMENUITEMS)
-		{
-			qspSetError(QSP_ERR_CANTADDMENUITEM);
-			return QSP_FALSE;
-		}
-		endPos = qspStrEnd(str);
-		pos = qspInStrRChar(str, QSP_MENUDELIM[0], pos2);
-		if (!pos)
-		{
-			pos = pos2;
-			pos2 = endPos;
-		}
-		qspCurMenuLocs[qspCurMenuItems++] = qspGetNewText(pos + 1, (long)(pos2 - pos) - 1);
-		if (pos2 < endPos && qspIsAnyString(++pos2))
-		{
-			imgPath = qspGetNewText(qspQstPath, qspQstPathLen);
-			imgPath = qspGetAddText(imgPath, pos2, qspQstPathLen, (long)(endPos - pos2));
-		}
-		else
-			imgPath = 0;
-		*pos = 0;
-		qspCallAddMenuItem(str, imgPath);
-		*pos = QSP_MENUDELIM[0];
-		if (imgPath) free(imgPath);
-	}
-	qspCallShowMenu();
 	return QSP_FALSE;
 }
 

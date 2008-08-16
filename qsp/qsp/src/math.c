@@ -15,8 +15,15 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
 #include "math.h"
+#include "callbacks.h"
+#include "errors.h"
+#include "game.h"
+#include "locations.h"
+#include "objects.h"
+#include "text.h"
+#include "variables.h"
+#include "variant.h"
 
 QSPMathOperation qspOps[qspOpLast_Operation];
 

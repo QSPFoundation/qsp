@@ -48,13 +48,16 @@
 		<Unit filename="src\coding.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\coding.h" />
 		<Unit filename="src\declarations.h" />
 		<Unit filename="src\locations.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\locations.h" />
 		<Unit filename="src\main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\main.h" />
 		<Unit filename="src\memwatch.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -62,6 +65,7 @@
 		<Unit filename="src\text.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\text.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

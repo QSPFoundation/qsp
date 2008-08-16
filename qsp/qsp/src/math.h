@@ -15,6 +15,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#include "declarations.h"
+#include "variant.h"
+
 #ifndef QSP_MATHDEFINES
 	#define QSP_MATHDEFINES
 
@@ -96,5 +99,8 @@
 
 		qspOpLast_Operation
 	};
+
+	void qspInitMath();
+	QSPVariant qspExprValue(QSP_CHAR *);
 
 #endif

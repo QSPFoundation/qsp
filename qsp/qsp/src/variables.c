@@ -15,8 +15,18 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
 #include "variables.h"
+#include "actions.h"
+#include "common.h"
+#include "errors.h"
+#include "locations.h"
+#include "math.h"
+#include "objects.h"
+#include "text.h"
+#include "time.h"
+#include "variant.h"
+
+QSPVar qspVars[QSP_VARSCOUNT];
 
 unsigned char qspRand8[256] =
 {
@@ -77,9 +87,8 @@ void qspRefreshVar(long varIndex)
 		v.Num = qspCurObjectsCount;
 		break;
 	case qspVarMsecsCount:
-		if ((qspMSCount += qspCallGetMSCount()) < 0) qspMSCount = 0;
 		v.IsStr = QSP_FALSE;
-		v.Num = qspMSCount;
+		v.Num = qspGetTime();
 		break;
 	case qspVarQSPVer:
 		v.IsStr = QSP_TRUE;

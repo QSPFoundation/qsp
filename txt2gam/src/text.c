@@ -15,7 +15,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "text.h"
 
 long qspAddText(QSP_CHAR **dest, QSP_CHAR *val, long destLen, long valLen, QSP_BOOL isCreate)
 {

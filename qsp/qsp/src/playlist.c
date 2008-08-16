@@ -15,7 +15,13 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "playlist.h"
+#include "callbacks.h"
+#include "game.h"
+#include "text.h"
+
+QSP_CHAR *qspPlayList = 0;
+long qspPlayListLen = 0;
 
 void qspPlayFile(QSP_CHAR *s, long volume, QSP_BOOL isAddToPlayList)
 {

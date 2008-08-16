@@ -15,7 +15,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "main.h"
+#include "coding.h"
+#include "locations.h"
+#include "text.h"
 
 long qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isFill)
 {

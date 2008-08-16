@@ -15,6 +15,9 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#include "declarations.h"
+#include "variant.h"
+
 #ifndef QSP_STATSDEFINES
 	#define QSP_STATSDEFINES
 
@@ -94,5 +97,10 @@
 
 		qspStatLast_Statement
 	};
+
+	void qspInitStats();
+	long qspGetStatArgs(QSP_CHAR *, long, QSPVariant *);
+	QSP_BOOL qspExecString(QSP_CHAR *, QSP_CHAR **);
+	QSP_BOOL qspExecCode(QSP_CHAR **, long, long, long, QSP_CHAR **, QSP_BOOL);
 
 #endif

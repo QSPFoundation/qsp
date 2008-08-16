@@ -15,8 +15,18 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "actions.h"
+#include "errors.h"
+#include "game.h"
 #include "statements.h"
+#include "text.h"
+#include "variant.h"
+
+QSPCurAct qspCurActions[QSP_MAXACTIONS];
+long qspCurActionsCount = 0;
+long qspCurSelAction = -1;
+QSP_BOOL qspIsActionsChanged = QSP_FALSE;
+QSP_BOOL qspCurIsShowActs = QSP_TRUE;
 
 void qspClearActions(QSP_BOOL isFirst)
 {

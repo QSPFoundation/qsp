@@ -354,11 +354,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\src\coding.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\declarations.h"
 				>
 			</File>
 			<File
+				RelativePath=".\src\locations.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\main.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\memwatch.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\text.h"
 				>
 			</File>
 		</Filter>

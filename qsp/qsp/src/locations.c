@@ -15,8 +15,19 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "locations.h"
+#include "actions.h"
+#include "common.h"
+#include "errors.h"
 #include "statements.h"
+#include "text.h"
+#include "variables.h"
+
+QSPLocation *qspLocs = 0;
+long qspLocsCount = 0;
+long qspCurLoc = -1;
+long qspRefreshCount = 0;
+long qspFullRefreshCount = 0;
 
 void qspCreateWorld(long start, long locsCount)
 {
@@ -170,4 +181,17 @@ void qspExecLocByVarName(QSP_CHAR *name)
 {
 	QSP_CHAR *locName = qspGetVarStrValue(name);
 	if (qspIsAnyString(locName)) qspExecLocByName(locName, QSP_FALSE);
+}
+
+void qspRefreshCurLoc(QSP_BOOL isChangeDesc)
+{
+	long oldRefreshCount;
+	qspClearActions(QSP_FALSE);
+	++qspRefreshCount;
+	if (isChangeDesc) ++qspFullRefreshCount;
+	oldRefreshCount = qspRefreshCount;
+	qspExecLocByIndex(qspCurLoc, isChangeDesc);
+	if (qspErrorNum) return;
+	if (qspRefreshCount == oldRefreshCount)
+		qspExecLocByVarName(QSP_FMT("ONNEWLOC"));
 }

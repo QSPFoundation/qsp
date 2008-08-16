@@ -15,7 +15,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "coding.h"
+#include "text.h"
 
 unsigned char qspCP1251ToKOI8RTable[] =
 {

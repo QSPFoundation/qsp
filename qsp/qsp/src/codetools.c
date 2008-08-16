@@ -15,7 +15,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "codetools.h"
+#include "text.h"
 
 long qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 {

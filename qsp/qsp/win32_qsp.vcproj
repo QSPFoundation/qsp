@@ -364,6 +364,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\errors.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\game.c"
 				>
 			</File>
@@ -380,6 +384,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\menu.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\objects.c"
 				>
 			</File>
@@ -393,6 +401,10 @@
 			</File>
 			<File
 				RelativePath=".\src\text.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\time.c"
 				>
 			</File>
 			<File
@@ -478,7 +490,39 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\src\actions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\callbacks.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\codetools.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\coding.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\common.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\declarations.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\errors.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\game.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\locations.h"
 				>
 			</File>
 			<File
@@ -490,6 +534,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\menu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\objects.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\playlist.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\qsp.h"
 				>
 			</File>
@@ -498,7 +554,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\text.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\time.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\variables.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\variant.h"
 				>
 			</File>
 			<Filter

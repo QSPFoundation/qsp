@@ -15,7 +15,12 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "text.h"
+#include "coding.h"
+#include "errors.h"
+#include "math.h"
+#include "variables.h"
+#include "variant.h"
 
 long qspAddText(QSP_CHAR **dest, QSP_CHAR *val, long destLen, long valLen, QSP_BOOL isCreate)
 {
@@ -309,4 +314,55 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 		++txt;
 	}
 	return 0;
+}
+
+QSP_CHAR *qspFormatText(QSP_CHAR *txt)
+{
+	QSPVariant val;
+	QSP_CHAR *newTxt, *lPos, *rPos;
+	long len, txtLen, oldTxtLen, bufSize;
+	if (qspGetVarNumValue(QSP_FMT("DISABLESUBEX"))) return qspGetNewText(txt, -1);
+	bufSize = 256;
+	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+	txtLen = oldTxtLen = 0;
+	lPos = QSP_STRSTR(txt, QSP_LSUBEX);
+	while (lPos)
+	{
+		len = (long)(lPos - txt);
+		if ((txtLen += len) >= bufSize)
+		{
+			bufSize = txtLen + 128;
+			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
+		}
+		QSP_STRNCPY(newTxt + oldTxtLen, txt, len);
+		oldTxtLen = txtLen;
+		txt = lPos + QSP_LEN(QSP_LSUBEX);
+		rPos = qspStrPos(txt, QSP_RSUBEX, QSP_FALSE);
+		if (!rPos)
+		{
+			qspSetError(QSP_ERR_BRACKNOTFOUND);
+			free(newTxt);
+			return 0;
+		}
+		*rPos = 0;
+		val = qspExprValue(txt);
+		*rPos = QSP_RSUBEX[0];
+		if (qspErrorNum)
+		{
+			free(newTxt);
+			return 0;
+		}
+		val = qspConvertVariantTo(val, QSP_TRUE, QSP_TRUE, 0);
+		if ((txtLen += (long)QSP_STRLEN(val.Str)) >= bufSize)
+		{
+			bufSize = txtLen + 128;
+			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
+		}
+		QSP_STRCPY(newTxt + oldTxtLen, val.Str);
+		free(val.Str);
+		oldTxtLen = txtLen;
+		txt = rPos + QSP_LEN(QSP_RSUBEX);
+		lPos = QSP_STRSTR(txt, QSP_LSUBEX);
+	}
+	return qspGetAddText(newTxt, txt, txtLen, -1);
 }

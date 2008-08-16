@@ -15,22 +15,23 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "locations.h"
+#include "declarations.h"
 
-QSPLocation *qspLocs = 0;
-long qspLocsCount = 0;
+#ifndef QSP_TEXTDEFINES
+	#define QSP_TEXTDEFINES
 
-void qspCreateWorld(long locsCount)
-{
-	long i;
-	for (i = 0; i < qspLocsCount; ++i)
-	{
-		free(qspLocs[i].Name);
-		free(qspLocs[i].OnVisit);
-	}
-	if (qspLocsCount != locsCount)
-	{
-		qspLocsCount = locsCount;
-		qspLocs = (QSPLocation *)realloc(qspLocs, qspLocsCount * sizeof(QSPLocation));
-	}
-}
+	#define QSP_STRSDELIM QSP_FMT("\r\n")
+	#define QSP_SPACES QSP_FMT(" \t")
+
+	/* Helpers */
+	#define QSP_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
+
+	long qspAddText(QSP_CHAR **, QSP_CHAR *, long, long, QSP_BOOL);
+	QSP_BOOL qspIsInList(QSP_CHAR *, QSP_CHAR);
+	QSP_CHAR *qspSkipSpaces(QSP_CHAR *);
+	QSP_CHAR *qspDelSpc(QSP_CHAR *);
+	QSP_BOOL qspIsEqual(QSP_CHAR *, QSP_CHAR *, long);
+	void qspFreeStrs(void **, long, QSP_BOOL);
+	QSP_CHAR *qspNumToStr(QSP_CHAR *, long);
+
+#endif

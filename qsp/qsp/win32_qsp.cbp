@@ -59,25 +59,36 @@
 		<Unit filename="src\actions.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\actions.h" />
 		<Unit filename="src\callbacks.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\callbacks.h" />
 		<Unit filename="src\codetools.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\codetools.h" />
 		<Unit filename="src\coding.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\coding.h" />
 		<Unit filename="src\common.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\common.h" />
 		<Unit filename="src\declarations.h" />
+		<Unit filename="src\errors.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\errors.h" />
 		<Unit filename="src\game.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\game.h" />
 		<Unit filename="src\locations.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\locations.h" />
 		<Unit filename="src\math.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -86,9 +97,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src\memwatch.h" />
+		<Unit filename="src\menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\menu.h" />
 		<Unit filename="src\objects.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\objects.h" />
 		<Unit filename="src\onig\config.h" />
 		<Unit filename="src\onig\enc\ascii.c">
 			<Option compilerVar="CC" />
@@ -143,6 +159,7 @@
 		<Unit filename="src\playlist.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\playlist.h" />
 		<Unit filename="src\qsp.h" />
 		<Unit filename="src\statements.c">
 			<Option compilerVar="CC" />
@@ -151,6 +168,11 @@
 		<Unit filename="src\text.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\text.h" />
+		<Unit filename="src\time.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src\time.h" />
 		<Unit filename="src\variables.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -158,6 +180,7 @@
 		<Unit filename="src\variant.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="src\variant.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

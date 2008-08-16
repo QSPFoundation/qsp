@@ -15,7 +15,18 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
+#include "objects.h"
+#include "errors.h"
+#include "game.h"
+#include "locations.h"
+#include "text.h"
+#include "variables.h"
+
+QSPObj qspCurObjects[QSP_MAXOBJECTS];
+long qspCurObjectsCount = 0;
+long qspCurSelObject = -1;
+QSP_BOOL qspIsObjectsChanged = QSP_FALSE;
+QSP_BOOL qspCurIsShowObjs = QSP_TRUE;
 
 void qspClearObjects(QSP_BOOL isFirst)
 {

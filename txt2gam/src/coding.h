@@ -15,22 +15,23 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "locations.h"
+#include "declarations.h"
 
-QSPLocation *qspLocs = 0;
-long qspLocsCount = 0;
+#ifndef QSP_CODINGDEFINES
+	#define QSP_CODINGDEFINES
 
-void qspCreateWorld(long locsCount)
-{
-	long i;
-	for (i = 0; i < qspLocsCount; ++i)
-	{
-		free(qspLocs[i].Name);
-		free(qspLocs[i].OnVisit);
-	}
-	if (qspLocsCount != locsCount)
-	{
-		qspLocsCount = locsCount;
-		qspLocs = (QSPLocation *)realloc(qspLocs, qspLocsCount * sizeof(QSPLocation));
-	}
-}
+	#define QSP_CODREMOV 5
+
+	extern wchar_t qspCP1251ToUnicodeTable[];
+
+	wchar_t qspDirectConvertUC(char, wchar_t *);
+	char qspReverseConvertUC(wchar_t, wchar_t *);
+	char *qspFromQSPString(QSP_CHAR *);
+	QSP_CHAR *qspToQSPString(char *);
+	char *qspQSPToGameString(QSP_CHAR *, QSP_BOOL, QSP_BOOL);
+	QSP_CHAR *qspGameToQSPString(char *, QSP_BOOL, QSP_BOOL);
+	long qspSplitGameStr(char *, QSP_BOOL, QSP_CHAR *, char ***);
+	long qspGameCodeWriteIntVal(char **, long, long, QSP_BOOL, QSP_BOOL);
+	long qspGameCodeWriteVal(char **, long, QSP_CHAR *, QSP_BOOL, QSP_BOOL);
+
+#endif

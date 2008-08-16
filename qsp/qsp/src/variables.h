@@ -15,8 +15,25 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#include "declarations.h"
+#include "variant.h"
+
 #ifndef QSP_VARSDEFINES
 	#define QSP_VARSDEFINES
+
+	#define QSP_VARSSEEK 50
+	#define QSP_VARSCOUNT 256 * QSP_VARSSEEK
+
+	typedef struct
+	{
+		QSP_CHAR *Name;
+		long *Value;
+		QSP_CHAR **TextValue;
+		long ValsCount;
+		QSP_CHAR **TextIndex;
+		long IndsCount;
+		long Type;
+	} QSPVar;
 
 	enum
 	{
@@ -30,5 +47,21 @@
 		qspVarSelObj,
 		qspVarSelAct
 	};
+
+	extern QSPVar qspVars[QSP_VARSCOUNT];
+
+	void qspClearVars(QSP_BOOL);
+	void qspInitVars();
+	long qspVarIndex(QSP_CHAR *, QSP_BOOL);
+	long qspVarIndexWithType(QSP_CHAR *, QSP_BOOL, QSP_BOOL *);
+	void qspSetVarValueByName(QSP_CHAR *, QSPVariant);
+	QSP_CHAR *qspGetVarStrValue(QSP_CHAR *);
+	long qspGetVarNumValue(QSP_CHAR *);
+	QSPVariant qspGetVar(QSP_CHAR *);
+	long qspArrayPos(QSP_CHAR *, long, QSPVariant, QSP_BOOL);
+	long qspGetVarsCount();
+	/* -- */
+	void qspStatementSetVarValue(QSP_CHAR *);
+	QSP_BOOL qspStatementCopyArr(QSPVariant *, long, QSP_CHAR **, char);
 
 #endif
