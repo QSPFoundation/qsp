@@ -479,7 +479,7 @@ QSP_BOOL QSPLoadGameWorld(QSP_CHAR *fileName)
 	return QSP_TRUE;
 }
 /* Сохранение состояния */
-QSP_BOOL QSPSaveGame(QSP_CHAR *fileName)
+QSP_BOOL QSPSaveGame(QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
@@ -490,6 +490,7 @@ QSP_BOOL QSPSaveGame(QSP_CHAR *fileName)
 		return QSP_FALSE;
 	}
 	qspIsMustWait = QSP_FALSE;
+	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return QSP_TRUE;
 }
 /* Загрузка состояния */

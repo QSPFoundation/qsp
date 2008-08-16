@@ -565,7 +565,7 @@ void QSPFrame::OnOpenGameStat(wxCommandEvent& event)
 void QSPFrame::OnSaveGameStat(wxCommandEvent& event)
 {
 	wxFileDialog dialog(this, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
-	if (dialog.ShowModal() == wxID_OK && !QSPSaveGame((QSP_CHAR *)dialog.GetPath().wx_str()))
+	if (dialog.ShowModal() == wxID_OK && !QSPSaveGame((QSP_CHAR *)dialog.GetPath().wx_str(), QSP_TRUE))
 		ShowError();
 }
 

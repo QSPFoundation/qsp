@@ -153,7 +153,7 @@
 		QSP_EXTERN void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorWhere, long *errorLine);
 		QSP_EXTERN QSP_CHAR *QSPGetErrorDesc(long errorNum);
 		QSP_EXTERN QSP_BOOL QSPLoadGameWorld(QSP_CHAR *file);
-		QSP_EXTERN QSP_BOOL QSPSaveGame(QSP_CHAR *file);
+		QSP_EXTERN QSP_BOOL QSPSaveGame(QSP_CHAR *file, QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPOpenSavedGame(QSP_CHAR *file, QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
 		QSP_EXTERN void QSPSelectMenuItem(long ind);

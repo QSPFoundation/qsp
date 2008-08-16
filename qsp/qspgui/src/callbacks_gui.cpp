@@ -324,7 +324,7 @@ void QSPCallBacks::SaveGameStatus()
 {
 	wxFileDialog dialog(m_frame, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
 	if (dialog.ShowModal() == wxID_OK)
-		QSPSaveGame((QSP_CHAR *)dialog.GetPath().wx_str());
+		QSPSaveGame((QSP_CHAR *)dialog.GetPath().wx_str(), QSP_FALSE);
 }
 
 void QSPCallBacks::UpdateGamePath()
