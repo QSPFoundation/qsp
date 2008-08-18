@@ -24,7 +24,6 @@
 #include "objects.h"
 #include "text.h"
 #include "time.h"
-#include "variant.h"
 
 QSPVar qspVars[QSP_VARSCOUNT];
 

@@ -23,7 +23,6 @@
 #include "objects.h"
 #include "text.h"
 #include "variables.h"
-#include "variant.h"
 
 QSPMathOperation qspOps[qspOpLast_Operation];
 

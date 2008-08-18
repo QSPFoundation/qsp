@@ -20,7 +20,6 @@
 #include "game.h"
 #include "statements.h"
 #include "text.h"
-#include "variant.h"
 
 QSPCurAct qspCurActions[QSP_MAXACTIONS];
 long qspCurActionsCount = 0;

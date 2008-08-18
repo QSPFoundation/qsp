@@ -66,7 +66,6 @@
 
 	#define QSP_VER QSP_FMT("0.0.6")
 	#define QSP_LOCALE "russian"
-	#define QSP_QUOTS QSP_FMT("'\"")
 
 	#define QSP_TRUE 1
 	#define QSP_FALSE 0

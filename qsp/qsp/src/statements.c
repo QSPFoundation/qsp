@@ -28,7 +28,6 @@
 #include "playlist.h"
 #include "text.h"
 #include "variables.h"
-#include "variant.h"
 
 QSPStatement qspStats[qspStatLast_Statement];
 
