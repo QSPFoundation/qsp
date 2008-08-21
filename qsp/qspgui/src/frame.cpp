@@ -194,20 +194,20 @@ void QSPFrame::LoadSettings()
 	cfg.Read(wxT("General/FontSize"), &m_fontSize, font.GetPointSize());
 	cfg.Read(wxT("General/FontName"), &m_fontName, font.GetFaceName());
 	cfg.Read(wxT("General/ShowHotkeys"), &m_isShowHotkeys, false);
-	cfg.Read(wxT("Pos/Left"), &x, 32);
-	cfg.Read(wxT("Pos/Top"), &y, 32);
-	cfg.Read(wxT("Pos/Width"), &w, 629);
-	cfg.Read(wxT("Pos/Height"), &h, 502);
+	cfg.Read(wxT("Pos/Left"), &x, 10);
+	cfg.Read(wxT("Pos/Top"), &y, 10);
+	cfg.Read(wxT("Pos/Width"), &w, 850);
+	cfg.Read(wxT("Pos/Height"), &h, 650);
 	cfg.Read(wxT("Pos/Maximize"), &isMaximize, false);
 	wxString panels(wxT("layout2|") \
-		wxT("name=imgback;state=2046;dir=1;layer=0;row=0;pos=0;prop=102431;bestw=310;besth=133;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=imgview;state=16779263;dir=1;layer=0;row=0;pos=1;prop=97569;bestw=310;besth=133;minw=50;minh=50;maxw=-1;maxh=-1;floatx=173;floaty=150;floatw=347;floath=277|") \
-		wxT("name=desc;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=428;besth=295;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=objs;state=16779260;dir=2;layer=0;row=0;pos=0;prop=100000;bestw=185;besth=295;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=acts;state=16779260;dir=3;layer=0;row=0;pos=0;prop=154708;bestw=428;besth=76;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=vars;state=16779260;dir=3;layer=0;row=0;pos=1;prop=65743;bestw=185;besth=76;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=input;state=16779260;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=619;besth=20;minw=50;minh=20;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("dock_size(5,0,0)=22|dock_size(2,0,0)=185|dock_size(3,1,0)=39|dock_size(3,0,0)=138|dock_size(1,0,0)=152|"));
+		wxT("name=imgback;state=2046;dir=1;layer=0;row=0;pos=0;prop=102431;bestw=413;besth=178;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("name=imgview;state=16779263;dir=1;layer=0;row=0;pos=1;prop=102431;bestw=413;besth=178;minw=50;minh=50;maxw=-1;maxh=-1;floatx=182;floaty=161;floatw=494;floath=368|") \
+		wxT("name=desc;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=610;besth=330;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("name=objs;state=16779260;dir=2;layer=0;row=0;pos=0;prop=100000;bestw=216;besth=313;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("name=acts;state=16779260;dir=3;layer=0;row=0;pos=0;prop=124833;bestw=461;besth=196;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("name=vars;state=16779260;dir=3;layer=0;row=0;pos=1;prop=95618;bestw=365;besth=196;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("name=input;state=16779260;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=832;besth=20;minw=50;minh=20;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("dock_size(5,0,0)=22|dock_size(3,0,0)=215|dock_size(2,0,0)=218|dock_size(3,1,0)=39|"));
 	cfg.Read(wxT("General/Panels"), &panels);
 	m_transhelper->Load(cfg, wxT("General/Language"));
 	// -------------------------------------------------
