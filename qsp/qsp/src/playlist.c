@@ -28,8 +28,10 @@ void qspPlayFile(QSP_CHAR *s, long volume, QSP_BOOL isAddToPlayList)
 	QSP_CHAR buf[4], *file;
 	if (qspIsAnyString(s))
 	{
-		if (volume < 0) volume = 0;
-		if (volume > 100) volume = 100;
+		if (volume < 0)
+			volume = 0;
+		else if (volume > 100)
+			volume = 100;
 		file = qspGetNewText(qspQstPath, qspQstPathLen);
 		file = qspGetAddText(file, s, qspQstPathLen, -1);
 		qspCallPlayFile(file, volume);

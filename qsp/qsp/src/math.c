@@ -744,22 +744,39 @@ void qspFunctionRGB(QSPVariant *args, long count, QSPVariant *tos)
 	r = args[0].Num;
 	g = args[1].Num;
 	b = args[2].Num;
-	if (r < 0) r = 0;
-	if (g < 0) g = 0;
-	if (b < 0) b = 0;
-	if (r > 255) r = 255;
-	if (g > 255) g = 255;
-	if (b > 255) b = 255;
+	if (r < 0)
+		r = 0;
+	else if (r > 255)
+		r = 255;
+	if (g < 0)
+		g = 0;
+	else if (g > 255)
+		g = 255;
+	if (b < 0)
+		b = 0;
+	else if (b > 255)
+		b = 255;
 	tos->Num = (b << 16) | (g << 8) | r;
 }
 
 void qspFunctionMid(QSPVariant *args, long count, QSPVariant *tos)
 {
-	long len, beg = args[1].Num - 1;
+	long len, subLen, beg = args[1].Num - 1;
 	if (beg < 0) beg = 0;
 	len = (long)QSP_STRLEN(args[0].Str);
-	if (beg < len && (count == 2 || args[2].Num > 0))
-		tos->Str = qspGetNewText(args[0].Str + beg, count == 3 ? args[2].Num : len - beg);
+	if (beg < len)
+	{
+		len -= beg;
+		if (count == 3)
+		{
+			subLen = args[2].Num;
+			if (subLen < 0)
+				len = 0;
+			else if (subLen < len)
+				len = subLen;
+		}
+		tos->Str = qspGetNewText(args[0].Str + beg, len);
+	}
 	else
 		tos->Str = qspGetNewText(QSP_FMT(""), 0);
 }
