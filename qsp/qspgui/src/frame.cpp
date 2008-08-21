@@ -201,7 +201,7 @@ void QSPFrame::LoadSettings()
 	cfg.Read(wxT("Pos/Maximize"), &isMaximize, false);
 	wxString panels(wxT("layout2|") \
 		wxT("name=imgback;state=4196350;dir=1;layer=0;row=0;pos=0;prop=102431;bestw=413;besth=178;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=imgview;state=6293501;dir=1;layer=0;row=0;pos=1;prop=102431;bestw=413;besth=178;minw=50;minh=50;maxw=-1;maxh=-1;floatx=182;floaty=161;floatw=494;floath=368|") \
+		wxT("name=imgview;state=6293503;dir=1;layer=0;row=0;pos=1;prop=102431;bestw=413;besth=178;minw=50;minh=50;maxw=-1;maxh=-1;floatx=182;floaty=161;floatw=494;floath=368|") \
 		wxT("name=desc;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=610;besth=330;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
 		wxT("name=objs;state=6293500;dir=2;layer=0;row=0;pos=0;prop=100000;bestw=216;besth=313;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
 		wxT("name=acts;state=6293500;dir=3;layer=0;row=0;pos=0;prop=124833;bestw=461;besth=196;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
