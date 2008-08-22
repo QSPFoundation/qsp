@@ -20,8 +20,6 @@
 
 	#include <wx/wx.h>
 	#include "animwin.h"
-	#include "keyevent.h"
-	#include "wheelevent.h"
 
 	class QSPImgCanvas : public wxWindow
 	{

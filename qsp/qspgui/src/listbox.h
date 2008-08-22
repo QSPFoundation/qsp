@@ -22,8 +22,6 @@
 	#include <wx/fontmap.h>
 	#include <wx/htmllbox.h>
 	#include "comtools.h"
-	#include "keyevent.h"
-	#include "wheelevent.h"
 
 	enum ListBoxType
 	{

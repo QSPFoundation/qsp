@@ -20,8 +20,6 @@
 
 	#include <wx/wx.h>
 	#include <wx/animate.h>
-	#include "keyevent.h"
-	#include "wheelevent.h"
 
 	class QSPAnimWin : public wxAnimationCtrl
 	{
@@ -34,9 +32,6 @@
 		// Methods
 		void RefreshUI();
 	protected:
-		// Internal methods
-		void PrepareEventForParent(wxEvent& event);
-
 		// Events
 		void OnKeyUp(wxKeyEvent& event);
 		void OnMouseWheel(wxMouseEvent& event);

@@ -19,7 +19,6 @@
 	#define INPUTBOX_H
 
 	#include <wx/wx.h>
-	#include "wheelevent.h"
 
 	DECLARE_EVENT_TYPE(wxEVT_ENTER, 0)
 

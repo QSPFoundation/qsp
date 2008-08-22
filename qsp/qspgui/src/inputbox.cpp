@@ -99,13 +99,7 @@ void QSPInputBox::OnKeyDown(wxKeyEvent& event)
 
 void QSPInputBox::OnMouseWheel(wxMouseEvent& event)
 {
+	event.Skip();
 	if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
-	{
-		wxMouseEvent mouseEvent(event);
-		mouseEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-		mouseEvent.SetEventType(wxEVT_WHEEL);
-		ProcessEvent(mouseEvent);
-	}
-	else
-		event.Skip();
+		event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }

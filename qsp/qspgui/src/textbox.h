@@ -22,8 +22,6 @@
 	#include <wx/fontmap.h>
 	#include <wx/html/htmlwin.h>
 	#include "comtools.h"
-	#include "keyevent.h"
-	#include "wheelevent.h"
 
 	class QSPTextBox : public wxHtmlWindow
 	{

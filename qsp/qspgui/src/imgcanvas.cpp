@@ -133,16 +133,11 @@ void QSPImgCanvas::OnPaint(wxPaintEvent& event)
 void QSPImgCanvas::OnKeyUp(wxKeyEvent& event)
 {
 	event.Skip();
-	wxKeyEvent keyEvent(event);
-	keyEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-	keyEvent.SetEventType(wxEVT_KEY);
-	ProcessEvent(keyEvent);
+	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }
 
 void QSPImgCanvas::OnMouseWheel(wxMouseEvent& event)
 {
-	wxMouseEvent mouseEvent(event);
-	mouseEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-	mouseEvent.SetEventType(wxEVT_WHEEL);
-	ProcessEvent(mouseEvent);
+	event.Skip();
+	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }

@@ -90,19 +90,12 @@ void QSPTextBox::OnKeyUp(wxKeyEvent& event)
 	event.Skip();
 	wxKeyEvent keyEvent(event);
 	keyEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-	keyEvent.SetEventType(wxEVT_KEY);
-	ProcessEvent(keyEvent);
+	TryParent(keyEvent);
 }
 
 void QSPTextBox::OnMouseWheel(wxMouseEvent& event)
 {
+	event.Skip();
 	if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
-	{
-		wxMouseEvent mouseEvent(event);
-		mouseEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-		mouseEvent.SetEventType(wxEVT_WHEEL);
-		ProcessEvent(mouseEvent);
-	}
-	else
-		event.Skip();
+		event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }

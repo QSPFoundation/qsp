@@ -35,31 +35,14 @@ void QSPAnimWin::RefreshUI()
 	Refresh();
 }
 
-void QSPAnimWin::PrepareEventForParent(wxEvent& event)
-{
-	wxWindow *wnd = GetParent();
-	if (wnd)
-	{
-		event.SetEventObject(wnd);
-		event.SetId(wnd->GetId());
-	}
-}
-
 void QSPAnimWin::OnKeyUp(wxKeyEvent& event)
 {
 	event.Skip();
-	wxKeyEvent keyEvent(event);
-	keyEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-	keyEvent.SetEventType(wxEVT_KEY);
-	PrepareEventForParent(keyEvent);
-	ProcessEvent(keyEvent);
+	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }
 
 void QSPAnimWin::OnMouseWheel(wxMouseEvent& event)
 {
-	wxMouseEvent mouseEvent(event);
-	mouseEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-	mouseEvent.SetEventType(wxEVT_WHEEL);
-	PrepareEventForParent(mouseEvent);
-	ProcessEvent(mouseEvent);
+	event.Skip();
+	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }

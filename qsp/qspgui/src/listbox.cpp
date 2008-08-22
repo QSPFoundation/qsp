@@ -172,21 +172,14 @@ void QSPListBox::OnChar(wxKeyEvent& event)
 void QSPListBox::OnKeyUp(wxKeyEvent& event)
 {
 	event.Skip();
-	wxKeyEvent keyEvent(event);
-	keyEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-	keyEvent.SetEventType(wxEVT_KEY);
-	ProcessEvent(keyEvent);
+	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }
 
 void QSPListBox::OnMouseWheel(wxMouseEvent& event)
 {
 	if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
 	{
-		wxMouseEvent mouseEvent(event);
-		mouseEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-		mouseEvent.SetEventType(wxEVT_WHEEL);
-		ProcessEvent(mouseEvent);
-	}
-	else
 		event.Skip();
+		event.m_wheelRotation = 0;
+	}
 }

@@ -160,8 +160,6 @@
 		<Unit filename="src/inputbox.h" />
 		<Unit filename="src/inputdlg.cpp" />
 		<Unit filename="src/inputdlg.h" />
-		<Unit filename="src/keyevent.cpp" />
-		<Unit filename="src/keyevent.h" />
 		<Unit filename="src/listbox.cpp" />
 		<Unit filename="src/listbox.h" />
 		<Unit filename="src/qsp.h" />
@@ -169,8 +167,6 @@
 		<Unit filename="src/textbox.h" />
 		<Unit filename="src/transhelper.cpp" />
 		<Unit filename="src/transhelper.h" />
-		<Unit filename="src/wheelevent.cpp" />
-		<Unit filename="src/wheelevent.h" />
 		<Extensions>
 			<code_completion />
 		</Extensions>

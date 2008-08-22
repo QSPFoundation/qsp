@@ -386,10 +386,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\keyevent.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\listbox.cpp"
 				>
 			</File>
@@ -399,10 +395,6 @@
 			</File>
 			<File
 				RelativePath=".\src\transhelper.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\src\wheelevent.cpp"
 				>
 			</File>
 		</Filter>
@@ -464,10 +456,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\keyevent.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\listbox.h"
 				>
 			</File>
@@ -481,10 +469,6 @@
 			</File>
 			<File
 				RelativePath=".\src\transhelper.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\wheelevent.h"
 				>
 			</File>
 		</Filter>
