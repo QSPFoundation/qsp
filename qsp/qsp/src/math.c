@@ -178,7 +178,7 @@ long qspFunctionOpCode(QSP_CHAR *funName)
 {
 	long i, j;
 	QSP_CHAR *uName;
-	qspUpperStr(uName = qspGetNewText(funName, -1));
+	qspUpperStr(uName = qspGetNewText(funName, QSP_OPMAXLEN));
 	for (i = qspOpFirst_Function; i < qspOpLast_Operation; ++i)
 		for (j = 0; j < 2; ++j)
 			if (qspOps[i].Names[j] && !QSP_STRCMP(uName, qspOps[i].Names[j]))
@@ -202,7 +202,7 @@ long qspOperatorOpCode(QSP_CHAR **expr)
 	long i, j, len;
 	QSP_CHAR *uExpr;
 	if (!(**expr)) return qspOpEnd;
-	qspUpperStr(uExpr = qspGetNewText(*expr, -1));
+	qspUpperStr(uExpr = qspGetNewText(*expr, QSP_OPMAXLEN));
 	for (i = qspOpFirst_NotUnaryOperator; i < qspOpFirst_Function; ++i)
 		for (j = 0; j < 2; ++j)
 			if (qspOps[i].Names[j])

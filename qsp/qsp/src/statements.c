@@ -156,7 +156,7 @@ long qspGetStatCode(QSP_CHAR *s, QSP_BOOL isMultiline, QSP_CHAR **pos)
 	if (*s == QSP_COMMENT[0]) return qspStatComment;
 	/* ------------------------------------------------------------------ */
 	last = (isMultiline ? qspStatFirst_NotMultilineStatement : qspStatLast_Statement);
-	qspUpperStr(uStr = qspGetNewText(s, -1));
+	qspUpperStr(uStr = qspGetNewText(s, QSP_STATMAXLEN));
 	for (i = qspStatFirst_Statement; i < last; ++i)
 		for (j = 0; j < 2; ++j)
 			if (qspStats[i].Names[j])
