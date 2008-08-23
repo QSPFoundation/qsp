@@ -24,7 +24,6 @@
 	#define QSP_OPMAXARGS 3
 	#define QSP_STACKSIZE 30
 	#define QSP_MAXITEMS 100
-	#define QSP_OPMAXLEN 8
 
 	typedef void (*QSP_FUNCTION)(QSPVariant *, long, QSPVariant *);
 

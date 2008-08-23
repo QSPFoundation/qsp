@@ -25,6 +25,7 @@
 #include "variables.h"
 
 QSPMathOperation qspOps[qspOpLast_Operation];
+long qspOpMaxLen = 0;
 
 void qspFunctionStrComp(QSPVariant *, long, QSPVariant *);
 void qspFunctionStrFind(QSPVariant *, long, QSPVariant *);
@@ -66,6 +67,10 @@ void qspAddOperation(long opCode,
 			qspOps[opCode].ArgsTypes[i] = va_arg(marker, int);
 		va_end(marker);
 	}
+	/* Max length */
+	for (i = 0; i < 2; ++i)
+		if (qspOps[opCode].NamesLens[i] > qspOpMaxLen)
+			qspOpMaxLen = qspOps[opCode].NamesLens[i];
 }
 
 void qspInitMath()
@@ -89,6 +94,7 @@ void qspInitMath()
 		1 - String
 		2 - Number
 	*/
+	qspOpMaxLen = 0;
 	qspAddOperation(qspOpValue, 0, 0, 0, 0, 0, 0, 0);
 	qspAddOperation(qspOpStart, 0, 0, 127, 0, 0, 0, 0);
 	qspAddOperation(qspOpEnd, 0, 0, 0, 0, 0, 0, 0);
@@ -178,7 +184,7 @@ long qspFunctionOpCode(QSP_CHAR *funName)
 {
 	long i, j;
 	QSP_CHAR *uName;
-	qspUpperStr(uName = qspGetNewText(funName, QSP_OPMAXLEN));
+	qspUpperStr(uName = qspGetNewText(funName, qspOpMaxLen));
 	for (i = qspOpFirst_Function; i < qspOpLast_Operation; ++i)
 		for (j = 0; j < 2; ++j)
 			if (qspOps[i].Names[j] && !QSP_STRCMP(uName, qspOps[i].Names[j]))
@@ -202,7 +208,7 @@ long qspOperatorOpCode(QSP_CHAR **expr)
 	long i, j, len;
 	QSP_CHAR *uExpr;
 	if (!(**expr)) return qspOpEnd;
-	qspUpperStr(uExpr = qspGetNewText(*expr, QSP_OPMAXLEN));
+	qspUpperStr(uExpr = qspGetNewText(*expr, qspOpMaxLen));
 	for (i = qspOpFirst_NotUnaryOperator; i < qspOpFirst_Function; ++i)
 		for (j = 0; j < 2; ++j)
 			if (qspOps[i].Names[j])

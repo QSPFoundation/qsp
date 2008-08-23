@@ -22,7 +22,6 @@
 	#define QSP_STATSDEFINES
 
 	#define QSP_STATMAXARGS 2
-	#define QSP_STATMAXLEN 9
 
 	typedef QSP_BOOL (*QSP_STATEMENT)(QSPVariant *, long, QSP_CHAR **, char);
 

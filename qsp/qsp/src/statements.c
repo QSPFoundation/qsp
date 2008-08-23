@@ -30,6 +30,7 @@
 #include "variables.h"
 
 QSPStatement qspStats[qspStatLast_Statement];
+long qspStatMaxLen = 0;
 
 QSP_BOOL qspStatementIf(QSP_CHAR *, QSP_CHAR **);
 QSP_BOOL qspStatementAddText(QSPVariant *, long, QSP_CHAR **, char);
@@ -74,6 +75,10 @@ void qspAddStatement(long statCode,
 			qspStats[statCode].ArgsTypes[i] = va_arg(marker, int);
 		va_end(marker);
 	}
+	/* Max length */
+	for (i = 0; i < 2; ++i)
+		if (qspStats[statCode].NamesLens[i] > qspStatMaxLen)
+			qspStatMaxLen = qspStats[statCode].NamesLens[i];
 }
 
 void qspInitStats()
@@ -96,6 +101,7 @@ void qspInitStats()
 		1 - String
 		2 - Number
 	*/
+	qspStatMaxLen = 0;
 	qspAddStatement(qspStatElse, QSP_FMT("ELSE"), 0, 0, 0, 0, 0);
 	qspAddStatement(qspStatEnd, QSP_FMT("END"), 0, 0, 0, 0, 0);
 	qspAddStatement(qspStatSet, QSP_FMT("SET"), QSP_FMT("LET"), 0, 0, 0, 0);
@@ -156,7 +162,7 @@ long qspGetStatCode(QSP_CHAR *s, QSP_BOOL isMultiline, QSP_CHAR **pos)
 	if (*s == QSP_COMMENT[0]) return qspStatComment;
 	/* ------------------------------------------------------------------ */
 	last = (isMultiline ? qspStatFirst_NotMultilineStatement : qspStatLast_Statement);
-	qspUpperStr(uStr = qspGetNewText(s, QSP_STATMAXLEN));
+	qspUpperStr(uStr = qspGetNewText(s, qspStatMaxLen));
 	for (i = qspStatFirst_Statement; i < last; ++i)
 		for (j = 0; j < 2; ++j)
 			if (qspStats[i].Names[j])
