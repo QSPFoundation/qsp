@@ -43,8 +43,7 @@ QSPImgCanvas::~QSPImgCanvas()
 bool QSPImgCanvas::OpenFile(const wxString& fileName)
 {
 	bool ret;
-	wxString path(fileName);
-	path.Replace(wxT("\\"), wxT("/"));
+	wxString path(wxFileName(fileName).GetFullPath());
 	if (m_path != path || path.IsEmpty())
 	{
 		if (wxFileExists(path))

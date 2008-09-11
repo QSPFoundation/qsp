@@ -26,9 +26,8 @@ END_EVENT_TABLE()
 
 wxHtmlOpeningStatus QSPTextBox::OnOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
 {
-	wxFileName file(url);
-	if (file.IsAbsolute()) return wxHTML_OPEN;
-	(*redirect = m_path + url).Replace(wxT("\\"), wxT("/"));
+	if (wxFileName(url).IsAbsolute()) return wxHTML_OPEN;
+	*redirect = wxFileName(m_path + url).GetFullPath();
 	return wxHTML_REDIRECT;
 }
 

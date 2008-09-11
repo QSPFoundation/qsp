@@ -19,6 +19,7 @@
 	#define IMGCANVAS_H
 
 	#include <wx/wx.h>
+	#include <wx/filename.h>
 	#include "animwin.h"
 
 	class QSPImgCanvas : public wxWindow

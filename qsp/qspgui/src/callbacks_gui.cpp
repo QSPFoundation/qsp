@@ -155,16 +155,10 @@ void QSPCallBacks::SetInputStrText(QSP_CHAR *text)
 
 QSP_BOOL QSPCallBacks::IsPlay(QSP_CHAR *file)
 {
-	FMOD_CHANNEL *channel;
 	FMOD_BOOL playing = FALSE;
-	wxString strFile(file);
-	strFile.Replace(wxT("\\"), wxT("/"));
-	QSPSounds::iterator elem = m_sounds.find(strFile.Upper());
+	QSPSounds::iterator elem = m_sounds.find(wxFileName(file).GetFullPath().Upper());
 	if (elem != m_sounds.end())
-	{
-		channel = ((QSPSound)(elem->second)).Channel;
-		FMOD_Channel_IsPlaying(channel, &playing);
-	}
+		FMOD_Channel_IsPlaying(((QSPSound)(elem->second)).Channel, &playing);
 	return (playing == TRUE);
 }
 
@@ -172,9 +166,7 @@ void QSPCallBacks::CloseFile(QSP_CHAR *file)
 {
 	if (file)
 	{
-		wxString strFile(file);
-		strFile.Replace(wxT("\\"), wxT("/"));
-		QSPSounds::iterator elem = m_sounds.find(strFile.Upper());
+		QSPSounds::iterator elem = m_sounds.find(wxFileName(file).GetFullPath().Upper());
 		if (elem != m_sounds.end())
 		{
 			((QSPSound)(elem->second)).Free();
@@ -196,8 +188,7 @@ void QSPCallBacks::PlayFile(QSP_CHAR *file, long volume)
 	QSPSound snd;
 	if (SetVolume(file, volume)) return;
 	CloseFile(file);
-	wxString strFile(file);
-	strFile.Replace(wxT("\\"), wxT("/"));
+	wxString strFile(wxFileName(file).GetFullPath());
 	if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(strFile.wx_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, 0, &newSound))
 	{
 		FMOD_System_PlaySound(m_sys, FMOD_CHANNEL_FREE, newSound, FALSE, &newChannel);
@@ -339,12 +330,8 @@ void QSPCallBacks::UpdateGamePath()
 
 bool QSPCallBacks::SetVolume(QSP_CHAR *file, long volume)
 {
-	FMOD_CHANNEL *channel;
 	if (!IsPlay(file)) return false;
-	wxString strFile(file);
-	strFile.Replace(wxT("\\"), wxT("/"));
-	QSPSounds::iterator elem = m_sounds.find(strFile.Upper());
-	channel = ((QSPSound)(elem->second)).Channel;
-	FMOD_Channel_SetVolume(channel, (float)volume / 100);
+	QSPSounds::iterator elem = m_sounds.find(wxFileName(file).GetFullPath().Upper());
+	FMOD_Channel_SetVolume(((QSPSound)(elem->second)).Channel, (float)volume / 100);
 	return true;
 }

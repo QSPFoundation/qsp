@@ -311,14 +311,12 @@ void QSPFrame::DeleteMenu()
 void QSPFrame::AddMenuItem(const wxString &name, const wxString &imgPath)
 {
 	Connect(m_menuItemId, wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(QSPFrame::OnMenu));
-	wxString itemName(name);
-	if (itemName == wxT("-"))
+	if (name == wxT("-"))
 		m_menu->AppendSeparator();
 	else
 	{
-		wxMenuItem *item = new wxMenuItem(m_menu, m_menuItemId, itemName);
-		wxString itemPath(imgPath);
-		itemPath.Replace(wxT("\\"), wxT("/"));
+		wxMenuItem *item = new wxMenuItem(m_menu, m_menuItemId, name);
+		wxString itemPath(wxFileName(imgPath).GetFullPath());
 		if (wxFileExists(itemPath))
 		{
 			wxBitmap itemBmp(itemPath, wxBITMAP_TYPE_ANY);
