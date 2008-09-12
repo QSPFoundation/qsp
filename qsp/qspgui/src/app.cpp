@@ -31,7 +31,7 @@ bool QSPApp::OnInit()
 	// ----------------------
 	wxFileName appPath(argv[0]);
 	appPath.MakeAbsolute();
-	wxString appPathString(appPath.GetPath() + wxFileName::GetPathSeparator());
+	wxString appPathString(appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));
 	m_transhelper = new QSPTranslationHelper(*this, appPathString + wxT("langs"));
 	#ifdef __WXMSW__
 		configPath = appPathString;
