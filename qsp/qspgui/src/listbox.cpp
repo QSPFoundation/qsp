@@ -30,7 +30,7 @@ END_EVENT_TABLE()
 wxHtmlOpeningStatus QSPListBox::OnOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
 {
 	if (wxFileName(url).IsAbsolute()) return wxHTML_OPEN;
-	*redirect = wxFileName(m_path + url).GetFullPath();
+	*redirect = wxFileName(m_path + url, wxPATH_DOS).GetFullPath();
 	return wxHTML_REDIRECT;
 }
 
@@ -119,7 +119,7 @@ void QSPListBox::SetTextFont(const wxFont& font)
 
 wxString QSPListBox::OnGetItem(size_t n) const
 {
-	bool isFileExists = wxFileName(m_path + m_images[n]).FileExists();
+	bool isFileExists = wxFileName(m_path + m_images[n], wxPATH_DOS).FileExists();
 	wxString color(QSPTools::GetHexColor(GetForegroundColour()));
 	wxString text(QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_descs[n] : QSPTools::ProceedAsPlain(m_descs[n])));
 	if (m_isShowNums && n < 9)

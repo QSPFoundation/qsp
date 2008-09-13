@@ -316,7 +316,7 @@ void QSPFrame::AddMenuItem(const wxString &name, const wxString &imgPath)
 	else
 	{
 		wxMenuItem *item = new wxMenuItem(m_menu, m_menuItemId, name);
-		wxString itemPath(wxFileName(imgPath).GetFullPath());
+		wxString itemPath(wxFileName(imgPath, wxPATH_DOS).GetFullPath());
 		if (wxFileExists(itemPath))
 		{
 			wxBitmap itemBmp(itemPath, wxBITMAP_TYPE_ANY);
