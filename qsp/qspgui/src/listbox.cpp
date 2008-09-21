@@ -75,13 +75,16 @@ void QSPListBox::AddItem(const wxString& image, const wxString& desc)
 
 void QSPListBox::EndItems()
 {
+	size_t count;
 	if (m_images != m_newImages || m_descs != m_newDescs)
 	{
 		m_images = m_newImages;
 		m_descs = m_newDescs;
 		Freeze();
-		SetItemCount(m_descs.GetCount());
+		count = m_descs.GetCount();
+		SetItemCount(count);
 		RefreshAll();
+		if (count) ScrollToRow(0);
 		Thaw();
 	}
 }
