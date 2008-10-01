@@ -138,9 +138,9 @@ void qspNewGame(QSP_BOOL isReset)
 		qspCallShowWindow(QSP_WIN_OBJS, QSP_TRUE);
 		qspCallShowWindow(QSP_WIN_VARS, QSP_TRUE);
 		qspCallShowWindow(QSP_WIN_INPUT, QSP_TRUE);
+		qspCallSetInputStrText(0);
 		qspCallShowPicture(0);
 		qspCallCloseFile(0);
-		qspCallSetInputStrText(0);
 		qspCallSetTimer(QSP_DEFTIMERINTERVAL);
 	}
 	qspRefreshCurLoc(QSP_TRUE);
@@ -396,8 +396,7 @@ QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 		qspReCodeGetIntVal(strs[2]) != qspQstCRC) return QSP_FALSE;
 	selAction = qspReCodeGetIntVal(strs[4]);
 	selObject = qspReCodeGetIntVal(strs[5]);
-	temp = qspReCodeGetIntVal(strs[10]);
-	if (temp < 0 || temp >= qspLocsCount) return QSP_FALSE;
+	if (qspReCodeGetIntVal(strs[10]) < 0) return QSP_FALSE;
 	temp = qspReCodeGetIntVal(strs[15]);
 	if (temp < 0 || temp > QSP_MAXINCFILES || (ind += temp) > strsCount) return QSP_FALSE;
 	if (ind + 1 > strsCount) return QSP_FALSE;
@@ -406,11 +405,9 @@ QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 	for (i = 0; i < count; ++i)
 	{
 		ind += 3;
-		temp = qspReCodeGetIntVal(strs[ind++]);
-		if (temp < 0 || temp >= qspLocsCount) return QSP_FALSE;
+		if (qspReCodeGetIntVal(strs[ind++]) < 0) return QSP_FALSE;
 		++ind;
-		temp = qspReCodeGetIntVal(strs[ind++]);
-		if (temp < 0) return QSP_FALSE;
+		if (qspReCodeGetIntVal(strs[ind++]) < 0) return QSP_FALSE;
 	}
 	if (ind + 1 > strsCount) return QSP_FALSE;
 	temp = qspReCodeGetIntVal(strs[ind++]);
@@ -549,17 +546,17 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	}
 	qspFreeStrs(strs, count, QSP_FALSE);
 	qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_TRUE;
+	qspOpenIncludes();
+	if (qspErrorNum) return;
 	qspInitVars();
 	qspCallShowWindow(QSP_WIN_ACTS, qspCurIsShowActs);
 	qspCallShowWindow(QSP_WIN_OBJS, qspCurIsShowObjs);
 	qspCallShowWindow(QSP_WIN_VARS, qspCurIsShowVars);
 	qspCallShowWindow(QSP_WIN_INPUT, qspCurIsShowInput);
+	qspCallSetInputStrText(qspCurInput);
 	qspCallShowPicture(0);
 	qspCallCloseFile(0);
-	qspCallSetInputStrText(qspCurInput);
 	qspPlayPLFiles();
-	qspOpenIncludes();
-	if (qspErrorNum) return;
 	qspExecLocByVarName(QSP_FMT("ONGLOAD"));
 }
 
