@@ -126,13 +126,14 @@ void qspNewGame(QSP_BOOL isReset)
 		qspSetError(QSP_ERR_GAMENOTLOADED);
 		return;
 	}
+	qspCurLoc = 0;
 	if (isReset)
 	{
-		qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
 		srand((unsigned int)time(0));
+		qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
 		qspMemClear(QSP_FALSE);
-		qspInitVars();
 		qspResetTime(0);
+		qspInitVars();
 		qspCallShowWindow(QSP_WIN_ACTS, QSP_TRUE);
 		qspCallShowWindow(QSP_WIN_OBJS, QSP_TRUE);
 		qspCallShowWindow(QSP_WIN_VARS, QSP_TRUE);
@@ -142,7 +143,6 @@ void qspNewGame(QSP_BOOL isReset)
 		qspCallSetInputStrText(0);
 		qspCallSetTimer(QSP_DEFTIMERINTERVAL);
 	}
-	qspCurLoc = 0;
 	qspRefreshCurLoc(QSP_TRUE);
 }
 
