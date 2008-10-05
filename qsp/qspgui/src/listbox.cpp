@@ -122,20 +122,20 @@ void QSPListBox::SetTextFont(const wxFont& font)
 
 wxString QSPListBox::OnGetItem(size_t n) const
 {
-	bool isFileExists = wxFileName(m_path + m_images[n], wxPATH_DOS).FileExists();
+	wxString image(wxFileName(m_images[n], wxPATH_DOS).GetFullPath());
 	wxString color(QSPTools::GetHexColor(GetForegroundColour()));
 	wxString text(QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_descs[n] : QSPTools::ProceedAsPlain(m_descs[n])));
 	if (m_isShowNums && n < 9)
 	{
-		if (isFileExists)
-			return wxString::Format(m_outFormatImageNums, color.wx_str(), n + 1, m_images[n].wx_str(), text.wx_str());
+		if (wxFileExists(image))
+			return wxString::Format(m_outFormatImageNums, color.wx_str(), n + 1, image.wx_str(), text.wx_str());
 		else
 			return wxString::Format(m_outFormatNums, color.wx_str(), n + 1, text.wx_str());
 	}
 	else
 	{
-		if (isFileExists)
-			return wxString::Format(m_outFormatImage, color.wx_str(), m_images[n].wx_str(), text.wx_str());
+		if (wxFileExists(image))
+			return wxString::Format(m_outFormatImage, color.wx_str(), image.wx_str(), text.wx_str());
 		else
 			return wxString::Format(m_outFormat, color.wx_str(), text.wx_str());
 	}
