@@ -127,23 +127,32 @@ long qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isF
 	return curLoc;
 }
 
-QSP_BOOL qspOpenQuestFromText(char *file, QSP_BOOL isUCS2, QSP_CHAR locStart, QSP_CHAR locEnd)
+QSP_BOOL qspOpenQuestFromText(char *file, QSP_CHAR locStart, QSP_CHAR locEnd)
 {
 	long fileSize, locsCount;
 	char *buf, *resBuf;
 	QSP_CHAR *data;
+	QSP_BOOL isUCS2;
 	FILE *f;
 	/* Loading file's contents */
 	if (!(f = fopen(file, "rb"))) return QSP_FALSE;
 	fseek(f, 0, SEEK_END);
 	fileSize = ftell(f);
-	buf = (char *)malloc(fileSize + 1);
+	buf = (char *)malloc(fileSize + 3);
 	fseek(f, 0, SEEK_SET);
 	fread(buf, 1, fileSize, f);
 	fclose(f);
-	buf[fileSize] = 0;
+	buf[fileSize] = buf[fileSize + 1] = buf[fileSize + 2] = 0;
 	resBuf = buf;
-	if (isUCS2 && (unsigned char)resBuf[0] == 0xFF && (unsigned char)resBuf[1] == 0xFE) resBuf += 2;
+	if ((unsigned char)resBuf[0] == 0xFF && (unsigned char)resBuf[1] == 0xFE)
+	{
+		resBuf += 2;
+		isUCS2 = QSP_TRUE;
+	}
+	else if (resBuf[0] && !resBuf[1])
+		isUCS2 = QSP_TRUE;
+	else
+		isUCS2 = QSP_FALSE;
 	data = qspGameToQSPString(resBuf, isUCS2, QSP_FALSE);
 	free(buf);
 	locsCount = qspGetLocs(data, locStart, locEnd, QSP_FALSE);
@@ -273,7 +282,7 @@ int main(int argc, char **argv)
 	}
 	qspLocs = 0;
 	qspLocsCount = 0;
-	if (isErr = !qspOpenQuestFromText(argv[1], isUCS2, locStart, locEnd))
+	if (isErr = !qspOpenQuestFromText(argv[1], locStart, locEnd))
 		printf("Loading game failed!\n");
 	else
 		if (isErr = !qspSaveQuest(argv[2], isOldFormat, isUCS2, passwd))
