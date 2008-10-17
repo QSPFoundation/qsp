@@ -80,7 +80,7 @@
 		#define QSP_ISDIGIT isdigit
 		#define QSP_WCSTOMBSLEN strlen
 		#define QSP_WCSTOMBS strncpy
-		#define QSP_MBTOSB
+		#define QSP_MBTOSB(a) ((unsigned char)(a))
 		#ifdef _WIN
 			#define QSP_FROM_OS_CHAR
 			#define QSP_TO_OS_CHAR
