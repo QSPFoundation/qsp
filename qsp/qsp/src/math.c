@@ -184,7 +184,7 @@ long qspFunctionOpCode(QSP_CHAR *funName)
 {
 	long i, j;
 	QSP_CHAR *uName;
-	qspUpperStr(uName = qspGetNewText(funName, qspOpMaxLen));
+	qspUpperStr(uName = qspGetNewText(funName, -1));
 	for (i = qspOpFirst_Function; i < qspOpLast_Operation; ++i)
 		for (j = 0; j < 2; ++j)
 			if (qspOps[i].Names[j] && !QSP_STRCMP(uName, qspOps[i].Names[j]))
