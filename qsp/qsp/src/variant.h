@@ -20,13 +20,16 @@
 #ifndef QSP_VARIANTDEFINES
 	#define QSP_VARIANTDEFINES
 
+	#define QSP_STR(a) (a).Val.Str
+	#define QSP_NUM(a) (a).Val.Num
+
 	typedef struct
 	{
 		union
 		{
 			QSP_CHAR *Str;
 			long Num;
-		};
+		} Val;
 		QSP_BOOL IsStr;
 	} QSPVariant;
 

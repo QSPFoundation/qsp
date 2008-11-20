@@ -135,18 +135,18 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 			return;
 		}
 		args[0].IsStr = QSP_TRUE;
-		args[0].Str = str;
+		QSP_STR(args[0]) = str;
 		str = qspLocs[locInd].Actions[i].Image;
 		if (str && *str)
 		{
 			args[1].IsStr = QSP_TRUE;
-			args[1].Str = str;
+			QSP_STR(args[1]) = str;
 			count = 2;
 		}
 		else
 			count = 1;
 		qspAddAction(args, count, qspLocs[locInd].Actions[i].OnPressLines, 0, qspLocs[locInd].Actions[i].OnPressLinesCount, QSP_TRUE);
-		free(args[0].Str);
+		free(QSP_STR(args[0]));
 		if (qspErrorNum)
 		{
 			qspRealLine = oldLine;

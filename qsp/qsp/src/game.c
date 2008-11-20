@@ -564,13 +564,13 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 {
 	long oldCurIncLocsCount;
 	QSP_CHAR *file;
-	if (qspIsAnyString(args[0].Str))
+	if (qspIsAnyString(QSP_STR(args[0])))
 	{
 		switch (extArg)
 		{
 		case 0:
 			file = qspGetNewText(qspQstPath, qspQstPathLen);
-			file = qspGetAddText(file, args[0].Str, qspQstPathLen, -1);
+			file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
 			qspOpenQuest(file, QSP_FALSE);
 			free(file);
 			if (qspErrorNum) return QSP_FALSE;
@@ -584,12 +584,12 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 			}
 			oldCurIncLocsCount = qspCurIncLocsCount;
 			file = qspGetNewText(qspQstPath, qspQstPathLen);
-			file = qspGetAddText(file, args[0].Str, qspQstPathLen, -1);
+			file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
 			qspOpenQuest(file, QSP_TRUE);
 			free(file);
 			if (qspErrorNum) return QSP_FALSE;
 			if (qspCurIncLocsCount != oldCurIncLocsCount)
-				qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(args[0].Str, -1);
+				qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(QSP_STR(args[0]), -1);
 			break;
 		}
 	}
@@ -600,10 +600,10 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 {
 	QSP_BOOL prevIsMustWait;
 	QSP_CHAR *file;
-	if (count == 1 && qspIsAnyString(args[0].Str))
+	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetNewText(qspQstPath, qspQstPathLen);
-		file = qspGetAddText(file, args[0].Str, qspQstPathLen, -1);
+		file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
 		qspOpenGameStatus(file);
 		free(file);
 	}
@@ -621,10 +621,10 @@ QSP_BOOL qspStatementSaveGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 {
 	QSP_BOOL prevIsMustWait;
 	QSP_CHAR *file;
-	if (count == 1 && qspIsAnyString(args[0].Str))
+	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetNewText(qspQstPath, qspQstPathLen);
-		file = qspGetAddText(file, args[0].Str, qspQstPathLen, -1);
+		file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
 		qspSaveGameStatus(file);
 		free(file);
 	}

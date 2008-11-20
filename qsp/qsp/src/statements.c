@@ -404,7 +404,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 				else if (statCode == qspStatIf)
 				{
 					elsePos = qspSearchElse(s, i, endLine);
-					if (args[0].Num)
+					if (QSP_NUM(args[0]))
 					{
 						if (elsePos >= 0)
 						{
@@ -466,7 +466,7 @@ QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	qspUpperStr(uStr = qspGetNewText(pos, -1));
 	ePos = qspStrPos(uStr, qspStats[qspStatElse].Names[0], QSP_TRUE);
 	free(uStr);
-	if (arg.Num)
+	if (QSP_NUM(arg))
 	{
 		if (ePos)
 		{
@@ -486,7 +486,7 @@ QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
 
 QSP_BOOL qspStatementAddText(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_CHAR *s = args[0].Str;
+	QSP_CHAR *s = QSP_STR(args[0]);
 	switch (extArg)
 	{
 	case 0:
@@ -583,13 +583,13 @@ QSP_BOOL qspStatementExit(QSPVariant *args, long count, QSP_CHAR **jumpTo, char 
 
 QSP_BOOL qspStatementGoSub(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	qspExecLocByName(args[0].Str, QSP_FALSE);
+	qspExecLocByName(QSP_STR(args[0]), QSP_FALSE);
 	return QSP_FALSE;
 }
 
 QSP_BOOL qspStatementGoTo(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long locInd = qspLocIndex(args[0].Str);
+	long locInd = qspLocIndex(QSP_STR(args[0]));
 	if (locInd < 0)
 	{
 		qspSetError(QSP_ERR_LOCNOTFOUND);
@@ -603,14 +603,14 @@ QSP_BOOL qspStatementGoTo(QSPVariant *args, long count, QSP_CHAR **jumpTo, char 
 QSP_BOOL qspStatementJump(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	free(*jumpTo);
-	qspUpperStr(*jumpTo = qspDelSpc(args[0].Str));
+	qspUpperStr(*jumpTo = qspDelSpc(QSP_STR(args[0])));
 	return QSP_FALSE;
 }
 
 QSP_BOOL qspStatementWait(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSP_BOOL prevIsMustWait = qspIsMustWait;
-	long num = args[0].Num;
+	long num = QSP_NUM(args[0]);
 	qspIsMustWait = QSP_FALSE;
 	qspCallRefreshInt(QSP_TRUE);
 	qspIsMustWait = prevIsMustWait;
@@ -621,7 +621,7 @@ QSP_BOOL qspStatementWait(QSPVariant *args, long count, QSP_CHAR **jumpTo, char 
 
 QSP_BOOL qspStatementSetTimer(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long num = args[0].Num;
+	long num = QSP_NUM(args[0]);
 	if (num < 0) num = 0;
 	qspCallSetTimer(num);
 	return QSP_FALSE;
@@ -629,7 +629,7 @@ QSP_BOOL qspStatementSetTimer(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 
 QSP_BOOL qspStatementShowWin(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_BOOL val = args[0].Num != 0;
+	QSP_BOOL val = QSP_NUM(args[0]) != 0;
 	switch (extArg)
 	{
 	case 0:
@@ -660,10 +660,10 @@ QSP_BOOL qspStatementRefInt(QSPVariant *args, long count, QSP_CHAR **jumpTo, cha
 QSP_BOOL qspStatementView(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSP_CHAR *file;
-	if (count == 1 && qspIsAnyString(args[0].Str))
+	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetNewText(qspQstPath, qspQstPathLen);
-		file = qspGetAddText(file, args[0].Str, qspQstPathLen, -1);
+		file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
 		qspCallShowPicture(file);
 		free(file);
 	}
@@ -674,17 +674,17 @@ QSP_BOOL qspStatementView(QSPVariant *args, long count, QSP_CHAR **jumpTo, char 
 
 QSP_BOOL qspStatementMsg(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	qspCallShowMessage(args[0].Str);
+	qspCallShowMessage(QSP_STR(args[0]));
 	return QSP_FALSE;
 }
 
 QSP_BOOL qspStatementExec(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSP_CHAR *cmd;
-	if (qspIsAnyString(args[0].Str))
+	if (qspIsAnyString(QSP_STR(args[0])))
 	{
 		cmd = qspGetNewText(qspQstPath, qspQstPathLen);
-		cmd = qspGetAddText(cmd, args[0].Str, qspQstPathLen, -1);
+		cmd = qspGetAddText(cmd, QSP_STR(args[0]), qspQstPathLen, -1);
 		qspCallSystem(cmd);
 		free(cmd);
 	}
@@ -693,5 +693,5 @@ QSP_BOOL qspStatementExec(QSPVariant *args, long count, QSP_CHAR **jumpTo, char 
 
 QSP_BOOL qspStatementDynamic(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	return qspExecString(args[0].Str, jumpTo);
+	return qspExecString(QSP_STR(args[0]), jumpTo);
 }

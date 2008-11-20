@@ -121,12 +121,12 @@ QSP_BOOL QSPGetExprValue(QSP_CHAR *expr, QSP_BOOL *isString, long *numVal, QSP_C
 	*isString = v.IsStr;
 	if (v.IsStr)
 	{
-		QSP_STRNCPY(strVal, v.Str, strValBufSize - 1);
-		free(v.Str);
+		QSP_STRNCPY(strVal, QSP_STR(v), strValBufSize - 1);
+		free(QSP_STR(v));
 		strVal[strValBufSize - 1] = 0;
 	}
 	else
-		*numVal = v.Num;
+		*numVal = QSP_NUM(v);
 	qspIsMustWait = QSP_FALSE;
 	return QSP_TRUE;
 }

@@ -117,8 +117,8 @@ void qspRefreshPlayList()
 
 QSP_BOOL qspStatementPlayFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long volume = (count == 2 ? args[1].Num : 100);
-	qspPlayFile(args[0].Str, volume, QSP_TRUE);
+	long volume = (count == 2 ? QSP_NUM(args[1]) : 100);
+	qspPlayFile(QSP_STR(args[0]), volume, QSP_TRUE);
 	return QSP_FALSE;
 }
 
@@ -127,13 +127,13 @@ QSP_BOOL qspStatementCloseFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 	long len;
 	QSP_CHAR *temp, *end, *pos;
 	if (!qspPlayListLen) return QSP_FALSE;
-	if (count == 1 && qspIsAnyString(args[0].Str))
+	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
-		pos = qspSearchPlayList(args[0].Str);
+		pos = qspSearchPlayList(QSP_STR(args[0]));
 		if (pos)
 		{
 			temp = qspGetNewText(qspQstPath, qspQstPathLen);
-			temp = qspGetAddText(temp, args[0].Str, qspQstPathLen, -1);
+			temp = qspGetAddText(temp, QSP_STR(args[0]), qspQstPathLen, -1);
 			qspCallCloseFile(temp);
 			free(temp);
 			do
@@ -144,7 +144,7 @@ QSP_BOOL qspStatementCloseFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 				qspPlayListLen = qspAddText(&temp, end + 1, len, qspPlayListLen - (long)(end - qspPlayList) - 1, QSP_FALSE);
 				free(qspPlayList);
 				qspPlayList = temp;
-				pos = qspSearchPlayList(args[0].Str);
+				pos = qspSearchPlayList(QSP_STR(args[0]));
 			} while (pos);
 		}
 	}

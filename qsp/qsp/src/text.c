@@ -353,13 +353,13 @@ QSP_CHAR *qspFormatText(QSP_CHAR *txt)
 			return 0;
 		}
 		val = qspConvertVariantTo(val, QSP_TRUE, QSP_TRUE, 0);
-		if ((txtLen += (long)QSP_STRLEN(val.Str)) >= bufSize)
+		if ((txtLen += (long)QSP_STRLEN(QSP_STR(val))) >= bufSize)
 		{
 			bufSize = txtLen + 128;
 			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
 		}
-		QSP_STRCPY(newTxt + oldTxtLen, val.Str);
-		free(val.Str);
+		QSP_STRCPY(newTxt + oldTxtLen, QSP_STR(val));
+		free(QSP_STR(val));
 		oldTxtLen = txtLen;
 		txt = rPos + QSP_LEN(QSP_RSUBEX);
 		lPos = QSP_STRSTR(txt, QSP_LSUBEX);

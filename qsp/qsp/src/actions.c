@@ -78,22 +78,22 @@ void qspAddAction(QSPVariant *args, long count, QSP_CHAR **code, long start, lon
 {
 	QSPCurAct *act;
 	QSP_CHAR *imgPath;
-	if (qspActIndex(args[0].Str) >= 0) return;
+	if (qspActIndex(QSP_STR(args[0])) >= 0) return;
 	if (qspCurActionsCount == QSP_MAXACTIONS)
 	{
 		qspSetError(QSP_ERR_CANTADDACTION);
 		return;
 	}
-	if (count == 2 && qspIsAnyString(args[1].Str))
+	if (count == 2 && qspIsAnyString(QSP_STR(args[1])))
 	{
 		imgPath = qspGetNewText(qspQstPath, qspQstPathLen);
-		imgPath = qspGetAddText(imgPath, args[1].Str, qspQstPathLen, -1);
+		imgPath = qspGetAddText(imgPath, QSP_STR(args[1]), qspQstPathLen, -1);
 	}
 	else
 		imgPath = 0;
 	act = qspCurActions + qspCurActionsCount++;
 	act->Image = imgPath;
-	act->Desc = qspGetNewText(args[0].Str, -1);
+	act->Desc = qspGetNewText(QSP_STR(args[0]), -1);
 	qspCopyStrs(&act->OnPressLines, code, start, end);
 	act->OnPressLinesCount = end - start;
 	act->Location = qspRealCurLoc;
@@ -143,7 +143,7 @@ void qspStatementAddAct(QSP_CHAR *s)
 
 QSP_BOOL qspStatementDelAct(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long actInd = qspActIndex(args[0].Str);
+	long actInd = qspActIndex(QSP_STR(args[0]));
 	if (actInd < 0) return QSP_FALSE;
 	if (qspCurSelAction >= actInd) qspCurSelAction = -1;
 	if (qspCurActions[actInd].Image) free(qspCurActions[actInd].Image);

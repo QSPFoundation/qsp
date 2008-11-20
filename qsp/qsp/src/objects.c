@@ -59,7 +59,7 @@ void qspClearObjectsWithNotify()
 		oldRefreshCount = qspRefreshCount;
 		for (i = 0; i < oldCount; ++i)
 		{
-			v.Str = objs[i];
+			QSP_STR(v) = objs[i];
 			qspSetVarValueByName(QSP_FMT("LASTOBJ"), v);
 			if (qspErrorNum) break;
 			qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
@@ -108,16 +108,16 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 		qspSetError(QSP_ERR_CANTADDOBJECT);
 		return QSP_FALSE;
 	}
-	if (count == 2 && qspIsAnyString(args[1].Str))
+	if (count == 2 && qspIsAnyString(QSP_STR(args[1])))
 	{
 		imgPath = qspGetNewText(qspQstPath, qspQstPathLen);
-		imgPath = qspGetAddText(imgPath, args[1].Str, qspQstPathLen, -1);
+		imgPath = qspGetAddText(imgPath, QSP_STR(args[1]), qspQstPathLen, -1);
 	}
 	else
 		imgPath = 0;
 	obj = qspCurObjects + qspCurObjectsCount++;
 	obj->Image = imgPath;
-	obj->Desc = qspGetNewText(args[0].Str, -1);
+	obj->Desc = qspGetNewText(QSP_STR(args[0]), -1);
 	qspIsObjectsChanged = QSP_TRUE;
 	qspSetVarValueByName(QSP_FMT("LASTOBJ"), args[0]);
 	if (qspErrorNum) return QSP_FALSE;
@@ -127,7 +127,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 
 QSP_BOOL qspStatementDelObj(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long objInd = qspObjIndex(args[0].Str);
+	long objInd = qspObjIndex(QSP_STR(args[0]));
 	if (objInd < 0) return QSP_FALSE;
 	if (qspCurSelObject >= objInd) qspCurSelObject = -1;
 	if (qspCurObjects[objInd].Image) free(qspCurObjects[objInd].Image);

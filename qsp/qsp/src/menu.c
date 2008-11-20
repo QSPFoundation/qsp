@@ -39,7 +39,7 @@ void qspClearMenu(QSP_BOOL isFirst)
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSP_CHAR *imgPath, *str, *pos, *pos2, *endPos;
-	long i, varInd = qspVarIndexWithType(args[0].Str, QSP_FALSE, 0);
+	long i, varInd = qspVarIndexWithType(QSP_STR(args[0]), QSP_FALSE, 0);
 	if (varInd < 0) return QSP_FALSE;
 	qspClearMenu(QSP_FALSE);
 	qspCallDeleteMenu();

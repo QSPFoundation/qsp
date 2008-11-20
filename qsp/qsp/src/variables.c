@@ -79,39 +79,39 @@ void qspRefreshVar(long varIndex)
 	{
 	case qspVarRnd:
 		v.IsStr = QSP_FALSE;
-		v.Num = rand() % 1000 + 1;
+		QSP_NUM(v) = rand() % 1000 + 1;
 		break;
 	case qspVarCountObj:
 		v.IsStr = QSP_FALSE;
-		v.Num = qspCurObjectsCount;
+		QSP_NUM(v) = qspCurObjectsCount;
 		break;
 	case qspVarMsecsCount:
 		v.IsStr = QSP_FALSE;
-		v.Num = qspGetTime();
+		QSP_NUM(v) = qspGetTime();
 		break;
 	case qspVarQSPVer:
 		v.IsStr = QSP_TRUE;
-		v.Str = QSP_VER;
+		QSP_STR(v) = QSP_VER;
 		break;
 	case qspVarUserText:
 		*emptyStr = 0;
 		v.IsStr = QSP_TRUE;
-		v.Str = (qspCurInput ? qspCurInput : emptyStr);
+		QSP_STR(v) = (qspCurInput ? qspCurInput : emptyStr);
 		break;
 	case qspVarCurLoc:
 		*emptyStr = 0;
 		v.IsStr = QSP_TRUE;
-		v.Str = (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : emptyStr);
+		QSP_STR(v) = (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : emptyStr);
 		break;
 	case qspVarSelObj:
 		*emptyStr = 0;
 		v.IsStr = QSP_TRUE;
-		v.Str = (qspCurSelObject >= 0 ? qspCurObjects[qspCurSelObject].Desc : emptyStr);
+		QSP_STR(v) = (qspCurSelObject >= 0 ? qspCurObjects[qspCurSelObject].Desc : emptyStr);
 		break;
 	case qspVarSelAct:
 		*emptyStr = 0;
 		v.IsStr = QSP_TRUE;
-		v.Str = (qspCurSelAction >= 0 ? qspCurActions[qspCurSelAction].Desc : emptyStr);
+		QSP_STR(v) = (qspCurSelAction >= 0 ? qspCurActions[qspCurSelAction].Desc : emptyStr);
 		break;
 	default:
 		return;
@@ -232,11 +232,11 @@ long qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 		if (qspErrorNum) return -1;
 		if (ind.IsStr)
 		{
-			*index = qspGetVarTextIndex(varIndex, ind.Str, isCreate);
-			free(ind.Str);
+			*index = qspGetVarTextIndex(varIndex, QSP_STR(ind), isCreate);
+			free(QSP_STR(ind));
 		}
 		else
-			*index = (ind.Num >= 0 ? ind.Num : 0);
+			*index = (QSP_NUM(ind) >= 0 ? QSP_NUM(ind) : 0);
 		return varIndex;
 	}
 	*index = 0;
@@ -260,9 +260,9 @@ void qspSetVarValueByIndex(long varIndex, long ind, QSPVariant val)
 		}
 	}
 	if (val.IsStr)
-		qspVars[varIndex].TextValue[ind] = qspGetAddText(qspVars[varIndex].TextValue[ind], val.Str, 0, -1);
+		qspVars[varIndex].TextValue[ind] = qspGetAddText(qspVars[varIndex].TextValue[ind], QSP_STR(val), 0, -1);
 	else
-		qspVars[varIndex].Value[ind] = val.Num;
+		qspVars[varIndex].Value[ind] = QSP_NUM(val);
 }
 
 void qspSetVarValueByName(QSP_CHAR *name, QSPVariant val)
@@ -285,7 +285,7 @@ void qspSetVar(QSP_CHAR *name, QSPVariant val)
 		return;
 	}
 	qspSetVarValueByIndex(varIndex, index, val);
-	if (val.IsStr) free(val.Str);
+	if (val.IsStr) free(QSP_STR(val));
 }
 
 QSPVariant qspGetVarValueByIndex(long varIndex, long ind, QSP_BOOL isStringType)
@@ -298,10 +298,10 @@ QSPVariant qspGetVarValueByIndex(long varIndex, long ind, QSP_BOOL isStringType)
 		if (ret.IsStr = isStringType)
 		{
 			text = qspVars[varIndex].TextValue[ind];
-			ret.Str = (text ? qspGetNewText(text, -1) : qspGetNewText(QSP_FMT(""), 0));
+			QSP_STR(ret) = (text ? qspGetNewText(text, -1) : qspGetNewText(QSP_FMT(""), 0));
 		}
 		else
-			ret.Num = qspVars[varIndex].Value[ind];
+			QSP_NUM(ret) = qspVars[varIndex].Value[ind];
 		return ret;
 	}
 	return qspGetEmptyVariant(isStringType);
@@ -362,12 +362,12 @@ long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 	}
 	if (isRegExp)
 	{
-		tempBeg = (OnigUChar *)val.Str;
-		tempEnd = (OnigUChar *)qspStrEnd(val.Str);
+		tempBeg = (OnigUChar *)QSP_STR(val);
+		tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(val));
 		if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL, &onigInfo))
 		{
 			qspSetError(QSP_ERR_INCORRECTREGEXP);
-			free(val.Str);
+			free(QSP_STR(val));
 			return -1;
 		}
 	}
@@ -386,27 +386,27 @@ long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 				tempEnd = (OnigUChar *)qspStrEnd(str);
 				if (onig_match(onigExp, tempBeg, tempEnd, tempBeg, onigReg, ONIG_OPTION_NONE) >= 0)
 				{
-					free(val.Str);
+					free(QSP_STR(val));
 					onig_region_free(onigReg, 1);
 					onig_free(onigExp);
 					return start;
 				}
 				onig_region_free(onigReg, 1);
 			}
-			else if (!QSP_STRCMP(str, val.Str))
+			else if (!QSP_STRCMP(str, QSP_STR(val)))
 			{
-				free(val.Str);
+				free(QSP_STR(val));
 				return start;
 			}
 		}
 		else
 		{
 			num = (start < count ? qspVars[varInd].Value[start] : 0);
-			if (num == val.Num) return start;
+			if (num == QSP_NUM(val)) return start;
 		}
 		++start;
 	}
-	if (val.IsStr) free(val.Str);
+	if (val.IsStr) free(QSP_STR(val));
 	if (isRegExp) onig_free(onigExp);
 	return -1;
 }
@@ -435,7 +435,7 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 	*pos = QSP_EQUAL[0];
 	qspSetVar(name, v);
 	free(name);
-	if (v.IsStr) free(v.Str);
+	if (v.IsStr) free(QSP_STR(v));
 }
 
 QSP_BOOL qspStatementCopyArr(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
@@ -443,10 +443,10 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 	QSP_CHAR *str;
 	long arrInd1, arrInd2, itemsCount;
 	/* Get index of the first array */
-	arrInd1 = qspVarIndexWithType(args[0].Str, QSP_TRUE, 0);
+	arrInd1 = qspVarIndexWithType(QSP_STR(args[0]), QSP_TRUE, 0);
 	if (arrInd1 < 0) return QSP_FALSE;
 	/* Get index of the second array */
-	arrInd2 = qspVarIndexWithType(args[1].Str, QSP_FALSE, 0);
+	arrInd2 = qspVarIndexWithType(QSP_STR(args[1]), QSP_FALSE, 0);
 	if (arrInd2 < 0 || arrInd1 == arrInd2) return QSP_FALSE;
 	/* --- */
 	if (qspVars[arrInd1].Value) free(qspVars[arrInd1].Value);
