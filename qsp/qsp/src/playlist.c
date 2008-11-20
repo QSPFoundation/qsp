@@ -125,7 +125,7 @@ QSP_BOOL qspStatementPlayFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 QSP_BOOL qspStatementCloseFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	long len;
-	QSP_CHAR *temp, *end, *pos;
+	QSP_CHAR *temp, *next, *pos;
 	if (!qspPlayListLen) return QSP_FALSE;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
@@ -138,10 +138,10 @@ QSP_BOOL qspStatementCloseFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 			free(temp);
 			do
 			{
-				end = QSP_STRCHR(pos + 1, QSP_PLFILEDELIM[0]);
+				next = QSP_STRCHR(pos + 1, QSP_PLFILEDELIM[0]) + 1;
 				len = (long)(pos - qspPlayList);
 				temp = qspGetNewText(qspPlayList, len);
-				qspPlayListLen = qspAddText(&temp, end + 1, len, qspPlayListLen - (long)(end - qspPlayList) - 1, QSP_FALSE);
+				qspPlayListLen = qspAddText(&temp, next, len, qspPlayListLen - (long)(next - qspPlayList), QSP_FALSE);
 				free(qspPlayList);
 				qspPlayList = temp;
 				pos = qspSearchPlayList(QSP_STR(args[0]));
