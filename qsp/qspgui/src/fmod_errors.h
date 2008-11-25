@@ -13,10 +13,10 @@
 #include "fmod.h"
 
 #ifdef __GNUC__ 
-static char *FMOD_ErrorString(FMOD_RESULT errcode) __attribute__((unused));
+static const char *FMOD_ErrorString(FMOD_RESULT errcode) __attribute__((unused));
 #endif
 
-static char *FMOD_ErrorString(FMOD_RESULT errcode)
+static const char *FMOD_ErrorString(FMOD_RESULT errcode)
 {
     switch (errcode)
     {
@@ -65,6 +65,7 @@ static char *FMOD_ErrorString(FMOD_RESULT errcode)
         case FMOD_ERR_INVALID_HANDLE:         return "An invalid object handle was used. ";
         case FMOD_ERR_INVALID_PARAM:          return "An invalid parameter was passed to this function. ";
         case FMOD_ERR_INVALID_SPEAKER:        return "An invalid speaker was passed to this function based on the current speaker mode. ";
+        case FMOD_ERR_INVALID_SYNCPOINT:      return "The syncpoint did not come from this sound handle. ";
         case FMOD_ERR_INVALID_VECTOR:         return "The vectors passed in are not unit length, or perpendicular. ";
         case FMOD_ERR_IRX:                    return "PS2 only.  fmodex.irx failed to initialize.  This is most likely because you forgot to load it. ";
         case FMOD_ERR_MAXAUDIBLE:             return "Reached maximum audible playback count for this sound's soundgroup. ";
@@ -87,7 +88,7 @@ static char *FMOD_ErrorString(FMOD_RESULT errcode)
         case FMOD_ERR_OUTPUT_ENUMERATION:     return "Error enumerating the available driver list. List may be inconsistent due to a recent device addition or removal. ";
         case FMOD_ERR_OUTPUT_FORMAT:          return "Soundcard does not support the minimum features needed for this soundsystem (16bit stereo output). ";
         case FMOD_ERR_OUTPUT_INIT:            return "Error initializing output device. ";
-        case FMOD_ERR_OUTPUT_NOHARDWARE:      return "FMOD_HARDWARE was specified but the sound card does not have the resources nescessary to play it. ";
+        case FMOD_ERR_OUTPUT_NOHARDWARE:      return "FMOD_HARDWARE was specified but the sound card does not have the resources necessary to play it. ";
         case FMOD_ERR_OUTPUT_NOSOFTWARE:      return "Attempted to create a software sound but no software channels were specified in System::init. ";
         case FMOD_ERR_PAN:                    return "Panning only works with mono or stereo sound sources. ";
         case FMOD_ERR_PLUGIN:                 return "An unspecified error has been returned from a 3rd party plugin. ";
