@@ -436,6 +436,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\fmod_memoryinfo.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\frame.h"
 				>
 			</File>

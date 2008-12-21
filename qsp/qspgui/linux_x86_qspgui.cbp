@@ -150,6 +150,7 @@
 		<Unit filename="src/fmod_codec.h" />
 		<Unit filename="src/fmod_dsp.h" />
 		<Unit filename="src/fmod_errors.h" />
+		<Unit filename="src/fmod_memoryinfo.h" />
 		<Unit filename="src/frame.cpp" />
 		<Unit filename="src/frame.h" />
 		<Unit filename="src/imgcanvas.cpp" />
