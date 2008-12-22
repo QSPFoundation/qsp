@@ -1,0 +1,12 @@
+#!/bin/bash
+WX_PATH=/home/byte/wxWidgets
+WX_QSP_PATH=/home/byte/wx_qsp
+QSP_PATH=`pwd`/../..
+
+svn up $WX_PATH
+rm -r $WX_QSP_PATH
+svn export $WX_PATH $WX_QSP_PATH
+patch -i $QSP_PATH/build_wx/wxPatch.diff -d $WX_QSP_PATH -p 3 --binary
+cd $WX_QSP_PATH
+./configure --disable-utf8 --disable-shared
+make

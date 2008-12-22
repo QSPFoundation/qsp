@@ -1,13 +1,14 @@
-rm -r _debug
-rm -r _release
-cp -rT misc/linux_x86 _debug
-cp -rT misc/linux_x86 _release
-cp -rT misc/common _debug
-cp -rT misc/common _release
+#!/bin/bash
+rm -fr _debug
+rm -fr _release
+rsync -r --exclude=.svn misc/linux_x86/ _debug
+rsync -r --exclude=.svn misc/linux_x86/ _release
+rsync -r --exclude=.svn misc/common/ _debug
+rsync -r --exclude=.svn misc/common/ _release
 # ---------------------------------
-rm -r qsp/.objs
+rm -fr qsp/.objs
 rm qsp/linux_x86_qsp.layout
 rm qsp/linux_x86_qsp.depend
-rm -r qspgui/.objs
+rm -fr qspgui/.objs
 rm qspgui/linux_x86_qspgui.layout
 rm qspgui/linux_x86_qspgui.depend
