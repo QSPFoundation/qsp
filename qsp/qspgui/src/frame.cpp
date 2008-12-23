@@ -177,7 +177,7 @@ void QSPFrame::LoadSettings()
 	m_backColor = wxColour(temp);
 	cfg.Read(wxT("General/FontColor"), &temp, 0x000000);
 	m_fontColor = wxColour(temp);
-	wxFont font(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
+	wxFont font(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	cfg.Read(wxT("General/FontSize"), &m_fontSize, font.GetPointSize());
 	cfg.Read(wxT("General/FontName"), &m_fontName, font.GetFaceName());
 	cfg.Read(wxT("General/ShowHotkeys"), &m_isShowHotkeys, false);

@@ -35,7 +35,7 @@ QSPTextBox::QSPTextBox(wxWindow *parent, wxWindowID id) : wxHtmlWindow(parent, i
 {
 	SetBorders(5);
 	m_isUseHtml = false;
-	m_font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+	m_font = wxFont(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	m_outFormat = wxString::Format(
 		wxT("<HTML><META HTTP-EQUIV = \"Content-Type\" CONTENT = \"text/html; charset=%s\">")
 		wxT("<BODY><FONT COLOR = #%%s>%%s</FONT></BODY></HTML>"),
