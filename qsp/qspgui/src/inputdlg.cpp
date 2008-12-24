@@ -55,6 +55,7 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
 	// ----------
 	wxSizer *sizerBottom = new wxBoxSizer(wxHORIZONTAL);
 	wxButton *btnOk = new wxButton(this, wxID_OK, _("OK"));
+	btnOk->SetDefault();
 	btnOk->SetBackgroundColour(backColor);
 	btnOk->SetForegroundColour(fontColor);
 	btnOk->SetFont(font);
@@ -71,7 +72,6 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
 	// ----------
 	inputStr->SetValidator(wxGenericValidator(&m_text));
 	sizerMain->SetMinSize(300, 200);
-	SetDefaultItem(btnOk);
 	SetAutoLayout(true);
 	SetSizer(sizerMain);
 	sizerMain->Fit(this);
