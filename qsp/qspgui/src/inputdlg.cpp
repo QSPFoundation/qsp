@@ -71,6 +71,7 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
 	// ----------
 	inputStr->SetValidator(wxGenericValidator(&m_text));
 	sizerMain->SetMinSize(300, 200);
+	SetDefaultItem(btnOk);
 	SetAutoLayout(true);
 	SetSizer(sizerMain);
 	sizerMain->Fit(this);
