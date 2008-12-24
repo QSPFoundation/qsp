@@ -6,6 +6,6 @@ QSPGUI_OPT="-D__WXGTK__ -D_UNICODE -DNDEBUG -I$WX_QSP_PATH/include -I$WX_QSP_PAT
 QSPGUI_LD_OPT="-L$WX_QSP_PATH/lib -L_release -lfmodexp -lqsp -lgtk-x11-2.0 -lgthread-2.0 -lc -lSM -lXxf86vm -ltiff -ljpeg -lwx_gtk2u_aui-2.9 -lwx_gtk2u_html-2.9 -lwx_gtk2u_adv-2.9 -lwx_gtk2u_core-2.9 -lwx_baseu-2.9"
 
 echo Building libqsp.so...
-gcc -fPIC -shared $LIBQSP_OPT -s -O2 -o _release/libqsp.so `find qsp/src/ -name *.c | tr '\n' ' '`
+gcc -fPIC -shared $LIBQSP_OPT -s -O3 -Os -o _release/libqsp.so `find qsp/src/ -name *.c | tr '\n' ' '`
 echo Building qspgui...
-g++ $QSPGUI_OPT -s -O2 -o _release/qspgui `find qspgui/src/ -name *.cpp | tr '\n' ' '` $QSPGUI_LD_OPT -Wl,-rpath,.
+g++ $QSPGUI_OPT -s -O3 -Os -o _release/qspgui `find qspgui/src/ -name *.cpp | tr '\n' ' '` $QSPGUI_LD_OPT -Wl,-rpath,.
