@@ -44,6 +44,8 @@
 		#define QSP_STRCHR wcschr
 		#define QSP_WCSTOMBSLEN(a) wcstombs(0, a, 0)
 		#define QSP_WCSTOMBS wcstombs
+		#define QSP_MBSTOWCSLEN(a) mbstowcs(0, a, 0)
+		#define QSP_MBSTOWCS mbstowcs
 		#define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
 		#define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
 		#define QSP_WCTOB
@@ -58,6 +60,8 @@
 		#define QSP_STRCHR strchr
 		#define QSP_WCSTOMBSLEN strlen
 		#define QSP_WCSTOMBS strncpy
+		#define QSP_MBSTOWCSLEN(a) strlen
+		#define QSP_MBSTOWCS strncpy
 		#define QSP_FROM_OS_CHAR
 		#define QSP_TO_OS_CHAR
 		#define QSP_WCTOB(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)

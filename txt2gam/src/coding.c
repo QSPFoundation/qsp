@@ -96,11 +96,9 @@ char *qspFromQSPString(QSP_CHAR *s)
 
 QSP_CHAR *qspToQSPString(char *s)
 {
-	long len = (long)strlen(s);
-	QSP_CHAR *ret = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
-	ret[len] = 0;
-	while (--len >= 0)
-		ret[len] = QSP_TO_OS_CHAR(s[len]);
+	long len = (long)QSP_MBSTOWCSLEN(s) + 1;
+	QSP_CHAR *ret = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
+	QSP_MBSTOWCS(ret, s, len);
 	return ret;
 }
 
