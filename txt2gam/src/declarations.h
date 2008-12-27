@@ -60,7 +60,7 @@
 		#define QSP_STRCHR strchr
 		#define QSP_WCSTOMBSLEN strlen
 		#define QSP_WCSTOMBS strncpy
-		#define QSP_MBSTOWCSLEN(a) strlen
+		#define QSP_MBSTOWCSLEN strlen
 		#define QSP_MBSTOWCS strncpy
 		#define QSP_FROM_OS_CHAR
 		#define QSP_TO_OS_CHAR
