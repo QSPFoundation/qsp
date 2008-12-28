@@ -47,7 +47,13 @@ unsigned char qspRand8[256] =
 	0xEA, 0x91, 0x34, 0xF6, 0x88, 0x43, 0x99, 0xD6, 0x89, 0x9B, 0x08, 0xF1, 0x5E, 0x1C, 0xB1, 0x13
 };
 
-void qspSetVarValueByIndex(long, long, QSPVariant);
+static void qspRefreshVar(long);
+static void qspInitSpecialVar(long, QSP_CHAR *);
+static long qspGetVarTextIndex(long, QSP_CHAR *, QSP_BOOL);
+static long qspGetVarData(QSP_CHAR *, QSP_BOOL, long *);
+static void qspSetVarValueByIndex(long, long, QSPVariant);
+static void qspSetVar(QSP_CHAR *, QSPVariant);
+static QSPVariant qspGetVarValueByIndex(long, long, QSP_BOOL);
 
 void qspClearVars(QSP_BOOL isFirst)
 {
@@ -71,7 +77,7 @@ void qspClearVars(QSP_BOOL isFirst)
 	}
 }
 
-void qspRefreshVar(long varIndex)
+static void qspRefreshVar(long varIndex)
 {
 	QSPVariant v;
 	QSP_CHAR emptyStr[1];
@@ -119,7 +125,7 @@ void qspRefreshVar(long varIndex)
 	qspSetVarValueByIndex(varIndex, 0, v);
 }
 
-void qspInitSpecialVar(long type, QSP_CHAR *name)
+static void qspInitSpecialVar(long type, QSP_CHAR *name)
 {
 	long varIndex = qspVarIndex(name, QSP_TRUE);
 	if (varIndex < 0) return;
@@ -187,7 +193,7 @@ long qspVarIndexWithType(QSP_CHAR *name, QSP_BOOL isCreate, QSP_BOOL *isString)
 	return varIndex;
 }
 
-long qspGetVarTextIndex(long varIndex, QSP_CHAR *str, QSP_BOOL isCreate)
+static long qspGetVarTextIndex(long varIndex, QSP_CHAR *str, QSP_BOOL isCreate)
 {
 	QSP_CHAR *uStr;
 	long i, n;
@@ -209,7 +215,7 @@ long qspGetVarTextIndex(long varIndex, QSP_CHAR *str, QSP_BOOL isCreate)
 	return qspVars[varIndex].ValsCount;
 }
 
-long qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
+static long qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 {
 	QSPVariant ind;
 	long varIndex;
@@ -243,7 +249,7 @@ long qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 	return qspVarIndex(s, isCreate);
 }
 
-void qspSetVarValueByIndex(long varIndex, long ind, QSPVariant val)
+static void qspSetVarValueByIndex(long varIndex, long ind, QSPVariant val)
 {
 	long count, oldCount = qspVars[varIndex].ValsCount;
 	if (ind >= oldCount)
@@ -272,7 +278,7 @@ void qspSetVarValueByName(QSP_CHAR *name, QSPVariant val)
 	qspSetVarValueByIndex(varIndex, 0, val);
 }
 
-void qspSetVar(QSP_CHAR *name, QSPVariant val)
+static void qspSetVar(QSP_CHAR *name, QSPVariant val)
 {
 	QSP_BOOL convErr;
 	long index, varIndex = qspGetVarData(name, QSP_TRUE, &index);
@@ -288,7 +294,7 @@ void qspSetVar(QSP_CHAR *name, QSPVariant val)
 	if (val.IsStr) free(QSP_STR(val));
 }
 
-QSPVariant qspGetVarValueByIndex(long varIndex, long ind, QSP_BOOL isStringType)
+static QSPVariant qspGetVarValueByIndex(long varIndex, long ind, QSP_BOOL isStringType)
 {
 	QSPVariant ret;
 	QSP_CHAR *text;

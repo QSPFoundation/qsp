@@ -18,7 +18,10 @@
 #include "codetools.h"
 #include "text.h"
 
-long qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
+static long qspProcessPreformattedStrings(QSP_CHAR *, QSP_CHAR ***);
+static long qspProcessEOLExtensions(QSP_CHAR **, long, QSP_CHAR ***);
+
+static long qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 {
 	QSP_CHAR **ret, *str, quot = 0;
 	long count = 0, strLen = 0, bufSize = 8, strBufSize = 256;
@@ -77,7 +80,7 @@ long qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 	return count;
 }
 
-long qspProcessEOLExtensions(QSP_CHAR **s, long count, QSP_CHAR ***strs)
+static long qspProcessEOLExtensions(QSP_CHAR **s, long count, QSP_CHAR ***strs)
 {
 	QSP_CHAR **ret, *str;
 	long len, i = 0, bufSize = 8, newCount = 0;

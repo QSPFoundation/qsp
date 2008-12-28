@@ -190,14 +190,18 @@ unsigned char qspKOI8ROrderTable[] =
 	0x96, 0xA6, 0x97, 0x98, 0x99, 0x9A, 0x8D, 0x89, 0xA3, 0xA2, 0x8E, 0x9F, 0xA4, 0xA0, 0x9E, 0xA1
 };
 
-long qspUCS2StrLen(char *str)
+static long qspUCS2StrLen(char *);
+static char *qspUCS2StrStr(char *, char *);
+static char *qspQSPToGameString(QSP_CHAR *, QSP_BOOL, QSP_BOOL);
+
+static long qspUCS2StrLen(char *str)
 {
 	unsigned short *ptr = (unsigned short *)str;
 	while (*ptr) ++ptr;
 	return (long)(ptr - (unsigned short *)str);
 }
 
-char *qspUCS2StrStr(char *str, char *subStr)
+static char *qspUCS2StrStr(char *str, char *subStr)
 {
 	unsigned short *s1, *s2, *cp = (unsigned short *)str;
 	while (*cp)
@@ -270,7 +274,7 @@ char *qspFromQSPString(QSP_CHAR *s)
 	return ret;
 }
 
-char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
+static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 {
 	unsigned short *ptr;
 	long offset, len = (long)QSP_STRLEN(s);

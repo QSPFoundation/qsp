@@ -30,6 +30,10 @@
 	extern unsigned char qspKOI8ROrderTable[];
 
 	int qspStrCmpSB(char *, char *, unsigned char *);
+	char qspDirectConvertSB(char, unsigned char *);
+	char qspReverseConvertSB(char, unsigned char *);
+	wchar_t qspDirectConvertUC(char, wchar_t *);
+	char qspReverseConvertUC(wchar_t, wchar_t *);
 	QSP_CHAR *qspCodeReCode(QSP_CHAR *, QSP_BOOL);
 	char *qspFromQSPString(QSP_CHAR *);
 	QSP_CHAR *qspGameToQSPString(char *, QSP_BOOL, QSP_BOOL);

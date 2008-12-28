@@ -23,7 +23,10 @@
 QSP_CHAR *qspPlayList = 0;
 long qspPlayListLen = 0;
 
-void qspPlayFile(QSP_CHAR *s, long volume, QSP_BOOL isAddToPlayList)
+static void qspPlayFile(QSP_CHAR *, long, QSP_BOOL);
+static QSP_CHAR *qspSearchPlayList(QSP_CHAR *);
+
+static void qspPlayFile(QSP_CHAR *s, long volume, QSP_BOOL isAddToPlayList)
 {
 	QSP_CHAR buf[4], *file;
 	if (qspIsAnyString(s))
@@ -46,7 +49,7 @@ void qspPlayFile(QSP_CHAR *s, long volume, QSP_BOOL isAddToPlayList)
 	}
 }
 
-QSP_CHAR *qspSearchPlayList(QSP_CHAR *file)
+static QSP_CHAR *qspSearchPlayList(QSP_CHAR *file)
 {
 	QSP_CHAR *uName, *playList, *pos;
 	long len = (long)QSP_STRLEN(file);

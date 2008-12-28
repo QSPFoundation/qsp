@@ -74,7 +74,13 @@ long qspCRCTable[256] =
 	0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
 };
 
-long qspCRC(void *data, long len)
+static long qspCRC(void *, long);
+static QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *);
+static void qspOpenIncludes();
+static QSP_BOOL qspCheckQuest(char **, long, QSP_BOOL);
+static QSP_BOOL qspCheckGameStatus(QSP_CHAR **, long);
+
+static long qspCRC(void *data, long len)
 {
 	unsigned char *ptr;
 	long crc = 0;
@@ -84,7 +90,7 @@ long qspCRC(void *data, long len)
 	return crc;
 }
 
-QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *path)
+static QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *path)
 {
 	QSP_CHAR *absPath;
 	absPath = qspGetNewText(qspQstPath, qspQstPathLen);
@@ -105,7 +111,7 @@ void qspClearIncludes(QSP_BOOL isFirst)
 	qspCurIncLocsCount = 0;
 }
 
-void qspOpenIncludes()
+static void qspOpenIncludes()
 {
 	long i;
 	QSP_CHAR *file;
@@ -146,7 +152,7 @@ void qspNewGame(QSP_BOOL isReset)
 	qspRefreshCurLoc(QSP_TRUE);
 }
 
-QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
+static QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
 {
 	long i, ind, locsCount, actsCount;
 	QSP_BOOL isOldFormat;
@@ -384,7 +390,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 	fclose(f);
 }
 
-QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
+static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 {
 	long i, ind, count, lastInd, temp, selAction, selObject;
 	ind = 16;

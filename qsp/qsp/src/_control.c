@@ -33,7 +33,9 @@
 
 volatile QSP_BOOL qspIsMustWait = QSP_FALSE;
 
-void qspWait(QSP_BOOL isBlock)
+static void qspWait(QSP_BOOL);
+
+static void qspWait(QSP_BOOL isBlock)
 {
 	while (qspIsMustWait) qspCallSleep(2);
 	if (isBlock) qspIsMustWait = QSP_TRUE;
