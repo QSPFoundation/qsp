@@ -28,6 +28,7 @@
 	extern long qspRealLine;
 	extern long qspRealWhere;
 
+	/* External functions */
 	void qspSetError(long);
 	void qspResetError(QSP_BOOL);
 

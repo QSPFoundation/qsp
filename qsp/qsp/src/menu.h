@@ -27,8 +27,9 @@
 	extern QSP_CHAR *qspCurMenuLocs[QSP_MAXMENUITEMS];
 	extern long qspCurMenuItems;
 
+	/* External functions */
 	void qspClearMenu(QSP_BOOL);
-	/* -- */
+	/* Statements */
 	QSP_BOOL qspStatementShowMenu(QSPVariant *, long, QSP_CHAR **, char);
 
 #endif

@@ -50,6 +50,7 @@
 
 	extern QSPVar qspVars[QSP_VARSCOUNT];
 
+	/* External functions */
 	void qspClearVars(QSP_BOOL);
 	void qspInitVars();
 	long qspVarIndex(QSP_CHAR *, QSP_BOOL);
@@ -60,7 +61,7 @@
 	QSPVariant qspGetVar(QSP_CHAR *);
 	long qspArrayPos(QSP_CHAR *, long, QSPVariant, QSP_BOOL);
 	long qspGetVarsCount();
-	/* -- */
+	/* Statements */
 	void qspStatementSetVarValue(QSP_CHAR *);
 	QSP_BOOL qspStatementCopyArr(QSPVariant *, long, QSP_CHAR **, char);
 

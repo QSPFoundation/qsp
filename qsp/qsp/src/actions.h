@@ -40,10 +40,11 @@
 	extern QSP_BOOL qspIsActionsChanged;
 	extern QSP_BOOL qspCurIsShowActs;
 
+	/* External functions */
 	void qspClearActions(QSP_BOOL);
 	void qspAddAction(QSPVariant *, long, QSP_CHAR **, long, long, QSP_BOOL);
 	void qspExecAction(long);
-	/* -- */
+	/* Statements */
 	void qspStatementAddAct(QSP_CHAR *);
 	QSP_BOOL qspStatementDelAct(QSPVariant *, long, QSP_CHAR **, char);
 

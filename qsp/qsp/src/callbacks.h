@@ -20,6 +20,7 @@
 #ifndef QSP_CALLSDEFINES
 	#define QSP_CALLSDEFINES
 
+	/* External functions */
 	void qspInitCallBacks();
 	void qspSetCallBack(long, QSP_CALLBACK);
 	void qspCallSetTimer(long);

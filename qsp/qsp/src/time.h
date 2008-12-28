@@ -22,6 +22,7 @@
 
 	extern long qspMSCount;
 
+	/* External functions */
 	void qspResetTime(long);
 	long qspGetTime();
 

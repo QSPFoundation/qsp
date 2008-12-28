@@ -100,6 +100,7 @@
 		qspOpLast_Operation
 	};
 
+	/* External functions */
 	void qspInitMath();
 	QSPVariant qspExprValue(QSP_CHAR *);
 

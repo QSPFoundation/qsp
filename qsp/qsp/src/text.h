@@ -27,6 +27,7 @@
 	/* Helpers */
 	#define QSP_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
 
+	/* External functions */
 	long qspAddText(QSP_CHAR **, QSP_CHAR *, long, long, QSP_BOOL);
 	QSP_CHAR *qspGetNewText(QSP_CHAR *, long);
 	QSP_CHAR *qspGetAddText(QSP_CHAR *, QSP_CHAR *, long, long);

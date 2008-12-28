@@ -29,6 +29,7 @@
 	extern unsigned char qspCP1251OrderTable[];
 	extern unsigned char qspKOI8ROrderTable[];
 
+	/* External functions */
 	int qspStrCmpSB(char *, char *, unsigned char *);
 	char qspDirectConvertSB(char, unsigned char *);
 	char qspReverseConvertSB(char, unsigned char *);

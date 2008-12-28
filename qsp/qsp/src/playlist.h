@@ -27,9 +27,10 @@
 	extern QSP_CHAR *qspPlayList;
 	extern long qspPlayListLen;
 
+	/* External functions */
 	void qspPlayPLFiles();
 	void qspRefreshPlayList();
-	/* -- */
+	/* Statements */
 	QSP_BOOL qspStatementPlayFile(QSPVariant *, long, QSP_CHAR **, char);
 	QSP_BOOL qspStatementCloseFile(QSPVariant *, long, QSP_CHAR **, char);
 

@@ -33,6 +33,7 @@
 		QSP_BOOL IsStr;
 	} QSPVariant;
 
+	/* External functions */
 	void qspFreeVariants(QSPVariant *, long);
 	QSPVariant qspGetEmptyVariant(QSP_BOOL);
 	QSPVariant qspConvertVariantTo(QSPVariant, QSP_BOOL, QSP_BOOL, QSP_BOOL *);

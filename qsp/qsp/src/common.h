@@ -31,6 +31,7 @@
 	extern QSP_BOOL qspCurIsShowVars;
 	extern QSP_BOOL qspCurIsShowInput;
 
+	/* External functions */
 	void qspPrepareExecution();
 	void qspMemClear(QSP_BOOL);
 

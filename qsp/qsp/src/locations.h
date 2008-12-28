@@ -43,6 +43,7 @@
 	extern long qspRefreshCount;
 	extern long qspFullRefreshCount;
 
+	/* External functions */
 	void qspCreateWorld(long, long);
 	long qspLocIndex(QSP_CHAR *);
 	void qspExecLocByIndex(long, QSP_BOOL);

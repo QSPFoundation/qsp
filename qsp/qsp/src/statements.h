@@ -98,6 +98,7 @@
 		qspStatLast_Statement
 	};
 
+	/* External functions */
 	void qspInitStats();
 	long qspGetStatArgs(QSP_CHAR *, long, QSPVariant *);
 	QSP_BOOL qspExecString(QSP_CHAR *, QSP_CHAR **);
