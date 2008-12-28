@@ -20,7 +20,11 @@
 #include "locations.h"
 #include "text.h"
 
-long qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isFill)
+static long qspGetLocs(QSP_CHAR *, QSP_CHAR, QSP_CHAR, QSP_BOOL);
+static QSP_BOOL qspOpenQuestFromText(char *, QSP_CHAR, QSP_CHAR);
+static QSP_BOOL qspSaveQuest(char *, QSP_BOOL, QSP_BOOL, QSP_CHAR *);
+
+static long qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isFill)
 {
 	char *name;
 	QSP_CHAR *locCode, *line, *pos, quot = 0;
@@ -127,7 +131,7 @@ long qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isF
 	return curLoc;
 }
 
-QSP_BOOL qspOpenQuestFromText(char *file, QSP_CHAR locStart, QSP_CHAR locEnd)
+static QSP_BOOL qspOpenQuestFromText(char *file, QSP_CHAR locStart, QSP_CHAR locEnd)
 {
 	long fileSize, locsCount;
 	char *buf, *resBuf;
@@ -162,7 +166,7 @@ QSP_BOOL qspOpenQuestFromText(char *file, QSP_CHAR locStart, QSP_CHAR locEnd)
 	return QSP_TRUE;
 }
 
-QSP_BOOL qspSaveQuest(char *file, QSP_BOOL isOldFormat, QSP_BOOL isUCS2, QSP_CHAR *passwd)
+static QSP_BOOL qspSaveQuest(char *file, QSP_BOOL isOldFormat, QSP_BOOL isUCS2, QSP_CHAR *passwd)
 {
 	long i, j, len;
 	char *buf;

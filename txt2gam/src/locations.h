@@ -29,6 +29,7 @@
 	extern QSPLocation *qspLocs;
 	extern long qspLocsCount;
 
+	/* External functions */
 	void qspCreateWorld(long);
 
 #endif

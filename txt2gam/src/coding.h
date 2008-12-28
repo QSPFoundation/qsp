@@ -24,6 +24,7 @@
 
 	extern wchar_t qspCP1251ToUnicodeTable[];
 
+	/* External functions */
 	wchar_t qspDirectConvertUC(char, wchar_t *);
 	char qspReverseConvertUC(wchar_t, wchar_t *);
 	char *qspFromQSPString(QSP_CHAR *);

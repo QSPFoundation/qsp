@@ -17,6 +17,8 @@
 
 #include "text.h"
 
+static QSP_CHAR *qspStrEnd(QSP_CHAR *);
+
 long qspAddText(QSP_CHAR **dest, QSP_CHAR *val, long destLen, long valLen, QSP_BOOL isCreate)
 {
 	long ret;
@@ -54,7 +56,7 @@ QSP_CHAR *qspSkipSpaces(QSP_CHAR *s)
 	return s;
 }
 
-QSP_CHAR *qspStrEnd(QSP_CHAR *s)
+static QSP_CHAR *qspStrEnd(QSP_CHAR *s)
 {
 	while (*s) ++s;
 	return s;

@@ -38,14 +38,19 @@ wchar_t qspCP1251ToUnicodeTable[] =
 	0x0448, 0x0449, 0x044A, 0x044B, 0x044C, 0x044D, 0x044E, 0x044F
 };
 
-long qspUCS2StrLen(char *str)
+static long qspUCS2StrLen(char *);
+static char *qspUCS2StrStr(char *, char *);
+static QSP_CHAR *qspCodeReCode(QSP_CHAR *, QSP_BOOL);
+static long qspAddGameText(char **, char *, QSP_BOOL, long, long, QSP_BOOL);
+
+static long qspUCS2StrLen(char *str)
 {
 	unsigned short *ptr = (unsigned short *)str;
 	while (*ptr) ++ptr;
 	return (long)(ptr - (unsigned short *)str);
 }
 
-char *qspUCS2StrStr(char *str, char *subStr)
+static char *qspUCS2StrStr(char *str, char *subStr)
 {
 	unsigned short *s1, *s2, *cp = (unsigned short *)str;
 	while (*cp)
@@ -75,7 +80,7 @@ char qspReverseConvertUC(wchar_t ch, wchar_t *table)
 	return 0x20;
 }
 
-QSP_CHAR *qspCodeReCode(QSP_CHAR *str, QSP_BOOL isCode)
+static QSP_CHAR *qspCodeReCode(QSP_CHAR *str, QSP_BOOL isCode)
 {
 	long offset, len = (long)QSP_STRLEN(str);
 	QSP_CHAR *buf = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
@@ -183,7 +188,7 @@ long qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSP_CHAR *delim, char ***res)
 	return count;
 }
 
-long qspAddGameText(char **dest, char *val, QSP_BOOL isUCS2, long destLen, long valLen, QSP_BOOL isCreate)
+static long qspAddGameText(char **dest, char *val, QSP_BOOL isUCS2, long destLen, long valLen, QSP_BOOL isCreate)
 {
 	char *destPtr;
 	unsigned short *destUCS2, *valUCS2;

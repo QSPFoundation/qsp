@@ -27,6 +27,7 @@
 	/* Helpers */
 	#define QSP_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
 
+	/* External functions */
 	long qspAddText(QSP_CHAR **, QSP_CHAR *, long, long, QSP_BOOL);
 	QSP_BOOL qspIsInList(QSP_CHAR *, QSP_CHAR);
 	QSP_CHAR *qspSkipSpaces(QSP_CHAR *);
