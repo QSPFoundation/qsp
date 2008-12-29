@@ -119,6 +119,16 @@ static void qspRefreshVar(long varIndex)
 		v.IsStr = QSP_TRUE;
 		QSP_STR(v) = (qspCurSelAction >= 0 ? qspCurActions[qspCurSelAction].Desc : emptyStr);
 		break;
+	case qspVarMainText:
+		*emptyStr = 0;
+		v.IsStr = QSP_TRUE;
+		QSP_STR(v) = (qspCurDesc ? qspCurDesc : emptyStr);
+		break;
+	case qspVarVarsText:
+		*emptyStr = 0;
+		v.IsStr = QSP_TRUE;
+		QSP_STR(v) = (qspCurVars ? qspCurVars : emptyStr);
+		break;
 	default:
 		return;
 	}
@@ -144,6 +154,8 @@ void qspInitVars()
 	qspInitSpecialVar(qspVarCurLoc, QSP_FMT("CURLOC"));
 	qspInitSpecialVar(qspVarSelObj, QSP_FMT("SELOBJ"));
 	qspInitSpecialVar(qspVarSelAct, QSP_FMT("SELACT"));
+	qspInitSpecialVar(qspVarMainText, QSP_FMT("MAINTXT"));
+	qspInitSpecialVar(qspVarVarsText, QSP_FMT("VARSTXT"));
 }
 
 long qspVarIndex(QSP_CHAR *name, QSP_BOOL isCreate)
