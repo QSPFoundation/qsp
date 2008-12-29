@@ -107,6 +107,11 @@
 			#define QSP_ONIG_ENC ONIG_ENCODING_KOI8_R
 		#endif
 	#endif
+	#ifdef _MSC_VER
+		#define QSP_TIME _time64
+	#else
+		#define QSP_TIME time
+	#endif
 	#ifdef _WIN
 		#define QSP_PATHDELIM QSP_FMT("\\")
 	#else

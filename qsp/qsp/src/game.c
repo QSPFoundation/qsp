@@ -136,7 +136,7 @@ void qspNewGame(QSP_BOOL isReset)
 	qspCurLoc = 0;
 	if (isReset)
 	{
-		srand((unsigned int)time(0));
+		srand((unsigned int)QSP_TIME(0));
 		qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
 		qspMemClear(QSP_FALSE);
 		qspResetTime(0);
