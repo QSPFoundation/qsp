@@ -124,7 +124,7 @@ static void qspRefreshVar(long varIndex)
 		v.IsStr = QSP_TRUE;
 		QSP_STR(v) = (qspCurDesc ? qspCurDesc : emptyStr);
 		break;
-	case qspVarVarsText:
+	case qspVarStatText:
 		*emptyStr = 0;
 		v.IsStr = QSP_TRUE;
 		QSP_STR(v) = (qspCurVars ? qspCurVars : emptyStr);
@@ -155,7 +155,7 @@ void qspInitVars()
 	qspInitSpecialVar(qspVarSelObj, QSP_FMT("SELOBJ"));
 	qspInitSpecialVar(qspVarSelAct, QSP_FMT("SELACT"));
 	qspInitSpecialVar(qspVarMainText, QSP_FMT("MAINTXT"));
-	qspInitSpecialVar(qspVarVarsText, QSP_FMT("VARSTXT"));
+	qspInitSpecialVar(qspVarStatText, QSP_FMT("STATTXT"));
 }
 
 long qspVarIndex(QSP_CHAR *name, QSP_BOOL isCreate)
