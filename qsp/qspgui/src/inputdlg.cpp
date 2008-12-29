@@ -55,14 +55,16 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
 	// ----------
 	wxSizer *sizerBottom = new wxBoxSizer(wxHORIZONTAL);
 	wxButton *btnOk = new wxButton(this, wxID_OK, _("OK"));
-	btnOk->SetDefault();
-	btnOk->SetBackgroundColour(backColor);
-	btnOk->SetForegroundColour(fontColor);
-	btnOk->SetFont(font);
 	wxButton *btnCancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
-	btnCancel->SetBackgroundColour(backColor);
-	btnCancel->SetForegroundColour(fontColor);
+	btnOk->SetDefault();
+	btnOk->SetFont(font);
 	btnCancel->SetFont(font);
+	#ifdef __WXMSW__
+		btnOk->SetBackgroundColour(backColor);
+		btnOk->SetForegroundColour(fontColor);
+		btnCancel->SetBackgroundColour(backColor);
+		btnCancel->SetForegroundColour(fontColor);
+	#endif
 	sizerBottom->Add(btnOk, 0, wxALL, 5);
 	sizerBottom->Add(btnCancel, 0, wxALL, 5);
 	// ----------
