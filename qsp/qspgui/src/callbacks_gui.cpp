@@ -29,7 +29,11 @@ void QSPCallBacks::Init(QSPFrame *frame)
 
 	FMOD_System_Create(&m_sys);
 	FMOD_System_SetPluginPath(m_sys, "sound");
-	FMOD_System_SetOutputByPlugin(m_sys, 0);
+	#ifdef __WXMSW__
+		FMOD_System_SetOutput(m_sys, FMOD_OUTPUTTYPE_DSOUND);
+	#else
+		FMOD_System_SetOutput(m_sys, FMOD_OUTPUTTYPE_OSS);
+	#endif
 	FMOD_System_Init(m_sys, 32, FMOD_INIT_NORMAL, 0);
 
 	QSPSetCallBack(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
