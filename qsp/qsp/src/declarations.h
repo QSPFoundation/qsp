@@ -44,6 +44,11 @@
 	#define QSP_DEFINES
 
 	#ifdef _UNICODE
+		#ifdef _MSC_VER
+			#define QSP_FOPEN _wfopen
+		#else
+			#define QSP_FOPEN qspFileOpen
+		#endif
 		#define QSP_STRCPY wcscpy
 		#define QSP_STRNCPY wcsncpy
 		#define QSP_STRLEN wcslen
@@ -69,6 +74,7 @@
 		#define QSP_WCTOB
 		#define QSP_BTOWC
 	#else
+		#define QSP_FOPEN fopen
 		#define QSP_STRCPY strcpy
 		#define QSP_STRNCPY strncpy
 		#define QSP_STRLEN strlen

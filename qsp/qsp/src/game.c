@@ -77,6 +77,7 @@ long qspCRCTable[256] =
 static long qspCRC(void *, long);
 static QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *);
 static void qspOpenIncludes();
+static FILE *qspFileOpen(QSP_CHAR *, QSP_CHAR *);
 static QSP_BOOL qspCheckQuest(char **, long, QSP_BOOL);
 static QSP_BOOL qspCheckGameStatus(QSP_CHAR **, long);
 
@@ -152,6 +153,18 @@ void qspNewGame(QSP_BOOL isReset)
 	qspRefreshCurLoc(QSP_TRUE);
 }
 
+static FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
+{
+	FILE *ret;
+	char *file, *mode;
+	file = qspFromQSPString(fileName);
+	mode = qspFromQSPString(fileMode);
+	ret = fopen(file, mode);
+	free(file);
+	free(mode);
+	return ret;
+}
+
 static QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
 {
 	long i, ind, locsCount, actsCount;
@@ -190,14 +203,12 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	QSP_BOOL isOldFormat, isUCS2, isAddLoc;
 	long i, j, ind, fileSize, dataSize, crc, count, locsCount, actsCount, start, end;
 	QSP_CHAR *data, *delim;
-	char **strs, *buf, *file = qspFromQSPString(fileName);
-	if (!(f = fopen(file, "rb")))
+	char **strs, *buf;
+	if (!(f = QSP_FOPEN(fileName, QSP_FMT("rb"))))
 	{
 		qspSetError(QSP_ERR_FILENOTFOUND);
-		free(file);
 		return;
 	}
-	free(file);
 	fseek(f, 0, SEEK_END);
 	if (!(fileSize = ftell(f)))
 	{
@@ -302,14 +313,11 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 	FILE *f;
 	long i, j, len, oldRefreshCount;
 	QSP_CHAR *temp, *buf;
-	char *file = qspFromQSPString(fileName);
-	if (!(f = fopen(file, "wb")))
+	if (!(f = QSP_FOPEN(fileName, QSP_FMT("wb"))))
 	{
 		qspSetError(QSP_ERR_FILENOTFOUND);
-		free(file);
 		return;
 	}
-	free(file);
 	oldRefreshCount = qspRefreshCount;
 	qspExecLocByVarName(QSP_FMT("ONGSAVE"));
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
@@ -444,14 +452,11 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	FILE *f;
 	long i, j, ind, fileSize, count, varInd, varsCount, valsCount;
 	QSP_CHAR **strs, *buf;
-	char *file = qspFromQSPString(fileName);
-	if (!(f = fopen(file, "rb")))
+	if (!(f = QSP_FOPEN(fileName, QSP_FMT("rb"))))
 	{
 		qspSetError(QSP_ERR_FILENOTFOUND);
-		free(file);
 		return;
 	}
-	free(file);
 	fseek(f, 0, SEEK_END);
 	if (!(fileSize = ftell(f) / sizeof(QSP_CHAR)))
 	{
