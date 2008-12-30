@@ -689,6 +689,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 	info.AddArtist(wxT("DzafT [dzaft@mail.ru]"));
 	info.AddArtist(wxT("Fireton [fireton@mail.ru]"));
 	info.AddArtist(wxT("Gilving [mrgilving@gmail.com]"));
+	info.AddArtist(wxT("Goraph [goraph@gmail.com]"));
 	info.AddArtist(wxT("HIman [himan@rambler.ru]"));
 	info.AddArtist(wxT("Lostas [lostas@mail.ru]"));
 	info.AddArtist(wxT("Mioirel [mioirel@rambler.ru]"));
@@ -697,6 +698,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 	info.AddArtist(wxT("Nex [nex@otaku.ru]"));
 	info.AddArtist(wxT("Ondoo [ondoo@mail.ru]"));
 	info.AddArtist(wxT("RB [qsp1@narod.ru]"));
+	info.AddArtist(wxT("rrock.ru [rrock.ru@gmail.com]"));
 	// ----
 	wxAboutBox(info);
 }
