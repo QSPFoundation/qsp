@@ -544,6 +544,9 @@ void QSPSetCallBack(long type, QSP_CALLBACK func)
 /* Инициализация */
 void QSPInit()
 {
+	#ifdef _DEBUG
+		mwInit();
+	#endif
 	qspIsMustWait = QSP_FALSE;
 	qspRefreshCount = qspFullRefreshCount = 0;
 	qspQstPath = qspQstFullPath = 0;
@@ -571,4 +574,7 @@ void QSPDeInit()
 	if (qspQstFullPath) free(qspQstFullPath);
 	qspCallCloseFile(0);
 	qspIsMustWait = QSP_FALSE;
+	#ifdef _DEBUG
+		mwTerm();
+	#endif
 }
