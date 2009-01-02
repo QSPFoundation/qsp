@@ -1,4 +1,4 @@
-// Copyright (C) 2005-2008 Valeriy Argunov (nporep AT mail DOT ru)
+// Copyright (C) 2005-2009 Valeriy Argunov (nporep AT mail DOT ru)
 /*
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -670,7 +670,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 	wxAboutDialogInfo info;
 	info.SetIcon(wxIcon(logo_big_xpm));
 	info.SetName(QSP_LOGO);
-	info.SetCopyright(wxT("Byte Soft, 2001-2008"));
+	info.SetCopyright(wxT("Byte Soft, 2001-2009"));
 	info.SetDescription(wxString::Format(
 		_("Version: %s\nEngine Compiled: %s\nGUI Compiled: %s"),
 		QSPGetVersion(),
