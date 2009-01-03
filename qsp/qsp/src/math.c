@@ -43,7 +43,6 @@ static void qspFunctionStrPos(QSPVariant *, long, QSPVariant *);
 static void qspFunctionRGB(QSPVariant *, long, QSPVariant *);
 static void qspFunctionMid(QSPVariant *, long, QSPVariant *);
 static void qspFunctionRand(QSPVariant *, long, QSPVariant *);
-static void qspFunctionInput(QSPVariant *, long, QSPVariant *);
 static void qspFunctionDesc(QSPVariant *, long, QSPVariant *);
 static void qspFunctionGetObj(QSPVariant *, long, QSPVariant *);
 static void qspFunctionIsPlay(QSPVariant *, long, QSPVariant *);
@@ -136,7 +135,7 @@ void qspInitMath()
 	qspAddOperation(qspOpIsNum, QSP_FMT("ISNUM"), 0, 30, 0, 2, 1, 1, 0);
 	qspAddOperation(qspOpLCase, QSP_FMT("LCASE"), QSP_STRCHAR QSP_FMT("LCASE"), 30, 0, 1, 1, 1, 1);
 	qspAddOperation(qspOpUCase, QSP_FMT("UCASE"), QSP_STRCHAR QSP_FMT("UCASE"), 30, 0, 1, 1, 1, 1);
-	qspAddOperation(qspOpInput, QSP_FMT("INPUT"), QSP_STRCHAR QSP_FMT("INPUT"), 30, qspFunctionInput, 1, 1, 1, 1);
+	qspAddOperation(qspOpInput, QSP_FMT("INPUT"), QSP_STRCHAR QSP_FMT("INPUT"), 30, 0, 1, 1, 1, 1);
 	qspAddOperation(qspOpStr, QSP_FMT("STR"), QSP_STRCHAR QSP_FMT("STR"), 30, 0, 1, 1, 1, 1);
 	qspAddOperation(qspOpVal, QSP_FMT("VAL"), 0, 30, 0, 2, 1, 1, 0);
 	qspAddOperation(qspOpIsPlay, QSP_FMT("ISPLAY"), 0, 30, qspFunctionIsPlay, 2, 1, 1, 1);
@@ -417,6 +416,9 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 				break;
 			case qspOpArrComp:
 				QSP_NUM(tos) = qspArrayPos(QSP_STR(args[1]), QSP_NUM(args[0]), args[2], QSP_TRUE);
+				break;
+			case qspOpInput:
+				QSP_STR(tos) = qspCallInputBox(QSP_STR(args[0]));
 				break;
 			case qspOpDynEval:
 				tos = qspExprValue(QSP_STR(args[0]));
@@ -808,14 +810,6 @@ static void qspFunctionRand(QSPVariant *args, long count, QSPVariant *tos)
 		max = QSP_NUM(args[0]);
 	}
 	QSP_NUM(*tos) = rand() % (max - min + 1) + min;
-}
-
-static void qspFunctionInput(QSPVariant *args, long count, QSPVariant *tos)
-{
-	QSP_BOOL prevIsMustWait = qspIsMustWait;
-	qspIsMustWait = QSP_FALSE;
-	QSP_STR(*tos) = qspCallInputBox(QSP_STR(args[0]));
-	qspIsMustWait = prevIsMustWait;
 }
 
 static void qspFunctionDesc(QSPVariant *args, long count, QSPVariant *tos)

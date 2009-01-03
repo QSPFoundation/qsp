@@ -20,6 +20,14 @@
 #ifndef QSP_CALLSDEFINES
 	#define QSP_CALLSDEFINES
 
+	typedef struct
+	{
+		QSP_BOOL IsMustWait;
+		long Location;
+		long Where;
+		long Line;
+	} QSPExecState;
+
 	/* External functions */
 	void qspInitCallBacks();
 	void qspSetCallBack(long, QSP_CALLBACK);

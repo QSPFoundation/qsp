@@ -614,11 +614,8 @@ static QSP_BOOL qspStatementJump(QSPVariant *args, long count, QSP_CHAR **jumpTo
 
 static QSP_BOOL qspStatementWait(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_BOOL prevIsMustWait = qspIsMustWait;
 	long num = QSP_NUM(args[0]);
-	qspIsMustWait = QSP_FALSE;
 	qspCallRefreshInt(QSP_TRUE);
-	qspIsMustWait = prevIsMustWait;
 	if (num < 0) num = 0;
 	qspCallSleep(num);
 	return QSP_FALSE;
@@ -655,10 +652,7 @@ static QSP_BOOL qspStatementShowWin(QSPVariant *args, long count, QSP_CHAR **jum
 
 static QSP_BOOL qspStatementRefInt(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_BOOL prevIsMustWait = qspIsMustWait;
-	qspIsMustWait = QSP_FALSE;
 	qspCallRefreshInt(QSP_TRUE);
-	qspIsMustWait = prevIsMustWait;
 	return QSP_FALSE;
 }
 

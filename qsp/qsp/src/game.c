@@ -609,7 +609,6 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 
 QSP_BOOL qspStatementOpenGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_BOOL prevIsMustWait;
 	QSP_CHAR *file;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
@@ -619,18 +618,12 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 		free(file);
 	}
 	else
-	{
-		prevIsMustWait = qspIsMustWait;
-		qspIsMustWait = QSP_FALSE;
 		qspCallOpenGame();
-		qspIsMustWait = prevIsMustWait;
-	}
 	return QSP_FALSE;
 }
 
 QSP_BOOL qspStatementSaveGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_BOOL prevIsMustWait;
 	QSP_CHAR *file;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
@@ -640,11 +633,6 @@ QSP_BOOL qspStatementSaveGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 		free(file);
 	}
 	else
-	{
-		prevIsMustWait = qspIsMustWait;
-		qspIsMustWait = QSP_FALSE;
 		qspCallSaveGame();
-		qspIsMustWait = prevIsMustWait;
-	}
 	return QSP_FALSE;
 }
