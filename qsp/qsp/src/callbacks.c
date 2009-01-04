@@ -16,6 +16,7 @@
 */
 
 #include "callbacks.h"
+#include "errors.h"
 #include "text.h"
 
 QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
