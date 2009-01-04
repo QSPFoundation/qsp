@@ -218,13 +218,8 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 void qspCallSleep(long msecs)
 {
 	/* Здесь ожидаем заданное количество миллисекунд */
-	QSPExecState state;
-	if (qspCallBacks[QSP_CALL_SLEEP])
-	{
-		qspSaveState(&state);
-		qspCallBacks[QSP_CALL_SLEEP](msecs);
-		qspRestoreState(&state);
-	}
+	/* Состояние не сохраняем */
+	if (qspCallBacks[QSP_CALL_SLEEP]) qspCallBacks[QSP_CALL_SLEEP](msecs);
 }
 
 long qspCallGetMSCount()
