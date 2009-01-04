@@ -423,7 +423,7 @@ void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorWhere, 
 {
 	qspWait(QSP_TRUE);
 	*errorNum = qspErrorNum;
-	*errorLoc = (qspErrorLoc >= 0 ? qspLocs[qspErrorLoc].Name : 0);
+	*errorLoc = (qspErrorLoc >= 0 && qspErrorLoc < qspLocsCount ? qspLocs[qspErrorLoc].Name : 0);
 	*errorWhere = qspErrorWhere;
 	*errorLine = qspErrorLine;
 	qspIsMustWait = QSP_FALSE;

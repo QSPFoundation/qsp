@@ -575,7 +575,6 @@ static QSP_BOOL qspStatementClear(QSPVariant *args, long count, QSP_CHAR **jumpT
 	case 8:
 		qspClearIncludes(QSP_FALSE);
 		if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
-		if (qspRealCurLoc >= qspLocsCount) qspRealCurLoc = -1;
 		break;
 	}
 	return QSP_FALSE;
