@@ -75,7 +75,7 @@ void QSPTextBox::SetTextFont(const wxFont& font)
 {
 	int fontSize = font.GetPointSize();
 	wxString fontName(font.GetFaceName());
-	if (m_font.GetFaceName() != fontName || m_font.GetPointSize() != fontSize)
+	if (!m_font.GetFaceName().IsSameAs(fontName, false) || m_font.GetPointSize() != fontSize)
 	{
 		m_font = font;
 		Freeze();

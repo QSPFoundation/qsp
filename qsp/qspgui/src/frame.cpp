@@ -289,9 +289,14 @@ void QSPFrame::ApplyParams()
 	}
 	// --------------
 	setFontName = ((QSPCallBacks::GetVarValue(QSP_FMT("FNAME"), &numVal, &strVal) && strVal && *strVal) ? wxString(strVal) : m_fontName);
-	if (setFontName != m_desc->GetTextFont().GetFaceName())
+	if (!setFontName.IsSameAs(m_desc->GetTextFont().GetFaceName(), false))
 	{
-		if (ApplyFontName(setFontName)) isRefresh = true;
+		if (ApplyFontName(setFontName))
+			isRefresh = true;
+		else if (!m_fontName.IsSameAs(m_desc->GetTextFont().GetFaceName(), false))
+		{
+			if (ApplyFontName(m_fontName)) isRefresh = true;
+		}
 	}
 	// --------------
 	if (isRefresh) RefreshUI();
@@ -428,12 +433,10 @@ bool QSPFrame::ApplyFontSize(int size)
 
 bool QSPFrame::ApplyFontName(const wxString& name)
 {
-	int index;
-	wxArrayString faces(wxFontEnumerator::GetFacenames());
-	if ((index = faces.Index(name, false)) >= 0)
+	if (wxFontEnumerator::IsValidFacename(name))
 	{
 		wxFont font(m_desc->GetTextFont());
-		font.SetFaceName(faces[index]);
+		font.SetFaceName(name);
 		ApplyFont(font);
 		return true;
 	}
