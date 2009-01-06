@@ -28,6 +28,8 @@
 		long Line;
 	} QSPExecState;
 
+	extern QSP_BOOL qspIsInCallBack;
+
 	/* External functions */
 	void qspInitCallBacks();
 	void qspSetCallBack(long, QSP_CALLBACK);

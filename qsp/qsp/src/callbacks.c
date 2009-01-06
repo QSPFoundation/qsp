@@ -20,6 +20,7 @@
 #include "text.h"
 
 QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
+QSP_BOOL qspIsInCallBack = QSP_FALSE;
 
 static void qspSaveState(QSPExecState *);
 static void qspRestoreState(QSPExecState *);
@@ -31,6 +32,7 @@ static void qspSaveState(QSPExecState *state)
 	state->Where = qspRealWhere;
 	state->Line = qspRealLine;
 	qspIsMustWait = QSP_FALSE;
+	qspIsInCallBack = QSP_TRUE;
 }
 
 static void qspRestoreState(QSPExecState *state)
@@ -39,6 +41,7 @@ static void qspRestoreState(QSPExecState *state)
 	qspRealWhere = state->Where;
 	qspRealCurLoc = state->Location;
 	qspIsMustWait = state->IsMustWait;
+	qspIsInCallBack = QSP_FALSE;
 }
 
 void qspInitCallBacks()
@@ -219,7 +222,12 @@ void qspCallSleep(long msecs)
 {
 	/* Здесь ожидаем заданное количество миллисекунд */
 	/* Состояние не сохраняем */
-	if (qspCallBacks[QSP_CALL_SLEEP]) qspCallBacks[QSP_CALL_SLEEP](msecs);
+	if (qspCallBacks[QSP_CALL_SLEEP])
+	{
+		qspIsInCallBack = QSP_TRUE;
+		qspCallBacks[QSP_CALL_SLEEP](msecs);
+		qspIsInCallBack = QSP_FALSE;
+	}
 }
 
 long qspCallGetMSCount()

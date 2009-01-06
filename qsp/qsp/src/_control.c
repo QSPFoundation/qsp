@@ -385,7 +385,7 @@ QSP_BOOL QSPExecLocationCode(QSP_CHAR *name, QSP_BOOL isRefresh)
 /* Выполнение кода локации-счетчика */
 QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh)
 {
-	if (!qspIsMustWait)
+	if (!(qspIsMustWait || qspIsInCallBack))
 	{
 		qspIsMustWait = QSP_TRUE;
 		qspPrepareExecution();
