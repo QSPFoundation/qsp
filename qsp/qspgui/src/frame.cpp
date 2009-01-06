@@ -273,29 +273,25 @@ void QSPFrame::ApplyParams()
 	setBackColor = ((QSPCallBacks::GetVarValue(QSP_FMT("BCOLOR"), &numVal, &strVal) && numVal) ? numVal : m_backColor);
 	if (setBackColor != m_desc->GetBackgroundColour())
 	{
-		ApplyBackColor(setBackColor);
-		isRefresh = true;
+		if (ApplyBackColor(setBackColor)) isRefresh = true;
 	}
 	// --------------
 	setFontColor = ((QSPCallBacks::GetVarValue(QSP_FMT("FCOLOR"), &numVal, &strVal) && numVal) ? numVal : m_fontColor);
 	if (setFontColor != m_desc->GetForegroundColour())
 	{
-		ApplyFontColor(setFontColor);
-		isRefresh = true;
+		if (ApplyFontColor(setFontColor)) isRefresh = true;
 	}
 	// --------------
 	setFontSize = ((QSPCallBacks::GetVarValue(QSP_FMT("FSIZE"), &numVal, &strVal) && numVal) ? numVal : m_fontSize);
 	if (setFontSize != m_desc->GetTextFont().GetPointSize())
 	{
-		ApplyFontSize(setFontSize);
-		isRefresh = true;
+		if (ApplyFontSize(setFontSize)) isRefresh = true;
 	}
 	// --------------
 	setFontName = ((QSPCallBacks::GetVarValue(QSP_FMT("FNAME"), &numVal, &strVal) && strVal && *strVal) ? wxString(strVal) : m_fontName);
 	if (setFontName != m_desc->GetTextFont().GetFaceName())
 	{
-		ApplyFontName(setFontName);
-		isRefresh = true;
+		if (ApplyFontName(setFontName)) isRefresh = true;
 	}
 	// --------------
 	if (isRefresh) RefreshUI();
@@ -422,30 +418,39 @@ void QSPFrame::ApplyFont(const wxFont& font)
 	m_input->SetFont(font);
 }
 
-void QSPFrame::ApplyFontSize(int size)
+bool QSPFrame::ApplyFontSize(int size)
 {
 	wxFont font(m_desc->GetTextFont());
 	font.SetPointSize(size);
 	ApplyFont(font);
+	return true;
 }
 
-void QSPFrame::ApplyFontName(const wxString& name)
+bool QSPFrame::ApplyFontName(const wxString& name)
 {
-	wxFont font(m_desc->GetTextFont());
-	font.SetFaceName(name);
-	ApplyFont(font);
+	int index;
+	wxArrayString faces(wxFontEnumerator::GetFacenames());
+	if ((index = faces.Index(name, false)) >= 0)
+	{
+		wxFont font(m_desc->GetTextFont());
+		font.SetFaceName(faces[index]);
+		ApplyFont(font);
+		return true;
+	}
+	return false;
 }
 
-void QSPFrame::ApplyFontColor(const wxColour& color)
+bool QSPFrame::ApplyFontColor(const wxColour& color)
 {
 	m_desc->SetForegroundColour(color);
 	m_objects->SetForegroundColour(color);
 	m_actions->SetForegroundColour(color);
 	m_vars->SetForegroundColour(color);
 	m_input->SetForegroundColour(color);
+	return true;
 }
 
-void QSPFrame::ApplyBackColor(const wxColour& color)
+bool QSPFrame::ApplyBackColor(const wxColour& color)
 {
 	m_desc->SetBackgroundColour(color);
 	m_objects->SetBackgroundColour(color);
@@ -454,6 +459,7 @@ void QSPFrame::ApplyBackColor(const wxColour& color)
 	m_input->SetBackgroundColour(color);
 	m_imgBack->SetBackgroundColour(color);
 	m_imgView->SetBackgroundColour(color);
+	return true;
 }
 
 void QSPFrame::CallPaneFunc(wxWindowID id, QSP_BOOL isShow) const

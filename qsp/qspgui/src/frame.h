@@ -21,6 +21,7 @@
 	#include <wx/wx.h>
 	#include <wx/fileconf.h>
 	#include <wx/cmdline.h>
+	#include <wx/fontenum.h>
 	#include <wx/fontdlg.h>
 	#include <wx/colordlg.h>
 	#include <wx/aboutdlg.h>
@@ -113,10 +114,10 @@
 		void ReCreateGUI();
 		void RefreshUI();
 		void ApplyFont(const wxFont& font);
-		void ApplyFontSize(int size);
-		void ApplyFontName(const wxString& name);
-		void ApplyFontColor(const wxColour& color);
-		void ApplyBackColor(const wxColour& color);
+		bool ApplyFontSize(int size);
+		bool ApplyFontName(const wxString& name);
+		bool ApplyFontColor(const wxColour& color);
+		bool ApplyBackColor(const wxColour& color);
 		void CallPaneFunc(wxWindowID id, QSP_BOOL isShow) const;
 		void TogglePane(wxWindowID id);
 
