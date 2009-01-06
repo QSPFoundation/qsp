@@ -106,8 +106,6 @@
 		wxMenu *GetGameMenu() const { return m_gameMenu; }
 		bool GetIsShowHotkeys() const { return m_isShowHotkeys; }
 		bool GetIsQuit() const { return m_isQuit; }
-		bool GetIsProcessEvents() const { return m_isProcessEvents; }
-		void SetIsProcessEvents(bool status) { m_isProcessEvents = status; }
 	protected:
 		// Internal methods
 		void ShowError();

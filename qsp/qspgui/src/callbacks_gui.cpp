@@ -253,12 +253,8 @@ long QSPCallBacks::GetMSCount()
 
 void QSPCallBacks::Msg(QSP_CHAR *str)
 {
-	bool oldIsProcessEvents;
-	wxMessageDialog msgDialog(m_frame, wxString(str), _("Info"), wxOK | wxICON_INFORMATION);
-	oldIsProcessEvents = m_frame->GetIsProcessEvents();
-	m_frame->SetIsProcessEvents(false);
-	msgDialog.ShowModal();
-	m_frame->SetIsProcessEvents(oldIsProcessEvents);
+	wxMessageDialog dialog(m_frame, wxString(str), _("Info"), wxOK | wxICON_INFORMATION);
+	dialog.ShowModal();
 }
 
 void QSPCallBacks::DeleteMenu()
@@ -278,9 +274,8 @@ void QSPCallBacks::ShowMenu()
 
 void QSPCallBacks::Input(QSP_CHAR *text, QSP_CHAR *buffer, long maxLen)
 {
-	bool oldIsProcessEvents;
 	RefreshInt(QSP_FALSE);
-	QSPInputDlg *inputDlg = new QSPInputDlg(m_frame,
+	QSPInputDlg dialog(m_frame,
 		wxID_ANY,
 		m_frame->GetDesc()->GetBackgroundColour(),
 		m_frame->GetDesc()->GetForegroundColour(),
@@ -290,17 +285,13 @@ void QSPCallBacks::Input(QSP_CHAR *text, QSP_CHAR *buffer, long maxLen)
 		m_isHtml,
 		m_gamePath
 	);
-	oldIsProcessEvents = m_frame->GetIsProcessEvents();
-	m_frame->SetIsProcessEvents(false);
-	inputDlg->ShowModal();
-	m_frame->SetIsProcessEvents(oldIsProcessEvents);
+	dialog.ShowModal();
 	#ifdef _UNICODE
-		wcsncpy(buffer, inputDlg->GetText().wx_str(), maxLen);
+		wcsncpy(buffer, dialog.GetText().wx_str(), maxLen);
 	#else
-		strncpy(buffer, inputDlg->GetText().wx_str(), maxLen);
+		strncpy(buffer, dialog.GetText().wx_str(), maxLen);
 	#endif
 	buffer[maxLen] = 0;
-	inputDlg->Destroy();
 }
 
 void QSPCallBacks::ShowImage(QSP_CHAR *file)

@@ -356,10 +356,10 @@ void QSPFrame::ShowError()
 			code,
 			wxGetTranslation(desc)
 		);
-	wxMessageDialog wxMsgDialog(this, wxMessage, _("Error"), wxOK | wxICON_ERROR);
+	wxMessageDialog dialog(this, wxMessage, _("Error"), wxOK | wxICON_ERROR);
 	oldIsProcessEvents = m_isProcessEvents;
 	m_isProcessEvents = false;
-	wxMsgDialog.ShowModal();
+	dialog.ShowModal();
 	m_isProcessEvents = oldIsProcessEvents;
 	QSPCallBacks::RefreshInt(QSP_FALSE);
 }
