@@ -222,12 +222,7 @@ void qspCallSleep(long msecs)
 {
 	/* Здесь ожидаем заданное количество миллисекунд */
 	/* Состояние не сохраняем */
-	if (qspCallBacks[QSP_CALL_SLEEP])
-	{
-		qspIsInCallBack = QSP_TRUE;
-		qspCallBacks[QSP_CALL_SLEEP](msecs);
-		qspIsInCallBack = QSP_FALSE;
-	}
+	if (qspCallBacks[QSP_CALL_SLEEP]) qspCallBacks[QSP_CALL_SLEEP](msecs);
 }
 
 long qspCallGetMSCount()
