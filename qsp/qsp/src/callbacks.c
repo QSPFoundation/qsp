@@ -27,12 +27,13 @@ static void qspRestoreState(QSPExecState *);
 
 static void qspSaveState(QSPExecState *state)
 {
+	state->IsInCallBack = qspIsInCallBack;
 	state->IsMustWait = qspIsMustWait;
 	state->Location = qspRealCurLoc;
 	state->Where = qspRealWhere;
 	state->Line = qspRealLine;
-	qspIsMustWait = QSP_FALSE;
 	qspIsInCallBack = QSP_TRUE;
+	qspIsMustWait = QSP_FALSE;
 }
 
 static void qspRestoreState(QSPExecState *state)
@@ -41,12 +42,13 @@ static void qspRestoreState(QSPExecState *state)
 	qspRealWhere = state->Where;
 	qspRealCurLoc = state->Location;
 	qspIsMustWait = state->IsMustWait;
-	qspIsInCallBack = QSP_FALSE;
+	qspIsInCallBack = state->IsInCallBack;
 }
 
 void qspInitCallBacks()
 {
 	long i;
+	qspIsInCallBack = QSP_FALSE;
 	for (i = 0; i < QSP_CALL_DUMMY; ++i)
 		qspCallBacks[i] = 0;
 }

@@ -22,6 +22,7 @@
 
 	typedef struct
 	{
+		QSP_BOOL IsInCallBack;
 		QSP_BOOL IsMustWait;
 		long Location;
 		long Where;
