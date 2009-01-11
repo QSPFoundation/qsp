@@ -222,20 +222,6 @@ diff -u -r d:/wx/wxWidgets/src/common/filesys.cpp d:/wx/wx_qsp/src/common/filesy
  
  #ifdef __WXMSW__
      // file urls either start with a forward slash (local harddisk),
-diff -u -r d:/wx/wxWidgets/src/common/intl.cpp d:/wx/wx_qsp/src/common/intl.cpp
---- d:/wx/wxWidgets/src/common/intl.cpp	2008-12-26 10:48:48 +0000
-+++ d:/wx/wx_qsp/src/common/intl.cpp	2009-01-03 17:43:30 +0000
-@@ -1198,7 +1198,9 @@
- 
- 
-   searchPath += GetFullSearchPath(szDirPrefix);
--  if ( szDirPrefix[LEN_LANG] == wxS('_') )
-+  // HzD_Byte's hack
-+  // if ( szDirPrefix[LEN_LANG] == wxS('_') )
-+  if ( szDirPrefix.length() > LEN_LANG && szDirPrefix[LEN_LANG] == wxS('_') )
-   {
-       // also add just base locale name: for things like "fr_BE" (Belgium
-       // French) we should use fall back on plain "fr" if no Belgium-specific
 diff -u -r d:/wx/wxWidgets/src/generic/animateg.cpp d:/wx/wx_qsp/src/generic/animateg.cpp
 --- d:/wx/wxWidgets/src/generic/animateg.cpp	2008-11-03 13:30:56 +0000
 +++ d:/wx/wx_qsp/src/generic/animateg.cpp	2009-01-03 17:27:30 +0000
