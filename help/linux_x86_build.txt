@@ -1,0 +1,11 @@
+Сборка QSP в Linux:
+
+1) После скачивания репозитория wx (svn co http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk wxWidgets), в скрипте "qsp/build_wx/linux_x86/update" прописываем путь к его директории (WX_PATH), и путь, в котором будет собираться патченный wx (WX_QSP_PATH);
+2) Запускаем "update";
+3) Запускаем "qsp/_cleanup_linux_x86";
+4) В "qsp/linux_x86_build" прописываем путь к патченному wx (WX_QSP_PATH);
+5) Запускаем "linux_x86_build".
+
+После сборки получим директорию "qsp/_release" с собранным QSP.
+
+wxWidgets в системе устанавливать не нужно.
