@@ -117,8 +117,11 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 	}
 	else
 	{
-		qspCurDescLen = qspAddText(&qspCurDesc, str, qspCurDescLen, -1, QSP_FALSE);
-		if (*str) qspIsMainDescChanged = QSP_TRUE;
+		if (*str)
+		{
+			qspCurDescLen = qspAddText(&qspCurDesc, str, qspCurDescLen, -1, QSP_FALSE);
+			qspIsMainDescChanged = QSP_TRUE;
+		}
 		free(str);
 	}
 	qspRealWhere = QSP_AREA_ONLOCACTION;

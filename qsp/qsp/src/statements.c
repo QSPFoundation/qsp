@@ -495,8 +495,11 @@ static QSP_BOOL qspStatementAddText(QSPVariant *args, long count, QSP_CHAR **jum
 	switch (extArg)
 	{
 	case 0:
-		qspCurVarsLen = qspAddText(&qspCurVars, s, qspCurVarsLen, -1, QSP_FALSE);
-		if (*s) qspIsVarsDescChanged = QSP_TRUE;
+		if (*s)
+		{
+			qspCurVarsLen = qspAddText(&qspCurVars, s, qspCurVarsLen, -1, QSP_FALSE);
+			qspIsVarsDescChanged = QSP_TRUE;
+		}
 		break;
 	case 1:
 		qspCurVarsLen = qspAddText(&qspCurVars, s, qspCurVarsLen, -1, QSP_FALSE);
@@ -504,8 +507,11 @@ static QSP_BOOL qspStatementAddText(QSPVariant *args, long count, QSP_CHAR **jum
 		qspIsVarsDescChanged = QSP_TRUE;
 		break;
 	case 2:
-		qspCurDescLen = qspAddText(&qspCurDesc, s, qspCurDescLen, -1, QSP_FALSE);
-		if (*s) qspIsMainDescChanged = QSP_TRUE;
+		if (*s)
+		{
+			qspCurDescLen = qspAddText(&qspCurDesc, s, qspCurDescLen, -1, QSP_FALSE);
+			qspIsMainDescChanged = QSP_TRUE;
+		}
 		break;
 	case 3:
 		qspCurDescLen = qspAddText(&qspCurDesc, s, qspCurDescLen, -1, QSP_FALSE);
