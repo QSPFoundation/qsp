@@ -47,6 +47,7 @@ static void qspFunctionDesc(QSPVariant *, long, QSPVariant *);
 static void qspFunctionGetObj(QSPVariant *, long, QSPVariant *);
 static void qspFunctionIsPlay(QSPVariant *, long, QSPVariant *);
 static void qspFunctionInstr(QSPVariant *, long, QSPVariant *);
+static void qspFunctionEval(QSPVariant *, long, QSPVariant *);
 
 static void qspAddOperation(long opCode,
 							QSP_CHAR *opName,
@@ -150,6 +151,7 @@ void qspInitMath()
 	qspAddOperation(qspOpArrPos, QSP_FMT("ARRPOS"), 0, 30, 0, 2, 3, 3, 2, 1, 0);
 	qspAddOperation(qspOpArrComp, QSP_FMT("ARRCOMP"), 0, 30, 0, 2, 3, 3, 2, 1, 0);
 	qspAddOperation(qspOpInstr, QSP_FMT("INSTR"), 0, 30, qspFunctionInstr, 2, 3, 3, 2, 1, 1);
+	qspAddOperation(qspOpEval, QSP_FMT("EVAL"), QSP_STRCHAR QSP_FMT("EVAL"), 30, qspFunctionEval, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddOperation(qspOpDynEval, QSP_FMT("DYNEVAL"), QSP_STRCHAR QSP_FMT("DYNEVAL"), 30, 0, 0, 1, 1, 1);
 }
 
@@ -866,4 +868,50 @@ static void qspFunctionInstr(QSPVariant *args, long count, QSPVariant *tos)
 	}
 	else
 		QSP_NUM(*tos) = 0;
+}
+
+static void qspFunctionEval(QSPVariant *args, long count, QSPVariant *tos)
+{
+	QSP_CHAR *text;
+	QSPVar local, result, *varRes, *varArgs;
+	varArgs = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE);
+	if (!varArgs) return;
+	varRes = qspVarReference(QSP_FMT("RESULT"), QSP_FALSE);
+	if (!varRes) return;
+	qspCopyVar(&local, varArgs);
+	qspSetArgs(varArgs, args + 1, count - 1);
+	qspCopyVar(&result, varRes);
+	qspEmptyVar(varRes);
+	qspExecLocByName(QSP_STR(args[0]), QSP_FALSE);
+	qspEmptyVar(varArgs);
+	qspCopyVar(varArgs, &local);
+	qspEmptyVar(&local);
+	if (qspErrorNum)
+	{
+		qspEmptyVar(varRes);
+		qspCopyVar(varRes, &result);
+		qspEmptyVar(&result);
+		return;
+	}
+	if (varRes->ValsCount)
+	{
+		if (text = varRes->TextValue[0])
+		{
+			tos->IsStr = QSP_TRUE;
+			QSP_STR(*tos) = qspGetNewText(text, -1);
+		}
+		else
+		{
+			tos->IsStr = QSP_FALSE;
+			QSP_NUM(*tos) = varRes->Value[0];
+		}
+	}
+	else
+	{
+		tos->IsStr = QSP_TRUE;
+		QSP_STR(*tos) = qspGetNewText(QSP_FMT(""), 0);
+	}
+	qspEmptyVar(varRes);
+	qspCopyVar(varRes, &result);
+	qspEmptyVar(&result);
 }

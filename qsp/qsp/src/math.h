@@ -21,7 +21,7 @@
 #ifndef QSP_MATHDEFINES
 	#define QSP_MATHDEFINES
 
-	#define QSP_OPMAXARGS 3
+	#define QSP_OPMAXARGS 10
 	#define QSP_STACKSIZE 30
 	#define QSP_MAXITEMS 100
 
@@ -96,6 +96,7 @@
 		qspOpArrPos,
 		qspOpArrComp,
 		qspOpInstr,
+		qspOpEval,
 		qspOpDynEval,
 
 		qspOpLast_Operation
