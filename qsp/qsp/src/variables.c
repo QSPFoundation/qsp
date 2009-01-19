@@ -175,10 +175,10 @@ void qspInitSpecialVars()
 
 QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
 {
+	long i;
 	QSPVar *var;
 	QSP_CHAR *uName;
 	unsigned char bCode;
-	long i, code;
 	if (*name == QSP_STRCHAR[0]) ++name;
 	if (!(*name) || QSP_ISDIGIT(*name) || QSP_STRPBRK(name, QSP_DELIMS))
 	{
@@ -189,9 +189,8 @@ QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
 	bCode = 0;
 	for (i = 0; uName[i]; ++i)
 		bCode = qspRand8[bCode ^ QSP_MBTOSB(uName[i])];
-	code = bCode * QSP_VARSSEEK;
 	i = 0;
-	var = qspVars + code;
+	var = qspVars + QSP_VARSSEEK * bCode;
 	while (i < QSP_VARSSEEK)
 	{
 		if (!var->Name)
