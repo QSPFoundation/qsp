@@ -21,7 +21,7 @@
 #ifndef QSP_STATSDEFINES
 	#define QSP_STATSDEFINES
 
-	#define QSP_STATMAXARGS 2
+	#define QSP_STATMAXARGS 10
 
 	typedef QSP_BOOL (*QSP_STATEMENT)(QSPVariant *, long, QSP_CHAR **, char);
 

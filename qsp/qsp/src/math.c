@@ -138,6 +138,7 @@ void qspInitMath()
 	qspAddOperation(qspOpInput, QSP_FMT("INPUT"), QSP_STRCHAR QSP_FMT("INPUT"), 30, 0, 1, 1, 1, 1);
 	qspAddOperation(qspOpStr, QSP_FMT("STR"), QSP_STRCHAR QSP_FMT("STR"), 30, 0, 1, 1, 1, 1);
 	qspAddOperation(qspOpVal, QSP_FMT("VAL"), 0, 30, 0, 2, 1, 1, 0);
+	qspAddOperation(qspOpArrSize, QSP_FMT("ARRSIZE"), 0, 30, 0, 2, 1, 1, 1);
 	qspAddOperation(qspOpIsPlay, QSP_FMT("ISPLAY"), 0, 30, qspFunctionIsPlay, 2, 1, 1, 1);
 	qspAddOperation(qspOpDesc, QSP_FMT("DESC"), QSP_STRCHAR QSP_FMT("DESC"), 30, qspFunctionDesc, 1, 1, 1, 1);
 	qspAddOperation(qspOpTrim, QSP_FMT("TRIM"), QSP_STRCHAR QSP_FMT("TRIM"), 30, 0, 1, 1, 1, 1);
@@ -407,6 +408,9 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 				args[0] = qspConvertVariantTo(args[0], QSP_FALSE, QSP_TRUE, &convErr);
 				convErr = QSP_FALSE;
 				QSP_NUM(tos) = QSP_NUM(args[0]);
+				break;
+			case qspOpArrSize:
+				QSP_NUM(tos) = qspArraySize(QSP_STR(args[0]));
 				break;
 			case qspOpTrim:
 				QSP_STR(tos) = qspDelSpc(QSP_STR(args[0]));

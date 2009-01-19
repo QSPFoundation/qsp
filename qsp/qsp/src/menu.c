@@ -38,14 +38,15 @@ void qspClearMenu(QSP_BOOL isFirst)
 
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
+	long i;
 	QSP_CHAR *imgPath, *str, *pos, *pos2, *endPos;
-	long i, varInd = qspVarIndexWithType(QSP_STR(args[0]), QSP_FALSE, 0);
-	if (varInd < 0) return QSP_FALSE;
+	QSPVar *var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0);
+	if (!var) return QSP_FALSE;
 	qspClearMenu(QSP_FALSE);
 	qspCallDeleteMenu();
-	for (i = 0; i < qspVars[varInd].ValsCount; ++i)
+	for (i = 0; i < var->ValsCount; ++i)
 	{
-		if (!((str = qspVars[varInd].TextValue[i]) && qspIsAnyString(str))) break;
+		if (!((str = var->TextValue[i]) && qspIsAnyString(str))) break;
 		pos2 = qspInStrRChar(str, QSP_MENUDELIM[0], 0);
 		if (!pos2)
 		{

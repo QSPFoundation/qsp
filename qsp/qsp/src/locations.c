@@ -92,7 +92,7 @@ long qspLocIndex(QSP_CHAR *name)
 
 void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 {
-	QSPVariant args[QSP_STATMAXARGS];
+	QSPVariant args[2];
 	QSP_CHAR *str, **code;
 	long i, count, oldLoc, oldWhere, oldLine;
 	oldLoc = qspRealCurLoc;

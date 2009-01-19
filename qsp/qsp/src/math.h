@@ -84,6 +84,7 @@
 		qspOpInput,
 		qspOpStr,
 		qspOpVal,
+		qspOpArrSize,
 		qspOpIsPlay,
 		qspOpDesc,
 		qspOpTrim,

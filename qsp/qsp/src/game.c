@@ -140,7 +140,7 @@ void qspNewGame(QSP_BOOL isReset)
 		qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
 		qspMemClear(QSP_FALSE);
 		qspResetTime(0);
-		qspInitVars();
+		qspInitSpecialVars();
 		qspCallShowWindow(QSP_WIN_ACTS, QSP_TRUE);
 		qspCallShowWindow(QSP_WIN_OBJS, QSP_TRUE);
 		qspCallShowWindow(QSP_WIN_VARS, QSP_TRUE);
@@ -559,7 +559,7 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_TRUE;
 	qspOpenIncludes();
 	if (qspErrorNum) return;
-	qspInitVars();
+	qspInitSpecialVars();
 	qspCallShowWindow(QSP_WIN_ACTS, qspCurIsShowActs);
 	qspCallShowWindow(QSP_WIN_OBJS, qspCurIsShowObjs);
 	qspCallShowWindow(QSP_WIN_VARS, qspCurIsShowVars);

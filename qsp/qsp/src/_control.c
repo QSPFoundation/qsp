@@ -298,33 +298,33 @@ void QSPShowWindow(long type, QSP_BOOL isShow)
 /* Получить количество элементов массива */
 QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, long *count)
 {
-	long varInd;
+	QSPVar *var;
 	qspWait(QSP_TRUE);
 	qspResetError(QSP_TRUE);
-	varInd = qspVarIndex(name, QSP_FALSE);
+	var = qspVarReference(name, QSP_FALSE);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
 		return QSP_FALSE;
 	}
-	*count = qspVars[varInd].ValsCount;
+	*count = var->ValsCount;
 	qspIsMustWait = QSP_FALSE;
 	return QSP_TRUE;
 }
 /* Получить значения указанного элемента массива */
 QSP_BOOL QSPGetVarValues(QSP_CHAR *name, long ind, long *numVal, QSP_CHAR **strVal)
 {
-	long varInd;
+	QSPVar *var;
 	qspWait(QSP_TRUE);
 	qspResetError(QSP_TRUE);
-	varInd = qspVarIndex(name, QSP_FALSE);
+	var = qspVarReference(name, QSP_FALSE);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
 		return QSP_FALSE;
 	}
-	*numVal = qspVars[varInd].Value[ind];
-	*strVal = qspVars[varInd].TextValue[ind];
+	*numVal = var->Value[ind];
+	*strVal = var->TextValue[ind];
 	qspIsMustWait = QSP_FALSE;
 	return QSP_TRUE;
 }

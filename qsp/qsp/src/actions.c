@@ -127,7 +127,7 @@ void qspExecAction(long ind)
 void qspStatementAddAct(QSP_CHAR *s)
 {
 	long count;
-	QSPVariant args[QSP_STATMAXARGS];
+	QSPVariant args[2];
 	QSP_CHAR *code, *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
 	if (!pos)
 	{
