@@ -96,7 +96,7 @@
 		qspOpArrPos,
 		qspOpArrComp,
 		qspOpInstr,
-		qspOpEval,
+		qspOpFunc,
 		qspOpDynEval,
 
 		qspOpLast_Operation

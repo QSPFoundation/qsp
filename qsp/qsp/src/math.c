@@ -47,7 +47,7 @@ static void qspFunctionDesc(QSPVariant *, long, QSPVariant *);
 static void qspFunctionGetObj(QSPVariant *, long, QSPVariant *);
 static void qspFunctionIsPlay(QSPVariant *, long, QSPVariant *);
 static void qspFunctionInstr(QSPVariant *, long, QSPVariant *);
-static void qspFunctionEval(QSPVariant *, long, QSPVariant *);
+static void qspFunctionFunc(QSPVariant *, long, QSPVariant *);
 
 static void qspAddOperation(long opCode,
 							QSP_CHAR *opName,
@@ -151,7 +151,7 @@ void qspInitMath()
 	qspAddOperation(qspOpArrPos, QSP_FMT("ARRPOS"), 0, 30, 0, 2, 3, 3, 2, 1, 0);
 	qspAddOperation(qspOpArrComp, QSP_FMT("ARRCOMP"), 0, 30, 0, 2, 3, 3, 2, 1, 0);
 	qspAddOperation(qspOpInstr, QSP_FMT("INSTR"), 0, 30, qspFunctionInstr, 2, 3, 3, 2, 1, 1);
-	qspAddOperation(qspOpEval, QSP_FMT("EVAL"), QSP_STRCHAR QSP_FMT("EVAL"), 30, qspFunctionEval, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	qspAddOperation(qspOpFunc, QSP_FMT("FUNC"), QSP_STRCHAR QSP_FMT("FUNC"), 30, qspFunctionFunc, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddOperation(qspOpDynEval, QSP_FMT("DYNEVAL"), QSP_STRCHAR QSP_FMT("DYNEVAL"), 30, 0, 0, 1, 1, 1);
 }
 
@@ -870,7 +870,7 @@ static void qspFunctionInstr(QSPVariant *args, long count, QSPVariant *tos)
 		QSP_NUM(*tos) = 0;
 }
 
-static void qspFunctionEval(QSPVariant *args, long count, QSPVariant *tos)
+static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 {
 	QSP_CHAR *text;
 	QSPVar local, result, *varRes, *varArgs;
