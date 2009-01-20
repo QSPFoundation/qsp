@@ -876,7 +876,7 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 	QSPVar local, result, *varRes, *varArgs;
 	varArgs = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE);
 	if (!varArgs) return;
-	varRes = qspVarReference(QSP_FMT("RESULT"), QSP_FALSE);
+	varRes = qspVarReference(QSP_FMT("RESULT"), QSP_TRUE);
 	if (!varRes) return;
 	qspCopyVar(&local, varArgs);
 	qspSetArgs(varArgs, args + 1, count - 1);
