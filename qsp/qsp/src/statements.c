@@ -260,8 +260,8 @@ long qspGetStatArgs(QSP_CHAR *s, long statCode, QSPVariant *args)
 {
 	QSP_CHAR *pos;
 	char type;
-	long count = 0;
 	QSP_BOOL convErr = QSP_FALSE;
+	long count = 0, oldRefreshCount = qspRefreshCount;
 	while (1)
 	{
 		s = qspSkipSpaces(s);
@@ -284,7 +284,7 @@ long qspGetStatArgs(QSP_CHAR *s, long statCode, QSPVariant *args)
 		}
 		else
 			args[count] = qspExprValue(s);
-		if (qspErrorNum) break;
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		type = qspStats[statCode].ArgsTypes[count];
 		if (type) args[count] = qspConvertVariantTo(args[count], type == 1, QSP_TRUE, &convErr);
 		++count;
@@ -296,10 +296,14 @@ long qspGetStatArgs(QSP_CHAR *s, long statCode, QSPVariant *args)
 		if (!pos) break;
 		s = pos + QSP_LEN(QSP_COMMA);
 	}
-	if (count < qspStats[statCode].MinArgsCount)
-		qspSetError(QSP_ERR_ARGSCOUNT);
-	if (qspErrorNum)
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
+		qspFreeVariants(args, count);
+		return 0;
+	}
+	if (count < qspStats[statCode].MinArgsCount)
+	{
+		qspSetError(QSP_ERR_ARGSCOUNT);
 		qspFreeVariants(args, count);
 		return 0;
 	}
@@ -355,8 +359,9 @@ QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
 			qspStatementSetVarValue(paramPos);
 			break;
 		default:
+			oldRefreshCount = qspRefreshCount;
 			count = qspGetStatArgs(paramPos, statCode, args);
-			if (qspErrorNum) break;
+			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 			isExit = qspStats[statCode].Func(args, count, jumpTo, qspStats[statCode].ExtArg);
 			qspFreeVariants(args, count);
 			return isExit;
@@ -398,7 +403,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 				*pos = 0;
 				count = qspGetStatArgs(paramPos, statCode, args);
 				*pos = QSP_COLONDELIM[0];
-				if (qspErrorNum) break;
+				if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 				if (statCode == qspStatAct)
 				{
 					qspAddAction(args, count, s, i, endPos, QSP_TRUE);
@@ -458,16 +463,18 @@ static QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
 {
 	QSPVariant arg;
 	QSP_BOOL isExit;
+	long oldRefreshCount;
 	QSP_CHAR *uStr, *ePos, *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
 	if (!pos)
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return QSP_FALSE;
 	}
+	oldRefreshCount = qspRefreshCount;
 	*pos = 0;
 	qspGetStatArgs(s, qspStatIf, &arg);
 	*pos = QSP_COLONDELIM[0];
-	if (qspErrorNum) return QSP_FALSE;
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
 	qspUpperStr(uStr = qspGetNewText(pos, -1));
 	ePos = qspStrPos(uStr, qspStats[qspStatElse].Names[0], QSP_TRUE);
 	free(uStr);

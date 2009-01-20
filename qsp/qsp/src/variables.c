@@ -251,6 +251,7 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 {
 	QSPVar *var;
 	QSPVariant ind;
+	long oldRefreshCount;
 	QSP_CHAR *rPos, *lPos = QSP_STRCHR(s, QSP_LSBRACK[0]);
 	if (lPos)
 	{
@@ -264,10 +265,11 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 			qspSetError(QSP_ERR_BRACKNOTFOUND);
 			return 0;
 		}
+		oldRefreshCount = qspRefreshCount;
 		*rPos = 0;
 		ind = qspExprValue(lPos + 1);
 		*rPos = QSP_RSBRACK[0];
-		if (qspErrorNum) return 0;
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
 		if (ind.IsStr)
 		{
 			*index = qspGetVarTextIndex(var, QSP_STR(ind), isCreate);
@@ -509,14 +511,16 @@ void qspMoveVar(QSPVar *dest, QSPVar *src)
 void qspStatementSetVarValue(QSP_CHAR *s)
 {
 	QSPVariant v;
+	long oldRefreshCount;
 	QSP_CHAR *name, *pos = qspStrPos(s, QSP_EQUAL, QSP_FALSE);
 	if (!pos)
 	{
 		qspSetError(QSP_ERR_EQNOTFOUND);
 		return;
 	}
+	oldRefreshCount = qspRefreshCount;
 	v = qspExprValue(pos + QSP_LEN(QSP_EQUAL));
-	if (qspErrorNum) return;
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
 	*pos = 0;
 	name = qspDelSpc(s);
 	*pos = QSP_EQUAL[0];

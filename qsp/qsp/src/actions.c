@@ -18,6 +18,7 @@
 #include "actions.h"
 #include "errors.h"
 #include "game.h"
+#include "locations.h"
 #include "statements.h"
 #include "text.h"
 
@@ -126,7 +127,7 @@ void qspExecAction(long ind)
 
 void qspStatementAddAct(QSP_CHAR *s)
 {
-	long count;
+	long oldRefreshCount, count;
 	QSPVariant args[2];
 	QSP_CHAR *code, *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
 	if (!pos)
@@ -134,10 +135,11 @@ void qspStatementAddAct(QSP_CHAR *s)
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return;
 	}
+	oldRefreshCount = qspRefreshCount;
 	*pos = 0;
 	count = qspGetStatArgs(s, qspStatAct, args);
 	*pos = QSP_COLONDELIM[0];
-	if (qspErrorNum) return;
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
 	code = pos + 1;
 	qspAddAction(args, count, &code, 0, 1, QSP_FALSE);
 	qspFreeVariants(args, count);

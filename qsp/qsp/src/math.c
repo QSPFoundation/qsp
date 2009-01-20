@@ -481,10 +481,11 @@ static void qspCompileExpression(QSP_CHAR *s, long *itemsCount, QSPVariant *comp
 	QSPVariant v;
 	QSP_CHAR *name;
 	QSP_BOOL waitForOperator = QSP_FALSE;
-	long opStack[QSP_STACKSIZE], argStack[QSP_STACKSIZE], opCode, opSp = -1, argSp = -1;
+	long oldRefreshCount, opStack[QSP_STACKSIZE], argStack[QSP_STACKSIZE], opCode, opSp = -1, argSp = -1;
 	opStack[0] = 0; argStack[0] = 0;
 	qspCompileExprPushOpCode(opStack, &opSp, argStack, &argSp, qspOpStart);
 	if (qspErrorNum) return;
+	oldRefreshCount = qspRefreshCount;
 	while (1)
 	{
 		s = qspSkipSpaces(s);
@@ -574,7 +575,7 @@ static void qspCompileExpression(QSP_CHAR *s, long *itemsCount, QSPVariant *comp
 			{
 				v.IsStr = QSP_TRUE;
 				QSP_STR(v) = qspGetString(&s);
-				if (qspErrorNum) return;
+				if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
 				qspAppendToCompiled(qspOpValue, itemsCount, compValues, compOpCodes, compArgsCounts, 0, v);
 				if (qspErrorNum)
 				{
@@ -642,7 +643,7 @@ static void qspCompileExpression(QSP_CHAR *s, long *itemsCount, QSPVariant *comp
 				else
 				{
 					v = qspGetVar(name);
-					if (qspErrorNum)
+					if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 					{
 						free(name);
 						return;
@@ -670,9 +671,9 @@ static void qspCompileExpression(QSP_CHAR *s, long *itemsCount, QSPVariant *comp
 QSPVariant qspExprValue(QSP_CHAR *expr)
 {
 	QSPVariant res, compValues[QSP_MAXITEMS];
-	long compOpCodes[QSP_MAXITEMS], compArgsCounts[QSP_MAXITEMS], itemsCount = 0;
+	long compOpCodes[QSP_MAXITEMS], compArgsCounts[QSP_MAXITEMS], itemsCount = 0, oldRefreshCount = qspRefreshCount;
 	qspCompileExpression(expr, &itemsCount, compValues, compOpCodes, compArgsCounts);
-	if (qspErrorNum)
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
 		res.IsStr = QSP_FALSE;
 		QSP_NUM(res) = 0;
@@ -822,14 +823,15 @@ static void qspFunctionRand(QSPVariant *args, long count, QSPVariant *tos)
 static void qspFunctionDesc(QSPVariant *args, long count, QSPVariant *tos)
 {
 	QSP_CHAR *desc;
-	long index = qspLocIndex(QSP_STR(args[0]));
+	long oldRefreshCount, index = qspLocIndex(QSP_STR(args[0]));
 	if (index < 0)
 	{
 		qspSetError(QSP_ERR_LOCNOTFOUND);
 		return;
 	}
+	oldRefreshCount = qspRefreshCount;
 	desc = qspFormatText(qspLocs[index].Desc);
-	if (qspErrorNum) return;
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
 	QSP_STR(*tos) = desc;
 }
 

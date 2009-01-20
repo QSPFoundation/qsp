@@ -95,7 +95,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 {
 	QSPVariant args[2];
 	QSP_CHAR *str, **code;
-	long i, count, oldLoc, oldWhere, oldLine;
+	long oldRefreshCount, i, count, oldLoc, oldWhere, oldLine;
 	QSPLocation *loc = qspLocs + locInd;
 	oldLoc = qspRealCurLoc;
 	oldWhere = qspRealWhere;
@@ -103,8 +103,9 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 	qspRealCurLoc = locInd;
 	qspRealWhere = QSP_AREA_ONLOCVISIT;
 	qspRealLine = 0;
+	oldRefreshCount = qspRefreshCount;
 	str = qspFormatText(loc->Desc);
-	if (qspErrorNum)
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
 		qspRealLine = oldLine;
 		qspRealWhere = oldWhere;
@@ -132,7 +133,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		str = loc->Actions[i].Desc;
 		if (!(str && *str)) break;
 		str = qspFormatText(str);
-		if (qspErrorNum)
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 		{
 			qspRealLine = oldLine;
 			qspRealWhere = oldWhere;

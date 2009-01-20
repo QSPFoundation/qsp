@@ -18,6 +18,7 @@
 #include "text.h"
 #include "coding.h"
 #include "errors.h"
+#include "locations.h"
 #include "math.h"
 #include "variables.h"
 #include "variant.h"
@@ -320,12 +321,13 @@ QSP_CHAR *qspFormatText(QSP_CHAR *txt)
 {
 	QSPVariant val;
 	QSP_CHAR *newTxt, *lPos, *rPos;
-	long len, txtLen, oldTxtLen, bufSize;
+	long oldRefreshCount, len, txtLen, oldTxtLen, bufSize;
 	if (qspGetVarNumValue(QSP_FMT("DISABLESUBEX"))) return qspGetNewText(txt, -1);
 	bufSize = 256;
 	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	txtLen = oldTxtLen = 0;
 	lPos = QSP_STRSTR(txt, QSP_LSUBEX);
+	oldRefreshCount = qspRefreshCount;
 	while (lPos)
 	{
 		len = (long)(lPos - txt);
@@ -347,7 +349,7 @@ QSP_CHAR *qspFormatText(QSP_CHAR *txt)
 		*rPos = 0;
 		val = qspExprValue(txt);
 		*rPos = QSP_RSUBEX[0];
-		if (qspErrorNum)
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 		{
 			free(newTxt);
 			return 0;
