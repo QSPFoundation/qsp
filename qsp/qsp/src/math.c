@@ -269,10 +269,11 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 {
 	QSPVariant stack[QSP_STACKSIZE], args[QSP_OPMAXARGS], tos;
 	char type;
-	long i, j, index, opCode, argsCount, len, sp = -1;
+	long i, j, index, oldRefreshCount, opCode, argsCount, len, sp = -1;
 	QSP_BOOL convErr = QSP_FALSE;
 	tos.IsStr = QSP_FALSE;
 	QSP_NUM(tos) = 0;
+	oldRefreshCount = qspRefreshCount;
 	for (index = 0; index < itemsCount; ++index)
 	{
 		opCode = compOpCodes[index];
@@ -440,9 +441,9 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 			qspFreeVariants(args, argsCount);
 			sp -= argsCount - 1;
 		}
-		if (qspErrorNum) break;
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 	}
-	if (qspErrorNum)
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
 		qspFreeVariants(stack, sp + 1);
 		tos.IsStr = QSP_FALSE;
@@ -873,23 +874,30 @@ static void qspFunctionInstr(QSPVariant *args, long count, QSPVariant *tos)
 static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 {
 	QSP_CHAR *text;
+	long oldRefreshCount;
 	QSPVar local, result, *varRes, *varArgs;
-	varArgs = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE);
-	if (!varArgs) return;
-	varRes = qspVarReference(QSP_FMT("RESULT"), QSP_TRUE);
-	if (!varRes) return;
+	if (!(varArgs = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE))) return;
+	if (!(varRes = qspVarReference(QSP_FMT("RESULT"), QSP_TRUE))) return;
 	qspMoveVar(&local, varArgs);
 	qspSetArgs(varArgs, args + 1, count - 1);
 	qspMoveVar(&result, varRes);
+	oldRefreshCount = qspRefreshCount;
 	qspExecLocByName(QSP_STR(args[0]), QSP_FALSE);
-	qspEmptyVar(varArgs);
-	qspMoveVar(varArgs, &local);
-	if (qspErrorNum)
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
-		qspEmptyVar(varRes);
-		qspMoveVar(varRes, &result);
+		qspEmptyVar(&local);
+		qspEmptyVar(&result);
 		return;
 	}
+	if (!((varArgs = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE)) &&
+		(varRes = qspVarReference(QSP_FMT("RESULT"), QSP_TRUE))))
+	{
+		qspEmptyVar(&local);
+		qspEmptyVar(&result);
+		return;
+	}
+	qspEmptyVar(varArgs);
+	qspMoveVar(varArgs, &local);
 	if (varRes->ValsCount)
 	{
 		if (text = varRes->TextValue[0])
