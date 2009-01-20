@@ -47,7 +47,6 @@ unsigned char qspRand8[256] =
 	0xEA, 0x91, 0x34, 0xF6, 0x88, 0x43, 0x99, 0xD6, 0x89, 0x9B, 0x08, 0xF1, 0x5E, 0x1C, 0xB1, 0x13
 };
 
-static void qspInitVarData(QSPVar *);
 static void qspRefreshVar(QSPVar *);
 static void qspInitSpecialVar(long, QSP_CHAR *);
 static long qspGetVarTextIndex(QSPVar *, QSP_CHAR *, QSP_BOOL);
@@ -55,6 +54,7 @@ static QSPVar *qspGetVarData(QSP_CHAR *, QSP_BOOL, long *);
 static void qspSetVarValueByReference(QSPVar *, long, QSPVariant);
 static void qspSetVar(QSP_CHAR *, QSPVariant);
 static QSPVariant qspGetVarValueByReference(QSPVar *, long, QSP_BOOL);
+static void qspCopyVar(QSPVar *, QSPVar *);
 
 void qspClearVars(QSP_BOOL isFirst)
 {
@@ -83,7 +83,7 @@ void qspEmptyVar(QSPVar *var)
 	qspInitVarData(var);
 }
 
-static void qspInitVarData(QSPVar *var)
+void qspInitVarData(QSPVar *var)
 {
 	var->Value = 0;
 	var->TextValue = 0;
@@ -382,7 +382,7 @@ QSPVariant qspGetVar(QSP_CHAR *name)
 	return qspGetVarValueByReference(var, index, *name == QSP_STRCHAR[0]);
 }
 
-void qspCopyVar(QSPVar *dest, QSPVar *src)
+static void qspCopyVar(QSPVar *dest, QSPVar *src)
 {
 	QSP_CHAR *str;
 	long count = dest->ValsCount = src->ValsCount;
@@ -491,7 +491,7 @@ long qspGetVarsCount()
 
 void qspSetArgs(QSPVar *var, QSPVariant *args, long count)
 {
-	qspEmptyVar(var);
+	qspInitVarData(var);
 	while (--count >= 0)
 		qspSetVarValueByReference(var, count, args[count]);
 }
