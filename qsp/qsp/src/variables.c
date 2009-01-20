@@ -47,6 +47,7 @@ unsigned char qspRand8[256] =
 	0xEA, 0x91, 0x34, 0xF6, 0x88, 0x43, 0x99, 0xD6, 0x89, 0x9B, 0x08, 0xF1, 0x5E, 0x1C, 0xB1, 0x13
 };
 
+static void qspInitVarData(QSPVar *);
 static void qspRefreshVar(QSPVar *);
 static void qspInitSpecialVar(long, QSP_CHAR *);
 static long qspGetVarTextIndex(QSPVar *, QSP_CHAR *, QSP_BOOL);
@@ -83,7 +84,7 @@ void qspEmptyVar(QSPVar *var)
 	qspInitVarData(var);
 }
 
-void qspInitVarData(QSPVar *var)
+static void qspInitVarData(QSPVar *var)
 {
 	var->Value = 0;
 	var->TextValue = 0;
@@ -491,9 +492,18 @@ long qspGetVarsCount()
 
 void qspSetArgs(QSPVar *var, QSPVariant *args, long count)
 {
-	qspInitVarData(var);
 	while (--count >= 0)
 		qspSetVarValueByReference(var, count, args[count]);
+}
+
+void qspMoveVar(QSPVar *dest, QSPVar *src)
+{
+	dest->Value = src->Value;
+	dest->TextValue = src->TextValue;
+	dest->ValsCount = src->ValsCount;
+	dest->TextIndex = src->TextIndex;
+	dest->IndsCount = src->IndsCount;
+	qspInitVarData(src);
 }
 
 void qspStatementSetVarValue(QSP_CHAR *s)

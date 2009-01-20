@@ -878,17 +878,16 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 	if (!varArgs) return;
 	varRes = qspVarReference(QSP_FMT("RESULT"), QSP_TRUE);
 	if (!varRes) return;
-	local = *varArgs;
+	qspMoveVar(&local, varArgs);
 	qspSetArgs(varArgs, args + 1, count - 1);
-	result = *varRes;
-	qspInitVarData(varRes);
+	qspMoveVar(&result, varRes);
 	qspExecLocByName(QSP_STR(args[0]), QSP_FALSE);
 	qspEmptyVar(varArgs);
-	*varArgs = local;
+	qspMoveVar(varArgs, &local);
 	if (qspErrorNum)
 	{
 		qspEmptyVar(varRes);
-		*varRes = result;
+		qspMoveVar(varRes, &result);
 		return;
 	}
 	if (varRes->ValsCount)
@@ -910,5 +909,5 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 		QSP_STR(*tos) = qspGetNewText(QSP_FMT(""), 0);
 	}
 	qspEmptyVar(varRes);
-	*varRes = result;
+	qspMoveVar(varRes, &result);
 }

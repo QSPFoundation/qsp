@@ -595,11 +595,11 @@ static QSP_BOOL qspStatementGoSub(QSPVariant *args, long count, QSP_CHAR **jumpT
 {
 	QSPVar local, *var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE);
 	if (!var) return QSP_FALSE;
-	local = *var;
+	qspMoveVar(&local, var);
 	qspSetArgs(var, args + 1, count - 1);
 	qspExecLocByName(QSP_STR(args[0]), QSP_FALSE);
 	qspEmptyVar(var);
-	*var = local;
+	qspMoveVar(var, &local);
 	return QSP_FALSE;
 }
 

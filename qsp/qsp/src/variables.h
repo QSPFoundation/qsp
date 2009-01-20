@@ -55,7 +55,6 @@
 	/* External functions */
 	void qspClearVars(QSP_BOOL);
 	void qspEmptyVar(QSPVar *);
-	void qspInitVarData(QSPVar *);
 	void qspInitSpecialVars();
 	QSPVar *qspVarReference(QSP_CHAR *, QSP_BOOL);
 	QSPVar *qspVarReferenceWithType(QSP_CHAR *, QSP_BOOL, QSP_BOOL *);
@@ -67,6 +66,7 @@
 	long qspArrayPos(QSP_CHAR *, long, QSPVariant, QSP_BOOL);
 	long qspGetVarsCount();
 	void qspSetArgs(QSPVar *, QSPVariant *, long);
+	void qspMoveVar(QSPVar *, QSPVar *);
 	/* Statements */
 	void qspStatementSetVarValue(QSP_CHAR *);
 	QSP_BOOL qspStatementCopyArr(QSPVariant *, long, QSP_CHAR **, char);
