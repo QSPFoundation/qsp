@@ -39,9 +39,9 @@ void qspClearMenu(QSP_BOOL isFirst)
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	long i;
+	QSPVar *var;
 	QSP_CHAR *imgPath, *str, *pos, *pos2, *endPos;
-	QSPVar *var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0);
-	if (!var) return QSP_FALSE;
+	if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0))) return QSP_FALSE;
 	qspClearMenu(QSP_FALSE);
 	qspCallDeleteMenu();
 	for (i = 0; i < var->ValsCount; ++i)

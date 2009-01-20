@@ -153,8 +153,8 @@ static void qspRefreshVar(QSPVar *var)
 
 static void qspInitSpecialVar(long type, QSP_CHAR *name)
 {
-	QSPVar *var = qspVarReference(name, QSP_TRUE);
-	if (!var) return;
+	QSPVar *var;
+	if (!(var = qspVarReference(name, QSP_TRUE))) return;
 	var->Type = type;
 	qspRefreshVar(var);
 }
@@ -307,17 +307,17 @@ static void qspSetVarValueByReference(QSPVar *var, long ind, QSPVariant val)
 
 void qspSetVarValueByName(QSP_CHAR *name, QSPVariant val)
 {
-	QSPVar *var = qspVarReference(name, QSP_TRUE);
-	if (!var) return;
+	QSPVar *var;
+	if (!(var = qspVarReference(name, QSP_TRUE))) return;
 	qspSetVarValueByReference(var, 0, val);
 }
 
 static void qspSetVar(QSP_CHAR *name, QSPVariant val)
 {
-	QSP_BOOL convErr;
+	QSPVar *var;
 	long index;
-	QSPVar *var = qspGetVarData(name, QSP_TRUE, &index);
-	if (!var) return;
+	QSP_BOOL convErr;
+	if (!(var = qspGetVarData(name, QSP_TRUE, &index))) return;
 	convErr = QSP_FALSE;
 	val = qspConvertVariantTo(val, *name == QSP_STRCHAR[0], QSP_FALSE, &convErr);
 	if (convErr)
@@ -351,8 +351,8 @@ static QSPVariant qspGetVarValueByReference(QSPVar *var, long ind, QSP_BOOL isSt
 QSP_CHAR *qspGetVarStrValue(QSP_CHAR *name)
 {
 	QSP_CHAR *text;
-	QSPVar *var = qspVarReference(name, QSP_FALSE);
-	if (var)
+	QSPVar *var;
+	if (var = qspVarReference(name, QSP_FALSE))
 	{
 		if (var->ValsCount)
 		{
@@ -367,8 +367,8 @@ QSP_CHAR *qspGetVarStrValue(QSP_CHAR *name)
 
 long qspGetVarNumValue(QSP_CHAR *name)
 {
-	QSPVar *var = qspVarReference(name, QSP_FALSE);
-	if (var)
+	QSPVar *var;
+	if (var = qspVarReference(name, QSP_FALSE))
 	{
 		if (var->ValsCount) return var->Value[0];
 	}
@@ -379,9 +379,9 @@ long qspGetVarNumValue(QSP_CHAR *name)
 
 QSPVariant qspGetVar(QSP_CHAR *name)
 {
+	QSPVar *var;
 	long index;
-	QSPVar *var = qspGetVarData(name, QSP_FALSE, &index);
-	if (!var) return qspGetEmptyVariant(QSP_FALSE);
+	if (!(var = qspGetVarData(name, QSP_FALSE, &index))) return qspGetEmptyVariant(QSP_FALSE);
 	return qspGetVarValueByReference(var, index, *name == QSP_STRCHAR[0]);
 }
 
@@ -411,22 +411,22 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src)
 
 long qspArraySize(QSP_CHAR *name)
 {
-	QSPVar *var = qspVarReferenceWithType(name, QSP_FALSE, 0);
-	if (!var) return 0;
+	QSPVar *var;
+	if (!(var = qspVarReferenceWithType(name, QSP_FALSE, 0))) return 0;
 	return var->ValsCount;
 }
 
 long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 {
 	long num;
+	QSPVar *var;
 	QSP_CHAR emptyStr[1], *str;
 	OnigUChar *tempBeg, *tempEnd;
 	regex_t *onigExp;
 	OnigRegion *onigReg;
 	OnigErrorInfo onigInfo;
 	QSP_BOOL convErr, isString;
-	QSPVar *var = qspVarReferenceWithType(name, QSP_FALSE, &isString);
-	if (!var) return -1;
+	if (!(var = qspVarReferenceWithType(name, QSP_FALSE, &isString))) return -1;
 	convErr = QSP_FALSE;
 	val = qspConvertVariantTo(val, isRegExp || isString, QSP_FALSE, &convErr);
 	if (convErr)
@@ -532,14 +532,12 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 QSP_BOOL qspStatementCopyArr(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSPVar *dest, *src;
-	/* Get first array */
-	dest = qspVarReferenceWithType(QSP_STR(args[0]), QSP_TRUE, 0);
-	if (!dest) return QSP_FALSE;
-	/* Get second array */
-	src = qspVarReferenceWithType(QSP_STR(args[1]), QSP_FALSE, 0);
-	if (!src || dest == src) return QSP_FALSE;
-	/* --- */
-	qspEmptyVar(dest);
-	qspCopyVar(dest, src);
+	if (!(dest = qspVarReferenceWithType(QSP_STR(args[0]), QSP_TRUE, 0))) return QSP_FALSE;
+	if (!(src = qspVarReferenceWithType(QSP_STR(args[1]), QSP_FALSE, 0))) return QSP_FALSE;
+	if (dest != src)
+	{
+		qspEmptyVar(dest);
+		qspCopyVar(dest, src);
+	}
 	return QSP_FALSE;
 }
