@@ -31,6 +31,7 @@
 	extern long qspQstPathLen;
 	extern QSP_CHAR *qspQstFullPath;
 	extern long qspQstCRC;
+	extern long qspCurIncLocsCount;
 
 	/* External functions */
 	void qspClearIncludes(QSP_BOOL);

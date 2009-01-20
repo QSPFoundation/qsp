@@ -18,6 +18,7 @@
 #include "locations.h"
 #include "common.h"
 #include "errors.h"
+#include "game.h"
 #include "statements.h"
 #include "text.h"
 #include "variables.h"
@@ -159,10 +160,15 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		}
 	}
 	qspRealWhere = QSP_AREA_ONLOCVISIT;
-	count = qspLocs[locInd].OnVisitLinesCount;
-	qspCopyStrs(&code, qspLocs[locInd].OnVisitLines, 0, count);
-	qspExecCode(code, 0, count, 1, 0, QSP_TRUE);
-	qspFreeStrs(code, count, QSP_FALSE);
+	if (locInd < qspLocsCount - qspCurIncLocsCount)
+		qspExecCode(qspLocs[locInd].OnVisitLines, 0, qspLocs[locInd].OnVisitLinesCount, 1, 0, QSP_TRUE);
+	else
+	{
+		count = qspLocs[locInd].OnVisitLinesCount;
+		qspCopyStrs(&code, qspLocs[locInd].OnVisitLines, 0, count);
+		qspExecCode(code, 0, count, 1, 0, QSP_TRUE);
+		qspFreeStrs(code, count, QSP_FALSE);
+	}
 	qspRealLine = oldLine;
 	qspRealWhere = oldWhere;
 	qspRealCurLoc = oldLoc;
