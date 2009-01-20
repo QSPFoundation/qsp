@@ -96,13 +96,14 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 	QSPVariant args[2];
 	QSP_CHAR *str, **code;
 	long i, count, oldLoc, oldWhere, oldLine;
+	QSPLocation *loc = qspLocs + locInd;
 	oldLoc = qspRealCurLoc;
 	oldWhere = qspRealWhere;
 	oldLine = qspRealLine;
 	qspRealCurLoc = locInd;
 	qspRealWhere = QSP_AREA_ONLOCVISIT;
 	qspRealLine = 0;
-	str = qspFormatText(qspLocs[locInd].Desc);
+	str = qspFormatText(loc->Desc);
 	if (qspErrorNum)
 	{
 		qspRealLine = oldLine;
@@ -128,7 +129,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 	qspRealWhere = QSP_AREA_ONLOCACTION;
 	for (i = 0; i < QSP_MAXACTIONS; ++i)
 	{
-		str = qspLocs[locInd].Actions[i].Desc;
+		str = loc->Actions[i].Desc;
 		if (!(str && *str)) break;
 		str = qspFormatText(str);
 		if (qspErrorNum)
@@ -140,7 +141,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		}
 		args[0].IsStr = QSP_TRUE;
 		QSP_STR(args[0]) = str;
-		str = qspLocs[locInd].Actions[i].Image;
+		str = loc->Actions[i].Image;
 		if (str && *str)
 		{
 			args[1].IsStr = QSP_TRUE;
@@ -149,7 +150,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		}
 		else
 			count = 1;
-		qspAddAction(args, count, qspLocs[locInd].Actions[i].OnPressLines, 0, qspLocs[locInd].Actions[i].OnPressLinesCount, QSP_TRUE);
+		qspAddAction(args, count, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount, QSP_TRUE);
 		free(QSP_STR(args[0]));
 		if (qspErrorNum)
 		{
@@ -161,11 +162,11 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 	}
 	qspRealWhere = QSP_AREA_ONLOCVISIT;
 	if (locInd < qspLocsCount - qspCurIncLocsCount)
-		qspExecCode(qspLocs[locInd].OnVisitLines, 0, qspLocs[locInd].OnVisitLinesCount, 1, 0, QSP_TRUE);
+		qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0, QSP_TRUE);
 	else
 	{
-		count = qspLocs[locInd].OnVisitLinesCount;
-		qspCopyStrs(&code, qspLocs[locInd].OnVisitLines, 0, count);
+		count = loc->OnVisitLinesCount;
+		qspCopyStrs(&code, loc->OnVisitLines, 0, count);
 		qspExecCode(code, 0, count, 1, 0, QSP_TRUE);
 		qspFreeStrs(code, count, QSP_FALSE);
 	}
