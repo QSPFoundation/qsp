@@ -530,7 +530,7 @@ void QSPFrame::OnQuit(wxCommandEvent& event)
 void QSPFrame::OnOpenGame(wxCommandEvent& event)
 {
 	wxCommandEvent dummy;
-	wxFileDialog dialog(this, _("Select game file"), wxEmptyString, wxEmptyString, _("QSP games (*.gam)|*.gam"), wxFD_OPEN);
+	wxFileDialog dialog(this, _("Select game file"), wxEmptyString, wxEmptyString, _("QSP games (*.qsp;*.gam)|*.qsp;*.gam"), wxFD_OPEN);
 	if (dialog.ShowModal() == wxID_OK)
 	{
 		if (QSPLoadGameWorld((QSP_CHAR *)dialog.GetPath().wx_str()))
