@@ -57,7 +57,7 @@ bool QSPApp::OnInit()
 	}
 	else
 	{
-		wxFileName autoPath(wxT("auto.gam"));
+		wxFileName autoPath(wxT("auto.qsp"));
 		autoPath.MakeAbsolute();
 		wxString autoPathString(autoPath.GetFullPath());
 		if (wxFileExists(autoPathString))
