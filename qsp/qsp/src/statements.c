@@ -127,7 +127,7 @@ void qspInitStats()
 	qspAddStatement(qspStatExec, QSP_FMT("EXEC"), 0, 0, qspStatementExec, 1, 1, 1);
 	qspAddStatement(qspStatExit, QSP_FMT("EXIT"), 0, 0, qspStatementExit, 0, 0);
 	qspAddStatement(qspStatGoSub, QSP_FMT("GOSUB"), QSP_FMT("GS"), 0, qspStatementGoSub, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	qspAddStatement(qspStatGoTo, QSP_FMT("GOTO"), QSP_FMT("GT"), 1, qspStatementGoTo, 1, 1, 1);
+	qspAddStatement(qspStatGoTo, QSP_FMT("GOTO"), QSP_FMT("GT"), 1, qspStatementGoTo, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddStatement(qspStatJump, QSP_FMT("JUMP"), 0, 0, qspStatementJump, 1, 1, 1);
 	qspAddStatement(qspStatKillAll, QSP_FMT("KILLALL"), 0, 7, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatKillObj, QSP_FMT("KILLOBJ"), 0, 5, qspStatementClear, 0, 0);
@@ -155,7 +155,7 @@ void qspInitStats()
 	qspAddStatement(qspStatUnSelect, QSP_FMT("UNSELECT"), QSP_FMT("UNSEL"), 0, qspStatementUnSelect, 0, 0);
 	qspAddStatement(qspStatView, QSP_FMT("VIEW"), 0, 0, qspStatementView, 0, 1, 1);
 	qspAddStatement(qspStatWait, QSP_FMT("WAIT"), 0, 0, qspStatementWait, 1, 1, 2);
-	qspAddStatement(qspStatXGoTo, QSP_FMT("XGOTO"), QSP_FMT("XGT"), 0, qspStatementGoTo, 1, 1, 1);
+	qspAddStatement(qspStatXGoTo, QSP_FMT("XGOTO"), QSP_FMT("XGT"), 0, qspStatementGoTo, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
 static long qspGetStatCode(QSP_CHAR *s, QSP_BOOL isMultiline, QSP_CHAR **pos)
@@ -624,12 +624,16 @@ static QSP_BOOL qspStatementGoSub(QSPVariant *args, long count, QSP_CHAR **jumpT
 
 static QSP_BOOL qspStatementGoTo(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
+	QSPVar *var;
 	long locInd = qspLocIndex(QSP_STR(args[0]));
 	if (locInd < 0)
 	{
 		qspSetError(QSP_ERR_LOCNOTFOUND);
 		return QSP_FALSE;
 	}
+	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE))) return QSP_FALSE;
+	qspEmptyVar(var);
+	qspSetArgs(var, args + 1, count - 1);
 	qspCurLoc = locInd;
 	qspRefreshCurLoc(extArg);
 	return QSP_FALSE;
