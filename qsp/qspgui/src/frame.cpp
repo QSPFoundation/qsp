@@ -786,7 +786,9 @@ void QSPFrame::OnKey(wxKeyEvent& event)
 {
 	int ind;
 	event.Skip();
-	if (m_isProcessEvents && !event.HasModifiers() && wxWindow::FindFocus() != m_input)
+	if (IsFullScreen() && event.GetKeyCode() == WXK_ESCAPE)
+		ShowFullScreen(false);
+	else if (m_isProcessEvents && !event.HasModifiers() && wxWindow::FindFocus() != m_input)
 	{
 		switch (event.GetKeyCode())
 		{
