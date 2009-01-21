@@ -686,7 +686,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 		QSPGetCompiledDateTime(),
 		wxT(__DATE__) wxT(", ") wxT(__TIME__)
 	));
-	info.SetWebSite(wxT("http://qsp.org.ru"));
+	info.SetWebSite(wxT("http://qsp.su"));
 	// ----
 	info.AddDeveloper(wxT("Byte [nporep@mail.ru]"));
 	info.AddDocWriter(wxT("Korwin [tightbow@yandex.ru]"));
