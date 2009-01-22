@@ -39,7 +39,6 @@ static long qspSearchEnd(QSP_CHAR **, long, long);
 static long qspSearchLabel(QSP_CHAR **, long, long, QSP_CHAR *);
 static QSP_BOOL qspStatementIf(QSP_CHAR *, QSP_CHAR **);
 static QSP_BOOL qspStatementAddText(QSPVariant *, long, QSP_CHAR **, char);
-static QSP_BOOL qspStatementAddNewLine(QSPVariant *, long, QSP_CHAR **, char);
 static QSP_BOOL qspStatementClear(QSPVariant *, long, QSP_CHAR **, char);
 static QSP_BOOL qspStatementExit(QSPVariant *, long, QSP_CHAR **, char);
 static QSP_BOOL qspStatementGoSub(QSPVariant *, long, QSP_CHAR **, char);
@@ -115,7 +114,6 @@ void qspInitStats()
 	qspAddStatement(qspStatAddObj, QSP_FMT("ADDOBJ"), QSP_FMT("ADD OBJ"), 0, qspStatementAddObject, 1, 2, 1, 1);
 	qspAddStatement(qspStatAddQst, QSP_FMT("ADDQST"), 0, 1, qspStatementOpenQst, 1, 1, 1);
 	qspAddStatement(qspStatClA, QSP_FMT("CLA"), 0, 3, qspStatementClear, 0, 0);
-	qspAddStatement(qspStatClear, QSP_FMT("CLEAR"), QSP_FMT("CLR"), 0, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatCloseAll, QSP_FMT("CLOSE ALL"), 0, 1, qspStatementCloseFile, 0, 0);
 	qspAddStatement(qspStatClose, QSP_FMT("CLOSE"), 0, 0, qspStatementCloseFile, 0, 1, 1);
 	qspAddStatement(qspStatClS, QSP_FMT("CLS"), 0, 4, qspStatementClear, 0, 0);
@@ -133,18 +131,19 @@ void qspInitStats()
 	qspAddStatement(qspStatKillObj, QSP_FMT("KILLOBJ"), 0, 5, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatKillQst, QSP_FMT("KILLQST"), 0, 8, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatKillVar, QSP_FMT("KILLVAR"), 0, 6, qspStatementClear, 0, 0);
-	qspAddStatement(qspStatMClear, QSP_FMT("*CLEAR"), QSP_FMT("*CLR"), 1, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatMenu, QSP_FMT("MENU"), 0, 0, qspStatementShowMenu, 1, 1, 1);
-	qspAddStatement(qspStatMNL, QSP_FMT("*NL"), 0, 1, qspStatementAddNewLine, 0, 0);
-	qspAddStatement(qspStatMPL, QSP_FMT("*PL"), 0, 3, qspStatementAddText, 1, 1, 1);
-	qspAddStatement(qspStatMP, QSP_FMT("*P"), 0, 2, qspStatementAddText, 1, 1, 1);
+	qspAddStatement(qspStatMClear, QSP_FMT("*CLEAR"), QSP_FMT("*CLR"), 1, qspStatementClear, 0, 0);
+	qspAddStatement(qspStatMNL, QSP_FMT("*NL"), 0, 5, qspStatementAddText, 0, 1, 1);
+	qspAddStatement(qspStatMPL, QSP_FMT("*PL"), 0, 3, qspStatementAddText, 0, 1, 1);
+	qspAddStatement(qspStatMP, QSP_FMT("*P"), 0, 1, qspStatementAddText, 1, 1, 1);
+	qspAddStatement(qspStatClear, QSP_FMT("CLEAR"), QSP_FMT("CLR"), 0, qspStatementClear, 0, 0);
+	qspAddStatement(qspStatNL, QSP_FMT("NL"), 0, 4, qspStatementAddText, 0, 1, 1);
+	qspAddStatement(qspStatPL, QSP_FMT("PL"), 0, 2, qspStatementAddText, 0, 1, 1);
+	qspAddStatement(qspStatP, QSP_FMT("P"), 0, 0, qspStatementAddText, 1, 1, 1);
 	qspAddStatement(qspStatMsg, QSP_FMT("MSG"), 0, 0, qspStatementMsg, 1, 1, 1);
-	qspAddStatement(qspStatNL, QSP_FMT("NL"), 0, 0, qspStatementAddNewLine, 0, 0);
 	qspAddStatement(qspStatOpenGame, QSP_FMT("OPENGAME"), 0, 0, qspStatementOpenGame, 0, 1, 1);
 	qspAddStatement(qspStatOpenQst, QSP_FMT("OPENQST"), 0, 0, qspStatementOpenQst, 1, 1, 1);
 	qspAddStatement(qspStatPlay, QSP_FMT("PLAY"), 0, 0, qspStatementPlayFile, 1, 2, 1, 2);
-	qspAddStatement(qspStatPL, QSP_FMT("PL"), 0, 1, qspStatementAddText, 1, 1, 1);
-	qspAddStatement(qspStatP, QSP_FMT("P"), 0, 0, qspStatementAddText, 1, 1, 1);
 	qspAddStatement(qspStatRefInt, QSP_FMT("REFINT"), 0, 0, qspStatementRefInt, 0, 0);
 	qspAddStatement(qspStatSaveGame, QSP_FMT("SAVEGAME"), 0, 0, qspStatementSaveGame, 0, 1, 1);
 	qspAddStatement(qspStatSetTimer, QSP_FMT("SETTIMER"), 0, 0, qspStatementSetTimer, 1, 1, 2);
@@ -498,47 +497,40 @@ static QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
 
 static QSP_BOOL qspStatementAddText(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_CHAR *s = QSP_STR(args[0]);
 	switch (extArg)
 	{
 	case 0:
-		if (*s)
+		if (*QSP_STR(args[0]))
 		{
-			qspCurVarsLen = qspAddText(&qspCurVars, s, qspCurVarsLen, -1, QSP_FALSE);
+			qspCurVarsLen = qspAddText(&qspCurVars, QSP_STR(args[0]), qspCurVarsLen, -1, QSP_FALSE);
 			qspIsVarsDescChanged = QSP_TRUE;
 		}
 		break;
 	case 1:
-		qspCurVarsLen = qspAddText(&qspCurVars, s, qspCurVarsLen, -1, QSP_FALSE);
-		qspCurVarsLen = qspAddText(&qspCurVars, QSP_STRSDELIM, qspCurVarsLen, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
-		qspIsVarsDescChanged = QSP_TRUE;
-		break;
-	case 2:
-		if (*s)
+		if (*QSP_STR(args[0]))
 		{
-			qspCurDescLen = qspAddText(&qspCurDesc, s, qspCurDescLen, -1, QSP_FALSE);
+			qspCurDescLen = qspAddText(&qspCurDesc, QSP_STR(args[0]), qspCurDescLen, -1, QSP_FALSE);
 			qspIsMainDescChanged = QSP_TRUE;
 		}
 		break;
-	case 3:
-		qspCurDescLen = qspAddText(&qspCurDesc, s, qspCurDescLen, -1, QSP_FALSE);
-		qspCurDescLen = qspAddText(&qspCurDesc, QSP_STRSDELIM, qspCurDescLen, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
-		qspIsMainDescChanged = QSP_TRUE;
-		break;
-	}
-	return QSP_FALSE;
-}
-
-static QSP_BOOL qspStatementAddNewLine(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
-{
-	switch (extArg)
-	{
-	case 0:
+	case 2:
+		if (count) qspCurVarsLen = qspAddText(&qspCurVars, QSP_STR(args[0]), qspCurVarsLen, -1, QSP_FALSE);
 		qspCurVarsLen = qspAddText(&qspCurVars, QSP_STRSDELIM, qspCurVarsLen, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
 		qspIsVarsDescChanged = QSP_TRUE;
 		break;
-	case 1:
+	case 3:
+		if (count) qspCurDescLen = qspAddText(&qspCurDesc, QSP_STR(args[0]), qspCurDescLen, -1, QSP_FALSE);
 		qspCurDescLen = qspAddText(&qspCurDesc, QSP_STRSDELIM, qspCurDescLen, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
+		qspIsMainDescChanged = QSP_TRUE;
+		break;
+	case 4:
+		qspCurVarsLen = qspAddText(&qspCurVars, QSP_STRSDELIM, qspCurVarsLen, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
+		if (count) qspCurVarsLen = qspAddText(&qspCurVars, QSP_STR(args[0]), qspCurVarsLen, -1, QSP_FALSE);
+		qspIsVarsDescChanged = QSP_TRUE;
+		break;
+	case 5:
+		qspCurDescLen = qspAddText(&qspCurDesc, QSP_STRSDELIM, qspCurDescLen, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
+		if (count) qspCurDescLen = qspAddText(&qspCurDesc, QSP_STR(args[0]), qspCurDescLen, -1, QSP_FALSE);
 		qspIsMainDescChanged = QSP_TRUE;
 		break;
 	}
