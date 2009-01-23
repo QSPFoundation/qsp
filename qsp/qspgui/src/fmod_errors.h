@@ -1,6 +1,6 @@
 
 /* ============================================================================================== */
-/* FMOD Ex - Error string header file. Copyright (c), Firelight Technologies Pty, Ltd. 2004-2008. */
+/* FMOD Ex - Error string header file. Copyright (c), Firelight Technologies Pty, Ltd. 2004-2009. */
 /*                                                                                                */
 /* Use this header if you want to store or display a string version / english explanation of      */
 /* the FMOD error codes.                                                                          */
@@ -44,6 +44,7 @@ static const char *FMOD_ErrorString(FMOD_RESULT errcode)
         case FMOD_ERR_EVENT_MAXSTREAMS:       return "Event failed because 'Max streams' was hit when FMOD_INIT_FAIL_ON_MAXSTREAMS was specified. ";
         case FMOD_ERR_EVENT_MISMATCH:         return "FSB mismatches the FEV it was compiled with, the stream/sample mode it was meant to be created with was different, or the FEV was built for a different platform. ";
         case FMOD_ERR_EVENT_NAMECONFLICT:     return "A category with the same name already exists. ";
+        case FMOD_ERR_EVENT_NEEDSSIMPLE:      return "Tried to call a function on a complex event that's only supported by simple events. ";
         case FMOD_ERR_EVENT_NOTFOUND:         return "The requested event, event group, event category or event property could not be found. ";
         case FMOD_ERR_FILE_BAD:               return "Error loading file. ";
         case FMOD_ERR_FILE_COULDNOTSEEK:      return "Couldn't perform seek operation.  This is a limitation of the medium (ie netstreams) or the file format. ";
@@ -73,6 +74,7 @@ static const char *FMOD_ErrorString(FMOD_RESULT errcode)
         case FMOD_ERR_MEMORY_CANTPOINT:       return "Can't use FMOD_OPENMEMORY_POINT on non PCM source data, or non mp3/xma/adpcm data if FMOD_CREATECOMPRESSEDSAMPLE was used. ";
         case FMOD_ERR_MEMORY_IOP:             return "PS2 only.  Not enough memory or resources on PlayStation 2 IOP ram. ";
         case FMOD_ERR_MEMORY_SRAM:            return "Not enough memory or resources on console sound ram. ";
+        case FMOD_ERR_MUSIC_UNINITIALIZED:    return "Music system is not initialized probably because no music data is loaded. ";
         case FMOD_ERR_NEEDS2D:                return "Tried to call a command on a 3d sound when the command was meant for 2d sound. ";
         case FMOD_ERR_NEEDS3D:                return "Tried to call a command on a 2d sound when the command was meant for 3d sound. ";
         case FMOD_ERR_NEEDSHARDWARE:          return "Tried to use a feature that requires hardware support.  (ie trying to play a VAG compressed sound in software on PS2). ";

@@ -1,10 +1,10 @@
-/* ======================================================================================== */
-/* FMOD Ex - Memory info header file. Copyright (c), Firelight Technologies Pty, Ltd. 2008. */
-/*                                                                                          */
-/* Use this header if you are interested in getting detailed information on FMOD's memory   */
-/* usage. See the documentation for more details.                                           */
-/*                                                                                          */
-/* ======================================================================================== */
+/* ============================================================================================= */
+/* FMOD Ex - Memory info header file. Copyright (c), Firelight Technologies Pty, Ltd. 2008-2009. */
+/*                                                                                               */
+/* Use this header if you are interested in getting detailed information on FMOD's memory        */
+/* usage. See the documentation for more details.                                                */
+/*                                                                                               */
+/* ============================================================================================= */
 
 #ifndef _FMOD_MEMORYINFO_H
 #define _FMOD_MEMORYINFO_H
@@ -79,6 +79,7 @@ typedef enum
     FMOD_MEMTYPE_EVENTPARAMETER        = 43,     /* Event parameter objects */
     FMOD_MEMTYPE_EVENTCATEGORY         = 44,     /* Event category objects */
     FMOD_MEMTYPE_EVENTENVELOPEPOINT    = 45,     /* Event envelope point objects */
+    FMOD_MEMTYPE_EVENTINSTANCEPOOL     = 46,     /* Event instance pool memory */
 
     FMOD_MEMTYPE_MAX,                            /* Number of "memoryused_array" fields. */
     FMOD_MEMTYPE_FORCEINT = 65536                /* Makes sure this enum is signed 32bit */
