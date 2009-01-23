@@ -60,10 +60,9 @@ static void qspCopyVar(QSPVar *, QSPVar *);
 void qspClearVars(QSP_BOOL isFirst)
 {
 	long i;
-	QSPVar *var;
+	QSPVar *var = qspVars;
 	for (i = 0; i < QSP_VARSCOUNT; ++i)
 	{
-		var = qspVars + i;
 		if (isFirst)
 			qspInitVarData(var);
 		else
@@ -73,6 +72,7 @@ void qspClearVars(QSP_BOOL isFirst)
 		}
 		var->Name = 0;
 		var->Type = qspVarNormal;
+		++var;
 	}
 }
 
@@ -190,9 +190,8 @@ QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
 	bCode = 0;
 	for (i = 0; uName[i]; ++i)
 		bCode = qspRand8[bCode ^ QSP_MBTOSB(uName[i])];
-	i = 0;
 	var = qspVars + QSP_VARSSEEK * bCode;
-	while (i < QSP_VARSSEEK)
+	for (i = 0; i < QSP_VARSSEEK; ++i)
 	{
 		if (!var->Name)
 		{
@@ -207,7 +206,6 @@ QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
 			free(uName);
 			return var;
 		}
-		++i;
 		++var;
 	}
 	free(uName);
