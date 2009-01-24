@@ -125,7 +125,7 @@ void QSPImgCanvas::OnPaint(wxPaintEvent& event)
 		return;
 	}
 	wxPaintDC dc(this);
-	wxBitmap bitmap(m_image.Scale(m_width, m_height));
+	wxBitmap bitmap(m_image.Scale(m_width, m_height, wxIMAGE_QUALITY_HIGH));
 	dc.DrawBitmap(bitmap, m_posX, m_posY, true);
 }
 
