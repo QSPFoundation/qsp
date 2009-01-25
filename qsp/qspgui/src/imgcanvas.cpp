@@ -29,7 +29,7 @@ END_EVENT_TABLE()
 QSPImgCanvas::QSPImgCanvas(wxWindow *parent, wxWindowID id) : wxWindow(parent, id, wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxFULL_REPAINT_ON_RESIZE)
 {
 	m_animation = new QSPAnimWin(this);
-	m_posX = m_posY = m_width = m_height = 0;
+	m_posX = m_posY = 0;
 	m_isAnim = false;
 	m_animation->Move(0, 0);
 	m_animation->Hide();
@@ -106,14 +106,14 @@ void QSPImgCanvas::OnSize(wxSizeEvent& event)
 	else
 	{
 		int srcW = m_image.GetWidth(), srcH = m_image.GetHeight();
-		m_width = srcW * h / srcH;
-		m_height = srcH * w / srcW;
-		if (m_width > w)
-			m_width = w;
+		int destW = srcW * h / srcH, destH = srcH * w / srcW;
+		if (destW > w)
+			destW = w;
 		else
-			m_height = h;
-		m_posX = (w - m_width) / 2;
-		m_posY = (h - m_height) / 2;
+			destH = h;
+		m_posX = (w - destW) / 2;
+		m_posY = (h - destH) / 2;
+		m_cachedBitmap = wxBitmap(m_image.Scale(destW, destH, wxIMAGE_QUALITY_HIGH));
 	}
 }
 
@@ -125,8 +125,7 @@ void QSPImgCanvas::OnPaint(wxPaintEvent& event)
 		return;
 	}
 	wxPaintDC dc(this);
-	wxBitmap bitmap(m_image.Scale(m_width, m_height, wxIMAGE_QUALITY_HIGH));
-	dc.DrawBitmap(bitmap, m_posX, m_posY, true);
+	dc.DrawBitmap(m_cachedBitmap, m_posX, m_posY, true);
 }
 
 void QSPImgCanvas::OnKeyUp(wxKeyEvent& event)

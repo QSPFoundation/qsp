@@ -47,12 +47,11 @@
 		// Fields
 		bool m_isAnim;
 		wxImage m_image;
+		wxBitmap m_cachedBitmap;
 		QSPAnimWin *m_animation;
 		wxString m_path;
 		int m_posX;
 		int m_posY;
-		int m_width;
-		int m_height;
 	};
 
 #endif
