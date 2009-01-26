@@ -226,9 +226,9 @@ QSPVar *qspVarReferenceWithType(QSP_CHAR *name, QSP_BOOL isCreate, QSP_BOOL *isS
 static long qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 {
 	QSP_CHAR *uStr;
-	long i, n;
+	long i, n = var->IndsCount;
 	qspUpperStr(uStr = qspGetNewText(str, -1));
-	for (i = 0; i < var->IndsCount; ++i)
+	for (i = 0; i < n; ++i)
 		if (!QSP_STRCMP(var->TextIndex[i], uStr))
 		{
 			free(uStr);
@@ -236,7 +236,7 @@ static long qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 		}
 	if (isCreate)
 	{
-		n = var->IndsCount++;
+		var->IndsCount++;
 		var->TextIndex = (QSP_CHAR **)realloc(var->TextIndex, (n + 1) * sizeof(QSP_CHAR *));
 		var->TextIndex[n] = uStr;
 		return n;
@@ -416,7 +416,7 @@ long qspArraySize(QSP_CHAR *name)
 
 long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 {
-	long num;
+	long num, count;
 	QSPVar *var;
 	QSP_CHAR emptyStr[1], *str;
 	OnigUChar *tempBeg, *tempEnd;
@@ -445,11 +445,12 @@ long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 	}
 	*emptyStr = 0;
 	if (start < 0) start = 0;
-	while (start <= var->ValsCount)
+	count = var->ValsCount;
+	while (start <= count)
 	{
 		if (val.IsStr)
 		{
-			if (!(start < var->ValsCount && (str = var->TextValue[start]))) str = emptyStr;
+			if (!(start < count && (str = var->TextValue[start]))) str = emptyStr;
 			if (isRegExp)
 			{
 				onigReg = onig_region_new();
@@ -472,7 +473,7 @@ long qspArrayPos(QSP_CHAR *name, long start, QSPVariant val, QSP_BOOL isRegExp)
 		}
 		else
 		{
-			num = (start < var->ValsCount ? var->Value[start] : 0);
+			num = (start < count ? var->Value[start] : 0);
 			if (num == QSP_NUM(val)) return start;
 		}
 		++start;
