@@ -19,7 +19,7 @@
 
 IMPLEMENT_CLASS(QSPInputBox, wxTextCtrl)
 
-wxDEFINE_EVENT(wxEVT_ENTER, wxCommandEvent)
+wxDEFINE_EVENT(wxEVT_ENTER, wxCommandEvent);
 
 BEGIN_EVENT_TABLE(QSPInputBox, wxTextCtrl)
 	EVT_CHAR(QSPInputBox::OnChar)

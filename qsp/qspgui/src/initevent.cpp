@@ -17,7 +17,7 @@
 
 #include "initevent.h"
 
-wxDEFINE_EVENT(wxEVT_INIT, wxInitEvent)
+wxDEFINE_EVENT(wxEVT_INIT, wxInitEvent);
 
 IMPLEMENT_DYNAMIC_CLASS(wxInitEvent, wxEvent)
 
