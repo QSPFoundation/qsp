@@ -20,7 +20,7 @@
 
 	#include <wx/wx.h>
 
-	wxDECLARE_LOCAL_EVENT(wxEVT_ENTER, wxCommandEvent)
+	wxDECLARE_EVENT(wxEVT_ENTER, wxCommandEvent)
 
 	#define EVT_ENTER(winid, func) \
 		wx__DECLARE_EVT1(wxEVT_ENTER, winid, wxCommandEventHandler(func))

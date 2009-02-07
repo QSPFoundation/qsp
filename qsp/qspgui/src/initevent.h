@@ -43,7 +43,7 @@
 		DECLARE_DYNAMIC_CLASS(wxInitEvent)
 	};
 
-	wxDECLARE_LOCAL_EVENT(wxEVT_INIT, wxInitEvent)
+	wxDECLARE_EVENT(wxEVT_INIT, wxInitEvent)
 
 	typedef void (wxEvtHandler::*wxInitEventFunction)(wxInitEvent&);
 
