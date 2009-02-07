@@ -43,12 +43,12 @@
 		DECLARE_DYNAMIC_CLASS(wxInitEvent)
 	};
 
-	DECLARE_EVENT_TYPE(wxEVT_INIT, 0)
+	wxDECLARE_LOCAL_EVENT(wxEVT_INIT, wxInitEvent)
 
 	typedef void (wxEvtHandler::*wxInitEventFunction)(wxInitEvent&);
 
 	#define wxInitEventHandler(func) \
-		(wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(wxInitEventFunction, &func)
+		wxEVENT_HANDLER_CAST(wxInitEventFunction, func)
 
 	#define EVT_INIT(func) \
 		wx__DECLARE_EVT0(wxEVT_INIT, wxInitEventHandler(func))
