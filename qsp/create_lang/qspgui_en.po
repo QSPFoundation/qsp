@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: English 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:13+1100\n"
-"PO-Revision-Date: 2009-01-22 03:24+0600\n"
+"PO-Revision-Date: 2009-02-23 23:57+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: English <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -889,8 +889,14 @@ msgstr "Select font's color"
 msgid "Select game file"
 msgstr "Select game file"
 
+msgid "Select l&inks' color...\tAlt-I"
+msgstr "Select l&inks' color...\tAlt-I"
+
 msgid "Select language"
 msgstr "Select language"
+
+msgid "Select links' color"
+msgstr "Select links' color"
 
 msgid "Select saved game file"
 msgstr "Select saved game file"

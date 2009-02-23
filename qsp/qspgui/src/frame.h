@@ -55,6 +55,7 @@
 		ID_SELECTFONT,
 		ID_SELECTFONTCOLOR,
 		ID_SELECTBACKCOLOR,
+		ID_SELECTLINKCOLOR,
 		ID_SELECTLANG,
 		ID_TOGGLEWINMODE,
 		ID_TOGGLEOBJS,
@@ -116,6 +117,7 @@
 		bool ApplyFontName(const wxString& name);
 		bool ApplyFontColor(const wxColour& color);
 		bool ApplyBackColor(const wxColour& color);
+		bool ApplyLinkColor(const wxColour& color);
 		void CallPaneFunc(wxWindowID id, QSP_BOOL isShow) const;
 		void TogglePane(wxWindowID id);
 
@@ -132,6 +134,7 @@
 		void OnSelectFont(wxCommandEvent& event);
 		void OnSelectFontColor(wxCommandEvent& event);
 		void OnSelectBackColor(wxCommandEvent& event);
+		void OnSelectLinkColor(wxCommandEvent& event);
 		void OnSelectLang(wxCommandEvent& event);
 		void OnToggleWinMode(wxCommandEvent& event);
 		void OnToggleObjs(wxCommandEvent& event);
@@ -169,6 +172,7 @@
 		wxMenu *m_wndsMenu;
 		wxAuiManager *m_manager;
 		wxColour m_backColor;
+		wxColour m_linkColor;
 		wxColour m_fontColor;
 		int m_fontSize;
 		wxString m_fontName;

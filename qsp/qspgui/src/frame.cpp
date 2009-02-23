@@ -32,6 +32,7 @@ BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
 	EVT_MENU(ID_SELECTFONT, QSPFrame::OnSelectFont)
 	EVT_MENU(ID_SELECTFONTCOLOR, QSPFrame::OnSelectFontColor)
 	EVT_MENU(ID_SELECTBACKCOLOR, QSPFrame::OnSelectBackColor)
+	EVT_MENU(ID_SELECTLINKCOLOR, QSPFrame::OnSelectLinkColor)
 	EVT_MENU(ID_SELECTLANG, QSPFrame::OnSelectLang)
 	EVT_MENU(ID_TOGGLEWINMODE, QSPFrame::OnToggleWinMode)
 	EVT_MENU(ID_TOGGLEOBJS, QSPFrame::OnToggleObjs)
@@ -99,6 +100,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	settingsMenu->Append(ID_SELECTFONT, wxT("-"));
 	settingsMenu->Append(ID_SELECTFONTCOLOR, wxT("-"));
 	settingsMenu->Append(ID_SELECTBACKCOLOR, wxT("-"));
+	settingsMenu->Append(ID_SELECTLINKCOLOR, wxT("-"));
 	settingsMenu->AppendSeparator();
 	wxMenuItem *settingsWinModeItem = new wxMenuItem(settingsMenu, ID_TOGGLEWINMODE, wxT("-"));
 	settingsWinModeItem->SetBitmap(wxBitmap(windowmode_xpm));
@@ -155,6 +157,7 @@ void QSPFrame::SaveSettings()
 	wxFileConfig cfg(wxEmptyString, wxEmptyString, m_configPath);
 	cfg.Write(wxT("General/BackColor"), m_backColor.Blue() << 16 | m_backColor.Green() << 8 | m_backColor.Red());
 	cfg.Write(wxT("General/FontColor"), m_fontColor.Blue() << 16 | m_fontColor.Green() << 8 | m_fontColor.Red());
+	cfg.Write(wxT("General/LinkColor"), m_linkColor.Blue() << 16 | m_linkColor.Green() << 8 | m_linkColor.Red());
 	cfg.Write(wxT("General/FontSize"), m_fontSize);
 	cfg.Write(wxT("General/FontName"), m_fontName);
 	cfg.Write(wxT("General/ShowHotkeys"), m_isShowHotkeys);
@@ -177,6 +180,8 @@ void QSPFrame::LoadSettings()
 	m_backColor = wxColour(temp);
 	cfg.Read(wxT("General/FontColor"), &temp, 0x000000);
 	m_fontColor = wxColour(temp);
+	cfg.Read(wxT("General/LinkColor"), &temp, 0xFF0000);
+	m_linkColor = wxColour(temp);
 	wxFont font(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	cfg.Read(wxT("General/FontSize"), &m_fontSize, font.GetPointSize());
 	cfg.Read(wxT("General/FontName"), &m_fontName, font.GetFaceName());
@@ -200,6 +205,7 @@ void QSPFrame::LoadSettings()
 	// -------------------------------------------------
 	ApplyBackColor(m_backColor);
 	ApplyFontColor(m_fontColor);
+	ApplyLinkColor(m_linkColor);
 	ApplyFontSize(m_fontSize);
 	ApplyFontName(m_fontName);
 	RefreshUI();
@@ -265,7 +271,7 @@ void QSPFrame::ApplyParams()
 {
 	long numVal;
 	QSP_CHAR *strVal;
-	wxColour setBackColor, setFontColor;
+	wxColour setBackColor, setFontColor, setLinkColor;
 	wxString setFontName;
 	int setFontSize;
 	bool isRefresh = false;
@@ -280,6 +286,12 @@ void QSPFrame::ApplyParams()
 	if (setFontColor != m_desc->GetForegroundColour())
 	{
 		if (ApplyFontColor(setFontColor)) isRefresh = true;
+	}
+	// --------------
+	setLinkColor = ((QSPCallBacks::GetVarValue(QSP_FMT("LCOLOR"), &numVal, &strVal) && numVal) ? numVal : m_linkColor);
+	if (setLinkColor != m_desc->GetLinkColor())
+	{
+		if (ApplyLinkColor(setLinkColor)) isRefresh = true;
 	}
 	// --------------
 	setFontSize = ((QSPCallBacks::GetVarValue(QSP_FMT("FSIZE"), &numVal, &strVal) && numVal) ? numVal : m_fontSize);
@@ -389,6 +401,7 @@ void QSPFrame::ReCreateGUI()
 	menuBar->SetLabel(ID_SELECTFONT, _("Select &font...\tAlt-F"));
 	menuBar->SetLabel(ID_SELECTFONTCOLOR, _("Select font's &color...\tAlt-C"));
 	menuBar->SetLabel(ID_SELECTBACKCOLOR, _("Select &background's color...\tAlt-B"));
+	menuBar->SetLabel(ID_SELECTLINKCOLOR, _("Select l&inks' color...\tAlt-I"));
 	menuBar->SetLabel(ID_TOGGLEWINMODE, _("Window / Fullscreen &mode\tAlt-Enter"));
 	menuBar->SetLabel(ID_SELECTLANG, _("Select &language...\tAlt-L"));
 	menuBar->SetLabel(ID_ABOUT, _("&About...\tCtrl-H"));
@@ -462,6 +475,15 @@ bool QSPFrame::ApplyBackColor(const wxColour& color)
 	m_input->SetBackgroundColour(color);
 	m_imgBack->SetBackgroundColour(color);
 	m_imgView->SetBackgroundColour(color);
+	return true;
+}
+
+bool QSPFrame::ApplyLinkColor(const wxColour& color)
+{
+	m_desc->SetLinkColor(color);
+	m_objects->SetLinkColor(color);
+	m_actions->SetLinkColor(color);
+	m_vars->SetLinkColor(color);
 	return true;
 }
 
@@ -622,6 +644,25 @@ void QSPFrame::OnSelectBackColor(wxCommandEvent& event)
 		else
 		{
 			ApplyBackColor(m_backColor);
+			RefreshUI();
+		}
+	}
+}
+
+void QSPFrame::OnSelectLinkColor(wxCommandEvent& event)
+{
+	wxColourData data;
+	data.SetColour(m_linkColor);
+	wxColourDialog dialog(this, &data);
+	dialog.SetTitle(_("Select links' color"));
+	if (dialog.ShowModal() == wxID_OK)
+	{
+		m_linkColor = dialog.GetColourData().GetColour();
+		if (m_isProcessEvents)
+			ApplyParams();
+		else
+		{
+			ApplyLinkColor(m_linkColor);
 			RefreshUI();
 		}
 	}
