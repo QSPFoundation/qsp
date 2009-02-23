@@ -183,7 +183,9 @@ void QSPFrame::LoadSettings()
 	cfg.Read(wxT("General/LinkColor"), &temp, 0xFF0000);
 	m_linkColor = wxColour(temp);
 	wxFont font(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	cfg.Read(wxT("General/FontSize"), &m_fontSize, font.GetPointSize());
+	temp = font.GetPointSize();
+	if (temp < 12) temp = 12;
+	cfg.Read(wxT("General/FontSize"), &m_fontSize, temp);
 	cfg.Read(wxT("General/FontName"), &m_fontName, font.GetFaceName());
 	cfg.Read(wxT("General/ShowHotkeys"), &m_isShowHotkeys, false);
 	cfg.Read(wxT("Pos/Left"), &x, 10);
