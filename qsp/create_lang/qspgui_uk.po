@@ -1,14 +1,9 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: Ukrainian 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:24+1100\n"
-"PO-Revision-Date: 2009-02-23 23:57+0600\n"
+"PO-Revision-Date: 2009-02-28 18:59+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: Ukrainian <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -17,142 +12,6 @@ msgstr ""
 "X-Poedit-Language: Ukrainian\n"
 "X-Poedit-Country: UKRAINE\n"
 "X-Poedit-SourceCharset: utf-8\n"
-
-msgid "\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"\n"
-"%s\n"
-"MEMWATCH: Abort, Retry or Ignore? "
-msgstr ""
-
-msgid ""
-"\n"
-"============= MEMWATCH "
-msgstr ""
-
-#, c-format
-msgid ""
-"\n"
-"MEMWATCH: assert trap: %s(%d), %s\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"\n"
-"MEMWATCH: log file handle destroyed, using mwSTDERR\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"\n"
-"MEMWATCH: verify trap: %s(%d), %s\n"
-msgstr ""
-
-msgid ""
-"\n"
-"Memory usage statistics (detailed):\n"
-msgstr ""
-
-msgid ""
-"\n"
-"Memory usage statistics (global):\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"\n"
-"Started at %s\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"\n"
-"Stopped at %s\n"
-msgstr ""
-
-#, c-format
-msgid ""
-"\n"
-"internal: mwWrite(): WARNING! OUTPUT EXCEEDED %u CHARS: SYSTEM UNSTABLE\n"
-msgstr ""
-
-msgid " \t{"
-msgstr ""
-
-#, c-format
-msgid "  %-8d                                  %-8ld %-8ld %-8ld %-8ld\n"
-msgstr ""
-
-#, c-format
-msgid " %-42s %-8ld %-8ld %-8ld %-8ld\n"
-msgstr ""
-
-#, c-format
-msgid " %d.%01d\n"
-msgstr ""
-
-#, c-format
-msgid " %d.%02d\n"
-msgstr ""
-
-msgid " Copyright (C) 1992-1999 Johan Lindh =============\n"
-msgstr ""
-
-#, c-format
-msgid " L)argest memory usage      : %ld\n"
-msgstr ""
-
-msgid " Module/Line                                Number   Largest  Total    Unfreed \n"
-msgstr ""
-
-#, c-format
-msgid " N)umber of allocations made: %ld\n"
-msgstr ""
-
-#, c-format
-msgid " T)otal of all alloc() calls: %ld\n"
-msgstr ""
-
-#, c-format
-msgid " U)nfreed bytes totals      : %ld\n"
-msgstr ""
-
-msgid " [WARNING: OUTPUT BUFFER OVERFLOW - SYSTEM UNSTABLE]\n"
-msgstr ""
-
-msgid " _"
-msgstr ""
-
-#, c-format
-msgid "%.2X%.2X%.2X"
-msgstr ""
-
-#, c-format
-msgid "%.48s called from %s(%d)"
-msgstr ""
-
-#, c-format
-msgid "%02X "
-msgstr ""
-
-#, c-format
-msgid "%c"
-msgstr ""
-
-#, c-format
-msgid "%ld"
-msgstr ""
-
-#, c-format
-msgid "%ld bytes"
-msgstr ""
-
-#, c-format
-msgid "%ld bytes\n"
-msgstr ""
 
 msgid "&About...\tCtrl-H"
 msgstr "&Про програму...\tCtrl-H"
@@ -202,151 +61,8 @@ msgstr "&Налаштування"
 msgid "&Show / Hide"
 msgstr "&Показати / Сховати"
 
-msgid "&amp;"
-msgstr ""
-
-msgid "&gt;"
-msgstr ""
-
-msgid "&lt;"
-msgstr ""
-
-msgid "&nbsp;"
-msgstr ""
-
-msgid "(32-bit flat model)"
-msgstr ""
-
-msgid ")\n"
-msgstr ""
-
-msgid "*"
-msgstr ""
-
-msgid "*.*"
-msgstr ""
-
-msgid "*CLEAR"
-msgstr ""
-
-msgid "*CLR"
-msgstr ""
-
-msgid "*NL"
-msgstr ""
-
-msgid "*P"
-msgstr ""
-
-msgid "*PL"
-msgstr ""
-
-msgid "++"
-msgstr ""
-
-msgid ", "
-msgstr ""
-
-msgid ", new limit = "
-msgstr ""
-
-msgid "-"
-msgstr ""
-
-msgid ".. "
-msgstr ""
-
-msgid ".mo"
-msgstr ""
-
-msgid "/"
-msgstr ""
-
-msgid "16-bit "
-msgstr ""
-
-msgid "2.71"
-msgstr ""
-
-msgid "32-bit "
-msgstr ""
-
-msgid "64-bit "
-msgstr ""
-
-#, c-format
-msgid "<BODY><FONT COLOR = #%%s>%%s</FONT></BODY></HTML>"
-msgstr ""
-
-#, c-format
-msgid "<FONT COLOR = #%%%%s><TABLE><TR>%%s</TR></TABLE></FONT>"
-msgstr ""
-
-#, c-format
-msgid "<HTML><META HTTP-EQUIV = \"Content-Type\" CONTENT = \"text/html; charset=%s\">"
-msgstr ""
-
-#, c-format
-msgid "<META HTTP-EQUIV = \"Content-Type\" CONTENT = \"text/html; charset=%s\">"
-msgstr ""
-
-#, c-format
-msgid "<TD WIDTH = 100%%>%s</TD>"
-msgstr ""
-
-#, c-format
-msgid "<TD><IMG SRC=\"%s\"></TD><TD WIDTH = 100%%>%s</TD>"
-msgstr ""
-
-#, c-format
-msgid "<TD>[%ld]</TD><TD WIDTH = 100%%>%s</TD>"
-msgstr ""
-
-#, c-format
-msgid "<TD>[%ld]</TD><TD><IMG SRC=\"%s\"></TD><TD WIDTH = 100%%>%s</TD>"
-msgstr ""
-
-msgid "<br>"
-msgstr ""
-
-msgid "<garbage-pointer>"
-msgstr ""
-
-msgid "<relinked>"
-msgstr ""
-
-msgid "<unknown type>"
-msgstr ""
-
-msgid "<unknown>"
-msgstr ""
-
 msgid "A&dditional desc\tCtrl-3"
 msgstr "Д&одадкове описування\tCtrl-3"
-
-msgid "ACT"
-msgstr ""
-
-msgid "ADD OBJ"
-msgstr ""
-
-msgid "ADDOBJ"
-msgstr ""
-
-msgid "ADDQST"
-msgstr ""
-
-msgid "AND"
-msgstr ""
-
-msgid "ARRCOMP"
-msgstr ""
-
-msgid "ARRPOS"
-msgstr ""
-
-msgid "About...\tAlt-H"
-msgstr ""
 
 msgid "Actions"
 msgstr "Дії"
@@ -354,71 +70,11 @@ msgstr "Дії"
 msgid "Additional desc"
 msgstr "Додадкове описування"
 
-msgid "Alex [dogmar88@mail.ru]"
-msgstr ""
-
-msgid "BACKIMAGE"
-msgstr ""
-
-msgid "BCOLOR"
-msgstr ""
-
-msgid "BalleR [vsevolod_kremyan@mail.ru]"
-msgstr ""
-
-msgid "Belial [belgame@bk.ru]"
-msgstr ""
-
 msgid "Bracket not found!"
 msgstr "Не відповідна кількість відкриваючих та закриваючих скобок!"
 
 msgid "Brackets not found!"
 msgstr "В виразі відсутні скобки!"
-
-msgid "Byte Soft, 2001-2007"
-msgstr ""
-
-msgid "Byte [nporep@mail.ru]"
-msgstr ""
-
-msgid "C++ "
-msgstr ""
-
-msgid "CLA"
-msgstr ""
-
-msgid "CLEAR"
-msgstr ""
-
-msgid "CLOSE"
-msgstr ""
-
-msgid "CLOSE ALL"
-msgstr ""
-
-msgid "CLR"
-msgstr ""
-
-msgid "CLS"
-msgstr ""
-
-msgid "CMDCLEAR"
-msgstr ""
-
-msgid "CMDCLR"
-msgstr ""
-
-msgid "COPYARR"
-msgstr ""
-
-msgid "COUNTER"
-msgstr ""
-
-msgid "COUNTOBJ"
-msgstr ""
-
-msgid "CURLOC"
-msgstr ""
 
 msgid "Can't add action!"
 msgstr "Неможливо додати дію!"
@@ -438,7 +94,6 @@ msgstr "Неможливо завантажити файл!"
 msgid "Cancel"
 msgstr "Скасувати"
 
-#, c-format
 msgid ""
 "Code: %ld\n"
 "Desc: %s"
@@ -446,151 +101,20 @@ msgstr ""
 "Код помилки: %ld\n"
 "Описування: %s"
 
-#, c-format
-msgid "Compiled using Borland C++ %d.%01d\n"
-msgstr ""
-
-msgid "Compiled using Microsoft C"
-msgstr ""
-
-#, c-format
-msgid "Compiled using Watcom C %d.%02d "
-msgstr ""
-
-msgid "DEBUG"
-msgstr ""
-
-msgid "DEL ACT"
-msgstr ""
-
-msgid "DEL OBJ"
-msgstr ""
-
-msgid "DELACT"
-msgstr ""
-
-msgid "DELOBJ"
-msgstr ""
-
-msgid "DESC"
-msgstr ""
-
-msgid "DISABLESCROLL"
-msgstr ""
-
-msgid "DISABLESUBEX"
-msgstr ""
-
 msgid "Default"
 msgstr "За промовчанням"
 
 msgid "Division by zero!"
 msgstr "Ділення на 0!"
 
-msgid "DzafT [dzaft@mail.ru]"
-msgstr ""
-
-msgid "ELSE"
-msgstr ""
-
-msgid "END"
-msgstr ""
-
-msgid "EXEC"
-msgstr ""
-
-msgid "EXEC:"
-msgstr ""
-
-msgid "EXIT"
-msgstr ""
-
-#, c-format
-msgid "Engine Compiled: %s\n"
-msgstr ""
-
 msgid "Error"
 msgstr "Помилка"
-
-#, c-format
-msgid "FBI<%ld>%s(%d)"
-msgstr ""
-
-msgid "FCOLOR"
-msgstr ""
-
-msgid "FNAME"
-msgstr ""
-
-msgid "FSIZE"
-msgstr ""
 
 msgid "File not found!"
 msgstr "Вказанный файл недоступний або не знайдений!"
 
-msgid "GOSUB"
-msgstr ""
-
-msgid "GOTO"
-msgstr ""
-
-msgid "GS"
-msgstr ""
-
-msgid "GT"
-msgstr ""
-
-#, c-format
-msgid "GUI Compiled: %s"
-msgstr ""
-
 msgid "Game not loaded!"
 msgstr "Гра не завантажена!"
-
-msgid "General/BackColor"
-msgstr ""
-
-msgid "General/FontColor"
-msgstr ""
-
-msgid "General/FontName"
-msgstr ""
-
-msgid "General/FontSize"
-msgstr ""
-
-msgid "General/Language"
-msgstr ""
-
-msgid "General/Panels"
-msgstr ""
-
-msgid "General/ShowHotkeys"
-msgstr ""
-
-msgid "Gilving [mrgilving@gmail.com]"
-msgstr ""
-
-msgid "HIman [himan@rambler.ru]"
-msgstr ""
-
-msgid "IF"
-msgstr ""
-
-msgid "IIF"
-msgstr ""
-
-msgid "INPUT"
-msgstr ""
-
-msgid "INSTR"
-msgstr ""
-
-msgid "ISNUM"
-msgstr ""
-
-msgid "ISPLAY"
-msgstr ""
 
 msgid "Image"
 msgstr "Зображення"
@@ -610,33 +134,6 @@ msgstr "Поле вводу"
 msgid "Input data"
 msgstr "Ввод даних"
 
-msgid "JUMP"
-msgstr ""
-
-msgid "KILLALL"
-msgstr ""
-
-msgid "KILLOBJ"
-msgstr ""
-
-msgid "KILLQST"
-msgstr ""
-
-msgid "KILLVAR"
-msgstr ""
-
-msgid "Korwin [tightbow@yandex.ru]"
-msgstr ""
-
-msgid "LCASE"
-msgstr ""
-
-msgid "LEN"
-msgstr ""
-
-msgid "LET"
-msgstr ""
-
 msgid "Label not found!"
 msgstr "Вказаная мітка не знайдена!"
 
@@ -646,7 +143,6 @@ msgstr "Мова"
 msgid "Location not found!"
 msgstr "Локація с заданою назвою не існує!"
 
-#, c-format
 msgid ""
 "Location: %s\n"
 "Area: %s\n"
@@ -660,126 +156,11 @@ msgstr ""
 "Код помилки: %ld\n"
 "Описування: %s"
 
-msgid "Lostas [lostas@mail.ru]"
-msgstr ""
-
-msgid "MAX"
-msgstr ""
-
-#, c-format
-msgid "MEMWATCH detected %ld anomalies\n"
-msgstr ""
-
-#, c-format
-msgid "MEMWATCH: assert trap: %s(%d), %s"
-msgstr ""
-
-#, c-format
-msgid "MEMWATCH: verify trap: %s(%d), %s"
-msgstr ""
-
-msgid "MENU"
-msgstr ""
-
-msgid "MID"
-msgstr ""
-
-msgid "MIN"
-msgstr ""
-
-msgid "MSECSCOUNT"
-msgstr ""
-
-msgid "MSG"
-msgstr ""
-
-msgid "Mioirel [mioirel@rambler.ru]"
-msgstr ""
-
-msgid "Modes: "
-msgstr ""
-
-msgid "Morgan [gorgonyte@mail.ru]"
-msgstr ""
-
-msgid "Mortem [reijii@darthman.com]"
-msgstr ""
-
-msgid "NL"
-msgstr ""
-
-msgid "NO"
-msgstr ""
-
-msgid "NOSAVE"
-msgstr ""
-
-#, c-format
-msgid "NULL free: <%ld> %s(%d), NULL pointer free'd\n"
-msgstr ""
-
-msgid "Nex [nex@otaku.ru]"
-msgstr ""
-
-msgid "NoMansLand "
-msgstr ""
-
-msgid "OBJ"
-msgstr ""
-
 msgid "OK"
 msgstr "OK"
 
-msgid "ONACTSEL"
-msgstr ""
-
-msgid "ONGLOAD"
-msgstr ""
-
-msgid "ONGSAVE"
-msgstr ""
-
-msgid "ONNEWLOC"
-msgstr ""
-
-msgid "ONOBJSEL"
-msgstr ""
-
-msgid "OPENGAME"
-msgstr ""
-
-msgid "OPENQST"
-msgstr ""
-
-msgid "OR"
-msgstr ""
-
 msgid "Objects"
 msgstr "Предмети"
-
-msgid "P"
-msgstr ""
-
-msgid "PL"
-msgstr ""
-
-msgid "PLAY"
-msgstr ""
-
-msgid "Pos/Height"
-msgstr ""
-
-msgid "Pos/Left"
-msgstr ""
-
-msgid "Pos/Maximize"
-msgstr ""
-
-msgid "Pos/Top"
-msgstr ""
-
-msgid "Pos/Width"
-msgstr ""
 
 msgid "Preview"
 msgstr "Предпросмотр"
@@ -787,77 +168,14 @@ msgstr "Предпросмотр"
 msgid "QSP games (*.qsp;*.gam)|*.qsp;*.gam"
 msgstr "Файли ігр QSP (*.qsp;*.gam)|*.qsp;*.gam"
 
-msgid "QSPGAME"
-msgstr ""
-
-msgid "QSPSAVEDGAME"
-msgstr ""
-
-msgid "QSPVER"
-msgstr ""
-
 msgid "Quest Soft Player 5"
 msgstr "Quest Soft Player 5"
 
 msgid "Quote not found!"
 msgstr "Відсутні завершаючі текст лапки!"
 
-msgid "RAND"
-msgstr ""
-
-msgid "RB [qsp1@narod.ru]"
-msgstr ""
-
-msgid "REFINT"
-msgstr ""
-
-msgid "RGB"
-msgstr ""
-
-msgid "RND"
-msgstr ""
-
 msgid "Regular expression's error!"
 msgstr "Помилка компиляції регулярного виразу!"
-
-msgid "SAVEGAME"
-msgstr ""
-
-msgid "SELACT"
-msgstr ""
-
-msgid "SELOBJ"
-msgstr ""
-
-msgid "SET"
-msgstr ""
-
-msgid "SETTIMER"
-msgstr ""
-
-msgid "SHOWACTS"
-msgstr ""
-
-msgid "SHOWINPUT"
-msgstr ""
-
-msgid "SHOWOBJS"
-msgstr ""
-
-msgid "SHOWSTAT"
-msgstr ""
-
-msgid "STR"
-msgstr ""
-
-msgid "STRCOMP"
-msgstr ""
-
-msgid "STRFIND"
-msgstr ""
-
-msgid "STRPOS"
-msgstr ""
 
 msgid "Saved game files (*.sav)|*.sav"
 msgstr "Файли ігрових станів QSP (*.sav)|*.sav"
@@ -913,9 +231,6 @@ msgstr "Переповнення стеку!"
 msgid "Syntax error!"
 msgstr "Помилка синтаксису!"
 
-msgid "TRIM"
-msgstr ""
-
 msgid "Too many items in expression!"
 msgstr "Занадто багато елементів у виразі!"
 
@@ -925,44 +240,12 @@ msgstr "Занадто багато змінних з однаковим хеш�
 msgid "Type mismatch!"
 msgstr "Невідповідність типів даних!"
 
-msgid "UCASE"
-msgstr ""
-
-msgid "UNSEL"
-msgstr ""
-
-msgid "UNSELECT"
-msgstr ""
-
-msgid "USEHTML"
-msgstr ""
-
-msgid "USERCOM"
-msgstr ""
-
-msgid "USER_TEXT"
-msgstr ""
-
-msgid "USRTXT"
-msgstr ""
-
 msgid "Unknown action!"
 msgstr "Невідома дія!"
 
 msgid "Unknown error!"
 msgstr "Невідома помилка!"
 
-msgid "VAL"
-msgstr ""
-
-msgid "VIEW"
-msgstr ""
-
-#, c-format
-msgid "Version: %s\n"
-msgstr ""
-
-#, c-format
 msgid ""
 "Version: %s\n"
 "Engine Compiled: %s\n"
@@ -972,581 +255,15 @@ msgstr ""
 "Дата компиляції інтерпретатора: %s\n"
 "Дата компиляції інтерфейса: %s"
 
-msgid "WAIT"
-msgstr ""
-
-#, c-format
-msgid "WILD free: <%ld> %s(%d), unknown pointer %p\n"
-msgstr ""
-
 msgid "Window / Fullscreen &mode\tAlt-Enter"
 msgstr "Віконний / Повноекранний &режим\tAlt-Enter"
 
-msgid "XGOTO"
-msgstr ""
-
-msgid "XGT"
-msgstr ""
-
 msgid "[end] not found!"
 msgstr "Багаторядкові форми операторів повинні завершуватися словом [end]!"
-
-msgid "[overflowed] "
-msgstr ""
-
-msgid "[underflowed] "
-msgstr ""
-
-msgid "\\"
-msgstr ""
-
-msgid "__STDC__ "
-msgstr ""
-
-msgid "a"
-msgstr ""
-
-msgid "acts"
-msgstr ""
-
-msgid "alloc "
-msgstr ""
-
-#, c-format
-msgid "assert trap: <%ld> %s(%d), %s\n"
-msgstr ""
-
-#, c-format
-msgid "assert trap: <%ld> AUTO IGNORED - execution continues\n"
-msgstr ""
-
-#, c-format
-msgid "assert trap: <%ld> IGNORED - execution continues\n"
-msgstr ""
-
-#, c-format
-msgid "assert trap: <%ld> RETRY - executing again\n"
-msgstr ""
-
-msgid "auto.gam"
-msgstr ""
-
-#, c-format
-msgid "autocheck: <%ld> %s(%d) "
-msgstr ""
-
-#, c-format
-msgid "breakout: %s\n"
-msgstr ""
-
-msgid "c"
-msgstr ""
-
-msgid "chain "
-msgstr ""
-
-#, c-format
-msgid "check: <%ld> %s(%d), checking %s%s%s\n"
-msgstr ""
-
-#, c-format
-msgid "check: <%ld> %s(%d), complete; no errors\n"
-msgstr ""
-
-msgid "check: heap chain broken, next link incorrect\n"
-msgstr ""
-
-msgid "check: heap chain broken, prev link incorrect\n"
-msgstr ""
-
-msgid "check: heap chain broken, tail incorrect\n"
-msgstr ""
-
-msgid "check: heap corruption detected\n"
-msgstr ""
-
-msgid "desc"
-msgstr ""
-
-msgid "dock_size(5,0,0)=22|dock_size(2,0,0)=185|dock_size(3,1,0)=39|dock_size(3,0,0)=138|dock_size(1,0,0)=152|"
-msgstr ""
-
-#, c-format
-msgid "double-free: <%ld> %s(%d), %p was freed from %s(%d)\n"
-msgstr ""
-
-#, c-format
-msgid "dropped: %u kilobytes of %s memory\n"
-msgstr ""
-
-#, c-format
-msgid "dropped: all %s memory (%u kb)\n"
-msgstr ""
-
-#, c-format
-msgid "fail: <%ld> %s(%d), %ld wanted %ld allocated\n"
-msgstr ""
-
-msgid "global"
-msgstr ""
-
-msgid "grabbed"
-msgstr ""
-
-#, c-format
-msgid "grabbed: %u kilobytes of %s memory\n"
-msgstr ""
-
-#, c-format
-msgid "grabbed: all allowed memory to %s (%u kb)\n"
-msgstr ""
-
-#, c-format
-msgid "grabbed: all available memory to %s (%u kb)\n"
-msgstr ""
-
-msgid "http://qsp.org.ru"
-msgstr ""
-
-msgid "imgback"
-msgstr ""
-
-msgid "imgview"
-msgstr ""
-
-msgid "input"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), MW-%p: link1 NULL, but not head\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), MW-%p: link1 failure\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), MW-%p: link2 NULL, but not tail\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), MW-%p: link2 failure\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), buffer <%ld> %s(%d) link1 broken\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), buffer <%ld> %s(%d) link2 broken\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), checksum for MW-%p is incorrect\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), info trashed; relinking\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), mwIsOwned fails for MW-%p\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d), no-mans-land MW-%p is corrupted\n"
-msgstr ""
-
-#, c-format
-msgid "internal: <%ld> %s(%d): pointer MW-%p is invalid\n"
-msgstr ""
-
-msgid "internal: NML/unfreed scan aborted, heap too damaged\n"
-msgstr ""
-
-msgid "internal: NML/unfreed scan restarting\n"
-msgstr ""
-
-#, c-format
-msgid "internal: NoMansLand block counter %ld, not zero\n"
-msgstr ""
-
-#, c-format
-msgid "internal: NoMansLand byte counter %ld, not zero\n"
-msgstr ""
-
-msgid "internal: flushing flag damaged and recovered\n"
-msgstr ""
-
-msgid "internal: flushing flag destroyed, so set to true\n"
-msgstr ""
-
-msgid "internal: log file handle damaged and recovered\n"
-msgstr ""
-
-#, c-format
-msgid "internal: memory low, statistics incomplete for '%s'\n"
-msgstr ""
-
-msgid "internal: mwAbort(): MEMWATCH not initialized!\n"
-msgstr ""
-
-#, c-format
-msgid "internal: mwFreeUp(%u) reported success, but malloc() fails\n"
-msgstr ""
-
-msgid "internal: mwTerm(): MEMWATCH has not been started!\n"
-msgstr ""
-
-msgid "internal: the grab list is not empty after mwDropAll()\n"
-msgstr ""
-
-msgid "langs"
-msgstr ""
-
-msgid "layout2|"
-msgstr ""
-
-#, c-format
-msgid "limit fail: <%ld> %s(%d), %ld wanted %ld available\n"
-msgstr ""
-
-msgid "limit: old limit = "
-msgstr ""
-
-msgid "line"
-msgstr ""
-
-#, c-format
-msgid "logfile: failed to open/create file '%s'\n"
-msgstr ""
-
-msgid "mEmwAtch"
-msgstr ""
-
-#, c-format
-msgid "mark: %p: %s\n"
-msgstr ""
-
-#, c-format
-msgid "mark: %s(%d), mark(%p)->next(%p) is trashed, can't mark for %s\n"
-msgstr ""
-
-#, c-format
-msgid "mark: %s(%d), mwFirstMark (%p) is trashed, can't mark for %s\n"
-msgstr ""
-
-#, c-format
-msgid "mark: %s(%d), no mark for %p:'%s', out of memory\n"
-msgstr ""
-
-#, c-format
-msgid "mark: %s(%d), no mark for NULL:'%s' may be set\n"
-msgstr ""
-
-#, c-format
-msgid "mark: %s(%d), no mark found for %p\n"
-msgstr ""
-
-#, c-format
-msgid "memwat%02d.log"
-msgstr ""
-
-msgid "memwatch.log"
-msgstr ""
-
-msgid "module"
-msgstr ""
-
-msgid "mwDWORD==("
-msgstr ""
-
-msgid "mwFreeUp"
-msgstr ""
-
-msgid "mwMutexLock: timed out, possible deadlock\n"
-msgstr ""
-
-#, c-format
-msgid "mwROUNDALLOC==%d sizeof(mwData)==%d mwDataSize==%d\n"
-msgstr ""
-
-msgid "name=acts;state=16779260;dir=3;layer=0;row=0;pos=0;prop=154708;bestw=428;besth=76;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|"
-msgstr ""
-
-msgid "name=desc;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=428;besth=295;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|"
-msgstr ""
-
-msgid "name=imgback;state=2046;dir=1;layer=0;row=0;pos=0;prop=102431;bestw=310;besth=133;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|"
-msgstr ""
-
-msgid "name=imgview;state=16779263;dir=1;layer=0;row=0;pos=1;prop=97569;bestw=310;besth=133;minw=50;minh=50;maxw=-1;maxh=-1;floatx=173;floaty=150;floatw=347;floath=277|"
-msgstr ""
-
-msgid "name=input;state=16779260;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=619;besth=20;minw=50;minh=20;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|"
-msgstr ""
-
-msgid "name=objs;state=16779260;dir=2;layer=0;row=0;pos=0;prop=100000;bestw=185;besth=295;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|"
-msgstr ""
-
-msgid "name=vars;state=16779260;dir=3;layer=0;row=0;pos=1;prop=65743;bestw=185;besth=76;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|"
-msgstr ""
-
-msgid "no allocations lost\n"
-msgstr ""
-
-msgid "no-mans-land"
-msgstr ""
-
-msgid "nomansland "
-msgstr ""
-
-msgid "none"
-msgstr ""
-
-msgid "none\n"
-msgstr ""
-
-msgid "objs"
-msgstr ""
 
 msgid "on action"
 msgstr "при обробці вибору дії"
 
 msgid "on visit"
 msgstr "при відвідування"
-
-#, c-format
-msgid "overflow: <%ld> %s(%d), %ld bytes alloc'd at <%ld> %s(%d)\n"
-msgstr ""
-
-msgid "qspgui.cfg"
-msgstr ""
-
-msgid "rb"
-msgstr ""
-
-#, c-format
-msgid "realloc: <%ld> %s(%d), %p was freed from %s(%d)\n"
-msgstr ""
-
-#, c-format
-msgid "realloc: <%ld> %s(%d), unknown pointer %p\n"
-msgstr ""
-
-#, c-format
-msgid "relink: <%ld> %s(%d) attempting emergency repairs...\n"
-msgstr ""
-
-#, c-format
-msgid "relink: <%ld> %s(%d) attempting to repair MW-%p...\n"
-msgstr ""
-
-#, c-format
-msgid "relink: <%ld> %s(%d) heap damaged beyond repair\n"
-msgstr ""
-
-#, c-format
-msgid "relink: <%ld> %s(%d) heap is empty, nothing to repair\n"
-msgstr ""
-
-#, c-format
-msgid "relink: MW-%p is a garbage pointer\n"
-msgstr ""
-
-#, c-format
-msgid "relink: MW-%p is the head (first) allocation\n"
-msgstr ""
-
-#, c-format
-msgid "relink: MW-%p is the tail (last) allocation\n"
-msgstr ""
-
-#, c-format
-msgid "relink: MW-%p next pointer is non-NULL, you have a wild pointer\n"
-msgstr ""
-
-#, c-format
-msgid "relink: MW-%p not found in forward chain search\n"
-msgstr ""
-
-#, c-format
-msgid "relink: MW-%p not found in reverse chain search\n"
-msgstr ""
-
-#, c-format
-msgid "relink: MW-%p prev pointer is non-NULL, you have a wild pointer\n"
-msgstr ""
-
-msgid "relink: both head and tail pointers damaged, aborting program\n"
-msgstr ""
-
-msgid "relink: cannot repair MW at NULL\n"
-msgstr ""
-
-msgid "relink: emergency repairs successful, assessing damage...\n"
-msgstr ""
-
-#, c-format
-msgid "relink: failed for MW-%p; forward chain fragmented at MW-%p: 'next' is %p\n"
-msgstr ""
-
-#, c-format
-msgid "relink: failed for MW-%p; head pointer destroyed\n"
-msgstr ""
-
-#, c-format
-msgid "relink: failed for MW-%p; reverse chain fragmented at MW-%p, 'prev' is %p\n"
-msgstr ""
-
-#, c-format
-msgid "relink: failed for MW-%p; tail pointer destroyed\n"
-msgstr ""
-
-#, c-format
-msgid "relink: forward chain's first damaged MW is MW-%p, %ld %sbytes at %s(%d)\n"
-msgstr ""
-
-#, c-format
-msgid "relink: forward chain's last intact MW is MW-%p, %ld %sbytes at %s(%d)\n"
-msgstr ""
-
-#, c-format
-msgid "relink: heap appears intact, MW-%p probably garbage pointer\n"
-msgstr ""
-
-msgid "relink: heap totally destroyed, aborting program\n"
-msgstr ""
-
-#, c-format
-msgid "relink: heap truncated, MW-%p designated as new mwHead\n"
-msgstr ""
-
-#, c-format
-msgid "relink: heap truncated, MW-%p designated as new mwTail\n"
-msgstr ""
-
-msgid "relink: heap verification FAILS - aborting program\n"
-msgstr ""
-
-#, c-format
-msgid "relink: mwHead (MW-%p) is damaged, skipping forward scan\n"
-msgstr ""
-
-#, c-format
-msgid "relink: mwHead is NULL, but mwTail is %p\n"
-msgstr ""
-
-#, c-format
-msgid "relink: mwTail (%p) is damaged, skipping reverse scan\n"
-msgstr ""
-
-#, c-format
-msgid "relink: mwTail is NULL, but mwHead is %p\n"
-msgstr ""
-
-#, c-format
-msgid "relink: partial, %ld MW-blocks of %ld bytes lost\n"
-msgstr ""
-
-#, c-format
-msgid "relink: reverse chain's first damaged MW is MW-%p, %ld %sbytes at %s(%d)\n"
-msgstr ""
-
-#, c-format
-msgid "relink: reverse chain's last intact MW is MW-%p, %ld %sbytes at %s(%d)\n"
-msgstr ""
-
-msgid "relink: successful, "
-msgstr ""
-
-#, c-format
-msgid "relink: the 'next' pointer of this MW points to %p, which is out-of-legal-access\n"
-msgstr ""
-
-#, c-format
-msgid "relink: the 'prev' pointer of this MW points to %p, which is out-of-legal-access\n"
-msgstr ""
-
-#, c-format
-msgid "relink: the mwHead pointer's 'prev' member is %p, not NULL\n"
-msgstr ""
-
-#, c-format
-msgid "relink: the mwTail pointer's 'next' member is %p, not NULL\n"
-msgstr ""
-
-msgid "relink: verifying heap integrity...\n"
-msgstr ""
-
-#, c-format
-msgid "size information lost for MW-%p\n"
-msgstr ""
-
-msgid "sound"
-msgstr ""
-
-#, c-format
-msgid "statistics: now collecting on a %s basis\n"
-msgstr ""
-
-#, c-format
-msgid "strdup: <%ld> %s(%d), strdup(NULL) called\n"
-msgstr ""
-
-#, c-format
-msgid "underflow: <%ld> %s(%d), %ld bytes alloc'd at <%ld> %s(%d)\n"
-msgstr ""
-
-#, c-format
-msgid "unfreed: <%ld> %s(%d), %ld bytes at %p "
-msgstr ""
-
-msgid "unknown"
-msgstr ""
-
-msgid "unsigned int"
-msgstr ""
-
-msgid "unsigned long"
-msgstr ""
-
-msgid "unsigned short"
-msgstr ""
-
-msgid "vars"
-msgstr ""
-
-#, c-format
-msgid "verify trap: <%ld> %s(%d), %s\n"
-msgstr ""
-
-#, c-format
-msgid "verify trap: <%ld> AUTO IGNORED - execution continues\n"
-msgstr ""
-
-#, c-format
-msgid "verify trap: <%ld> IGNORED - execution continues\n"
-msgstr ""
-
-#, c-format
-msgid "verify trap: <%ld> RETRY - executing again\n"
-msgstr ""
-
-msgid "wb"
-msgstr ""
-
-#, c-format
-msgid "wild pointer: <%ld> %s memory hit at %p\n"
-msgstr ""
-
-#, c-format
-msgid "wild pointer: <%ld> NoMansLand %p alloc'd at %s(%d)\n"
-msgstr ""
-
-msgid "|"
-msgstr ""
-
-msgid "}\n"
-msgstr ""
 
