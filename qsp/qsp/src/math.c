@@ -47,6 +47,7 @@ static void qspFunctionDesc(QSPVariant *, long, QSPVariant *);
 static void qspFunctionGetObj(QSPVariant *, long, QSPVariant *);
 static void qspFunctionIsPlay(QSPVariant *, long, QSPVariant *);
 static void qspFunctionInstr(QSPVariant *, long, QSPVariant *);
+static void qspFunctionReplace(QSPVariant *, long, QSPVariant *);
 static void qspFunctionFunc(QSPVariant *, long, QSPVariant *);
 
 static void qspAddOperation(long opCode,
@@ -151,6 +152,7 @@ void qspInitMath()
 	qspAddOperation(qspOpArrPos, QSP_FMT("ARRPOS"), 0, 30, 0, 2, 3, 3, 2, 1, 0);
 	qspAddOperation(qspOpArrComp, QSP_FMT("ARRCOMP"), 0, 30, 0, 2, 3, 3, 2, 1, 0);
 	qspAddOperation(qspOpInstr, QSP_FMT("INSTR"), 0, 30, qspFunctionInstr, 2, 3, 3, 2, 1, 1);
+	qspAddOperation(qspOpReplace, QSP_FMT("REPLACE"), QSP_STRCHAR QSP_FMT("REPLACE"), 30, qspFunctionReplace, 1, 2, 3, 1, 1, 1);
 	qspAddOperation(qspOpFunc, QSP_FMT("FUNC"), QSP_STRCHAR QSP_FMT("FUNC"), 30, qspFunctionFunc, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddOperation(qspOpDynEval, QSP_FMT("DYNEVAL"), QSP_STRCHAR QSP_FMT("DYNEVAL"), 30, 0, 0, 1, 1, 1);
 }
@@ -877,6 +879,42 @@ static void qspFunctionInstr(QSPVariant *args, long count, QSPVariant *tos)
 	}
 	else
 		QSP_NUM(*tos) = 0;
+}
+
+static void qspFunctionReplace(QSPVariant *args, long count, QSPVariant *tos)
+{
+	long len, txtLen, oldTxtLen, searchLen, repLen, bufSize = 256;
+	QSP_CHAR emptyStr[1], *newTxt, *pos, *repTxt, *txt = QSP_STR(args[0]);
+	searchLen = (long)QSP_STRLEN(QSP_STR(args[1]));
+	if (count == 2)
+	{
+		*emptyStr = 0;
+		repTxt = emptyStr;
+		repLen = 0;
+	}
+	else
+	{
+		repTxt = QSP_STR(args[2]);
+		repLen = (long)QSP_STRLEN(repTxt);
+	}
+	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+	txtLen = oldTxtLen = 0;
+	pos = QSP_STRSTR(txt, QSP_STR(args[1]));
+	while (pos)
+	{
+		len = (long)(pos - txt);
+		if ((txtLen += len + repLen) >= bufSize)
+		{
+			bufSize = txtLen + 128;
+			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
+		}
+		QSP_STRNCPY(newTxt + oldTxtLen, txt, len);
+		QSP_STRCPY(newTxt + oldTxtLen + len, repTxt);
+		oldTxtLen = txtLen;
+		txt = pos + searchLen;
+		pos = QSP_STRSTR(txt, QSP_STR(args[1]));
+	}
+	QSP_STR(*tos) = qspGetAddText(newTxt, txt, txtLen, -1);
 }
 
 static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
