@@ -198,19 +198,23 @@ static long qspFunctionOpCode(QSP_CHAR *funName)
 	QSP_CHAR *uName;
 	qspUpperStr(uName = qspGetNewText(funName, -1));
 	for (i = qspOpFirst_Function; i < qspOpLast_Operation; ++i)
+	{
 		for (j = 0; j < 2; ++j)
 			if (qspOps[i].Names[j] && !QSP_STRCMP(uName, qspOps[i].Names[j]))
 			{
 				free(uName);
 				return i;
 			}
+	}
 	for (i = qspOpFirst_UnaryKeyword; i < qspOpFirst_NotUnaryOperator; ++i)
+	{
 		for (j = 0; j < 2; ++j)
 			if (qspOps[i].Names[j] && !QSP_STRCMP(uName, qspOps[i].Names[j]))
 			{
 				free(uName);
 				return i;
 			}
+	}
 	free(uName);
 	return qspOpUnknown;
 }
@@ -222,6 +226,7 @@ static long qspOperatorOpCode(QSP_CHAR **expr)
 	if (!(**expr)) return qspOpEnd;
 	qspUpperStr(uExpr = qspGetNewText(*expr, qspOpMaxLen));
 	for (i = qspOpFirst_NotUnaryOperator; i < qspOpFirst_Function; ++i)
+	{
 		for (j = 0; j < 2; ++j)
 			if (qspOps[i].Names[j])
 			{
@@ -233,6 +238,7 @@ static long qspOperatorOpCode(QSP_CHAR **expr)
 					return i;
 				}
 			}
+	}
 	free(uExpr);
 	return qspOpUnknown;
 }

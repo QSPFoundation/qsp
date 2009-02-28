@@ -168,6 +168,7 @@ static long qspGetStatCode(QSP_CHAR *s, QSP_BOOL isMultiline, QSP_CHAR **pos)
 	last = (isMultiline ? qspStatFirst_NotMultilineStatement : qspStatLast_Statement);
 	qspUpperStr(uStr = qspGetNewText(s, qspStatMaxLen));
 	for (i = qspStatFirst_Statement; i < last; ++i)
+	{
 		for (j = 0; j < 2; ++j)
 			if (qspStats[i].Names[j])
 			{
@@ -179,6 +180,7 @@ static long qspGetStatCode(QSP_CHAR *s, QSP_BOOL isMultiline, QSP_CHAR **pos)
 					return i;
 				}
 			}
+	}
 	free(uStr);
 	return qspStatUnknown;
 }
