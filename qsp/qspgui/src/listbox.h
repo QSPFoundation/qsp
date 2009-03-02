@@ -38,6 +38,9 @@
 		QSPListBox(wxWindow *parent, wxWindowID id, ListBoxType type = LB_NORMAL);
 
 		// Methods
+		void SetStandardFonts(int size = -1,
+			const wxString& normal_face = wxEmptyString,
+			const wxString& fixed_face = wxEmptyString);
 		void RefreshUI();
 		void BeginItems();
 		void AddItem(const wxString& image, const wxString& desc);
@@ -48,11 +51,14 @@
 		void SetIsShowNums(bool isShow);
 		void SetTextFont(const wxFont& font);
 		wxFont GetTextFont() const { return m_font; }
+		void SetLinkColor(const wxColour& clr);
+		const wxColour& GetLinkColor() const;
 		void SetGamePath(const wxString& path) { m_path = path; }
 	protected:
 		// Internal methods
 		virtual wxString OnGetItem(size_t n) const;
-		virtual wxHtmlOpeningStatus OnOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const;
+		virtual wxHtmlOpeningStatus OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const;
+		void CreateHTMLParser() const;
 
 		// Events
 		void OnMouseMove(wxMouseEvent& event);

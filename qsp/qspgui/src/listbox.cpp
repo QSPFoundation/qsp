@@ -27,7 +27,7 @@ BEGIN_EVENT_TABLE(QSPListBox, wxHtmlListBox)
 	EVT_MOUSEWHEEL(QSPListBox::OnMouseWheel)
 END_EVENT_TABLE()
 
-wxHtmlOpeningStatus QSPListBox::OnOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
+wxHtmlOpeningStatus QSPListBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
 {
 	if (wxFileName(url).IsAbsolute()) return wxHTML_OPEN;
 	*redirect = wxFileName(m_path + url, wxPATH_DOS).GetFullPath();
@@ -52,6 +52,13 @@ QSPListBox::QSPListBox(wxWindow *parent, wxWindowID id, ListBoxType type) : wxHt
 	wxString fontName(m_font.GetFaceName());
 	SetStandardFonts(m_font.GetPointSize(), fontName, fontName);
 	SetSelectionBackground(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+}
+
+void QSPListBox::SetStandardFonts(int size, const wxString& normal_face, const wxString& fixed_face)
+{
+	CreateHTMLParser();
+	m_htmlParser->SetStandardFonts(size, normal_face, fixed_face);
+	RefreshUI();
 }
 
 void QSPListBox::RefreshUI()
@@ -114,9 +121,35 @@ void QSPListBox::SetTextFont(const wxFont& font)
 	if (!m_font.GetFaceName().IsSameAs(fontName, false) || m_font.GetPointSize() != fontSize)
 	{
 		m_font = font;
-		Freeze();
 		SetStandardFonts(fontSize, fontName, fontName);
-		Thaw();
+	}
+}
+
+void QSPListBox::SetLinkColor(const wxColour& clr)
+{
+	CreateHTMLParser();
+	m_htmlParser->SetLinkColor(clr);
+	RefreshUI();
+}
+
+const wxColour& QSPListBox::GetLinkColor() const
+{
+	CreateHTMLParser();
+	return m_htmlParser->GetLinkColor();
+}
+
+void QSPListBox::CreateHTMLParser() const
+{
+	if (!m_htmlParser)
+	{
+		QSPListBox *self = wxConstCast(this, QSPListBox);
+		self->m_htmlParser = new wxHtmlWinParser(self);
+		m_htmlParser->SetDC(new wxClientDC(self));
+		m_htmlParser->SetFS(&self->m_filesystem);
+		#if !wxUSE_UNICODE
+			if (GetFont().Ok()) m_htmlParser->SetInputEncoding(GetFont().GetEncoding());
+		#endif
+		m_htmlParser->SetStandardFonts();
 	}
 }
 

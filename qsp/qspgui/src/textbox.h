@@ -40,10 +40,12 @@
 		void SetTextFont(const wxFont& font);
 		wxFont GetTextFont() const { return m_font; }
 		wxString GetText() const { return m_text; }
+		void SetLinkColor(const wxColour& clr);
+		const wxColour& GetLinkColor() const { return m_Parser->GetLinkColor(); }
 		void SetGamePath(const wxString& path) { m_path = path; }
 	protected:
 		// Internal methods
-		virtual wxHtmlOpeningStatus OnOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const;
+		virtual wxHtmlOpeningStatus OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const;
 
 		// Events
 		void OnKeyUp(wxKeyEvent& event);

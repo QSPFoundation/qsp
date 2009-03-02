@@ -24,7 +24,7 @@ BEGIN_EVENT_TABLE(QSPTextBox, wxHtmlWindow)
 	EVT_MOUSEWHEEL(QSPTextBox::OnMouseWheel)
 END_EVENT_TABLE()
 
-wxHtmlOpeningStatus QSPTextBox::OnOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
+wxHtmlOpeningStatus QSPTextBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
 {
 	if (wxFileName(url).IsAbsolute()) return wxHTML_OPEN;
 	*redirect = wxFileName(m_path + url, wxPATH_DOS).GetFullPath();
@@ -84,12 +84,18 @@ void QSPTextBox::SetTextFont(const wxFont& font)
 	}
 }
 
+void QSPTextBox::SetLinkColor(const wxColour& clr)
+{
+	m_Parser->SetLinkColor(clr);
+	RefreshUI();
+}
+
 void QSPTextBox::OnKeyUp(wxKeyEvent& event)
 {
 	event.Skip();
 	wxKeyEvent keyEvent(event);
 	keyEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-	TryParent(keyEvent);
+	TryAfter(keyEvent);
 }
 
 void QSPTextBox::OnMouseWheel(wxMouseEvent& event)
