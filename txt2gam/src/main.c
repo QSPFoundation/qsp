@@ -112,6 +112,11 @@ static long qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_B
 					bufSize = 512;
 					locCode = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 				}
+				if (pos && *qspSkipSpaces(pos + QSP_LEN(QSP_STRSDELIM)) == locEnd)
+				{
+					data = pos;
+					continue;
+				}
 			}
 			if (pos)
 				data = pos + QSP_LEN(QSP_STRSDELIM);
