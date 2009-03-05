@@ -376,7 +376,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\math.c"
+				RelativePath=".\src\mathops.c"
 				>
 			</File>
 			<File
@@ -526,7 +526,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\math.h"
+				RelativePath=".\src\mathops.h"
 				>
 			</File>
 			<File

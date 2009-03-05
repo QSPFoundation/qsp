@@ -301,7 +301,7 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	else
 	{
 		qspQstFullPath = qspGetAddText(qspQstFullPath, fileName, 0, -1);
-		delim = qspInStrRChar(qspQstFullPath, QSP_PATHDELIM[0], 0);
+		delim = qspInStrRChars(qspQstFullPath, QSP_PATHDELIMS, 0);
 		qspQstPathLen = (delim ? (long)(delim - qspQstFullPath) + 1 : 0);
 		qspQstPath = qspGetAddText(qspQstPath, qspQstFullPath, 0, qspQstPathLen);
 		qspQstCRC = crc;

@@ -19,7 +19,7 @@
 #include "coding.h"
 #include "errors.h"
 #include "locations.h"
-#include "math.h"
+#include "mathops.h"
 #include "variables.h"
 #include "variant.h"
 
@@ -135,13 +135,16 @@ QSP_BOOL qspIsEqual(QSP_CHAR *str1, QSP_CHAR *str2, long maxLen)
 	return (delta == 0);
 }
 
-QSP_CHAR *qspInStrRChar(QSP_CHAR *str, QSP_CHAR ch, QSP_CHAR *end)
+QSP_CHAR *qspInStrRChars(QSP_CHAR *str, QSP_CHAR *chars, QSP_CHAR *end)
 {
-	if (!end) end = qspStrEnd(str);
-	if (end == str) return 0;
-	--end;
-	while (end != str && *end != ch) --end;
-	return (*end == ch ? end : 0);
+	QSP_CHAR *pos = 0;
+	while (*str)
+	{
+		if (end && str == end) break;
+		if (qspIsInList(chars, *str)) pos = str;
+		++str;
+	}
+	return pos;
 }
 
 QSP_CHAR *qspJoinStrs(QSP_CHAR **s, long count, QSP_CHAR *delim)

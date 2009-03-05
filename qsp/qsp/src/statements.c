@@ -22,7 +22,7 @@
 #include "errors.h"
 #include "game.h"
 #include "locations.h"
-#include "math.h"
+#include "mathops.h"
 #include "menu.h"
 #include "objects.h"
 #include "playlist.h"

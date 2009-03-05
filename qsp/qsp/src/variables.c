@@ -20,7 +20,7 @@
 #include "common.h"
 #include "errors.h"
 #include "locations.h"
-#include "math.h"
+#include "mathops.h"
 #include "objects.h"
 #include "text.h"
 #include "time.h"

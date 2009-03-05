@@ -41,7 +41,7 @@
 	void qspLowerStr(QSP_CHAR *);
 	void qspUpperStr(QSP_CHAR *);
 	QSP_BOOL qspIsEqual(QSP_CHAR *, QSP_CHAR *, long);
-	QSP_CHAR *qspInStrRChar(QSP_CHAR *, QSP_CHAR, QSP_CHAR *);
+	QSP_CHAR *qspInStrRChars(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspJoinStrs(QSP_CHAR **, long, QSP_CHAR *);
 	long qspSplitStr(QSP_CHAR *, QSP_CHAR *, QSP_CHAR ***);
 	void qspCopyStrs(QSP_CHAR ***, QSP_CHAR **, long, long);

@@ -116,10 +116,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/locations.h" />
-		<Unit filename="src/math.c">
+		<Unit filename="src/mathops.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="src/math.h" />
+		<Unit filename="src/mathops.h" />
 		<Unit filename="src/memwatch.c">
 			<Option compilerVar="CC" />
 		</Unit>

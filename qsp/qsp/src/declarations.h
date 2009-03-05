@@ -87,7 +87,7 @@
 		#define QSP_WCSTOMBSLEN strlen
 		#define QSP_WCSTOMBS strncpy
 		#define QSP_MBTOSB(a) ((unsigned char)(a))
-		#ifdef _WIN
+		#if defined(_WIN) || defined(_PSP)
 			#define QSP_FROM_OS_CHAR
 			#define QSP_TO_OS_CHAR
 			#define QSP_WCTOB(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
@@ -112,10 +112,10 @@
 	#else
 		#define QSP_TIME time
 	#endif
-	#ifdef _WIN
-		#define QSP_PATHDELIM QSP_FMT("\\")
+	#if defined(_WIN) || defined(_PSP)
+		#define QSP_PATHDELIMS QSP_FMT("/\\")
 	#else
-		#define QSP_PATHDELIM QSP_FMT("/")
+		#define QSP_PATHDELIMS QSP_FMT("/")
 	#endif
 
 	#define QSP_VER QSP_FMT("5.5.5")

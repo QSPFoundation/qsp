@@ -47,7 +47,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 	for (i = 0; i < var->ValsCount; ++i)
 	{
 		if (!((str = var->TextValue[i]) && qspIsAnyString(str))) break;
-		pos2 = qspInStrRChar(str, QSP_MENUDELIM[0], 0);
+		pos2 = qspInStrRChars(str, QSP_MENUDELIM, 0);
 		if (!pos2)
 		{
 			qspSetError(QSP_ERR_COLONNOTFOUND);
@@ -59,7 +59,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 			return QSP_FALSE;
 		}
 		endPos = qspStrEnd(str);
-		pos = qspInStrRChar(str, QSP_MENUDELIM[0], pos2);
+		pos = qspInStrRChars(str, QSP_MENUDELIM, pos2);
 		if (!pos)
 		{
 			pos = pos2;
