@@ -883,9 +883,14 @@ static void qspFunctionInstr(QSPVariant *args, long count, QSPVariant *tos)
 
 static void qspFunctionReplace(QSPVariant *args, long count, QSPVariant *tos)
 {
-	long len, txtLen, oldTxtLen, searchLen, repLen, bufSize = 256;
+	long len, txtLen, oldTxtLen, searchLen, repLen, bufSize;
 	QSP_CHAR emptyStr[1], *newTxt, *pos, *repTxt, *txt = QSP_STR(args[0]);
 	searchLen = (long)QSP_STRLEN(QSP_STR(args[1]));
+	if (!searchLen)
+	{
+		QSP_STR(*tos) = qspGetNewText(txt, -1);
+		return;
+	}
 	if (count == 2)
 	{
 		*emptyStr = 0;
@@ -897,6 +902,7 @@ static void qspFunctionReplace(QSPVariant *args, long count, QSPVariant *tos)
 		repTxt = QSP_STR(args[2]);
 		repLen = (long)QSP_STRLEN(repTxt);
 	}
+	bufSize = 256;
 	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	txtLen = oldTxtLen = 0;
 	pos = QSP_STRSTR(txt, QSP_STR(args[1]));
