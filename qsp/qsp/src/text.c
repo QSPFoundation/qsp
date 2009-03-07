@@ -88,6 +88,11 @@ QSP_BOOL qspIsInListEOL(QSP_CHAR *list, QSP_CHAR ch)
 	return (*list == ch);
 }
 
+QSP_BOOL qspIsDigit(QSP_CHAR ch)
+{
+	return (ch >= QSP_FMT('0') && ch <= QSP_FMT('9'));
+}
+
 QSP_CHAR *qspSkipSpaces(QSP_CHAR *s)
 {
 	while (qspIsInList(QSP_SPACES, *s)) ++s;

@@ -23,7 +23,6 @@
 #include <limits.h>
 #include <string.h>
 #include <wchar.h>
-#include <ctype.h>
 #include <wctype.h>
 
 /* MEMWATCH */
@@ -60,7 +59,6 @@
 		#define QSP_STRCMP wcscmp
 		#define QSP_STRCOLL wcscmp
 		#define QSP_STRPBRK wcspbrk
-		#define QSP_ISDIGIT iswdigit
 		#define QSP_WCSTOMBSLEN(a) wcstombs(0, a, 0)
 		#define QSP_WCSTOMBS wcstombs
 		#define QSP_MBTOSB(a) ((a) % 256)
@@ -83,7 +81,6 @@
 		#define QSP_STRTOL strtol
 		#define QSP_STRCMP strcmp
 		#define QSP_STRPBRK strpbrk
-		#define QSP_ISDIGIT isdigit
 		#define QSP_WCSTOMBSLEN strlen
 		#define QSP_WCSTOMBS strncpy
 		#define QSP_MBTOSB(a) ((unsigned char)(a))

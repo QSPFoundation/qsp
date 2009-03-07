@@ -34,6 +34,7 @@
 	QSP_BOOL qspClearText(void **, long *);
 	QSP_BOOL qspIsInList(QSP_CHAR *, QSP_CHAR);
 	QSP_BOOL qspIsInListEOL(QSP_CHAR *, QSP_CHAR);
+	QSP_BOOL qspIsDigit(QSP_CHAR);
 	QSP_CHAR *qspSkipSpaces(QSP_CHAR *);
 	QSP_CHAR *qspStrEnd(QSP_CHAR *);
 	QSP_CHAR *qspDelSpc(QSP_CHAR *);

@@ -181,7 +181,7 @@ QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
 	QSP_CHAR *uName;
 	unsigned char bCode;
 	if (*name == QSP_STRCHAR[0]) ++name;
-	if (!(*name) || QSP_ISDIGIT(*name) || QSP_STRPBRK(name, QSP_DELIMS))
+	if (!(*name) || qspIsDigit(*name) || QSP_STRPBRK(name, QSP_DELIMS))
 	{
 		qspSetError(QSP_ERR_NOTCORRECTNAME);
 		return 0;

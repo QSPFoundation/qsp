@@ -161,7 +161,7 @@ static long qspGetNumber(QSP_CHAR **expr)
 {
 	long i = 0;
 	QSP_CHAR buf[11], *pos = *expr;
-	while (QSP_ISDIGIT(*pos))
+	while (qspIsDigit(*pos))
 	{
 		if (i < QSP_LEN(buf)) buf[i] = *pos;
 		++i;
@@ -565,7 +565,7 @@ static void qspCompileExpression(QSP_CHAR *s, long *itemsCount, QSPVariant *comp
 		}
 		else
 		{
-			if (QSP_ISDIGIT(*s))
+			if (qspIsDigit(*s))
 			{
 				v.IsStr = QSP_FALSE;
 				QSP_NUM(v) = qspGetNumber(&s);
