@@ -34,7 +34,8 @@ void QSPTranslationHelper::Load(wxConfigBase &config, const wxString &key)
 	m_locale = new wxLocale;
 	m_locale->Init(lang);
 	m_locale->AddCatalogLookupPathPrefix(m_path);
-	m_locale->AddCatalog(m_app.GetAppName());
+	if (!m_locale->AddCatalog(m_app.GetAppName()))
+		m_locale->AddCatalog(m_app.GetAppName() + wxT("_") + m_locale->GetName().Left(2));
 }
 
 void QSPTranslationHelper::Save(wxConfigBase &config, const wxString &key) const
@@ -57,19 +58,9 @@ bool QSPTranslationHelper::AskUserForLanguage()
 	wxDir dir(m_path);
 	if (dir.IsOpened())
 	{
-		wxString anyFileMask;
-		#ifdef __WXMSW__
-			anyFileMask = wxT("*.*");
-		#else
-			anyFileMask = wxT("*");
-		#endif
-		for (bool cont = dir.GetFirst(&filename, anyFileMask, wxDIR_DEFAULT); cont; cont = dir.GetNext(&filename))
+		for (bool cont = dir.GetFirst(&filename, wxT("*"), wxDIR_DEFAULT); cont; cont = dir.GetNext(&filename))
 		{
-			langinfo = wxLocale::FindLanguageInfo(filename);
-			if (langinfo &&
-				wxFileExists(dir.GetName() + wxFileName::GetPathSeparator() +
-				filename + wxFileName::GetPathSeparator() +
-				m_app.GetAppName() + wxT(".mo")))
+			if (langinfo = wxLocale::FindLanguageInfo(filename))
 			{
 				names.Add(langinfo->Description);
 				identifiers.Add(langinfo->Language);
@@ -83,7 +74,8 @@ bool QSPTranslationHelper::AskUserForLanguage()
 		m_locale = new wxLocale;
 		m_locale->Init(identifiers[index]);
 		m_locale->AddCatalogLookupPathPrefix(m_path);
-		m_locale->AddCatalog(m_app.GetAppName());
+		if (!m_locale->AddCatalog(m_app.GetAppName()))
+			m_locale->AddCatalog(m_app.GetAppName() + wxT("_") + m_locale->GetName().Left(2));
 		return true;
 	}
 	return false;
