@@ -137,10 +137,10 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	}
 	m_frame->GetObjects()->SetSelection(QSPGetSelObjectIndex());
 	// -------------------------------
-	m_frame->ShowPane(ID_BACKPIC,
-		GetVarValue(QSP_FMT("BACKIMAGE"), &numVal, &strVal) &&
-		strVal && *strVal && m_frame->GetImgBack()->OpenFile(m_gamePath + strVal)
-	);
+	if (GetVarValue(QSP_FMT("BACKIMAGE"), &numVal, &strVal) && strVal && *strVal)
+		m_frame->GetDesc()->LoadBackImage(m_gamePath + strVal);
+	else
+		m_frame->GetDesc()->LoadBackImage(wxEmptyString);
 	// -------------------------------
 	m_frame->ApplyParams();
 	if (isRedraw)

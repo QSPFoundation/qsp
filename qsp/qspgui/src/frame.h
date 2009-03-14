@@ -71,7 +71,6 @@
 		ID_OBJECTS,
 		ID_ACTIONS,
 		ID_VIEWPIC,
-		ID_BACKPIC,
 		ID_INPUT,
 		ID_TIMER
 	};
@@ -102,7 +101,6 @@
 		QSPInputBox *GetInput() const { return m_input; }
 		QSPListBox *GetActions() const { return m_actions; }
 		QSPListBox *GetObjects() const { return m_objects; }
-		QSPImgCanvas *GetImgBack() const { return m_imgBack; }
 		QSPImgCanvas *GetImgView() const { return m_imgView; }
 		wxMenu *GetGameMenu() const { return m_gameMenu; }
 		bool GetIsShowHotkeys() const { return m_isShowHotkeys; }
@@ -163,7 +161,6 @@
 		QSPInputBox *m_input;
 		QSPListBox *m_objects;
 		QSPListBox *m_actions;
-		QSPImgCanvas *m_imgBack;
 		QSPImgCanvas *m_imgView;
 		wxMenu *m_gameMenu;
 		long m_menuItemId;

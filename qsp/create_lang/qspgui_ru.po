@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Russian 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:24+1100\n"
-"PO-Revision-Date: 2009-02-28 18:59+0600\n"
+"PO-Revision-Date: 2009-03-14 21:41+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: Russian <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -115,9 +115,6 @@ msgstr "Указанный файл недоступен или не найде�
 
 msgid "Game not loaded!"
 msgstr "Игра не загружена!"
-
-msgid "Image"
-msgstr "Изображение"
 
 msgid "Incorrect arguments' count!"
 msgstr "Неверное число аргументов оператора / функции!"

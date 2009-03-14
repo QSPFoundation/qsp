@@ -33,6 +33,7 @@
 
 		// Methods
 		void RefreshUI(bool isScroll = false);
+		void LoadBackImage(const wxString& fileName);
 
 		// Accessors
 		void SetIsHtml(bool isHtml, bool isScroll = false);
@@ -55,6 +56,7 @@
 		bool m_isUseHtml;
 		wxString m_outFormat;
 		wxString m_path;
+		wxString m_imagePath;
 		wxFont m_font;
 		wxString m_text;
 	};

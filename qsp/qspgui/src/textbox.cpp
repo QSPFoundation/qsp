@@ -62,6 +62,27 @@ void QSPTextBox::RefreshUI(bool isScroll)
 	Thaw();
 }
 
+void QSPTextBox::LoadBackImage(const wxString& fileName)
+{
+	wxString path(wxFileName(fileName, wxPATH_DOS).GetFullPath());
+	if (m_imagePath != path)
+	{
+		m_imagePath = path;
+		if (wxFileExists(path))
+		{
+			wxImage image;
+			if (image.LoadFile(path))
+			{
+				SetBackgroundImage(wxBitmap(image));
+				Refresh();
+				return;
+			}
+		}
+		SetBackgroundImage(wxNullBitmap);
+		Refresh();
+	}
+}
+
 void QSPTextBox::SetText(const wxString& text, bool isScroll)
 {
 	if (m_text != text)

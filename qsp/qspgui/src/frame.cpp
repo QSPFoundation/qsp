@@ -121,20 +121,18 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	// --------------------------------------
 	m_manager = new wxAuiManager(this);
 	m_manager->SetDockSizeConstraint(0.5, 0.5);
-	m_imgBack = new QSPImgCanvas(this, ID_BACKPIC);
-	m_manager->AddPane(m_imgBack, wxAuiPaneInfo().Name(wxT("imgback")).MinSize(50, 50).BestSize(150, 150).CloseButton(false).MaximizeButton().Top().Hide());
 	m_imgView = new QSPImgCanvas(this, ID_VIEWPIC);
-	m_manager->AddPane(m_imgView, wxAuiPaneInfo().Name(wxT("imgview")).MinSize(50, 50).BestSize(150, 150).MaximizeButton().Top().Hide());
+	m_manager->AddPane(m_imgView, wxAuiPaneInfo().Name(wxT("imgview")).MinSize(50, 50).BestSize(150, 150).Top().MaximizeButton().Hide());
 	m_desc = new QSPTextBox(this, ID_MAINDESC);
 	m_manager->AddPane(m_desc, wxAuiPaneInfo().Name(wxT("desc")).CenterPane());
 	m_objects = new QSPListBox(this, ID_OBJECTS);
-	m_manager->AddPane(m_objects, wxAuiPaneInfo().Name(wxT("objs")).MinSize(50, 50).BestSize(100, 100).MaximizeButton().Right());
+	m_manager->AddPane(m_objects, wxAuiPaneInfo().Name(wxT("objs")).MinSize(50, 50).BestSize(100, 100).Right().MaximizeButton());
 	m_actions = new QSPListBox(this, ID_ACTIONS, LB_EXTENDED);
-	m_manager->AddPane(m_actions, wxAuiPaneInfo().Name(wxT("acts")).MinSize(50, 50).BestSize(100, 100).MaximizeButton().Bottom());
+	m_manager->AddPane(m_actions, wxAuiPaneInfo().Name(wxT("acts")).MinSize(50, 50).BestSize(100, 100).Bottom().MaximizeButton());
 	m_vars = new QSPTextBox(this, ID_VARSDESC);
-	m_manager->AddPane(m_vars, wxAuiPaneInfo().Name(wxT("vars")).MinSize(50, 50).BestSize(100, 100).MaximizeButton().Bottom());
+	m_manager->AddPane(m_vars, wxAuiPaneInfo().Name(wxT("vars")).MinSize(50, 50).BestSize(100, 100).Bottom().MaximizeButton());
 	m_input = new QSPInputBox(this, ID_INPUT);
-	m_manager->AddPane(m_input, wxAuiPaneInfo().Name(wxT("input")).MinSize(50, 20).BestSize(100, 20).Layer(1).Bottom());
+	m_manager->AddPane(m_input, wxAuiPaneInfo().Name(wxT("input")).MinSize(50, 20).BestSize(100, 20).Bottom().Layer(1));
 	// --------------------------------------
 	SetMinSize(wxSize(450, 300));
 	m_isQuit = false;
@@ -194,14 +192,13 @@ void QSPFrame::LoadSettings()
 	cfg.Read(wxT("Pos/Height"), &h, 650);
 	cfg.Read(wxT("Pos/Maximize"), &isMaximize, false);
 	wxString panels(wxT("layout2|") \
-		wxT("name=imgback;state=4196350;dir=1;layer=0;row=0;pos=0;prop=102431;bestw=413;besth=178;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=imgview;state=6293503;dir=1;layer=0;row=0;pos=1;prop=102431;bestw=413;besth=178;minw=50;minh=50;maxw=-1;maxh=-1;floatx=182;floaty=161;floatw=494;floath=368|") \
-		wxT("name=desc;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=610;besth=330;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=objs;state=6293500;dir=2;layer=0;row=0;pos=0;prop=100000;bestw=216;besth=313;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=acts;state=6293500;dir=3;layer=0;row=0;pos=0;prop=124833;bestw=461;besth=196;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("name=vars;state=6293500;dir=3;layer=0;row=0;pos=1;prop=95618;bestw=365;besth=196;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("name=imgview;state=6293503;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=832;besth=150;minw=50;minh=50;maxw=-1;maxh=-1;floatx=175;floaty=148;floatw=518;floath=372|") \
+		wxT("name=desc;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=613;besth=341;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("name=objs;state=6293500;dir=2;layer=0;row=0;pos=0;prop=100000;bestw=213;besth=324;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("name=acts;state=6293500;dir=3;layer=0;row=0;pos=0;prop=117349;bestw=475;besth=185;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
+		wxT("name=vars;state=6293500;dir=3;layer=0;row=0;pos=1;prop=82651;bestw=351;besth=185;minw=50;minh=50;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
 		wxT("name=input;state=2099196;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=832;besth=20;minw=50;minh=20;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
-		wxT("dock_size(5,0,0)=22|dock_size(3,0,0)=215|dock_size(2,0,0)=218|dock_size(3,1,0)=39|"));
+		wxT("dock_size(5,0,0)=22|dock_size(2,0,0)=215|dock_size(3,0,0)=204|dock_size(3,1,0)=39|"));
 	cfg.Read(wxT("General/Panels"), &panels);
 	m_transhelper->Load(cfg, wxT("General/Language"));
 	// -------------------------------------------------
@@ -215,7 +212,6 @@ void QSPFrame::LoadSettings()
 	m_manager->RestoreMaximizedPane();
 	SetSize(x, y, w, h);
 	ShowPane(ID_VIEWPIC, false);
-	ShowPane(ID_BACKPIC, false);
 	ShowPane(ID_ACTIONS, true);
 	ShowPane(ID_OBJECTS, true);
 	ShowPane(ID_VARSDESC, true);
@@ -408,7 +404,6 @@ void QSPFrame::ReCreateGUI()
 	menuBar->SetLabel(ID_SELECTLANG, _("Select &language...\tAlt-L"));
 	menuBar->SetLabel(ID_ABOUT, _("&About...\tCtrl-H"));
 	// --------------------------------------
-	m_manager->GetPane(wxT("imgback")).Caption(_("Image"));
 	m_manager->GetPane(wxT("imgview")).Caption(_("Preview"));
 	m_manager->GetPane(wxT("objs")).Caption(_("Objects"));
 	m_manager->GetPane(wxT("acts")).Caption(_("Actions"));
@@ -426,7 +421,6 @@ void QSPFrame::RefreshUI()
 	m_vars->RefreshUI();
 	m_input->Refresh();
 	m_imgView->RefreshUI();
-	m_imgBack->RefreshUI();
 }
 
 void QSPFrame::ApplyFont(const wxFont& font)
@@ -475,7 +469,6 @@ bool QSPFrame::ApplyBackColor(const wxColour& color)
 	m_actions->SetBackgroundColour(color);
 	m_vars->SetBackgroundColour(color);
 	m_input->SetBackgroundColour(color);
-	m_imgBack->SetBackgroundColour(color);
 	m_imgView->SetBackgroundColour(color);
 	return true;
 }
