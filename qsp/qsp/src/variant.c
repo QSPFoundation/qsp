@@ -35,85 +35,71 @@ QSPVariant qspGetEmptyVariant(QSP_BOOL isStringType)
 	return ret;
 }
 
-QSPVariant qspConvertVariantTo(QSPVariant val, QSP_BOOL isToString, QSP_BOOL isFreeStr, QSP_BOOL *isError)
+QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
 {
-	QSPVariant res;
+	long num;
 	QSP_CHAR *temp, buf[12];
-	res.IsStr = isToString;
-	if (val.IsStr)
+	if (val->IsStr)
 	{
-		if (isToString)
-			QSP_STR(res) = (isFreeStr ? QSP_STR(val) : qspGetNewText(QSP_STR(val), -1));
-		else
+		if (!isToString)
 		{
-			QSP_NUM(res) = qspStrToNum(QSP_STR(val), &temp);
-			if (*temp) *isError = QSP_TRUE;
-			if (isFreeStr) free(QSP_STR(val));
+			num = qspStrToNum(QSP_PSTR(val), &temp);
+			if (*temp) return QSP_TRUE;
+			free(QSP_PSTR(val));
+			QSP_PNUM(val) = num;
+			val->IsStr = QSP_FALSE;
 		}
 	}
-	else
+	else if (isToString)
 	{
-		if (isToString)
-			QSP_STR(res) = qspGetNewText(qspNumToStr(buf, QSP_NUM(val)), -1);
-		else
-			QSP_NUM(res) = QSP_NUM(val);
+		QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)), -1);
+		val->IsStr = QSP_TRUE;
 	}
-	return res;
+	return QSP_FALSE;
 }
 
-void qspCopyVariant(QSPVariant *dest, QSPVariant src)
+void qspCopyVariant(QSPVariant *dest, QSPVariant *src)
 {
-	if (dest->IsStr = src.IsStr)
-		QSP_STR(*dest) = qspGetNewText(QSP_STR(src), -1);
+	if (dest->IsStr = src->IsStr)
+		QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src), -1);
 	else
-		QSP_NUM(*dest) = QSP_NUM(src);
+		QSP_PNUM(dest) = QSP_PNUM(src);
 }
 
-QSP_BOOL qspIsCanConvertToNum(QSPVariant val)
+QSP_BOOL qspIsCanConvertToNum(QSPVariant *val)
 {
 	QSP_CHAR *temp;
-	if (val.IsStr)
+	if (val->IsStr)
 	{
-		qspStrToNum(QSP_STR(val), &temp);
+		qspStrToNum(QSP_PSTR(val), &temp);
 		if (*temp) return QSP_FALSE;
 	}
 	return QSP_TRUE;
 }
 
-int qspAutoConvertCompare(QSPVariant v1, QSPVariant v2)
+int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
 {
 	int res;
-	QSP_BOOL isFree1 = QSP_FALSE, isFree2 = QSP_FALSE;
-	if (v1.IsStr != v2.IsStr)
+	if (v1->IsStr != v2->IsStr)
 	{
-		if (v2.IsStr)
+		if (v2->IsStr)
 		{
 			if (qspIsCanConvertToNum(v2))
-				v2 = qspConvertVariantTo(v2, QSP_FALSE, QSP_FALSE, 0);
+				qspConvertVariantTo(v2, QSP_FALSE);
 			else
-			{
-				v1 = qspConvertVariantTo(v1, QSP_TRUE, QSP_FALSE, 0);
-				isFree1 = QSP_TRUE;
-			}
+				qspConvertVariantTo(v1, QSP_TRUE);
 		}
 		else
 		{
 			if (qspIsCanConvertToNum(v1))
-				v1 = qspConvertVariantTo(v1, QSP_FALSE, QSP_FALSE, 0);
+				qspConvertVariantTo(v1, QSP_FALSE);
 			else
-			{
-				v2 = qspConvertVariantTo(v2, QSP_TRUE, QSP_FALSE, 0);
-				isFree2 = QSP_TRUE;
-			}
+				qspConvertVariantTo(v2, QSP_TRUE);
 		}
 	}
-	if (v1.IsStr)
-	{
-		res = QSP_STRCOLL(QSP_STR(v1), QSP_STR(v2));
-		if (isFree1) free(QSP_STR(v1));
-		if (isFree2) free(QSP_STR(v2));
-	}
+	if (v1->IsStr)
+		res = QSP_STRCOLL(QSP_PSTR(v1), QSP_PSTR(v2));
 	else
-		res = (QSP_NUM(v1) > QSP_NUM(v2) ? 1 : (QSP_NUM(v1) < QSP_NUM(v2) ? -1 : 0));
+		res = (QSP_PNUM(v1) > QSP_PNUM(v2) ? 1 : (QSP_PNUM(v1) < QSP_PNUM(v2) ? -1 : 0));
 	return res;
 }

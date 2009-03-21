@@ -58,12 +58,12 @@
 	void qspInitSpecialVars();
 	QSPVar *qspVarReference(QSP_CHAR *, QSP_BOOL);
 	QSPVar *qspVarReferenceWithType(QSP_CHAR *, QSP_BOOL, QSP_BOOL *);
-	void qspSetVarValueByName(QSP_CHAR *, QSPVariant);
+	void qspSetVarValueByName(QSP_CHAR *, QSPVariant *);
 	QSP_CHAR *qspGetVarStrValue(QSP_CHAR *);
 	long qspGetVarNumValue(QSP_CHAR *);
 	QSPVariant qspGetVar(QSP_CHAR *);
 	long qspArraySize(QSP_CHAR *);
-	long qspArrayPos(QSP_CHAR *, long, QSPVariant, QSP_BOOL);
+	long qspArrayPos(QSPVariant *, long, QSP_BOOL);
 	long qspGetVarsCount();
 	void qspSetArgs(QSPVar *, QSPVariant *, long);
 	void qspMoveVar(QSPVar *, QSPVar *);

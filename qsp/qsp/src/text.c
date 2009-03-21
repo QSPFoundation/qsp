@@ -362,7 +362,7 @@ QSP_CHAR *qspFormatText(QSP_CHAR *txt)
 			free(newTxt);
 			return 0;
 		}
-		val = qspConvertVariantTo(val, QSP_TRUE, QSP_TRUE, 0);
+		qspConvertVariantTo(&val, QSP_TRUE);
 		if ((txtLen += (long)QSP_STRLEN(QSP_STR(val))) >= bufSize)
 		{
 			bufSize = txtLen + 128;

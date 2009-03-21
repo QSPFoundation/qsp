@@ -261,7 +261,6 @@ long qspGetStatArgs(QSP_CHAR *s, long statCode, QSPVariant *args)
 {
 	QSP_CHAR *pos;
 	char type;
-	QSP_BOOL convErr = QSP_FALSE;
 	long count = 0, oldRefreshCount = qspRefreshCount;
 	while (1)
 	{
@@ -287,13 +286,13 @@ long qspGetStatArgs(QSP_CHAR *s, long statCode, QSPVariant *args)
 			args[count] = qspExprValue(s);
 		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		type = qspStats[statCode].ArgsTypes[count];
-		if (type) args[count] = qspConvertVariantTo(args[count], type == 1, QSP_TRUE, &convErr);
-		++count;
-		if (convErr)
+		if (type && qspConvertVariantTo(args + count, type == 1))
 		{
 			qspSetError(QSP_ERR_TYPEMISMATCH);
+			++count;
 			break;
 		}
+		++count;
 		if (!pos) break;
 		s = pos + QSP_LEN(QSP_COMMA);
 	}

@@ -22,6 +22,8 @@
 
 	#define QSP_STR(a) (a).Val.Str
 	#define QSP_NUM(a) (a).Val.Num
+	#define QSP_PSTR(a) (a)->Val.Str
+	#define QSP_PNUM(a) (a)->Val.Num
 
 	typedef struct
 	{
@@ -36,9 +38,9 @@
 	/* External functions */
 	void qspFreeVariants(QSPVariant *, long);
 	QSPVariant qspGetEmptyVariant(QSP_BOOL);
-	QSPVariant qspConvertVariantTo(QSPVariant, QSP_BOOL, QSP_BOOL, QSP_BOOL *);
-	void qspCopyVariant(QSPVariant *, QSPVariant);
-	QSP_BOOL qspIsCanConvertToNum(QSPVariant);
-	int qspAutoConvertCompare(QSPVariant, QSPVariant);
+	QSP_BOOL qspConvertVariantTo(QSPVariant *, QSP_BOOL);
+	void qspCopyVariant(QSPVariant *, QSPVariant *);
+	QSP_BOOL qspIsCanConvertToNum(QSPVariant *);
+	int qspAutoConvertCompare(QSPVariant *, QSPVariant *);
 
 #endif
