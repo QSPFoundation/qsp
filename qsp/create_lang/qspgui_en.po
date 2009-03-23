@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: English 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:13+1100\n"
-"PO-Revision-Date: 2009-03-14 21:41+0600\n"
+"PO-Revision-Date: 2009-03-24 01:40+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: English <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -176,6 +176,15 @@ msgstr "Regular expression's error!"
 
 msgid "Saved game files (*.sav)|*.sav"
 msgstr "Saved game files (*.sav)|*.sav"
+
+msgid "&Font"
+msgstr "&Font"
+
+msgid "&Colors"
+msgstr "&Colors"
+
+msgid "&Always use selected font's size"
+msgstr "&Always use selected font's size"
 
 msgid "Select &background's color...\tAlt-B"
 msgstr "Select &background's color...\tAlt-B"

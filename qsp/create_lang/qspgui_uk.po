@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Ukrainian 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:24+1100\n"
-"PO-Revision-Date: 2009-03-14 21:41+0600\n"
+"PO-Revision-Date: 2009-03-24 01:40+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: Ukrainian <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -176,6 +176,15 @@ msgstr "Помилка компиляції регулярного виразу!
 
 msgid "Saved game files (*.sav)|*.sav"
 msgstr "Файли ігрових станів QSP (*.sav)|*.sav"
+
+msgid "&Font"
+msgstr "&Шрифт"
+
+msgid "&Colors"
+msgstr "&Кольори"
+
+msgid "&Always use selected font's size"
+msgstr "&Завжди використовувати обраний розмір шрифта"
 
 msgid "Select &background's color...\tAlt-B"
 msgstr "Вибрати колір &фону...\tAlt-B"
