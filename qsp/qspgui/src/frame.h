@@ -52,7 +52,10 @@
 		ID_NEWGAME,
 		ID_OPENGAMESTAT,
 		ID_SAVEGAMESTAT,
+		ID_FONT,
 		ID_SELECTFONT,
+		ID_USEFONTSIZE,
+		ID_COLORS,
 		ID_SELECTFONTCOLOR,
 		ID_SELECTBACKCOLOR,
 		ID_SELECTLINKCOLOR,
@@ -130,6 +133,7 @@
 		void OnOpenGameStat(wxCommandEvent& event);
 		void OnSaveGameStat(wxCommandEvent& event);
 		void OnSelectFont(wxCommandEvent& event);
+		void OnUseFontSize(wxCommandEvent& event);
 		void OnSelectFontColor(wxCommandEvent& event);
 		void OnSelectBackColor(wxCommandEvent& event);
 		void OnSelectLinkColor(wxCommandEvent& event);
@@ -167,12 +171,14 @@
 		wxMenu *m_menu;
 		wxMenu *m_fileMenu;
 		wxMenu *m_wndsMenu;
+		wxMenu *m_fontMenu;
 		wxAuiManager *m_manager;
 		wxColour m_backColor;
 		wxColour m_linkColor;
 		wxColour m_fontColor;
 		int m_fontSize;
 		wxString m_fontName;
+		bool m_isUseFontSize;
 		bool m_isProcessEvents;
 		bool m_isQuit;
 		bool m_isShowHotkeys;

@@ -30,6 +30,7 @@ BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
 	EVT_MENU(ID_OPENGAMESTAT, QSPFrame::OnOpenGameStat)
 	EVT_MENU(ID_SAVEGAMESTAT, QSPFrame::OnSaveGameStat)
 	EVT_MENU(ID_SELECTFONT, QSPFrame::OnSelectFont)
+	EVT_MENU(ID_USEFONTSIZE, QSPFrame::OnUseFontSize)
 	EVT_MENU(ID_SELECTFONTCOLOR, QSPFrame::OnSelectFontColor)
 	EVT_MENU(ID_SELECTBACKCOLOR, QSPFrame::OnSelectBackColor)
 	EVT_MENU(ID_SELECTLINKCOLOR, QSPFrame::OnSelectLinkColor)
@@ -95,12 +96,19 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	m_wndsMenu->Append(ID_TOGGLECAPTIONS, wxT("-"));
 	m_wndsMenu->Append(ID_TOGGLEHOTKEYS, wxT("-"));
 	// ------------
+	m_fontMenu = new wxMenu;
+	m_fontMenu->Append(ID_SELECTFONT, wxT("-"));
+	m_fontMenu->AppendCheckItem(ID_USEFONTSIZE, wxT("-"));
+	// ------------
+	wxMenu *colorsMenu = new wxMenu;
+	colorsMenu->Append(ID_SELECTFONTCOLOR, wxT("-"));
+	colorsMenu->Append(ID_SELECTBACKCOLOR, wxT("-"));
+	colorsMenu->Append(ID_SELECTLINKCOLOR, wxT("-"));
+	// ------------
 	wxMenu *settingsMenu = new wxMenu;
 	settingsMenu->Append(ID_SHOWHIDE, wxT("-"), m_wndsMenu);
-	settingsMenu->Append(ID_SELECTFONT, wxT("-"));
-	settingsMenu->Append(ID_SELECTFONTCOLOR, wxT("-"));
-	settingsMenu->Append(ID_SELECTBACKCOLOR, wxT("-"));
-	settingsMenu->Append(ID_SELECTLINKCOLOR, wxT("-"));
+	settingsMenu->Append(ID_FONT, wxT("-"), m_fontMenu);
+	settingsMenu->Append(ID_COLORS, wxT("-"), colorsMenu);
 	settingsMenu->AppendSeparator();
 	wxMenuItem *settingsWinModeItem = new wxMenuItem(settingsMenu, ID_TOGGLEWINMODE, wxT("-"));
 	settingsWinModeItem->SetBitmap(wxBitmap(windowmode_xpm));
@@ -153,11 +161,12 @@ void QSPFrame::SaveSettings()
 	if (IsIconized()) Iconize(false);
 	if (isMaximized = IsMaximized()) Maximize(false);
 	wxFileConfig cfg(wxEmptyString, wxEmptyString, m_configPath);
-	cfg.Write(wxT("General/BackColor"), m_backColor.Blue() << 16 | m_backColor.Green() << 8 | m_backColor.Red());
-	cfg.Write(wxT("General/FontColor"), m_fontColor.Blue() << 16 | m_fontColor.Green() << 8 | m_fontColor.Red());
-	cfg.Write(wxT("General/LinkColor"), m_linkColor.Blue() << 16 | m_linkColor.Green() << 8 | m_linkColor.Red());
-	cfg.Write(wxT("General/FontSize"), m_fontSize);
-	cfg.Write(wxT("General/FontName"), m_fontName);
+	cfg.Write(wxT("Colors/BackColor"), m_backColor.Blue() << 16 | m_backColor.Green() << 8 | m_backColor.Red());
+	cfg.Write(wxT("Colors/FontColor"), m_fontColor.Blue() << 16 | m_fontColor.Green() << 8 | m_fontColor.Red());
+	cfg.Write(wxT("Colors/LinkColor"), m_linkColor.Blue() << 16 | m_linkColor.Green() << 8 | m_linkColor.Red());
+	cfg.Write(wxT("Font/FontSize"), m_fontSize);
+	cfg.Write(wxT("Font/FontName"), m_fontName);
+	cfg.Write(wxT("Font/UseFontSize"), m_isUseFontSize);
 	cfg.Write(wxT("General/ShowHotkeys"), m_isShowHotkeys);
 	cfg.Write(wxT("General/Panels"), m_manager->SavePerspective());
 	m_transhelper->Save(cfg, wxT("General/Language"));
@@ -174,17 +183,18 @@ void QSPFrame::LoadSettings()
 	bool isMaximize;
 	int x, y, w, h, temp;
 	wxFileConfig cfg(wxEmptyString, wxEmptyString, m_configPath);
-	cfg.Read(wxT("General/BackColor"), &temp, 0xE0E0E0);
+	cfg.Read(wxT("Colors/BackColor"), &temp, 0xE0E0E0);
 	m_backColor = wxColour(temp);
-	cfg.Read(wxT("General/FontColor"), &temp, 0x000000);
+	cfg.Read(wxT("Colors/FontColor"), &temp, 0x000000);
 	m_fontColor = wxColour(temp);
-	cfg.Read(wxT("General/LinkColor"), &temp, 0xFF0000);
+	cfg.Read(wxT("Colors/LinkColor"), &temp, 0xFF0000);
 	m_linkColor = wxColour(temp);
 	wxFont font(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
 	temp = font.GetPointSize();
 	if (temp < 12) temp = 12;
-	cfg.Read(wxT("General/FontSize"), &m_fontSize, temp);
-	cfg.Read(wxT("General/FontName"), &m_fontName, font.GetFaceName());
+	cfg.Read(wxT("Font/FontSize"), &m_fontSize, temp);
+	cfg.Read(wxT("Font/FontName"), &m_fontName, font.GetFaceName());
+	cfg.Read(wxT("Font/UseFontSize"), &m_isUseFontSize, false);
 	cfg.Read(wxT("General/ShowHotkeys"), &m_isShowHotkeys, false);
 	cfg.Read(wxT("Pos/Left"), &x, 10);
 	cfg.Read(wxT("Pos/Top"), &y, 10);
@@ -208,6 +218,7 @@ void QSPFrame::LoadSettings()
 	ApplyFontSize(m_fontSize);
 	ApplyFontName(m_fontName);
 	RefreshUI();
+	m_fontMenu->Check(ID_USEFONTSIZE, m_isUseFontSize);
 	m_manager->LoadPerspective(panels);
 	m_manager->RestoreMaximizedPane();
 	SetSize(x, y, w, h);
@@ -292,7 +303,10 @@ void QSPFrame::ApplyParams()
 		if (ApplyLinkColor(setLinkColor)) isRefresh = true;
 	}
 	// --------------
-	setFontSize = ((QSPCallBacks::GetVarValue(QSP_FMT("FSIZE"), &numVal, &strVal) && numVal) ? numVal : m_fontSize);
+	if (m_isUseFontSize)
+		setFontSize = m_fontSize;
+	else
+		setFontSize = ((QSPCallBacks::GetVarValue(QSP_FMT("FSIZE"), &numVal, &strVal) && numVal) ? numVal : m_fontSize);
 	if (setFontSize != m_desc->GetTextFont().GetPointSize())
 	{
 		if (ApplyFontSize(setFontSize)) isRefresh = true;
@@ -396,7 +410,10 @@ void QSPFrame::ReCreateGUI()
 	menuBar->SetLabel(ID_TOGGLECAPTIONS, _("&Captions\tCtrl-5"));
 	menuBar->SetLabel(ID_TOGGLEHOTKEYS, _("&Hotkeys for actions\tCtrl-6"));
 	menuBar->SetLabel(ID_SHOWHIDE, _("&Show / Hide"));
+	menuBar->SetLabel(ID_FONT, _("&Font"));
 	menuBar->SetLabel(ID_SELECTFONT, _("Select &font...\tAlt-F"));
+	menuBar->SetLabel(ID_USEFONTSIZE, _("&Always use selected font's size"));
+	menuBar->SetLabel(ID_COLORS, _("&Colors"));
 	menuBar->SetLabel(ID_SELECTFONTCOLOR, _("Select font's &color...\tAlt-C"));
 	menuBar->SetLabel(ID_SELECTBACKCOLOR, _("Select &background's color...\tAlt-B"));
 	menuBar->SetLabel(ID_SELECTLINKCOLOR, _("Select l&inks' color...\tAlt-I"));
@@ -603,6 +620,18 @@ void QSPFrame::OnSelectFont(wxCommandEvent& event)
 			ApplyFontName(m_fontName);
 			RefreshUI();
 		}
+	}
+}
+
+void QSPFrame::OnUseFontSize(wxCommandEvent& event)
+{
+	m_isUseFontSize = !m_isUseFontSize;
+	if (m_isProcessEvents)
+		ApplyParams();
+	else
+	{
+		ApplyFontSize(m_fontSize);
+		RefreshUI();
 	}
 }
 
