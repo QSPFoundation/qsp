@@ -59,6 +59,7 @@ IMPLEMENT_CLASS(QSPFrame, wxFrame)
 
 QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper) :
 	wxFrame(0, wxID_ANY, wxEmptyString),
+	m_configDefPath(configPath),
 	m_configPath(configPath),
 	m_transhelper(transhelper)
 {
@@ -525,16 +526,30 @@ void QSPFrame::TogglePane(wxWindowID id)
 	ShowPane(id, isShow);
 }
 
-void QSPFrame::OnInit(wxInitEvent& event)
+void QSPFrame::OpenGameFile(const wxString& path)
 {
-	wxCommandEvent dummy;
-	if (QSPLoadGameWorld((QSP_CHAR *)event.GetInitString().wx_str()))
+	if (QSPLoadGameWorld((QSP_CHAR *)path.wx_str()))
 	{
+		wxCommandEvent dummy;
+		wxFileName file(path);
+		wxString configString(file.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + wxT("qspgui.cfg"));
+		wxString newPath(wxFileExists(configString) ? configString : m_configDefPath);
+		if (newPath != m_configPath)
+		{
+			SaveSettings();
+			m_configPath = newPath;
+			LoadSettings();
+		}
 		OnNewGame(dummy);
 		EnableControls(true);
 	}
 	else
 		ShowError();
+}
+
+void QSPFrame::OnInit(wxInitEvent& event)
+{
+	OpenGameFile(event.GetInitString());
 }
 
 void QSPFrame::OnClose(wxCloseEvent& event)
@@ -563,18 +578,9 @@ void QSPFrame::OnQuit(wxCommandEvent& event)
 
 void QSPFrame::OnOpenGame(wxCommandEvent& event)
 {
-	wxCommandEvent dummy;
 	wxFileDialog dialog(this, _("Select game file"), wxEmptyString, wxEmptyString, _("QSP games (*.qsp;*.gam)|*.qsp;*.gam"), wxFD_OPEN);
 	if (dialog.ShowModal() == wxID_OK)
-	{
-		if (QSPLoadGameWorld((QSP_CHAR *)dialog.GetPath().wx_str()))
-		{
-			OnNewGame(dummy);
-			EnableControls(true);
-		}
-		else
-			ShowError();
-	}
+		OpenGameFile(dialog.GetPath());
 }
 
 void QSPFrame::OnNewGame(wxCommandEvent& event)

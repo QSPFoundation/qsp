@@ -121,6 +121,7 @@
 		bool ApplyLinkColor(const wxColour& color);
 		void CallPaneFunc(wxWindowID id, QSP_BOOL isShow) const;
 		void TogglePane(wxWindowID id);
+		void OpenGameFile(const wxString& path);
 
 		// Events
 		void OnInit(wxInitEvent& event);
@@ -158,6 +159,7 @@
 
 		// Fields
 		wxString m_configPath;
+		wxString m_configDefPath;
 		QSPTranslationHelper *m_transhelper;
 		wxTimer *m_timer;
 		QSPTextBox *m_desc;
