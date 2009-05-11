@@ -190,11 +190,10 @@ void QSPFrame::LoadSettings()
 	m_fontColor = wxColour(temp);
 	cfg.Read(wxT("Colors/LinkColor"), &temp, 0xFF0000);
 	m_linkColor = wxColour(temp);
-	wxFont font(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
-	temp = font.GetPointSize();
+	temp = wxNORMAL_FONT->GetPointSize();
 	if (temp < 12) temp = 12;
 	cfg.Read(wxT("Font/FontSize"), &m_fontSize, temp);
-	cfg.Read(wxT("Font/FontName"), &m_fontName, font.GetFaceName());
+	cfg.Read(wxT("Font/FontName"), &m_fontName, wxNORMAL_FONT->GetFaceName());
 	cfg.Read(wxT("Font/UseFontSize"), &m_isUseFontSize, false);
 	cfg.Read(wxT("General/ShowHotkeys"), &m_isShowHotkeys, false);
 	cfg.Read(wxT("Pos/Left"), &x, 10);

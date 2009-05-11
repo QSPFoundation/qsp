@@ -39,7 +39,7 @@ QSPListBox::QSPListBox(wxWindow *parent, wxWindowID id, ListBoxType type) : wxHt
 	m_type = type;
 	m_isUseHtml = false;
 	m_isShowNums = false;
-	m_font = wxFont(-1, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	m_font = *wxNORMAL_FONT;
 	wxString commonPart(wxString::Format(
 		wxT("<META HTTP-EQUIV = \"Content-Type\" CONTENT = \"text/html; charset=%s\">")
 		wxT("<FONT COLOR = #%%%%s><TABLE CELLSPACING = 4 CELLPADDING = 0><TR>%%s</TR></TABLE></FONT>"),
