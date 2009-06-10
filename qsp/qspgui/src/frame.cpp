@@ -63,7 +63,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	m_configPath(configPath),
 	m_transhelper(transhelper)
 {
-	SetIcon(wxIcon(logo_xpm));
+	SetIcon(wxICON(logo));
 	m_timer = new wxTimer(this, ID_TIMER);
 	m_menu = new wxMenu;
 	// Menu
