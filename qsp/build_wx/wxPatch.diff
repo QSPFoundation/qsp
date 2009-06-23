@@ -1,7 +1,7 @@
 diff -u -r d:/wx/wxWidgets/Makefile.in d:/wx/wx_qsp/Makefile.in
---- d:/wx/wxWidgets/Makefile.in	2009-05-13 00:13:53 +0700
-+++ d:/wx/wx_qsp/Makefile.in	2009-06-05 00:32:49 +0700
-@@ -15607,8 +15607,8 @@
+--- d:/wx/wxWidgets/Makefile.in	2009-06-23 21:47:49 +0700
++++ d:/wx/wx_qsp/Makefile.in	2009-06-23 23:58:55 +0700
+@@ -15618,8 +15618,8 @@
  monodll_gtk_aboutdlg.o: $(srcdir)/src/gtk/aboutdlg.cpp $(MONODLL_ODEP)
  	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/gtk/aboutdlg.cpp
  
@@ -12,7 +12,7 @@ diff -u -r d:/wx/wxWidgets/Makefile.in d:/wx/wx_qsp/Makefile.in
  
  monodll_gtk_bmpcbox.o: $(srcdir)/src/gtk/bmpcbox.cpp $(MONODLL_ODEP)
  	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/gtk/bmpcbox.cpp
-@@ -20323,8 +20323,8 @@
+@@ -20340,8 +20340,8 @@
  monolib_gtk_aboutdlg.o: $(srcdir)/src/gtk/aboutdlg.cpp $(MONOLIB_ODEP)
  	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/gtk/aboutdlg.cpp
  
@@ -23,7 +23,7 @@ diff -u -r d:/wx/wxWidgets/Makefile.in d:/wx/wx_qsp/Makefile.in
  
  monolib_gtk_bmpcbox.o: $(srcdir)/src/gtk/bmpcbox.cpp $(MONOLIB_ODEP)
  	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/gtk/bmpcbox.cpp
-@@ -31561,8 +31561,8 @@
+@@ -31584,8 +31584,8 @@
  advdll_gtk_aboutdlg.o: $(srcdir)/src/gtk/aboutdlg.cpp $(ADVDLL_ODEP)
  	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/gtk/aboutdlg.cpp
  
@@ -34,7 +34,7 @@ diff -u -r d:/wx/wxWidgets/Makefile.in d:/wx/wx_qsp/Makefile.in
  
  advdll_gtk_bmpcbox.o: $(srcdir)/src/gtk/bmpcbox.cpp $(ADVDLL_ODEP)
  	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/gtk/bmpcbox.cpp
-@@ -31876,8 +31876,8 @@
+@@ -31899,8 +31899,8 @@
  advlib_gtk_aboutdlg.o: $(srcdir)/src/gtk/aboutdlg.cpp $(ADVLIB_ODEP)
  	$(CXXC) -c -o $@ $(ADVLIB_CXXFLAGS) $(srcdir)/src/gtk/aboutdlg.cpp
  
@@ -47,7 +47,7 @@ diff -u -r d:/wx/wxWidgets/Makefile.in d:/wx/wx_qsp/Makefile.in
  	$(CXXC) -c -o $@ $(ADVLIB_CXXFLAGS) $(srcdir)/src/gtk/bmpcbox.cpp
 diff -u -r d:/wx/wxWidgets/include/wx/animate.h d:/wx/wx_qsp/include/wx/animate.h
 --- d:/wx/wxWidgets/include/wx/animate.h	2009-05-09 19:27:30 +0700
-+++ d:/wx/wx_qsp/include/wx/animate.h	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/include/wx/animate.h	2009-06-23 23:58:55 +0700
 @@ -115,11 +115,15 @@
  // include the platform-specific version of the wxAnimationCtrl class
  // ----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ diff -u -r d:/wx/wxWidgets/include/wx/animate.h d:/wx/wx_qsp/include/wx/animate.
  
 diff -u -r d:/wx/wxWidgets/include/wx/animdecod.h d:/wx/wx_qsp/include/wx/animdecod.h
 --- d:/wx/wxWidgets/include/wx/animdecod.h	2009-06-03 04:49:17 +0700
-+++ d:/wx/wx_qsp/include/wx/animdecod.h	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/include/wx/animdecod.h	2009-06-23 23:58:55 +0700
 @@ -146,6 +146,9 @@
      // the transparent colour for this frame if any or wxNullColour.
      virtual wxColour GetTransparentColour(unsigned int frame) const = 0;
@@ -79,7 +79,7 @@ diff -u -r d:/wx/wxWidgets/include/wx/animdecod.h d:/wx/wx_qsp/include/wx/animde
      wxColour GetBackgroundColour() const { return m_background; }
 diff -u -r d:/wx/wxWidgets/include/wx/aui/floatpane.h d:/wx/wx_qsp/include/wx/aui/floatpane.h
 --- d:/wx/wxWidgets/include/wx/aui/floatpane.h	2009-05-09 19:25:53 +0700
-+++ d:/wx/wx_qsp/include/wx/aui/floatpane.h	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/include/wx/aui/floatpane.h	2009-06-23 23:58:55 +0700
 @@ -32,6 +32,8 @@
  class WXDLLIMPEXP_AUI wxAuiFloatingFrame : public wxAuiFloatingFrameBaseClass
  {
@@ -107,7 +107,7 @@ diff -u -r d:/wx/wxWidgets/include/wx/aui/floatpane.h d:/wx/wx_qsp/include/wx/au
      wxAuiManager* GetOwnerManager() const;
 diff -u -r d:/wx/wxWidgets/include/wx/generic/animate.h d:/wx/wx_qsp/include/wx/generic/animate.h
 --- d:/wx/wxWidgets/include/wx/generic/animate.h	2009-05-09 19:27:25 +0700
-+++ d:/wx/wx_qsp/include/wx/generic/animate.h	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/include/wx/generic/animate.h	2009-06-23 23:58:55 +0700
 @@ -27,8 +27,13 @@
      wxAnimation(const wxString &name, wxAnimationType type = wxANIMATION_TYPE_ANY)
          { LoadFile(name, type); }
@@ -137,7 +137,7 @@ diff -u -r d:/wx/wxWidgets/include/wx/generic/animate.h d:/wx/wx_qsp/include/wx/
      DECLARE_DYNAMIC_CLASS(wxAnimationCtrl)
 diff -u -r d:/wx/wxWidgets/include/wx/gifdecod.h d:/wx/wx_qsp/include/wx/gifdecod.h
 --- d:/wx/wxWidgets/include/wx/gifdecod.h	2009-06-03 04:49:17 +0700
-+++ d:/wx/wx_qsp/include/wx/gifdecod.h	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/include/wx/gifdecod.h	2009-06-23 23:58:55 +0700
 @@ -66,8 +66,11 @@
      virtual long GetDelay(unsigned int frame) const;
  
@@ -150,35 +150,9 @@ diff -u -r d:/wx/wxWidgets/include/wx/gifdecod.h d:/wx/wx_qsp/include/wx/gifdeco
  
      // load function which returns more info than just Load():
      wxGIFErrorCode LoadGIF( wxInputStream& stream );
-diff -u -r d:/wx/wxWidgets/include/wx/html/htmlwin.h d:/wx/wx_qsp/include/wx/html/htmlwin.h
---- d:/wx/wxWidgets/include/wx/html/htmlwin.h	2009-05-09 19:26:55 +0700
-+++ d:/wx/wx_qsp/include/wx/html/htmlwin.h	2009-06-05 00:32:49 +0700
-@@ -316,7 +316,10 @@
- 
-     // Sets the bitmap to use for background (currnetly it will be tiled,
-     // when/if we have CSS support we could add other possibilities...)
--    void SetBackgroundImage(const wxBitmap& bmpBg) { m_bmpBg = bmpBg; }
-+    // HzD_Byte's hack
-+    // void SetBackgroundImage(const wxBitmap& bmpBg) { m_bmpBg = bmpBg; }
-+    void SetBackgroundImage(const wxBitmap& bmpBg);
-+    void CalcImageSize();
- 
-     // Saves custom settings into cfg config. it will use the path 'path'
-     // if given, otherwise it will save info into currently selected path.
-@@ -515,6 +518,10 @@
- 
-     // background image, may be invalid
-     wxBitmap m_bmpBg;
-+    // HzD_Byte's hack
-+    wxBitmap m_bmpRealBg;
-+    int m_posX;
-+    int m_posY;
- 
-     // variables used when user is selecting text
-     wxPoint     m_tmpSelFromPos;
 diff -u -r d:/wx/wxWidgets/include/wx/htmllbox.h d:/wx/wx_qsp/include/wx/htmllbox.h
 --- d:/wx/wxWidgets/include/wx/htmllbox.h	2009-05-09 19:27:31 +0700
-+++ d:/wx/wx_qsp/include/wx/htmllbox.h	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/include/wx/htmllbox.h	2009-06-23 23:58:55 +0700
 @@ -130,7 +130,8 @@
      // ensure that the given item is cached
      void CacheItem(size_t n) const;
@@ -210,7 +184,7 @@ diff -u -r d:/wx/wxWidgets/include/wx/htmllbox.h d:/wx/wx_qsp/include/wx/htmllbo
      friend class wxHtmlListBoxStyle;
 diff -u -r d:/wx/wxWidgets/src/aui/floatpane.cpp d:/wx/wx_qsp/src/aui/floatpane.cpp
 --- d:/wx/wxWidgets/src/aui/floatpane.cpp	2009-05-09 19:22:52 +0700
-+++ d:/wx/wx_qsp/src/aui/floatpane.cpp	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/src/aui/floatpane.cpp	2009-06-23 23:58:55 +0700
 @@ -145,10 +145,13 @@
          SetClientSize(size);
      }
@@ -226,9 +200,9 @@ diff -u -r d:/wx/wxWidgets/src/aui/floatpane.cpp d:/wx/wx_qsp/src/aui/floatpane.
  
  wxAuiManager* wxAuiFloatingFrame::GetOwnerManager() const
 diff -u -r d:/wx/wxWidgets/src/aui/framemanager.cpp d:/wx/wx_qsp/src/aui/framemanager.cpp
---- d:/wx/wxWidgets/src/aui/framemanager.cpp	2009-05-09 19:22:52 +0700
-+++ d:/wx/wx_qsp/src/aui/framemanager.cpp	2009-06-05 00:32:49 +0700
-@@ -2720,6 +2720,8 @@
+--- d:/wx/wxWidgets/src/aui/framemanager.cpp	2009-06-23 21:47:22 +0700
++++ d:/wx/wx_qsp/src/aui/framemanager.cpp	2009-06-23 23:58:55 +0700
+@@ -2721,6 +2721,8 @@
                  p.window->Refresh();
                  p.window->Update();
              }
@@ -239,7 +213,7 @@ diff -u -r d:/wx/wxWidgets/src/aui/framemanager.cpp d:/wx/wx_qsp/src/aui/framema
  
 diff -u -r d:/wx/wxWidgets/src/common/filesys.cpp d:/wx/wx_qsp/src/common/filesys.cpp
 --- d:/wx/wxWidgets/src/common/filesys.cpp	2009-05-09 19:23:43 +0700
-+++ d:/wx/wx_qsp/src/common/filesys.cpp	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/src/common/filesys.cpp	2009-06-23 23:58:55 +0700
 @@ -633,7 +633,8 @@
          path = path.Mid(2);
  #endif
@@ -252,7 +226,7 @@ diff -u -r d:/wx/wxWidgets/src/common/filesys.cpp d:/wx/wx_qsp/src/common/filesy
      // file urls either start with a forward slash (local harddisk),
 diff -u -r d:/wx/wxWidgets/src/generic/animateg.cpp d:/wx/wx_qsp/src/generic/animateg.cpp
 --- d:/wx/wxWidgets/src/generic/animateg.cpp	2009-05-09 19:24:45 +0700
-+++ d:/wx/wx_qsp/src/generic/animateg.cpp	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/src/generic/animateg.cpp	2009-06-23 23:58:55 +0700
 @@ -277,6 +277,8 @@
      m_currentFrame = 0;
      m_looped = false;
@@ -345,7 +319,7 @@ diff -u -r d:/wx/wxWidgets/src/generic/animateg.cpp d:/wx/wx_qsp/src/generic/ani
  
 diff -u -r d:/wx/wxWidgets/src/generic/scrlwing.cpp d:/wx/wx_qsp/src/generic/scrlwing.cpp
 --- d:/wx/wxWidgets/src/generic/scrlwing.cpp	2009-05-09 19:24:45 +0700
-+++ d:/wx/wx_qsp/src/generic/scrlwing.cpp	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/src/generic/scrlwing.cpp	2009-06-23 23:58:55 +0700
 @@ -550,6 +550,8 @@
          m_win->SetScrollPos(wxVERTICAL, m_yScrollPosition);
      }
@@ -376,96 +350,21 @@ diff -u -r d:/wx/wxWidgets/src/generic/scrlwing.cpp d:/wx/wx_qsp/src/generic/scr
      // update the position and scroll the window now:
      if (m_xScrollPosition != new_x)
 diff -u -r d:/wx/wxWidgets/src/html/htmlwin.cpp d:/wx/wx_qsp/src/html/htmlwin.cpp
---- d:/wx/wxWidgets/src/html/htmlwin.cpp	2009-05-24 22:22:45 +0700
-+++ d:/wx/wx_qsp/src/html/htmlwin.cpp	2009-06-05 00:32:49 +0700
-@@ -354,7 +354,32 @@
-     delete m_backBuffer;
- }
- 
-+// HzD_Byte's hack
-+void wxHtmlWindow::SetBackgroundImage(const wxBitmap& bmpBg)
-+{
-+    m_bmpBg = bmpBg;
-+    CalcImageSize();
-+}
- 
-+void wxHtmlWindow::CalcImageSize()
-+{
-+    if (m_bmpBg.Ok())
-+    {
-+        int w, h;
-+        GetClientSize(&w, &h);
-+        if (w < 1) w = 1;
-+        if (h < 1) h = 1;
-+        int srcW = m_bmpBg.GetWidth(), srcH = m_bmpBg.GetHeight();
-+        int destW = srcW * h / srcH, destH = srcH * w / srcW;
-+        if (destW > w)
-+            destW = w;
-+        else
-+            destH = h;
-+        m_posX = (w - destW) / 2;
-+        m_posY = (h - destH) / 2;
-+        m_bmpRealBg = wxBitmap(m_bmpBg.ConvertToImage().Scale(destW, destH));
-+    }
-+}
- 
- void wxHtmlWindow::SetRelatedFrame(wxFrame* frame, const wxString& format)
- {
-@@ -451,8 +476,11 @@
+--- d:/wx/wxWidgets/src/html/htmlwin.cpp	2009-06-23 21:47:22 +0700
++++ d:/wx/wx_qsp/src/html/htmlwin.cpp	2009-06-24 00:02:02 +0700
+@@ -463,7 +463,8 @@
      // ...and run the parser on it:
      wxClientDC *dc = new wxClientDC(this);
      dc->SetMapMode(wxMM_TEXT);
+-    SetBackgroundColour(wxColour(0xFF, 0xFF, 0xFF));
 +    // HzD_Byte's hack
-+    /*
-     SetBackgroundColour(wxColour(0xFF, 0xFF, 0xFF));
++    // SetBackgroundColour(wxColour(0xFF, 0xFF, 0xFF));
      SetBackgroundImage(wxNullBitmap);
-+    */
  
      m_Parser->SetDC(dc);
-     if (m_Cell)
-@@ -981,6 +1009,9 @@
- 
- void wxHtmlWindow::OnEraseBackground(wxEraseEvent& event)
- {
-+    // HzD_Byte's hack
-+    return;
-+
-     if ( !m_bmpBg.Ok() )
-     {
-         // don't even skip the event, if we don't have a bg bitmap we're going
-@@ -1031,6 +1062,8 @@
-         m_backBuffer = new wxBitmap(sz.x, sz.y);
-     dcm.SelectObject(*m_backBuffer);
- 
-+    // HzD_Byte's hack
-+    /*
-     if ( m_eraseBgInOnPaint )
-     {
-         dcm.SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
-@@ -1048,6 +1081,11 @@
-                  &dc,
-                  0, rect.GetTop());
-     }
-+    */
-+    dcm.SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
-+    dcm.Clear();
-+    if (m_bmpBg.Ok())
-+        dcm.DrawBitmap(m_bmpRealBg, m_posX, m_posY, true);
- 
-     PrepareDC(dcm);
-     dcm.SetMapMode(wxMM_TEXT);
-@@ -1117,6 +1155,8 @@
-         m_selection->ClearPrivPos();
-     }
- 
-+    // HzD_Byte's hack
-+    CalcImageSize();
-     Refresh();
- }
- 
 diff -u -r d:/wx/wxWidgets/src/html/m_image.cpp d:/wx/wx_qsp/src/html/m_image.cpp
 --- d:/wx/wxWidgets/src/html/m_image.cpp	2009-05-09 19:22:48 +0700
-+++ d:/wx/wx_qsp/src/html/m_image.cpp	2009-06-05 00:40:55 +0700
++++ d:/wx/wx_qsp/src/html/m_image.cpp	2009-06-23 23:58:55 +0700
 @@ -303,6 +303,8 @@
  private:
      wxBitmap           *m_bitmap;
@@ -561,7 +460,7 @@ diff -u -r d:/wx/wxWidgets/src/html/m_image.cpp d:/wx/wx_qsp/src/html/m_image.cp
          dc.GetUserScale(&us_x, &us_y);
 diff -u -r d:/wx/wxWidgets/src/html/winpars.cpp d:/wx/wx_qsp/src/html/winpars.cpp
 --- d:/wx/wxWidgets/src/html/winpars.cpp	2009-05-09 19:22:48 +0700
-+++ d:/wx/wx_qsp/src/html/winpars.cpp	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/src/html/winpars.cpp	2009-06-23 23:58:55 +0700
 @@ -55,6 +55,8 @@
      m_whitespaceMode = Whitespace_Normal;
      m_lastWordCell = NULL;
@@ -600,7 +499,7 @@ diff -u -r d:/wx/wxWidgets/src/html/winpars.cpp d:/wx/wx_qsp/src/html/winpars.cp
          status = m_windowInterface->OnHTMLOpeningURL(type, myfullurl, &redirect);
 diff -u -r d:/wx/wxWidgets/src/msw/ownerdrw.cpp d:/wx/wx_qsp/src/msw/ownerdrw.cpp
 --- d:/wx/wxWidgets/src/msw/ownerdrw.cpp	2009-05-09 19:24:08 +0700
-+++ d:/wx/wx_qsp/src/msw/ownerdrw.cpp	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/src/msw/ownerdrw.cpp	2009-06-23 23:58:55 +0700
 @@ -270,6 +270,8 @@
  
      // add a 4-pixel separator, otherwise menus look cluttered
@@ -612,7 +511,7 @@ diff -u -r d:/wx/wxWidgets/src/msw/ownerdrw.cpp d:/wx/wx_qsp/src/msw/ownerdrw.cp
      // margin width above
 diff -u -r d:/wx/wxWidgets/src/msw/textctrl.cpp d:/wx/wx_qsp/src/msw/textctrl.cpp
 --- d:/wx/wxWidgets/src/msw/textctrl.cpp	2009-05-09 19:24:08 +0700
-+++ d:/wx/wx_qsp/src/msw/textctrl.cpp	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/src/msw/textctrl.cpp	2009-06-23 23:58:55 +0700
 @@ -1846,6 +1846,8 @@
                  // Insert tab since calling the default Windows handler
                  // doesn't seem to do it
@@ -624,7 +523,7 @@ diff -u -r d:/wx/wxWidgets/src/msw/textctrl.cpp d:/wx/wx_qsp/src/msw/textctrl.cp
              break;
 diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/Editor.cxx d:/wx/wx_qsp/src/stc/scintilla/src/Editor.cxx
 --- d:/wx/wxWidgets/src/stc/scintilla/src/Editor.cxx	2009-05-09 19:22:34 +0700
-+++ d:/wx/wx_qsp/src/stc/scintilla/src/Editor.cxx	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/src/stc/scintilla/src/Editor.cxx	2009-06-23 23:58:55 +0700
 @@ -16,6 +16,8 @@
  #define INCLUDE_DEPRECATED_FEATURES
  #endif
@@ -690,7 +589,7 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/Editor.cxx d:/wx/wx_qsp/src/stc
  	}
 diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/scintilla/src/LexVB.cxx
 --- d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx	2009-05-09 19:22:34 +0700
-+++ d:/wx/wx_qsp/src/stc/scintilla/src/LexVB.cxx	2009-06-05 00:32:49 +0700
++++ d:/wx/wx_qsp/src/stc/scintilla/src/LexVB.cxx	2009-06-23 23:58:55 +0700
 @@ -1,8 +1,8 @@
  // Scintilla source code edit control
  /** @file LexVB.cxx
