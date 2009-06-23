@@ -44,11 +44,15 @@
 		void SetLinkColor(const wxColour& clr);
 		const wxColour& GetLinkColor() const { return m_Parser->GetLinkColor(); }
 		void SetGamePath(const wxString& path) { m_path = path; }
+		void SetBackgroundImage(const wxBitmap& bmpBg);
 	protected:
 		// Internal methods
+		void CalcImageSize();
 		virtual wxHtmlOpeningStatus OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const;
 
 		// Events
+		void OnSize(wxSizeEvent& event);
+		void OnEraseBackground(wxEraseEvent& event);
 		void OnKeyUp(wxKeyEvent& event);
 		void OnMouseWheel(wxMouseEvent& event);
 
@@ -59,6 +63,10 @@
 		wxString m_imagePath;
 		wxFont m_font;
 		wxString m_text;
+		wxBitmap m_bmpBg;
+		wxBitmap m_bmpRealBg;
+		int m_posX;
+		int m_posY;
 	};
 
 #endif

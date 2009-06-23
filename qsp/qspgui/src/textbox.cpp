@@ -20,6 +20,8 @@
 IMPLEMENT_CLASS(QSPTextBox, wxHtmlWindow)
 
 BEGIN_EVENT_TABLE(QSPTextBox, wxHtmlWindow)
+	EVT_SIZE(QSPTextBox::OnSize)
+	EVT_ERASE_BACKGROUND(QSPTextBox::OnEraseBackground)
 	EVT_KEY_UP(QSPTextBox::OnKeyUp)
 	EVT_MOUSEWHEEL(QSPTextBox::OnMouseWheel)
 END_EVENT_TABLE()
@@ -124,4 +126,48 @@ void QSPTextBox::OnMouseWheel(wxMouseEvent& event)
 	event.Skip();
 	if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
 		event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
+}
+
+void QSPTextBox::OnSize(wxSizeEvent& event)
+{
+	CalcImageSize();
+	wxHtmlWindow::OnSize(event);
+}
+
+void QSPTextBox::OnEraseBackground(wxEraseEvent& event)
+{
+	wxDC *dc = event.GetDC();
+	dc->SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
+	dc->Clear();
+	if (m_bmpBg.Ok())
+	{
+		wxPoint pt = dc->GetDeviceOrigin();
+		dc->DrawBitmap(m_bmpRealBg, m_posX - pt.x, m_posY - pt.y, true);
+	}
+}
+
+void QSPTextBox::SetBackgroundImage(const wxBitmap& bmpBg)
+{
+	m_bmpBg = bmpBg;
+	CalcImageSize();
+}
+
+void QSPTextBox::CalcImageSize()
+{
+	if (m_bmpBg.Ok())
+	{
+		int w, h;
+		GetClientSize(&w, &h);
+		if (w < 1) w = 1;
+		if (h < 1) h = 1;
+		int srcW = m_bmpBg.GetWidth(), srcH = m_bmpBg.GetHeight();
+		int destW = srcW * h / srcH, destH = srcH * w / srcW;
+		if (destW > w)
+			destW = w;
+		else
+			destH = h;
+		m_posX = (w - destW) / 2;
+		m_posY = (h - destH) / 2;
+		m_bmpRealBg = wxBitmap(m_bmpBg.ConvertToImage().Scale(destW, destH));
+	}
 }
