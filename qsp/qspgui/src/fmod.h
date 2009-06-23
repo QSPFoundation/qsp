@@ -15,7 +15,7 @@
     0xaaaabbcc -> aaaa = major version number.  bb = minor version number.  cc = development version number.
 */
 
-#define FMOD_VERSION    0x00042201
+#define FMOD_VERSION    0x00042411
 
 /*
     Compiler specific settings.
@@ -197,6 +197,7 @@ typedef enum
     FMOD_ERR_INVALID_FLOAT,         /* Value passed in was a NaN, Inf or denormalized float. */
     FMOD_ERR_INVALID_HANDLE,        /* An invalid object handle was used. */
     FMOD_ERR_INVALID_PARAM,         /* An invalid parameter was passed to this function. */
+    FMOD_ERR_INVALID_POSITION,      /* An invalid seek position was passed to this function. */
     FMOD_ERR_INVALID_SPEAKER,       /* An invalid speaker was passed to this function based on the current speaker mode. */
     FMOD_ERR_INVALID_SYNCPOINT,     /* The syncpoint did not come from this sound handle. */
     FMOD_ERR_INVALID_VECTOR,        /* The vectors passed in are not unit length, or perpendicular. */
@@ -245,11 +246,13 @@ typedef enum
     FMOD_ERR_EVENT_FAILED,          /* An Event failed to be retrieved, most likely due to 'just fail' being specified as the max playbacks behavior. */
     FMOD_ERR_EVENT_INFOONLY,        /* Can't execute this command on an EVENT_INFOONLY event. */
     FMOD_ERR_EVENT_INTERNAL,        /* An error occured that wasn't supposed to.  See debug log for reason. */
-    FMOD_ERR_EVENT_MAXSTREAMS,      /* Event failed because 'Max streams' was hit when FMOD_INIT_FAIL_ON_MAXSTREAMS was specified. */
+    FMOD_ERR_EVENT_MAXSTREAMS,      /* Event failed because 'Max streams' was hit when FMOD_EVENT_INIT_FAIL_ON_MAXSTREAMS was specified. */
     FMOD_ERR_EVENT_MISMATCH,        /* FSB mismatches the FEV it was compiled with, the stream/sample mode it was meant to be created with was different, or the FEV was built for a different platform. */
     FMOD_ERR_EVENT_NAMECONFLICT,    /* A category with the same name already exists. */
     FMOD_ERR_EVENT_NOTFOUND,        /* The requested event, event group, event category or event property could not be found. */
     FMOD_ERR_EVENT_NEEDSSIMPLE,     /* Tried to call a function on a complex event that's only supported by simple events. */
+    FMOD_ERR_EVENT_GUIDCONFLICT,    /* An event with the same GUID already exists. */
+    FMOD_ERR_EVENT_ALREADY_LOADED,  /* The specified project has already been loaded. Having multiple copies of the same project loaded simultaneously is forbidden. */
 
     FMOD_ERR_MUSIC_UNINITIALIZED,   /* Music system is not initialized probably because no music data is loaded. */
 
@@ -400,6 +403,7 @@ typedef enum
 #define FMOD_DEBUG_DISPLAY_TIMESTAMPS   0x01000000
 #define FMOD_DEBUG_DISPLAY_LINENUMBERS  0x02000000
 #define FMOD_DEBUG_DISPLAY_COMPRESS     0x04000000
+#define FMOD_DEBUG_DISPLAY_THREAD       0x08000000
 #define FMOD_DEBUG_DISPLAY_ALL          0x0F000000   
 #define FMOD_DEBUG_ALL                  0xFFFFFFFF
 /* [DEFINE_END] */
@@ -430,9 +434,12 @@ typedef enum
 ]
 */
 #define FMOD_MEMORY_NORMAL             0x00000000       /* Standard memory. */
+#define FMOD_MEMORY_STREAM_FILE        0x00000001       /* Stream file buffer, size controllable with System::setStreamBufferSize. */
+#define FMOD_MEMORY_STREAM_DECODE      0x00000002       /* Stream decode buffer, size controllable with FMOD_CREATESOUNDEXINFO::decodebuffersize. */
 #define FMOD_MEMORY_XBOX360_PHYSICAL   0x00100000       /* Requires XPhysicalAlloc / XPhysicalFree. */
 #define FMOD_MEMORY_PERSISTENT         0x00200000       /* Persistent memory. Memory will be freed when System::release is called. */
 #define FMOD_MEMORY_SECONDARY          0x00400000       /* Secondary memory. Allocation should be in secondary memory. For example RSX on the PS3. */
+#define FMOD_MEMORY_ALL                0xFFFFFFFF
 
 
 /* [DEFINE_END] */
@@ -655,29 +662,29 @@ typedef enum
     Channel::set3DOcclusion
 ]
 */
-#define FMOD_INIT_NORMAL                 0x00000000 /* All platforms - Initialize normally */
-#define FMOD_INIT_STREAM_FROM_UPDATE     0x00000001 /* All platforms - No stream thread is created internally.  Streams are driven from System::update.  Mainly used with non-realtime outputs. */
-#define FMOD_INIT_3D_RIGHTHANDED         0x00000002 /* All platforms - FMOD will treat +X as right, +Y as up and +Z as backwards (towards you). */
-#define FMOD_INIT_SOFTWARE_DISABLE       0x00000004 /* All platforms - Disable software mixer to save memory.  Anything created with FMOD_SOFTWARE will fail and DSP will not work. */
-#define FMOD_INIT_SOFTWARE_OCCLUSION     0x00000008 /* All platforms - All FMOD_SOFTWARE with FMOD_3D based voices will add a software lowpass filter effect into the DSP chain which is automatically used when Channel::set3DOcclusion is used or the geometry API. */
-#define FMOD_INIT_SOFTWARE_HRTF          0x00000010 /* All platforms - All FMOD_SOFTWARE with FMOD_3D based voices will add a software lowpass filter effect into the DSP chain which causes sounds to sound duller when the sound goes behind the listener.  Use System::setAdvancedSettings to adjust cutoff frequency. */
-#define FMOD_INIT_SOFTWARE_REVERB_LOWMEM 0x00000040 /* All platforms - SFX reverb is run using 22/24khz delay buffers, halving the memory required. */
-#define FMOD_INIT_ENABLE_PROFILE         0x00000020 /* All platforms - Enable TCP/IP based host which allows FMOD Designer or FMOD Profiler to connect to it, and view memory, CPU and the DSP network graph in real-time. */
-#define FMOD_INIT_VOL0_BECOMES_VIRTUAL   0x00000080 /* All platforms - Any sounds that are 0 volume will go virtual and not be processed except for having their positions updated virtually.  Use System::setAdvancedSettings to adjust what volume besides zero to switch to virtual at. */
-#define FMOD_INIT_WASAPI_EXCLUSIVE       0x00000100 /* Win32 Vista only - for WASAPI output - Enable exclusive access to hardware, lower latency at the expense of excluding other applications from accessing the audio hardware. */
-#define FMOD_INIT_DSOUND_HRTFNONE        0x00000200 /* Win32 only - for DirectSound output - FMOD_HARDWARE | FMOD_3D buffers use simple stereo panning/doppler/attenuation when 3D hardware acceleration is not present. */
-#define FMOD_INIT_DSOUND_HRTFLIGHT       0x00000400 /* Win32 only - for DirectSound output - FMOD_HARDWARE | FMOD_3D buffers use a slightly higher quality algorithm when 3D hardware acceleration is not present. */
-#define FMOD_INIT_DSOUND_HRTFFULL        0x00000800 /* Win32 only - for DirectSound output - FMOD_HARDWARE | FMOD_3D buffers use full quality 3D playback when 3d hardware acceleration is not present. */
-#define FMOD_INIT_PS2_DISABLECORE0REVERB 0x00010000 /* PS2 only - Disable reverb on CORE 0 to regain 256k SRAM. */
-#define FMOD_INIT_PS2_DISABLECORE1REVERB 0x00020000 /* PS2 only - Disable reverb on CORE 1 to regain 256k SRAM. */
-#define FMOD_INIT_PS2_DONTUSESCRATCHPAD  0x00040000 /* PS2 only - Disable FMOD's usage of the scratchpad. */
-#define FMOD_INIT_PS2_SWAPDMACHANNELS    0x00080000 /* PS2 only - Changes FMOD from using SPU DMA channel 0 for software mixing, and 1 for sound data upload/file streaming, to 1 and 0 respectively. */
-#define FMOD_INIT_PS3_PREFERDTS          0x00800000 /* PS3 only - Prefer DTS over Dolby Digital if both are supported. Note: 8 and 6 channel LPCM is always preferred over both DTS and Dolby Digital. */
-#define FMOD_INIT_PS3_FORCE2CHLPCM       0x01000000 /* PS3 only - Force PS3 system output mode to 2 channel LPCM. */
-#define FMOD_INIT_XBOX_REMOVEHEADROOM    0x00100000 /* Xbox only - By default DirectSound attenuates all sound by 6db to avoid clipping/distortion.  CAUTION.  If you use this flag you are responsible for the final mix to make sure clipping / distortion doesn't happen. */
-#define FMOD_INIT_360_MUSICMUTENOTPAUSE  0x00200000 /* Xbox 360 only - The "music" channelgroup which by default pauses when custom 360 dashboard music is played, can be changed to mute (therefore continues playing) instead of pausing, by using this flag. */
-#define FMOD_INIT_SYNCMIXERWITHUPDATE    0x00400000 /* Win32/Wii/PS3/Xbox/Xbox 360 - FMOD Mixer thread is woken up to do a mix when System::update is called rather than waking periodically on its own timer. */
-#define FMOD_INIT_NEURALTHX              0x02000000 /* Win32/Mac/Linux/Solaris - Use Neural THX downmixing from 7.1 if speakermode set to FMOD_SPEAKERMODE_STEREO or FMOD_SPEAKERMODE_5POINT1. */
+#define FMOD_INIT_NORMAL                    0x00000000 /* All platforms - Initialize normally */
+#define FMOD_INIT_STREAM_FROM_UPDATE        0x00000001 /* All platforms - No stream thread is created internally.  Streams are driven from System::update.  Mainly used with non-realtime outputs. */
+#define FMOD_INIT_3D_RIGHTHANDED            0x00000002 /* All platforms - FMOD will treat +X as right, +Y as up and +Z as backwards (towards you). */
+#define FMOD_INIT_SOFTWARE_DISABLE          0x00000004 /* All platforms - Disable software mixer to save memory.  Anything created with FMOD_SOFTWARE will fail and DSP will not work. */
+#define FMOD_INIT_SOFTWARE_OCCLUSION        0x00000008 /* All platforms - All FMOD_SOFTWARE with FMOD_3D based voices will add a software lowpass filter effect into the DSP chain which is automatically used when Channel::set3DOcclusion is used or the geometry API. */
+#define FMOD_INIT_SOFTWARE_HRTF             0x00000010 /* All platforms - All FMOD_SOFTWARE with FMOD_3D based voices will add a software lowpass filter effect into the DSP chain which causes sounds to sound duller when the sound goes behind the listener.  Use System::setAdvancedSettings to adjust cutoff frequency. */
+#define FMOD_INIT_ENABLE_PROFILE            0x00000020 /* All platforms - Enable TCP/IP based host which allows FMOD Designer or FMOD Profiler to connect to it, and view memory, CPU and the DSP network graph in real-time. */
+#define FMOD_INIT_VOL0_BECOMES_VIRTUAL      0x00000080 /* All platforms - Any sounds that are 0 volume will go virtual and not be processed except for having their positions updated virtually.  Use System::setAdvancedSettings to adjust what volume besides zero to switch to virtual at. */
+#define FMOD_INIT_WASAPI_EXCLUSIVE          0x00000100 /* Win32 Vista only - for WASAPI output - Enable exclusive access to hardware, lower latency at the expense of excluding other applications from accessing the audio hardware. */
+#define FMOD_INIT_DSOUND_HRTFNONE           0x00000200 /* Win32 only - for DirectSound output - FMOD_HARDWARE | FMOD_3D buffers use simple stereo panning/doppler/attenuation when 3D hardware acceleration is not present. */
+#define FMOD_INIT_DSOUND_HRTFLIGHT          0x00000400 /* Win32 only - for DirectSound output - FMOD_HARDWARE | FMOD_3D buffers use a slightly higher quality algorithm when 3D hardware acceleration is not present. */
+#define FMOD_INIT_DSOUND_HRTFFULL           0x00000800 /* Win32 only - for DirectSound output - FMOD_HARDWARE | FMOD_3D buffers use full quality 3D playback when 3d hardware acceleration is not present. */
+#define FMOD_INIT_PS2_DISABLECORE0REVERB    0x00010000 /* PS2 only - Disable reverb on CORE 0 to regain 256k SRAM. */
+#define FMOD_INIT_PS2_DISABLECORE1REVERB    0x00020000 /* PS2 only - Disable reverb on CORE 1 to regain 256k SRAM. */
+#define FMOD_INIT_PS2_DONTUSESCRATCHPAD     0x00040000 /* PS2 only - Disable FMOD's usage of the scratchpad. */
+#define FMOD_INIT_PS2_SWAPDMACHANNELS       0x00080000 /* PS2 only - Changes FMOD from using SPU DMA channel 0 for software mixing, and 1 for sound data upload/file streaming, to 1 and 0 respectively. */
+#define FMOD_INIT_PS3_PREFERDTS             0x00800000 /* PS3 only - Prefer DTS over Dolby Digital if both are supported. Note: 8 and 6 channel LPCM is always preferred over both DTS and Dolby Digital. */
+#define FMOD_INIT_PS3_FORCE2CHLPCM          0x01000000 /* PS3 only - Force PS3 system output mode to 2 channel LPCM. */
+#define FMOD_INIT_XBOX_REMOVEHEADROOM       0x00100000 /* Xbox only - By default DirectSound attenuates all sound by 6db to avoid clipping/distortion.  CAUTION.  If you use this flag you are responsible for the final mix to make sure clipping / distortion doesn't happen. */
+#define FMOD_INIT_SYSTEM_MUSICMUTENOTPAUSE  0x00200000 /* Xbox 360 / PS3 - The "music" channelgroup which by default pauses when custom 360 dashboard / PS3 BGM music is played, can be changed to mute (therefore continues playing) instead of pausing, by using this flag. */
+#define FMOD_INIT_SYNCMIXERWITHUPDATE       0x00400000 /* Win32/Wii/PS3/Xbox/Xbox 360 - FMOD Mixer thread is woken up to do a mix when System::update is called rather than waking periodically on its own timer. */
+#define FMOD_INIT_NEURALTHX                 0x02000000 /* Win32/Mac/Linux/Solaris - Use Neural THX downmixing from 7.1 if speakermode set to FMOD_SPEAKERMODE_STEREO or FMOD_SPEAKERMODE_5POINT1. */
+#define FMOD_INIT_GEOMETRY_USECLOSEST       0x04000000 /* All platforms - With the geometry engine, only process the closest polygon rather than accumulating all polygons the sound to listener line intersects. */
 /* [DEFINE_END] */
 
 
@@ -822,7 +829,7 @@ typedef enum
 #define FMOD_CREATESAMPLE              0x00000100  /* Decompress at loadtime, decompressing or decoding whole file into memory as the target sample format (ie PCM).  Fastest for FMOD_SOFTWARE based playback and most flexible.  */
 #define FMOD_CREATECOMPRESSEDSAMPLE    0x00000200  /* Load MP2, MP3, IMAADPCM or XMA into memory and leave it compressed.  During playback the FMOD software mixer will decode it in realtime as a 'compressed sample'.  Can only be used in combination with FMOD_SOFTWARE.  Overrides FMOD_CREATESAMPLE.  If the sound data is not ADPCM, MPEG or XMA it will behave as if it was created with FMOD_CREATESAMPLE and decode the sound into PCM. */
 #define FMOD_OPENUSER                  0x00000400  /* Opens a user created static sample or stream. Use FMOD_CREATESOUNDEXINFO to specify format and/or read callbacks.  If a user created 'sample' is created with no read callback, the sample will be empty.  Use Sound::lock and Sound::unlock to place sound data into the sound if this is the case. */
-#define FMOD_OPENMEMORY                0x00000800  /* "name_or_data" will be interpreted as a pointer to memory instead of filename for creating sounds.  Use FMOD_CREATESOUNDEXINFO to specify length.  FMOD duplicates the memory into its own buffers.  Can be freed after open. */
+#define FMOD_OPENMEMORY                0x00000800  /* "name_or_data" will be interpreted as a pointer to memory instead of filename for creating sounds.  Use FMOD_CREATESOUNDEXINFO to specify length.  If used with FMOD_CREATESAMPLE or FMOD_CREATECOMPRESSEDSAMPLE, FMOD duplicates the memory into its own buffers.  Your own buffer can be freed after open.  If used with FMOD_CREATESTREAM, FMOD will stream out of the buffer whose pointer you passed in.  In this case, your own buffer should not be freed until you have finished with and released the stream.*/
 #define FMOD_OPENMEMORY_POINT          0x10000000  /* "name_or_data" will be interpreted as a pointer to memory instead of filename for creating sounds.  Use FMOD_CREATESOUNDEXINFO to specify length.  This differs to FMOD_OPENMEMORY in that it uses the memory as is, without duplicating the memory into its own buffers.  For Wii/PSP FMOD_HARDWARE supports this flag for the GCADPCM/VAG formats.  On other platforms FMOD_SOFTWARE must be used, as sound hardware on the other platforms (ie PC) cannot access main ram.  Cannot be freed after open, only after Sound::release.   Will not work if the data is compressed and FMOD_CREATECOMPRESSEDSAMPLE is not used. */
 #define FMOD_OPENRAW                   0x00001000  /* Will ignore file format and treat as raw pcm.  Use FMOD_CREATESOUNDEXINFO to specify format.  Requires at least defaultfrequency, numchannels and format to be specified before it will open.  Must be little endian data. */
 #define FMOD_OPENONLY                  0x00002000  /* Just open the file, dont prebuffer or read.  Good for fast opens for info, or when sound::readData is to be used. */
@@ -1295,7 +1302,7 @@ typedef enum
     FMOD_SPEAKERMAPTYPE_DEFAULT,     /* This is the default, and just means FMOD decides which speakers it puts the source channels. */
     FMOD_SPEAKERMAPTYPE_ALLMONO,     /* This means the sound is made up of all mono sounds.  All voices will be panned to the front center by default in this case.  */
     FMOD_SPEAKERMAPTYPE_ALLSTEREO,   /* This means the sound is made up of all stereo sounds.  All voices will be panned to front left and front right alternating every second channel.  */
-    FMOD_SPEAKERMAPTYPE_51_PROTOOLS, /* Map a 5.1 sound to use protools L C R Ls Rs LFE mapping.  Will return an error if not a 6 channel sound. */
+    FMOD_SPEAKERMAPTYPE_51_PROTOOLS  /* Map a 5.1 sound to use protools L C R Ls Rs LFE mapping.  Will return an error if not a 6 channel sound. */
 } FMOD_SPEAKERMAPTYPE;
 
 
@@ -1730,7 +1737,7 @@ typedef struct FMOD_ADVANCEDSETTINGS
     int             cbsize;                   /* [in]     Size of this structure.  Use sizeof(FMOD_ADVANCEDSETTINGS)  NOTE: This must be set before calling System::getAdvancedSettings! */
     int             maxMPEGcodecs;            /* [in/out] Optional. Specify 0 to ignore. For use with FMOD_CREATECOMPRESSEDSAMPLE only.  Mpeg  codecs consume 29,424 bytes per instance and this number will determine how many mpeg channels can be played simultaneously.  Default = 16. */
     int             maxADPCMcodecs;           /* [in/out] Optional. Specify 0 to ignore. For use with FMOD_CREATECOMPRESSEDSAMPLE only.  ADPCM codecs consume 2,136 bytes per instance (based on FSB encoded ADPCM block size - see remarks) and this number will determine how many ADPCM channels can be played simultaneously.  Default = 32. */
-    int             maxXMAcodecs;             /* [in/out] Optional. Specify 0 to ignore. For use with FMOD_CREATECOMPRESSEDSAMPLE only.  XMA   codecs consume 20,512 bytes per instance and this number will determine how many XMA channels can be played simultaneously.  Default = 32.  */
+    int             maxXMAcodecs;             /* [in/out] Optional. Specify 0 to ignore. For use with FMOD_CREATECOMPRESSEDSAMPLE only.  XMA   codecs consume 14,836 bytes per instance and this number will determine how many XMA channels can be played simultaneously.  Default = 32.  */
     int             maxPCMcodecs;             /* [in/out] Optional. Specify 0 to ignore. For use with PS3 only.                          PCM   codecs consume 12,672 bytes per instance and this number will determine how many streams and PCM voices can be played simultaneously. Default = 16 */
     int             ASIONumChannels;          /* [in/out] Optional. Specify 0 to ignore. Number of channels available on the ASIO device. */
     char          **ASIOChannelList;          /* [in/out] Optional. Specify 0 to ignore. Pointer to an array of strings (number of entries defined by ASIONumChannels) with ASIO channel names. */

@@ -42,44 +42,45 @@ typedef enum
     FMOD_MEMTYPE_CODEC                 = 7,      /* Codecs allocated for streaming */
     FMOD_MEMTYPE_FILE                  = 8,      /* File buffers and structures */
     FMOD_MEMTYPE_SOUND                 = 9,      /* Sound objects and internals */
-    FMOD_MEMTYPE_SOUNDGROUP            = 10,     /* SoundGroup objects and internals */
-    FMOD_MEMTYPE_STREAMBUFFER          = 11,     /* Stream buffer memory */
-    FMOD_MEMTYPE_DSPCONNECTION         = 12,     /* DSPConnection objects and internals */
-    FMOD_MEMTYPE_DSP                   = 13,     /* DSP implementation objects */
-    FMOD_MEMTYPE_DSPCODEC              = 14,     /* Realtime file format decoding DSP objects */
-    FMOD_MEMTYPE_PROFILE               = 15,     /* Profiler memory footprint. */
-    FMOD_MEMTYPE_RECORDBUFFER          = 16,     /* Buffer used to store recorded data from microphone */
-    FMOD_MEMTYPE_REVERB                = 17,     /* Reverb implementation objects */
-    FMOD_MEMTYPE_REVERBCHANNELPROPS    = 18,     /* Reverb channel properties structs */
-    FMOD_MEMTYPE_GEOMETRY              = 19,     /* Geometry objects and internals */
-    FMOD_MEMTYPE_SYNCPOINT             = 20,     /* Sync point memory. */
+    FMOD_MEMTYPE_SOUND_SECONDARYRAM    = 10,     /* Sound data stored in secondary RAM */
+    FMOD_MEMTYPE_SOUNDGROUP            = 11,     /* SoundGroup objects and internals */
+    FMOD_MEMTYPE_STREAMBUFFER          = 12,     /* Stream buffer memory */
+    FMOD_MEMTYPE_DSPCONNECTION         = 13,     /* DSPConnection objects and internals */
+    FMOD_MEMTYPE_DSP                   = 14,     /* DSP implementation objects */
+    FMOD_MEMTYPE_DSPCODEC              = 15,     /* Realtime file format decoding DSP objects */
+    FMOD_MEMTYPE_PROFILE               = 16,     /* Profiler memory footprint. */
+    FMOD_MEMTYPE_RECORDBUFFER          = 17,     /* Buffer used to store recorded data from microphone */
+    FMOD_MEMTYPE_REVERB                = 18,     /* Reverb implementation objects */
+    FMOD_MEMTYPE_REVERBCHANNELPROPS    = 19,     /* Reverb channel properties structs */
+    FMOD_MEMTYPE_GEOMETRY              = 20,     /* Geometry objects and internals */
+    FMOD_MEMTYPE_SYNCPOINT             = 21,     /* Sync point memory. */
 
-    FMOD_MEMTYPE_EVENTSYSTEM           = 21,     /* EventSystem and various internals */
-    FMOD_MEMTYPE_MUSICSYSTEM           = 22,     /* MusicSystem and various internals */
-    FMOD_MEMTYPE_FEV                   = 23,     /* Definition of objects contained in all loaded projects e.g. events, groups, categories */
-    FMOD_MEMTYPE_MEMORYFSB             = 24,     /* Data loaded with registerMemoryFSB */
-    FMOD_MEMTYPE_EVENTPROJECT          = 25,     /* EventProject objects and internals */
-    FMOD_MEMTYPE_EVENTGROUPI           = 26,     /* EventGroup objects and internals */
-    FMOD_MEMTYPE_SOUNDBANKCLASS        = 27,     /* Objects used to manage wave banks */
-    FMOD_MEMTYPE_SOUNDBANKLIST         = 28,     /* Data used to manage lists of wave bank usage */
-    FMOD_MEMTYPE_STREAMINSTANCE        = 29,     /* Stream objects and internals */
-    FMOD_MEMTYPE_SOUNDDEFCLASS         = 30,     /* Sound definition objects */
-    FMOD_MEMTYPE_SOUNDDEFDEFCLASS      = 31,     /* Sound definition static data objects */
-    FMOD_MEMTYPE_SOUNDDEFPOOL          = 32,     /* Sound definition pool data */
-    FMOD_MEMTYPE_REVERBDEF             = 33,     /* Reverb definition objects */
-    FMOD_MEMTYPE_EVENTREVERB           = 34,     /* Reverb objects */
-    FMOD_MEMTYPE_USERPROPERTY          = 35,     /* User property objects */
-    FMOD_MEMTYPE_EVENTINSTANCE         = 36,     /* Event instance base objects */
-    FMOD_MEMTYPE_EVENTINSTANCE_COMPLEX = 37,     /* Complex event instance objects */
-    FMOD_MEMTYPE_EVENTINSTANCE_SIMPLE  = 38,     /* Simple event instance objects */
-    FMOD_MEMTYPE_EVENTINSTANCE_LAYER   = 39,     /* Event layer instance objects */
-    FMOD_MEMTYPE_EVENTINSTANCE_SOUND   = 40,     /* Event sound instance objects */
-    FMOD_MEMTYPE_EVENTENVELOPE         = 41,     /* Event envelope objects */
-    FMOD_MEMTYPE_EVENTENVELOPEDEF      = 42,     /* Event envelope definition objects */
-    FMOD_MEMTYPE_EVENTPARAMETER        = 43,     /* Event parameter objects */
-    FMOD_MEMTYPE_EVENTCATEGORY         = 44,     /* Event category objects */
-    FMOD_MEMTYPE_EVENTENVELOPEPOINT    = 45,     /* Event envelope point objects */
-    FMOD_MEMTYPE_EVENTINSTANCEPOOL     = 46,     /* Event instance pool memory */
+    FMOD_MEMTYPE_EVENTSYSTEM           = 22,     /* EventSystem and various internals */
+    FMOD_MEMTYPE_MUSICSYSTEM           = 23,     /* MusicSystem and various internals */
+    FMOD_MEMTYPE_FEV                   = 24,     /* Definition of objects contained in all loaded projects e.g. events, groups, categories */
+    FMOD_MEMTYPE_MEMORYFSB             = 25,     /* Data loaded with registerMemoryFSB */
+    FMOD_MEMTYPE_EVENTPROJECT          = 26,     /* EventProject objects and internals */
+    FMOD_MEMTYPE_EVENTGROUPI           = 27,     /* EventGroup objects and internals */
+    FMOD_MEMTYPE_SOUNDBANKCLASS        = 28,     /* Objects used to manage wave banks */
+    FMOD_MEMTYPE_SOUNDBANKLIST         = 29,     /* Data used to manage lists of wave bank usage */
+    FMOD_MEMTYPE_STREAMINSTANCE        = 30,     /* Stream objects and internals */
+    FMOD_MEMTYPE_SOUNDDEFCLASS         = 31,     /* Sound definition objects */
+    FMOD_MEMTYPE_SOUNDDEFDEFCLASS      = 32,     /* Sound definition static data objects */
+    FMOD_MEMTYPE_SOUNDDEFPOOL          = 33,     /* Sound definition pool data */
+    FMOD_MEMTYPE_REVERBDEF             = 34,     /* Reverb definition objects */
+    FMOD_MEMTYPE_EVENTREVERB           = 35,     /* Reverb objects */
+    FMOD_MEMTYPE_USERPROPERTY          = 36,     /* User property objects */
+    FMOD_MEMTYPE_EVENTINSTANCE         = 37,     /* Event instance base objects */
+    FMOD_MEMTYPE_EVENTINSTANCE_COMPLEX = 38,     /* Complex event instance objects */
+    FMOD_MEMTYPE_EVENTINSTANCE_SIMPLE  = 39,     /* Simple event instance objects */
+    FMOD_MEMTYPE_EVENTINSTANCE_LAYER   = 40,     /* Event layer instance objects */
+    FMOD_MEMTYPE_EVENTINSTANCE_SOUND   = 41,     /* Event sound instance objects */
+    FMOD_MEMTYPE_EVENTENVELOPE         = 42,     /* Event envelope objects */
+    FMOD_MEMTYPE_EVENTENVELOPEDEF      = 43,     /* Event envelope definition objects */
+    FMOD_MEMTYPE_EVENTPARAMETER        = 44,     /* Event parameter objects */
+    FMOD_MEMTYPE_EVENTCATEGORY         = 45,     /* Event category objects */
+    FMOD_MEMTYPE_EVENTENVELOPEPOINT    = 46,     /* Event envelope point objects */
+    FMOD_MEMTYPE_EVENTINSTANCEPOOL     = 47,     /* Event instance pool memory */
 
     FMOD_MEMTYPE_MAX,                            /* Number of "memoryused_array" fields. */
     FMOD_MEMTYPE_FORCEINT = 65536                /* Makes sure this enum is signed 32bit */
@@ -120,6 +121,7 @@ typedef enum
 #define FMOD_MEMBITS_CODEC                       (1 << FMOD_MEMTYPE_CODEC)               /* Codecs allocated for streaming */
 #define FMOD_MEMBITS_FILE                        (1 << FMOD_MEMTYPE_FILE)                /* Codecs allocated for streaming */
 #define FMOD_MEMBITS_SOUND                       (1 << FMOD_MEMTYPE_SOUND)               /* Sound objects and internals */
+#define FMOD_MEMBITS_SOUND_SECONDARYRAM          (1 << FMOD_MEMTYPE_SOUND_SECONDARYRAM)  /* Sound data stored in secondary RAM */
 #define FMOD_MEMBITS_SOUNDGROUP                  (1 << FMOD_MEMTYPE_SOUNDGROUP)          /* SoundGroup objects and internals */
 #define FMOD_MEMBITS_STREAMBUFFER                (1 << FMOD_MEMTYPE_STREAMBUFFER)        /* Stream buffer memory */
 #define FMOD_MEMBITS_DSPCONNECTION               (1 << FMOD_MEMTYPE_DSPCONNECTION)       /* DSPConnection objects and internals */
