@@ -349,11 +349,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 	for (i = 0; i < qspCurActionsCount; ++i)
 	{
 		if (qspCurActions[i].Image)
-		{
-			temp = qspGetNewText(qspCurActions[i].Image + qspQstPathLen, -1);
-			len = qspCodeWriteVal(&buf, len, temp, QSP_TRUE);
-			free(temp);
-		}
+			len = qspCodeWriteVal(&buf, len, qspCurActions[i].Image + qspQstPathLen, QSP_TRUE);
 		else
 			len = qspCodeWriteVal(&buf, len, 0, QSP_FALSE);
 		len = qspCodeWriteVal(&buf, len, qspCurActions[i].Desc, QSP_TRUE);
@@ -368,11 +364,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 	for (i = 0; i < qspCurObjectsCount; ++i)
 	{
 		if (qspCurObjects[i].Image)
-		{
-			temp = qspGetNewText(qspCurObjects[i].Image + qspQstPathLen, -1);
-			len = qspCodeWriteVal(&buf, len, temp, QSP_TRUE);
-			free(temp);
-		}
+			len = qspCodeWriteVal(&buf, len, qspCurObjects[i].Image + qspQstPathLen, QSP_TRUE);
 		else
 			len = qspCodeWriteVal(&buf, len, 0, QSP_FALSE);
 		len = qspCodeWriteVal(&buf, len, qspCurObjects[i].Desc, QSP_TRUE);
