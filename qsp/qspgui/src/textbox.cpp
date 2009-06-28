@@ -139,7 +139,7 @@ void QSPTextBox::OnEraseBackground(wxEraseEvent& event)
 	wxDC *dc = event.GetDC();
 	dc->SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
 	dc->Clear();
-	if (m_bmpBg.Ok())
+	if (m_bmpBg.Ok() && m_bmpRealBg.Ok())
 	{
 		wxPoint pt = dc->GetDeviceOrigin();
 		dc->DrawBitmap(m_bmpRealBg, m_posX - pt.x, m_posY - pt.y, true);
@@ -168,6 +168,9 @@ void QSPTextBox::CalcImageSize()
 			destH = h;
 		m_posX = (w - destW) / 2;
 		m_posY = (h - destH) / 2;
-		m_bmpRealBg = wxBitmap(m_bmpBg.ConvertToImage().Scale(destW, destH));
+		if (destW > 0 && destH > 0)
+			m_bmpRealBg = wxBitmap(m_bmpBg.ConvertToImage().Scale(destW, destH));
+		else
+			m_bmpRealBg = wxNullBitmap;
 	}
 }

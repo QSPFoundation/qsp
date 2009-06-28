@@ -113,7 +113,10 @@ void QSPImgCanvas::OnSize(wxSizeEvent& event)
 			destH = h;
 		m_posX = (w - destW) / 2;
 		m_posY = (h - destH) / 2;
-		m_cachedBitmap = wxBitmap(m_image.Scale(destW, destH, wxIMAGE_QUALITY_HIGH));
+		if (destW > 0 && destH > 0)
+			m_cachedBitmap = wxBitmap(m_image.Scale(destW, destH, wxIMAGE_QUALITY_HIGH));
+		else
+			m_cachedBitmap = wxNullBitmap;
 	}
 }
 
@@ -125,7 +128,8 @@ void QSPImgCanvas::OnPaint(wxPaintEvent& event)
 		return;
 	}
 	wxPaintDC dc(this);
-	dc.DrawBitmap(m_cachedBitmap, m_posX, m_posY, true);
+	if (m_cachedBitmap.Ok())
+		dc.DrawBitmap(m_cachedBitmap, m_posX, m_posY, true);
 }
 
 void QSPImgCanvas::OnKeyUp(wxKeyEvent& event)
