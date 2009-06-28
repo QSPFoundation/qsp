@@ -22,7 +22,6 @@
 	#include "frame.h"
 	#include "inputdlg.h"
 	#include "fmod.h"
-	#include "fmod_errors.h"
 
 	typedef struct
 	{
