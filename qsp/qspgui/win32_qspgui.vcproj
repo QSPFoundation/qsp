@@ -432,10 +432,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\fmod_errors.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\fmod_memoryinfo.h"
 				>
 			</File>
