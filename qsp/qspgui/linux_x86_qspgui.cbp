@@ -20,6 +20,7 @@
 					<Add option="-O" />
 					<Add option="-D__WXGTK__" />
 					<Add option="-DNDEBUG" />
+					<Add option="-D_FILE_OFFSET_BITS=64" />
 					<Add directory="/home/byte/wx_qsp/_build_release/lib/wx/include/gtk2-ansi-release-static-2.9" />
 				</Compiler>
 				<Linker>
@@ -55,6 +56,7 @@
 					<Add option="-D__WXGTK__" />
 					<Add option="-D_UNICODE" />
 					<Add option="-DNDEBUG" />
+					<Add option="-D_FILE_OFFSET_BITS=64" />
 					<Add directory="/home/byte/wx_qsp/_build_release_unicode/lib/wx/include/gtk2-unicode-release-static-2.9" />
 				</Compiler>
 				<Linker>
@@ -85,6 +87,7 @@
 					<Add option="-g" />
 					<Add option="-D__WXGTK__" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D_FILE_OFFSET_BITS=64" />
 					<Add directory="/home/byte/wx_qsp/_build_debug/lib/wx/include/gtk2-ansi-debug-static-2.9" />
 				</Compiler>
 				<Linker>
@@ -115,6 +118,7 @@
 					<Add option="-D__WXGTK__" />
 					<Add option="-D_UNICODE" />
 					<Add option="-D_DEBUG" />
+					<Add option="-D_FILE_OFFSET_BITS=64" />
 					<Add directory="/home/byte/wx_qsp/_build_debug_unicode/lib/wx/include/gtk2-unicode-debug-static-2.9" />
 				</Compiler>
 				<Linker>
@@ -149,7 +153,6 @@
 		<Unit filename="src/fmod.h" />
 		<Unit filename="src/fmod_codec.h" />
 		<Unit filename="src/fmod_dsp.h" />
-		<Unit filename="src/fmod_errors.h" />
 		<Unit filename="src/fmod_memoryinfo.h" />
 		<Unit filename="src/frame.cpp" />
 		<Unit filename="src/frame.h" />
