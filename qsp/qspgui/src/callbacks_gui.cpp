@@ -256,7 +256,17 @@ long QSPCallBacks::GetMSCount()
 
 void QSPCallBacks::Msg(QSP_CHAR *str)
 {
-	wxMessageDialog dialog(m_frame, wxString(str), _("Info"), wxOK | wxICON_INFORMATION);
+	RefreshInt(QSP_FALSE);
+	QSPMsgDlg dialog(m_frame,
+		wxID_ANY,
+		m_frame->GetDesc()->GetBackgroundColour(),
+		m_frame->GetDesc()->GetForegroundColour(),
+		m_frame->GetDesc()->GetTextFont(),
+		_("Info"),
+		wxString(str),
+		m_isHtml,
+		m_gamePath
+	);
 	dialog.ShowModal();
 }
 

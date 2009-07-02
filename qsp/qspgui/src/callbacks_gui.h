@@ -20,6 +20,7 @@
 
 	#include <map>
 	#include "frame.h"
+	#include "msgdlg.h"
 	#include "inputdlg.h"
 	#include "fmod.h"
 

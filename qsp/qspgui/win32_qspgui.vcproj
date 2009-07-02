@@ -390,6 +390,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\msgdlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\textbox.cpp"
 				>
 			</File>
@@ -457,6 +461,10 @@
 			</File>
 			<File
 				RelativePath=".\src\listbox.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\msgdlg.h"
 				>
 			</File>
 			<File

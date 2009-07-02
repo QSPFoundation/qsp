@@ -15,44 +15,39 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#ifndef INPUTDLG_H
-	#define INPUTDLG_H
+#ifndef MSGDLG_H
+	#define MSGDLG_H
 
 	#include <wx/wx.h>
 	#include <wx/statline.h>
-	#include <wx/valgen.h>
 	#include "textbox.h"
 
 	enum
 	{
-		ID_INPUT_DESC
+		ID_MSG_DESC
 	};
 
-	class QSPInputDlg : public wxDialog
+	class QSPMsgDlg : public wxDialog
 	{
-		DECLARE_CLASS(QSPInputDlg)
+		DECLARE_CLASS(QSPMsgDlg)
 		DECLARE_EVENT_TABLE()
 	public:
 		// C-tors / D-tor
-		QSPInputDlg(wxWindow* parent,
-					wxWindowID id,
-					const wxColour& backColor,
-					const wxColour& fontColor,
-					const wxFont& font,
-					const wxString& caption,
-					const wxString& text,
-					bool isHtml,
-					const wxString& gamePath);
-
-		// Accessors
-		wxString GetText() const { return m_text; }
+		QSPMsgDlg(wxWindow* parent,
+				wxWindowID id,
+				const wxColour& backColor,
+				const wxColour& fontColor,
+				const wxFont& font,
+				const wxString& caption,
+				const wxString& text,
+				bool isHtml,
+				const wxString& gamePath);
 	protected:
 		// Events
 		void OnLinkClicked(wxHtmlLinkEvent& event);
 
 		// Fields
 		QSPTextBox *m_desc;
-		wxString m_text;
 	};
 
 #endif

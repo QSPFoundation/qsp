@@ -166,6 +166,8 @@
 		<Unit filename="src/inputdlg.h" />
 		<Unit filename="src/listbox.cpp" />
 		<Unit filename="src/listbox.h" />
+		<Unit filename="src/msgdlg.cpp" />
+		<Unit filename="src/msgdlg.h" />
 		<Unit filename="src/qsp.h" />
 		<Unit filename="src/textbox.cpp" />
 		<Unit filename="src/textbox.h" />

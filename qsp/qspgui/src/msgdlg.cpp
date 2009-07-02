@@ -15,75 +15,64 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "inputdlg.h"
+#include "msgdlg.h"
 
-IMPLEMENT_CLASS(QSPInputDlg, wxDialog)
+IMPLEMENT_CLASS(QSPMsgDlg, wxDialog)
 
-BEGIN_EVENT_TABLE(QSPInputDlg, wxDialog)
-	EVT_HTML_LINK_CLICKED(ID_INPUT_DESC, QSPInputDlg::OnLinkClicked)
+BEGIN_EVENT_TABLE(QSPMsgDlg, wxDialog)
+	EVT_HTML_LINK_CLICKED(ID_MSG_DESC, QSPMsgDlg::OnLinkClicked)
 END_EVENT_TABLE()
 
-QSPInputDlg::QSPInputDlg(wxWindow* parent,
-						 wxWindowID id,
-						 const wxColour& backColor,
-						 const wxColour& fontColor,
-						 const wxFont& font,
-						 const wxString& caption,
-						 const wxString& text,
-						 bool isHtml,
-						 const wxString& gamePath)
+QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
+					 wxWindowID id,
+					 const wxColour& backColor,
+					 const wxColour& fontColor,
+					 const wxFont& font,
+					 const wxString& caption,
+					 const wxString& text,
+					 bool isHtml,
+					 const wxString& gamePath)
 {
 	if (!Create(parent, id, caption, wxDefaultPosition, wxDefaultSize, wxCAPTION | wxRESIZE_BORDER | wxSYSTEM_MENU)) return;
 	// ----------
 	SetBackgroundColour(backColor);
 	wxSizer *sizerUp = new wxBoxSizer(wxVERTICAL);
-	m_desc = new QSPTextBox(this, ID_INPUT_DESC);
+	m_desc = new QSPTextBox(this, ID_MSG_DESC);
 	m_desc->SetGamePath(gamePath);
 	m_desc->SetIsHtml(isHtml);
 	m_desc->SetBackgroundColour(backColor);
 	m_desc->SetForegroundColour(fontColor);
 	m_desc->SetTextFont(font);
 	m_desc->SetText(text);
-	wxTextCtrl *inputStr = new wxTextCtrl(this, wxID_ANY);
-	inputStr->SetBackgroundColour(backColor);
-	inputStr->SetForegroundColour(fontColor);
-	inputStr->SetFont(font);
 	wxStaticLine* line = new wxStaticLine(this, wxID_STATIC, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
 	sizerUp->Add(m_desc, 1, wxALL | wxGROW, 2);
-	sizerUp->Add(inputStr, 0, wxALL | wxGROW, 2);
 	sizerUp->Add(line, 0, wxALL | wxGROW, 2);
 	// ----------
 	wxSizer *sizerBottom = new wxBoxSizer(wxHORIZONTAL);
 	wxButton *btnOk = new wxButton(this, wxID_OK, _("OK"));
-	wxButton *btnCancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
 	btnOk->SetDefault();
 	btnOk->SetFont(font);
-	btnCancel->SetFont(font);
 	#ifdef __WXMSW__
 		btnOk->SetBackgroundColour(backColor);
 		btnOk->SetForegroundColour(fontColor);
-		btnCancel->SetBackgroundColour(backColor);
-		btnCancel->SetForegroundColour(fontColor);
 	#endif
 	sizerBottom->Add(btnOk, 0, wxALL, 2);
-	sizerBottom->Add(btnCancel, 0, wxALL, 2);
 	// ----------
 	wxSizer *sizerMain = new wxBoxSizer(wxVERTICAL);
 	sizerMain->Add(sizerUp, 1, wxGROW, 0);
 	sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
 	// ----------
-	inputStr->SetValidator(wxGenericValidator(&m_text));
 	sizerMain->SetMinSize(300, 200);
 	SetAutoLayout(true);
 	SetSizer(sizerMain);
 	sizerMain->Fit(this);
 	sizerMain->SetSizeHints(this);
-	SetSize(420, 280);
+	SetSize(520, 350);
 	Center();
-	inputStr->SetFocus();
+	btnOk->SetFocus();
 }
 
-void QSPInputDlg::OnLinkClicked(wxHtmlLinkEvent& event)
+void QSPMsgDlg::OnLinkClicked(wxHtmlLinkEvent& event)
 {
 	wxString href;
 	wxHtmlLinkInfo info(event.GetLinkInfo());
