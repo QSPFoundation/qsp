@@ -356,7 +356,7 @@ QSP_BOOL QSPExecString(QSP_CHAR *s, QSP_BOOL isRefresh)
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
 	jumpToFake = qspGetNewText(QSP_FMT(""), 0);
-	qspExecString(s, &jumpToFake);
+	qspExecStringAsCode(s, &jumpToFake);
 	free(jumpToFake);
 	if (qspErrorNum)
 	{

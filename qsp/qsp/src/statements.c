@@ -37,6 +37,7 @@ static long qspGetStatCode(QSP_CHAR *, QSP_BOOL, QSP_CHAR **);
 static long qspSearchElse(QSP_CHAR **, long, long);
 static long qspSearchEnd(QSP_CHAR **, long, long);
 static long qspSearchLabel(QSP_CHAR **, long, long, QSP_CHAR *);
+static QSP_BOOL qspExecString(QSP_CHAR *, QSP_CHAR **);
 static QSP_BOOL qspStatementIf(QSP_CHAR *, QSP_CHAR **);
 static QSP_BOOL qspStatementAddText(QSPVariant *, long, QSP_CHAR **, char);
 static QSP_BOOL qspStatementClear(QSPVariant *, long, QSP_CHAR **, char);
@@ -310,7 +311,7 @@ long qspGetStatArgs(QSP_CHAR *s, long statCode, QSPVariant *args)
 	return count;
 }
 
-QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
+static QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
 {
 	QSPVariant args[QSP_STATMAXARGS];
 	long oldRefreshCount, statCode, count;
@@ -387,7 +388,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 	i = startLine;
 	while (i < endLine)
 	{
-		qspRealLine = i + codeOffset;
+		if (codeOffset > 0) qspRealLine = i + codeOffset;
 		statCode = qspGetStatCode(s[i], QSP_TRUE, &paramPos);
 		if (statCode == qspStatAct || statCode == qspStatIf)
 		{
@@ -418,7 +419,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 					{
 						if (elsePos >= 0)
 						{
-							isExit = qspExecCode(s, i, elsePos, 1, jumpTo, QSP_FALSE);
+							isExit = qspExecCode(s, i, elsePos, codeOffset, jumpTo, QSP_FALSE);
 							if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 							if (**jumpTo)
 							{
@@ -456,6 +457,16 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 		++i;
 	}
 	if (uLevel) free(jumpToFake);
+	return isExit;
+}
+
+QSP_BOOL qspExecStringAsCode(QSP_CHAR *s, QSP_CHAR **jumpTo)
+{
+	QSP_BOOL isExit;
+	QSP_CHAR **strs;
+	long count = qspPreprocessData(s, &strs);
+	isExit = qspExecCode(strs, 0, count, 0, jumpTo, QSP_FALSE);
+	qspFreeStrs(strs, count, QSP_FALSE);
 	return isExit;
 }
 
@@ -719,5 +730,5 @@ static QSP_BOOL qspStatementExec(QSPVariant *args, long count, QSP_CHAR **jumpTo
 
 static QSP_BOOL qspStatementDynamic(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	return qspExecString(QSP_STR(args[0]), jumpTo);
+	return qspExecStringAsCode(QSP_STR(args[0]), jumpTo);
 }

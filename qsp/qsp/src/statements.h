@@ -101,7 +101,7 @@
 	/* External functions */
 	void qspInitStats();
 	long qspGetStatArgs(QSP_CHAR *, long, QSPVariant *);
-	QSP_BOOL qspExecString(QSP_CHAR *, QSP_CHAR **);
 	QSP_BOOL qspExecCode(QSP_CHAR **, long, long, long, QSP_CHAR **, QSP_BOOL);
+	QSP_BOOL qspExecStringAsCode(QSP_CHAR *);
 
 #endif
