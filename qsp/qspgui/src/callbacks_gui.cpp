@@ -61,7 +61,7 @@ void QSPCallBacks::DeInit()
 	FMOD_System_Release(m_sys);
 }
 
-bool QSPCallBacks::GetVarValue(QSP_CHAR *name, long *num, QSP_CHAR **str)
+bool QSPCallBacks::GetVarValue(const QSP_CHAR *name, long *num, QSP_CHAR **str)
 {
 	if (QSPGetVarValuesCount(name, num) && *num)
 	{
@@ -88,8 +88,8 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	// -------------------------------
 	UpdateGamePath();
 	// -------------------------------
-	QSP_CHAR *mainDesc = QSPGetMainDesc();
-	QSP_CHAR *varsDesc = QSPGetVarsDesc();
+	const QSP_CHAR *mainDesc = QSPGetMainDesc();
+	const QSP_CHAR *varsDesc = QSPGetVarsDesc();
 	// -------------------------------
 	isScroll = !(GetVarValue(QSP_FMT("DISABLESCROLL"), &numVal, &strVal) && numVal);
 	isCanSave = !(GetVarValue(QSP_FMT("NOSAVE"), &numVal, &strVal) && numVal);
@@ -153,12 +153,12 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, isCanSave);
 }
 
-void QSPCallBacks::SetInputStrText(QSP_CHAR *text)
+void QSPCallBacks::SetInputStrText(const QSP_CHAR *text)
 {
 	m_frame->GetInput()->SetText(wxString(text));
 }
 
-QSP_BOOL QSPCallBacks::IsPlay(QSP_CHAR *file)
+QSP_BOOL QSPCallBacks::IsPlay(const QSP_CHAR *file)
 {
 	FMOD_BOOL playing = FALSE;
 	QSPSounds::iterator elem = m_sounds.find(wxFileName(file, wxPATH_DOS).GetFullPath().Upper());
@@ -167,7 +167,7 @@ QSP_BOOL QSPCallBacks::IsPlay(QSP_CHAR *file)
 	return (playing == TRUE);
 }
 
-void QSPCallBacks::CloseFile(QSP_CHAR *file)
+void QSPCallBacks::CloseFile(const QSP_CHAR *file)
 {
 	if (file)
 	{
@@ -186,7 +186,7 @@ void QSPCallBacks::CloseFile(QSP_CHAR *file)
 	}
 }
 
-void QSPCallBacks::PlayFile(QSP_CHAR *file, long volume)
+void QSPCallBacks::PlayFile(const QSP_CHAR *file, long volume)
 {
 	FMOD_SOUND *newSound;
 	FMOD_CHANNEL *newChannel;
@@ -254,7 +254,7 @@ long QSPCallBacks::GetMSCount()
 	return ret;
 }
 
-void QSPCallBacks::Msg(QSP_CHAR *str)
+void QSPCallBacks::Msg(const QSP_CHAR *str)
 {
 	RefreshInt(QSP_FALSE);
 	QSPMsgDlg dialog(m_frame,
@@ -275,7 +275,7 @@ void QSPCallBacks::DeleteMenu()
 	m_frame->DeleteMenu();
 }
 
-void QSPCallBacks::AddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
+void QSPCallBacks::AddMenuItem(const QSP_CHAR *name, const QSP_CHAR *imgPath)
 {
 	m_frame->AddMenuItem(wxString(name), wxString(imgPath));
 }
@@ -285,7 +285,7 @@ void QSPCallBacks::ShowMenu()
 	m_frame->ShowMenu();
 }
 
-void QSPCallBacks::Input(QSP_CHAR *text, QSP_CHAR *buffer, long maxLen)
+void QSPCallBacks::Input(const QSP_CHAR *text, QSP_CHAR *buffer, long maxLen)
 {
 	RefreshInt(QSP_FALSE);
 	QSPInputDlg dialog(m_frame,
@@ -307,7 +307,7 @@ void QSPCallBacks::Input(QSP_CHAR *text, QSP_CHAR *buffer, long maxLen)
 	buffer[maxLen] = 0;
 }
 
-void QSPCallBacks::ShowImage(QSP_CHAR *file)
+void QSPCallBacks::ShowImage(const QSP_CHAR *file)
 {
 	m_frame->ShowPane(ID_VIEWPIC, m_frame->GetImgView()->OpenFile(wxString(file)));
 }
@@ -316,14 +316,14 @@ void QSPCallBacks::OpenGameStatus()
 {
 	wxFileDialog dialog(m_frame, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
 	if (dialog.ShowModal() == wxID_OK)
-		QSPOpenSavedGame((QSP_CHAR *)dialog.GetPath().wx_str(), QSP_FALSE);
+		QSPOpenSavedGame((const QSP_CHAR *)dialog.GetPath().wx_str(), QSP_FALSE);
 }
 
 void QSPCallBacks::SaveGameStatus()
 {
 	wxFileDialog dialog(m_frame, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
 	if (dialog.ShowModal() == wxID_OK)
-		QSPSaveGame((QSP_CHAR *)dialog.GetPath().wx_str(), QSP_FALSE);
+		QSPSaveGame((const QSP_CHAR *)dialog.GetPath().wx_str(), QSP_FALSE);
 }
 
 void QSPCallBacks::UpdateGamePath()
@@ -336,7 +336,7 @@ void QSPCallBacks::UpdateGamePath()
 	m_frame->GetVars()->SetGamePath(m_gamePath);
 }
 
-bool QSPCallBacks::SetVolume(QSP_CHAR *file, long volume)
+bool QSPCallBacks::SetVolume(const QSP_CHAR *file, long volume)
 {
 	if (!IsPlay(file)) return false;
 	QSPSounds::iterator elem = m_sounds.find(wxFileName(file, wxPATH_DOS).GetFullPath().Upper());

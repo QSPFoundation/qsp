@@ -43,30 +43,30 @@
 		// Methods
 		static void Init(QSPFrame *frame);
 		static void DeInit();
-		static bool GetVarValue(QSP_CHAR *name, long *num, QSP_CHAR **str);
+		static bool GetVarValue(const QSP_CHAR *name, long *num, QSP_CHAR **str);
 
 		// CallBacks
 		static void RefreshInt(QSP_BOOL isRedraw);
 		static void SetTimer(long msecs);
-		static void SetInputStrText(QSP_CHAR *text);
-		static QSP_BOOL IsPlay(QSP_CHAR *file);
-		static void CloseFile(QSP_CHAR *file);
-		static void PlayFile(QSP_CHAR *file, long volume);
+		static void SetInputStrText(const QSP_CHAR *text);
+		static QSP_BOOL IsPlay(const QSP_CHAR *file);
+		static void CloseFile(const QSP_CHAR *file);
+		static void PlayFile(const QSP_CHAR *file, long volume);
 		static void ShowPane(long type, QSP_BOOL isShow);
 		static void Sleep(long msecs);
 		static long GetMSCount();
-		static void Msg(QSP_CHAR *str);
+		static void Msg(const QSP_CHAR *str);
 		static void DeleteMenu();
-		static void AddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath);
+		static void AddMenuItem(const QSP_CHAR *name, const QSP_CHAR *imgPath);
 		static void ShowMenu();
-		static void Input(QSP_CHAR *text, QSP_CHAR *buffer, long maxLen);
-		static void ShowImage(QSP_CHAR *file);
+		static void Input(const QSP_CHAR *text, QSP_CHAR *buffer, long maxLen);
+		static void ShowImage(const QSP_CHAR *file);
 		static void OpenGameStatus();
 		static void SaveGameStatus();
 	private:
 		// Internal methods
 		static void UpdateGamePath();
-		static bool SetVolume(QSP_CHAR *file, long volume);
+		static bool SetVolume(const QSP_CHAR *file, long volume);
 
 		// Fields
 		static wxString m_gamePath;

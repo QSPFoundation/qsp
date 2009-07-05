@@ -362,10 +362,10 @@ void QSPFrame::ShowError()
 {
 	bool oldIsProcessEvents;
 	wxString wxMessage;
-	QSP_CHAR *loc, *desc;
+	QSP_CHAR *loc;
 	long code, where, line;
 	QSPGetLastErrorData(&code, &loc, &where, &line);
-	desc = QSPGetErrorDesc(code);
+	const QSP_CHAR *desc = QSPGetErrorDesc(code);
 	if (loc)
 		wxMessage = wxString::Format(
 			_("Location: %s\nArea: %s\nLine: %ld\nCode: %ld\nDesc: %s"),
@@ -528,7 +528,7 @@ void QSPFrame::TogglePane(wxWindowID id)
 
 void QSPFrame::OpenGameFile(const wxString& path)
 {
-	if (QSPLoadGameWorld((QSP_CHAR *)path.wx_str()))
+	if (QSPLoadGameWorld((const QSP_CHAR *)path.wx_str()))
 	{
 		wxCommandEvent dummy;
 		wxFileName file(path);
@@ -592,14 +592,14 @@ void QSPFrame::OnNewGame(wxCommandEvent& event)
 void QSPFrame::OnOpenGameStat(wxCommandEvent& event)
 {
 	wxFileDialog dialog(this, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
-	if (dialog.ShowModal() == wxID_OK && !QSPOpenSavedGame((QSP_CHAR *)dialog.GetPath().wx_str(), QSP_TRUE))
+	if (dialog.ShowModal() == wxID_OK && !QSPOpenSavedGame((const QSP_CHAR *)dialog.GetPath().wx_str(), QSP_TRUE))
 		ShowError();
 }
 
 void QSPFrame::OnSaveGameStat(wxCommandEvent& event)
 {
 	wxFileDialog dialog(this, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
-	if (dialog.ShowModal() == wxID_OK && !QSPSaveGame((QSP_CHAR *)dialog.GetPath().wx_str(), QSP_TRUE))
+	if (dialog.ShowModal() == wxID_OK && !QSPSaveGame((const QSP_CHAR *)dialog.GetPath().wx_str(), QSP_TRUE))
 		ShowError();
 }
 
@@ -800,7 +800,7 @@ void QSPFrame::OnLinkClicked(wxHtmlLinkEvent& event)
 		}
 		else if (href.Upper().StartsWith(wxT("EXEC:")))
 		{
-			if (m_isProcessEvents && !QSPExecString((QSP_CHAR *)href.Mid(5).wx_str(), QSP_TRUE)) ShowError();
+			if (m_isProcessEvents && !QSPExecString((const QSP_CHAR *)href.Mid(5).wx_str(), QSP_TRUE)) ShowError();
 		}
 		else if (href.ToLong(&ind))
 		{
@@ -844,7 +844,7 @@ void QSPFrame::OnInputTextChange(wxCommandEvent& event)
 {
 	wxString text(event.GetString());
 	m_input->SetText(text, false);
-	QSPSetInputStrText((QSP_CHAR *)text.wx_str());
+	QSPSetInputStrText((const QSP_CHAR *)text.wx_str());
 }
 
 void QSPFrame::OnInputTextEnter(wxCommandEvent& event)

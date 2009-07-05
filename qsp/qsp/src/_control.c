@@ -44,12 +44,12 @@ static void qspWait(QSP_BOOL isBlock)
 /* Информация о версии */
 
 /* Версия */
-QSP_CHAR *QSPGetVersion()
+const QSP_CHAR *QSPGetVersion()
 {
 	return QSP_VER;
 }
 /* Дата и время компиляции */
-QSP_CHAR *QSPGetCompiledDateTime()
+const QSP_CHAR *QSPGetCompiledDateTime()
 {
 	return QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__);
 }
@@ -62,14 +62,14 @@ long QSPGetFullRefreshCount()
 }
 /* ------------------------------------------------------------ */
 /* Полный путь к загруженному файлу игры */
-QSP_CHAR *QSPGetQstFullPath()
+const QSP_CHAR *QSPGetQstFullPath()
 {
 	qspWait(QSP_FALSE);
 	return qspQstFullPath;
 }
 /* ------------------------------------------------------------ */
 /* Название текущей локации */
-QSP_CHAR *QSPGetCurLoc()
+const QSP_CHAR *QSPGetCurLoc()
 {
 	QSP_CHAR *ret;
 	qspWait(QSP_TRUE);
@@ -81,7 +81,7 @@ QSP_CHAR *QSPGetCurLoc()
 /* Основное описание локации */
 
 /* Текст основного окна описания локации */
-QSP_CHAR *QSPGetMainDesc()
+const QSP_CHAR *QSPGetMainDesc()
 {
 	qspWait(QSP_FALSE);
 	return qspCurDesc;
@@ -96,7 +96,7 @@ QSP_BOOL QSPIsMainDescChanged()
 /* Дополнительное описание локации */
 
 /* Текст дополнительного окна описания локации */
-QSP_CHAR *QSPGetVarsDesc()
+const QSP_CHAR *QSPGetVarsDesc()
 {
 	qspWait(QSP_FALSE);
 	return qspCurVars;
@@ -109,12 +109,12 @@ QSP_BOOL QSPIsVarsDescChanged()
 }
 /* ------------------------------------------------------------ */
 /* Получить значение указанного выражения */
-QSP_BOOL QSPGetExprValue(QSP_CHAR *expr, QSP_BOOL *isString, long *numVal, QSP_CHAR *strVal, long strValBufSize)
+QSP_BOOL QSPGetExprValue(const QSP_CHAR *expr, QSP_BOOL *isString, long *numVal, QSP_CHAR *strVal, long strValBufSize)
 {
 	QSPVariant v;
 	qspWait(QSP_TRUE);
 	qspResetError(QSP_TRUE);
-	v = qspExprValue(expr);
+	v = qspExprValue((QSP_CHAR *)expr);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -134,10 +134,10 @@ QSP_BOOL QSPGetExprValue(QSP_CHAR *expr, QSP_BOOL *isString, long *numVal, QSP_C
 }
 /* ------------------------------------------------------------ */
 /* Текст строки ввода */
-void QSPSetInputStrText(QSP_CHAR *val)
+void QSPSetInputStrText(const QSP_CHAR *val)
 {
 	qspWait(QSP_TRUE);
-	qspCurInputLen = qspAddText(&qspCurInput, val, 0, -1, QSP_FALSE);
+	qspCurInputLen = qspAddText(&qspCurInput, (QSP_CHAR *)val, 0, -1, QSP_FALSE);
 	qspIsMustWait = QSP_FALSE;
 }
 /* ------------------------------------------------------------ */
@@ -296,12 +296,12 @@ void QSPShowWindow(long type, QSP_BOOL isShow)
 /* Переменные */
 
 /* Получить количество элементов массива */
-QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, long *count)
+QSP_BOOL QSPGetVarValuesCount(const QSP_CHAR *name, long *count)
 {
 	QSPVar *var;
 	qspWait(QSP_TRUE);
 	qspResetError(QSP_TRUE);
-	var = qspVarReference(name, QSP_FALSE);
+	var = qspVarReference((QSP_CHAR *)name, QSP_FALSE);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -312,12 +312,12 @@ QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, long *count)
 	return QSP_TRUE;
 }
 /* Получить значения указанного элемента массива */
-QSP_BOOL QSPGetVarValues(QSP_CHAR *name, long ind, long *numVal, QSP_CHAR **strVal)
+QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, long ind, long *numVal, QSP_CHAR **strVal)
 {
 	QSPVar *var;
 	qspWait(QSP_TRUE);
 	qspResetError(QSP_TRUE);
-	var = qspVarReference(name, QSP_FALSE);
+	var = qspVarReference((QSP_CHAR *)name, QSP_FALSE);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -350,13 +350,13 @@ QSP_BOOL QSPGetVarNameByIndex(long index, QSP_CHAR **name)
 /* Выполнение кода */
 
 /* Выполнение строки кода */
-QSP_BOOL QSPExecString(QSP_CHAR *s, QSP_BOOL isRefresh)
+QSP_BOOL QSPExecString(const QSP_CHAR *s, QSP_BOOL isRefresh)
 {
 	QSP_CHAR *jumpToFake;
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
 	jumpToFake = qspGetNewText(QSP_FMT(""), 0);
-	qspExecStringAsCode(s, &jumpToFake);
+	qspExecStringAsCode((QSP_CHAR *)s, &jumpToFake);
 	free(jumpToFake);
 	if (qspErrorNum)
 	{
@@ -368,11 +368,11 @@ QSP_BOOL QSPExecString(QSP_CHAR *s, QSP_BOOL isRefresh)
 	return QSP_TRUE;
 }
 /* Выполнение кода указанной локации */
-QSP_BOOL QSPExecLocationCode(QSP_CHAR *name, QSP_BOOL isRefresh)
+QSP_BOOL QSPExecLocationCode(const QSP_CHAR *name, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
-	qspExecLocByName(name, QSP_FALSE);
+	qspExecLocByName((QSP_CHAR *)name, QSP_FALSE);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -429,7 +429,7 @@ void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorWhere, 
 	qspIsMustWait = QSP_FALSE;
 }
 /* Получить описание ошибки по ее номеру */
-QSP_CHAR *QSPGetErrorDesc(long errorNum)
+const QSP_CHAR *QSPGetErrorDesc(long errorNum)
 {
 	QSP_CHAR *str;
 	switch (errorNum)
@@ -467,11 +467,11 @@ QSP_CHAR *QSPGetErrorDesc(long errorNum)
 /* Управление игрой */
 
 /* Загрузка новой игры */
-QSP_BOOL QSPLoadGameWorld(QSP_CHAR *fileName)
+QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *fileName)
 {
 	qspWait(QSP_TRUE);
 	qspResetError(QSP_TRUE);
-	qspOpenQuest(fileName, QSP_FALSE);
+	qspOpenQuest((QSP_CHAR *)fileName, QSP_FALSE);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -481,11 +481,11 @@ QSP_BOOL QSPLoadGameWorld(QSP_CHAR *fileName)
 	return QSP_TRUE;
 }
 /* Сохранение состояния */
-QSP_BOOL QSPSaveGame(QSP_CHAR *fileName, QSP_BOOL isRefresh)
+QSP_BOOL QSPSaveGame(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
-	qspSaveGameStatus(fileName);
+	qspSaveGameStatus((QSP_CHAR *)fileName);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -496,11 +496,11 @@ QSP_BOOL QSPSaveGame(QSP_CHAR *fileName, QSP_BOOL isRefresh)
 	return QSP_TRUE;
 }
 /* Загрузка состояния */
-QSP_BOOL QSPOpenSavedGame(QSP_CHAR *fileName, QSP_BOOL isRefresh)
+QSP_BOOL QSPOpenSavedGame(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
-	qspOpenGameStatus(fileName);
+	qspOpenGameStatus((QSP_CHAR *)fileName);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;

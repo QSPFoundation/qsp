@@ -74,24 +74,24 @@
 
 	enum
 	{
-		QSP_CALL_ISPLAYINGFILE, /* QSP_BOOL func(QSP_CHAR *file) */
-		QSP_CALL_PLAYFILE, /* void func(QSP_CHAR *file, long volume) */
-		QSP_CALL_CLOSEFILE, /* void func(QSP_CHAR *file) */
-		QSP_CALL_SHOWIMAGE, /* void func(QSP_CHAR *file) */
+		QSP_CALL_ISPLAYINGFILE, /* QSP_BOOL func(const QSP_CHAR *file) */
+		QSP_CALL_PLAYFILE, /* void func(const QSP_CHAR *file, long volume) */
+		QSP_CALL_CLOSEFILE, /* void func(const QSP_CHAR *file) */
+		QSP_CALL_SHOWIMAGE, /* void func(const QSP_CHAR *file) */
 		QSP_CALL_SHOWWINDOW, /* void func(long type, QSP_BOOL isShow) */
 		QSP_CALL_DELETEMENU, /* void func() */
-		QSP_CALL_ADDMENUITEM, /* void func(QSP_CHAR *name, QSP_CHAR *imgPath) */
+		QSP_CALL_ADDMENUITEM, /* void func(const QSP_CHAR *name, const QSP_CHAR *imgPath) */
 		QSP_CALL_SHOWMENU, /* void func() */
-		QSP_CALL_SHOWMSGSTR, /* void func(QSP_CHAR *str) */
+		QSP_CALL_SHOWMSGSTR, /* void func(const QSP_CHAR *str) */
 		QSP_CALL_REFRESHINT, /* void func(QSP_BOOL isRedraw) */
 		QSP_CALL_SETTIMER, /* void func(long msecs) */
-		QSP_CALL_SETINPUTSTRTEXT, /* void func(QSP_CHAR *text) */
-		QSP_CALL_SYSTEM, /* void func(QSP_CHAR *str) */
+		QSP_CALL_SETINPUTSTRTEXT, /* void func(const QSP_CHAR *text) */
+		QSP_CALL_SYSTEM, /* void func(const QSP_CHAR *str) */
 		QSP_CALL_OPENGAMESTATUS, /* void func() */
 		QSP_CALL_SAVEGAMESTATUS, /* void func() */
 		QSP_CALL_SLEEP, /* void func(long msecs) */
 		QSP_CALL_GETMSCOUNT, /* long func() */
-		QSP_CALL_INPUTBOX, /* void func(QSP_CHAR *text, QSP_CHAR *buffer, long maxLen) */
+		QSP_CALL_INPUTBOX, /* void func(const QSP_CHAR *text, QSP_CHAR *buffer, long maxLen) */
 		QSP_CALL_DUMMY
 	};
 
@@ -119,17 +119,17 @@
 	extern "C"
 	{
 	#endif
-		QSP_EXTERN QSP_CHAR *QSPGetVersion();
-		QSP_EXTERN QSP_CHAR *QSPGetCompiledDateTime();
+		QSP_EXTERN const QSP_CHAR *QSPGetVersion();
+		QSP_EXTERN const QSP_CHAR *QSPGetCompiledDateTime();
 		QSP_EXTERN long QSPGetFullRefreshCount();
-		QSP_EXTERN QSP_CHAR *QSPGetQstFullPath();
-		QSP_EXTERN QSP_CHAR *QSPGetCurLoc();
-		QSP_EXTERN QSP_CHAR *QSPGetMainDesc();
+		QSP_EXTERN const QSP_CHAR *QSPGetQstFullPath();
+		QSP_EXTERN const QSP_CHAR *QSPGetCurLoc();
+		QSP_EXTERN const QSP_CHAR *QSPGetMainDesc();
 		QSP_EXTERN QSP_BOOL QSPIsMainDescChanged();
-		QSP_EXTERN QSP_CHAR *QSPGetVarsDesc();
+		QSP_EXTERN const QSP_CHAR *QSPGetVarsDesc();
 		QSP_EXTERN QSP_BOOL QSPIsVarsDescChanged();
-		QSP_EXTERN QSP_BOOL QSPGetExprValue(QSP_CHAR *str, QSP_BOOL *isString, long *numVal, QSP_CHAR *strVal, long strValBufSize);
-		QSP_EXTERN void QSPSetInputStrText(QSP_CHAR *str);
+		QSP_EXTERN QSP_BOOL QSPGetExprValue(const QSP_CHAR *str, QSP_BOOL *isString, long *numVal, QSP_CHAR *strVal, long strValBufSize);
+		QSP_EXTERN void QSPSetInputStrText(const QSP_CHAR *str);
 		QSP_EXTERN long QSPGetActionsCount();
 		QSP_EXTERN void QSPGetActionData(long ind, QSP_CHAR **imgPath, QSP_CHAR **desc);
 		QSP_EXTERN QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh);
@@ -142,19 +142,19 @@
 		QSP_EXTERN long QSPGetSelObjectIndex();
 		QSP_EXTERN QSP_BOOL QSPIsObjectsChanged();
 		QSP_EXTERN void QSPShowWindow(long type, QSP_BOOL isShow);
-		QSP_EXTERN QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, long *count);
-		QSP_EXTERN QSP_BOOL QSPGetVarValues(QSP_CHAR *name, long ind, long *numVal, QSP_CHAR **strVal);
+		QSP_EXTERN QSP_BOOL QSPGetVarValuesCount(const QSP_CHAR *name, long *count);
+		QSP_EXTERN QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, long ind, long *numVal, QSP_CHAR **strVal);
 		QSP_EXTERN long QSPGetMaxVarsCount();
 		QSP_EXTERN QSP_BOOL QSPGetVarNameByIndex(long ind, QSP_CHAR **name);
-		QSP_EXTERN QSP_BOOL QSPExecString(QSP_CHAR *str, QSP_BOOL isRefresh);
+		QSP_EXTERN QSP_BOOL QSPExecString(const QSP_CHAR *str, QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh);
-		QSP_EXTERN QSP_BOOL QSPExecLocationCode(QSP_CHAR *name, QSP_BOOL isRefresh);
+		QSP_EXTERN QSP_BOOL QSPExecLocationCode(const QSP_CHAR *name, QSP_BOOL isRefresh);
 		QSP_EXTERN void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorWhere, long *errorLine);
-		QSP_EXTERN QSP_CHAR *QSPGetErrorDesc(long errorNum);
-		QSP_EXTERN QSP_BOOL QSPLoadGameWorld(QSP_CHAR *file);
-		QSP_EXTERN QSP_BOOL QSPSaveGame(QSP_CHAR *file, QSP_BOOL isRefresh);
-		QSP_EXTERN QSP_BOOL QSPOpenSavedGame(QSP_CHAR *file, QSP_BOOL isRefresh);
+		QSP_EXTERN const QSP_CHAR *QSPGetErrorDesc(long errorNum);
+		QSP_EXTERN QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *file);
+		QSP_EXTERN QSP_BOOL QSPSaveGame(const QSP_CHAR *file, QSP_BOOL isRefresh);
+		QSP_EXTERN QSP_BOOL QSPOpenSavedGame(const QSP_CHAR *file, QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
 		QSP_EXTERN void QSPSelectMenuItem(long ind);
 		QSP_EXTERN void QSPSetCallBack(long type, QSP_CALLBACK func);
