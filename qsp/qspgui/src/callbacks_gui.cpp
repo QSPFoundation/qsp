@@ -194,7 +194,7 @@ void QSPCallBacks::PlayFile(const QSP_CHAR *file, long volume)
 	if (SetVolume(file, volume)) return;
 	CloseFile(file);
 	wxString strFile(wxFileName(file, wxPATH_DOS).GetFullPath());
-	if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(strFile.wx_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, 0, &newSound))
+	if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(strFile.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, 0, &newSound))
 	{
 		FMOD_System_PlaySound(m_sys, FMOD_CHANNEL_FREE, newSound, FALSE, &newChannel);
 		snd.Channel = newChannel;
@@ -300,9 +300,9 @@ void QSPCallBacks::Input(const QSP_CHAR *text, QSP_CHAR *buffer, long maxLen)
 	);
 	dialog.ShowModal();
 	#ifdef _UNICODE
-		wcsncpy(buffer, dialog.GetText().wx_str(), maxLen);
+		wcsncpy(buffer, dialog.GetText().c_str(), maxLen);
 	#else
-		strncpy(buffer, dialog.GetText().wx_str(), maxLen);
+		strncpy(buffer, dialog.GetText().c_str(), maxLen);
 	#endif
 	buffer[maxLen] = 0;
 }
@@ -316,14 +316,14 @@ void QSPCallBacks::OpenGameStatus()
 {
 	wxFileDialog dialog(m_frame, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
 	if (dialog.ShowModal() == wxID_OK)
-		QSPOpenSavedGame((const QSP_CHAR *)dialog.GetPath().wx_str(), QSP_FALSE);
+		QSPOpenSavedGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_FALSE);
 }
 
 void QSPCallBacks::SaveGameStatus()
 {
 	wxFileDialog dialog(m_frame, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
 	if (dialog.ShowModal() == wxID_OK)
-		QSPSaveGame((const QSP_CHAR *)dialog.GetPath().wx_str(), QSP_FALSE);
+		QSPSaveGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_FALSE);
 }
 
 void QSPCallBacks::UpdateGamePath()
