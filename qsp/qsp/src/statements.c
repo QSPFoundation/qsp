@@ -129,10 +129,10 @@ void qspInitStats()
 	qspAddStatement(qspStatGoSub, QSP_FMT("GOSUB"), QSP_FMT("GS"), 0, qspStatementGoSub, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddStatement(qspStatGoTo, QSP_FMT("GOTO"), QSP_FMT("GT"), 1, qspStatementGoTo, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddStatement(qspStatJump, QSP_FMT("JUMP"), 0, 0, qspStatementJump, 1, 1, 1);
-	qspAddStatement(qspStatKillAll, QSP_FMT("KILLALL"), 0, 7, qspStatementClear, 0, 0);
-	qspAddStatement(qspStatKillObj, QSP_FMT("KILLOBJ"), 0, 5, qspStatementClear, 0, 0);
-	qspAddStatement(qspStatKillQst, QSP_FMT("KILLQST"), 0, 8, qspStatementClear, 0, 0);
-	qspAddStatement(qspStatKillVar, QSP_FMT("KILLVAR"), 0, 6, qspStatementClear, 0, 0);
+	qspAddStatement(qspStatKillAll, QSP_FMT("KILLALL"), 0, 5, qspStatementClear, 0, 0);
+	qspAddStatement(qspStatKillObj, QSP_FMT("KILLOBJ"), 0, 1, qspStatementDelObj, 0, 1, 2);
+	qspAddStatement(qspStatKillQst, QSP_FMT("KILLQST"), 0, 6, qspStatementClear, 0, 0);
+	qspAddStatement(qspStatKillVar, QSP_FMT("KILLVAR"), 0, 0, qspStatementKillVar, 0, 2, 1, 2);
 	qspAddStatement(qspStatMenu, QSP_FMT("MENU"), 0, 0, qspStatementShowMenu, 1, 1, 1);
 	qspAddStatement(qspStatMClear, QSP_FMT("*CLEAR"), QSP_FMT("*CLR"), 1, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatMNL, QSP_FMT("*NL"), 0, 5, qspStatementAddText, 0, 1, 1);
@@ -579,18 +579,11 @@ static QSP_BOOL qspStatementClear(QSPVariant *args, long count, QSP_CHAR **jumpT
 		qspCallSetInputStrText(0);
 		break;
 	case 5:
+		qspClearVars(QSP_FALSE);
+		qspInitSpecialVars();
 		qspClearObjectsWithNotify();
 		break;
 	case 6:
-		qspClearVars(QSP_FALSE);
-		qspInitSpecialVars();
-		break;
-	case 7:
-		qspClearVars(QSP_FALSE);
-		qspInitSpecialVars();
-		qspClearObjectsWithNotify();
-		break;
-	case 8:
 		qspClearIncludes(QSP_FALSE);
 		if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
 		break;

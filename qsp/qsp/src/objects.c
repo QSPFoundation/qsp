@@ -28,6 +28,8 @@ long qspCurSelObject = -1;
 QSP_BOOL qspIsObjectsChanged = QSP_FALSE;
 QSP_BOOL qspCurIsShowObjs = QSP_TRUE;
 
+static void qspRemoveObject(long);
+
 void qspClearObjects(QSP_BOOL isFirst)
 {
 	long i;
@@ -67,6 +69,31 @@ void qspClearObjectsWithNotify()
 		}
 		qspFreeStrs(objs, oldCount, QSP_FALSE);
 	}
+}
+
+static void qspRemoveObject(long index)
+{
+	QSPVariant name;
+	if (!qspCurObjectsCount) return;
+	if (index < 0)
+		index = 0;
+	else if (index >= qspCurObjectsCount)
+		index = qspCurObjectsCount - 1;
+	if (qspCurSelObject >= index) qspCurSelObject = -1;
+	name.IsStr = QSP_TRUE;
+	QSP_STR(name) = qspCurObjects[index].Desc;
+	if (qspCurObjects[index].Image) free(qspCurObjects[index].Image);
+	--qspCurObjectsCount;
+	while (index < qspCurObjectsCount)
+	{
+		qspCurObjects[index] = qspCurObjects[index + 1];
+		++index;
+	}
+	qspIsObjectsChanged = QSP_TRUE;
+	qspSetVarValueByName(QSP_FMT("LASTOBJ"), &name);
+	free(QSP_STR(name));
+	if (qspErrorNum) return;
+	qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
 }
 
 long qspObjIndex(QSP_CHAR *name)
@@ -127,21 +154,20 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 
 QSP_BOOL qspStatementDelObj(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long objInd = qspObjIndex(QSP_STR(args[0]));
-	if (objInd < 0) return QSP_FALSE;
-	if (qspCurSelObject >= objInd) qspCurSelObject = -1;
-	if (qspCurObjects[objInd].Image) free(qspCurObjects[objInd].Image);
-	free(qspCurObjects[objInd].Desc);
-	--qspCurObjectsCount;
-	while (objInd < qspCurObjectsCount)
+	long objInd;
+	switch (extArg)
 	{
-		qspCurObjects[objInd] = qspCurObjects[objInd + 1];
-		++objInd;
+	case 0:
+		objInd = qspObjIndex(QSP_STR(args[0]));
+		if (objInd >= 0) qspRemoveObject(objInd);
+		break;
+	case 1:
+		if (count)
+			qspRemoveObject(QSP_NUM(args[0]) - 1);
+		else
+			qspClearObjectsWithNotify();
+		break;
 	}
-	qspIsObjectsChanged = QSP_TRUE;
-	qspSetVarValueByName(QSP_FMT("LASTOBJ"), args);
-	if (qspErrorNum) return QSP_FALSE;
-	qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
 	return QSP_FALSE;
 }
 

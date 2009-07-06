@@ -70,5 +70,6 @@
 	/* Statements */
 	void qspStatementSetVarValue(QSP_CHAR *);
 	QSP_BOOL qspStatementCopyArr(QSPVariant *, long, QSP_CHAR **, char);
+	QSP_BOOL qspStatementKillVar(QSPVariant *, long, QSP_CHAR **, char);
 
 #endif
