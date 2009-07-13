@@ -62,8 +62,8 @@ QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
 	sizerMain->Add(sizerUp, 1, wxGROW, 0);
 	sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
 	// ----------
-	static const int minWidth = 300;
-	static const int maxWidth = 470;
+	static const int minWidth = 400;
+	static const int maxWidth = 550;
 	static const int minHeight = 100;
 	static const int maxHeight = 350;
 	sizerMain->SetMinSize(minWidth, minHeight);
@@ -71,14 +71,14 @@ QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
 	SetSizer(sizerMain);
 	sizerMain->Fit(this);
 	sizerMain->SetSizeHints(this);
-	SetSize(maxWidth, minHeight);
-	int delta = GetSize().GetHeight() - m_desc->GetSize().GetHeight() + m_desc->GetCharHeight();
-	int height = m_desc->GetInternalRepresentation()->GetHeight() + delta;
-	if (height < minHeight)
-		height = minHeight;
-	else if (height > maxHeight)
-		height = maxHeight;
-	SetSize(maxWidth, height);
+	SetSize(minWidth, minHeight);
+	int deltaH = GetSize().GetHeight() - m_desc->GetSize().GetHeight() + m_desc->GetCharHeight();
+	int deltaW = GetSize().GetWidth() - m_desc->GetSize().GetWidth();
+	int height = m_desc->GetInternalRepresentation()->GetHeight() + deltaH;
+	int width = m_desc->GetInternalRepresentation()->GetWidth() + deltaW;
+	height = wxMin(wxMax(height, minHeight), maxHeight);
+	width = wxMin(wxMax(width, minWidth), maxWidth);
+	SetSize(width, height);
 	Center();
 	btnOk->SetFocus();
 }
