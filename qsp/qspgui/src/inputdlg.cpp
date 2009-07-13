@@ -73,7 +73,7 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
 	sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
 	// ----------
 	inputStr->SetValidator(wxGenericValidator(&m_text));
-	static const int minWidth = 400;
+	static const int minWidth = 420;
 	static const int maxWidth = 550;
 	static const int minHeight = 150;
 	static const int maxHeight = 350;
