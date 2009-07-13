@@ -33,7 +33,7 @@ QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
 					 bool isHtml,
 					 const wxString& gamePath)
 {
-	if (!Create(parent, id, caption, wxDefaultPosition, wxDefaultSize, wxCAPTION | wxRESIZE_BORDER | wxSYSTEM_MENU)) return;
+	if (!Create(parent, id, caption, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)) return;
 	// ----------
 	SetBackgroundColour(backColor);
 	wxSizer *sizerUp = new wxBoxSizer(wxVERTICAL);
