@@ -77,12 +77,12 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
 	static const int maxWidth = 550;
 	static const int minHeight = 150;
 	static const int maxHeight = 350;
+	SetSize(minWidth, minHeight);
 	sizerMain->SetMinSize(minWidth, minHeight);
 	SetAutoLayout(true);
 	SetSizer(sizerMain);
 	sizerMain->Fit(this);
 	sizerMain->SetSizeHints(this);
-	SetSize(minWidth, minHeight);
 	int deltaH = GetSize().GetHeight() - m_desc->GetSize().GetHeight() + m_desc->GetCharHeight();
 	int deltaW = GetSize().GetWidth() - m_desc->GetSize().GetWidth();
 	int height = m_desc->GetInternalRepresentation()->GetHeight() + deltaH;
