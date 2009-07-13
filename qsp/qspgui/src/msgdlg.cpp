@@ -62,12 +62,23 @@ QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
 	sizerMain->Add(sizerUp, 1, wxGROW, 0);
 	sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
 	// ----------
-	sizerMain->SetMinSize(300, 200);
+	static const int minWidth = 300;
+	static const int maxWidth = 470;
+	static const int minHeight = 100;
+	static const int maxHeight = 350;
+	sizerMain->SetMinSize(minWidth, minHeight);
 	SetAutoLayout(true);
 	SetSizer(sizerMain);
 	sizerMain->Fit(this);
 	sizerMain->SetSizeHints(this);
-	SetSize(520, 350);
+	SetSize(maxWidth, minHeight);
+	int delta = GetSize().GetHeight() - m_desc->GetSize().GetHeight() + m_desc->GetCharHeight();
+	int height = m_desc->GetInternalRepresentation()->GetHeight() + delta;
+	if (height < minHeight)
+		height = minHeight;
+	else if (height > maxHeight)
+		height = maxHeight;
+	SetSize(maxWidth, height);
 	Center();
 	btnOk->SetFocus();
 }

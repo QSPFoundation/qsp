@@ -73,12 +73,23 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
 	sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
 	// ----------
 	inputStr->SetValidator(wxGenericValidator(&m_text));
-	sizerMain->SetMinSize(300, 200);
+	static const int minWidth = 300;
+	static const int maxWidth = 420;
+	static const int minHeight = 150;
+	static const int maxHeight = 350;
+	sizerMain->SetMinSize(minWidth, minHeight);
 	SetAutoLayout(true);
 	SetSizer(sizerMain);
 	sizerMain->Fit(this);
 	sizerMain->SetSizeHints(this);
-	SetSize(420, 280);
+	SetSize(maxWidth, minHeight);
+	int delta = GetSize().GetHeight() - m_desc->GetSize().GetHeight() + m_desc->GetCharHeight();
+	int height = m_desc->GetInternalRepresentation()->GetHeight() + delta;
+	if (height < minHeight)
+		height = minHeight;
+	else if (height > maxHeight)
+		height = maxHeight;
+	SetSize(maxWidth, height);
 	Center();
 	inputStr->SetFocus();
 }
