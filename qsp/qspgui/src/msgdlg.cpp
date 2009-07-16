@@ -62,7 +62,7 @@ QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
 	sizerMain->Add(sizerUp, 1, wxGROW, 0);
 	sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
 	// ----------
-	static const int minWidth = 420;
+	static const int minWidth = 450;
 	static const int maxWidth = 550;
 	static const int minHeight = 100;
 	static const int maxHeight = 350;
