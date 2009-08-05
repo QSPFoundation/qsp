@@ -23,6 +23,7 @@
 
 	#define QSP_PLVOLUMEDELIM QSP_FMT("*")
 	#define QSP_PLFILEDELIM QSP_FMT("|")
+	#define QSP_PLMAXLEN 16384
 
 	extern QSP_CHAR *qspPlayList;
 	extern long qspPlayListLen;

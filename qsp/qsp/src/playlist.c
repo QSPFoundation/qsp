@@ -48,6 +48,7 @@ static void qspPlayFile(QSP_CHAR *s, long volume, QSP_BOOL isAddToPlayList)
 				qspPlayListLen = qspAddText(&qspPlayList, qspNumToStr(buf, volume), qspPlayListLen, -1, QSP_FALSE);
 			}
 			qspPlayListLen = qspAddText(&qspPlayList, QSP_PLFILEDELIM, qspPlayListLen, 1, QSP_FALSE);
+			if (qspPlayListLen > QSP_PLMAXLEN) qspRefreshPlayList();
 		}
 	}
 }
