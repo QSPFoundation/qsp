@@ -175,18 +175,17 @@ static long qspGetNumber(QSP_CHAR **expr)
 
 static QSP_CHAR *qspGetName(QSP_CHAR **expr)
 {
-	QSP_CHAR *rPos, *startPos = *expr, *pos = startPos;
+	QSP_CHAR *startPos = *expr, *pos = startPos;
 	do
 	{
 		if (*(++pos) == QSP_LSBRACK[0])
 		{
-			rPos = qspStrPos(pos, QSP_RSBRACK, QSP_FALSE);
-			if (!rPos)
+			if (!(pos = qspStrPos(pos, QSP_RSBRACK, QSP_FALSE)))
 			{
 				qspSetError(QSP_ERR_BRACKNOTFOUND);
 				return 0;
 			}
-			pos = rPos + 1;
+			++pos;
 			break;
 		}
 	} while (!qspIsInListEOL(QSP_DELIMS, *pos));
