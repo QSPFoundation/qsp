@@ -408,7 +408,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 				if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 				if (statCode == qspStatAct)
 				{
-					qspAddAction(args, count, s, i, endPos, QSP_TRUE);
+					qspAddAction(args, count, s, i, endPos, codeOffset > 0);
 					qspFreeVariants(args, count);
 					if (qspErrorNum) break;
 					i = endPos;
