@@ -901,44 +901,13 @@ static void qspFunctionInstr(QSPVariant *args, long count, QSPVariant *tos)
 
 static void qspFunctionReplace(QSPVariant *args, long count, QSPVariant *tos)
 {
-	long len, txtLen, oldTxtLen, searchLen, repLen, bufSize;
-	QSP_CHAR emptyStr[1], *newTxt, *pos, *repTxt, *txt = QSP_STR(args[0]);
-	searchLen = (long)QSP_STRLEN(QSP_STR(args[1]));
-	if (!searchLen)
-	{
-		QSP_PSTR(tos) = qspGetNewText(txt, -1);
-		return;
-	}
-	if (count == 2)
-	{
-		*emptyStr = 0;
-		repTxt = emptyStr;
-		repLen = 0;
-	}
+	QSP_CHAR *searchTxt = QSP_STR(args[1]);
+	if (!(*searchTxt))
+		QSP_PSTR(tos) = qspGetNewText(QSP_STR(args[0]), -1);
+	else if (count == 2)
+		QSP_PSTR(tos) = qspReplaceText(QSP_STR(args[0]), searchTxt, QSP_FMT(""));
 	else
-	{
-		repTxt = QSP_STR(args[2]);
-		repLen = (long)QSP_STRLEN(repTxt);
-	}
-	bufSize = 256;
-	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
-	txtLen = oldTxtLen = 0;
-	pos = QSP_STRSTR(txt, QSP_STR(args[1]));
-	while (pos)
-	{
-		len = (long)(pos - txt);
-		if ((txtLen += len + repLen) >= bufSize)
-		{
-			bufSize = txtLen + 128;
-			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
-		}
-		QSP_STRNCPY(newTxt + oldTxtLen, txt, len);
-		QSP_STRCPY(newTxt + oldTxtLen + len, repTxt);
-		oldTxtLen = txtLen;
-		txt = pos + searchLen;
-		pos = QSP_STRSTR(txt, QSP_STR(args[1]));
-	}
-	QSP_PSTR(tos) = qspGetAddText(newTxt, txt, txtLen, -1);
+		QSP_PSTR(tos) = qspReplaceText(QSP_STR(args[0]), searchTxt, QSP_STR(args[2]));
 }
 
 static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)

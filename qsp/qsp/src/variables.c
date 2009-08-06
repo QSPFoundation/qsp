@@ -185,6 +185,12 @@ static void qspRefreshVar(QSPVar *var)
 		v.IsStr = QSP_TRUE;
 		QSP_STR(v) = (qspCurVars ? qspCurVars : emptyStr);
 		break;
+	case qspVarCurActs:
+		v.IsStr = QSP_TRUE;
+		QSP_STR(v) = qspGetAllActionsAsCode();
+		qspSetVarValueByReference(var, 0, &v);
+		free(QSP_STR(v));
+		return;
 	default:
 		return;
 	}
@@ -212,6 +218,7 @@ void qspInitSpecialVars()
 	qspInitSpecialVar(qspVarSelAct, QSP_FMT("SELACT"));
 	qspInitSpecialVar(qspVarMainText, QSP_FMT("MAINTXT"));
 	qspInitSpecialVar(qspVarStatText, QSP_FMT("STATTXT"));
+	qspInitSpecialVar(qspVarCurActs, QSP_FMT("CURACTS"));
 }
 
 QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)

@@ -125,6 +125,40 @@ void qspExecAction(long ind)
 	qspRealCurLoc = oldLoc;
 }
 
+QSP_CHAR *qspGetAllActionsAsCode()
+{
+	long len = 0, i;
+	QSP_CHAR *res, *temp;
+	res = qspGetNewText(QSP_FMT(""), 0);
+	for (i = 0; i < qspCurActionsCount; ++i)
+	{
+		len = qspAddText(&res, QSP_FMT("ACT '"), len, 5, QSP_FALSE);
+		temp = qspReplaceText(qspCurActions[i].Desc, QSP_FMT("'"), QSP_FMT("''"));
+		len = qspAddText(&res, temp, len, -1, QSP_FALSE);
+		free(temp);
+		if (qspCurActions[i].Image)
+		{
+			len = qspAddText(&res, QSP_FMT("','"), len, 3, QSP_FALSE);
+			temp = qspReplaceText(qspCurActions[i].Image + qspQstPathLen, QSP_FMT("'"), QSP_FMT("''"));
+			len = qspAddText(&res, temp, len, -1, QSP_FALSE);
+			free(temp);
+		}
+		len = qspAddText(&res, QSP_FMT("':"), len, 2, QSP_FALSE);
+		if (qspCurActions[i].OnPressLinesCount == 1)
+			len = qspAddText(&res, *qspCurActions[i].OnPressLines, len, -1, QSP_FALSE);
+		else
+		{
+			len = qspAddText(&res, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
+			temp = qspJoinStrs(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount, QSP_STRSDELIM);
+			len = qspAddText(&res, temp, len, -1, QSP_FALSE);
+			free(temp);
+			len = qspAddText(&res, QSP_STRSDELIM QSP_FMT("END"), len, QSP_LEN(QSP_STRSDELIM) + 3, QSP_FALSE);
+		}
+		len = qspAddText(&res, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
+	}
+	return res;
+}
+
 void qspStatementAddAct(QSP_CHAR *s)
 {
 	long oldRefreshCount, count;

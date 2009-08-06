@@ -325,6 +325,31 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 	return 0;
 }
 
+QSP_CHAR *qspReplaceText(QSP_CHAR *txt, QSP_CHAR *searchTxt, QSP_CHAR *repTxt)
+{
+	long txtLen = 0, oldTxtLen = 0, bufSize = 256, searchLen, repLen, len;
+	QSP_CHAR *newTxt, *pos;
+	searchLen = (long)QSP_STRLEN(searchTxt);
+	repLen = (long)QSP_STRLEN(repTxt);
+	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+	pos = QSP_STRSTR(txt, searchTxt);
+	while (pos)
+	{
+		len = (long)(pos - txt);
+		if ((txtLen += len + repLen) >= bufSize)
+		{
+			bufSize = txtLen + 128;
+			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
+		}
+		QSP_STRNCPY(newTxt + oldTxtLen, txt, len);
+		QSP_STRCPY(newTxt + oldTxtLen + len, repTxt);
+		oldTxtLen = txtLen;
+		txt = pos + searchLen;
+		pos = QSP_STRSTR(txt, searchTxt);
+	}
+	return qspGetAddText(newTxt, txt, txtLen, -1);
+}
+
 QSP_CHAR *qspFormatText(QSP_CHAR *txt)
 {
 	QSPVariant val;

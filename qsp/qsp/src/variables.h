@@ -47,7 +47,8 @@
 		qspVarSelObj,
 		qspVarSelAct,
 		qspVarMainText,
-		qspVarStatText
+		qspVarStatText,
+		qspVarCurActs
 	};
 
 	extern QSPVar qspVars[QSP_VARSCOUNT];

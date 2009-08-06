@@ -51,6 +51,7 @@
 	long qspStrToNum(QSP_CHAR *, QSP_CHAR **);
 	QSP_CHAR *qspNumToStr(QSP_CHAR *, long);
 	QSP_CHAR *qspStrPos(QSP_CHAR *, QSP_CHAR *, QSP_BOOL);
+	QSP_CHAR *qspReplaceText(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspFormatText(QSP_CHAR *);
 
 #endif

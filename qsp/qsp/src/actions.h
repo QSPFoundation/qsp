@@ -44,6 +44,7 @@
 	void qspClearActions(QSP_BOOL);
 	void qspAddAction(QSPVariant *, long, QSP_CHAR **, long, long, QSP_BOOL);
 	void qspExecAction(long);
+	QSP_CHAR *qspGetAllActionsAsCode();
 	/* Statements */
 	void qspStatementAddAct(QSP_CHAR *);
 	QSP_BOOL qspStatementDelAct(QSPVariant *, long, QSP_CHAR **, char);
