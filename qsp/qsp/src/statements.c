@@ -580,7 +580,6 @@ static QSP_BOOL qspStatementClear(QSPVariant *args, long count, QSP_CHAR **jumpT
 		break;
 	case 5:
 		qspClearVars(QSP_FALSE);
-		qspInitSpecialVars();
 		qspClearObjectsWithNotify();
 		break;
 	case 6:

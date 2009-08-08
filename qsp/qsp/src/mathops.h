@@ -48,10 +48,6 @@
 		qspOpOpenBracket,
 		qspOpMinus,
 
-		qspOpFirst_UnaryKeyword,
-		qspOpNot = qspOpFirst_UnaryKeyword,
-		qspOpObj,
-
 		qspOpFirst_NotUnaryOperator,
 		qspOpComma = qspOpFirst_NotUnaryOperator,
 		qspOpCloseBracket,
@@ -72,7 +68,9 @@
 		qspOpAppend,
 
 		qspOpFirst_Function,
-		qspOpMin = qspOpFirst_Function,
+		qspOpNot = qspOpFirst_Function,
+		qspOpObj,
+		qspOpMin,
 		qspOpMax,
 		qspOpRand,
 		qspOpIIf,
@@ -99,6 +97,17 @@
 		qspOpReplace,
 		qspOpFunc,
 		qspOpDynEval,
+		qspOpRnd,
+		qspOpCountObj,
+		qspOpMsecsCount,
+		qspOpQSPVer,
+		qspOpUserText,
+		qspOpCurLoc,
+		qspOpSelObj,
+		qspOpSelAct,
+		qspOpMainText,
+		qspOpStatText,
+		qspOpCurActs,
 
 		qspOpLast_Operation
 	};

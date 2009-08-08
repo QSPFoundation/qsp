@@ -32,31 +32,13 @@
 		long ValsCount;
 		QSP_CHAR **TextIndex;
 		long IndsCount;
-		long Type;
 	} QSPVar;
-
-	enum
-	{
-		qspVarNormal,
-		qspVarQSPVer,
-		qspVarRnd,
-		qspVarCountObj,
-		qspVarMsecsCount,
-		qspVarUserText,
-		qspVarCurLoc,
-		qspVarSelObj,
-		qspVarSelAct,
-		qspVarMainText,
-		qspVarStatText,
-		qspVarCurActs
-	};
 
 	extern QSPVar qspVars[QSP_VARSCOUNT];
 
 	/* External functions */
 	void qspClearVars(QSP_BOOL);
 	void qspEmptyVar(QSPVar *);
-	void qspInitSpecialVars();
 	QSPVar *qspVarReference(QSP_CHAR *, QSP_BOOL);
 	QSPVar *qspVarReferenceWithType(QSP_CHAR *, QSP_BOOL, QSP_BOOL *);
 	void qspSetVarValueByName(QSP_CHAR *, QSPVariant *);
