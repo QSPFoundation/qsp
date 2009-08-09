@@ -34,6 +34,7 @@
 	extern long qspCurIncLocsCount;
 
 	/* External functions */
+	QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *);
 	void qspClearIncludes(QSP_BOOL);
 	void qspNewGame(QSP_BOOL);
 	void qspOpenQuest(QSP_CHAR *, QSP_BOOL);

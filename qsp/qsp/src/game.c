@@ -75,7 +75,6 @@ long qspCRCTable[256] =
 };
 
 static long qspCRC(void *, long);
-static QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *);
 static void qspOpenIncludes();
 static FILE *qspFileOpen(QSP_CHAR *, QSP_CHAR *);
 static QSP_BOOL qspCheckQuest(char **, long, QSP_BOOL);
@@ -91,7 +90,7 @@ static long qspCRC(void *data, long len)
 	return crc;
 }
 
-static QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *path)
+QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *path)
 {
 	QSP_CHAR *absPath;
 	absPath = qspGetNewText(qspQstPath, qspQstPathLen);
@@ -118,8 +117,7 @@ static void qspOpenIncludes()
 	QSP_CHAR *file;
 	for (i = 0; i < qspCurIncFilesCount; ++i)
 	{
-		file = qspGetNewText(qspQstPath, qspQstPathLen);
-		file = qspGetAddText(file, qspCurIncFiles[i], qspQstPathLen, -1);
+		file = qspGetAbsFromRelPath(qspCurIncFiles[i]);
 		qspOpenQuest(file, QSP_TRUE);
 		free(file);
 		if (qspErrorNum) return;
@@ -570,8 +568,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 		switch (extArg)
 		{
 		case 0:
-			file = qspGetNewText(qspQstPath, qspQstPathLen);
-			file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
+			file = qspGetAbsFromRelPath(QSP_STR(args[0]));
 			qspOpenQuest(file, QSP_FALSE);
 			free(file);
 			if (qspErrorNum) return QSP_FALSE;
@@ -584,8 +581,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 				return QSP_FALSE;
 			}
 			oldCurIncLocsCount = qspCurIncLocsCount;
-			file = qspGetNewText(qspQstPath, qspQstPathLen);
-			file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
+			file = qspGetAbsFromRelPath(QSP_STR(args[0]));
 			qspOpenQuest(file, QSP_TRUE);
 			free(file);
 			if (qspErrorNum) return QSP_FALSE;
@@ -602,8 +598,7 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 	QSP_CHAR *file;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
-		file = qspGetNewText(qspQstPath, qspQstPathLen);
-		file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
+		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
 		qspOpenGameStatus(file);
 		free(file);
 	}
@@ -617,8 +612,7 @@ QSP_BOOL qspStatementSaveGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 	QSP_CHAR *file;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
-		file = qspGetNewText(qspQstPath, qspQstPathLen);
-		file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
+		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
 		qspSaveGameStatus(file);
 		free(file);
 	}

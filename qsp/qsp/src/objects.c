@@ -136,10 +136,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 		return QSP_FALSE;
 	}
 	if (count == 2 && qspIsAnyString(QSP_STR(args[1])))
-	{
-		imgPath = qspGetNewText(qspQstPath, qspQstPathLen);
-		imgPath = qspGetAddText(imgPath, QSP_STR(args[1]), qspQstPathLen, -1);
-	}
+		imgPath = qspGetAbsFromRelPath(QSP_STR(args[1]));
 	else
 		imgPath = 0;
 	obj = qspCurObjects + qspCurObjectsCount++;

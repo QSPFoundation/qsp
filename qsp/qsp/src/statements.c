@@ -776,8 +776,7 @@ static QSP_BOOL qspStatementView(QSPVariant *args, long count, QSP_CHAR **jumpTo
 	QSP_CHAR *file;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
-		file = qspGetNewText(qspQstPath, qspQstPathLen);
-		file = qspGetAddText(file, QSP_STR(args[0]), qspQstPathLen, -1);
+		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
 		qspCallShowPicture(file);
 		free(file);
 	}
@@ -797,8 +796,7 @@ static QSP_BOOL qspStatementExec(QSPVariant *args, long count, QSP_CHAR **jumpTo
 	QSP_CHAR *cmd;
 	if (qspIsAnyString(QSP_STR(args[0])))
 	{
-		cmd = qspGetNewText(qspQstPath, qspQstPathLen);
-		cmd = qspGetAddText(cmd, QSP_STR(args[0]), qspQstPathLen, -1);
+		cmd = qspGetAbsFromRelPath(QSP_STR(args[0]));
 		qspCallSystem(cmd);
 		free(cmd);
 	}

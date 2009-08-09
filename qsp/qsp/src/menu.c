@@ -67,10 +67,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 		}
 		qspCurMenuLocs[qspCurMenuItems++] = qspGetNewText(pos + 1, (long)(pos2 - pos) - 1);
 		if (pos2 < endPos && qspIsAnyString(++pos2))
-		{
-			imgPath = qspGetNewText(qspQstPath, qspQstPathLen);
-			imgPath = qspGetAddText(imgPath, pos2, qspQstPathLen, (long)(endPos - pos2));
-		}
+			imgPath = qspGetAbsFromRelPath(pos2);
 		else
 			imgPath = 0;
 		*pos = 0;
