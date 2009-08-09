@@ -21,6 +21,7 @@
 #ifndef QSP_MATHDEFINES
 	#define QSP_MATHDEFINES
 
+	#define QSP_MAXOPSNAMES 100
 	#define QSP_OPMAXARGS 10
 	#define QSP_STACKSIZE 30
 	#define QSP_MAXITEMS 100
@@ -29,8 +30,13 @@
 
 	typedef struct
 	{
-		QSP_CHAR *Names[2];
-		long NamesLens[2];
+		long Code;
+		QSP_CHAR *Name;
+		long NameLen;
+	} QSPMathOpName;
+
+	typedef struct
+	{
 		char Priority;
 		char ResType;
 		long MinArgsCount;
@@ -47,13 +53,9 @@
 		qspOpValue,
 		qspOpOpenBracket,
 		qspOpMinus,
-
-		qspOpFirst_NotUnaryOperator,
-		qspOpComma = qspOpFirst_NotUnaryOperator,
+		qspOpComma,
 		qspOpCloseBracket,
-
-		qspOpFirst_BinaryOperator,
-		qspOpMul = qspOpFirst_BinaryOperator,
+		qspOpMul,
 		qspOpDiv,
 		qspOpAdd,
 		qspOpSub,
