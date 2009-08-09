@@ -233,7 +233,7 @@ static long qspOperatorOpCode(QSP_CHAR **expr)
 	for (i = qspOpFirst_NotUnaryOperator; i < qspOpFirst_Function; ++i)
 	{
 		for (j = 0; j < 2; ++j)
-			if (qspOps[i].Names[j] && qspIsEqual(uExpr, qspOps[i].Names[j], (len = qspOps[i].NamesLens[j])))
+			if (qspOps[i].Names[j] && !qspStrsComp(uExpr, qspOps[i].Names[j], (len = qspOps[i].NamesLens[j])))
 			{
 				*expr += len;
 				free(uExpr);

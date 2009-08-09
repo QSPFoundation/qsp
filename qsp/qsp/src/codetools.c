@@ -29,19 +29,7 @@ static long qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 	ret = (QSP_CHAR **)malloc(bufSize * sizeof(QSP_CHAR *));
 	while (*data)
 	{
-		if (!quot && qspIsEqual(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM)))
-		{
-			str[strLen] = 0;
-			if (++count > bufSize)
-			{
-				bufSize <<= 1;
-				ret = (QSP_CHAR **)realloc(ret, bufSize * sizeof(QSP_CHAR *));
-			}
-			ret[count - 1] = qspDelSpc(str);
-			strLen = 0;
-			data += QSP_LEN(QSP_STRSDELIM);
-		}
-		else
+		if (quot || qspStrsComp(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM)))
 		{
 			if (++strLen >= strBufSize)
 			{
@@ -69,6 +57,18 @@ static long qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 			else if (qspIsInList(QSP_QUOTS, *data))
 				quot = *data;
 			++data;
+		}
+		else
+		{
+			str[strLen] = 0;
+			if (++count > bufSize)
+			{
+				bufSize <<= 1;
+				ret = (QSP_CHAR **)realloc(ret, bufSize * sizeof(QSP_CHAR *));
+			}
+			ret[count - 1] = qspDelSpc(str);
+			strLen = 0;
+			data += QSP_LEN(QSP_STRSDELIM);
 		}
 	}
 	str[strLen] = 0;

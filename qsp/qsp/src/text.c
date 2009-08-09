@@ -132,12 +132,12 @@ void qspUpperStr(QSP_CHAR *str)
 	while (*str) *str++ = QSP_CHRUPR(*str);
 }
 
-QSP_BOOL qspIsEqual(QSP_CHAR *str1, QSP_CHAR *str2, long maxLen)
+int qspStrsComp(QSP_CHAR *str1, QSP_CHAR *str2, long maxLen)
 {
-	long delta = 0;
-	while (maxLen-- && !(delta = (long)(*str1 - *str2)) && *str2)
+	int delta = 0;
+	while (maxLen-- && !(delta = (int)(*str1 - *str2)) && *str2)
 		++str1, ++str2;
-	return (delta == 0);
+	return delta;
 }
 
 QSP_CHAR *qspInStrRChars(QSP_CHAR *str, QSP_CHAR *chars, QSP_CHAR *end)
@@ -313,11 +313,11 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 					isLastDelim = QSP_TRUE;
 				else if (isLastDelim)
 				{
-					if (qspIsInListEOL(QSP_DELIMS, txt[strLen]) && qspIsEqual(txt, str, strLen)) return txt;
+					if (qspIsInListEOL(QSP_DELIMS, txt[strLen]) && !qspStrsComp(txt, str, strLen)) return txt;
 					isLastDelim = QSP_FALSE;
 				}
 			}
-			else if (qspIsEqual(txt, str, strLen))
+			else if (!qspStrsComp(txt, str, strLen))
 				return txt;
 		}
 		++txt;

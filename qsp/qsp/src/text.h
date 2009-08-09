@@ -42,7 +42,7 @@
 	QSP_BOOL qspIsAnyString(QSP_CHAR *);
 	void qspLowerStr(QSP_CHAR *);
 	void qspUpperStr(QSP_CHAR *);
-	QSP_BOOL qspIsEqual(QSP_CHAR *, QSP_CHAR *, long);
+	int qspStrsComp(QSP_CHAR *, QSP_CHAR *, long);
 	QSP_CHAR *qspInStrRChars(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspJoinStrs(QSP_CHAR **, long, QSP_CHAR *);
 	long qspSplitStr(QSP_CHAR *, QSP_CHAR *, QSP_CHAR ***);
