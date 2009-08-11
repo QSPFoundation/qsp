@@ -346,15 +346,6 @@ diff -u -r d:/wx/wxWidgets/src/generic/scrlwing.cpp d:/wx/wx_qsp/src/generic/scr
  }
  
  int wxScrollHelperBase::CalcScrollInc(wxScrollWinEvent& event)
-@@ -1483,6 +1489,8 @@
-     // otherwise invalidated area could be updated incorrectly later when
-     // ScrollWindow() makes sure they're repainted before scrolling them
-     m_targetWindow->Update();
-+    // HzD_Byte's hack
-+    m_targetWindow->Refresh(true, GetScrollRect());
- 
-     // update the position and scroll the window now:
-     if (m_xScrollPosition != new_x)
 diff -u -r d:/wx/wxWidgets/src/html/htmlwin.cpp d:/wx/wx_qsp/src/html/htmlwin.cpp
 --- d:/wx/wxWidgets/src/html/htmlwin.cpp	2009-06-23 21:47:22 +0700
 +++ d:/wx/wx_qsp/src/html/htmlwin.cpp	2009-06-29 03:01:41 +0700
