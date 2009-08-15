@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Ukrainian 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:24+1100\n"
-"PO-Revision-Date: 2009-03-24 01:40+0600\n"
+"PO-Revision-Date: 2009-08-16 02:30+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: Ukrainian <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -272,4 +272,25 @@ msgstr "при обробці вибору дії"
 
 msgid "on visit"
 msgstr "при відвідування"
+
+msgid "Sound &volume"
+msgstr "Гучність &звуку"
+
+msgid "No sound\tAlt-1"
+msgstr "Без звуку\tAlt-1"
+
+msgid "20%\tAlt-2"
+msgstr "20%\tAlt-2"
+
+msgid "40%\tAlt-3"
+msgstr "40%\tAlt-3"
+
+msgid "60%\tAlt-4"
+msgstr "60%\tAlt-4"
+
+msgid "80%\tAlt-5"
+msgstr "80%\tAlt-5"
+
+msgid "Initial volume\tAlt-6"
+msgstr "Початкова гучність\tAlt-6"
 

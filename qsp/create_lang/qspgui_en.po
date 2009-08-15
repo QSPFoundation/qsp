@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: English 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:13+1100\n"
-"PO-Revision-Date: 2009-03-24 01:40+0600\n"
+"PO-Revision-Date: 2009-08-16 02:29+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: English <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -272,4 +272,25 @@ msgstr "on action"
 
 msgid "on visit"
 msgstr "on visit"
+
+msgid "Sound &volume"
+msgstr "Sound &volume"
+
+msgid "No sound\tAlt-1"
+msgstr "No sound\tAlt-1"
+
+msgid "20%\tAlt-2"
+msgstr "20%\tAlt-2"
+
+msgid "40%\tAlt-3"
+msgstr "40%\tAlt-3"
+
+msgid "60%\tAlt-4"
+msgstr "60%\tAlt-4"
+
+msgid "80%\tAlt-5"
+msgstr "80%\tAlt-5"
+
+msgid "Initial volume\tAlt-6"
+msgstr "Initial volume\tAlt-6"
 

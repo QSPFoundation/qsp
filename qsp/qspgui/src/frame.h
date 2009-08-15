@@ -52,6 +52,13 @@
 		ID_NEWGAME,
 		ID_OPENGAMESTAT,
 		ID_SAVEGAMESTAT,
+		ID_VOLUME,
+		ID_VOLUME0,
+		ID_VOLUME20,
+		ID_VOLUME40,
+		ID_VOLUME60,
+		ID_VOLUME80,
+		ID_VOLUME100,
 		ID_FONT,
 		ID_SELECTFONT,
 		ID_USEFONTSIZE,
@@ -121,6 +128,7 @@
 		bool ApplyLinkColor(const wxColour& color);
 		void CallPaneFunc(wxWindowID id, QSP_BOOL isShow) const;
 		void TogglePane(wxWindowID id);
+		void SetOverallVolume(int percents);
 		void OpenGameFile(const wxString& path);
 
 		// Events
@@ -146,6 +154,7 @@
 		void OnToggleInput(wxCommandEvent& event);
 		void OnToggleCaptions(wxCommandEvent& event);
 		void OnToggleHotkeys(wxCommandEvent& event);
+		void OnVolume(wxCommandEvent& event);
 		void OnAbout(wxCommandEvent& event);
 		void OnLinkClicked(wxHtmlLinkEvent& event);
 		void OnObjectChange(wxCommandEvent& event);
@@ -174,6 +183,7 @@
 		wxMenu *m_fileMenu;
 		wxMenu *m_wndsMenu;
 		wxMenu *m_fontMenu;
+		wxMenu *m_volumeMenu;
 		wxAuiManager *m_manager;
 		wxColour m_backColor;
 		wxColour m_linkColor;
@@ -184,6 +194,7 @@
 		bool m_isProcessEvents;
 		bool m_isQuit;
 		bool m_isShowHotkeys;
+		int m_Volume;
 	};
 
 #endif

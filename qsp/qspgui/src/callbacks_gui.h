@@ -28,6 +28,7 @@
 	{
 		FMOD_CHANNEL *Channel;
 		FMOD_SOUND *Sound;
+		long Volume;
 
 		void Free() const
 		{
@@ -44,6 +45,7 @@
 		static void Init(QSPFrame *frame);
 		static void DeInit();
 		static bool GetVarValue(const QSP_CHAR *name, long *num, QSP_CHAR **str);
+		static void SetOverallVolume(float coeff);
 
 		// CallBacks
 		static void RefreshInt(QSP_BOOL isRedraw);
@@ -67,6 +69,7 @@
 		// Internal methods
 		static void UpdateGamePath();
 		static bool SetVolume(const QSP_CHAR *file, long volume);
+		static void UpdateSounds();
 
 		// Fields
 		static wxString m_gamePath;
@@ -74,6 +77,7 @@
 		static bool m_isHtml;
 		static FMOD_SYSTEM *m_sys;
 		static QSPSounds m_sounds;
+		static float m_volumeCoeff;
 	};
 
 #endif

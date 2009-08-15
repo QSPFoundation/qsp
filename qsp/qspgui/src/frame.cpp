@@ -42,6 +42,12 @@ BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
 	EVT_MENU(ID_TOGGLEINPUT, QSPFrame::OnToggleInput)
 	EVT_MENU(ID_TOGGLECAPTIONS, QSPFrame::OnToggleCaptions)
 	EVT_MENU(ID_TOGGLEHOTKEYS, QSPFrame::OnToggleHotkeys)
+	EVT_MENU(ID_VOLUME0, QSPFrame::OnVolume)
+	EVT_MENU(ID_VOLUME20, QSPFrame::OnVolume)
+	EVT_MENU(ID_VOLUME40, QSPFrame::OnVolume)
+	EVT_MENU(ID_VOLUME60, QSPFrame::OnVolume)
+	EVT_MENU(ID_VOLUME80, QSPFrame::OnVolume)
+	EVT_MENU(ID_VOLUME100, QSPFrame::OnVolume)
 	EVT_MENU(ID_ABOUT, QSPFrame::OnAbout)
 	EVT_HTML_LINK_CLICKED(ID_MAINDESC, QSPFrame::OnLinkClicked)
 	EVT_HTML_LINK_CLICKED(ID_VARSDESC, QSPFrame::OnLinkClicked)
@@ -107,10 +113,19 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	colorsMenu->Append(ID_SELECTBACKCOLOR, wxT("-"));
 	colorsMenu->Append(ID_SELECTLINKCOLOR, wxT("-"));
 	// ------------
+	m_volumeMenu = new wxMenu;
+	m_volumeMenu->AppendRadioItem(ID_VOLUME0, wxT("-"));
+	m_volumeMenu->AppendRadioItem(ID_VOLUME20, wxT("-"));
+	m_volumeMenu->AppendRadioItem(ID_VOLUME40, wxT("-"));
+	m_volumeMenu->AppendRadioItem(ID_VOLUME60, wxT("-"));
+	m_volumeMenu->AppendRadioItem(ID_VOLUME80, wxT("-"));
+	m_volumeMenu->AppendRadioItem(ID_VOLUME100, wxT("-"));
+	// ------------
 	wxMenu *settingsMenu = new wxMenu;
 	settingsMenu->Append(ID_SHOWHIDE, wxT("-"), m_wndsMenu);
 	settingsMenu->Append(ID_FONT, wxT("-"), m_fontMenu);
 	settingsMenu->Append(ID_COLORS, wxT("-"), colorsMenu);
+	settingsMenu->Append(ID_VOLUME, wxT("-"), m_volumeMenu);
 	settingsMenu->AppendSeparator();
 	wxMenuItem *settingsWinModeItem = new wxMenuItem(settingsMenu, ID_TOGGLEWINMODE, wxT("-"));
 	settingsWinModeItem->SetBitmap(wxBitmap(windowmode_xpm));
@@ -145,6 +160,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	m_manager->AddPane(m_input, wxAuiPaneInfo().Name(wxT("input")).MinSize(50, 20).BestSize(100, 20).Bottom().Layer(1));
 	// --------------------------------------
 	SetMinSize(wxSize(450, 300));
+	SetOverallVolume(100);
 	m_isQuit = false;
 }
 
@@ -169,6 +185,7 @@ void QSPFrame::SaveSettings()
 	cfg.Write(wxT("Font/FontSize"), m_fontSize);
 	cfg.Write(wxT("Font/FontName"), m_fontName);
 	cfg.Write(wxT("Font/UseFontSize"), m_isUseFontSize);
+	cfg.Write(wxT("General/Volume"), m_Volume);
 	cfg.Write(wxT("General/ShowHotkeys"), m_isShowHotkeys);
 	cfg.Write(wxT("General/Panels"), m_manager->SavePerspective());
 	m_transhelper->Save(cfg, wxT("General/Language"));
@@ -197,6 +214,7 @@ void QSPFrame::LoadSettings()
 	cfg.Read(wxT("Font/FontName"), &m_fontName, wxNORMAL_FONT->GetFaceName());
 	cfg.Read(wxT("Font/UseFontSize"), &m_isUseFontSize, false);
 	cfg.Read(wxT("General/ShowHotkeys"), &m_isShowHotkeys, false);
+	cfg.Read(wxT("General/Volume"), &m_Volume, 100);
 	cfg.Read(wxT("Pos/Left"), &x, 10);
 	cfg.Read(wxT("Pos/Top"), &y, 10);
 	cfg.Read(wxT("Pos/Width"), &w, 850);
@@ -213,6 +231,7 @@ void QSPFrame::LoadSettings()
 	cfg.Read(wxT("General/Panels"), &panels);
 	m_transhelper->Load(cfg, wxT("General/Language"));
 	// -------------------------------------------------
+	SetOverallVolume(m_Volume);
 	ApplyBackColor(m_backColor);
 	ApplyFontColor(m_fontColor);
 	ApplyLinkColor(m_linkColor);
@@ -418,6 +437,13 @@ void QSPFrame::ReCreateGUI()
 	menuBar->SetLabel(ID_SELECTFONTCOLOR, _("Select font's &color...\tAlt-C"));
 	menuBar->SetLabel(ID_SELECTBACKCOLOR, _("Select &background's color...\tAlt-B"));
 	menuBar->SetLabel(ID_SELECTLINKCOLOR, _("Select l&inks' color...\tAlt-I"));
+	menuBar->SetLabel(ID_VOLUME, _("Sound &volume"));
+	menuBar->SetLabel(ID_VOLUME0, _("No sound\tAlt-1"));
+	menuBar->SetLabel(ID_VOLUME20, _("20%\tAlt-2"));
+	menuBar->SetLabel(ID_VOLUME40, _("40%\tAlt-3"));
+	menuBar->SetLabel(ID_VOLUME60, _("60%\tAlt-4"));
+	menuBar->SetLabel(ID_VOLUME80, _("80%\tAlt-5"));
+	menuBar->SetLabel(ID_VOLUME100, _("Initial volume\tAlt-6"));
 	menuBar->SetLabel(ID_TOGGLEWINMODE, _("Window / Fullscreen &mode\tAlt-Enter"));
 	menuBar->SetLabel(ID_SELECTLANG, _("Select &language...\tAlt-L"));
 	menuBar->SetLabel(ID_ABOUT, _("&About...\tCtrl-H"));
@@ -517,6 +543,23 @@ void QSPFrame::CallPaneFunc(wxWindowID id, QSP_BOOL isShow) const
 		QSPShowWindow(QSP_WIN_INPUT, isShow);
 		break;
 	}
+}
+
+void QSPFrame::SetOverallVolume(int percents)
+{
+	int id = wxNOT_FOUND;
+	switch (percents)
+	{
+	case 0: id = ID_VOLUME0; break;
+	case 20: id = ID_VOLUME20; break;
+	case 40: id = ID_VOLUME40; break;
+	case 60: id = ID_VOLUME60; break;
+	case 80: id = ID_VOLUME80; break;
+	case 100: id = ID_VOLUME100; break;
+	}
+	if (id >= 0) m_volumeMenu->Check(id, true);
+	QSPCallBacks::SetOverallVolume((float)percents / 100);
+	m_Volume = percents;
 }
 
 void QSPFrame::TogglePane(wxWindowID id)
@@ -701,6 +744,20 @@ void QSPFrame::OnSelectLinkColor(wxCommandEvent& event)
 void QSPFrame::OnSelectLang(wxCommandEvent& event)
 {
 	if (m_transhelper->AskUserForLanguage()) ReCreateGUI();
+}
+
+void QSPFrame::OnVolume(wxCommandEvent& event)
+{
+	int volume = 100;
+	switch (event.GetId())
+	{
+	case ID_VOLUME0: volume = 0; break;
+	case ID_VOLUME20: volume = 20; break;
+	case ID_VOLUME40: volume = 40; break;
+	case ID_VOLUME60: volume = 60; break;
+	case ID_VOLUME80: volume = 80; break;
+	}
+	SetOverallVolume(volume);
 }
 
 void QSPFrame::OnToggleWinMode(wxCommandEvent& event)

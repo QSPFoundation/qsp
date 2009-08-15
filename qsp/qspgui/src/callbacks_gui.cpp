@@ -22,10 +22,12 @@ QSPFrame *QSPCallBacks::m_frame;
 bool QSPCallBacks::m_isHtml;
 FMOD_SYSTEM *QSPCallBacks::m_sys;
 QSPSounds QSPCallBacks::m_sounds;
+float QSPCallBacks::m_volumeCoeff;
 
 void QSPCallBacks::Init(QSPFrame *frame)
 {
 	m_frame = frame;
+	m_volumeCoeff = 1.0;
 
 	FMOD_System_Create(&m_sys);
 	FMOD_System_SetPluginPath(m_sys, "sound");
@@ -196,9 +198,11 @@ void QSPCallBacks::PlayFile(const QSP_CHAR *file, long volume)
 	wxString strFile(wxFileName(file, wxPATH_DOS).GetFullPath());
 	if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(strFile.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, 0, &newSound))
 	{
+		UpdateSounds();
 		FMOD_System_PlaySound(m_sys, FMOD_CHANNEL_FREE, newSound, FALSE, &newChannel);
 		snd.Channel = newChannel;
 		snd.Sound = newSound;
+		snd.Volume = volume;
 		m_sounds.insert(QSPSounds::value_type(strFile.Upper(), snd));
 		SetVolume(file, volume);
 	}
@@ -340,6 +344,45 @@ bool QSPCallBacks::SetVolume(const QSP_CHAR *file, long volume)
 {
 	if (!IsPlay(file)) return false;
 	QSPSounds::iterator elem = m_sounds.find(wxFileName(file, wxPATH_DOS).GetFullPath().Upper());
-	FMOD_Channel_SetVolume(((QSPSound)(elem->second)).Channel, (float)volume / 100);
+	QSPSound *snd = (QSPSound *)&elem->second;
+	snd->Volume = volume;
+	FMOD_Channel_SetVolume(snd->Channel, (float)(m_volumeCoeff * volume) / 100);
 	return true;
+}
+
+void QSPCallBacks::SetOverallVolume(float coeff)
+{
+	QSPSound *snd;
+	FMOD_BOOL playing = FALSE;
+	if (coeff < 0.0)
+		coeff = 0.0;
+	else if (coeff > 1.0)
+		coeff = 1.0;
+	m_volumeCoeff = coeff;
+	for (QSPSounds::iterator i = m_sounds.begin(); i != m_sounds.end(); ++i)
+	{
+		snd = (QSPSound *)&i->second;
+		FMOD_Channel_IsPlaying(snd->Channel, &playing);
+		if (playing)
+			FMOD_Channel_SetVolume(snd->Channel, (float)(m_volumeCoeff * snd->Volume) / 100);
+	}
+}
+
+void QSPCallBacks::UpdateSounds()
+{
+	QSPSound *snd;
+	FMOD_BOOL playing = FALSE;
+	QSPSounds::iterator i = m_sounds.begin();
+	while (i != m_sounds.end())
+	{
+		snd = (QSPSound *)&i->second;
+		FMOD_Channel_IsPlaying(snd->Channel, &playing);
+		if (playing)
+			++i;
+		else
+		{
+			snd->Free();
+			m_sounds.erase(i++);
+		}
+	}
 }
