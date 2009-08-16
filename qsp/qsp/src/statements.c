@@ -332,48 +332,64 @@ static long qspSearchLabel(QSP_CHAR **s, long start, long end, QSP_CHAR *str)
 
 long qspGetStatArgs(QSP_CHAR *s, long statCode, QSPVariant *args)
 {
-	QSP_CHAR *pos;
 	char type;
-	long count = 0, oldRefreshCount = qspRefreshCount;
-	while (1)
+	long oldRefreshCount, count = 0;
+	QSP_CHAR *pos, *brack = 0;
+	s = qspSkipSpaces(s);
+	if (*s == QSP_LRBRACK[0])
 	{
-		s = qspSkipSpaces(s);
-		if (!(*s))
+		if (!(brack = qspStrPos(s, QSP_RRBRACK, QSP_FALSE)))
 		{
-			if (count) qspSetError(QSP_ERR_SYNTAX);
-			break;
+			qspSetError(QSP_ERR_BRACKNOTFOUND);
+			return 0;
 		}
-		if (count == qspStats[statCode].MaxArgsCount)
+		*brack = 0;
+		s = qspSkipSpaces(s + 1);
+	}
+	if (*s)
+	{
+		oldRefreshCount = qspRefreshCount;
+		while (1)
 		{
-			qspSetError(QSP_ERR_ARGSCOUNT);
-			break;
-		}
-		pos = qspStrPos(s, QSP_COMMA, QSP_FALSE);
-		if (pos)
-		{
-			*pos = 0;
-			args[count] = qspExprValue(s);
-			*pos = QSP_COMMA[0];
-		}
-		else
-			args[count] = qspExprValue(s);
-		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-		type = qspStats[statCode].ArgsTypes[count];
-		if (type && qspConvertVariantTo(args + count, type == 1))
-		{
-			qspSetError(QSP_ERR_TYPEMISMATCH);
+			if (count == qspStats[statCode].MaxArgsCount)
+			{
+				qspSetError(QSP_ERR_ARGSCOUNT);
+				break;
+			}
+			pos = qspStrPos(s, QSP_COMMA, QSP_FALSE);
+			if (pos)
+			{
+				*pos = 0;
+				args[count] = qspExprValue(s);
+				*pos = QSP_COMMA[0];
+			}
+			else
+				args[count] = qspExprValue(s);
+			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+			type = qspStats[statCode].ArgsTypes[count];
+			if (type && qspConvertVariantTo(args + count, type == 1))
+			{
+				qspSetError(QSP_ERR_TYPEMISMATCH);
+				++count;
+				break;
+			}
 			++count;
-			break;
+			if (!pos) break;
+			s = qspSkipSpaces(pos + QSP_LEN(QSP_COMMA));
+			if (!(*s))
+			{
+				qspSetError(QSP_ERR_SYNTAX);
+				break;
+			}
 		}
-		++count;
-		if (!pos) break;
-		s = pos + QSP_LEN(QSP_COMMA);
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+		{
+			qspFreeVariants(args, count);
+			if (brack) *brack = QSP_RRBRACK[0];
+			return 0;
+		}
 	}
-	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-	{
-		qspFreeVariants(args, count);
-		return 0;
-	}
+	if (brack) *brack = QSP_RRBRACK[0];
 	if (count < qspStats[statCode].MinArgsCount)
 	{
 		qspSetError(QSP_ERR_ARGSCOUNT);
