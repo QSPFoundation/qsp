@@ -165,7 +165,7 @@ QSP_BOOL QSPCallBacks::IsPlay(const QSP_CHAR *file)
 	FMOD_BOOL playing = FALSE;
 	QSPSounds::iterator elem = m_sounds.find(wxFileName(file, wxPATH_DOS).GetFullPath().Upper());
 	if (elem != m_sounds.end())
-		FMOD_Channel_IsPlaying(((QSPSound)(elem->second)).Channel, &playing);
+		FMOD_Channel_IsPlaying(((QSPSound *)(&elem->second))->Channel, &playing);
 	return (playing == TRUE);
 }
 
@@ -176,14 +176,14 @@ void QSPCallBacks::CloseFile(const QSP_CHAR *file)
 		QSPSounds::iterator elem = m_sounds.find(wxFileName(file, wxPATH_DOS).GetFullPath().Upper());
 		if (elem != m_sounds.end())
 		{
-			((QSPSound)(elem->second)).Free();
+			((QSPSound *)(&elem->second))->Free();
 			m_sounds.erase(elem);
 		}
 	}
 	else
 	{
 		for (QSPSounds::iterator i = m_sounds.begin(); i != m_sounds.end(); ++i)
-			((QSPSound)(i->second)).Free();
+			((QSPSound *)(&i->second))->Free();
 		m_sounds.clear();
 	}
 }
