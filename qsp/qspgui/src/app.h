@@ -19,6 +19,7 @@
 	#define APP_H
 
 	#include <wx/wx.h>
+	#include <wx/stdpaths.h>
 	#include "callbacks_gui.h"
 	#include "transhelper.h"
 

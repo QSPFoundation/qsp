@@ -33,11 +33,10 @@ bool QSPApp::OnInit()
 	appPath.MakeAbsolute();
 	wxString appPathString(appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));
 	m_transhelper = new QSPTranslationHelper(*this, appPathString + wxT("langs"));
-	#ifdef __WXMSW__
+	if (wxFileName::IsDirWritable(appPathString))
 		configPath = appPathString;
-	#else
-		configPath = wxGetHomeDir() + wxFileName::GetPathSeparator();
-	#endif
+	else
+		configPath = wxStandardPaths::Get().GetUserConfigDir() + wxFileName::GetPathSeparator();
 	configPath += wxT("qspgui.cfg");
 	// ----------------------
 	frame = new QSPFrame(configPath, m_transhelper);
