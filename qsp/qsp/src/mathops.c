@@ -403,6 +403,7 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 			if (sp == QSP_STACKSIZE - 1)
 			{
 				qspSetError(QSP_ERR_STACKOVERFLOW);
+				if (tos.IsStr) free(QSP_STR(tos));
 				break;
 			}
 			stack[++sp] = tos;
