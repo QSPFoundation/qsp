@@ -219,7 +219,7 @@ void qspInitStats()
 	qspAddStatName(qspStatPlay, QSP_FMT("PLAY"), 0);
 	qspAddStatName(qspStatRefInt, QSP_FMT("REFINT"), 2);
 	qspAddStatName(qspStatSaveGame, QSP_FMT("SAVEGAME"), 2);
-	qspAddStatName(qspStatSetTimer, QSP_FMT("SETTIMER"), 2);
+	qspAddStatName(qspStatSetTimer, QSP_FMT("SETTIMER"), 1);
 	qspAddStatName(qspStatShowActs, QSP_FMT("SHOWACTS"), 2);
 	qspAddStatName(qspStatShowInput, QSP_FMT("SHOWINPUT"), 2);
 	qspAddStatName(qspStatShowObjs, QSP_FMT("SHOWOBJS"), 2);
