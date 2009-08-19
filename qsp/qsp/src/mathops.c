@@ -398,6 +398,15 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 				}
 			}
 		}
+		else
+		{
+			if (sp == QSP_STACKSIZE - 1)
+			{
+				qspSetError(QSP_ERR_STACKOVERFLOW);
+				break;
+			}
+			stack[++sp] = tos;
+		}
 		if (!qspErrorNum)
 		{
 			type = qspOps[opCode].ResType;
@@ -405,12 +414,6 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 			switch (opCode)
 			{
 			case qspOpValue:
-				if (sp == QSP_STACKSIZE - 1)
-				{
-					qspSetError(QSP_ERR_STACKOVERFLOW);
-					break;
-				}
-				stack[++sp] = tos;
 				tos = compValues[index];
 				break;
 			case qspOpMul:
