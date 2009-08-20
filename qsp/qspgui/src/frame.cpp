@@ -819,6 +819,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 	info.AddDeveloper(wxT("Byte [nporep@mail.ru]"));
 	info.AddDocWriter(wxT("Korwin [tightbow@yandex.ru]"));
 	info.AddArtist(wxT("3dEyes [3deyes@gmail.com]"));
+	info.AddArtist(wxT("Ajenta [ajenta.arrow@gmail.com]"));
 	info.AddArtist(wxT("Alex [dogmar88@mail.ru]"));
 	info.AddArtist(wxT("BalleR [vsevolod_kremyan@mail.ru]"));
 	info.AddArtist(wxT("BaxZzZz [bauer_v@mail.ru]"));
@@ -833,9 +834,11 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 	info.AddArtist(wxT("Morgan [gorgonyte@mail.ru]"));
 	info.AddArtist(wxT("Mortem [reijii@darthman.com]"));
 	info.AddArtist(wxT("Nex [nex@otaku.ru]"));
+	info.AddArtist(wxT("Ntropy [ntropy@yandex.ru]"));
 	info.AddArtist(wxT("Ondoo [ondoo@mail.ru]"));
 	info.AddArtist(wxT("RB [qsp1@narod.ru]"));
 	info.AddArtist(wxT("rrock.ru [rrock.ru@gmail.com]"));
+	info.AddArtist(wxT("WladySpb [wladyspb@mail.ru]"));
 	// ----
 	wxAboutBox(info);
 }
