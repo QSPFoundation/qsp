@@ -154,30 +154,28 @@ QSP_CHAR *qspInStrRChars(QSP_CHAR *str, QSP_CHAR *chars, QSP_CHAR *end)
 
 QSP_CHAR *qspJoinStrs(QSP_CHAR **s, long count, QSP_CHAR *delim)
 {
-	long i, newTxtLen = 0, newTxtRealLen = 0, newTxtBufSize = 256, lastIndex = count - 1, delimLen = (long)QSP_STRLEN(delim);
-	QSP_CHAR *newTxt = (QSP_CHAR *)malloc(newTxtBufSize * sizeof(QSP_CHAR));
-	*newTxt = 0;
+	long i, txtLen = 0, txtRealLen = 0, bufSize = 256, lastIndex = count - 1, delimLen = (long)QSP_STRLEN(delim);
+	QSP_CHAR *txt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+	*txt = 0;
 	for (i = 0; i < count; ++i)
 	{
-		newTxtLen += (long)QSP_STRLEN(s[i]);
-		if (newTxtLen >= newTxtBufSize)
+		if ((txtLen += (long)QSP_STRLEN(s[i])) >= bufSize)
 		{
-			newTxtBufSize = newTxtLen + 128;
-			newTxt = (QSP_CHAR *)realloc(newTxt, newTxtBufSize * sizeof(QSP_CHAR));
+			bufSize = txtLen + 128;
+			txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
 		}
-		QSP_STRCPY(newTxt + newTxtRealLen, s[i]);
+		QSP_STRCPY(txt + txtRealLen, s[i]);
 		if (i == lastIndex) break;
-		newTxtRealLen = newTxtLen;
-		newTxtLen += delimLen;
-		if (newTxtLen >= newTxtBufSize)
+		txtRealLen = txtLen;
+		if ((txtLen += delimLen) >= bufSize)
 		{
-			newTxtBufSize = newTxtLen + 128;
-			newTxt = (QSP_CHAR *)realloc(newTxt, newTxtBufSize * sizeof(QSP_CHAR));
+			bufSize = txtLen + 128;
+			txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
 		}
-		QSP_STRCPY(newTxt + newTxtRealLen, delim);
-		newTxtRealLen = newTxtLen;
+		QSP_STRCPY(txt + txtRealLen, delim);
+		txtRealLen = txtLen;
 	}
-	return newTxt;
+	return txt;
 }
 
 long qspSplitStr(QSP_CHAR *str, QSP_CHAR *delim, QSP_CHAR ***res)
