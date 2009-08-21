@@ -34,7 +34,7 @@ void QSPCallBacks::Init(QSPFrame *frame)
 	#ifdef __WXMSW__
 		FMOD_System_SetOutput(m_sys, FMOD_OUTPUTTYPE_DSOUND);
 	#else
-		FMOD_System_SetOutput(m_sys, FMOD_OUTPUTTYPE_OSS);
+		FMOD_System_SetOutput(m_sys, FMOD_OUTPUTTYPE_ALSA);
 	#endif
 	FMOD_System_Init(m_sys, 32, FMOD_INIT_NORMAL, 0);
 
