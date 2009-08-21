@@ -9,4 +9,4 @@ svn export $WX_PATH $WX_QSP_PATH
 patch -i $QSP_PATH/build_wx/wxPatch.diff -d $WX_QSP_PATH -p 3 --binary
 cd $WX_QSP_PATH
 ./configure --disable-utf8 --disable-shared
-make -j $((`grep -c ^processor /proc/cpuinfo` + 1))
+make -j $[`grep -c ^processor /proc/cpuinfo` + 1]
