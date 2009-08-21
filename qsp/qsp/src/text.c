@@ -156,6 +156,7 @@ QSP_CHAR *qspJoinStrs(QSP_CHAR **s, long count, QSP_CHAR *delim)
 {
 	long i, newTxtLen = 0, newTxtRealLen = 0, newTxtBufSize = 256, lastIndex = count - 1, delimLen = (long)QSP_STRLEN(delim);
 	QSP_CHAR *newTxt = (QSP_CHAR *)malloc(newTxtBufSize * sizeof(QSP_CHAR));
+	*newTxt = 0;
 	for (i = 0; i < count; ++i)
 	{
 		newTxtLen += (long)QSP_STRLEN(s[i]);

@@ -124,7 +124,7 @@ void qspExecAction(long ind)
 
 QSP_CHAR *qspGetAllActionsAsCode()
 {
-	long len = 0, i;
+	long len = 0, count, i;
 	QSP_CHAR *res, *temp;
 	res = qspGetNewText(QSP_FMT(""), 0);
 	for (i = 0; i < qspCurActionsCount; ++i)
@@ -141,14 +141,18 @@ QSP_CHAR *qspGetAllActionsAsCode()
 			free(temp);
 		}
 		len = qspAddText(&res, QSP_FMT("':"), len, 2, QSP_FALSE);
-		if (qspCurActions[i].OnPressLinesCount == 1)
+		count = qspCurActions[i].OnPressLinesCount;
+		if (count == 1 && qspIsAnyString(*qspCurActions[i].OnPressLines))
 			len = qspAddText(&res, *qspCurActions[i].OnPressLines, len, -1, QSP_FALSE);
 		else
 		{
-			len = qspAddText(&res, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
-			temp = qspJoinStrs(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount, QSP_STRSDELIM);
-			len = qspAddText(&res, temp, len, -1, QSP_FALSE);
-			free(temp);
+			if (count >= 2)
+			{
+				len = qspAddText(&res, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
+				temp = qspJoinStrs(qspCurActions[i].OnPressLines, count, QSP_STRSDELIM);
+				len = qspAddText(&res, temp, len, -1, QSP_FALSE);
+				free(temp);
+			}
 			len = qspAddText(&res, QSP_STRSDELIM QSP_FMT("END"), len, QSP_LEN(QSP_STRSDELIM) + 3, QSP_FALSE);
 		}
 		len = qspAddText(&res, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
