@@ -441,6 +441,59 @@ long qspArrayPos(QSPVariant *args, long argsCount, QSP_BOOL isRegExp)
 	return -1;
 }
 
+QSPVariant qspArrayMinMaxItem(QSP_CHAR *name, QSP_BOOL isMin)
+{
+	QSPVar *var;
+	QSP_CHAR *str;
+	QSP_BOOL isString;
+	long curInd, count;
+	QSPVariant res;
+	if (!(var = qspVarReferenceWithType(name, QSP_FALSE, &isString)))
+		return qspGetEmptyVariant(QSP_FALSE);
+	curInd = -1;
+	count = var->ValsCount;
+	while (--count >= 0)
+	{
+		if (isString)
+		{
+			str = var->TextValue[count];
+			if (curInd >= 0)
+			{
+				if (str && *str)
+				{
+					if (isMin)
+					{
+						if (QSP_STRCOLL(str, var->TextValue[curInd]) < 0)
+							curInd = count;
+					}
+					else if (QSP_STRCOLL(str, var->TextValue[curInd]) > 0)
+						curInd = count;
+				}
+			}
+			else if (str && *str)
+				curInd = count;
+		}
+		else if (curInd >= 0)
+		{
+			if (isMin)
+			{
+				if (var->Value[count] < var->Value[curInd])
+					curInd = count;
+			}
+			else if (var->Value[count] > var->Value[curInd])
+				curInd = count;
+		}
+		else
+			curInd = count;
+	}
+	if (curInd < 0) return qspGetEmptyVariant(isString);
+	if (res.IsStr = isString)
+		QSP_STR(res) = qspGetNewText(var->TextValue[curInd], -1);
+	else
+		QSP_NUM(res) = var->Value[curInd];
+	return res;
+}
+
 long qspGetVarsCount()
 {
 	long i, count = 0;

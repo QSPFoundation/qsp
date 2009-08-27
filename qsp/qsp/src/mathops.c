@@ -57,6 +57,8 @@ static void qspFunctionIsPlay(QSPVariant *, long, QSPVariant *);
 static void qspFunctionInstr(QSPVariant *, long, QSPVariant *);
 static void qspFunctionReplace(QSPVariant *, long, QSPVariant *);
 static void qspFunctionFunc(QSPVariant *, long, QSPVariant *);
+static void qspFunctionMin(QSPVariant *, long, QSPVariant *);
+static void qspFunctionMax(QSPVariant *, long, QSPVariant *);
 
 static void qspAddOperation(long opCode, char priority, QSP_FUNCTION func, char resType, long minArgs, long maxArgs, ...)
 {
@@ -147,8 +149,8 @@ void qspInitMath()
 	qspAddOperation(qspOpOr, 6, 0, 2, 2, 2, 2, 2);
 	qspAddOperation(qspOpObj, 8, 0, 2, 1, 1, 1);
 	qspAddOperation(qspOpNot, 8, 0, 2, 1, 1, 2);
-	qspAddOperation(qspOpMin, 30, 0, 0, 2, 2, 0, 0);
-	qspAddOperation(qspOpMax, 30, 0, 0, 2, 2, 0, 0);
+	qspAddOperation(qspOpMin, 30, qspFunctionMin, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+	qspAddOperation(qspOpMax, 30, qspFunctionMax, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddOperation(qspOpRand, 30, qspFunctionRand, 2, 1, 2, 2, 2);
 	qspAddOperation(qspOpIIf, 30, 0, 0, 3, 3, 2, 0, 0);
 	qspAddOperation(qspOpRGB, 30, qspFunctionRGB, 2, 3, 3, 2, 2, 2);
@@ -492,12 +494,6 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 				QSP_NUM(tos) = QSP_NUM(args[0]) | QSP_NUM(args[1]);
 				break;
 			/* Embedded functions -------------------------------------------------------------- */
-			case qspOpMin:
-				qspCopyVariant(&tos, qspAutoConvertCompare(args, args + 1) < 0 ? args : args + 1);
-				break;
-			case qspOpMax:
-				qspCopyVariant(&tos, qspAutoConvertCompare(args, args + 1) > 0 ? args : args + 1);
-				break;
 			case qspOpIIf:
 				qspCopyVariant(&tos, QSP_NUM(args[0]) ? args + 1 : args + 2);
 				break;
@@ -1110,4 +1106,44 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 	}
 	qspEmptyVar(varRes);
 	qspMoveVar(varRes, &result);
+}
+
+static void qspFunctionMin(QSPVariant *args, long count, QSPVariant *tos)
+{
+	long minInd;
+	if (count == 1)
+	{
+		qspConvertVariantTo(args, QSP_TRUE);
+		*tos = qspArrayMinMaxItem(QSP_STR(args[0]), QSP_TRUE);
+	}
+	else
+	{
+		minInd = 0;
+		while (--count > 0)
+		{
+			if (qspAutoConvertCompare(args + count, args + minInd) < 0)
+				minInd = count;
+		}
+		qspCopyVariant(tos, args + minInd);
+	}
+}
+
+static void qspFunctionMax(QSPVariant *args, long count, QSPVariant *tos)
+{
+	long maxInd;
+	if (count == 1)
+	{
+		qspConvertVariantTo(args, QSP_TRUE);
+		*tos = qspArrayMinMaxItem(QSP_STR(args[0]), QSP_FALSE);
+	}
+	else
+	{
+		maxInd = 0;
+		while (--count > 0)
+		{
+			if (qspAutoConvertCompare(args + count, args + maxInd) > 0)
+				maxInd = count;
+		}
+		qspCopyVariant(tos, args + maxInd);
+	}
 }

@@ -47,6 +47,7 @@
 	QSPVariant qspGetVar(QSP_CHAR *);
 	long qspArraySize(QSP_CHAR *);
 	long qspArrayPos(QSPVariant *, long, QSP_BOOL);
+	QSPVariant qspArrayMinMaxItem(QSP_CHAR *, QSP_BOOL);
 	long qspGetVarsCount();
 	void qspSetArgs(QSPVar *, QSPVariant *, long);
 	void qspMoveVar(QSPVar *, QSPVar *);
