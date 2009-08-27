@@ -165,8 +165,10 @@
 		void OnKey(wxKeyEvent& event);
 		void OnWheel(wxMouseEvent& event);
 		void OnPaneClose(wxAuiManagerEvent& event);
+		void OnDropFiles(wxDropFilesEvent& event);
 
 		// Fields
+		bool m_isGameOpened;
 		wxString m_configPath;
 		wxString m_configDefPath;
 		QSPTranslationHelper *m_transhelper;

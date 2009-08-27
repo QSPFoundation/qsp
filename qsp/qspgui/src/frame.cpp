@@ -59,6 +59,7 @@ BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
 	EVT_KEY_UP(QSPFrame::OnKey)
 	EVT_MOUSEWHEEL(QSPFrame::OnWheel)
 	EVT_AUI_PANE_CLOSE(QSPFrame::OnPaneClose)
+	EVT_DROP_FILES(QSPFrame::OnDropFiles)
 END_EVENT_TABLE()
 
 IMPLEMENT_CLASS(QSPFrame, wxFrame)
@@ -71,6 +72,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 {
 	wxRegisterId(ID_TIMER);
 	SetIcon(wxICON(logo));
+	DragAcceptFiles(true);
 	m_timer = new wxTimer(this, ID_TIMER);
 	m_menu = new wxMenu;
 	// Menu
@@ -162,6 +164,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	SetMinSize(wxSize(450, 300));
 	SetOverallVolume(100);
 	m_isQuit = false;
+	m_isGameOpened = false;
 }
 
 QSPFrame::~QSPFrame()
@@ -585,6 +588,7 @@ void QSPFrame::OpenGameFile(const wxString& path)
 		}
 		OnNewGame(dummy);
 		EnableControls(true);
+		m_isGameOpened = true;
 	}
 	else
 		ShowError();
@@ -957,4 +961,14 @@ void QSPFrame::OnPaneClose(wxAuiManagerEvent& event)
 		CallPaneFunc(event.GetPane()->window->GetId(), QSP_FALSE);
 	else
 		event.Veto();
+}
+
+void QSPFrame::OnDropFiles(wxDropFilesEvent& event)
+{
+	if (event.GetNumberOfFiles() && (!m_isGameOpened || m_isProcessEvents))
+	{
+		wxFileName path(*event.GetFiles());
+		path.MakeAbsolute();
+		OpenGameFile(path.GetFullPath());
+	}
 }
