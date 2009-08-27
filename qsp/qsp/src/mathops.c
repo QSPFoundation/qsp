@@ -1110,7 +1110,7 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 
 static void qspFunctionMin(QSPVariant *args, long count, QSPVariant *tos)
 {
-	long minInd;
+	long i, minInd;
 	if (count == 1)
 	{
 		qspConvertVariantTo(args, QSP_TRUE);
@@ -1119,10 +1119,10 @@ static void qspFunctionMin(QSPVariant *args, long count, QSPVariant *tos)
 	else
 	{
 		minInd = 0;
-		while (--count > 0)
+		for (i = 1; i < count; ++i)
 		{
-			if (qspAutoConvertCompare(args + count, args + minInd) < 0)
-				minInd = count;
+			if (qspAutoConvertCompare(args + i, args + minInd) < 0)
+				minInd = i;
 		}
 		qspCopyVariant(tos, args + minInd);
 	}
@@ -1130,7 +1130,7 @@ static void qspFunctionMin(QSPVariant *args, long count, QSPVariant *tos)
 
 static void qspFunctionMax(QSPVariant *args, long count, QSPVariant *tos)
 {
-	long maxInd;
+	long i, maxInd;
 	if (count == 1)
 	{
 		qspConvertVariantTo(args, QSP_TRUE);
@@ -1139,10 +1139,10 @@ static void qspFunctionMax(QSPVariant *args, long count, QSPVariant *tos)
 	else
 	{
 		maxInd = 0;
-		while (--count > 0)
+		for (i = 1; i < count; ++i)
 		{
-			if (qspAutoConvertCompare(args + count, args + maxInd) > 0)
-				maxInd = count;
+			if (qspAutoConvertCompare(args + i, args + maxInd) > 0)
+				maxInd = i;
 		}
 		qspCopyVariant(tos, args + maxInd);
 	}

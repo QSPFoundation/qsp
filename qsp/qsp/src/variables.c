@@ -366,7 +366,7 @@ long qspArrayPos(QSPVariant *args, long argsCount, QSP_BOOL isRegExp)
 	long num, count, ind;
 	QSPVar *var;
 	QSPVariant *val;
-	QSP_CHAR emptyStr[1], *str;
+	QSP_CHAR *str;
 	OnigUChar *tempBeg, *tempEnd;
 	regex_t *onigExp;
 	OnigRegion *onigReg;
@@ -407,13 +407,12 @@ long qspArrayPos(QSPVariant *args, long argsCount, QSP_BOOL isRegExp)
 			return -1;
 		}
 	}
-	*emptyStr = 0;
 	count = var->ValsCount;
 	while (ind <= count)
 	{
 		if (val->IsStr)
 		{
-			if (!(ind < count && (str = var->TextValue[ind]))) str = emptyStr;
+			if (!(ind < count && (str = var->TextValue[ind]))) str = QSP_FMT("");
 			if (isRegExp)
 			{
 				onigReg = onig_region_new();
