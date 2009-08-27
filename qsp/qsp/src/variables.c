@@ -456,9 +456,9 @@ QSPVariant qspArrayMinMaxItem(QSP_CHAR *name, QSP_BOOL isMin)
 		if (isString)
 		{
 			str = var->TextValue[count];
-			if (curInd >= 0)
+			if (str && *str)
 			{
-				if (str && *str)
+				if (curInd >= 0)
 				{
 					if (isMin)
 					{
@@ -468,9 +468,9 @@ QSPVariant qspArrayMinMaxItem(QSP_CHAR *name, QSP_BOOL isMin)
 					else if (QSP_STRCOLL(str, var->TextValue[curInd]) > 0)
 						curInd = count;
 				}
+				else
+					curInd = count;
 			}
-			else if (str && *str)
-				curInd = count;
 		}
 		else if (curInd >= 0)
 		{
