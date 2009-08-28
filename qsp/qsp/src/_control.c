@@ -530,7 +530,13 @@ QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh)
 /* Ф-я предназначена только для вызова из CallBack'а QSP_CALL_SHOWMENU */
 void QSPSelectMenuItem(long index)
 {
-	if (index >= 0 && index < qspCurMenuItems) qspExecLocByName(qspCurMenuLocs[index], QSP_FALSE);
+	QSPVariant arg;
+	if (index >= 0 && index < qspCurMenuItems)
+	{
+		arg.IsStr = QSP_FALSE;
+		QSP_NUM(arg) = index + 1;
+		qspExecLocByNameWithArgs(qspCurMenuLocs[index], &arg, 1);
+	}
 }
 /* ------------------------------------------------------------ */
 /* Установка CALLBACK'ов */
