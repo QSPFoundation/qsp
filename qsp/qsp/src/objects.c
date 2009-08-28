@@ -62,9 +62,7 @@ void qspClearObjectsWithNotify()
 		for (i = 0; i < oldCount; ++i)
 		{
 			QSP_STR(v) = objs[i];
-			qspSetVarValueByName(QSP_FMT("LASTOBJ"), &v);
-			if (qspErrorNum) break;
-			qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
+			qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJDEL"), &v, 1);
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		}
 		qspFreeStrs(objs, oldCount, QSP_FALSE);
@@ -90,10 +88,8 @@ static void qspRemoveObject(long index)
 		++index;
 	}
 	qspIsObjectsChanged = QSP_TRUE;
-	qspSetVarValueByName(QSP_FMT("LASTOBJ"), &name);
+	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJDEL"), &name, 1);
 	free(QSP_STR(name));
-	if (qspErrorNum) return;
-	qspExecLocByVarName(QSP_FMT("ONOBJDEL"));
 }
 
 long qspObjIndex(QSP_CHAR *name)
@@ -143,9 +139,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 	obj->Image = imgPath;
 	obj->Desc = qspGetNewText(QSP_STR(args[0]), -1);
 	qspIsObjectsChanged = QSP_TRUE;
-	qspSetVarValueByName(QSP_FMT("LASTOBJ"), args);
-	if (qspErrorNum) return QSP_FALSE;
-	qspExecLocByVarName(QSP_FMT("ONOBJADD"));
+	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args, 1);
 	return QSP_FALSE;
 }
 

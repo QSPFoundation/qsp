@@ -684,25 +684,7 @@ static QSP_BOOL qspStatementExit(QSPVariant *args, long count, QSP_CHAR **jumpTo
 
 static QSP_BOOL qspStatementGoSub(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long oldRefreshCount;
-	QSPVar local, *var;
-	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE))) return QSP_FALSE;
-	qspMoveVar(&local, var);
-	qspSetArgs(var, args + 1, count - 1);
-	oldRefreshCount = qspRefreshCount;
-	qspExecLocByName(QSP_STR(args[0]), QSP_FALSE);
-	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-	{
-		qspEmptyVar(&local);
-		return QSP_FALSE;
-	}
-	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE)))
-	{
-		qspEmptyVar(&local);
-		return QSP_FALSE;
-	}
-	qspEmptyVar(var);
-	qspMoveVar(var, &local);
+	qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1);
 	return QSP_FALSE;
 }
 

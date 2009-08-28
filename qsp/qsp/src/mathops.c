@@ -1063,29 +1063,21 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 {
 	QSP_CHAR *text;
 	long oldRefreshCount;
-	QSPVar local, result, *varRes, *varArgs;
-	if (!(varArgs = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE))) return;
+	QSPVar result, *varRes;
 	if (!(varRes = qspVarReference(QSP_FMT("RESULT"), QSP_TRUE))) return;
-	qspMoveVar(&local, varArgs);
-	qspSetArgs(varArgs, args + 1, count - 1);
 	qspMoveVar(&result, varRes);
 	oldRefreshCount = qspRefreshCount;
-	qspExecLocByName(QSP_STR(args[0]), QSP_FALSE);
+	qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
-		qspEmptyVar(&local);
 		qspEmptyVar(&result);
 		return;
 	}
-	if (!((varArgs = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE)) &&
-		(varRes = qspVarReference(QSP_FMT("RESULT"), QSP_TRUE))))
+	if (!(varRes = qspVarReference(QSP_FMT("RESULT"), QSP_TRUE)))
 	{
-		qspEmptyVar(&local);
 		qspEmptyVar(&result);
 		return;
 	}
-	qspEmptyVar(varArgs);
-	qspMoveVar(varArgs, &local);
 	if (varRes->ValsCount)
 	{
 		if (text = varRes->TextValue[0])

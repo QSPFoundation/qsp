@@ -193,6 +193,35 @@ void qspExecLocByVarName(QSP_CHAR *name)
 	if (qspIsAnyString(locName)) qspExecLocByName(locName, QSP_FALSE);
 }
 
+void qspExecLocByNameWithArgs(QSP_CHAR *name, QSPVariant *args, long count)
+{
+	QSPVar local, *var;
+	long oldRefreshCount;
+	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE))) return;
+	qspMoveVar(&local, var);
+	qspSetArgs(var, args, count);
+	oldRefreshCount = qspRefreshCount;
+	qspExecLocByName(name, QSP_FALSE);
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+	{
+		qspEmptyVar(&local);
+		return;
+	}
+	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE)))
+	{
+		qspEmptyVar(&local);
+		return;
+	}
+	qspEmptyVar(var);
+	qspMoveVar(var, &local);
+}
+
+void qspExecLocByVarNameWithArgs(QSP_CHAR *name, QSPVariant *args, long count)
+{
+	QSP_CHAR *locName = qspGetVarStrValue(name);
+	if (qspIsAnyString(locName)) qspExecLocByNameWithArgs(locName, args, count);
+}
+
 void qspRefreshCurLoc(QSP_BOOL isChangeDesc)
 {
 	long oldRefreshCount;
