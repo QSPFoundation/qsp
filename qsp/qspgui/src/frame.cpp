@@ -408,7 +408,7 @@ void QSPFrame::ShowError()
 	m_isProcessEvents = false;
 	dialog.ShowModal();
 	m_isProcessEvents = oldIsProcessEvents;
-	QSPCallBacks::RefreshInt(QSP_FALSE);
+	if (m_isGameOpened) QSPCallBacks::RefreshInt(QSP_FALSE);
 }
 
 void QSPFrame::ReCreateGUI()
@@ -576,6 +576,7 @@ void QSPFrame::OpenGameFile(const wxString& path)
 {
 	if (QSPLoadGameWorld((const QSP_CHAR *)path.c_str()))
 	{
+		m_isGameOpened = true;
 		wxCommandEvent dummy;
 		wxFileName file(path);
 		wxString configString(file.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + wxT("qspgui.cfg"));
@@ -588,7 +589,6 @@ void QSPFrame::OpenGameFile(const wxString& path)
 		}
 		OnNewGame(dummy);
 		EnableControls(true);
-		m_isGameOpened = true;
 	}
 	else
 		ShowError();
