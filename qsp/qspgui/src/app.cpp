@@ -17,6 +17,8 @@
 
 #include "app.h"
 
+#define QSP_CONFIG wxT("qspgui.cfg")
+
 IMPLEMENT_APP(QSPApp)
 
 bool QSPApp::OnInit()
@@ -33,11 +35,9 @@ bool QSPApp::OnInit()
 	appPath.MakeAbsolute();
 	wxString appPathString(appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));
 	m_transhelper = new QSPTranslationHelper(*this, appPathString + wxT("langs"));
-	if (wxFileName::IsDirWritable(appPathString))
-		configPath = appPathString;
-	else
-		configPath = wxStandardPaths::Get().GetUserConfigDir() + wxFileName::GetPathSeparator();
-	configPath += wxT("qspgui.cfg");
+	configPath = appPathString + QSP_CONFIG;
+	if (!(wxFileExists(configPath) || wxFileName::IsDirWritable(appPathString)))
+		configPath = wxFileName(wxStandardPaths::Get().GetUserConfigDir(), QSP_CONFIG).GetFullPath();
 	// ----------------------
 	frame = new QSPFrame(configPath, m_transhelper);
 	frame->LoadSettings();
