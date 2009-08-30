@@ -746,9 +746,13 @@ static long qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, long *comp
 			}
 			else if (*s == QSP_RRBRACK[0])
 			{
-				if (opStack[opSp] != qspOpOpenBracket)
+				opCode = opStack[opSp];
+				if (opCode != qspOpOpenBracket)
 				{
-					qspSetError(QSP_ERR_BRACKNOTFOUND);
+					if (opCode >= qspOpFirst_Function && qspOps[opCode].MinArgsCount)
+						qspSetError(QSP_ERR_ARGSCOUNT);
+					else
+						qspSetError(QSP_ERR_SYNTAX);
 					break;
 				}
 				opCode = opStack[--opSp];
