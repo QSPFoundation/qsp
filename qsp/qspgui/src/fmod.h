@@ -15,7 +15,7 @@
     0xaaaabbcc -> aaaa = major version number.  bb = minor version number.  cc = development version number.
 */
 
-#define FMOD_VERSION    0x00042602
+#define FMOD_VERSION    0x00042606
 
 /*
     Compiler specific settings.
@@ -215,7 +215,7 @@ typedef enum
     FMOD_ERR_NET_SOCKET_ERROR,      /* A socket error occurred.  This is a catch-all for socket-related errors not listed elsewhere. */
     FMOD_ERR_NET_URL,               /* The specified URL couldn't be resolved. */
     FMOD_ERR_NET_WOULD_BLOCK,       /* Operation on a non-blocking socket could not complete immediately. */
-    FMOD_ERR_NOTREADY,              /* Operation could not be performed because specified sound is not ready. */
+    FMOD_ERR_NOTREADY,              /* Operation could not be performed because specified sound/DSP connection is not ready. */
     FMOD_ERR_OUTPUT_ALLOCATED,      /* Error initializing output device, but more specifically, the output device is already in use and cannot be reused. */
     FMOD_ERR_OUTPUT_CREATEBUFFER,   /* Error creating hardware sound buffer. */
     FMOD_ERR_OUTPUT_DRIVERCALL,     /* A call to a standard soundcard driver failed, which could possibly mean a bug in the driver or resources were missing or exhausted. */
@@ -1443,9 +1443,7 @@ typedef struct FMOD_CREATESOUNDEXINFO
     EAX   means hardware reverb on FMOD_OUTPUTTYPE_DSOUND on windows only (must use FMOD_HARDWARE), on soundcards that support EAX 1 to 4.
     EAX4  means hardware reverb on FMOD_OUTPUTTYPE_DSOUND on windows only (must use FMOD_HARDWARE), on soundcards that support EAX 4.
     I3DL2 means hardware reverb on FMOD_OUTPUTTYPE_DSOUND on windows only (must use FMOD_HARDWARE), on soundcards that support I3DL2 non EAX native reverb.
-    GC    means Nintendo Gamecube hardware reverb (must use FMOD_HARDWARE).
     WII   means Nintendo Wii hardware reverb (must use FMOD_HARDWARE).
-    Xbox1 means the original Xbox hardware reverb (must use FMOD_HARDWARE).
     PS2   means Playstation 2 hardware reverb (must use FMOD_HARDWARE).
     SFX   means FMOD SFX software reverb.  This works on any platform that uses FMOD_SOFTWARE for loading sounds.
     
@@ -1464,33 +1462,33 @@ typedef struct FMOD_CREATESOUNDEXINFO
 */
 typedef struct FMOD_REVERB_PROPERTIES
 {                                   /*          MIN     MAX     DEFAULT  DESCRIPTION */
-    int          Instance;          /* [in]     0     , 3     , 0      , Environment Instance. Simultaneous HW reverbs are possible on some platforms. (SUPPORTED:EAX4/SFX(3 instances)/GC and Wii (2 instances)) */
+    int          Instance;          /* [in]     0     , 3     , 0      , Environment Instance. Simultaneous HW reverbs are possible on some platforms. (SUPPORTED:EAX4/SFX(3 instances) and Wii (2 instances)) */
     int          Environment;       /* [in/out] -1    , 25    , -1     , sets all listener properties.  -1 = OFF.                                      (SUPPORTED:EAX/PS2) */
     float        EnvSize;           /* [in/out] 1.0   , 100.0 , 7.5    , environment size in meters                                                    (SUPPORTED:EAX) */
-    float        EnvDiffusion;      /* [in/out] 0.0   , 1.0   , 1.0    , environment diffusion                                                         (SUPPORTED:EAX/Xbox1/GC) */
-    int          Room;              /* [in/out] -10000, 0     , -1000  , room effect level (at mid frequencies)                                        (SUPPORTED:EAX/Xbox1/GC/I3DL2/SFX) */
-    int          RoomHF;            /* [in/out] -10000, 0     , -100   , relative room effect level at high frequencies                                (SUPPORTED:EAX/Xbox1/I3DL2/SFX) */
+    float        EnvDiffusion;      /* [in/out] 0.0   , 1.0   , 1.0    , environment diffusion                                                         (SUPPORTED:EAX) */
+    int          Room;              /* [in/out] -10000, 0     , -1000  , room effect level (at mid frequencies)                                        (SUPPORTED:EAX/I3DL2/SFX) */
+    int          RoomHF;            /* [in/out] -10000, 0     , -100   , relative room effect level at high frequencies                                (SUPPORTED:EAX/I3DL2/SFX) */
     int          RoomLF;            /* [in/out] -10000, 0     , 0      , relative room effect level at low frequencies                                 (SUPPORTED:EAX/SFX) */
-    float        DecayTime;         /* [in/out] 0.1   , 20.0  , 1.49   , reverberation decay time at mid frequencies                                   (SUPPORTED:EAX/Xbox1/GC/I3DL2/SFX) */
-    float        DecayHFRatio;      /* [in/out] 0.1   , 2.0   , 0.83   , high-frequency to mid-frequency decay time ratio                              (SUPPORTED:EAX/Xbox1/I3DL2/SFX) */
+    float        DecayTime;         /* [in/out] 0.1   , 20.0  , 1.49   , reverberation decay time at mid frequencies                                   (SUPPORTED:EAX/I3DL2/SFX) */
+    float        DecayHFRatio;      /* [in/out] 0.1   , 2.0   , 0.83   , high-frequency to mid-frequency decay time ratio                              (SUPPORTED:EAX/I3DL2/SFX) */
     float        DecayLFRatio;      /* [in/out] 0.1   , 2.0   , 1.0    , low-frequency to mid-frequency decay time ratio                               (SUPPORTED:EAX) */
-    int          Reflections;       /* [in/out] -10000, 1000  , -2602  , early reflections level relative to room effect                               (SUPPORTED:EAX/Xbox1/GC/I3DL2/SFX) */
-    float        ReflectionsDelay;  /* [in/out] 0.0   , 0.3   , 0.007  , initial reflection delay time                                                 (SUPPORTED:EAX/Xbox1/I3DL2/SFX) */
+    int          Reflections;       /* [in/out] -10000, 1000  , -2602  , early reflections level relative to room effect                               (SUPPORTED:EAX/I3DL2/SFX) */
+    float        ReflectionsDelay;  /* [in/out] 0.0   , 0.3   , 0.007  , initial reflection delay time                                                 (SUPPORTED:EAX/I3DL2/SFX) */
     float        ReflectionsPan[3]; /* [in/out]       ,       , [0,0,0], early reflections panning vector                                              (SUPPORTED:EAX) */
-    int          Reverb;            /* [in/out] -10000, 2000  , 200    , late reverberation level relative to room effect                              (SUPPORTED:EAX/Xbox1/I3DL2/SFX) */
-    float        ReverbDelay;       /* [in/out] 0.0   , 0.1   , 0.011  , late reverberation delay time relative to initial reflection                  (SUPPORTED:EAX/Xbox1/GC/I3DL2/SFX) */
+    int          Reverb;            /* [in/out] -10000, 2000  , 200    , late reverberation level relative to room effect                              (SUPPORTED:EAX/I3DL2/SFX) */
+    float        ReverbDelay;       /* [in/out] 0.0   , 0.1   , 0.011  , late reverberation delay time relative to initial reflection                  (SUPPORTED:EAX/I3DL2/SFX) */
     float        ReverbPan[3];      /* [in/out]       ,       , [0,0,0], late reverberation panning vector                                             (SUPPORTED:EAX) */
     float        EchoTime;          /* [in/out] .075  , 0.25  , 0.25   , echo time                                                                     (SUPPORTED:EAX/PS2(FMOD_PRESET_PS2_ECHO/FMOD_PRESET_PS2_DELAY only) */
     float        EchoDepth;         /* [in/out] 0.0   , 1.0   , 0.0    , echo depth                                                                    (SUPPORTED:EAX/PS2(FMOD_PRESET_PS2_ECHO only) */
     float        ModulationTime;    /* [in/out] 0.04  , 4.0   , 0.25   , modulation time                                                               (SUPPORTED:EAX) */
-    float        ModulationDepth;   /* [in/out] 0.0   , 1.0   , 0.0    , modulation depth                                                              (SUPPORTED:EAX/GC) */
+    float        ModulationDepth;   /* [in/out] 0.0   , 1.0   , 0.0    , modulation depth                                                              (SUPPORTED:EAX) */
     float        AirAbsorptionHF;   /* [in/out] -100  , 0.0   , -5.0   , change in level per meter at high frequencies                                 (SUPPORTED:EAX) */
-    float        HFReference;       /* [in/out] 1000.0, 20000 , 5000.0 , reference high frequency (hz)                                                 (SUPPORTED:EAX/Xbox1/I3DL2/SFX) */
+    float        HFReference;       /* [in/out] 1000.0, 20000 , 5000.0 , reference high frequency (hz)                                                 (SUPPORTED:EAX/I3DL2/SFX) */
     float        LFReference;       /* [in/out] 20.0  , 1000.0, 250.0  , reference low frequency (hz)                                                  (SUPPORTED:EAX/SFX) */
-    float        RoomRolloffFactor; /* [in/out] 0.0   , 10.0  , 0.0    , like rolloffscale in System::set3DSettings but for reverb room size effect    (SUPPORTED:EAX/Xbox1/I3DL2/SFX) */
-    float        Diffusion;         /* [in/out] 0.0   , 100.0 , 100.0  , Value that controls the echo density in the late reverberation decay.         (SUPPORTED:I3DL2/Xbox1/SFX) */
-    float        Density;           /* [in/out] 0.0   , 100.0 , 100.0  , Value that controls the modal density in the late reverberation decay         (SUPPORTED:I3DL2/Xbox1/SFX) */
-    unsigned int Flags;             /* [in/out] FMOD_REVERB_FLAGS - modifies the behavior of above properties                                          (SUPPORTED:EAX/PS2/GC/WII) */
+    float        RoomRolloffFactor; /* [in/out] 0.0   , 10.0  , 0.0    , like rolloffscale in System::set3DSettings but for reverb room size effect    (SUPPORTED:EAX/I3DL2) */
+    float        Diffusion;         /* [in/out] 0.0   , 100.0 , 100.0  , Value that controls the echo density in the late reverberation decay.         (SUPPORTED:I3DL2/SFX) */
+    float        Density;           /* [in/out] 0.0   , 100.0 , 100.0  , Value that controls the modal density in the late reverberation decay         (SUPPORTED:I3DL2/SFX) */
+    unsigned int Flags;             /* [in/out] FMOD_REVERB_FLAGS - modifies the behavior of above properties                                          (SUPPORTED:EAX/PS2/WII) */
 } FMOD_REVERB_PROPERTIES;
 
 
@@ -1629,9 +1627,7 @@ typedef struct FMOD_REVERB_PROPERTIES
     EAX   means hardware reverb on FMOD_OUTPUTTYPE_DSOUND on windows only (must use FMOD_HARDWARE), on soundcards that support EAX 1 to 4.
     EAX4  means hardware reverb on FMOD_OUTPUTTYPE_DSOUND on windows only (must use FMOD_HARDWARE), on soundcards that support EAX 4.
     I3DL2 means hardware reverb on FMOD_OUTPUTTYPE_DSOUND on windows only (must use FMOD_HARDWARE), on soundcards that support I3DL2 non EAX native reverb.
-    GC    means Nintendo Gamecube hardware reverb (must use FMOD_HARDWARE).
     WII   means Nintendo Wii hardware reverb (must use FMOD_HARDWARE).
-    Xbox1 means the original Xbox hardware reverb (must use FMOD_HARDWARE).
     PS2   means Playstation 2 hardware reverb (must use FMOD_HARDWARE).
     SFX   means FMOD SFX software reverb.  This works on any platform that uses FMOD_SOFTWARE for loading sounds.
     
@@ -1653,14 +1649,14 @@ typedef struct FMOD_REVERB_PROPERTIES
 */
 typedef struct FMOD_REVERB_CHANNELPROPERTIES
 {                                      /*          MIN     MAX    DEFAULT  DESCRIPTION */
-    int          Direct;               /* [in/out] -10000, 1000,  0,       direct path level (at low and mid frequencies)              (SUPPORTED:EAX/I3DL2/Xbox1/SFX) */
-    int          DirectHF;             /* [in/out] -10000, 0,     0,       relative direct path level at high frequencies              (SUPPORTED:EAX/I3DL2/Xbox1) */
-    int          Room;                 /* [in/out] -10000, 1000,  0,       room effect level (at low and mid frequencies)              (SUPPORTED:EAX/I3DL2/Xbox1/GC/SFX) */
-    int          RoomHF;               /* [in/out] -10000, 0,     0,       relative room effect level at high frequencies              (SUPPORTED:EAX/I3DL2/Xbox1) */
-    int          Obstruction;          /* [in/out] -10000, 0,     0,       main obstruction control (attenuation at high frequencies)  (SUPPORTED:EAX/I3DL2/Xbox1) */
-    float        ObstructionLFRatio;   /* [in/out] 0.0,    1.0,   0.0,     obstruction low-frequency level re. main control            (SUPPORTED:EAX/I3DL2/Xbox1) */
-    int          Occlusion;            /* [in/out] -10000, 0,     0,       main occlusion control (attenuation at high frequencies)    (SUPPORTED:EAX/I3DL2/Xbox1) */
-    float        OcclusionLFRatio;     /* [in/out] 0.0,    1.0,   0.25,    occlusion low-frequency level re. main control              (SUPPORTED:EAX/I3DL2/Xbox1) */
+    int          Direct;               /* [in/out] -10000, 1000,  0,       direct path level (at low and mid frequencies)              (SUPPORTED:EAX/I3DL2/SFX) */
+    int          DirectHF;             /* [in/out] -10000, 0,     0,       relative direct path level at high frequencies              (SUPPORTED:EAX/I3DL2) */
+    int          Room;                 /* [in/out] -10000, 1000,  0,       room effect level (at low and mid frequencies)              (SUPPORTED:EAX/I3DL2/SFX) */
+    int          RoomHF;               /* [in/out] -10000, 0,     0,       relative room effect level at high frequencies              (SUPPORTED:EAX/I3DL2) */
+    int          Obstruction;          /* [in/out] -10000, 0,     0,       main obstruction control (attenuation at high frequencies)  (SUPPORTED:EAX/I3DL2) */
+    float        ObstructionLFRatio;   /* [in/out] 0.0,    1.0,   0.0,     obstruction low-frequency level re. main control            (SUPPORTED:EAX/I3DL2) */
+    int          Occlusion;            /* [in/out] -10000, 0,     0,       main occlusion control (attenuation at high frequencies)    (SUPPORTED:EAX/I3DL2) */
+    float        OcclusionLFRatio;     /* [in/out] 0.0,    1.0,   0.25,    occlusion low-frequency level re. main control              (SUPPORTED:EAX/I3DL2) */
     float        OcclusionRoomRatio;   /* [in/out] 0.0,    10.0,  1.5,     relative occlusion control for room effect                  (SUPPORTED:EAX only) */
     float        OcclusionDirectRatio; /* [in/out] 0.0,    10.0,  1.0,     relative occlusion control for direct path                  (SUPPORTED:EAX only) */
     int          Exclusion;            /* [in/out] -10000, 0,     0,       main exlusion control (attenuation at high frequencies)     (SUPPORTED:EAX only) */
@@ -1668,7 +1664,7 @@ typedef struct FMOD_REVERB_CHANNELPROPERTIES
     int          OutsideVolumeHF;      /* [in/out] -10000, 0,     0,       outside sound cone level at high frequencies                (SUPPORTED:EAX only) */
     float        DopplerFactor;        /* [in/out] 0.0,    10.0,  0.0,     like DS3D flDopplerFactor but per source                    (SUPPORTED:EAX only) */
     float        RolloffFactor;        /* [in/out] 0.0,    10.0,  0.0,     like DS3D flRolloffFactor but per source                    (SUPPORTED:EAX only) */
-    float        RoomRolloffFactor;    /* [in/out] 0.0,    10.0,  0.0,     like DS3D flRolloffFactor but for room effect               (SUPPORTED:EAX/I3DL2/Xbox1) */
+    float        RoomRolloffFactor;    /* [in/out] 0.0,    10.0,  0.0,     like DS3D flRolloffFactor but for room effect               (SUPPORTED:EAX/I3DL2) */
     float        AirAbsorptionFactor;  /* [in/out] 0.0,    10.0,  1.0,     multiplies AirAbsorptionHF member of FMOD_REVERB_PROPERTIES (SUPPORTED:EAX only) */
     unsigned int Flags;                /* [in/out] FMOD_REVERB_CHANNELFLAGS - modifies the behavior of properties                      (SUPPORTED:EAX only) */
     FMOD_DSP    *ConnectionPoint;      /* [in/out] See remarks.            DSP network location to connect reverb for this channel.    (SUPPORTED:SFX only).*/
