@@ -18,8 +18,6 @@
 #include "frame.h"
 #include "callbacks_gui.h"
 
-#define QSP_LOGO _("Quest Soft Player 5")
-
 BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
 	EVT_INIT(QSPFrame::OnInit)
 	EVT_CLOSE(QSPFrame::OnClose)
@@ -579,7 +577,7 @@ void QSPFrame::OpenGameFile(const wxString& path)
 		m_isGameOpened = true;
 		wxCommandEvent dummy;
 		wxFileName file(path);
-		wxString configString(file.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + wxT("qspgui.cfg"));
+		wxString configString(file.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + QSP_CONFIG);
 		wxString newPath(wxFileExists(configString) ? configString : m_configDefPath);
 		if (newPath != m_configPath)
 		{

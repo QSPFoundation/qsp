@@ -44,6 +44,9 @@
 	#include "icons/windowmode.xpm"
 	#include "icons/about.xpm"
 
+	#define QSP_LOGO _("Quest Soft Player 5")
+	#define QSP_CONFIG wxT("qspgui.cfg")
+
 	enum
 	{
 		ID_BEGOFDYNMENU,

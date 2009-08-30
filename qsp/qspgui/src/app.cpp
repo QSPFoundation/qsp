@@ -17,8 +17,6 @@
 
 #include "app.h"
 
-#define QSP_CONFIG wxT("qspgui.cfg")
-
 IMPLEMENT_APP(QSPApp)
 
 bool QSPApp::OnInit()
