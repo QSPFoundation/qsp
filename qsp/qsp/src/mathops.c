@@ -749,7 +749,7 @@ static long qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, long *comp
 				opCode = opStack[opSp];
 				if (opCode != qspOpOpenBracket)
 				{
-					if (opCode >= qspOpFirst_Function && qspOps[opCode].MinArgsCount)
+					if (opCode >= qspOpFirst_Function)
 						qspSetError(QSP_ERR_ARGSCOUNT);
 					else
 						qspSetError(QSP_ERR_SYNTAX);
@@ -826,7 +826,10 @@ static long qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, long *comp
 			}
 			else
 			{
-				qspSetError(QSP_ERR_SYNTAX);
+				if (opStack[opSp] >= qspOpFirst_Function)
+					qspSetError(QSP_ERR_ARGSCOUNT);
+				else
+					qspSetError(QSP_ERR_SYNTAX);
 				break;
 			}
 		}
