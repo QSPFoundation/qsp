@@ -114,7 +114,7 @@ void QSPImgCanvas::OnSize(wxSizeEvent& event)
 		m_posX = (w - destW) / 2;
 		m_posY = (h - destH) / 2;
 		if (destW > 0 && destH > 0)
-			m_cachedBitmap = wxBitmap(m_image.Scale(destW, destH, wxIMAGE_QUALITY_HIGH));
+			m_cachedBitmap = wxBitmap(m_image.Scale(destW, destH, wxIMAGE_QUALITY_BILINEAR));
 		else
 			m_cachedBitmap = wxNullBitmap;
 	}
