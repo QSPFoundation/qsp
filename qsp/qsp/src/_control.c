@@ -352,12 +352,9 @@ QSP_BOOL QSPGetVarNameByIndex(long index, QSP_CHAR **name)
 /* Выполнение строки кода */
 QSP_BOOL QSPExecString(const QSP_CHAR *s, QSP_BOOL isRefresh)
 {
-	QSP_CHAR *jumpToFake;
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
-	jumpToFake = qspGetNewText(QSP_FMT(""), 0);
-	qspExecStringAsCode((QSP_CHAR *)s, &jumpToFake);
-	free(jumpToFake);
+	qspExecStringAsCode((QSP_CHAR *)s, 0);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;

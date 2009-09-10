@@ -459,15 +459,15 @@ static QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	}
 }
 
-QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset, QSP_CHAR **jumpTo, QSP_BOOL uLevel)
+QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset, QSP_CHAR **jumpTo)
 {
 	QSPVariant args[2];
 	QSP_CHAR *jumpToFake, *pos, *paramPos;
 	long i, statCode, count, endPos, elsePos, oldRefreshCount;
-	QSP_BOOL isExit = QSP_FALSE;
+	QSP_BOOL uLevel, isExit = QSP_FALSE;
 	oldRefreshCount = qspRefreshCount;
 	/* Prepare temporary data */
-	if (uLevel)
+	if (uLevel = !jumpTo)
 	{
 		jumpToFake = qspGetNewText(QSP_FMT(""), 0);
 		jumpTo = &jumpToFake;
@@ -507,7 +507,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 					{
 						if (elsePos >= 0)
 						{
-							isExit = qspExecCode(s, i, elsePos, codeOffset, jumpTo, QSP_FALSE);
+							isExit = qspExecCode(s, i, elsePos, codeOffset, jumpTo);
 							if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 							if (**jumpTo)
 							{
@@ -553,7 +553,7 @@ QSP_BOOL qspExecStringAsCode(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	QSP_BOOL isExit;
 	QSP_CHAR **strs;
 	long count = qspPreprocessData(s, &strs);
-	isExit = qspExecCode(strs, 0, count, 0, jumpTo, QSP_FALSE);
+	isExit = qspExecCode(strs, 0, count, 0, jumpTo);
 	qspFreeStrs(strs, count, QSP_FALSE);
 	return isExit;
 }

@@ -115,7 +115,7 @@ void qspExecAction(long ind)
 	qspRealWhere = act->Where;
 	count = act->OnPressLinesCount;
 	qspCopyStrs(&code, act->OnPressLines, 0, count);
-	qspExecCode(code, 0, count, act->StartLine, 0, QSP_TRUE);
+	qspExecCode(code, 0, count, act->StartLine, 0);
 	qspFreeStrs(code, count, QSP_FALSE);
 	qspRealLine = oldLine;
 	qspRealWhere = oldWhere;

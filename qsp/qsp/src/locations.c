@@ -163,12 +163,12 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 	}
 	qspRealWhere = QSP_AREA_ONLOCVISIT;
 	if (locInd < qspLocsCount - qspCurIncLocsCount)
-		qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0, QSP_TRUE);
+		qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0);
 	else
 	{
 		count = loc->OnVisitLinesCount;
 		qspCopyStrs(&code, loc->OnVisitLines, 0, count);
-		qspExecCode(code, 0, count, 1, 0, QSP_TRUE);
+		qspExecCode(code, 0, count, 1, 0);
 		qspFreeStrs(code, count, QSP_FALSE);
 	}
 	qspRealLine = oldLine;
