@@ -57,6 +57,7 @@ static void qspFunctionIsPlay(QSPVariant *, long, QSPVariant *);
 static void qspFunctionInstr(QSPVariant *, long, QSPVariant *);
 static void qspFunctionReplace(QSPVariant *, long, QSPVariant *);
 static void qspFunctionFunc(QSPVariant *, long, QSPVariant *);
+static void qspFunctionDynEval(QSPVariant *, long, QSPVariant *);
 static void qspFunctionMin(QSPVariant *, long, QSPVariant *);
 static void qspFunctionMax(QSPVariant *, long, QSPVariant *);
 
@@ -175,7 +176,7 @@ void qspInitMath()
 	qspAddOperation(qspOpInstr, 30, qspFunctionInstr, 2, 2, 3, 0, 1, 1);
 	qspAddOperation(qspOpReplace, 30, qspFunctionReplace, 1, 2, 3, 1, 1, 1);
 	qspAddOperation(qspOpFunc, 30, qspFunctionFunc, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-	qspAddOperation(qspOpDynEval, 30, 0, 0, 1, 1, 1);
+	qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddOperation(qspOpRnd, 30, 0, 2, 0, 0);
 	qspAddOperation(qspOpCountObj, 30, 0, 2, 0, 0);
 	qspAddOperation(qspOpMsecsCount, 30, 0, 2, 0, 0);
@@ -532,9 +533,6 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 				break;
 			case qspOpInput:
 				QSP_STR(tos) = qspCallInputBox(QSP_STR(args[0]));
-				break;
-			case qspOpDynEval:
-				tos = qspExprValue(QSP_STR(args[0]));
 				break;
 			case qspOpRnd:
 				QSP_NUM(tos) = rand() % 1000 + 1;
@@ -1105,6 +1103,29 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 	}
 	qspEmptyVar(varRes);
 	qspMoveVar(varRes, &result);
+}
+
+static void qspFunctionDynEval(QSPVariant *args, long count, QSPVariant *tos)
+{
+	QSPVar local, *var;
+	long oldRefreshCount;
+	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE))) return;
+	qspMoveVar(&local, var);
+	qspSetArgs(var, args + 1, count - 1);
+	oldRefreshCount = qspRefreshCount;
+	*tos = qspExprValue(QSP_STR(args[0]));
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+	{
+		qspEmptyVar(&local);
+		return;
+	}
+	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE)))
+	{
+		qspEmptyVar(&local);
+		return;
+	}
+	qspEmptyVar(var);
+	qspMoveVar(var, &local);
 }
 
 static void qspFunctionMin(QSPVariant *args, long count, QSPVariant *tos)
