@@ -72,11 +72,8 @@ void qspClearObjectsWithNotify()
 static void qspRemoveObject(long index)
 {
 	QSPVariant name;
-	if (!qspCurObjectsCount) return;
-	if (index < 0)
-		index = 0;
-	else if (index >= qspCurObjectsCount)
-		index = qspCurObjectsCount - 1;
+	if (!(qspCurObjectsCount && index < qspCurObjectsCount)) return;
+	if (index < 0) index = 0;
 	if (qspCurSelObject >= index) qspCurSelObject = -1;
 	name.IsStr = QSP_TRUE;
 	QSP_STR(name) = qspCurObjects[index].Desc;

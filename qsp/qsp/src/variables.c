@@ -91,11 +91,8 @@ static void qspRemoveArrayItem(QSP_CHAR *name, long index)
 	QSPVar *var;
 	long origIndex;
 	if (!(var = qspVarReferenceWithType(name, QSP_FALSE, 0))) return;
-	if (!var->ValsCount) return;
-	if (index < 0)
-		index = 0;
-	else if (index >= var->ValsCount)
-		index = var->ValsCount - 1;
+	if (!(var->ValsCount && index < var->ValsCount)) return;
+	if (index < 0) index = 0;
 	origIndex = index;
 	if (var->TextValue[index]) free(var->TextValue[index]);
 	var->ValsCount--;
