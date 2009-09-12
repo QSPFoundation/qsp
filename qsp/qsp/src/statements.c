@@ -135,7 +135,7 @@ void qspInitStats()
 	qspAddStatement(qspStatCopyArr, 0, qspStatementCopyArr, 2, 2, 1, 1);
 	qspAddStatement(qspStatDelAct, 0, qspStatementDelAct, 1, 1, 1);
 	qspAddStatement(qspStatDelObj, 0, qspStatementDelObj, 1, 1, 1);
-	qspAddStatement(qspStatDynamic, 0, qspStatementDynamic, 1, 1, 1);
+	qspAddStatement(qspStatDynamic, 0, qspStatementDynamic, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddStatement(qspStatExec, 0, qspStatementExec, 1, 1, 1);
 	qspAddStatement(qspStatExit, 0, qspStatementExit, 0, 0);
 	qspAddStatement(qspStatGoSub, 0, qspStatementGoSub, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -548,14 +548,12 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 	return isExit;
 }
 
-QSP_BOOL qspExecStringAsCode(QSP_CHAR *s, QSP_CHAR **jumpTo)
+void qspExecStringAsCode(QSP_CHAR *s)
 {
-	QSP_BOOL isExit;
 	QSP_CHAR **strs;
 	long count = qspPreprocessData(s, &strs);
-	isExit = qspExecCode(strs, 0, count, 0, jumpTo);
+	qspExecCode(strs, 0, count, 0, 0);
 	qspFreeStrs(strs, count, QSP_FALSE);
-	return isExit;
 }
 
 static QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
@@ -790,5 +788,24 @@ static QSP_BOOL qspStatementExec(QSPVariant *args, long count, QSP_CHAR **jumpTo
 
 static QSP_BOOL qspStatementDynamic(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	return qspExecStringAsCode(QSP_STR(args[0]), jumpTo);
+	QSPVar local, *var;
+	long oldRefreshCount;
+	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE))) return QSP_FALSE;
+	qspMoveVar(&local, var);
+	qspSetArgs(var, args + 1, count - 1);
+	oldRefreshCount = qspRefreshCount;
+	qspExecStringAsCode(QSP_STR(args[0]));
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+	{
+		qspEmptyVar(&local);
+		return QSP_FALSE;
+	}
+	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE)))
+	{
+		qspEmptyVar(&local);
+		return QSP_FALSE;
+	}
+	qspEmptyVar(var);
+	qspMoveVar(var, &local);
+	return QSP_FALSE;
 }

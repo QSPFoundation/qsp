@@ -354,7 +354,7 @@ QSP_BOOL QSPExecString(const QSP_CHAR *s, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
-	qspExecStringAsCode((QSP_CHAR *)s, 0);
+	qspExecStringAsCode((QSP_CHAR *)s);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
