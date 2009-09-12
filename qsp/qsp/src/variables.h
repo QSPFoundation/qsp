@@ -23,6 +23,8 @@
 
 	#define QSP_VARSSEEK 50
 	#define QSP_VARSCOUNT 256 * QSP_VARSSEEK
+	#define QSP_VARARGS QSP_FMT("ARGS")
+	#define QSP_VARRES QSP_FMT("RESULT")
 
 	typedef struct
 	{

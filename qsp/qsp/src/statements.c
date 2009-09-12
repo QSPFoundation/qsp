@@ -695,7 +695,7 @@ static QSP_BOOL qspStatementGoTo(QSPVariant *args, long count, QSP_CHAR **jumpTo
 		qspSetError(QSP_ERR_LOCNOTFOUND);
 		return QSP_FALSE;
 	}
-	if (!(var = qspVarReference(QSP_ARGSNAME, QSP_TRUE))) return QSP_FALSE;
+	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return QSP_FALSE;
 	qspEmptyVar(var);
 	qspSetArgs(var, args + 1, count - 1);
 	qspCurLoc = locInd;
@@ -790,7 +790,7 @@ static QSP_BOOL qspStatementDynamic(QSPVariant *args, long count, QSP_CHAR **jum
 {
 	QSPVar local, *var;
 	long oldRefreshCount;
-	if (!(var = qspVarReference(QSP_ARGSNAME, QSP_TRUE))) return QSP_FALSE;
+	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return QSP_FALSE;
 	qspMoveVar(&local, var);
 	qspSetArgs(var, args + 1, count - 1);
 	oldRefreshCount = qspRefreshCount;
@@ -800,7 +800,7 @@ static QSP_BOOL qspStatementDynamic(QSPVariant *args, long count, QSP_CHAR **jum
 		qspEmptyVar(&local);
 		return QSP_FALSE;
 	}
-	if (!(var = qspVarReference(QSP_ARGSNAME, QSP_TRUE)))
+	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE)))
 	{
 		qspEmptyVar(&local);
 		return QSP_FALSE;

@@ -1069,7 +1069,7 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 	QSP_CHAR *text;
 	long oldRefreshCount;
 	QSPVar result, *varRes;
-	if (!(varRes = qspVarReference(QSP_RESNAME, QSP_TRUE))) return;
+	if (!(varRes = qspVarReference(QSP_VARRES, QSP_TRUE))) return;
 	qspMoveVar(&result, varRes);
 	oldRefreshCount = qspRefreshCount;
 	qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1);
@@ -1078,7 +1078,7 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 		qspEmptyVar(&result);
 		return;
 	}
-	if (!(varRes = qspVarReference(QSP_RESNAME, QSP_TRUE)))
+	if (!(varRes = qspVarReference(QSP_VARRES, QSP_TRUE)))
 	{
 		qspEmptyVar(&result);
 		return;
@@ -1109,7 +1109,7 @@ static void qspFunctionDynEval(QSPVariant *args, long count, QSPVariant *tos)
 {
 	QSPVar local, *var;
 	long oldRefreshCount;
-	if (!(var = qspVarReference(QSP_ARGSNAME, QSP_TRUE))) return;
+	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return;
 	qspMoveVar(&local, var);
 	qspSetArgs(var, args + 1, count - 1);
 	oldRefreshCount = qspRefreshCount;
@@ -1119,7 +1119,7 @@ static void qspFunctionDynEval(QSPVariant *args, long count, QSPVariant *tos)
 		qspEmptyVar(&local);
 		return;
 	}
-	if (!(var = qspVarReference(QSP_ARGSNAME, QSP_TRUE)))
+	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE)))
 	{
 		qspEmptyVar(&local);
 		return;
