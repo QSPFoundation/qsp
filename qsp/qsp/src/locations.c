@@ -197,7 +197,7 @@ void qspExecLocByNameWithArgs(QSP_CHAR *name, QSPVariant *args, long count)
 {
 	QSPVar local, *var;
 	long oldRefreshCount;
-	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE))) return;
+	if (!(var = qspVarReference(QSP_ARGSNAME, QSP_TRUE))) return;
 	qspMoveVar(&local, var);
 	qspSetArgs(var, args, count);
 	oldRefreshCount = qspRefreshCount;
@@ -207,7 +207,7 @@ void qspExecLocByNameWithArgs(QSP_CHAR *name, QSPVariant *args, long count)
 		qspEmptyVar(&local);
 		return;
 	}
-	if (!(var = qspVarReference(QSP_FMT("ARGS"), QSP_TRUE)))
+	if (!(var = qspVarReference(QSP_ARGSNAME, QSP_TRUE)))
 	{
 		qspEmptyVar(&local);
 		return;
