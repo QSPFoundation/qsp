@@ -111,7 +111,7 @@
 		#define QSP_PATHDELIMS QSP_FMT("/")
 	#endif
 
-	#define QSP_VER QSP_FMT("5.6.1")
+	#define QSP_VER QSP_FMT("5.6.2")
 	#define QSP_LOCALE "russian"
 	#define QSP_STRCHAR QSP_FMT("$")
 	#define QSP_LABEL QSP_FMT(":")
