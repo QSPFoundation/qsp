@@ -561,6 +561,7 @@ void QSPInit()
 	qspCurLoc = -1;
 	qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
 	setlocale(LC_ALL, QSP_LOCALE);
+	qspSetSeed(0);
 	qspPrepareExecution();
 	qspMemClear(QSP_TRUE);
 	qspInitCallBacks();
