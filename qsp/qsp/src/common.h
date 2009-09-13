@@ -34,5 +34,7 @@
 	/* External functions */
 	void qspPrepareExecution();
 	void qspMemClear(QSP_BOOL);
+	void qspSetSeed(unsigned int);
+	int qspRand();
 
 #endif

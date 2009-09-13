@@ -25,6 +25,8 @@
 #include "playlist.h"
 #include "variables.h"
 
+static unsigned int qspRandX[55], qspRandY[256], qspRandZ;
+static int qspRandI, qspRandJ;
 QSP_CHAR *qspCurDesc = 0;
 long qspCurDescLen = 0;
 QSP_CHAR *qspCurVars = 0;
@@ -35,6 +37,8 @@ QSP_BOOL qspIsMainDescChanged = QSP_FALSE;
 QSP_BOOL qspIsVarsDescChanged = QSP_FALSE;
 QSP_BOOL qspCurIsShowVars = QSP_TRUE;
 QSP_BOOL qspCurIsShowInput = QSP_TRUE;
+
+static unsigned int qspURand();
 
 void qspPrepareExecution()
 {
@@ -72,4 +76,35 @@ void qspMemClear(QSP_BOOL isFirst)
 	qspCurInputLen = 0;
 	qspPlayList = 0;
 	qspPlayListLen = 0;
+}
+
+void qspSetSeed(unsigned int seed)
+{
+	int i;
+	qspRandX[0] = 1;
+	qspRandX[1] = seed;
+	for (i = 2; i < 55; ++i)
+		qspRandX[i] = qspRandX[i - 1] + qspRandX[i - 2];
+	qspRandI = 23;
+	qspRandJ = 54;
+	for (i = 255; i >= 0; --i) qspURand();
+	for (i = 255; i >= 0; --i) qspRandY[i] = qspURand();
+	qspRandZ = qspURand();
+}
+
+static unsigned int qspURand()
+{
+	if (--qspRandI < 0) qspRandI = 54;
+	if (--qspRandJ < 0) qspRandJ = 54;
+	return qspRandX[qspRandJ] += qspRandX[qspRandI];
+}
+
+int qspRand()
+{
+	int i = qspRandZ >> 24;
+	qspRandZ = qspRandY[i];
+	if (--qspRandI < 0) qspRandI = 54;
+	if (--qspRandJ < 0) qspRandJ = 54;
+	qspRandY[i] = qspRandX[qspRandJ] += qspRandX[qspRandI];
+	return qspRandZ & 0x7FFFFFFF;
 }

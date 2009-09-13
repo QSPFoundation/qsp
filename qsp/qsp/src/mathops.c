@@ -535,7 +535,7 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 				QSP_STR(tos) = qspCallInputBox(QSP_STR(args[0]));
 				break;
 			case qspOpRnd:
-				QSP_NUM(tos) = rand() % 1000 + 1;
+				QSP_NUM(tos) = qspRand() % 1000 + 1;
 				break;
 			case qspOpCountObj:
 				QSP_NUM(tos) = qspCurObjectsCount;
@@ -981,7 +981,7 @@ static void qspFunctionRand(QSPVariant *args, long count, QSPVariant *tos)
 		min = max;
 		max = QSP_NUM(args[0]);
 	}
-	QSP_PNUM(tos) = rand() % (max - min + 1) + min;
+	QSP_PNUM(tos) = qspRand() % (max - min + 1) + min;
 }
 
 static void qspFunctionDesc(QSPVariant *args, long count, QSPVariant *tos)
