@@ -106,5 +106,5 @@ int qspRand()
 	if (--qspRandI < 0) qspRandI = 54;
 	if (--qspRandJ < 0) qspRandJ = 54;
 	qspRandY[i] = qspRandX[qspRandJ] += qspRandX[qspRandI];
-	return qspRandZ & 0x7FFFFFFF;
+	return qspRandZ & QSP_RANDMASK;
 }
