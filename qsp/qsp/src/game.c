@@ -553,6 +553,7 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	qspFreeStrs(strs, count, QSP_FALSE);
 	qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_TRUE;
 	qspOpenIncludes();
+	if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
 	if (qspErrorNum) return;
 	qspCallShowWindow(QSP_WIN_ACTS, qspCurIsShowActs);
 	qspCallShowWindow(QSP_WIN_OBJS, qspCurIsShowObjs);
