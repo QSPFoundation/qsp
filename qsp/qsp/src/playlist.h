@@ -22,13 +22,13 @@
 	#define QSP_PLAYLISTDEFINES
 
 	#define QSP_PLVOLUMEDELIM QSP_FMT("*")
-	#define QSP_PLFILEDELIM QSP_FMT("|")
-	#define QSP_PLMAXLEN 16384
+	#define QSP_MAXPLFILES 500
 
-	extern QSP_CHAR *qspPlayList;
-	extern long qspPlayListLen;
+	extern QSP_CHAR *qspPLFiles[QSP_MAXPLFILES];
+	extern long qspPLFilesCount;
 
 	/* External functions */
+	void qspClearPlayList(QSP_BOOL);
 	void qspPlayPLFiles();
 	void qspRefreshPlayList();
 	/* Statements */

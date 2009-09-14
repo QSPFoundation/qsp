@@ -53,6 +53,7 @@ void qspMemClear(QSP_BOOL isFirst)
 	qspClearObjects(isFirst);
 	qspClearActions(isFirst);
 	qspClearMenu(isFirst);
+	qspClearPlayList(isFirst);
 	if (!isFirst)
 	{
 		if (qspCurDesc)
@@ -66,7 +67,6 @@ void qspMemClear(QSP_BOOL isFirst)
 			if (qspCurVarsLen) qspIsVarsDescChanged = QSP_TRUE;
 		}
 		if (qspCurInput) free(qspCurInput);
-		if (qspPlayList) free(qspPlayList);
 	}
 	qspCurDesc = 0;
 	qspCurDescLen = 0;
@@ -74,8 +74,6 @@ void qspMemClear(QSP_BOOL isFirst)
 	qspCurVarsLen = 0;
 	qspCurInput = 0;
 	qspCurInputLen = 0;
-	qspPlayList = 0;
-	qspPlayListLen = 0;
 }
 
 void qspSetSeed(unsigned int seed)
