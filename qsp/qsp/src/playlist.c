@@ -29,7 +29,7 @@ static long qspSearchPlayList(QSP_CHAR *);
 void qspClearPlayList(QSP_BOOL isFirst)
 {
 	long i;
-	if (!isFirst && qspPLFilesCount)
+	if (!isFirst)
 	{
 		for (i = 0; i < qspPLFilesCount; ++i)
 			free(qspPLFiles[i]);
