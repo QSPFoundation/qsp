@@ -57,8 +57,9 @@ void qspCreateWorld(long start, long locsCount)
 
 long qspLocIndex(QSP_CHAR *name)
 {
-	long i, locNameLen, bufSize;
-	QSP_CHAR *uName, *buf;
+	long i;
+	QSPLocation *loc;
+	QSP_CHAR *uName;
 	if (!qspLocsCount) return -1;
 	uName = qspDelSpc(name);
 	if (!(*uName))
@@ -67,27 +68,17 @@ long qspLocIndex(QSP_CHAR *name)
 		return -1;
 	}
 	qspUpperStr(uName);
-	bufSize = 16;
-	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+	loc = qspLocs;
 	for (i = 0; i < qspLocsCount; ++i)
 	{
-		locNameLen = (long)QSP_STRLEN(qspLocs[i].Name);
-		if (locNameLen >= bufSize)
-		{
-			bufSize = locNameLen + 8;
-			buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
-		}
-		QSP_STRCPY(buf, qspLocs[i].Name);
-		qspUpperStr(buf);
-		if (!QSP_STRCMP(buf, uName))
+		if (!QSP_STRCMP(loc->Name, uName))
 		{
 			free(uName);
-			free(buf);
 			return i;
 		}
+		++loc;
 	}
 	free(uName);
-	free(buf);
 	return -1;
 }
 

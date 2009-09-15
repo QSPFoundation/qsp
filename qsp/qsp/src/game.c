@@ -255,7 +255,7 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	{
 		data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
 		if (isAddLoc = !isAddLocs || qspLocIndex(data) < 0)
-			qspLocs[locsCount].Name = data;
+			qspUpperStr(qspLocs[locsCount].Name = data);
 		else
 			free(data);
 		if (isAddLoc)
