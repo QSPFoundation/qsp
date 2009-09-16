@@ -53,7 +53,7 @@ static long qspActIndex(QSP_CHAR *name)
 	QSP_CHAR *uName, *buf;
 	if (!qspCurActionsCount) return -1;
 	qspUpperStr(uName = qspGetNewText(name, -1));
-	bufSize = 32;
+	bufSize = 64;
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspCurActionsCount; ++i)
 	{

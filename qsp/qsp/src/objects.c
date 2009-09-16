@@ -95,7 +95,7 @@ long qspObjIndex(QSP_CHAR *name)
 	QSP_CHAR *uName, *buf;
 	if (!qspCurObjectsCount) return -1;
 	qspUpperStr(uName = qspGetNewText(name, -1));
-	bufSize = 16;
+	bufSize = 32;
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspCurObjectsCount; ++i)
 	{
