@@ -87,7 +87,7 @@ static long qspSearchPlayList(QSP_CHAR *file)
 		}
 		QSP_STRCPY(buf, qspPLFiles[i]);
 		qspUpperStr(buf);
-		if (!qspStrsComp(buf, uName, len) && (!buf[len] || buf[len] == QSP_PLVOLUMEDELIM[0]))
+		if (!(qspStrsComp(buf, uName, len) || (buf[len] && buf[len] != QSP_PLVOLUMEDELIM[0])))
 		{
 			free(uName);
 			free(buf);
