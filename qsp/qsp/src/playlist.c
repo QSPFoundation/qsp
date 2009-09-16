@@ -75,7 +75,7 @@ static long qspSearchPlayList(QSP_CHAR *file)
 	if (!qspPLFilesCount) return -1;
 	len = (long)QSP_STRLEN(file);
 	qspUpperStr(uName = qspGetNewText(file, len));
-	bufSize = 64;
+	bufSize = 32;
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspPLFilesCount; ++i)
 	{
