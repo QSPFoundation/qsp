@@ -154,7 +154,7 @@ void qspInitMath()
 	qspAddOperation(qspOpMax, 30, qspFunctionMax, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddOperation(qspOpRand, 30, qspFunctionRand, 2, 1, 2, 2, 2);
 	qspAddOperation(qspOpIIf, 30, 0, 0, 3, 3, 2, 0, 0);
-	qspAddOperation(qspOpRGB, 30, qspFunctionRGB, 2, 3, 3, 2, 2, 2);
+	qspAddOperation(qspOpRGB, 30, qspFunctionRGB, 2, 3, 4, 2, 2, 2, 2);
 	qspAddOperation(qspOpLen, 30, 0, 2, 1, 1, 1);
 	qspAddOperation(qspOpIsNum, 30, 0, 2, 1, 1, 0);
 	qspAddOperation(qspOpLCase, 30, 0, 1, 1, 1, 1);
@@ -930,10 +930,18 @@ static void qspFunctionStrPos(QSPVariant *args, long count, QSPVariant *tos)
 
 static void qspFunctionRGB(QSPVariant *args, long count, QSPVariant *tos)
 {
-	long r, g, b;
+	long r, g, b, a = 0;
 	r = QSP_NUM(args[0]);
 	g = QSP_NUM(args[1]);
 	b = QSP_NUM(args[2]);
+	if (count == 4)
+	{
+		a = QSP_NUM(args[3]);
+		if (a < 0)
+			a = 0;
+		else if (a > 255)
+			a = 255;
+	}
 	if (r < 0)
 		r = 0;
 	else if (r > 255)
@@ -946,7 +954,7 @@ static void qspFunctionRGB(QSPVariant *args, long count, QSPVariant *tos)
 		b = 0;
 	else if (b > 255)
 		b = 255;
-	QSP_PNUM(tos) = (b << 16) | (g << 8) | r;
+	QSP_PNUM(tos) = (a << 24) | (b << 16) | (g << 8) | r;
 }
 
 static void qspFunctionMid(QSPVariant *args, long count, QSPVariant *tos)
