@@ -930,7 +930,7 @@ static void qspFunctionStrPos(QSPVariant *args, long count, QSPVariant *tos)
 
 static void qspFunctionRGB(QSPVariant *args, long count, QSPVariant *tos)
 {
-	long r, g, b, a = 0;
+	long r, g, b, a = 255;
 	r = QSP_NUM(args[0]);
 	g = QSP_NUM(args[1]);
 	b = QSP_NUM(args[2]);
