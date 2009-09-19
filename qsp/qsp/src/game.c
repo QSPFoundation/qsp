@@ -404,6 +404,7 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 	if (qspReCodeGetIntVal(strs[9]) < 0) return QSP_FALSE;
 	temp = qspReCodeGetIntVal(strs[14]);
 	if (temp < 0 || temp > QSP_MAXPLFILES || (ind += temp) > strsCount) return QSP_FALSE;
+	if (ind + 1 > strsCount) return QSP_FALSE;
 	temp = qspReCodeGetIntVal(strs[ind++]);
 	if (temp < 0 || temp > QSP_MAXINCFILES || (ind += temp) > strsCount) return QSP_FALSE;
 	if (ind + 1 > strsCount) return QSP_FALSE;
