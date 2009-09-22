@@ -104,9 +104,12 @@ void qspClearIncludes(QSP_BOOL isFirst)
 	{
 		for (i = 0; i < qspCurIncFilesCount; ++i)
 			free(qspCurIncFiles[i]);
-		count = qspLocsCount - qspCurIncLocsCount;
-		qspCreateWorld(count, count);
-		if (qspCurIncLocsCount) qspPrepareLocs();
+		if (qspCurIncLocsCount)
+		{
+			count = qspLocsCount - qspCurIncLocsCount;
+			qspCreateWorld(count, count);
+			qspPrepareLocs();
+		}
 	}
 	qspCurIncFilesCount = 0;
 	qspCurIncLocsCount = 0;
