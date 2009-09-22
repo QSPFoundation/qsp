@@ -67,12 +67,22 @@ void qspCreateWorld(long start, long locsCount)
 		qspLocsNames = (QSPLocName *)realloc(qspLocsNames, qspLocsCount * sizeof(QSPLocName));
 	}
 	for (i = start; i < qspLocsCount; ++i)
+	{
+		qspLocsNames[i].Name = 0;
 		for (j = 0; j < QSP_MAXACTIONS; ++j)
 			qspLocs[i].Actions[j].Desc = 0;
+	}
 }
 
 void qspPrepareLocs()
 {
+	long i;
+	for (i = 0; i < qspLocsCount; ++i)
+	{
+		if (qspLocsNames[i].Name) free(qspLocsNames[i].Name);
+		qspLocsNames[i].Index = i;
+		qspUpperStr(qspLocsNames[i].Name = qspGetNewText(qspLocs[i].Name, -1));
+	}
 	qsort(qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocsCompare);
 }
 

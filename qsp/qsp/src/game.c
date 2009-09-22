@@ -106,6 +106,7 @@ void qspClearIncludes(QSP_BOOL isFirst)
 			free(qspCurIncFiles[i]);
 		count = qspLocsCount - qspCurIncLocsCount;
 		qspCreateWorld(count, count);
+		if (qspCurIncLocsCount) qspPrepareLocs();
 	}
 	qspCurIncFilesCount = 0;
 	qspCurIncLocsCount = 0;
@@ -255,11 +256,7 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	{
 		data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
 		if (isAddLoc = !isAddLocs || qspLocIndex(data) < 0)
-		{
 			qspLocs[locsCount].Name = data;
-			qspLocsNames[locsCount].Index = locsCount;
-			qspUpperStr(qspLocsNames[locsCount].Name = qspGetNewText(data, -1));
-		}
 		else
 			free(data);
 		if (isAddLoc)
