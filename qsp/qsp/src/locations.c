@@ -24,16 +24,31 @@
 #include "variables.h"
 
 QSPLocation *qspLocs = 0;
+QSPLocName *qspLocsNames = 0;
 long qspLocsCount = 0;
 long qspCurLoc = -1;
 long qspRefreshCount = 0;
 long qspFullRefreshCount = 0;
+
+static int qspLocsCompare(const void *, const void *);
+static int qspLocStringCompare(const void *, const void *);
+
+static int qspLocsCompare(const void *locName1, const void *locName2)
+{
+	return QSP_STRCMP(((QSPLocName *)locName1)->Name, ((QSPLocName *)locName2)->Name);
+}
+
+static int qspLocStringCompare(const void *name, const void *compareTo)
+{
+	return QSP_STRCMP((QSP_CHAR *)name, ((QSPLocName *)compareTo)->Name);
+}
 
 void qspCreateWorld(long start, long locsCount)
 {
 	long i, j;
 	for (i = start; i < qspLocsCount; ++i)
 	{
+		free(qspLocsNames[i].Name);
 		free(qspLocs[i].Name);
 		free(qspLocs[i].Desc);
 		qspFreeStrs(qspLocs[i].OnVisitLines, qspLocs[i].OnVisitLinesCount, QSP_FALSE);
@@ -49,16 +64,21 @@ void qspCreateWorld(long start, long locsCount)
 	{
 		qspLocsCount = locsCount;
 		qspLocs = (QSPLocation *)realloc(qspLocs, qspLocsCount * sizeof(QSPLocation));
+		qspLocsNames = (QSPLocName *)realloc(qspLocsNames, qspLocsCount * sizeof(QSPLocName));
 	}
 	for (i = start; i < qspLocsCount; ++i)
 		for (j = 0; j < QSP_MAXACTIONS; ++j)
 			qspLocs[i].Actions[j].Desc = 0;
 }
 
+void qspPrepareLocs()
+{
+	qsort(qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocsCompare);
+}
+
 long qspLocIndex(QSP_CHAR *name)
 {
-	long i;
-	QSPLocation *loc;
+	QSPLocName *loc;
 	QSP_CHAR *uName;
 	if (!qspLocsCount) return -1;
 	uName = qspDelSpc(name);
@@ -68,17 +88,9 @@ long qspLocIndex(QSP_CHAR *name)
 		return -1;
 	}
 	qspUpperStr(uName);
-	loc = qspLocs;
-	for (i = 0; i < qspLocsCount; ++i)
-	{
-		if (!QSP_STRCMP(loc->Name, uName))
-		{
-			free(uName);
-			return i;
-		}
-		++loc;
-	}
+	loc = (QSPLocName *)bsearch(uName, qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocStringCompare);
 	free(uName);
+	if (loc) return loc->Index;
 	return -1;
 }
 

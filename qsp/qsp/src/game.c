@@ -255,7 +255,11 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	{
 		data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
 		if (isAddLoc = !isAddLocs || qspLocIndex(data) < 0)
-			qspUpperStr(qspLocs[locsCount].Name = data);
+		{
+			qspLocs[locsCount].Name = data;
+			qspLocsNames[locsCount].Index = locsCount;
+			qspUpperStr(qspLocsNames[locsCount].Name = qspGetNewText(data, -1));
+		}
 		else
 			free(data);
 		if (isAddLoc)
@@ -293,8 +297,10 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	qspFreeStrs(strs, count, QSP_FALSE);
 	qspLocsCount = end;
 	qspCreateWorld(end, locsCount);
+	count = locsCount - start;
+	if (count) qspPrepareLocs();
 	if (isAddLocs)
-		qspCurIncLocsCount += locsCount - start;
+		qspCurIncLocsCount += count;
 	else
 	{
 		qspQstFullPath = qspGetAddText(qspQstFullPath, fileName, 0, -1);
@@ -395,8 +401,8 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 	ind = 15;
 	if (ind > strsCount) return QSP_FALSE;
 	if (QSP_STRCMP(strs[0], QSP_SAVEDGAMEID) ||
-		QSP_STRCOLL(strs[1], QSP_GAMEMINVER) < 0 ||
-		QSP_STRCOLL(strs[1], QSP_VER) > 0) return QSP_FALSE;
+		QSP_STRCMP(strs[1], QSP_GAMEMINVER) < 0 ||
+		QSP_STRCMP(strs[1], QSP_VER) > 0) return QSP_FALSE;
 	if (!qspGetVarNumValue(QSP_FMT("DEBUG")) &&
 		qspReCodeGetIntVal(strs[2]) != qspQstCRC) return QSP_FALSE;
 	selAction = qspReCodeGetIntVal(strs[4]);

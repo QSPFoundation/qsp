@@ -37,8 +37,14 @@
 		long OnVisitLinesCount;
 		QSPLocAct Actions[QSP_MAXACTIONS];
 	} QSPLocation;
+	typedef struct
+	{
+		long Index;
+		QSP_CHAR *Name;
+	} QSPLocName;
 
 	extern QSPLocation *qspLocs;
+	extern QSPLocName *qspLocsNames;
 	extern long qspLocsCount;
 	extern long qspCurLoc;
 	extern long qspRefreshCount;
@@ -46,6 +52,7 @@
 
 	/* External functions */
 	void qspCreateWorld(long, long);
+	void qspPrepareLocs();
 	long qspLocIndex(QSP_CHAR *);
 	void qspExecLocByIndex(long, QSP_BOOL);
 	void qspExecLocByName(QSP_CHAR *, QSP_BOOL);

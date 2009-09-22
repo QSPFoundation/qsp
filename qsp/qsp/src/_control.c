@@ -557,6 +557,7 @@ void QSPInit()
 	qspQstCRC = 0;
 	qspMSCount = 0;
 	qspLocs = 0;
+	qspLocsNames = 0;
 	qspLocsCount = 0;
 	qspCurLoc = -1;
 	qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
