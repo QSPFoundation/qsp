@@ -159,7 +159,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	m_input = new QSPInputBox(this, ID_INPUT);
 	m_manager->AddPane(m_input, wxAuiPaneInfo().Name(wxT("input")).MinSize(50, 20).BestSize(100, 20).Bottom().Layer(1));
 	// --------------------------------------
-	SetMinSize(wxSize(450, 300));
+	SetMinClientSize(wxSize(450, 300));
 	SetOverallVolume(100);
 	m_isFixedSize = false;
 	m_isQuit = false;
@@ -176,6 +176,7 @@ QSPFrame::~QSPFrame()
 
 void QSPFrame::SaveSettings()
 {
+	int x, y, w, h;
 	bool isMaximized;
 	if (IsFullScreen()) ShowFullScreen(false);
 	if (IsIconized()) Iconize(false);
@@ -191,17 +192,19 @@ void QSPFrame::SaveSettings()
 	cfg.Write(wxT("General/ShowHotkeys"), m_isShowHotkeys);
 	cfg.Write(wxT("General/Panels"), m_manager->SavePerspective());
 	m_transhelper->Save(cfg, wxT("General/Language"));
-	wxRect r = GetRect();
-	cfg.Write(wxT("Pos/Left"), r.GetLeft());
-	cfg.Write(wxT("Pos/Top"), r.GetTop());
-	cfg.Write(wxT("Pos/Width"), r.GetWidth());
-	cfg.Write(wxT("Pos/Height"), r.GetHeight());
+	GetPosition(&x, &y);
+	GetClientSize(&w, &h);
+	cfg.Write(wxT("Pos/Left"), x);
+	cfg.Write(wxT("Pos/Top"), y);
+	cfg.Write(wxT("Pos/Width"), w);
+	cfg.Write(wxT("Pos/Height"), h);
 	cfg.Write(wxT("Pos/Maximize"), isMaximized);
 	cfg.Write(wxT("Pos/FixedSize"), m_isFixedSize);
 }
 
 void QSPFrame::LoadSettings()
 {
+	long style = wxDEFAULT_FRAME_STYLE;
 	bool isMaximize;
 	int x, y, w, h, temp;
 	wxFileConfig cfg(wxEmptyString, wxEmptyString, m_configPath);
@@ -249,22 +252,23 @@ void QSPFrame::LoadSettings()
 	m_settingsMenu->Check(ID_USEFONTSIZE, m_isUseFontSize);
 	m_manager->LoadPerspective(panels);
 	m_manager->RestoreMaximizedPane();
-	SetSize(x, y, w, h);
+	SetClientSize(w, h);
+	Move(x, y);
 	ShowPane(ID_VIEWPIC, false);
 	ShowPane(ID_ACTIONS, true);
 	ShowPane(ID_OBJECTS, true);
 	ShowPane(ID_VARSDESC, true);
 	ShowPane(ID_INPUT, true);
 	ReCreateGUI();
-	Show();
-	SetWindowStyle(wxDEFAULT_FRAME_STYLE);
-	if (isMaximize)
-		Maximize();
-	else if (m_isFixedSize)
+	if (m_isFixedSize)
 	{
 		m_settingsMenu->Enable(ID_TOGGLEWINMODE, false);
-		SetWindowStyle(wxDEFAULT_FRAME_STYLE & ~(wxMAXIMIZE_BOX | wxRESIZE_BORDER));
+		style &= ~(wxMAXIMIZE_BOX | wxRESIZE_BORDER);
 	}
+	else if (isMaximize)
+		Maximize();
+	SetWindowStyle(style);
+	Show();
 }
 
 void QSPFrame::EnableControls(bool status, bool isExtended)
