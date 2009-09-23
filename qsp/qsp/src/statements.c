@@ -343,8 +343,13 @@ long qspGetStatArgs(QSP_CHAR *s, long statCode, QSPVariant *args)
 			qspSetError(QSP_ERR_BRACKNOTFOUND);
 			return 0;
 		}
-		*brack = 0;
-		s = qspSkipSpaces(s + 1);
+		if (qspIsAnyString(brack + 1))
+			brack = 0;
+		else
+		{
+			*brack = 0;
+			s = qspSkipSpaces(s + 1);
+		}
 	}
 	if (*s)
 	{
