@@ -257,6 +257,7 @@ void QSPFrame::LoadSettings()
 	ShowPane(ID_INPUT, true);
 	ReCreateGUI();
 	Show();
+	SetWindowStyle(wxDEFAULT_FRAME_STYLE);
 	if (isMaximize)
 		Maximize();
 	else if (m_isFixedSize)
