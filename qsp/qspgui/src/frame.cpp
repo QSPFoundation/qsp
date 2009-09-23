@@ -161,7 +161,6 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	// --------------------------------------
 	SetMinClientSize(wxSize(450, 300));
 	SetOverallVolume(100);
-	m_isFixedSize = false;
 	m_isQuit = false;
 	m_isGameOpened = false;
 }
@@ -199,12 +198,10 @@ void QSPFrame::SaveSettings()
 	cfg.Write(wxT("Pos/Width"), w);
 	cfg.Write(wxT("Pos/Height"), h);
 	cfg.Write(wxT("Pos/Maximize"), isMaximized);
-	cfg.Write(wxT("Pos/FixedSize"), m_isFixedSize);
 }
 
 void QSPFrame::LoadSettings()
 {
-	long style = wxDEFAULT_FRAME_STYLE;
 	bool isMaximize;
 	int x, y, w, h, temp;
 	wxFileConfig cfg(wxEmptyString, wxEmptyString, m_configPath);
@@ -226,7 +223,6 @@ void QSPFrame::LoadSettings()
 	cfg.Read(wxT("Pos/Width"), &w, 850);
 	cfg.Read(wxT("Pos/Height"), &h, 650);
 	cfg.Read(wxT("Pos/Maximize"), &isMaximize, false);
-	cfg.Read(wxT("Pos/FixedSize"), &m_isFixedSize, false);
 	wxString panels(wxT("layout2|") \
 		wxT("name=imgview;state=1080035327;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=832;besth=150;minw=50;minh=50;maxw=-1;maxh=-1;floatx=175;floaty=148;floatw=518;floath=372|") \
 		wxT("name=desc;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=613;besth=341;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
@@ -260,14 +256,7 @@ void QSPFrame::LoadSettings()
 	ShowPane(ID_VARSDESC, true);
 	ShowPane(ID_INPUT, true);
 	ReCreateGUI();
-	if (m_isFixedSize)
-	{
-		m_settingsMenu->Enable(ID_TOGGLEWINMODE, false);
-		style &= ~(wxMAXIMIZE_BOX | wxRESIZE_BORDER);
-	}
-	else if (isMaximize)
-		Maximize();
-	SetWindowStyle(style);
+	if (isMaximize) Maximize();
 	Show();
 }
 

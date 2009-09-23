@@ -198,7 +198,6 @@
 		bool m_isQuit;
 		bool m_isShowHotkeys;
 		int m_volume;
-		bool m_isFixedSize;
 	};
 
 #endif
