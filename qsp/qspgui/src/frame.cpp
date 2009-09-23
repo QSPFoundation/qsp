@@ -240,7 +240,11 @@ void QSPFrame::LoadSettings()
 	ApplyFontColor(m_fontColor);
 	ApplyLinkColor(m_linkColor);
 	ApplyFontSize(m_fontSize);
-	ApplyFontName(m_fontName);
+	if (!ApplyFontName(m_fontName))
+	{
+		m_fontName = wxNORMAL_FONT->GetFaceName();
+		ApplyFontName(m_fontName);
+	}
 	RefreshUI();
 	m_settingsMenu->Check(ID_USEFONTSIZE, m_isUseFontSize);
 	m_manager->LoadPerspective(panels);
