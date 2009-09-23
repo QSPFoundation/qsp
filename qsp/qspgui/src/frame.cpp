@@ -95,43 +95,43 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	gameSaveItem->SetBitmap(wxBitmap(statussave_xpm));
 	m_gameMenu->Append(gameSaveItem);
 	// ------------
-	m_wndsMenu = new wxMenu;
-	m_wndsMenu->Append(ID_TOGGLEOBJS, wxT("-"));
-	m_wndsMenu->Append(ID_TOGGLEACTS, wxT("-"));
-	m_wndsMenu->Append(ID_TOGGLEDESC, wxT("-"));
-	m_wndsMenu->Append(ID_TOGGLEINPUT, wxT("-"));
-	m_wndsMenu->AppendSeparator();
-	m_wndsMenu->Append(ID_TOGGLECAPTIONS, wxT("-"));
-	m_wndsMenu->Append(ID_TOGGLEHOTKEYS, wxT("-"));
+	wxMenu *wndsMenu = new wxMenu;
+	wndsMenu->Append(ID_TOGGLEOBJS, wxT("-"));
+	wndsMenu->Append(ID_TOGGLEACTS, wxT("-"));
+	wndsMenu->Append(ID_TOGGLEDESC, wxT("-"));
+	wndsMenu->Append(ID_TOGGLEINPUT, wxT("-"));
+	wndsMenu->AppendSeparator();
+	wndsMenu->Append(ID_TOGGLECAPTIONS, wxT("-"));
+	wndsMenu->Append(ID_TOGGLEHOTKEYS, wxT("-"));
 	// ------------
-	m_fontMenu = new wxMenu;
-	m_fontMenu->Append(ID_SELECTFONT, wxT("-"));
-	m_fontMenu->AppendCheckItem(ID_USEFONTSIZE, wxT("-"));
+	wxMenu *fontMenu = new wxMenu;
+	fontMenu->Append(ID_SELECTFONT, wxT("-"));
+	fontMenu->AppendCheckItem(ID_USEFONTSIZE, wxT("-"));
 	// ------------
 	wxMenu *colorsMenu = new wxMenu;
 	colorsMenu->Append(ID_SELECTFONTCOLOR, wxT("-"));
 	colorsMenu->Append(ID_SELECTBACKCOLOR, wxT("-"));
 	colorsMenu->Append(ID_SELECTLINKCOLOR, wxT("-"));
 	// ------------
-	m_volumeMenu = new wxMenu;
-	m_volumeMenu->AppendRadioItem(ID_VOLUME0, wxT("-"));
-	m_volumeMenu->AppendRadioItem(ID_VOLUME20, wxT("-"));
-	m_volumeMenu->AppendRadioItem(ID_VOLUME40, wxT("-"));
-	m_volumeMenu->AppendRadioItem(ID_VOLUME60, wxT("-"));
-	m_volumeMenu->AppendRadioItem(ID_VOLUME80, wxT("-"));
-	m_volumeMenu->AppendRadioItem(ID_VOLUME100, wxT("-"));
+	wxMenu *volumeMenu = new wxMenu;
+	volumeMenu->AppendRadioItem(ID_VOLUME0, wxT("-"));
+	volumeMenu->AppendRadioItem(ID_VOLUME20, wxT("-"));
+	volumeMenu->AppendRadioItem(ID_VOLUME40, wxT("-"));
+	volumeMenu->AppendRadioItem(ID_VOLUME60, wxT("-"));
+	volumeMenu->AppendRadioItem(ID_VOLUME80, wxT("-"));
+	volumeMenu->AppendRadioItem(ID_VOLUME100, wxT("-"));
 	// ------------
-	wxMenu *settingsMenu = new wxMenu;
-	settingsMenu->Append(ID_SHOWHIDE, wxT("-"), m_wndsMenu);
-	settingsMenu->Append(ID_FONT, wxT("-"), m_fontMenu);
-	settingsMenu->Append(ID_COLORS, wxT("-"), colorsMenu);
-	settingsMenu->Append(ID_VOLUME, wxT("-"), m_volumeMenu);
-	settingsMenu->AppendSeparator();
-	wxMenuItem *settingsWinModeItem = new wxMenuItem(settingsMenu, ID_TOGGLEWINMODE, wxT("-"));
+	m_settingsMenu = new wxMenu;
+	m_settingsMenu->Append(ID_SHOWHIDE, wxT("-"), wndsMenu);
+	m_settingsMenu->Append(ID_FONT, wxT("-"), fontMenu);
+	m_settingsMenu->Append(ID_COLORS, wxT("-"), colorsMenu);
+	m_settingsMenu->Append(ID_VOLUME, wxT("-"), volumeMenu);
+	m_settingsMenu->AppendSeparator();
+	wxMenuItem *settingsWinModeItem = new wxMenuItem(m_settingsMenu, ID_TOGGLEWINMODE, wxT("-"));
 	settingsWinModeItem->SetBitmap(wxBitmap(windowmode_xpm));
-	settingsMenu->Append(settingsWinModeItem);
-	settingsMenu->AppendSeparator();
-	settingsMenu->Append(ID_SELECTLANG, wxT("-"));
+	m_settingsMenu->Append(settingsWinModeItem);
+	m_settingsMenu->AppendSeparator();
+	m_settingsMenu->Append(ID_SELECTLANG, wxT("-"));
 	// ------------
 	wxMenu *helpMenu = new wxMenu;
 	wxMenuItem *helpAboutItem = new wxMenuItem(helpMenu, ID_ABOUT, wxT("-"));
@@ -140,7 +140,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	// ------------
 	menuBar->Append(m_fileMenu, wxEmptyString);
 	menuBar->Append(m_gameMenu, wxEmptyString);
-	menuBar->Append(settingsMenu, wxEmptyString);
+	menuBar->Append(m_settingsMenu, wxEmptyString);
 	menuBar->Append(helpMenu, wxEmptyString);
 	SetMenuBar(menuBar);
 	// --------------------------------------
@@ -161,6 +161,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	// --------------------------------------
 	SetMinSize(wxSize(450, 300));
 	SetOverallVolume(100);
+	m_isFixedSize = false;
 	m_isQuit = false;
 	m_isGameOpened = false;
 }
@@ -186,7 +187,7 @@ void QSPFrame::SaveSettings()
 	cfg.Write(wxT("Font/FontSize"), m_fontSize);
 	cfg.Write(wxT("Font/FontName"), m_fontName);
 	cfg.Write(wxT("Font/UseFontSize"), m_isUseFontSize);
-	cfg.Write(wxT("General/Volume"), m_Volume);
+	cfg.Write(wxT("General/Volume"), m_volume);
 	cfg.Write(wxT("General/ShowHotkeys"), m_isShowHotkeys);
 	cfg.Write(wxT("General/Panels"), m_manager->SavePerspective());
 	m_transhelper->Save(cfg, wxT("General/Language"));
@@ -196,6 +197,7 @@ void QSPFrame::SaveSettings()
 	cfg.Write(wxT("Pos/Width"), r.GetWidth());
 	cfg.Write(wxT("Pos/Height"), r.GetHeight());
 	cfg.Write(wxT("Pos/Maximize"), isMaximized);
+	cfg.Write(wxT("Pos/FixedSize"), m_isFixedSize);
 }
 
 void QSPFrame::LoadSettings()
@@ -215,12 +217,13 @@ void QSPFrame::LoadSettings()
 	cfg.Read(wxT("Font/FontName"), &m_fontName, wxNORMAL_FONT->GetFaceName());
 	cfg.Read(wxT("Font/UseFontSize"), &m_isUseFontSize, false);
 	cfg.Read(wxT("General/ShowHotkeys"), &m_isShowHotkeys, false);
-	cfg.Read(wxT("General/Volume"), &m_Volume, 100);
+	cfg.Read(wxT("General/Volume"), &m_volume, 100);
 	cfg.Read(wxT("Pos/Left"), &x, 10);
 	cfg.Read(wxT("Pos/Top"), &y, 10);
 	cfg.Read(wxT("Pos/Width"), &w, 850);
 	cfg.Read(wxT("Pos/Height"), &h, 650);
 	cfg.Read(wxT("Pos/Maximize"), &isMaximize, false);
+	cfg.Read(wxT("Pos/FixedSize"), &m_isFixedSize, false);
 	wxString panels(wxT("layout2|") \
 		wxT("name=imgview;state=1080035327;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=832;besth=150;minw=50;minh=50;maxw=-1;maxh=-1;floatx=175;floaty=148;floatw=518;floath=372|") \
 		wxT("name=desc;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=613;besth=341;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
@@ -232,14 +235,14 @@ void QSPFrame::LoadSettings()
 	cfg.Read(wxT("General/Panels"), &panels);
 	m_transhelper->Load(cfg, wxT("General/Language"));
 	// -------------------------------------------------
-	SetOverallVolume(m_Volume);
+	SetOverallVolume(m_volume);
 	ApplyBackColor(m_backColor);
 	ApplyFontColor(m_fontColor);
 	ApplyLinkColor(m_linkColor);
 	ApplyFontSize(m_fontSize);
 	ApplyFontName(m_fontName);
 	RefreshUI();
-	m_fontMenu->Check(ID_USEFONTSIZE, m_isUseFontSize);
+	m_settingsMenu->Check(ID_USEFONTSIZE, m_isUseFontSize);
 	m_manager->LoadPerspective(panels);
 	m_manager->RestoreMaximizedPane();
 	SetSize(x, y, w, h);
@@ -250,7 +253,13 @@ void QSPFrame::LoadSettings()
 	ShowPane(ID_INPUT, true);
 	ReCreateGUI();
 	Show();
-	if (isMaximize) Maximize();
+	if (isMaximize)
+		Maximize();
+	else if (m_isFixedSize)
+	{
+		m_settingsMenu->Enable(ID_TOGGLEWINMODE, false);
+		SetWindowStyle(wxDEFAULT_FRAME_STYLE & ~(wxMAXIMIZE_BOX | wxRESIZE_BORDER));
+	}
 }
 
 void QSPFrame::EnableControls(bool status, bool isExtended)
@@ -259,10 +268,10 @@ void QSPFrame::EnableControls(bool status, bool isExtended)
 	m_fileMenu->Enable(ID_NEWGAME, status);
 	m_gameMenu->Enable(ID_OPENGAMESTAT, status);
 	m_gameMenu->Enable(ID_SAVEGAMESTAT, status);
-	m_wndsMenu->Enable(ID_TOGGLEOBJS, status);
-	m_wndsMenu->Enable(ID_TOGGLEACTS, status);
-	m_wndsMenu->Enable(ID_TOGGLEDESC, status);
-	m_wndsMenu->Enable(ID_TOGGLEINPUT, status);
+	m_settingsMenu->Enable(ID_TOGGLEOBJS, status);
+	m_settingsMenu->Enable(ID_TOGGLEACTS, status);
+	m_settingsMenu->Enable(ID_TOGGLEDESC, status);
+	m_settingsMenu->Enable(ID_TOGGLEINPUT, status);
 	m_objects->Enable(status);
 	m_actions->Enable(status);
 	m_input->SetEditable(status);
@@ -558,9 +567,9 @@ void QSPFrame::SetOverallVolume(int percents)
 	case 80: id = ID_VOLUME80; break;
 	case 100: id = ID_VOLUME100; break;
 	}
-	if (id >= 0) m_volumeMenu->Check(id, true);
+	if (id >= 0) m_settingsMenu->Check(id, true);
 	QSPCallBacks::SetOverallVolume((float)percents / 100);
-	m_Volume = percents;
+	m_volume = percents;
 }
 
 void QSPFrame::TogglePane(wxWindowID id)

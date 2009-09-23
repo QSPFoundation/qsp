@@ -186,9 +186,7 @@
 		long m_menuItemId;
 		wxMenu *m_menu;
 		wxMenu *m_fileMenu;
-		wxMenu *m_wndsMenu;
-		wxMenu *m_fontMenu;
-		wxMenu *m_volumeMenu;
+		wxMenu *m_settingsMenu;
 		wxAuiManager *m_manager;
 		wxColour m_backColor;
 		wxColour m_linkColor;
@@ -199,7 +197,8 @@
 		bool m_isProcessEvents;
 		bool m_isQuit;
 		bool m_isShowHotkeys;
-		int m_Volume;
+		int m_volume;
+		bool m_isFixedSize;
 	};
 
 #endif
