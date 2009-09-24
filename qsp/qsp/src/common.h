@@ -28,6 +28,7 @@
 	extern long qspCurVarsLen;
 	extern QSP_CHAR *qspCurInput;
 	extern long qspCurInputLen;
+	extern long qspTimerInterval;
 	extern QSP_BOOL qspIsMainDescChanged;
 	extern QSP_BOOL qspIsVarsDescChanged;
 	extern QSP_BOOL qspCurIsShowVars;

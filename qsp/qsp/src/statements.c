@@ -728,6 +728,7 @@ static QSP_BOOL qspStatementSetTimer(QSPVariant *args, long count, QSP_CHAR **ju
 {
 	long num = QSP_NUM(args[0]);
 	if (num < 0) num = 0;
+	qspTimerInterval = num;
 	qspCallSetTimer(num);
 	return QSP_FALSE;
 }

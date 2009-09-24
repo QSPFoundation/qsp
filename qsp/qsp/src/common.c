@@ -33,6 +33,7 @@ QSP_CHAR *qspCurVars = 0;
 long qspCurVarsLen = 0;
 QSP_CHAR *qspCurInput = 0;
 long qspCurInputLen = 0;
+long qspTimerInterval = 0;
 QSP_BOOL qspIsMainDescChanged = QSP_FALSE;
 QSP_BOOL qspIsVarsDescChanged = QSP_FALSE;
 QSP_BOOL qspCurIsShowVars = QSP_TRUE;

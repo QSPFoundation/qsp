@@ -139,6 +139,7 @@ void qspNewGame(QSP_BOOL isReset)
 	if (isReset)
 	{
 		qspSetSeed((unsigned int)QSP_TIME(0));
+		qspTimerInterval = QSP_DEFTIMERINTERVAL;
 		qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
 		qspMemClear(QSP_FALSE);
 		qspResetTime(0);
@@ -344,6 +345,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 	len = qspCodeWriteIntVal(&buf, len, (long)qspCurIsShowObjs, QSP_TRUE);
 	len = qspCodeWriteIntVal(&buf, len, (long)qspCurIsShowVars, QSP_TRUE);
 	len = qspCodeWriteIntVal(&buf, len, (long)qspCurIsShowInput, QSP_TRUE);
+	len = qspCodeWriteIntVal(&buf, len, qspTimerInterval, QSP_TRUE);
 	len = qspCodeWriteIntVal(&buf, len, qspPLFilesCount, QSP_TRUE);
 	for (i = 0; i < qspPLFilesCount; ++i)
 		len = qspCodeWriteVal(&buf, len, qspPLFiles[i], QSP_TRUE);
@@ -398,7 +400,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 {
 	long i, ind, count, lastInd, temp, selAction, selObject;
-	ind = 15;
+	ind = 16;
 	if (ind > strsCount) return QSP_FALSE;
 	if (QSP_STRCMP(strs[0], QSP_SAVEDGAMEID) ||
 		QSP_STRCMP(strs[1], QSP_GAMEMINVER) < 0 ||
@@ -408,7 +410,8 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 	selAction = qspReCodeGetIntVal(strs[4]);
 	selObject = qspReCodeGetIntVal(strs[5]);
 	if (qspReCodeGetIntVal(strs[9]) < 0) return QSP_FALSE;
-	temp = qspReCodeGetIntVal(strs[14]);
+	if (qspReCodeGetIntVal(strs[14]) < 0) return QSP_FALSE;
+	temp = qspReCodeGetIntVal(strs[15]);
 	if (temp < 0 || temp > QSP_MAXPLFILES || (ind += temp) > strsCount) return QSP_FALSE;
 	if (ind + 1 > strsCount) return QSP_FALSE;
 	temp = qspReCodeGetIntVal(strs[ind++]);
@@ -491,8 +494,9 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	qspCurIsShowObjs = qspReCodeGetIntVal(strs[11]) != 0;
 	qspCurIsShowVars = qspReCodeGetIntVal(strs[12]) != 0;
 	qspCurIsShowInput = qspReCodeGetIntVal(strs[13]) != 0;
-	qspPLFilesCount = qspReCodeGetIntVal(strs[14]);
-	ind = 15;
+	qspTimerInterval = qspReCodeGetIntVal(strs[14]);
+	qspPLFilesCount = qspReCodeGetIntVal(strs[15]);
+	ind = 16;
 	for (i = 0; i < qspPLFilesCount; ++i)
 		qspPLFiles[i] = qspCodeReCode(strs[ind++], QSP_FALSE);
 	qspCurIncFilesCount = qspReCodeGetIntVal(strs[ind++]);
@@ -570,6 +574,7 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	qspCallShowPicture(0);
 	qspCallCloseFile(0);
 	qspPlayPLFiles();
+	qspCallSetTimer(qspTimerInterval);
 	qspExecLocByVarName(QSP_FMT("ONGLOAD"));
 }
 

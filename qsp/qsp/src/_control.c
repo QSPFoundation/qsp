@@ -560,6 +560,7 @@ void QSPInit()
 	qspLocsNames = 0;
 	qspLocsCount = 0;
 	qspCurLoc = -1;
+	qspTimerInterval = 0;
 	qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
 	setlocale(LC_ALL, QSP_LOCALE);
 	qspSetSeed(0);
