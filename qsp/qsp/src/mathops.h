@@ -60,6 +60,7 @@
 		qspOpDiv,
 		qspOpAdd,
 		qspOpSub,
+		qspOpMod,
 		qspOpNe,
 		qspOpLeq,
 		qspOpGeq,

@@ -138,6 +138,7 @@ void qspInitMath()
 	qspAddOperation(qspOpSub, 14, 0, 2, 2, 2, 2, 2);
 	qspAddOperation(qspOpMul, 17, 0, 2, 2, 2, 2, 2);
 	qspAddOperation(qspOpDiv, 17, 0, 2, 2, 2, 2, 2);
+	qspAddOperation(qspOpMod, 16, 0, 2, 2, 2, 2, 2);
 	qspAddOperation(qspOpNe, 10, 0, 2, 2, 2, 0, 0);
 	qspAddOperation(qspOpLeq, 10, 0, 2, 2, 2, 0, 0);
 	qspAddOperation(qspOpGeq, 10, 0, 2, 2, 2, 0, 0);
@@ -196,6 +197,7 @@ void qspInitMath()
 	qspAddOpName(qspOpSub, QSP_SUB, 1);
 	qspAddOpName(qspOpMul, QSP_MUL, 1);
 	qspAddOpName(qspOpDiv, QSP_DIV, 1);
+	qspAddOpName(qspOpMod, QSP_FMT("MOD"), 1);
 	qspAddOpName(qspOpNe, QSP_NOTEQUAL1, 1);
 	qspAddOpName(qspOpNe, QSP_NOTEQUAL2, 0);
 	qspAddOpName(qspOpLeq, QSP_LESSEQ1, 0);
@@ -457,6 +459,14 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 			case qspOpSub:
 				QSP_NUM(tos) = QSP_NUM(args[0]) - QSP_NUM(args[1]);
 				break;
+			case qspOpMod:
+				if (!QSP_NUM(args[1]))
+				{
+					qspSetError(QSP_ERR_DIVBYZERO);
+					break;
+				}
+				QSP_NUM(tos) = QSP_NUM(args[0]) % QSP_NUM(args[1]);
+				break;
 			case qspOpAppend:
 				len = qspAddText(&QSP_STR(tos), QSP_STR(args[0]), 0, -1, QSP_TRUE);
 				QSP_STR(tos) = qspGetAddText(QSP_STR(tos), QSP_STR(args[1]), len, -1);
@@ -635,7 +645,7 @@ static long qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, long *comp
 				qspSetError(QSP_ERR_UNKNOWNACTION);
 				break;
 			}
-			if ((opCode == qspOpAnd || opCode == qspOpOr) && !qspIsInList(QSP_SPACES QSP_QUOTS QSP_LRBRACK, *s))
+			if ((opCode == qspOpAnd || opCode == qspOpOr || opCode == qspOpMod) && !qspIsInList(QSP_SPACES QSP_QUOTS QSP_LRBRACK, *s))
 			{
 				qspSetError(QSP_ERR_SYNTAX);
 				break;
