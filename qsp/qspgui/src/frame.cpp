@@ -258,6 +258,7 @@ void QSPFrame::LoadSettings()
 	ReCreateGUI();
 	if (isMaximize) Maximize();
 	Show();
+	m_manager->Update();
 }
 
 void QSPFrame::EnableControls(bool status, bool isExtended)
