@@ -192,7 +192,6 @@ void qspInitMath()
 	/* Names */
 	qspAddOpName(qspOpOpenBracket, QSP_LRBRACK, 1);
 	qspAddOpName(qspOpCloseBracket, QSP_RRBRACK, 1);
-	qspAddOpName(qspOpMinus, QSP_UMINUS, 1);
 	qspAddOpName(qspOpAdd, QSP_ADD, 1);
 	qspAddOpName(qspOpSub, QSP_SUB, 1);
 	qspAddOpName(qspOpMul, QSP_MUL, 1);
