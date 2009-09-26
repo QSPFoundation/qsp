@@ -68,7 +68,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	m_configPath(configPath),
 	m_transhelper(transhelper)
 {
-	wxRegisterId(ID_TIMER);
+	wxRegisterId(ID_DUMMY);
 	SetIcon(wxICON(logo));
 	DragAcceptFiles(true);
 	m_timer = new wxTimer(this, ID_TIMER);

@@ -85,7 +85,9 @@
 		ID_ACTIONS,
 		ID_VIEWPIC,
 		ID_INPUT,
-		ID_TIMER
+		ID_TIMER,
+
+		ID_DUMMY
 	};
 
 	class QSPFrame : public wxFrame
