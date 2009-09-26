@@ -152,6 +152,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 		m_frame->EnableControls(false, true);
 		m_frame->Update();
 		wxTheApp->Yield(true);
+		if (m_frame->GetIsQuit()) return;
 		m_frame->EnableControls(true, true);
 	}
 	m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, isCanSave);
@@ -242,19 +243,14 @@ void QSPCallBacks::Sleep(long msecs)
 		wxThread::Sleep(50);
 		m_frame->Update();
 		wxTheApp->Yield(true);
-		if (m_frame->GetIsQuit()) break;
+		if (m_frame->GetIsQuit()) return;
 	}
-	if (!m_frame->GetIsQuit())
-	{
-		wxThread::Sleep(msecs % 50);
-		m_frame->Update();
-		wxTheApp->Yield(true);
-	}
-	if (!m_frame->GetIsQuit())
-	{
-		m_frame->EnableControls(true, true);
-		m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, isSave);
-	}
+	wxThread::Sleep(msecs % 50);
+	m_frame->Update();
+	wxTheApp->Yield(true);
+	if (m_frame->GetIsQuit()) return;
+	m_frame->EnableControls(true, true);
+	m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, isSave);
 }
 
 long QSPCallBacks::GetMSCount()

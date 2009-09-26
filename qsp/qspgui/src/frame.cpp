@@ -603,11 +603,9 @@ void QSPFrame::OpenGameFile(const wxString& path)
 			LoadSettings();
 		}
 		OnNewGame(dummy);
-		if (!m_isQuit)
-		{
-			UpdateTitle();
-			EnableControls(true);
-		}
+		if (m_isQuit) return;
+		UpdateTitle();
+		EnableControls(true);
 	}
 	else
 		ShowError();
