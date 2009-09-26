@@ -333,7 +333,7 @@ void QSPCallBacks::OpenGameStatus()
 	if (m_frame->GetIsQuit()) return;
 	wxFileDialog *dialog = new wxFileDialog(m_frame, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
 	int res = dialog->ShowModal();
-	wxString path(dialog.GetPath());
+	wxString path(dialog->GetPath());
 	dialog->Destroy();
 	if (res == wxID_OK)
 		QSPOpenSavedGame((const QSP_CHAR *)path.c_str(), QSP_FALSE);
