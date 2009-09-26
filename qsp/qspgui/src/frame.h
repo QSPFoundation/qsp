@@ -123,6 +123,7 @@
 	protected:
 		// Internal methods
 		void ShowError();
+		void UpdateTitle();
 		void ReCreateGUI();
 		void RefreshUI();
 		void ApplyFont(const wxFont& font);

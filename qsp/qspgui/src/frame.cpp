@@ -419,10 +419,17 @@ void QSPFrame::ShowError()
 	if (m_isGameOpened) QSPCallBacks::RefreshInt(QSP_FALSE);
 }
 
+void QSPFrame::UpdateTitle()
+{
+	SetTitle(QSP_LOGO);
+	if (m_configPath != m_configDefPath)
+		SetTitle(GetTitle() + wxT(" [+]"));
+}
+
 void QSPFrame::ReCreateGUI()
 {
 	wxMenuBar *menuBar = GetMenuBar();
-	SetTitle(QSP_LOGO);
+	UpdateTitle();
 	// ------------
 	menuBar->SetMenuLabel(0, _("&Quest"));
 	menuBar->SetMenuLabel(1, _("&Game"));
@@ -596,7 +603,11 @@ void QSPFrame::OpenGameFile(const wxString& path)
 			LoadSettings();
 		}
 		OnNewGame(dummy);
-		if (!m_isQuit) EnableControls(true);
+		if (!m_isQuit)
+		{
+			UpdateTitle();
+			EnableControls(true);
+		}
 	}
 	else
 		ShowError();
