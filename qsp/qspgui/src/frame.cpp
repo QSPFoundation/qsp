@@ -393,6 +393,7 @@ void QSPFrame::ShowError()
 	wxString wxMessage;
 	QSP_CHAR *loc;
 	long code, where, line;
+	if (m_isQuit) return;
 	QSPGetLastErrorData(&code, &loc, &where, &line);
 	const QSP_CHAR *desc = QSPGetErrorDesc(code);
 	if (loc)
@@ -595,7 +596,7 @@ void QSPFrame::OpenGameFile(const wxString& path)
 			LoadSettings();
 		}
 		OnNewGame(dummy);
-		EnableControls(true);
+		if (!m_isQuit) EnableControls(true);
 	}
 	else
 		ShowError();
@@ -632,9 +633,12 @@ void QSPFrame::OnQuit(wxCommandEvent& event)
 
 void QSPFrame::OnOpenGame(wxCommandEvent& event)
 {
-	wxFileDialog dialog(this, _("Select game file"), wxEmptyString, wxEmptyString, _("QSP games (*.qsp;*.gam)|*.qsp;*.gam"), wxFD_OPEN);
-	if (dialog.ShowModal() == wxID_OK)
-		OpenGameFile(dialog.GetPath());
+	wxFileDialog *dialog = new wxFileDialog(this, _("Select game file"), wxEmptyString, wxEmptyString, _("QSP games (*.qsp;*.gam)|*.qsp;*.gam"), wxFD_OPEN);
+	int res = dialog->ShowModal();
+	wxString path(dialog->GetPath());
+	dialog->Destroy();
+	if (res == wxID_OK)
+		OpenGameFile(path);
 }
 
 void QSPFrame::OnNewGame(wxCommandEvent& event)
@@ -645,15 +649,21 @@ void QSPFrame::OnNewGame(wxCommandEvent& event)
 
 void QSPFrame::OnOpenGameStat(wxCommandEvent& event)
 {
-	wxFileDialog dialog(this, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
-	if (dialog.ShowModal() == wxID_OK && !QSPOpenSavedGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_TRUE))
+	wxFileDialog *dialog = new wxFileDialog(this, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
+	int res = dialog->ShowModal();
+	wxString path(dialog->GetPath());
+	dialog->Destroy();
+	if (res == wxID_OK && !QSPOpenSavedGame((const QSP_CHAR *)path.c_str(), QSP_TRUE))
 		ShowError();
 }
 
 void QSPFrame::OnSaveGameStat(wxCommandEvent& event)
 {
-	wxFileDialog dialog(this, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
-	if (dialog.ShowModal() == wxID_OK && !QSPSaveGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_TRUE))
+	wxFileDialog *dialog = new wxFileDialog(this, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
+	int res = dialog->ShowModal();
+	wxString path(dialog->GetPath());
+	dialog->Destroy();
+	if (res == wxID_OK && !QSPSaveGame((const QSP_CHAR *)path.c_str(), QSP_TRUE))
 		ShowError();
 }
 

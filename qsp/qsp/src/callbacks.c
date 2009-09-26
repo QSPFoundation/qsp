@@ -276,7 +276,9 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 	{
 		qspSaveState(&state);
 		buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
+		*buffer = 0;
 		qspCallBacks[QSP_CALL_INPUTBOX](text, buffer, maxLen);
+		buffer[maxLen] = 0;
 		qspRestoreState(&state);
 	}
 	else
