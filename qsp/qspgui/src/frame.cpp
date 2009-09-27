@@ -423,7 +423,7 @@ void QSPFrame::UpdateTitle()
 {
 	SetTitle(QSP_LOGO);
 	if (m_configPath != m_configDefPath)
-		SetTitle(GetTitle() + wxT(" [+]"));
+		SetTitle(wxString::Format(wxT("%s [+]"), GetTitle().wx_str()));
 }
 
 void QSPFrame::ReCreateGUI()
