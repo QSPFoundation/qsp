@@ -38,15 +38,33 @@ void qspClearMenu(QSP_BOOL isFirst)
 
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	long i, len;
+	long ind, maxItems, len;
 	QSPVar *var;
 	QSP_CHAR *imgPath, *str, *pos, *pos2;
 	if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0))) return QSP_FALSE;
 	qspClearMenu(QSP_FALSE);
 	qspCallDeleteMenu();
-	for (i = 0; i < var->ValsCount; ++i)
+	if (count == 1)
 	{
-		if (!((str = var->TextValue[i]) && qspIsAnyString(str))) break;
+		ind = 0;
+		maxItems = QSP_MAXMENUITEMS;
+	}
+	else
+	{
+		ind = QSP_NUM(args[1]);
+		if (ind < 0) ind = 0;
+		if (count == 2)
+			maxItems = QSP_MAXMENUITEMS;
+		else
+		{
+			maxItems = QSP_NUM(args[2]);
+			if (maxItems < 0) maxItems = 0;
+		}
+	}
+	while (ind < var->ValsCount)
+	{
+		if (qspCurMenuItems == maxItems) break;
+		if (!((str = var->TextValue[ind]) && qspIsAnyString(str))) break;
 		if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM, 0)))
 		{
 			qspSetError(QSP_ERR_COLONNOTFOUND);
@@ -73,7 +91,8 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 		qspCallAddMenuItem(str, imgPath);
 		*pos = QSP_MENUDELIM[0];
 		if (imgPath) free(imgPath);
+		++ind;
 	}
-	qspCallShowMenu();
+	if (qspCurMenuItems) qspCallShowMenu();
 	return QSP_FALSE;
 }
