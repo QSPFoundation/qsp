@@ -472,7 +472,7 @@ diff -u -r d:/wx/wxWidgets/src/html/m_image.cpp d:/wx/wx_qsp/src/html/m_image.cp
 +            m_bmpW = m_bmpMaxW * m_bmpH / m_bmpMaxH;
 +        else if (m_bmpH == wxDefaultCoord)
 +            m_bmpH = m_bmpMaxH * m_bmpW / m_bmpMaxW;
-+        if (img.GetWidth() == m_bmpMaxW && img.GetHeight() == m_bmpMaxH)
++        if (ww == m_bmpMaxW && hh == m_bmpMaxH)
 +            m_bitmap = new wxBitmap(img);
 +        else
 +            m_bitmap = new wxBitmap(img.Size(wxSize(m_bmpMaxW, m_bmpMaxH), wxPoint(0, 0)));
