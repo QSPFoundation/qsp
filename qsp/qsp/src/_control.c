@@ -578,7 +578,6 @@ void QSPDeInit()
 	qspCreateWorld(0, 0);
 	if (qspQstPath) free(qspQstPath);
 	if (qspQstFullPath) free(qspQstFullPath);
-	qspCallCloseFile(0);
 	qspIsMustWait = QSP_FALSE;
 	#ifdef _DEBUG
 		mwTerm();

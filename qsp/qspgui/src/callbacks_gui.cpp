@@ -59,6 +59,7 @@ void QSPCallBacks::Init(QSPFrame *frame)
 
 void QSPCallBacks::DeInit()
 {
+	CloseFile(0);
 	FMOD_System_Close(m_sys);
 	FMOD_System_Release(m_sys);
 }
