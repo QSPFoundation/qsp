@@ -205,7 +205,7 @@ void QSPFrame::LoadSettings()
 {
 	bool isMaximize;
 	int x, y, w, h, temp;
-	if (IsShown()) Hide();
+	Hide();
 	wxFileConfig cfg(wxEmptyString, wxEmptyString, m_configPath);
 	cfg.Read(wxT("Colors/BackColor"), &temp, 0xE0E0E0);
 	m_backColor = wxColour(temp);
@@ -622,6 +622,7 @@ void QSPFrame::OnClose(wxCloseEvent& event)
 	if (event.CanVeto()) event.Veto();
 	SaveSettings();
 	EnableControls(false, true);
+	Hide();
 	m_isQuit = true;
 }
 
