@@ -140,6 +140,7 @@
 		// Events
 		void OnInit(wxInitEvent& event);
 		void OnClose(wxCloseEvent& event);
+		void OnIdle(wxIdleEvent& event);
 		void OnTimer(wxTimerEvent& event);
 		void OnMenu(wxCommandEvent& event);
 		void OnQuit(wxCommandEvent& event);
