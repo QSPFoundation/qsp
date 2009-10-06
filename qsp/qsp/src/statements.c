@@ -782,13 +782,7 @@ static QSP_BOOL qspStatementMsg(QSPVariant *args, long count, QSP_CHAR **jumpTo,
 
 static QSP_BOOL qspStatementExec(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
-	QSP_CHAR *cmd;
-	if (qspIsAnyString(QSP_STR(args[0])))
-	{
-		cmd = qspGetAbsFromRelPath(QSP_STR(args[0]));
-		qspCallSystem(cmd);
-		free(cmd);
-	}
+	qspCallSystem(QSP_STR(args[0]));
 	return QSP_FALSE;
 }
 
