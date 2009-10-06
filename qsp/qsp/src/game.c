@@ -366,6 +366,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].Location, QSP_TRUE);
 		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].Where, QSP_TRUE);
 		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].StartLine, QSP_TRUE);
+		len = qspCodeWriteIntVal(&buf, len, (long)qspCurActions[i].IsManageLines, QSP_TRUE);
 	}
 	len = qspCodeWriteIntVal(&buf, len, qspCurObjectsCount, QSP_TRUE);
 	for (i = 0; i < qspCurObjectsCount; ++i)
@@ -418,13 +419,14 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 	if (temp < 0 || temp > QSP_MAXINCFILES || (ind += temp) > strsCount) return QSP_FALSE;
 	if (ind + 1 > strsCount) return QSP_FALSE;
 	count = qspReCodeGetIntVal(strs[ind++]);
-	if (count < 0 || count > QSP_MAXACTIONS || selAction >= count || (ind + 6 * count) > strsCount) return QSP_FALSE;
+	if (count < 0 || count > QSP_MAXACTIONS || selAction >= count || (ind + 7 * count) > strsCount) return QSP_FALSE;
 	for (i = 0; i < count; ++i)
 	{
 		ind += 3;
 		if (qspReCodeGetIntVal(strs[ind++]) < 0) return QSP_FALSE;
 		++ind;
 		if (qspReCodeGetIntVal(strs[ind++]) < 0) return QSP_FALSE;
+		++ind;
 	}
 	if (ind + 1 > strsCount) return QSP_FALSE;
 	temp = qspReCodeGetIntVal(strs[ind++]);
@@ -521,6 +523,7 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 		qspCurActions[i].Location = qspReCodeGetIntVal(strs[ind++]);
 		qspCurActions[i].Where = qspReCodeGetIntVal(strs[ind++]);
 		qspCurActions[i].StartLine = qspReCodeGetIntVal(strs[ind++]);
+		qspCurActions[i].IsManageLines = qspReCodeGetIntVal(strs[ind++]) != 0;
 	}
 	qspCurObjectsCount = qspReCodeGetIntVal(strs[ind++]);
 	for (i = 0; i < qspCurObjectsCount; ++i)

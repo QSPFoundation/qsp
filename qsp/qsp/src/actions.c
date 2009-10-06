@@ -77,7 +77,7 @@ static long qspActIndex(QSP_CHAR *name)
 	return -1;
 }
 
-void qspAddAction(QSPVariant *args, long count, QSP_CHAR **code, long start, long end, QSP_BOOL isFromNextLine)
+void qspAddAction(QSPVariant *args, long count, QSP_CHAR **code, long start, long end, QSP_BOOL isManageLines)
 {
 	QSPCurAct *act;
 	QSP_CHAR *imgPath;
@@ -98,7 +98,8 @@ void qspAddAction(QSPVariant *args, long count, QSP_CHAR **code, long start, lon
 	act->OnPressLinesCount = end - start;
 	act->Location = qspRealCurLoc;
 	act->Where = qspRealWhere;
-	act->StartLine = (isFromNextLine ? qspRealLine + 1 : qspRealLine);
+	act->StartLine = qspRealLine;
+	act->IsManageLines = isManageLines;
 	qspIsActionsChanged = QSP_TRUE;
 }
 
@@ -115,7 +116,13 @@ void qspExecAction(long ind)
 	qspRealWhere = act->Where;
 	count = act->OnPressLinesCount;
 	qspCopyStrs(&code, act->OnPressLines, 0, count);
-	qspExecCode(code, 0, count, act->StartLine, 0);
+	if (act->IsManageLines)
+		qspExecCode(code, 0, count, act->StartLine + 1, 0);
+	else
+	{
+		qspRealLine = act->StartLine;
+		qspExecCode(code, 0, count, 0, 0);
+	}
 	qspFreeStrs(code, count, QSP_FALSE);
 	qspRealLine = oldLine;
 	qspRealWhere = oldWhere;

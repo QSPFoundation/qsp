@@ -32,6 +32,7 @@
 		long Location;
 		long Where;
 		long StartLine;
+		QSP_BOOL IsManageLines;
 	} QSPCurAct;
 
 	extern QSPCurAct qspCurActions[QSP_MAXACTIONS];
