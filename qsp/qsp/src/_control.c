@@ -41,6 +41,14 @@ static void qspWait(QSP_BOOL isBlock)
 	if (isBlock) qspIsMustWait = QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
+/* Управление режимом отладки */
+void QSPEnableDebugMode(QSP_BOOL isDebug)
+{
+	qspWait(QSP_TRUE);
+	qspIsDebug = isDebug;
+	qspIsMustWait = QSP_FALSE;
+}
+/* ------------------------------------------------------------ */
 /* Информация о версии */
 
 /* Версия */
@@ -551,6 +559,7 @@ void QSPInit()
 		mwInit();
 	#endif
 	qspIsMustWait = QSP_FALSE;
+	qspIsDebug = QSP_FALSE;
 	qspRefreshCount = qspFullRefreshCount = 0;
 	qspQstPath = qspQstFullPath = 0;
 	qspQstPathLen = 0;

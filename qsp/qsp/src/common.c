@@ -27,6 +27,7 @@
 
 static unsigned int qspRandX[55], qspRandY[256], qspRandZ;
 static int qspRandI, qspRandJ;
+QSP_BOOL qspIsDebug = QSP_FALSE;
 QSP_CHAR *qspCurDesc = 0;
 long qspCurDescLen = 0;
 QSP_CHAR *qspCurVars = 0;

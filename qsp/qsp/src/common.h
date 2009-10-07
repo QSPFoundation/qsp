@@ -22,6 +22,7 @@
 
 	#define QSP_RANDMASK 0x7FFFFFFF
 
+	extern QSP_BOOL qspIsDebug;
 	extern QSP_CHAR *qspCurDesc;
 	extern long qspCurDescLen;
 	extern QSP_CHAR *qspCurVars;

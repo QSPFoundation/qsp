@@ -481,7 +481,11 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, long startLine, long endLine, long codeOffset
 	i = startLine;
 	while (i < endLine)
 	{
-		if (codeOffset > 0) qspRealLine = i + codeOffset;
+		if (codeOffset > 0)
+		{
+			qspRealLine = i + codeOffset;
+			if (qspIsDebug) qspCallDebug();
+		}
 		statCode = qspGetStatCode(s[i], &paramPos);
 		if (statCode == qspStatAct || statCode == qspStatIf)
 		{

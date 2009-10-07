@@ -52,6 +52,18 @@ void qspSetCallBack(long type, QSP_CALLBACK func)
 	qspCallBacks[type] = func;
 }
 
+void qspCallDebug()
+{
+	/* Здесь передаем управление отладчику */
+	QSPExecState state;
+	if (qspCallBacks[QSP_CALL_DEBUG])
+	{
+		qspSaveState(&state);
+		qspCallBacks[QSP_CALL_DEBUG]();
+		qspRestoreState(&state);
+	}
+}
+
 void qspCallSetTimer(long msecs)
 {
 	/* Здесь устанавливаем интервал таймера */

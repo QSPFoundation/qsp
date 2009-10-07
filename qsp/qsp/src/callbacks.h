@@ -31,6 +31,7 @@
 	/* External functions */
 	void qspInitCallBacks();
 	void qspSetCallBack(long, QSP_CALLBACK);
+	void qspCallDebug();
 	void qspCallSetTimer(long);
 	void qspCallRefreshInt(QSP_BOOL);
 	void qspCallSetInputStrText(QSP_CHAR *);

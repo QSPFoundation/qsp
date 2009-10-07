@@ -67,6 +67,7 @@
 
 	enum
 	{
+		QSP_CALL_DEBUG, /* void func() */
 		QSP_CALL_ISPLAYINGFILE, /* QSP_BOOL func(const QSP_CHAR *file) */
 		QSP_CALL_PLAYFILE, /* void func(const QSP_CHAR *file, long volume) */
 		QSP_CALL_CLOSEFILE, /* void func(const QSP_CHAR *file) */
@@ -112,6 +113,7 @@
 	extern "C"
 	{
 	#endif
+		QSP_EXTERN void QSPEnableDebugMode(QSP_BOOL isDebug);
 		QSP_EXTERN const QSP_CHAR *QSPGetVersion();
 		QSP_EXTERN const QSP_CHAR *QSPGetCompiledDateTime();
 		QSP_EXTERN long QSPGetFullRefreshCount();
