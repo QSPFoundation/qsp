@@ -114,6 +114,7 @@
 	{
 	#endif
 		QSP_EXTERN void QSPEnableDebugMode(QSP_BOOL isDebug);
+		QSP_EXTERN void QSPGetCurrentState(QSP_CHAR **loc, long *actIndex, long *line);
 		QSP_EXTERN const QSP_CHAR *QSPGetVersion();
 		QSP_EXTERN const QSP_CHAR *QSPGetCompiledDateTime();
 		QSP_EXTERN long QSPGetFullRefreshCount();

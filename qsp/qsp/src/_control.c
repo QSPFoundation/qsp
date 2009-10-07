@@ -41,11 +41,22 @@ static void qspWait(QSP_BOOL isBlock)
 	if (isBlock) qspIsMustWait = QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
+/* Отладка */
+
 /* Управление режимом отладки */
 void QSPEnableDebugMode(QSP_BOOL isDebug)
 {
 	qspWait(QSP_TRUE);
 	qspIsDebug = isDebug;
+	qspIsMustWait = QSP_FALSE;
+}
+/* Получение текущей исполняемой строки */
+void QSPGetCurrentState(QSP_CHAR **loc, long *actIndex, long *line)
+{
+	qspWait(QSP_TRUE);
+	*loc = (qspRealCurLoc >= 0 ? qspLocs[qspRealCurLoc].Name : 0);
+	*actIndex = qspRealActIndex;
+	*line = qspRealLine;
 	qspIsMustWait = QSP_FALSE;
 }
 /* ------------------------------------------------------------ */
