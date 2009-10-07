@@ -24,9 +24,6 @@
 	{
 		QSP_BOOL IsInCallBack;
 		QSP_BOOL IsMustWait;
-		long Location;
-		long Where;
-		long Line;
 	} QSPExecState;
 
 	extern QSP_BOOL qspIsInCallBack;

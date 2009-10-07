@@ -29,18 +29,12 @@ static void qspSaveState(QSPExecState *state)
 {
 	state->IsInCallBack = qspIsInCallBack;
 	state->IsMustWait = qspIsMustWait;
-	state->Location = qspRealCurLoc;
-	state->Where = qspRealWhere;
-	state->Line = qspRealLine;
 	qspIsInCallBack = QSP_TRUE;
 	qspIsMustWait = QSP_FALSE;
 }
 
 static void qspRestoreState(QSPExecState *state)
 {
-	qspRealLine = state->Line;
-	qspRealWhere = state->Where;
-	qspRealCurLoc = state->Location;
 	qspIsMustWait = state->IsMustWait;
 	qspIsInCallBack = state->IsInCallBack;
 }
