@@ -30,6 +30,6 @@
 
 	/* External functions */
 	void qspSetError(long);
-	void qspResetError(QSP_BOOL);
+	void qspResetError();
 
 #endif

@@ -113,7 +113,7 @@ QSP_BOOL QSPGetExprValue(const QSP_CHAR *expr, QSP_BOOL *isString, long *numVal,
 {
 	QSPVariant v;
 	qspWait(QSP_TRUE);
-	qspResetError(QSP_TRUE);
+	qspResetError();
 	v = qspExprValue((QSP_CHAR *)expr);
 	if (qspErrorNum)
 	{
@@ -300,7 +300,7 @@ QSP_BOOL QSPGetVarValuesCount(const QSP_CHAR *name, long *count)
 {
 	QSPVar *var;
 	qspWait(QSP_TRUE);
-	qspResetError(QSP_TRUE);
+	qspResetError();
 	var = qspVarReference((QSP_CHAR *)name, QSP_FALSE);
 	if (qspErrorNum)
 	{
@@ -316,7 +316,7 @@ QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, long ind, long *numVal, QSP_CHAR 
 {
 	QSPVar *var;
 	qspWait(QSP_TRUE);
-	qspResetError(QSP_TRUE);
+	qspResetError();
 	var = qspVarReference((QSP_CHAR *)name, QSP_FALSE);
 	if (qspErrorNum)
 	{
@@ -467,7 +467,7 @@ const QSP_CHAR *QSPGetErrorDesc(long errorNum)
 QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *fileName)
 {
 	qspWait(QSP_TRUE);
-	qspResetError(QSP_TRUE);
+	qspResetError();
 	qspOpenQuest((QSP_CHAR *)fileName, QSP_FALSE);
 	if (qspErrorNum)
 	{
@@ -555,6 +555,9 @@ void QSPInit()
 	qspQstPath = qspQstFullPath = 0;
 	qspQstPathLen = 0;
 	qspQstCRC = 0;
+	qspRealCurLoc = -1;
+	qspRealWhere = QSP_AREA_NONE;
+	qspRealLine = 0;
 	qspMSCount = 0;
 	qspLocs = 0;
 	qspLocsNames = 0;

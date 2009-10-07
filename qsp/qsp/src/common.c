@@ -43,7 +43,7 @@ static unsigned int qspURand();
 
 void qspPrepareExecution()
 {
-	qspResetError(QSP_TRUE);
+	qspResetError();
 	qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_FALSE;
 }
 

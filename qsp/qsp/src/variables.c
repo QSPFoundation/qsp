@@ -304,7 +304,7 @@ QSP_CHAR *qspGetVarStrValue(QSP_CHAR *name)
 		}
 	}
 	else
-		qspResetError(QSP_FALSE);
+		qspResetError();
 	return QSP_FMT("");
 }
 
@@ -316,7 +316,7 @@ long qspGetVarNumValue(QSP_CHAR *name)
 		if (var->ValsCount) return var->Value[0];
 	}
 	else
-		qspResetError(QSP_FALSE);
+		qspResetError();
 	return 0;
 }
 
