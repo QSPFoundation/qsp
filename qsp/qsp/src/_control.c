@@ -50,8 +50,8 @@ void QSPEnableDebugMode(QSP_BOOL isDebug)
 	qspIsDebug = isDebug;
 	qspIsMustWait = QSP_FALSE;
 }
-/* ѕолучение текущей исполн€емой строки */
-void QSPGetCurrentState(QSP_CHAR **loc, long *actIndex, long *line)
+/* ѕолучение данных текущего состо€ни€ */
+void QSPGetCurStateData(QSP_CHAR **loc, long *actIndex, long *line)
 {
 	qspWait(QSP_TRUE);
 	*loc = (qspRealCurLoc >= 0 ? qspLocs[qspRealCurLoc].Name : 0);
