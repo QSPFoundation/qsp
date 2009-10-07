@@ -364,7 +364,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 		len = qspCodeWriteVal(&buf, len, temp, QSP_TRUE);
 		free(temp);
 		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].Location, QSP_TRUE);
-		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].Where, QSP_TRUE);
+		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].ActIndex, QSP_TRUE);
 		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].StartLine, QSP_TRUE);
 		len = qspCodeWriteIntVal(&buf, len, (long)qspCurActions[i].IsManageLines, QSP_TRUE);
 	}
@@ -521,7 +521,7 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 		qspCurActions[i].OnPressLinesCount = qspSplitStr(buf, QSP_STRSALTDELIM, &qspCurActions[i].OnPressLines);
 		free(buf);
 		qspCurActions[i].Location = qspReCodeGetIntVal(strs[ind++]);
-		qspCurActions[i].Where = qspReCodeGetIntVal(strs[ind++]);
+		qspCurActions[i].ActIndex = qspReCodeGetIntVal(strs[ind++]);
 		qspCurActions[i].StartLine = qspReCodeGetIntVal(strs[ind++]);
 		qspCurActions[i].IsManageLines = qspReCodeGetIntVal(strs[ind++]) != 0;
 	}

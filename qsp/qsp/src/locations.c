@@ -108,20 +108,20 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 {
 	QSPVariant args[2];
 	QSP_CHAR *str, **code;
-	long oldRefreshCount, i, count, oldLoc, oldWhere, oldLine;
+	long oldRefreshCount, i, count, oldLoc, oldActIndex, oldLine;
 	QSPLocation *loc = qspLocs + locInd;
 	oldLoc = qspRealCurLoc;
-	oldWhere = qspRealWhere;
+	oldActIndex = qspRealActIndex;
 	oldLine = qspRealLine;
 	qspRealCurLoc = locInd;
-	qspRealWhere = QSP_AREA_ONLOCVISIT;
+	qspRealActIndex = -1;
 	qspRealLine = 0;
 	oldRefreshCount = qspRefreshCount;
 	str = qspFormatText(loc->Desc);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
 		qspRealLine = oldLine;
-		qspRealWhere = oldWhere;
+		qspRealActIndex = oldActIndex;
 		qspRealCurLoc = oldLoc;
 		return;
 	}
@@ -140,7 +140,6 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		}
 		free(str);
 	}
-	qspRealWhere = QSP_AREA_ONLOCACTION;
 	for (i = 0; i < QSP_MAXACTIONS; ++i)
 	{
 		str = loc->Actions[i].Desc;
@@ -149,10 +148,11 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 		{
 			qspRealLine = oldLine;
-			qspRealWhere = oldWhere;
+			qspRealActIndex = oldActIndex;
 			qspRealCurLoc = oldLoc;
 			return;
 		}
+		qspRealActIndex = i;
 		args[0].IsStr = QSP_TRUE;
 		QSP_STR(args[0]) = str;
 		str = loc->Actions[i].Image;
@@ -169,12 +169,12 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		if (qspErrorNum)
 		{
 			qspRealLine = oldLine;
-			qspRealWhere = oldWhere;
+			qspRealActIndex = oldActIndex;
 			qspRealCurLoc = oldLoc;
 			return;
 		}
 	}
-	qspRealWhere = QSP_AREA_ONLOCVISIT;
+	qspRealActIndex = -1;
 	if (locInd < qspLocsCount - qspCurIncLocsCount)
 		qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0);
 	else
@@ -185,7 +185,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 		qspFreeStrs(code, count, QSP_FALSE);
 	}
 	qspRealLine = oldLine;
-	qspRealWhere = oldWhere;
+	qspRealActIndex = oldActIndex;
 	qspRealCurLoc = oldLoc;
 }
 

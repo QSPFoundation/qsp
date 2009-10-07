@@ -20,10 +20,10 @@
 long qspErrorNum = 0;
 long qspErrorLoc = -1;
 long qspErrorLine = 0;
-long qspErrorWhere = 0;
+long qspErrorActIndex = -1;
 long qspRealCurLoc = -1;
 long qspRealLine = 0;
-long qspRealWhere = 0;
+long qspRealActIndex = -1;
 
 void qspSetError(long num)
 {
@@ -31,7 +31,7 @@ void qspSetError(long num)
 	{
 		qspErrorNum = num;
 		qspErrorLoc = qspRealCurLoc;
-		qspErrorWhere = qspRealWhere;
+		qspErrorActIndex = qspRealActIndex;
 		qspErrorLine = qspRealLine;
 	}
 }
@@ -40,6 +40,6 @@ void qspResetError()
 {
 	qspErrorNum = 0;
 	qspErrorLoc = -1;
-	qspErrorWhere = QSP_AREA_NONE;
+	qspErrorActIndex = -1;
 	qspErrorLine = 0;
 }

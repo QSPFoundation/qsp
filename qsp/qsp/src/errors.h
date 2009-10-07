@@ -23,10 +23,10 @@
 	extern long qspErrorNum;
 	extern long qspErrorLoc;
 	extern long qspErrorLine;
-	extern long qspErrorWhere;
+	extern long qspErrorActIndex;
 	extern long qspRealCurLoc;
 	extern long qspRealLine;
-	extern long qspRealWhere;
+	extern long qspRealActIndex;
 
 	/* External functions */
 	void qspSetError(long);

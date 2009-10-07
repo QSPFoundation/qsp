@@ -59,13 +59,6 @@
 
 	enum
 	{
-		QSP_AREA_NONE,
-		QSP_AREA_ONLOCVISIT,
-		QSP_AREA_ONLOCACTION
-	};
-
-	enum
-	{
 		QSP_WIN_ACTS,
 		QSP_WIN_OBJS,
 		QSP_WIN_VARS,
@@ -150,7 +143,7 @@
 		QSP_EXTERN QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPExecLocationCode(const QSP_CHAR *name, QSP_BOOL isRefresh);
-		QSP_EXTERN void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorWhere, long *errorLine);
+		QSP_EXTERN void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorActIndex, long *errorLine);
 		QSP_EXTERN const QSP_CHAR *QSPGetErrorDesc(long errorNum);
 		QSP_EXTERN QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *file);
 		QSP_EXTERN QSP_BOOL QSPSaveGame(const QSP_CHAR *file, QSP_BOOL isRefresh);

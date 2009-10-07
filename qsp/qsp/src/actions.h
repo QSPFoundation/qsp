@@ -30,7 +30,7 @@
 		QSP_CHAR **OnPressLines;
 		long OnPressLinesCount;
 		long Location;
-		long Where;
+		long ActIndex;
 		long StartLine;
 		QSP_BOOL IsManageLines;
 	} QSPCurAct;

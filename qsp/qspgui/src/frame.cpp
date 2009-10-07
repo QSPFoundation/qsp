@@ -393,15 +393,15 @@ void QSPFrame::ShowError()
 	bool oldIsProcessEvents;
 	wxString wxMessage;
 	QSP_CHAR *loc;
-	long code, where, line;
+	long code, actIndex, line;
 	if (m_isQuit) return;
-	QSPGetLastErrorData(&code, &loc, &where, &line);
+	QSPGetLastErrorData(&code, &loc, &actIndex, &line);
 	const QSP_CHAR *desc = QSPGetErrorDesc(code);
 	if (loc)
 		wxMessage = wxString::Format(
 			_("Location: %s\nArea: %s\nLine: %ld\nCode: %ld\nDesc: %s"),
 			loc,
-			(where == QSP_AREA_ONLOCVISIT ? _("on visit") : _("on action")),
+			(actIndex < 0 ? _("on visit") : _("on action")),
 			line,
 			code,
 			wxGetTranslation(desc)

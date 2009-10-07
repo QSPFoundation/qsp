@@ -416,12 +416,12 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh)
 /* Ошибки */
 
 /* Получить информацию о последней ошибке */
-void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorWhere, long *errorLine)
+void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorActIndex, long *errorLine)
 {
 	qspWait(QSP_TRUE);
 	*errorNum = qspErrorNum;
 	*errorLoc = (qspErrorLoc >= 0 && qspErrorLoc < qspLocsCount ? qspLocs[qspErrorLoc].Name : 0);
-	*errorWhere = qspErrorWhere;
+	*errorActIndex = qspErrorActIndex;
 	*errorLine = qspErrorLine;
 	qspIsMustWait = QSP_FALSE;
 }
@@ -556,7 +556,7 @@ void QSPInit()
 	qspQstPathLen = 0;
 	qspQstCRC = 0;
 	qspRealCurLoc = -1;
-	qspRealWhere = QSP_AREA_NONE;
+	qspRealActIndex = -1;
 	qspRealLine = 0;
 	qspMSCount = 0;
 	qspLocs = 0;
