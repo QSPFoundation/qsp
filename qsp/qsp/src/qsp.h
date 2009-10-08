@@ -67,7 +67,7 @@
 
 	enum
 	{
-		QSP_CALL_DEBUG, /* void func() */
+		QSP_CALL_DEBUG, /* void func(const QSP_CHAR *str) */
 		QSP_CALL_ISPLAYINGFILE, /* QSP_BOOL func(const QSP_CHAR *file) */
 		QSP_CALL_PLAYFILE, /* void func(const QSP_CHAR *file, long volume) */
 		QSP_CALL_CLOSEFILE, /* void func(const QSP_CHAR *file) */

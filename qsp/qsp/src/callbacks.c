@@ -64,14 +64,14 @@ void qspSetCallBack(long type, QSP_CALLBACK func)
 	qspCallBacks[type] = func;
 }
 
-void qspCallDebug()
+void qspCallDebug(QSP_CHAR *str)
 {
 	/* Здесь передаем управление отладчику */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_DEBUG])
 	{
 		qspSaveCallState(&state);
-		qspCallBacks[QSP_CALL_DEBUG]();
+		qspCallBacks[QSP_CALL_DEBUG](str);
 		qspRestoreCallState(&state);
 	}
 }
