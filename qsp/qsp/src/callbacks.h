@@ -28,7 +28,7 @@
 		QSP_BOOL IsVarsDescChanged;
 		QSP_BOOL IsObjectsChanged;
 		QSP_BOOL IsActionsChanged;
-	} QSPExecState;
+	} QSPCallState;
 
 	extern QSP_BOOL qspIsInCallBack;
 
