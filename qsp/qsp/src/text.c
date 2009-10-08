@@ -279,21 +279,21 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 {
 	QSP_BOOL isLastDelim;
 	long strLen, c1, c2;
-	QSP_CHAR quot, *txtEnd, *pos = QSP_STRSTR(txt, str);
+	QSP_CHAR quot, *pos = QSP_STRSTR(txt, str);
 	if (!pos) return 0;
 	if (!(isIsolated || QSP_STRPBRK(txt, QSP_QUOTS QSP_LRBRACK QSP_LSBRACK))) return pos;
 	strLen = (long)QSP_STRLEN(str);
-	txtEnd = qspStrEnd(txt) - strLen + 1;
+	pos = qspStrEnd(txt) - strLen + 1;
 	c1 = c2 = 0;
 	isLastDelim = QSP_TRUE;
-	while (txt < txtEnd)
+	while (txt < pos)
 	{
 		if (qspIsInList(QSP_QUOTS, *txt))
 		{
 			quot = *txt;
-			while (++txt < txtEnd)
+			while (++txt < pos)
 				if (*txt == quot && *(++txt) != quot) break;
-			if (txt >= txtEnd) return 0;
+			if (txt >= pos) return 0;
 			isLastDelim = QSP_TRUE;
 		}
 		if (*txt == QSP_LRBRACK[0])
