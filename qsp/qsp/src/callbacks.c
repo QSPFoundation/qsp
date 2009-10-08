@@ -59,6 +59,8 @@ void qspCallDebug()
 	if (qspCallBacks[QSP_CALL_DEBUG])
 	{
 		qspSaveState(&state);
+		/* Специальный вызов */
+		qspIsInCallBack = QSP_FALSE;
 		qspCallBacks[QSP_CALL_DEBUG]();
 		qspRestoreState(&state);
 	}
