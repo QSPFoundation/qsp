@@ -16,7 +16,10 @@
 */
 
 #include "callbacks.h"
+#include "actions.h"
+#include "common.h"
 #include "errors.h"
+#include "objects.h"
 #include "text.h"
 
 QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
@@ -29,12 +32,21 @@ static void qspSaveState(QSPExecState *state)
 {
 	state->IsInCallBack = qspIsInCallBack;
 	state->IsMustWait = qspIsMustWait;
+	state->IsMainDescChanged = qspIsMainDescChanged;
+	state->IsVarsDescChanged = qspIsVarsDescChanged;
+	state->IsObjectsChanged = qspIsObjectsChanged;
+	state->IsActionsChanged = qspIsActionsChanged;
 	qspIsInCallBack = QSP_TRUE;
 	qspIsMustWait = QSP_FALSE;
 }
 
 static void qspRestoreState(QSPExecState *state)
 {
+	qspResetError();
+	qspIsActionsChanged = state->IsActionsChanged;
+	qspIsObjectsChanged = state->IsObjectsChanged;
+	qspIsVarsDescChanged = state->IsVarsDescChanged;
+	qspIsMainDescChanged = state->IsMainDescChanged;
 	qspIsMustWait = state->IsMustWait;
 	qspIsInCallBack = state->IsInCallBack;
 }

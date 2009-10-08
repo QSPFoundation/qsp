@@ -24,6 +24,10 @@
 	{
 		QSP_BOOL IsInCallBack;
 		QSP_BOOL IsMustWait;
+		QSP_BOOL IsMainDescChanged;
+		QSP_BOOL IsVarsDescChanged;
+		QSP_BOOL IsObjectsChanged;
+		QSP_BOOL IsActionsChanged;
 	} QSPExecState;
 
 	extern QSP_BOOL qspIsInCallBack;
