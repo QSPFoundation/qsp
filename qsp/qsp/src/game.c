@@ -309,6 +309,7 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 		qspQstPathLen = (delim ? (long)(delim - qspQstFullPath) + 1 : 0);
 		qspQstPath = qspGetAddText(qspQstPath, qspQstFullPath, 0, qspQstPathLen);
 		qspQstCRC = crc;
+		qspCurLoc = -1;
 	}
 }
 

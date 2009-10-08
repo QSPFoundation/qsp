@@ -54,7 +54,7 @@ void QSPEnableDebugMode(QSP_BOOL isDebug)
 void QSPGetCurStateData(QSP_CHAR **loc, long *actIndex, long *line)
 {
 	qspWait(QSP_TRUE);
-	*loc = (qspRealCurLoc >= 0 ? qspLocs[qspRealCurLoc].Name : 0);
+	*loc = (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount ? qspLocs[qspRealCurLoc].Name : 0);
 	*actIndex = qspRealActIndex;
 	*line = qspRealLine;
 	qspIsMustWait = QSP_FALSE;
