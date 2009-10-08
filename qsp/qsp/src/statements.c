@@ -570,7 +570,7 @@ static QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	QSPVariant arg;
 	QSP_BOOL isExit;
 	long oldRefreshCount;
-	QSP_CHAR *uStr, *ePos, *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
+	QSP_CHAR ch, *uStr, *ePos, *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
 	if (!pos)
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
@@ -588,17 +588,18 @@ static QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	{
 		if (ePos)
 		{
-			ePos = ePos - uStr + pos;
+			ePos = pos + (ePos - uStr);
+			ch = *ePos;
 			*ePos = 0;
 			isExit = qspExecString(pos + 1, jumpTo);
-			*ePos = QSP_STATELSE[0];
+			*ePos = ch;
 			return isExit;
 		}
 		else
 			return qspExecString(pos + 1, jumpTo);
 	}
 	else if (ePos)
-		return qspExecString(ePos - uStr + pos + QSP_LEN(QSP_STATELSE), jumpTo);
+		return qspExecString(pos + (ePos - uStr) + QSP_LEN(QSP_STATELSE), jumpTo);
 	return QSP_FALSE;
 }
 
