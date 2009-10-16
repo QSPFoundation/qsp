@@ -784,7 +784,7 @@ static long qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, long *comp
 				name = qspGetName(&s);
 				if (qspErrorNum) break;
 				opCode = qspFunctionOpCode(name);
-				if (opCode != qspOpUnknown)
+				if (opCode >= qspOpFirst_Function)
 				{
 					free(name);
 					if (*s == QSP_LRBRACK[0])
