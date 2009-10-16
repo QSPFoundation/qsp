@@ -638,7 +638,7 @@ static long qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, long *comp
 		if (waitForOperator)
 		{
 			opCode = qspOperatorOpCode(&s);
-			if (opCode == qspOpUnknown)
+			if (opCode == qspOpUnknown || opCode >= qspOpFirst_Function)
 			{
 				qspSetError(QSP_ERR_UNKNOWNACTION);
 				break;
