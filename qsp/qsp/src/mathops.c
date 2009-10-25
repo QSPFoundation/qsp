@@ -862,7 +862,6 @@ static void qspFunctionStrComp(QSPVariant *args, long count, QSPVariant *tos)
 {
 	OnigUChar *tempBeg, *tempEnd;
 	regex_t *onigExp;
-	OnigRegion *onigReg;
 	OnigErrorInfo onigInfo;
 	tempBeg = (OnigUChar *)QSP_STR(args[1]);
 	tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[1]));
@@ -870,11 +869,9 @@ static void qspFunctionStrComp(QSPVariant *args, long count, QSPVariant *tos)
 		qspSetError(QSP_ERR_INCORRECTREGEXP);
 	else
 	{
-		onigReg = onig_region_new();
 		tempBeg = (OnigUChar *)QSP_STR(args[0]);
 		tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[0]));
-		QSP_PNUM(tos) = -(onig_match(onigExp, tempBeg, tempEnd, tempBeg, onigReg, ONIG_OPTION_NONE) >= 0);
-		onig_region_free(onigReg, 1);
+		QSP_PNUM(tos) = -(onig_match(onigExp, tempBeg, tempEnd, tempBeg, 0, ONIG_OPTION_NONE) == tempEnd - tempBeg);
 		onig_free(onigExp);
 	}
 }

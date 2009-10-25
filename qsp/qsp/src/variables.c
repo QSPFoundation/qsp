@@ -367,7 +367,6 @@ long qspArrayPos(QSPVariant *args, long argsCount, QSP_BOOL isRegExp)
 	QSP_CHAR *str;
 	OnigUChar *tempBeg, *tempEnd;
 	regex_t *onigExp;
-	OnigRegion *onigReg;
 	OnigErrorInfo onigInfo;
 	QSP_BOOL isString;
 	if (qspConvertVariantTo(args, argsCount == 2))
@@ -413,16 +412,13 @@ long qspArrayPos(QSPVariant *args, long argsCount, QSP_BOOL isRegExp)
 			if (!(ind < count && (str = var->TextValue[ind]))) str = QSP_FMT("");
 			if (isRegExp)
 			{
-				onigReg = onig_region_new();
 				tempBeg = (OnigUChar *)str;
 				tempEnd = (OnigUChar *)qspStrEnd(str);
-				if (onig_match(onigExp, tempBeg, tempEnd, tempBeg, onigReg, ONIG_OPTION_NONE) >= 0)
+				if (onig_match(onigExp, tempBeg, tempEnd, tempBeg, 0, ONIG_OPTION_NONE) == tempEnd - tempBeg)
 				{
-					onig_region_free(onigReg, 1);
 					onig_free(onigExp);
 					return ind;
 				}
-				onig_region_free(onigReg, 1);
 			}
 			else if (!QSP_STRCMP(str, QSP_PSTR(val)))
 				return ind;
