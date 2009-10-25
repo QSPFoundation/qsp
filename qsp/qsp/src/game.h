@@ -37,6 +37,7 @@
 	QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *);
 	void qspClearIncludes(QSP_BOOL);
 	void qspNewGame(QSP_BOOL);
+	void qspOpenQuestFromData(char *, long, QSP_CHAR *, QSP_BOOL);
 	void qspOpenQuest(QSP_CHAR *, QSP_BOOL);
 	void qspSaveGameStatus(QSP_CHAR *);
 	void qspOpenGameStatus(QSP_CHAR *);

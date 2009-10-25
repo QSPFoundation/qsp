@@ -149,6 +149,7 @@
 		QSP_EXTERN void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorActIndex, long *errorLine);
 		QSP_EXTERN const QSP_CHAR *QSPGetErrorDesc(long errorNum);
 		QSP_EXTERN QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *file);
+		QSP_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const char *data, long dataSize, const QSP_CHAR *file);
 		QSP_EXTERN QSP_BOOL QSPSaveGame(const QSP_CHAR *file, QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPOpenSavedGame(const QSP_CHAR *file, QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);

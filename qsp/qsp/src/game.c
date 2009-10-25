@@ -171,15 +171,15 @@ static QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
 {
 	long i, ind, locsCount, actsCount;
 	QSP_BOOL isOldFormat;
-	QSP_CHAR *data = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
-	isOldFormat = QSP_STRCMP(data, QSP_GAMEID) != 0;
-	free(data);
+	QSP_CHAR *buf = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
+	isOldFormat = QSP_STRCMP(buf, QSP_GAMEID) != 0;
+	free(buf);
 	ind = (isOldFormat ? 30 : 4);
 	if (ind > count) return QSP_FALSE;
-	data = (isOldFormat ?
+	buf = (isOldFormat ?
 		qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE));
-	locsCount = qspStrToNum(data, 0);
-	free(data);
+	locsCount = qspStrToNum(buf, 0);
+	free(buf);
 	if (locsCount <= 0) return QSP_FALSE;
 	for (i = 0; i < locsCount; ++i)
 	{
@@ -189,9 +189,9 @@ static QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
 		else
 		{
 			if (ind + 1 > count) return QSP_FALSE;
-			data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-			actsCount = qspStrToNum(data, 0);
-			free(data);
+			buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
+			actsCount = qspStrToNum(buf, 0);
+			free(buf);
 			if (actsCount < 0 || actsCount > QSP_MAXACTIONS) return QSP_FALSE;
 		}
 		if ((ind += (actsCount * (isOldFormat ? 2 : 3))) > count) return QSP_FALSE;
@@ -199,47 +199,32 @@ static QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
 	return QSP_TRUE;
 }
 
-void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
+void qspOpenQuestFromData(char *data, long dataSize, QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 {
-	FILE *f;
 	QSP_BOOL isOldFormat, isUCS2, isAddLoc;
-	long i, j, ind, fileSize, dataSize, crc, count, locsCount, actsCount, start, end;
-	QSP_CHAR *data, *delim;
-	char **strs, *buf;
-	if (!(f = QSP_FOPEN(fileName, QSP_FMT("rb"))))
-	{
-		qspSetError(QSP_ERR_FILENOTFOUND);
-		return;
-	}
-	fseek(f, 0, SEEK_END);
-	if (!(fileSize = ftell(f)))
+	long i, j, ind, crc, count, locsCount, actsCount, start, end;
+	QSP_CHAR *buf, *delim;
+	char **strs;
+	if (dataSize < 2)
 	{
 		qspSetError(QSP_ERR_CANTLOADFILE);
-		fclose(f);
 		return;
 	}
-	dataSize = fileSize + 1;
-	buf = (char *)malloc(dataSize);
-	fseek(f, 0, SEEK_SET);
-	fread(buf, 1, fileSize, f);
-	fclose(f);
-	buf[fileSize] = 0;
-	if (!isAddLocs) crc = qspCRC(buf, dataSize);
-	count = qspSplitGameStr(buf, isUCS2 = !buf[1], QSP_STRSDELIM, &strs);
-	free(buf);
+	if (!isAddLocs) crc = qspCRC(data, dataSize);
+	count = qspSplitGameStr(data, isUCS2 = !data[1], QSP_STRSDELIM, &strs);
 	if (!qspCheckQuest(strs, count, isUCS2))
 	{
 		qspSetError(QSP_ERR_CANTLOADFILE);
 		qspFreeStrs(strs, count, QSP_FALSE);
 		return;
 	}
-	data = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
-	isOldFormat = QSP_STRCMP(data, QSP_GAMEID) != 0;
-	free(data);
-	data = (isOldFormat ?
+	buf = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
+	isOldFormat = QSP_STRCMP(buf, QSP_GAMEID) != 0;
+	free(buf);
+	buf = (isOldFormat ?
 		qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE));
-	locsCount = qspStrToNum(data, 0);
-	free(data);
+	locsCount = qspStrToNum(buf, 0);
+	free(buf);
 	if (isAddLocs)
 	{
 		start = qspLocsCount;
@@ -258,17 +243,17 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	ind = (isOldFormat ? 30 : 4);
 	for (i = start; i < end; ++i)
 	{
-		data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-		if (isAddLoc = !isAddLocs || qspLocIndex(data) < 0)
-			qspLocs[locsCount].Name = data;
+		buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
+		if (isAddLoc = !isAddLocs || qspLocIndex(buf) < 0)
+			qspLocs[locsCount].Name = buf;
 		else
-			free(data);
+			free(buf);
 		if (isAddLoc)
 		{
 			qspLocs[locsCount].Desc = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-			data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-			qspLocs[locsCount].OnVisitLinesCount = qspPreprocessData(data, &qspLocs[locsCount].OnVisitLines);
-			free(data);
+			buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
+			qspLocs[locsCount].OnVisitLinesCount = qspPreprocessData(buf, &qspLocs[locsCount].OnVisitLines);
+			free(buf);
 		}
 		else
 			ind += 2;
@@ -276,9 +261,9 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 			actsCount = 20;
 		else
 		{
-			data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-			actsCount = qspStrToNum(data, 0);
-			free(data);
+			buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
+			actsCount = qspStrToNum(buf, 0);
+			free(buf);
 		}
 		if (isAddLoc)
 		{
@@ -286,9 +271,9 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 			{
 				qspLocs[locsCount].Actions[j].Image = (isOldFormat ? 0 : qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE));
 				qspLocs[locsCount].Actions[j].Desc = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-				data = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-				qspLocs[locsCount].Actions[j].OnPressLinesCount = qspPreprocessData(data, &qspLocs[locsCount].Actions[j].OnPressLines);
-				free(data);
+				buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
+				qspLocs[locsCount].Actions[j].OnPressLinesCount = qspPreprocessData(buf, &qspLocs[locsCount].Actions[j].OnPressLines);
+				free(buf);
 			}
 			++locsCount;
 		}
@@ -311,6 +296,27 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 		qspQstCRC = crc;
 		qspCurLoc = -1;
 	}
+}
+
+void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
+{
+	FILE *f;
+	char *buf;
+	long fileSize;
+	if (!(f = QSP_FOPEN(fileName, QSP_FMT("rb"))))
+	{
+		qspSetError(QSP_ERR_FILENOTFOUND);
+		return;
+	}
+	fseek(f, 0, SEEK_END);
+	fileSize = ftell(f);
+	buf = (char *)malloc(fileSize + 1);
+	fseek(f, 0, SEEK_SET);
+	fread(buf, 1, fileSize, f);
+	fclose(f);
+	buf[fileSize] = 0;
+	qspOpenQuestFromData(buf, fileSize + 1, fileName, isAddLocs);
+	free(buf);
 }
 
 void qspSaveGameStatus(QSP_CHAR *fileName)

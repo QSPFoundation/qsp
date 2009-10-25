@@ -482,12 +482,26 @@ const QSP_CHAR *QSPGetErrorDesc(long errorNum)
 /* ------------------------------------------------------------ */
 /* Управление игрой */
 
-/* Загрузка новой игры */
+/* Загрузка новой игры из файла */
 QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *fileName)
 {
 	qspWait(QSP_TRUE);
 	qspResetError();
 	qspOpenQuest((QSP_CHAR *)fileName, QSP_FALSE);
+	if (qspErrorNum)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
+	qspIsMustWait = QSP_FALSE;
+	return QSP_TRUE;
+}
+/* Загрузка новой игры из памяти */
+QSP_BOOL QSPLoadGameWorldFromData(const char *data, long dataSize, const QSP_CHAR *fileName)
+{
+	qspWait(QSP_TRUE);
+	qspResetError();
+	qspOpenQuestFromData((char *)data, dataSize, (QSP_CHAR *)fileName, QSP_FALSE);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
