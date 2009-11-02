@@ -114,7 +114,6 @@
 	#define QSP_VER QSP_FMT("5.6.3")
 	#define QSP_LOCALE "russian"
 	#define QSP_STRCHAR QSP_FMT("$")
-	#define QSP_NEWITEMCHAR QSP_FMT("+")
 	#define QSP_LABEL QSP_FMT(":")
 	#define QSP_COMMENT QSP_FMT("!")
 	#define QSP_QUOTS QSP_FMT("'\"")

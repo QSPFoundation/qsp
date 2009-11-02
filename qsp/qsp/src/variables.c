@@ -214,7 +214,7 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 			return 0;
 		}
 		s = qspSkipSpaces(lPos + 1);
-		if (*s == QSP_NEWITEMCHAR[0] && qspSkipSpaces(s + 1) == rPos)
+		if (s == rPos)
 			*index = var->ValsCount;
 		else
 		{
