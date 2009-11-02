@@ -213,18 +213,24 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isCreate, long *index)
 			qspSetError(QSP_ERR_BRACKNOTFOUND);
 			return 0;
 		}
-		oldRefreshCount = qspRefreshCount;
-		*rPos = 0;
-		ind = qspExprValue(lPos + 1);
-		*rPos = QSP_RSBRACK[0];
-		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
-		if (ind.IsStr)
-		{
-			*index = qspGetVarTextIndex(var, QSP_STR(ind), isCreate);
-			free(QSP_STR(ind));
-		}
+		s = qspSkipSpaces(lPos + 1);
+		if (*s == QSP_NEWITEMCHAR[0] && qspSkipSpaces(s + 1) == rPos)
+			*index = var->ValsCount;
 		else
-			*index = (QSP_NUM(ind) >= 0 ? QSP_NUM(ind) : 0);
+		{
+			oldRefreshCount = qspRefreshCount;
+			*rPos = 0;
+			ind = qspExprValue(s);
+			*rPos = QSP_RSBRACK[0];
+			if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
+			if (ind.IsStr)
+			{
+				*index = qspGetVarTextIndex(var, QSP_STR(ind), isCreate);
+				free(QSP_STR(ind));
+			}
+			else
+				*index = (QSP_NUM(ind) >= 0 ? QSP_NUM(ind) : 0);
+		}
 		return var;
 	}
 	*index = 0;
