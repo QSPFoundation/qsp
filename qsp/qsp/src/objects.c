@@ -65,7 +65,7 @@ void qspClearObjectsWithNotify()
 			qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJDEL"), &v, 1);
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		}
-		qspFreeStrs(objs, oldCount, QSP_FALSE);
+		qspFreeStrs(objs, oldCount);
 	}
 }
 

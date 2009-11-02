@@ -113,6 +113,6 @@ long qspPreprocessData(QSP_CHAR *data, QSP_CHAR ***strs)
 	QSP_CHAR **s;
 	long res, count = qspProcessPreformattedStrings(data, &s);
 	res = qspProcessEOLExtensions(s, count, strs);
-	qspFreeStrs(s, count, QSP_FALSE);
+	qspFreeStrs(s, count);
 	return res;
 }

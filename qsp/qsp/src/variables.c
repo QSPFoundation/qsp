@@ -74,9 +74,16 @@ void qspClearVars(QSP_BOOL isFirst)
 
 void qspEmptyVar(QSPVar *var)
 {
+	long count;
 	if (var->NumVals) free(var->NumVals);
-	qspFreeStrs(var->StrVals, var->ValsCount, QSP_TRUE);
-	qspFreeStrs(var->Indices, var->IndsCount, QSP_FALSE);
+	if (var->StrVals)
+	{
+		count = var->ValsCount;
+		while (--count >= 0)
+			if (var->StrVals[count]) free(var->StrVals[count]);
+		free(var->StrVals);
+	}
+	qspFreeStrs(var->Indices, var->IndsCount);
 	qspInitVarData(var);
 }
 

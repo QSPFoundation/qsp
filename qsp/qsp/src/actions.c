@@ -39,7 +39,7 @@ void qspClearActions(QSP_BOOL isFirst)
 		{
 			if (qspCurActions[i].Image) free(qspCurActions[i].Image);
 			free(qspCurActions[i].Desc);
-			qspFreeStrs(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount, QSP_FALSE);
+			qspFreeStrs(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount);
 		}
 		qspIsActionsChanged = QSP_TRUE;
 	}
@@ -123,7 +123,7 @@ void qspExecAction(long ind)
 		qspRealLine = act->StartLine;
 		qspExecCode(code, 0, count, 0, 0);
 	}
-	qspFreeStrs(code, count, QSP_FALSE);
+	qspFreeStrs(code, count);
 	qspRealLine = oldLine;
 	qspRealActIndex = oldActIndex;
 	qspRealCurLoc = oldLoc;
@@ -194,7 +194,7 @@ QSP_BOOL qspStatementDelAct(QSPVariant *args, long count, QSP_CHAR **jumpTo, cha
 	if (qspCurSelAction >= actInd) qspCurSelAction = -1;
 	if (qspCurActions[actInd].Image) free(qspCurActions[actInd].Image);
 	free(qspCurActions[actInd].Desc);
-	qspFreeStrs(qspCurActions[actInd].OnPressLines, qspCurActions[actInd].OnPressLinesCount, QSP_FALSE);
+	qspFreeStrs(qspCurActions[actInd].OnPressLines, qspCurActions[actInd].OnPressLinesCount);
 	--qspCurActionsCount;
 	while (actInd < qspCurActionsCount)
 	{

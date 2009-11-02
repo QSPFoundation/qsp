@@ -221,17 +221,11 @@ void qspCopyStrs(QSP_CHAR ***dest, QSP_CHAR **src, long start, long end)
 		*dest = 0;
 }
 
-void qspFreeStrs(void **strs, long count, QSP_BOOL isVerify)
+void qspFreeStrs(void **strs, long count)
 {
 	if (strs)
 	{
-		if (isVerify)
-		{
-			while (--count >= 0)
-				if (strs[count]) free(strs[count]);
-		}
-		else
-			while (--count >= 0) free(strs[count]);
+		while (--count >= 0) free(strs[count]);
 		free(strs);
 	}
 }

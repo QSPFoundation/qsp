@@ -562,7 +562,7 @@ void qspExecStringAsCode(QSP_CHAR *s)
 	QSP_CHAR **strs;
 	long count = qspPreprocessData(s, &strs);
 	qspExecCode(strs, 0, count, 0, 0);
-	qspFreeStrs(strs, count, QSP_FALSE);
+	qspFreeStrs(strs, count);
 }
 
 static QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
