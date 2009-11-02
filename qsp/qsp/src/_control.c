@@ -342,8 +342,8 @@ QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, long ind, long *numVal, QSP_CHAR 
 		qspIsMustWait = QSP_FALSE;
 		return QSP_FALSE;
 	}
-	*numVal = var->Value[ind];
-	*strVal = var->TextValue[ind];
+	*numVal = var->NumVals[ind];
+	*strVal = var->StrVals[ind];
 	qspIsMustWait = QSP_FALSE;
 	return QSP_TRUE;
 }

@@ -29,10 +29,10 @@
 	typedef struct
 	{
 		QSP_CHAR *Name;
-		long *Value;
-		QSP_CHAR **TextValue;
+		long *NumVals;
+		QSP_CHAR **StrVals;
 		long ValsCount;
-		QSP_CHAR **TextIndex;
+		QSP_CHAR **Indices;
 		long IndsCount;
 	} QSPVar;
 

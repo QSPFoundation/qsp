@@ -393,12 +393,12 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 			len = qspCodeWriteIntVal(&buf, len, qspVars[i].ValsCount, QSP_TRUE);
 			for (j = 0; j < qspVars[i].ValsCount; ++j)
 			{
-				len = qspCodeWriteIntVal(&buf, len, qspVars[i].Value[j], QSP_TRUE);
-				len = qspCodeWriteVal(&buf, len, qspVars[i].TextValue[j], QSP_TRUE);
+				len = qspCodeWriteIntVal(&buf, len, qspVars[i].NumVals[j], QSP_TRUE);
+				len = qspCodeWriteVal(&buf, len, qspVars[i].StrVals[j], QSP_TRUE);
 			}
 			len = qspCodeWriteIntVal(&buf, len, qspVars[i].IndsCount, QSP_TRUE);
 			for (j = 0; j < qspVars[i].IndsCount; ++j)
-				len = qspCodeWriteVal(&buf, len, qspVars[i].TextIndex[j], QSP_TRUE);
+				len = qspCodeWriteVal(&buf, len, qspVars[i].Indices[j], QSP_TRUE);
 		}
 	fwrite(buf, sizeof(QSP_CHAR), len, f);
 	free(buf);
@@ -554,21 +554,21 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 		valsCount = qspVars[varInd].ValsCount = qspReCodeGetIntVal(strs[ind++]);
 		if (valsCount)
 		{
-			qspVars[varInd].Value = (long *)malloc(valsCount * sizeof(long));
-			qspVars[varInd].TextValue = (QSP_CHAR **)malloc(valsCount * sizeof(QSP_CHAR *));
+			qspVars[varInd].NumVals = (long *)malloc(valsCount * sizeof(long));
+			qspVars[varInd].StrVals = (QSP_CHAR **)malloc(valsCount * sizeof(QSP_CHAR *));
 			for (j = 0; j < valsCount; ++j)
 			{
-				qspVars[varInd].Value[j] = qspReCodeGetIntVal(strs[ind++]);
-				qspVars[varInd].TextValue[j] = (*strs[ind] ? qspCodeReCode(strs[ind], QSP_FALSE) : 0);
+				qspVars[varInd].NumVals[j] = qspReCodeGetIntVal(strs[ind++]);
+				qspVars[varInd].StrVals[j] = (*strs[ind] ? qspCodeReCode(strs[ind], QSP_FALSE) : 0);
 				++ind;
 			}
 		}
 		valsCount = qspVars[varInd].IndsCount = qspReCodeGetIntVal(strs[ind++]);
 		if (valsCount)
 		{
-			qspVars[varInd].TextIndex = (QSP_CHAR **)malloc(valsCount * sizeof(QSP_CHAR *));
+			qspVars[varInd].Indices = (QSP_CHAR **)malloc(valsCount * sizeof(QSP_CHAR *));
 			for (j = 0; j < valsCount; ++j)
-				qspVars[varInd].TextIndex[j] = qspCodeReCode(strs[ind++], QSP_FALSE);
+				qspVars[varInd].Indices[j] = qspCodeReCode(strs[ind++], QSP_FALSE);
 		}
 	}
 	qspFreeStrs(strs, count, QSP_FALSE);

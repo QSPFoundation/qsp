@@ -1098,7 +1098,7 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 	}
 	if (varRes->ValsCount)
 	{
-		if (text = varRes->TextValue[0])
+		if (text = varRes->StrVals[0])
 		{
 			tos->IsStr = QSP_TRUE;
 			QSP_PSTR(tos) = qspGetNewText(text, -1);
@@ -1106,7 +1106,7 @@ static void qspFunctionFunc(QSPVariant *args, long count, QSPVariant *tos)
 		else
 		{
 			tos->IsStr = QSP_FALSE;
-			QSP_PNUM(tos) = varRes->Value[0];
+			QSP_PNUM(tos) = varRes->NumVals[0];
 		}
 	}
 	else
