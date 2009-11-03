@@ -393,8 +393,8 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 			len = qspCodeWriteIntVal(&buf, len, qspVars[i].ValsCount, QSP_TRUE);
 			for (j = 0; j < qspVars[i].ValsCount; ++j)
 			{
-				len = qspCodeWriteIntVal(&buf, len, qspVars[i].NumVals[j], QSP_TRUE);
-				len = qspCodeWriteVal(&buf, len, qspVars[i].StrVals[j], QSP_TRUE);
+				len = qspCodeWriteIntVal(&buf, len, qspVars[i].Values[j].Num, QSP_TRUE);
+				len = qspCodeWriteVal(&buf, len, qspVars[i].Values[j].Str, QSP_TRUE);
 			}
 			len = qspCodeWriteIntVal(&buf, len, qspVars[i].IndsCount, QSP_TRUE);
 			for (j = 0; j < qspVars[i].IndsCount; ++j)
@@ -554,12 +554,11 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 		valsCount = qspVars[varInd].ValsCount = qspReCodeGetIntVal(strs[ind++]);
 		if (valsCount)
 		{
-			qspVars[varInd].NumVals = (long *)malloc(valsCount * sizeof(long));
-			qspVars[varInd].StrVals = (QSP_CHAR **)malloc(valsCount * sizeof(QSP_CHAR *));
+			qspVars[varInd].Values = (QSPVarValue *)malloc(valsCount * sizeof(QSPVarValue));
 			for (j = 0; j < valsCount; ++j)
 			{
-				qspVars[varInd].NumVals[j] = qspReCodeGetIntVal(strs[ind++]);
-				qspVars[varInd].StrVals[j] = (*strs[ind] ? qspCodeReCode(strs[ind], QSP_FALSE) : 0);
+				qspVars[varInd].Values[j].Num = qspReCodeGetIntVal(strs[ind++]);
+				qspVars[varInd].Values[j].Str = (*strs[ind] ? qspCodeReCode(strs[ind], QSP_FALSE) : 0);
 				++ind;
 			}
 		}

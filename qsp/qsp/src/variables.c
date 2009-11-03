@@ -75,13 +75,12 @@ void qspClearVars(QSP_BOOL isFirst)
 void qspEmptyVar(QSPVar *var)
 {
 	long count;
-	if (var->NumVals) free(var->NumVals);
-	if (var->StrVals)
+	if (var->Values)
 	{
 		count = var->ValsCount;
 		while (--count >= 0)
-			if (var->StrVals[count]) free(var->StrVals[count]);
-		free(var->StrVals);
+			if (var->Values[count].Str) free(var->Values[count].Str);
+		free(var->Values);
 	}
 	qspFreeStrs(var->Indices, var->IndsCount);
 	qspInitVarData(var);
@@ -102,12 +101,11 @@ static void qspRemoveArrayItem(QSP_CHAR *name, long index)
 	if (!(var->ValsCount && index < var->ValsCount)) return;
 	if (index < 0) index = 0;
 	origIndex = index;
-	if (var->StrVals[index]) free(var->StrVals[index]);
+	if (var->Values[index].Str) free(var->Values[index].Str);
 	var->ValsCount--;
 	while (index < var->ValsCount)
 	{
-		var->NumVals[index] = var->NumVals[index + 1];
-		var->StrVals[index] = var->StrVals[index + 1];
+		var->Values[index] = var->Values[index + 1];
 		++index;
 	}
 	if (origIndex < var->IndsCount)
@@ -124,8 +122,7 @@ static void qspRemoveArrayItem(QSP_CHAR *name, long index)
 
 static void qspInitVarData(QSPVar *var)
 {
-	var->NumVals = 0;
-	var->StrVals = 0;
+	var->Values = 0;
 	var->ValsCount = 0;
 	var->Indices = 0;
 	var->IndsCount = 0;
@@ -254,21 +251,19 @@ static void qspSetVarValueByReference(QSPVar *var, long ind, QSPVariant *val)
 	long count, oldCount = var->ValsCount;
 	if (ind >= oldCount)
 	{
-		count = ind + 1;
-		var->ValsCount = count;
-		var->NumVals = (long *)realloc(var->NumVals, count * sizeof(long));
-		var->StrVals = (QSP_CHAR **)realloc(var->StrVals, count * sizeof(QSP_CHAR *));
+		count = var->ValsCount = ind + 1;
+		var->Values = (QSPVarValue *)realloc(var->Values, count * sizeof(QSPVarValue));
 		while (oldCount < count)
 		{
-			var->NumVals[oldCount] = 0;
-			var->StrVals[oldCount] = 0;
+			var->Values[oldCount].Num = 0;
+			var->Values[oldCount].Str = 0;
 			++oldCount;
 		}
 	}
 	if (val->IsStr)
-		var->StrVals[ind] = qspGetAddText(var->StrVals[ind], QSP_PSTR(val), 0, -1);
+		var->Values[ind].Str = qspGetAddText(var->Values[ind].Str, QSP_PSTR(val), 0, -1);
 	else
-		var->NumVals[ind] = QSP_PNUM(val);
+		var->Values[ind].Num = QSP_PNUM(val);
 }
 
 void qspSetVarValueByName(QSP_CHAR *name, QSPVariant *val)
@@ -299,11 +294,11 @@ static QSPVariant qspGetVarValueByReference(QSPVar *var, long ind, QSP_BOOL isSt
 	{
 		if (ret.IsStr = isStringType)
 		{
-			text = var->StrVals[ind];
+			text = var->Values[ind].Str;
 			QSP_STR(ret) = (text ? qspGetNewText(text, -1) : qspGetNewText(QSP_FMT(""), 0));
 		}
 		else
-			QSP_NUM(ret) = var->NumVals[ind];
+			QSP_NUM(ret) = var->Values[ind].Num;
 		return ret;
 	}
 	return qspGetEmptyVariant(isStringType);
@@ -317,7 +312,7 @@ QSP_CHAR *qspGetVarStrValue(QSP_CHAR *name)
 	{
 		if (var->ValsCount)
 		{
-			text = var->StrVals[0];
+			text = var->Values[0].Str;
 			if (text) return text;
 		}
 	}
@@ -331,7 +326,7 @@ long qspGetVarNumValue(QSP_CHAR *name)
 	QSPVar *var;
 	if (var = qspVarReference(name, QSP_FALSE))
 	{
-		if (var->ValsCount) return var->NumVals[0];
+		if (var->ValsCount) return var->Values[0].Num;
 	}
 	else
 		qspResetError();
@@ -352,20 +347,16 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src)
 	long count = dest->ValsCount = src->ValsCount;
 	if (count)
 	{
-		dest->NumVals = (long *)malloc(count * sizeof(long));
-		dest->StrVals = (QSP_CHAR **)malloc(count * sizeof(QSP_CHAR *));
+		dest->Values = (QSPVarValue *)malloc(count * sizeof(QSPVarValue));
 		while (--count >= 0)
 		{
-			dest->NumVals[count] = src->NumVals[count];
-			str = src->StrVals[count];
-			dest->StrVals[count] = (str ? qspGetNewText(str, -1) : 0);
+			dest->Values[count].Num = src->Values[count].Num;
+			str = src->Values[count].Str;
+			dest->Values[count].Str = (str ? qspGetNewText(str, -1) : 0);
 		}
 	}
 	else
-	{
-		dest->NumVals = 0;
-		dest->StrVals = 0;
-	}
+		dest->Values = 0;
 	count = dest->IndsCount = src->IndsCount;
 	qspCopyStrs(&dest->Indices, src->Indices, 0, count);
 }
@@ -427,7 +418,7 @@ long qspArrayPos(QSPVariant *args, long argsCount, QSP_BOOL isRegExp)
 	{
 		if (val->IsStr)
 		{
-			if (!(ind < count && (str = var->StrVals[ind]))) str = QSP_FMT("");
+			if (!(ind < count && (str = var->Values[ind].Str))) str = QSP_FMT("");
 			if (isRegExp)
 			{
 				tempBeg = (OnigUChar *)str;
@@ -443,7 +434,7 @@ long qspArrayPos(QSPVariant *args, long argsCount, QSP_BOOL isRegExp)
 		}
 		else
 		{
-			num = (ind < count ? var->NumVals[ind] : 0);
+			num = (ind < count ? var->Values[ind].Num : 0);
 			if (num == QSP_PNUM(val)) return ind;
 		}
 		++ind;
@@ -467,17 +458,17 @@ QSPVariant qspArrayMinMaxItem(QSP_CHAR *name, QSP_BOOL isMin)
 	{
 		if (isString)
 		{
-			str = var->StrVals[count];
+			str = var->Values[count].Str;
 			if (str && *str)
 			{
 				if (curInd >= 0)
 				{
 					if (isMin)
 					{
-						if (QSP_STRCOLL(str, var->StrVals[curInd]) < 0)
+						if (QSP_STRCOLL(str, var->Values[curInd].Str) < 0)
 							curInd = count;
 					}
-					else if (QSP_STRCOLL(str, var->StrVals[curInd]) > 0)
+					else if (QSP_STRCOLL(str, var->Values[curInd].Str) > 0)
 						curInd = count;
 				}
 				else
@@ -488,10 +479,10 @@ QSPVariant qspArrayMinMaxItem(QSP_CHAR *name, QSP_BOOL isMin)
 		{
 			if (isMin)
 			{
-				if (var->NumVals[count] < var->NumVals[curInd])
+				if (var->Values[count].Num < var->Values[curInd].Num)
 					curInd = count;
 			}
-			else if (var->NumVals[count] > var->NumVals[curInd])
+			else if (var->Values[count].Num > var->Values[curInd].Num)
 				curInd = count;
 		}
 		else
@@ -499,9 +490,9 @@ QSPVariant qspArrayMinMaxItem(QSP_CHAR *name, QSP_BOOL isMin)
 	}
 	if (curInd < 0) return qspGetEmptyVariant(isString);
 	if (res.IsStr = isString)
-		QSP_STR(res) = qspGetNewText(var->StrVals[curInd], -1);
+		QSP_STR(res) = qspGetNewText(var->Values[curInd].Str, -1);
 	else
-		QSP_NUM(res) = var->NumVals[curInd];
+		QSP_NUM(res) = var->Values[curInd].Num;
 	return res;
 }
 
@@ -521,8 +512,7 @@ void qspSetArgs(QSPVar *var, QSPVariant *args, long count)
 
 void qspMoveVar(QSPVar *dest, QSPVar *src)
 {
-	dest->NumVals = src->NumVals;
-	dest->StrVals = src->StrVals;
+	dest->Values = src->Values;
 	dest->ValsCount = src->ValsCount;
 	dest->Indices = src->Indices;
 	dest->IndsCount = src->IndsCount;

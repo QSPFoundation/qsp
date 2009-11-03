@@ -64,7 +64,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 	while (ind < var->ValsCount)
 	{
 		if (qspCurMenuItems == maxItems) break;
-		if (!((str = var->StrVals[ind]) && qspIsAnyString(str))) break;
+		if (!((str = var->Values[ind].Str) && qspIsAnyString(str))) break;
 		if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM, 0)))
 		{
 			qspSetError(QSP_ERR_COLONNOTFOUND);

@@ -28,9 +28,14 @@
 
 	typedef struct
 	{
+		long Num;
+		QSP_CHAR *Str;
+	} QSPVarValue;
+
+	typedef struct
+	{
 		QSP_CHAR *Name;
-		long *NumVals;
-		QSP_CHAR **StrVals;
+		QSPVarValue *Values;
 		long ValsCount;
 		QSP_CHAR **Indices;
 		long IndsCount;
