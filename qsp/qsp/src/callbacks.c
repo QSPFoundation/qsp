@@ -43,10 +43,10 @@ static void qspSaveCallState(QSPCallState *state)
 static void qspRestoreCallState(QSPCallState *state)
 {
 	qspResetError();
-	qspIsActionsChanged = state->IsActionsChanged;
-	qspIsObjectsChanged = state->IsObjectsChanged;
-	qspIsVarsDescChanged = state->IsVarsDescChanged;
-	qspIsMainDescChanged = state->IsMainDescChanged;
+	if (state->IsActionsChanged) qspIsActionsChanged = QSP_TRUE;
+	if (state->IsObjectsChanged) qspIsObjectsChanged = QSP_TRUE;
+	if (state->IsVarsDescChanged) qspIsVarsDescChanged = QSP_TRUE;
+	if (state->IsMainDescChanged) qspIsMainDescChanged = QSP_TRUE;
 	qspIsMustWait = state->IsMustWait;
 	qspIsInCallBack = state->IsInCallBack;
 }
@@ -241,8 +241,13 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 void qspCallSleep(long msecs)
 {
 	/* Здесь ожидаем заданное количество миллисекунд */
-	/* Состояние не сохраняем */
-	if (qspCallBacks[QSP_CALL_SLEEP]) qspCallBacks[QSP_CALL_SLEEP](msecs);
+	QSPCallState state;
+	if (qspCallBacks[QSP_CALL_SLEEP])
+	{
+		qspSaveCallState(&state);
+		qspCallBacks[QSP_CALL_SLEEP](msecs);
+		qspRestoreCallState(&state);
+	}
 }
 
 long qspCallGetMSCount()
