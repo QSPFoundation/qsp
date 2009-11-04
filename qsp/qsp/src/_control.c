@@ -37,7 +37,7 @@ static void qspWait(QSP_BOOL);
 
 static void qspWait(QSP_BOOL isBlock)
 {
-	while (qspIsMustWait) qspCallSleep(10);
+	while (qspIsMustWait);
 	if (isBlock) qspIsMustWait = QSP_TRUE;
 }
 /* ------------------------------------------------------------ */

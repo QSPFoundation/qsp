@@ -23,7 +23,7 @@
 #include "text.h"
 
 QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
-QSP_BOOL qspIsInCallBack = QSP_FALSE;
+volatile QSP_BOOL qspIsInCallBack = QSP_FALSE;
 
 static void qspSaveCallState(QSPCallState *);
 static void qspRestoreCallState(QSPCallState *);

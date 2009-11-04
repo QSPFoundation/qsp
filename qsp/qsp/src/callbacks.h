@@ -30,7 +30,7 @@
 		QSP_BOOL IsActionsChanged;
 	} QSPCallState;
 
-	extern QSP_BOOL qspIsInCallBack;
+	extern volatile QSP_BOOL qspIsInCallBack;
 
 	/* External functions */
 	void qspInitCallBacks();
