@@ -81,7 +81,7 @@ static void qspAddOperation(long opCode, char priority, QSP_FUNCTION func, char 
 
 static void qspAddOpName(long opCode, QSP_CHAR *opName, long level)
 {
-	long count, len = (long)QSP_STRLEN(opName);
+	long count, len = QSP_STRLEN(opName);
 	count = qspOpsNamesCounts[level];
 	qspOpsNames[level][count].Name = opName;
 	qspOpsNames[level][count].NameLen = len;
@@ -103,7 +103,7 @@ static int qspMathOpStringFullCompare(const void *name, const void *compareTo)
 
 static int qspMathOpStringCompare(const void *name, const void *compareTo)
 {
-	return qspStrsComp((QSP_CHAR *)name, ((QSPMathOpName *)compareTo)->Name, ((QSPMathOpName *)compareTo)->NameLen);
+	return qspStrsNComp((QSP_CHAR *)name, ((QSPMathOpName *)compareTo)->Name, ((QSPMathOpName *)compareTo)->NameLen);
 }
 
 void qspInitMath()
@@ -507,7 +507,7 @@ static QSPVariant qspValue(long itemsCount, QSPVariant *compValues, long *compOp
 				qspCopyVariant(&tos, QSP_NUM(args[0]) ? args + 1 : args + 2);
 				break;
 			case qspOpLen:
-				QSP_NUM(tos) = (long)QSP_STRLEN(QSP_STR(args[0]));
+				QSP_NUM(tos) = QSP_STRLEN(QSP_STR(args[0]));
 				break;
 			case qspOpIsNum:
 				QSP_NUM(tos) = -qspIsCanConvertToNum(args);
@@ -966,7 +966,7 @@ static void qspFunctionMid(QSPVariant *args, long count, QSPVariant *tos)
 {
 	long len, subLen, beg = QSP_NUM(args[1]) - 1;
 	if (beg < 0) beg = 0;
-	len = (long)QSP_STRLEN(QSP_STR(args[0]));
+	len = QSP_STRLEN(QSP_STR(args[0]));
 	if (beg < len)
 	{
 		len -= beg;
@@ -1057,7 +1057,7 @@ static void qspFunctionInstr(QSPVariant *args, long count, QSPVariant *tos)
 		beg = QSP_NUM(args[0]) - 1;
 		if (beg < 0) beg = 0;
 	}
-	if (beg < (long)QSP_STRLEN(txt))
+	if (beg < QSP_STRLEN(txt))
 	{
 		str = QSP_STRSTR(txt + beg, str);
 		QSP_PNUM(tos) = (str ? (long)(str - txt) + 1 : 0);

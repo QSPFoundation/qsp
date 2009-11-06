@@ -99,7 +99,7 @@ long qspObjIndex(QSP_CHAR *name)
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspCurObjectsCount; ++i)
 	{
-		objNameLen = (long)QSP_STRLEN(qspCurObjects[i].Desc);
+		objNameLen = QSP_STRLEN(qspCurObjects[i].Desc);
 		if (objNameLen >= bufSize)
 		{
 			bufSize = objNameLen + 8;

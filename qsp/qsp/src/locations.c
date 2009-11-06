@@ -128,7 +128,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 	if (isChangeDesc)
 	{
 		if (qspCurDesc) free(qspCurDesc);
-		qspCurDescLen = (long)QSP_STRLEN(qspCurDesc = str);
+		qspCurDescLen = QSP_STRLEN(qspCurDesc = str);
 		qspIsMainDescChanged = QSP_TRUE;
 	}
 	else

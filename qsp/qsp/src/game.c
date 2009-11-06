@@ -495,9 +495,9 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	qspResetTime(qspReCodeGetIntVal(strs[3]));
 	qspCurSelAction = qspReCodeGetIntVal(strs[4]);
 	qspCurSelObject = qspReCodeGetIntVal(strs[5]);
-	if (*strs[6]) qspCurInputLen = (long)QSP_STRLEN(qspCurInput = qspCodeReCode(strs[6], QSP_FALSE));
-	if (*strs[7]) qspCurDescLen = (long)QSP_STRLEN(qspCurDesc = qspCodeReCode(strs[7], QSP_FALSE));
-	if (*strs[8]) qspCurVarsLen = (long)QSP_STRLEN(qspCurVars = qspCodeReCode(strs[8], QSP_FALSE));
+	if (*strs[6]) qspCurInputLen = QSP_STRLEN(qspCurInput = qspCodeReCode(strs[6], QSP_FALSE));
+	if (*strs[7]) qspCurDescLen = QSP_STRLEN(qspCurDesc = qspCodeReCode(strs[7], QSP_FALSE));
+	if (*strs[8]) qspCurVarsLen = QSP_STRLEN(qspCurVars = qspCodeReCode(strs[8], QSP_FALSE));
 	qspCurLoc = qspReCodeGetIntVal(strs[9]);
 	qspCurIsShowActs = qspReCodeGetIntVal(strs[10]) != 0;
 	qspCurIsShowObjs = qspReCodeGetIntVal(strs[11]) != 0;

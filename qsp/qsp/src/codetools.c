@@ -29,7 +29,7 @@ static long qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 	ret = (QSP_CHAR **)malloc(bufSize * sizeof(QSP_CHAR *));
 	while (*data)
 	{
-		if (quot || qspStrsComp(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM)))
+		if (quot || qspStrsNComp(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM)))
 		{
 			if (++strLen >= strBufSize)
 			{

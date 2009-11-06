@@ -79,7 +79,7 @@ static void qspAddStatement(long statCode, char extArg, QSP_STATEMENT func, long
 
 static void qspAddStatName(long statCode, QSP_CHAR *statName, long level)
 {
-	long count, len = (long)QSP_STRLEN(statName);
+	long count, len = QSP_STRLEN(statName);
 	count = qspStatsNamesCounts[level];
 	qspStatsNames[level][count].Name = statName;
 	qspStatsNames[level][count].NameLen = len;
@@ -96,7 +96,7 @@ static int qspStatsCompare(const void *statName1, const void *statName2)
 
 static int qspStatStringCompare(const void *name, const void *compareTo)
 {
-	return qspStrsComp((QSP_CHAR *)name, ((QSPStatName *)compareTo)->Name, ((QSPStatName *)compareTo)->NameLen);
+	return qspStrsNComp((QSP_CHAR *)name, ((QSPStatName *)compareTo)->Name, ((QSPStatName *)compareTo)->NameLen);
 }
 
 void qspInitStats()

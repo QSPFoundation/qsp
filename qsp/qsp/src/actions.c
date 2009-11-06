@@ -57,7 +57,7 @@ static long qspActIndex(QSP_CHAR *name)
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspCurActionsCount; ++i)
 	{
-		actNameLen = (long)QSP_STRLEN(qspCurActions[i].Desc);
+		actNameLen = QSP_STRLEN(qspCurActions[i].Desc);
 		if (actNameLen >= bufSize)
 		{
 			bufSize = actNameLen + 16;

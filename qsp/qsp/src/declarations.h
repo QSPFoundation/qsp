@@ -48,21 +48,37 @@
 		#else
 			#define QSP_FOPEN qspFileOpen
 		#endif
-		#define QSP_STRCPY wcscpy
-		#define QSP_STRNCPY wcsncpy
-		#define QSP_STRLEN wcslen
-		#define QSP_STRSTR wcsstr
-		#define QSP_STRCHR wcschr
-		#define QSP_STRTOL wcstol
+		#ifdef _INTERNAL_WCS
+			#define QSP_STRCPY qspStrCopy
+			#define QSP_STRNCPY qspStrNCopy
+			#define QSP_STRLEN qspStrLen
+			#define QSP_STRSTR qspStrStr
+			#define QSP_STRCHR qspStrChar
+			#define QSP_STRCMP qspStrsComp
+			#define QSP_STRCOLL qspStrsComp
+			#define QSP_STRPBRK qspStrPBrk
+		#else
+			#define QSP_STRCPY wcscpy
+			#define QSP_STRNCPY wcsncpy
+			#define QSP_STRLEN (long)wcslen
+			#define QSP_STRSTR wcsstr
+			#define QSP_STRCHR wcschr
+			#define QSP_STRCMP wcscmp
+			#define QSP_STRCOLL wcscmp
+			#define QSP_STRPBRK wcspbrk
+		#endif
 		#define QSP_CHRLWR towlower
 		#define QSP_CHRUPR towupper
-		#define QSP_STRCMP wcscmp
-		#define QSP_STRCOLL wcscmp
-		#define QSP_STRPBRK wcspbrk
-		#define QSP_WCSTOMBSLEN(a) wcstombs(0, a, 0)
+		#define QSP_WCSTOMBSLEN(a) (long)wcstombs(0, a, 0)
 		#define QSP_WCSTOMBS wcstombs
 		#define QSP_MBTOSB(a) ((a) % 256)
-		#define QSP_ONIG_ENC (sizeof(wchar_t) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE)
+		#ifndef _WCHAR_SIZE
+			#define QSP_ONIG_ENC (sizeof(wchar_t) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE)
+		#elif _WCHAR_SIZE == 2
+			#define QSP_ONIG_ENC ONIG_ENCODING_UTF16_LE
+		#else
+			#define QSP_ONIG_ENC ONIG_ENCODING_UTF32_LE
+		#endif
 		#define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
 		#define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
 		#define QSP_WCTOB
@@ -71,13 +87,12 @@
 		#define QSP_FOPEN fopen
 		#define QSP_STRCPY strcpy
 		#define QSP_STRNCPY strncpy
-		#define QSP_STRLEN strlen
+		#define QSP_STRLEN (long)strlen
 		#define QSP_STRSTR strstr
 		#define QSP_STRCHR strchr
-		#define QSP_STRTOL strtol
 		#define QSP_STRCMP strcmp
 		#define QSP_STRPBRK strpbrk
-		#define QSP_WCSTOMBSLEN strlen
+		#define QSP_WCSTOMBSLEN (long)strlen
 		#define QSP_WCSTOMBS strncpy
 		#define QSP_MBTOSB(a) ((unsigned char)(a))
 		#if defined(_WIN) || defined(_PSP)

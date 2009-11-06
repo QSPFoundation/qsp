@@ -73,13 +73,13 @@ static long qspSearchPlayList(QSP_CHAR *file)
 	QSP_CHAR *uName, *buf;
 	long i, bufSize, itemLen, len;
 	if (!qspPLFilesCount) return -1;
-	len = (long)QSP_STRLEN(file);
+	len = QSP_STRLEN(file);
 	qspUpperStr(uName = qspGetNewText(file, len));
 	bufSize = 32;
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspPLFilesCount; ++i)
 	{
-		itemLen = (long)QSP_STRLEN(qspPLFiles[i]);
+		itemLen = QSP_STRLEN(qspPLFiles[i]);
 		if (itemLen >= bufSize)
 		{
 			bufSize = itemLen + 8;
@@ -87,7 +87,7 @@ static long qspSearchPlayList(QSP_CHAR *file)
 		}
 		QSP_STRCPY(buf, qspPLFiles[i]);
 		qspUpperStr(buf);
-		if (!(qspStrsComp(buf, uName, len) || (buf[len] && buf[len] != QSP_PLVOLUMEDELIM[0])))
+		if (!(qspStrsNComp(buf, uName, len) || (buf[len] && buf[len] != QSP_PLVOLUMEDELIM[0])))
 		{
 			free(uName);
 			free(buf);
