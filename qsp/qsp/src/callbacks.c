@@ -17,6 +17,7 @@
 
 #include "callbacks.h"
 #include "actions.h"
+#include "coding.h"
 #include "common.h"
 #include "errors.h"
 #include "objects.h"
@@ -63,6 +64,8 @@ void qspSetCallBack(long type, QSP_CALLBACK func)
 {
 	qspCallBacks[type] = func;
 }
+
+#ifndef _FLASH
 
 void qspCallDebug(QSP_CHAR *str)
 {
@@ -308,3 +311,396 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 		buffer = qspGetNewText(QSP_FMT(""), 0);
 	return buffer;
 }
+
+#else
+
+void qspCallDebug(QSP_CHAR *str)
+{
+	/* Здесь передаем управление отладчику */
+	QSPCallState state;
+	char *strUTF8;
+	AS3_Val args;
+	if (qspCallBacks[QSP_CALL_DEBUG])
+	{
+		qspSaveCallState(&state);
+		if (str)
+		{
+			strUTF8 = qspW2C(str);
+			args = AS3_Array("StrType", strUTF8);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
+		qspCallBacks[QSP_CALL_DEBUG](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallSetTimer(long msecs)
+{
+	/* Здесь устанавливаем интервал таймера */
+	QSPCallState state;
+	AS3_Val args;
+	if (qspCallBacks[QSP_CALL_SETTIMER])
+	{
+		qspSaveCallState(&state);
+		args = AS3_Array("IntType", msecs);
+		qspCallBacks[QSP_CALL_SETTIMER](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallRefreshInt(QSP_BOOL isRedraw)
+{
+	/* Здесь выполняем обновление интерфейса */
+	QSPCallState state;
+	AS3_Val args;
+	if (qspCallBacks[QSP_CALL_REFRESHINT])
+	{
+		qspSaveCallState(&state);
+		args = AS3_Array("IntType", isRedraw);
+		qspCallBacks[QSP_CALL_REFRESHINT](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallSetInputStrText(QSP_CHAR *text)
+{
+	/* Здесь устанавливаем текст строки ввода */
+	QSPCallState state;
+	AS3_Val args;
+	char *textUTF8;
+	if (qspCallBacks[QSP_CALL_SETINPUTSTRTEXT])
+	{
+		qspSaveCallState(&state);
+		if (text)
+		{
+			textUTF8 = qspW2C(text);
+			args = AS3_Array("StrType", textUTF8);
+			free(textUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
+		qspCallBacks[QSP_CALL_SETINPUTSTRTEXT](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
+{
+	/* Здесь добавляем пункт меню */
+	QSPCallState state;
+	AS3_Val args;
+	char *nameUTF8;
+	char *imgUTF8;
+	if (qspCallBacks[QSP_CALL_ADDMENUITEM])
+	{
+		qspSaveCallState(&state);
+		nameUTF8 = (name ? qspW2C(name) : 0);
+		imgUTF8 = (imgPath ? qspW2C(imgPath) : 0);
+		args = AS3_Array("StrType, StrType", nameUTF8, imgUTF8);
+		if (nameUTF8) free(nameUTF8);
+		if (imgUTF8) free(imgUTF8);
+		qspCallBacks[QSP_CALL_ADDMENUITEM](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallSystem(QSP_CHAR *cmd)
+{
+	/* Здесь выполняем системный вызов */
+	QSPCallState state;
+	AS3_Val args;
+	char *strUTF8;
+	if (qspCallBacks[QSP_CALL_SYSTEM])
+	{
+		qspSaveCallState(&state);
+		if (cmd)
+		{
+			strUTF8 = qspW2C(cmd);
+			args = AS3_Array("StrType", strUTF8);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
+		qspCallBacks[QSP_CALL_SYSTEM](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallOpenGame()
+{
+	/* Здесь позволяем пользователю выбрать файл */
+	/* состояния игры для загрузки и загружаем его */
+	QSPCallState state;
+	AS3_Val args;
+	if (qspCallBacks[QSP_CALL_OPENGAMESTATUS])
+	{
+		qspSaveCallState(&state);
+		args = AS3_Array("");
+		qspCallBacks[QSP_CALL_OPENGAMESTATUS](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallSaveGame()
+{
+	/* Здесь позволяем пользователю выбрать файл */
+	/* для сохранения состояния игры и сохраняем */
+	/* в нем текущее состояние */
+	QSPCallState state;
+	AS3_Val args;
+	if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS])
+	{
+		qspSaveCallState(&state);
+		args = AS3_Array("");
+		qspCallBacks[QSP_CALL_SAVEGAMESTATUS](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallShowMessage(QSP_CHAR *text)
+{
+	/* Здесь показываем сообщение */
+	QSPCallState state;
+	AS3_Val args;
+	char *strUTF8;
+	if (qspCallBacks[QSP_CALL_SHOWMSGSTR])
+	{
+		qspSaveCallState(&state);
+		if (text)
+		{
+			strUTF8 = qspW2C(text);
+			args = AS3_Array("StrType", strUTF8);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
+		qspCallBacks[QSP_CALL_SHOWMSGSTR](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallShowMenu()
+{
+	/* Здесь показываем меню */
+	QSPCallState state;
+	AS3_Val args;
+	if (qspCallBacks[QSP_CALL_SHOWMENU])
+	{
+		qspSaveCallState(&state);
+		args = AS3_Array("");
+		qspCallBacks[QSP_CALL_SHOWMENU](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallShowPicture(QSP_CHAR *file)
+{
+	/* Здесь показываем изображение */
+	QSPCallState state;
+	AS3_Val args;
+	char *strUTF8;
+	if (qspCallBacks[QSP_CALL_SHOWIMAGE])
+	{
+		qspSaveCallState(&state);
+		if (file)
+		{
+			strUTF8 = qspW2C(file);
+			args = AS3_Array("StrType", strUTF8);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
+		qspCallBacks[QSP_CALL_SHOWIMAGE](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallShowWindow(long type, QSP_BOOL isShow)
+{
+	/* Здесь показываем или скрываем окно */
+	QSPCallState state;
+	AS3_Val args;
+	if (qspCallBacks[QSP_CALL_SHOWWINDOW])
+	{
+		qspSaveCallState(&state);
+		args = AS3_Array("IntType, IntType", type, isShow);
+		qspCallBacks[QSP_CALL_SHOWWINDOW](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallPlayFile(QSP_CHAR *file, long volume)
+{
+	/* Здесь начинаем воспроизведение файла с заданной громкостью */
+	QSPCallState state;
+	AS3_Val args;
+	char *strUTF8;
+	if (qspCallBacks[QSP_CALL_PLAYFILE])
+	{
+		qspSaveCallState(&state);
+		if (file)
+		{
+			strUTF8 = qspW2C(file);
+			args = AS3_Array("StrType, IntType", strUTF8, volume);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType, IntType", 0, volume);
+		qspCallBacks[QSP_CALL_PLAYFILE](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
+{
+	/* Здесь проверяем, проигрывается ли файл */
+	QSPCallState state;
+	QSP_BOOL isPlaying;
+	AS3_Val args;
+	AS3_Val res;
+	char *strUTF8;
+	if (qspCallBacks[QSP_CALL_ISPLAYINGFILE])
+	{
+		qspSaveCallState(&state);
+		if (file)
+		{
+			strUTF8 = qspW2C(file);
+			args = AS3_Array("StrType", strUTF8);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
+		res = qspCallBacks[QSP_CALL_ISPLAYINGFILE](args);
+		AS3_Release(args);
+		isPlaying = (QSP_BOOL)AS3_IntValue(res);
+		AS3_Release(res);
+		qspRestoreCallState(&state);
+		return isPlaying;
+	}
+	return QSP_FALSE;
+}
+
+void qspCallSleep(long msecs)
+{
+	/* Здесь ожидаем заданное количество миллисекунд */
+	QSPCallState state;
+	AS3_Val args;
+	if (qspCallBacks[QSP_CALL_SLEEP])
+	{
+		qspSaveCallState(&state);
+		args = AS3_Array("IntType", msecs);
+		qspCallBacks[QSP_CALL_SLEEP](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+long qspCallGetMSCount()
+{
+	/* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
+	QSPCallState state;
+	long count;
+	AS3_Val args;
+	AS3_Val res;
+	if (qspCallBacks[QSP_CALL_GETMSCOUNT])
+	{
+		qspSaveCallState(&state);
+		args = AS3_Array("");
+		res = qspCallBacks[QSP_CALL_GETMSCOUNT](args);
+		AS3_Release(args);
+		count = AS3_IntValue(res);
+		AS3_Release(res);
+		qspRestoreCallState(&state);
+		return count;
+	}
+	return 0;
+}
+
+void qspCallCloseFile(QSP_CHAR *file)
+{
+	/* Здесь выполняем закрытие файла */
+	QSPCallState state;
+	AS3_Val args;
+	char *strUTF8;
+	if (qspCallBacks[QSP_CALL_CLOSEFILE])
+	{
+		qspSaveCallState(&state);
+		if (file)
+		{
+			strUTF8 = qspW2C(file);
+			args = AS3_Array("StrType", strUTF8);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
+		qspCallBacks[QSP_CALL_CLOSEFILE](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallDeleteMenu()
+{
+	/* Здесь удаляем текущее меню */
+	QSPCallState state;
+	AS3_Val args;
+	if (qspCallBacks[QSP_CALL_DELETEMENU])
+	{
+		qspSaveCallState(&state);
+		args = AS3_Array("");
+		qspCallBacks[QSP_CALL_DELETEMENU](args);
+		AS3_Release(args);
+		qspRestoreCallState(&state);
+	}
+}
+
+QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
+{
+	/* Здесь вводим текст */
+	QSPCallState state;
+	QSP_CHAR *buffer;
+	AS3_Val args;
+	AS3_Val res;
+	char *strUTF8;
+	char *resText;
+	long maxLen = 511;
+	if (qspCallBacks[QSP_CALL_INPUTBOX])
+	{
+		qspSaveCallState(&state);
+		if (text)
+		{
+			strUTF8 = qspW2C(text);
+			args = AS3_Array("StrType", strUTF8);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
+		res = qspCallBacks[QSP_CALL_INPUTBOX](args);
+		AS3_Release(args);
+		resText = AS3_StringValue(res);
+		AS3_Release(res);
+		buffer = qspC2W(resText);
+		free(resText);
+		qspRestoreCallState(&state);
+	}
+	else
+		buffer = qspGetNewText(QSP_FMT(""), 0);
+	return buffer;
+}
+
+#endif

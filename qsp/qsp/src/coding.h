@@ -39,4 +39,9 @@
 	long qspCodeWriteIntVal(QSP_CHAR **, long, long, QSP_BOOL);
 	long qspCodeWriteVal(QSP_CHAR **, long, QSP_CHAR *, QSP_BOOL);
 
+	#ifdef _FLASH
+		char *qspW2C(QSP_CHAR *);
+		QSP_CHAR *qspC2W(char *);
+	#endif
+
 #endif

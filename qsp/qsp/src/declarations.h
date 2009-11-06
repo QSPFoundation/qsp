@@ -72,13 +72,7 @@
 		#define QSP_WCSTOMBSLEN(a) (long)wcstombs(0, a, 0)
 		#define QSP_WCSTOMBS wcstombs
 		#define QSP_MBTOSB(a) ((a) % 256)
-		#ifndef _WCHAR_SIZE
-			#define QSP_ONIG_ENC (sizeof(wchar_t) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE)
-		#elif _WCHAR_SIZE == 2
-			#define QSP_ONIG_ENC ONIG_ENCODING_UTF16_LE
-		#else
-			#define QSP_ONIG_ENC ONIG_ENCODING_UTF32_LE
-		#endif
+		#define QSP_ONIG_ENC (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE)
 		#define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
 		#define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
 		#define QSP_WCTOB
