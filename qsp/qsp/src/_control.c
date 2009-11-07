@@ -1330,7 +1330,7 @@ AS3_Val QSPLoadGameWorldFromData(void *param, AS3_Val args)
 	qspIsMustWait = QSP_FALSE;
 	return AS3_True();
 }
-/* Сохранение состояния */
+/* Сохранение состояния в файл */
 AS3_Val QSPSaveGame(void *param, AS3_Val args)
 {
 	char *fileName;
@@ -1351,7 +1351,29 @@ AS3_Val QSPSaveGame(void *param, AS3_Val args)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return AS3_True();
 }
-/* Загрузка состояния */
+/* Сохранение состояния в память */
+AS3_Val QSPSaveGameAsString(void *param, AS3_Val args)
+{
+	long len;
+	QSP_BOOL isRefresh;
+	AS3_Val data;
+	QSP_CHAR *buf;
+	AS3_ArrayValue(args, "AS3ValType, IntType", &data, &isRefresh);
+	qspWait(QSP_TRUE);
+	qspPrepareExecution();
+	if (!(len = qspSaveGameStatusToString(&buf)))
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
+	AS3_ByteArray_seek(data, 0, SEEK_SET);
+	AS3_ByteArray_writeBytes(data, buf, (len + 1) * sizeof(QSP_CHAR));
+	free(buf);
+	qspIsMustWait = QSP_FALSE;
+	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+	return AS3_True();
+}
+/* Загрузка состояния из файла */
 AS3_Val QSPOpenSavedGame(void *param, AS3_Val args)
 {
 	char *fileName;
@@ -1363,6 +1385,30 @@ AS3_Val QSPOpenSavedGame(void *param, AS3_Val args)
 	fileNameWC = qspC2W(fileName);
 	qspOpenGameStatus(fileNameWC);
 	free(fileNameWC);
+	if (qspErrorNum)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
+	qspIsMustWait = QSP_FALSE;
+	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+	return AS3_True();
+}
+/* Загрузка состояния из памяти */
+AS3_Val QSPOpenSavedGameFromString(void *param, AS3_Val args)
+{
+	AS3_Val data;
+	long dataSize;
+	QSP_BOOL isRefresh;
+	QSP_CHAR *ptr;
+	AS3_ArrayValue(args, "AS3ValType, IntType, IntType", &data, &dataSize, &isRefresh);
+	qspWait(QSP_TRUE);
+	ptr = (QSP_CHAR *)malloc(dataSize);
+	AS3_ByteArray_seek(data, 0, SEEK_SET);
+	AS3_ByteArray_readBytes(ptr, data, dataSize);
+	qspPrepareExecution();
+	qspOpenGameStatusFromString(ptr);
+	free(ptr);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -1505,7 +1551,9 @@ int main()
 	AS3_Val loadGameWorld = AS3_Function(0, QSPLoadGameWorld);
 	AS3_Val loadGameWorldFromData = AS3_Function(0, QSPLoadGameWorldFromData);
 	AS3_Val saveGame = AS3_Function(0, QSPSaveGame);
+	AS3_Val saveGameAsString = AS3_Function(0, QSPSaveGameAsString);
 	AS3_Val openSavedGame = AS3_Function(0, QSPOpenSavedGame);
+	AS3_Val openSavedGameFromString = AS3_Function(0, QSPOpenSavedGameFromString);
 	AS3_Val restartGame = AS3_Function(0, QSPRestartGame);
 	AS3_Val selectMenuItem = AS3_Function(0, QSPSelectMenuItem);
 	AS3_Val setCallBack = AS3_Function(0, QSPSetCallBack);
@@ -1525,17 +1573,17 @@ int main()
 		"QSPGetMaxVarsCount:AS3ValType, QSPGetVarNameByIndex:AS3ValType, QSPExecString:AS3ValType, "
 		"QSPExecLocationCode:AS3ValType, QSPExecCounter:AS3ValType, QSPExecUserInput:AS3ValType, "
 		"QSPGetLastErrorData:AS3ValType, QSPGetErrorDesc:AS3ValType, QSPLoadGameWorld:AS3ValType, "
-		"QSPLoadGameWorldFromData:AS3ValType, QSPSaveGame:AS3ValType, QSPOpenSavedGame:AS3ValType, "
-		"QSPRestartGame:AS3ValType, QSPSelectMenuItem:AS3ValType, QSPSetCallBack:AS3ValType, "
-		"QSPInit:AS3ValType, QSPDeInit:AS3ValType",
+		"QSPLoadGameWorldFromData:AS3ValType, QSPSaveGame:AS3ValType, QSPSaveGameAsString:AS3ValType, "
+		"QSPOpenSavedGame:AS3ValType, QSPOpenSavedGameFromString:AS3ValType, QSPRestartGame:AS3ValType, "
+		"QSPSelectMenuItem:AS3ValType, QSPSetCallBack:AS3ValType, QSPInit:AS3ValType, QSPDeInit:AS3ValType",
 		enableDebugMode, getCurStateData, getVersion, getCompiledDateTime, getFullRefreshCount,
 		getQstFullPath, getCurLoc, getMainDesc, isMainDescChanged, getVarsDesc, isVarsDescChanged,
 		getExprValue, setInputStrText, getActionsCount, getActionData, executeSelActionCode, setSelActionIndex,
 		getSelActionIndex, isActionsChanged, getObjectsCount, getObjectData, setSelObjectIndex,
 		getSelObjectIndex, isObjectsChanged, showWindow, getVarValuesCount, getVarValues, getMaxVarsCount,
 		getVarNameByIndex, execString, execLocationCode, execCounter, execUserInput, getLastErrorData,
-		getErrorDesc, loadGameWorld, loadGameWorldFromData, saveGame, openSavedGame, restartGame,
-		selectMenuItem, setCallBack, init, deInit);
+		getErrorDesc, loadGameWorld, loadGameWorldFromData, saveGame, saveGameAsString, openSavedGame,
+		openSavedGameFromString, restartGame, selectMenuItem, setCallBack, init, deInit);
 
 	// Release
 	AS3_Release(enableDebugMode);
@@ -1576,7 +1624,9 @@ int main()
 	AS3_Release(loadGameWorld);
 	AS3_Release(loadGameWorldFromData);
 	AS3_Release(saveGame);
+	AS3_Release(saveGameAsString);
 	AS3_Release(openSavedGame);
+	AS3_Release(openSavedGameFromString);
 	AS3_Release(restartGame);
 	AS3_Release(selectMenuItem);
 	AS3_Release(setCallBack);
