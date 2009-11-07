@@ -166,7 +166,9 @@
 		QSP_EXTERN QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *file);
 		QSP_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const char *data, long dataSize, const QSP_CHAR *file);
 		QSP_EXTERN QSP_BOOL QSPSaveGame(const QSP_CHAR *file, QSP_BOOL isRefresh);
+		QSP_EXTERN QSP_BOOL QSPSaveGameAsString(QSP_CHAR *strBuf, long strBufSize, long *realSize, QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPOpenSavedGame(const QSP_CHAR *file, QSP_BOOL isRefresh);
+		QSP_EXTERN QSP_BOOL QSPOpenSavedGameFromString(const QSP_CHAR *str, QSP_BOOL isRefresh);
 		QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
 		QSP_EXTERN void QSPSelectMenuItem(long ind);
 		QSP_EXTERN void QSPSetCallBack(long type, QSP_CALLBACK func);

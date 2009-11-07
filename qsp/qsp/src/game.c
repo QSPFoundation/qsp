@@ -319,89 +319,94 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	free(buf);
 }
 
+long qspSaveGameStatusToString(QSP_CHAR **buf)
+{
+	QSP_CHAR *temp;
+	long i, j, len, oldRefreshCount = qspRefreshCount;
+	qspExecLocByVarName(QSP_FMT("ONGSAVE"));
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
+	*buf = 0;
+	qspRefreshPlayList();
+	len = qspCodeWriteVal(buf, 0, QSP_SAVEDGAMEID, QSP_FALSE);
+	len = qspCodeWriteVal(buf, len, QSP_VER, QSP_FALSE);
+	len = qspCodeWriteIntVal(buf, len, qspQstCRC, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, qspGetTime(), QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, qspCurSelAction, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, qspCurSelObject, QSP_TRUE);
+	len = qspCodeWriteVal(buf, len, qspCurInput, QSP_TRUE);
+	len = qspCodeWriteVal(buf, len, qspCurDesc, QSP_TRUE);
+	len = qspCodeWriteVal(buf, len, qspCurVars, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, qspCurLoc, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, (long)qspCurIsShowActs, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, (long)qspCurIsShowObjs, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, (long)qspCurIsShowVars, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, (long)qspCurIsShowInput, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, qspTimerInterval, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, qspPLFilesCount, QSP_TRUE);
+	for (i = 0; i < qspPLFilesCount; ++i)
+		len = qspCodeWriteVal(buf, len, qspPLFiles[i], QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, qspCurIncFilesCount, QSP_TRUE);
+	for (i = 0; i < qspCurIncFilesCount; ++i)
+		len = qspCodeWriteVal(buf, len, qspCurIncFiles[i], QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, qspCurActionsCount, QSP_TRUE);
+	for (i = 0; i < qspCurActionsCount; ++i)
+	{
+		if (qspCurActions[i].Image)
+			len = qspCodeWriteVal(buf, len, qspCurActions[i].Image + qspQstPathLen, QSP_TRUE);
+		else
+			len = qspCodeWriteVal(buf, len, 0, QSP_FALSE);
+		len = qspCodeWriteVal(buf, len, qspCurActions[i].Desc, QSP_TRUE);
+		temp = qspJoinStrs(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount, QSP_STRSALTDELIM);
+		len = qspCodeWriteVal(buf, len, temp, QSP_TRUE);
+		free(temp);
+		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].Location, QSP_TRUE);
+		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].ActIndex, QSP_TRUE);
+		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].StartLine, QSP_TRUE);
+		len = qspCodeWriteIntVal(buf, len, (long)qspCurActions[i].IsManageLines, QSP_TRUE);
+	}
+	len = qspCodeWriteIntVal(buf, len, qspCurObjectsCount, QSP_TRUE);
+	for (i = 0; i < qspCurObjectsCount; ++i)
+	{
+		if (qspCurObjects[i].Image)
+			len = qspCodeWriteVal(buf, len, qspCurObjects[i].Image + qspQstPathLen, QSP_TRUE);
+		else
+			len = qspCodeWriteVal(buf, len, 0, QSP_FALSE);
+		len = qspCodeWriteVal(buf, len, qspCurObjects[i].Desc, QSP_TRUE);
+	}
+	len = qspCodeWriteIntVal(buf, len, qspGetVarsCount(), QSP_TRUE);
+	for (i = 0; i < QSP_VARSCOUNT; ++i)
+		if (qspVars[i].Name)
+		{
+			len = qspCodeWriteIntVal(buf, len, i, QSP_TRUE);
+			len = qspCodeWriteVal(buf, len, qspVars[i].Name, QSP_TRUE);
+			len = qspCodeWriteIntVal(buf, len, qspVars[i].ValsCount, QSP_TRUE);
+			for (j = 0; j < qspVars[i].ValsCount; ++j)
+			{
+				len = qspCodeWriteIntVal(buf, len, qspVars[i].Values[j].Num, QSP_TRUE);
+				len = qspCodeWriteVal(buf, len, qspVars[i].Values[j].Str, QSP_TRUE);
+			}
+			len = qspCodeWriteIntVal(buf, len, qspVars[i].IndsCount, QSP_TRUE);
+			for (j = 0; j < qspVars[i].IndsCount; ++j)
+				len = qspCodeWriteVal(buf, len, qspVars[i].Indices[j], QSP_TRUE);
+		}
+	return len;
+}
+
 void qspSaveGameStatus(QSP_CHAR *fileName)
 {
 	FILE *f;
-	long i, j, len, oldRefreshCount;
-	QSP_CHAR *temp, *buf;
+	long len;
+	QSP_CHAR *buf;
 	if (!(f = QSP_FOPEN(fileName, QSP_FMT("wb"))))
 	{
 		qspSetError(QSP_ERR_FILENOTFOUND);
 		return;
 	}
-	oldRefreshCount = qspRefreshCount;
-	qspExecLocByVarName(QSP_FMT("ONGSAVE"));
-	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+	if (len = qspSaveGameStatusToString(&buf))
 	{
-		fclose(f);
-		return;
+		fwrite(buf, sizeof(QSP_CHAR), len, f);
+		free(buf);
 	}
-	buf = 0;
-	qspRefreshPlayList();
-	len = qspCodeWriteVal(&buf, 0, QSP_SAVEDGAMEID, QSP_FALSE);
-	len = qspCodeWriteVal(&buf, len, QSP_VER, QSP_FALSE);
-	len = qspCodeWriteIntVal(&buf, len, qspQstCRC, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, qspGetTime(), QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, qspCurSelAction, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, qspCurSelObject, QSP_TRUE);
-	len = qspCodeWriteVal(&buf, len, qspCurInput, QSP_TRUE);
-	len = qspCodeWriteVal(&buf, len, qspCurDesc, QSP_TRUE);
-	len = qspCodeWriteVal(&buf, len, qspCurVars, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, qspCurLoc, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, (long)qspCurIsShowActs, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, (long)qspCurIsShowObjs, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, (long)qspCurIsShowVars, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, (long)qspCurIsShowInput, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, qspTimerInterval, QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, qspPLFilesCount, QSP_TRUE);
-	for (i = 0; i < qspPLFilesCount; ++i)
-		len = qspCodeWriteVal(&buf, len, qspPLFiles[i], QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, qspCurIncFilesCount, QSP_TRUE);
-	for (i = 0; i < qspCurIncFilesCount; ++i)
-		len = qspCodeWriteVal(&buf, len, qspCurIncFiles[i], QSP_TRUE);
-	len = qspCodeWriteIntVal(&buf, len, qspCurActionsCount, QSP_TRUE);
-	for (i = 0; i < qspCurActionsCount; ++i)
-	{
-		if (qspCurActions[i].Image)
-			len = qspCodeWriteVal(&buf, len, qspCurActions[i].Image + qspQstPathLen, QSP_TRUE);
-		else
-			len = qspCodeWriteVal(&buf, len, 0, QSP_FALSE);
-		len = qspCodeWriteVal(&buf, len, qspCurActions[i].Desc, QSP_TRUE);
-		temp = qspJoinStrs(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount, QSP_STRSALTDELIM);
-		len = qspCodeWriteVal(&buf, len, temp, QSP_TRUE);
-		free(temp);
-		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].Location, QSP_TRUE);
-		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].ActIndex, QSP_TRUE);
-		len = qspCodeWriteIntVal(&buf, len, qspCurActions[i].StartLine, QSP_TRUE);
-		len = qspCodeWriteIntVal(&buf, len, (long)qspCurActions[i].IsManageLines, QSP_TRUE);
-	}
-	len = qspCodeWriteIntVal(&buf, len, qspCurObjectsCount, QSP_TRUE);
-	for (i = 0; i < qspCurObjectsCount; ++i)
-	{
-		if (qspCurObjects[i].Image)
-			len = qspCodeWriteVal(&buf, len, qspCurObjects[i].Image + qspQstPathLen, QSP_TRUE);
-		else
-			len = qspCodeWriteVal(&buf, len, 0, QSP_FALSE);
-		len = qspCodeWriteVal(&buf, len, qspCurObjects[i].Desc, QSP_TRUE);
-	}
-	len = qspCodeWriteIntVal(&buf, len, qspGetVarsCount(), QSP_TRUE);
-	for (i = 0; i < QSP_VARSCOUNT; ++i)
-		if (qspVars[i].Name)
-		{
-			len = qspCodeWriteIntVal(&buf, len, i, QSP_TRUE);
-			len = qspCodeWriteVal(&buf, len, qspVars[i].Name, QSP_TRUE);
-			len = qspCodeWriteIntVal(&buf, len, qspVars[i].ValsCount, QSP_TRUE);
-			for (j = 0; j < qspVars[i].ValsCount; ++j)
-			{
-				len = qspCodeWriteIntVal(&buf, len, qspVars[i].Values[j].Num, QSP_TRUE);
-				len = qspCodeWriteVal(&buf, len, qspVars[i].Values[j].Str, QSP_TRUE);
-			}
-			len = qspCodeWriteIntVal(&buf, len, qspVars[i].IndsCount, QSP_TRUE);
-			for (j = 0; j < qspVars[i].IndsCount; ++j)
-				len = qspCodeWriteVal(&buf, len, qspVars[i].Indices[j], QSP_TRUE);
-		}
-	fwrite(buf, sizeof(QSP_CHAR), len, f);
-	free(buf);
 	fclose(f);
 }
 
@@ -459,30 +464,11 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 	return QSP_TRUE;
 }
 
-void qspOpenGameStatus(QSP_CHAR *fileName)
+void qspOpenGameStatusFromString(QSP_CHAR *str)
 {
-	FILE *f;
-	long i, j, ind, fileSize, count, varInd, varsCount, valsCount;
-	QSP_CHAR **strs, *buf;
-	if (!(f = QSP_FOPEN(fileName, QSP_FMT("rb"))))
-	{
-		qspSetError(QSP_ERR_FILENOTFOUND);
-		return;
-	}
-	fseek(f, 0, SEEK_END);
-	if (!(fileSize = ftell(f) / sizeof(QSP_CHAR)))
-	{
-		qspSetError(QSP_ERR_CANTLOADFILE);
-		fclose(f);
-		return;
-	}
-	buf = (QSP_CHAR *)malloc((fileSize + 1) * sizeof(QSP_CHAR));
-	fseek(f, 0, SEEK_SET);
-	fread(buf, sizeof(QSP_CHAR), fileSize, f);
-	fclose(f);
-	buf[fileSize] = 0;
-	count = qspSplitStr(buf, QSP_STRSDELIM, &strs);
-	free(buf);
+	long i, j, ind, count, varInd, varsCount, valsCount;
+	QSP_CHAR **strs;
+	count = qspSplitStr(str, QSP_STRSDELIM, &strs);
 	if (!qspCheckGameStatus(strs, count))
 	{
 		qspSetError(QSP_ERR_CANTLOADFILE);
@@ -516,17 +502,17 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	{
 		if (*strs[ind])
 		{
-			buf = qspCodeReCode(strs[ind], QSP_FALSE);
-			qspCurActions[i].Image = qspGetAbsFromRelPath(buf);
-			free(buf);
+			str = qspCodeReCode(strs[ind], QSP_FALSE);
+			qspCurActions[i].Image = qspGetAbsFromRelPath(str);
+			free(str);
 		}
 		else
 			qspCurActions[i].Image = 0;
 		++ind;
 		qspCurActions[i].Desc = qspCodeReCode(strs[ind++], QSP_FALSE);
-		buf = qspCodeReCode(strs[ind++], QSP_FALSE);
-		qspCurActions[i].OnPressLinesCount = qspSplitStr(buf, QSP_STRSALTDELIM, &qspCurActions[i].OnPressLines);
-		free(buf);
+		str = qspCodeReCode(strs[ind++], QSP_FALSE);
+		qspCurActions[i].OnPressLinesCount = qspSplitStr(str, QSP_STRSALTDELIM, &qspCurActions[i].OnPressLines);
+		free(str);
 		qspCurActions[i].Location = qspReCodeGetIntVal(strs[ind++]);
 		qspCurActions[i].ActIndex = qspReCodeGetIntVal(strs[ind++]);
 		qspCurActions[i].StartLine = qspReCodeGetIntVal(strs[ind++]);
@@ -537,9 +523,9 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	{
 		if (*strs[ind])
 		{
-			buf = qspCodeReCode(strs[ind], QSP_FALSE);
-			qspCurObjects[i].Image = qspGetAbsFromRelPath(buf);
-			free(buf);
+			str = qspCodeReCode(strs[ind], QSP_FALSE);
+			qspCurObjects[i].Image = qspGetAbsFromRelPath(str);
+			free(str);
 		}
 		else
 			qspCurObjects[i].Image = 0;
@@ -585,6 +571,32 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	qspPlayPLFiles();
 	qspCallSetTimer(qspTimerInterval);
 	qspExecLocByVarName(QSP_FMT("ONGLOAD"));
+}
+
+void qspOpenGameStatus(QSP_CHAR *fileName)
+{
+	FILE *f;
+	long fileSize;
+	QSP_CHAR *buf;
+	if (!(f = QSP_FOPEN(fileName, QSP_FMT("rb"))))
+	{
+		qspSetError(QSP_ERR_FILENOTFOUND);
+		return;
+	}
+	fseek(f, 0, SEEK_END);
+	if (!(fileSize = ftell(f) / sizeof(QSP_CHAR)))
+	{
+		qspSetError(QSP_ERR_CANTLOADFILE);
+		fclose(f);
+		return;
+	}
+	buf = (QSP_CHAR *)malloc((fileSize + 1) * sizeof(QSP_CHAR));
+	fseek(f, 0, SEEK_SET);
+	fread(buf, sizeof(QSP_CHAR), fileSize, f);
+	fclose(f);
+	buf[fileSize] = 0;
+	qspOpenGameStatusFromString(buf);
+	free(buf);
 }
 
 QSP_BOOL qspStatementOpenQst(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)

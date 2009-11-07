@@ -514,7 +514,7 @@ QSP_BOOL QSPLoadGameWorldFromData(const char *data, long dataSize, const QSP_CHA
 	qspIsMustWait = QSP_FALSE;
 	return QSP_TRUE;
 }
-/* Сохранение состояния */
+/* Сохранение состояния в файл */
 QSP_BOOL QSPSaveGame(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
@@ -529,12 +529,55 @@ QSP_BOOL QSPSaveGame(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return QSP_TRUE;
 }
-/* Загрузка состояния */
+/* Сохранение состояния в память */
+QSP_BOOL QSPSaveGameAsString(QSP_CHAR *strBuf, long strBufSize, long *realSize, QSP_BOOL isRefresh)
+{
+	long len, size;
+	QSP_CHAR *data;
+	qspWait(QSP_TRUE);
+	qspPrepareExecution();
+	if (!(len = qspSaveGameStatusToString(&data)))
+	{
+		*realSize = 0;
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
+	size = len + 1;
+	*realSize = size;
+	if (size > strBufSize)
+	{
+		free(data);
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
+	QSP_STRNCPY(strBuf, data, strBufSize - 1);
+	free(data);
+	strBuf[strBufSize - 1] = 0;
+	qspIsMustWait = QSP_FALSE;
+	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+	return QSP_TRUE;
+}
+/* Загрузка состояния из файла */
 QSP_BOOL QSPOpenSavedGame(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
 	qspOpenGameStatus((QSP_CHAR *)fileName);
+	if (qspErrorNum)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
+	qspIsMustWait = QSP_FALSE;
+	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+	return QSP_TRUE;
+}
+/* Загрузка состояния из памяти */
+QSP_BOOL QSPOpenSavedGameFromString(const QSP_CHAR *str, QSP_BOOL isRefresh)
+{
+	qspWait(QSP_TRUE);
+	qspPrepareExecution();
+	qspOpenGameStatusFromString((QSP_CHAR *)str);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
