@@ -723,9 +723,9 @@ static long qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, long *comp
 			}
 			else if (qspIsInList(QSP_QUOTS, *s))
 			{
+				if (!(name = qspGetString(&s))) break;
 				v.IsStr = QSP_TRUE;
-				QSP_STR(v) = qspGetString(&s);
-				if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+				QSP_STR(v) = name;
 				qspAppendToCompiled(qspOpValue, &itemsCount, compValues, compOpCodes, compArgsCounts, 0, v);
 				if (qspErrorNum)
 				{
@@ -781,8 +781,7 @@ static long qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, long *comp
 			}
 			else if (!qspIsInListEOL(QSP_DELIMS, *s))
 			{
-				name = qspGetName(&s);
-				if (qspErrorNum) break;
+				if (!(name = qspGetName(&s))) break;
 				opCode = qspFunctionOpCode(name);
 				if (opCode >= qspOpFirst_Function)
 				{
@@ -851,9 +850,8 @@ static long qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, long *comp
 QSPVariant qspExprValue(QSP_CHAR *expr)
 {
 	QSPVariant compValues[QSP_MAXITEMS];
-	long compOpCodes[QSP_MAXITEMS], compArgsCounts[QSP_MAXITEMS], itemsCount, oldRefreshCount = qspRefreshCount;
-	itemsCount = qspCompileExpression(expr, compValues, compOpCodes, compArgsCounts);
-	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+	long compOpCodes[QSP_MAXITEMS], compArgsCounts[QSP_MAXITEMS], itemsCount;
+	if (!(itemsCount = qspCompileExpression(expr, compValues, compOpCodes, compArgsCounts)))
 		return qspGetEmptyVariant(QSP_FALSE);
 	return qspValue(itemsCount, compValues, compOpCodes, compArgsCounts);
 }
@@ -1000,15 +998,13 @@ static void qspFunctionRand(QSPVariant *args, long count, QSPVariant *tos)
 static void qspFunctionDesc(QSPVariant *args, long count, QSPVariant *tos)
 {
 	QSP_CHAR *desc;
-	long oldRefreshCount, index = qspLocIndex(QSP_STR(args[0]));
+	long index = qspLocIndex(QSP_STR(args[0]));
 	if (index < 0)
 	{
 		qspSetError(QSP_ERR_LOCNOTFOUND);
 		return;
 	}
-	oldRefreshCount = qspRefreshCount;
-	desc = qspFormatText(qspLocs[index].Desc);
-	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+	if (!(desc = qspFormatText(qspLocs[index].Desc))) return;
 	QSP_PSTR(tos) = desc;
 }
 
