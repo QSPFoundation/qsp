@@ -57,6 +57,8 @@
 			#define QSP_STRCMP qspStrsComp
 			#define QSP_STRCOLL qspStrsComp
 			#define QSP_STRPBRK qspStrPBrk
+			#define QSP_CHRLWR qspToWLower
+			#define QSP_CHRUPR qspToWUpper
 		#else
 			#define QSP_STRCPY wcscpy
 			#define QSP_STRNCPY wcsncpy
@@ -66,9 +68,9 @@
 			#define QSP_STRCMP wcscmp
 			#define QSP_STRCOLL wcscmp
 			#define QSP_STRPBRK wcspbrk
+			#define QSP_CHRLWR towlower
+			#define QSP_CHRUPR towupper
 		#endif
-		#define QSP_CHRLWR towlower
-		#define QSP_CHRUPR towupper
 		#define QSP_WCSTOMBSLEN(a) (long)wcstombs(0, a, 0)
 		#define QSP_WCSTOMBS wcstombs
 		#define QSP_MBTOSB(a) ((a) % 256)
@@ -154,5 +156,10 @@
 
 	/* Variables */
 	extern volatile QSP_BOOL qspIsMustWait;
+
+	#ifdef _INTERNAL_WCS
+		int qspToWLower(int);
+		int qspToWUpper(int);
+	#endif
 
 #endif
