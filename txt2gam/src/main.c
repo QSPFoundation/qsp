@@ -289,11 +289,8 @@ static QSP_BOOL qspExportStrings(char *file, char *outFile, QSP_CHAR locStart, Q
 
 static QSP_BOOL qspOpenQuestFromText(char *file, QSP_CHAR locStart, QSP_CHAR locEnd)
 {
-	long fileSize, locsCount;
-	char *buf, *resBuf;
+	long locsCount;
 	QSP_CHAR *data;
-	QSP_BOOL isUCS2;
-	FILE *f;
 	if (!qspLoadFileContents(file, &data)) return QSP_FALSE;
 	locsCount = qspGetLocs(data, locStart, locEnd, QSP_FALSE);
 	qspCreateWorld(locsCount);
