@@ -1511,6 +1511,24 @@ AS3_Val QSPDeInit(void *param, AS3_Val args)
 	return AS3_Undefined();
 }
 
+AS3_Val QSPPauseLibrary(void *param, AS3_Val args)
+{
+	qspWait(QSP_TRUE);
+	qspPauseLibrary();
+	qspIsMustWait = QSP_FALSE;
+	return AS3_Undefined();
+}
+
+AS3_Val QSPReturnValue(void *param, AS3_Val args)
+{
+	AS3_Val resVal;
+	AS3_ArrayValue(args, "AS3ValType", &resVal);
+	qspWait(QSP_TRUE);
+	qspSetReturnValue(resVal);
+	qspIsMustWait = QSP_FALSE;
+	return AS3_Undefined();
+}
+
 int main()
 {
 	AS3_Val enableDebugMode = AS3_Function(0, QSPEnableDebugMode);
@@ -1524,17 +1542,17 @@ int main()
 	AS3_Val isMainDescChanged = AS3_Function(0, QSPIsMainDescChanged);
 	AS3_Val getVarsDesc = AS3_Function(0, QSPGetVarsDesc);
 	AS3_Val isVarsDescChanged = AS3_Function(0, QSPIsVarsDescChanged);
-	AS3_Val getExprValue = AS3_Function(0, QSPGetExprValue);
+	AS3_Val getExprValue = AS3_FunctionAsync(0, QSPGetExprValue);
 	AS3_Val setInputStrText = AS3_Function(0, QSPSetInputStrText);
 	AS3_Val getActionsCount = AS3_Function(0, QSPGetActionsCount);
 	AS3_Val getActionData = AS3_Function(0, QSPGetActionData);
-	AS3_Val executeSelActionCode = AS3_Function(0, QSPExecuteSelActionCode);
-	AS3_Val setSelActionIndex = AS3_Function(0, QSPSetSelActionIndex);
+	AS3_Val executeSelActionCode = AS3_FunctionAsync(0, QSPExecuteSelActionCode);
+	AS3_Val setSelActionIndex = AS3_FunctionAsync(0, QSPSetSelActionIndex);
 	AS3_Val getSelActionIndex = AS3_Function(0, QSPGetSelActionIndex);
 	AS3_Val isActionsChanged = AS3_Function(0, QSPIsActionsChanged);
 	AS3_Val getObjectsCount = AS3_Function(0, QSPGetObjectsCount);
 	AS3_Val getObjectData = AS3_Function(0, QSPGetObjectData);
-	AS3_Val setSelObjectIndex = AS3_Function(0, QSPSetSelObjectIndex);
+	AS3_Val setSelObjectIndex = AS3_FunctionAsync(0, QSPSetSelObjectIndex);
 	AS3_Val getSelObjectIndex = AS3_Function(0, QSPGetSelObjectIndex);
 	AS3_Val isObjectsChanged = AS3_Function(0, QSPIsObjectsChanged);
 	AS3_Val showWindow = AS3_Function(0, QSPShowWindow);
@@ -1542,23 +1560,25 @@ int main()
 	AS3_Val getVarValues = AS3_Function(0, QSPGetVarValues);
 	AS3_Val getMaxVarsCount = AS3_Function(0, QSPGetMaxVarsCount);
 	AS3_Val getVarNameByIndex = AS3_Function(0, QSPGetVarNameByIndex);
-	AS3_Val execString = AS3_Function(0, QSPExecString);
-	AS3_Val execLocationCode = AS3_Function(0, QSPExecLocationCode);
-	AS3_Val execCounter = AS3_Function(0, QSPExecCounter);
-	AS3_Val execUserInput = AS3_Function(0, QSPExecUserInput);
+	AS3_Val execString = AS3_FunctionAsync(0, QSPExecString);
+	AS3_Val execLocationCode = AS3_FunctionAsync(0, QSPExecLocationCode);
+	AS3_Val execCounter = AS3_FunctionAsync(0, QSPExecCounter);
+	AS3_Val execUserInput = AS3_FunctionAsync(0, QSPExecUserInput);
 	AS3_Val getLastErrorData = AS3_Function(0, QSPGetLastErrorData);
 	AS3_Val getErrorDesc = AS3_Function(0, QSPGetErrorDesc);
 	AS3_Val loadGameWorld = AS3_Function(0, QSPLoadGameWorld);
 	AS3_Val loadGameWorldFromData = AS3_Function(0, QSPLoadGameWorldFromData);
-	AS3_Val saveGame = AS3_Function(0, QSPSaveGame);
-	AS3_Val saveGameAsString = AS3_Function(0, QSPSaveGameAsString);
-	AS3_Val openSavedGame = AS3_Function(0, QSPOpenSavedGame);
-	AS3_Val openSavedGameFromString = AS3_Function(0, QSPOpenSavedGameFromString);
-	AS3_Val restartGame = AS3_Function(0, QSPRestartGame);
+	AS3_Val saveGame = AS3_FunctionAsync(0, QSPSaveGame);
+	AS3_Val saveGameAsString = AS3_FunctionAsync(0, QSPSaveGameAsString);
+	AS3_Val openSavedGame = AS3_FunctionAsync(0, QSPOpenSavedGame);
+	AS3_Val openSavedGameFromString = AS3_FunctionAsync(0, QSPOpenSavedGameFromString);
+	AS3_Val restartGame = AS3_FunctionAsync(0, QSPRestartGame);
 	AS3_Val selectMenuItem = AS3_Function(0, QSPSelectMenuItem);
 	AS3_Val setCallBack = AS3_Function(0, QSPSetCallBack);
 	AS3_Val init = AS3_Function(0, QSPInit);
 	AS3_Val deInit = AS3_Function(0, QSPDeInit);
+	AS3_Val pauseLibrary = AS3_Function(0, QSPPauseLibrary);
+	AS3_Val returnValue = AS3_Function(0, QSPReturnValue);
 
 	AS3_Val result = AS3_Object(
 		"QSPEnableDebugMode:AS3ValType, QSPGetCurStateData:AS3ValType, QSPGetVersion:AS3ValType, "
@@ -1575,7 +1595,8 @@ int main()
 		"QSPGetLastErrorData:AS3ValType, QSPGetErrorDesc:AS3ValType, QSPLoadGameWorld:AS3ValType, "
 		"QSPLoadGameWorldFromData:AS3ValType, QSPSaveGame:AS3ValType, QSPSaveGameAsString:AS3ValType, "
 		"QSPOpenSavedGame:AS3ValType, QSPOpenSavedGameFromString:AS3ValType, QSPRestartGame:AS3ValType, "
-		"QSPSelectMenuItem:AS3ValType, QSPSetCallBack:AS3ValType, QSPInit:AS3ValType, QSPDeInit:AS3ValType",
+		"QSPSelectMenuItem:AS3ValType, QSPSetCallBack:AS3ValType, QSPInit:AS3ValType, QSPDeInit:AS3ValType, "
+		"QSPPauseLibrary:AS3ValType, QSPReturnValue:AS3ValType",
 		enableDebugMode, getCurStateData, getVersion, getCompiledDateTime, getFullRefreshCount,
 		getQstFullPath, getCurLoc, getMainDesc, isMainDescChanged, getVarsDesc, isVarsDescChanged,
 		getExprValue, setInputStrText, getActionsCount, getActionData, executeSelActionCode, setSelActionIndex,
@@ -1583,7 +1604,7 @@ int main()
 		getSelObjectIndex, isObjectsChanged, showWindow, getVarValuesCount, getVarValues, getMaxVarsCount,
 		getVarNameByIndex, execString, execLocationCode, execCounter, execUserInput, getLastErrorData,
 		getErrorDesc, loadGameWorld, loadGameWorldFromData, saveGame, saveGameAsString, openSavedGame,
-		openSavedGameFromString, restartGame, selectMenuItem, setCallBack, init, deInit);
+		openSavedGameFromString, restartGame, selectMenuItem, setCallBack, init, deInit, pauseLibrary, returnValue);
 
 	// Release
 	AS3_Release(enableDebugMode);
@@ -1632,6 +1653,8 @@ int main()
 	AS3_Release(setCallBack);
 	AS3_Release(init);
 	AS3_Release(deInit);
+	AS3_Release(pauseLibrary);
+	AS3_Release(returnValue);
 
 	AS3_LibInit(result);
 
