@@ -56,6 +56,8 @@ static void qspRestoreCallState(QSPCallState *state)
 	qspIsInCallBack = state->IsInCallBack;
 }
 
+#ifndef _FLASH
+
 void qspInitCallBacks()
 {
 	long i;
@@ -68,8 +70,6 @@ void qspSetCallBack(long type, QSP_CALLBACK func)
 {
 	qspCallBacks[type] = func;
 }
-
-#ifndef _FLASH
 
 void qspCallDebug(QSP_CHAR *str)
 {
@@ -318,13 +318,29 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 
 #else
 
+void qspInitCallBacks()
+{
+	long i;
+	qspIsInCallBack = QSP_FALSE;
+	for (i = 0; i < QSP_CALL_DUMMY; ++i)
+		qspCallBacks[i].IsSet = QSP_FALSE;
+}
+
+void qspSetCallBack(long type, QSP_CALLBACK func)
+{
+	qspCallBacks[type] = func;
+	AS3_Acquire(qspCallBacks[type].ThisVal);
+	AS3_Acquire(qspCallBacks[type].FuncVal);
+	qspCallBacks[type].IsSet = QSP_TRUE;
+}
+
 void qspCallDebug(QSP_CHAR *str)
 {
 	/* Здесь передаем управление отладчику */
 	QSPCallState state;
 	char *strUTF8;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_DEBUG])
+	if (qspCallBacks[QSP_CALL_DEBUG].IsSet)
 	{
 		qspSaveCallState(&state);
 		if (str)
@@ -335,7 +351,7 @@ void qspCallDebug(QSP_CHAR *str)
 		}
 		else
 			args = AS3_Array("StrType", 0);
-		qspCallBacks[QSP_CALL_DEBUG](args);
+		AS3_Call(qspCallBacks[QSP_CALL_DEBUG].FuncVal, qspCallBacks[QSP_CALL_DEBUG].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -347,11 +363,11 @@ void qspCallSetTimer(long msecs)
 	/* Здесь устанавливаем интервал таймера */
 	QSPCallState state;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_SETTIMER])
+	if (qspCallBacks[QSP_CALL_SETTIMER].IsSet)
 	{
 		qspSaveCallState(&state);
 		args = AS3_Array("IntType", msecs);
-		qspCallBacks[QSP_CALL_SETTIMER](args);
+		AS3_Call(qspCallBacks[QSP_CALL_SETTIMER].FuncVal, qspCallBacks[QSP_CALL_SETTIMER].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -363,11 +379,11 @@ void qspCallRefreshInt(QSP_BOOL isRedraw)
 	/* Здесь выполняем обновление интерфейса */
 	QSPCallState state;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_REFRESHINT])
+	if (qspCallBacks[QSP_CALL_REFRESHINT].IsSet)
 	{
 		qspSaveCallState(&state);
 		args = AS3_Array("IntType", isRedraw);
-		qspCallBacks[QSP_CALL_REFRESHINT](args);
+		AS3_Call(qspCallBacks[QSP_CALL_REFRESHINT].FuncVal, qspCallBacks[QSP_CALL_REFRESHINT].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -380,7 +396,7 @@ void qspCallSetInputStrText(QSP_CHAR *text)
 	QSPCallState state;
 	AS3_Val args;
 	char *textUTF8;
-	if (qspCallBacks[QSP_CALL_SETINPUTSTRTEXT])
+	if (qspCallBacks[QSP_CALL_SETINPUTSTRTEXT].IsSet)
 	{
 		qspSaveCallState(&state);
 		if (text)
@@ -391,7 +407,7 @@ void qspCallSetInputStrText(QSP_CHAR *text)
 		}
 		else
 			args = AS3_Array("StrType", 0);
-		qspCallBacks[QSP_CALL_SETINPUTSTRTEXT](args);
+		AS3_Call(qspCallBacks[QSP_CALL_SETINPUTSTRTEXT].FuncVal, qspCallBacks[QSP_CALL_SETINPUTSTRTEXT].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -405,7 +421,7 @@ void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
 	AS3_Val args;
 	char *nameUTF8;
 	char *imgUTF8;
-	if (qspCallBacks[QSP_CALL_ADDMENUITEM])
+	if (qspCallBacks[QSP_CALL_ADDMENUITEM].IsSet)
 	{
 		qspSaveCallState(&state);
 		nameUTF8 = (name ? qspW2C(name) : 0);
@@ -413,7 +429,7 @@ void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
 		args = AS3_Array("StrType, StrType", nameUTF8, imgUTF8);
 		if (nameUTF8) free(nameUTF8);
 		if (imgUTF8) free(imgUTF8);
-		qspCallBacks[QSP_CALL_ADDMENUITEM](args);
+		AS3_Call(qspCallBacks[QSP_CALL_ADDMENUITEM].FuncVal, qspCallBacks[QSP_CALL_ADDMENUITEM].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -426,7 +442,7 @@ void qspCallSystem(QSP_CHAR *cmd)
 	QSPCallState state;
 	AS3_Val args;
 	char *strUTF8;
-	if (qspCallBacks[QSP_CALL_SYSTEM])
+	if (qspCallBacks[QSP_CALL_SYSTEM].IsSet)
 	{
 		qspSaveCallState(&state);
 		if (cmd)
@@ -437,7 +453,7 @@ void qspCallSystem(QSP_CHAR *cmd)
 		}
 		else
 			args = AS3_Array("StrType", 0);
-		qspCallBacks[QSP_CALL_SYSTEM](args);
+		AS3_Call(qspCallBacks[QSP_CALL_SYSTEM].FuncVal, qspCallBacks[QSP_CALL_SYSTEM].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -450,11 +466,11 @@ void qspCallOpenGame()
 	/* состояния игры для загрузки и загружаем его */
 	QSPCallState state;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_OPENGAMESTATUS])
+	if (qspCallBacks[QSP_CALL_OPENGAMESTATUS].IsSet)
 	{
 		qspSaveCallState(&state);
 		args = AS3_Array("");
-		qspCallBacks[QSP_CALL_OPENGAMESTATUS](args);
+		AS3_Call(qspCallBacks[QSP_CALL_OPENGAMESTATUS].FuncVal, qspCallBacks[QSP_CALL_OPENGAMESTATUS].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -468,11 +484,11 @@ void qspCallSaveGame()
 	/* в нем текущее состояние */
 	QSPCallState state;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS])
+	if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS].IsSet)
 	{
 		qspSaveCallState(&state);
 		args = AS3_Array("");
-		qspCallBacks[QSP_CALL_SAVEGAMESTATUS](args);
+		AS3_Call(qspCallBacks[QSP_CALL_SAVEGAMESTATUS].FuncVal, qspCallBacks[QSP_CALL_SAVEGAMESTATUS].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -485,7 +501,7 @@ void qspCallShowMessage(QSP_CHAR *text)
 	QSPCallState state;
 	AS3_Val args;
 	char *strUTF8;
-	if (qspCallBacks[QSP_CALL_SHOWMSGSTR])
+	if (qspCallBacks[QSP_CALL_SHOWMSGSTR].IsSet)
 	{
 		qspSaveCallState(&state);
 		if (text)
@@ -496,7 +512,7 @@ void qspCallShowMessage(QSP_CHAR *text)
 		}
 		else
 			args = AS3_Array("StrType", 0);
-		qspCallBacks[QSP_CALL_SHOWMSGSTR](args);
+		AS3_Call(qspCallBacks[QSP_CALL_SHOWMSGSTR].FuncVal, qspCallBacks[QSP_CALL_SHOWMSGSTR].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -508,11 +524,11 @@ void qspCallShowMenu()
 	/* Здесь показываем меню */
 	QSPCallState state;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_SHOWMENU])
+	if (qspCallBacks[QSP_CALL_SHOWMENU].IsSet)
 	{
 		qspSaveCallState(&state);
 		args = AS3_Array("");
-		qspCallBacks[QSP_CALL_SHOWMENU](args);
+		AS3_Call(qspCallBacks[QSP_CALL_SHOWMENU].FuncVal, qspCallBacks[QSP_CALL_SHOWMENU].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -525,7 +541,7 @@ void qspCallShowPicture(QSP_CHAR *file)
 	QSPCallState state;
 	AS3_Val args;
 	char *strUTF8;
-	if (qspCallBacks[QSP_CALL_SHOWIMAGE])
+	if (qspCallBacks[QSP_CALL_SHOWIMAGE].IsSet)
 	{
 		qspSaveCallState(&state);
 		if (file)
@@ -536,7 +552,7 @@ void qspCallShowPicture(QSP_CHAR *file)
 		}
 		else
 			args = AS3_Array("StrType", 0);
-		qspCallBacks[QSP_CALL_SHOWIMAGE](args);
+		AS3_Call(qspCallBacks[QSP_CALL_SHOWIMAGE].FuncVal, qspCallBacks[QSP_CALL_SHOWIMAGE].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -548,11 +564,11 @@ void qspCallShowWindow(long type, QSP_BOOL isShow)
 	/* Здесь показываем или скрываем окно */
 	QSPCallState state;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_SHOWWINDOW])
+	if (qspCallBacks[QSP_CALL_SHOWWINDOW].IsSet)
 	{
 		qspSaveCallState(&state);
 		args = AS3_Array("IntType, IntType", type, isShow);
-		qspCallBacks[QSP_CALL_SHOWWINDOW](args);
+		AS3_Call(qspCallBacks[QSP_CALL_SHOWWINDOW].FuncVal, qspCallBacks[QSP_CALL_SHOWWINDOW].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -565,7 +581,7 @@ void qspCallPlayFile(QSP_CHAR *file, long volume)
 	QSPCallState state;
 	AS3_Val args;
 	char *strUTF8;
-	if (qspCallBacks[QSP_CALL_PLAYFILE])
+	if (qspCallBacks[QSP_CALL_PLAYFILE].IsSet)
 	{
 		qspSaveCallState(&state);
 		if (file)
@@ -576,7 +592,7 @@ void qspCallPlayFile(QSP_CHAR *file, long volume)
 		}
 		else
 			args = AS3_Array("StrType, IntType", 0, volume);
-		qspCallBacks[QSP_CALL_PLAYFILE](args);
+		AS3_Call(qspCallBacks[QSP_CALL_PLAYFILE].FuncVal, qspCallBacks[QSP_CALL_PLAYFILE].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -590,7 +606,7 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 	QSP_BOOL isPlaying;
 	AS3_Val args;
 	char *strUTF8;
-	if (qspCallBacks[QSP_CALL_ISPLAYINGFILE])
+	if (qspCallBacks[QSP_CALL_ISPLAYINGFILE].IsSet)
 	{
 		qspSaveCallState(&state);
 		if (file)
@@ -601,7 +617,7 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 		}
 		else
 			args = AS3_Array("StrType", 0);
-		qspCallBacks[QSP_CALL_ISPLAYINGFILE](args);
+		AS3_Call(qspCallBacks[QSP_CALL_ISPLAYINGFILE].FuncVal, qspCallBacks[QSP_CALL_ISPLAYINGFILE].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		isPlaying = (QSP_BOOL)AS3_IntValue(result);
@@ -617,11 +633,11 @@ void qspCallSleep(long msecs)
 	/* Здесь ожидаем заданное количество миллисекунд */
 	QSPCallState state;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_SLEEP])
+	if (qspCallBacks[QSP_CALL_SLEEP].IsSet)
 	{
 		qspSaveCallState(&state);
 		args = AS3_Array("IntType", msecs);
-		qspCallBacks[QSP_CALL_SLEEP](args);
+		AS3_Call(qspCallBacks[QSP_CALL_SLEEP].FuncVal, qspCallBacks[QSP_CALL_SLEEP].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -634,11 +650,11 @@ long qspCallGetMSCount()
 	QSPCallState state;
 	long count;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_GETMSCOUNT])
+	if (qspCallBacks[QSP_CALL_GETMSCOUNT].IsSet)
 	{
 		qspSaveCallState(&state);
 		args = AS3_Array("");
-		qspCallBacks[QSP_CALL_GETMSCOUNT](args);
+		AS3_Call(qspCallBacks[QSP_CALL_GETMSCOUNT].FuncVal, qspCallBacks[QSP_CALL_GETMSCOUNT].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		count = AS3_IntValue(result);
@@ -655,7 +671,7 @@ void qspCallCloseFile(QSP_CHAR *file)
 	QSPCallState state;
 	AS3_Val args;
 	char *strUTF8;
-	if (qspCallBacks[QSP_CALL_CLOSEFILE])
+	if (qspCallBacks[QSP_CALL_CLOSEFILE].IsSet)
 	{
 		qspSaveCallState(&state);
 		if (file)
@@ -666,7 +682,7 @@ void qspCallCloseFile(QSP_CHAR *file)
 		}
 		else
 			args = AS3_Array("StrType", 0);
-		qspCallBacks[QSP_CALL_CLOSEFILE](args);
+		AS3_Call(qspCallBacks[QSP_CALL_CLOSEFILE].FuncVal, qspCallBacks[QSP_CALL_CLOSEFILE].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -678,11 +694,11 @@ void qspCallDeleteMenu()
 	/* Здесь удаляем текущее меню */
 	QSPCallState state;
 	AS3_Val args;
-	if (qspCallBacks[QSP_CALL_DELETEMENU])
+	if (qspCallBacks[QSP_CALL_DELETEMENU].IsSet)
 	{
 		qspSaveCallState(&state);
 		args = AS3_Array("");
-		qspCallBacks[QSP_CALL_DELETEMENU](args);
+		AS3_Call(qspCallBacks[QSP_CALL_DELETEMENU].FuncVal, qspCallBacks[QSP_CALL_DELETEMENU].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		qspRestoreCallState(&state);
@@ -698,7 +714,7 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 	char *strUTF8;
 	char *resText;
 	long maxLen = 511;
-	if (qspCallBacks[QSP_CALL_INPUTBOX])
+	if (qspCallBacks[QSP_CALL_INPUTBOX].IsSet)
 	{
 		qspSaveCallState(&state);
 		if (text)
@@ -709,7 +725,7 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 		}
 		else
 			args = AS3_Array("StrType", 0);
-		qspCallBacks[QSP_CALL_INPUTBOX](args);
+		AS3_Call(qspCallBacks[QSP_CALL_INPUTBOX].FuncVal, qspCallBacks[QSP_CALL_INPUTBOX].ThisVal, args);
 		AS3_Release(args);
 		flyield();
 		resText = AS3_StringValue(result);

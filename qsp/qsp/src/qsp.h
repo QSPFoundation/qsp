@@ -118,7 +118,12 @@
 			typedef long (*QSP_CALLBACK)();
 		#endif
 	#else
-		typedef AS3_Val (*QSP_CALLBACK)(AS3_Val);
+		typedef struct
+		{
+			QSP_BOOL IsSet;
+			AS3_Val ThisVal;
+			AS3_Val FuncVal;
+		} QSP_CALLBACK;
 	#endif
 
 	#ifdef __cplusplus

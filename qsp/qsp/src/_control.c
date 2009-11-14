@@ -1458,9 +1458,12 @@ AS3_Val QSPSetCallBack(void *param, AS3_Val args)
 	long type;
 	AS3_Val thisVal;
 	AS3_Val funcVal;
+	QSP_CALLBACK callBack;
 	AS3_ArrayValue(args, "IntType, AS3ValType, AS3ValType", &type, &thisVal, &funcVal);
 	qspWait(QSP_TRUE);
-	qspSetCallBack(type, (QSP_CALLBACK)AS3_Shim(funcVal, thisVal, "AS3ValType", "AS3ValType", 0));
+	callBack.ThisVal = thisVal;
+	callBack.FuncVal = funcVal;
+	qspSetCallBack(type, callBack);
 	qspIsMustWait = QSP_FALSE;
 	return AS3_Undefined();
 }
