@@ -1514,14 +1514,6 @@ AS3_Val QSPDeInit(void *param, AS3_Val args)
 	return AS3_Undefined();
 }
 
-AS3_Val QSPPauseLibrary(void *param, AS3_Val args)
-{
-	qspWait(QSP_TRUE);
-	qspPauseLibrary();
-	qspIsMustWait = QSP_FALSE;
-	return AS3_Undefined();
-}
-
 AS3_Val QSPReturnValue(void *param, AS3_Val args)
 {
 	AS3_Val resVal;
@@ -1580,7 +1572,6 @@ int main()
 	AS3_Val setCallBack = AS3_Function(0, QSPSetCallBack);
 	AS3_Val init = AS3_Function(0, QSPInit);
 	AS3_Val deInit = AS3_Function(0, QSPDeInit);
-	AS3_Val pauseLibrary = AS3_Function(0, QSPPauseLibrary);
 	AS3_Val returnValue = AS3_Function(0, QSPReturnValue);
 
 	AS3_Val result = AS3_Object(
@@ -1599,7 +1590,7 @@ int main()
 		"QSPLoadGameWorldFromData:AS3ValType, QSPSaveGame:AS3ValType, QSPSaveGameAsString:AS3ValType, "
 		"QSPOpenSavedGame:AS3ValType, QSPOpenSavedGameFromString:AS3ValType, QSPRestartGame:AS3ValType, "
 		"QSPSelectMenuItem:AS3ValType, QSPSetCallBack:AS3ValType, QSPInit:AS3ValType, QSPDeInit:AS3ValType, "
-		"QSPPauseLibrary:AS3ValType, QSPReturnValue:AS3ValType",
+		"QSPReturnValue:AS3ValType",
 		enableDebugMode, getCurStateData, getVersion, getCompiledDateTime, getFullRefreshCount,
 		getQstFullPath, getCurLoc, getMainDesc, isMainDescChanged, getVarsDesc, isVarsDescChanged,
 		getExprValue, setInputStrText, getActionsCount, getActionData, executeSelActionCode, setSelActionIndex,
@@ -1607,7 +1598,7 @@ int main()
 		getSelObjectIndex, isObjectsChanged, showWindow, getVarValuesCount, getVarValues, getMaxVarsCount,
 		getVarNameByIndex, execString, execLocationCode, execCounter, execUserInput, getLastErrorData,
 		getErrorDesc, loadGameWorld, loadGameWorldFromData, saveGame, saveGameAsString, openSavedGame,
-		openSavedGameFromString, restartGame, selectMenuItem, setCallBack, init, deInit, pauseLibrary, returnValue);
+		openSavedGameFromString, restartGame, selectMenuItem, setCallBack, init, deInit, returnValue);
 
 	// Release
 	AS3_Release(enableDebugMode);
@@ -1656,7 +1647,6 @@ int main()
 	AS3_Release(setCallBack);
 	AS3_Release(init);
 	AS3_Release(deInit);
-	AS3_Release(pauseLibrary);
 	AS3_Release(returnValue);
 
 	AS3_LibInit(result);

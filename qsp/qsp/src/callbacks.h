@@ -56,7 +56,6 @@
 	QSP_CHAR *qspCallInputBox(QSP_CHAR *);
 
 	#ifdef _FLASH
-		void qspPauseLibrary();
 		void qspSetReturnValue(AS3_Val res);
 	#endif
 

@@ -739,16 +739,10 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 	return buffer;
 }
 
-void qspPauseLibrary()
-{
-	__asm__("grunner.suspend();");
-}
-
 void qspSetReturnValue(AS3_Val res)
 {
 	result = res;
 	AS3_Acquire(result);
-	__asm__("grunner.resume();");
 }
 
 #endif

@@ -228,7 +228,6 @@
 		QSP_EXTERN AS3_Val QSPSetCallBack(void *param, AS3_Val args);
 		QSP_EXTERN AS3_Val QSPInit(void *param, AS3_Val args);
 		QSP_EXTERN AS3_Val QSPDeInit(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPPauseLibrary(void *param, AS3_Val args);
 		QSP_EXTERN AS3_Val QSPReturnValue(void *param, AS3_Val args);
 
 	#endif
