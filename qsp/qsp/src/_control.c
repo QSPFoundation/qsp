@@ -1568,7 +1568,7 @@ int main()
 	AS3_Val openSavedGame = AS3_FunctionAsync(0, QSPOpenSavedGame);
 	AS3_Val openSavedGameFromString = AS3_FunctionAsync(0, QSPOpenSavedGameFromString);
 	AS3_Val restartGame = AS3_FunctionAsync(0, QSPRestartGame);
-	AS3_Val selectMenuItem = AS3_Function(0, QSPSelectMenuItem);
+	AS3_Val selectMenuItem = AS3_FunctionAsync(0, QSPSelectMenuItem);
 	AS3_Val setCallBack = AS3_Function(0, QSPSetCallBack);
 	AS3_Val init = AS3_Function(0, QSPInit);
 	AS3_Val deInit = AS3_Function(0, QSPDeInit);

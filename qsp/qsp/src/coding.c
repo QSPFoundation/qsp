@@ -590,9 +590,9 @@ static int qspUTF8_wctomb(unsigned char *r, wchar_t wc, int n)
 char *qspW2C(QSP_CHAR *src)
 {
 	int ret;
-	char *dst = (char *)malloc((QSP_STRLEN(src) * sizeof(QSP_CHAR)) + 1);
+	char *dst = (char *)malloc((QSP_STRLEN(src) * 3) + 1);
 	char *s = dst;
-	while ((ret = qspUTF8_wctomb(s, *src, sizeof(QSP_CHAR))) && *s)
+	while ((ret = qspUTF8_wctomb(s, *src, 3)) && *s)
 	{
 		++src;
 		s += ret;
@@ -607,7 +607,7 @@ QSP_CHAR *qspC2W(char *src)
 	wchar_t ch;
 	QSP_CHAR *dst = (QSP_CHAR *)malloc((strlen(src) + 1) * sizeof(QSP_CHAR));
 	QSP_CHAR *s = dst;
-	while ((ret = qspUTF8_mbtowc(&ch, src, sizeof(QSP_CHAR))) && ch)
+	while ((ret = qspUTF8_mbtowc(&ch, src, 3)) && ch)
 	{
 		*s++ = ch;
 		src += ret;
