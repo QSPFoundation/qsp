@@ -293,10 +293,14 @@ QSP_CHAR *qspCodeReCode(QSP_CHAR *str, QSP_BOOL isCode)
 
 char *qspFromQSPString(QSP_CHAR *s)
 {
-	long len = QSP_WCSTOMBSLEN(s) + 1;
-	char *ret = (char *)malloc(len);
-	QSP_WCSTOMBS(ret, s, len);
-	return ret;
+	#ifdef _FLASH
+		return qspW2C(s);
+	#else
+		long len = QSP_WCSTOMBSLEN(s) + 1;
+		char *ret = (char *)malloc(len);
+		QSP_WCSTOMBS(ret, s, len);
+		return ret;
+	#endif
 }
 
 static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
