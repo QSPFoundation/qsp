@@ -768,14 +768,19 @@ static QSP_BOOL qspStatementRefInt(QSPVariant *args, long count, QSP_CHAR **jump
 static QSP_BOOL qspStatementView(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSP_CHAR *file;
+	if (qspViewPath) free(qspViewPath);
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
-		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
+		qspViewPath = qspGetNewText(QSP_STR(args[0]), -1);
+		file = qspGetAbsFromRelPath(qspViewPath);
 		qspCallShowPicture(file);
 		free(file);
 	}
 	else
+	{
+		qspViewPath = 0;
 		qspCallShowPicture(0);
+	}
 	return QSP_FALSE;
 }
 

@@ -34,6 +34,7 @@ QSP_CHAR *qspCurVars = 0;
 long qspCurVarsLen = 0;
 QSP_CHAR *qspCurInput = 0;
 long qspCurInputLen = 0;
+QSP_CHAR *qspViewPath = 0;
 long qspTimerInterval = 0;
 QSP_BOOL qspIsMainDescChanged = QSP_FALSE;
 QSP_BOOL qspIsVarsDescChanged = QSP_FALSE;
@@ -69,6 +70,7 @@ void qspMemClear(QSP_BOOL isFirst)
 			if (qspCurVarsLen) qspIsVarsDescChanged = QSP_TRUE;
 		}
 		if (qspCurInput) free(qspCurInput);
+		if (qspViewPath) free(qspViewPath);
 	}
 	qspCurDesc = 0;
 	qspCurDescLen = 0;
@@ -76,6 +78,7 @@ void qspMemClear(QSP_BOOL isFirst)
 	qspCurVarsLen = 0;
 	qspCurInput = 0;
 	qspCurInputLen = 0;
+	qspViewPath = 0;
 }
 
 void qspSetSeed(unsigned int seed)

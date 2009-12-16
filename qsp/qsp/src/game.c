@@ -333,6 +333,7 @@ long qspSaveGameStatusToString(QSP_CHAR **buf)
 	len = qspCodeWriteIntVal(buf, len, qspGetTime(), QSP_TRUE);
 	len = qspCodeWriteIntVal(buf, len, qspCurSelAction, QSP_TRUE);
 	len = qspCodeWriteIntVal(buf, len, qspCurSelObject, QSP_TRUE);
+	len = qspCodeWriteVal(buf, len, qspViewPath, QSP_TRUE);
 	len = qspCodeWriteVal(buf, len, qspCurInput, QSP_TRUE);
 	len = qspCodeWriteVal(buf, len, qspCurDesc, QSP_TRUE);
 	len = qspCodeWriteVal(buf, len, qspCurVars, QSP_TRUE);
@@ -413,7 +414,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 {
 	long i, ind, count, lastInd, temp, selAction, selObject;
-	ind = 16;
+	ind = 17;
 	if (ind > strsCount) return QSP_FALSE;
 	if (QSP_STRCMP(strs[0], QSP_SAVEDGAMEID) ||
 		QSP_STRCMP(strs[1], QSP_GAMEMINVER) < 0 ||
@@ -422,9 +423,9 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 		qspReCodeGetIntVal(strs[2]) != qspQstCRC) return QSP_FALSE;
 	selAction = qspReCodeGetIntVal(strs[4]);
 	selObject = qspReCodeGetIntVal(strs[5]);
-	if (qspReCodeGetIntVal(strs[9]) < 0) return QSP_FALSE;
-	if (qspReCodeGetIntVal(strs[14]) < 0) return QSP_FALSE;
-	temp = qspReCodeGetIntVal(strs[15]);
+	if (qspReCodeGetIntVal(strs[10]) < 0) return QSP_FALSE;
+	if (qspReCodeGetIntVal(strs[15]) < 0) return QSP_FALSE;
+	temp = qspReCodeGetIntVal(strs[16]);
 	if (temp < 0 || temp > QSP_MAXPLFILES || (ind += temp) > strsCount) return QSP_FALSE;
 	if (ind + 1 > strsCount) return QSP_FALSE;
 	temp = qspReCodeGetIntVal(strs[ind++]);
@@ -467,7 +468,7 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 void qspOpenGameStatusFromString(QSP_CHAR *str)
 {
 	long i, j, ind, count, varInd, varsCount, valsCount;
-	QSP_CHAR **strs;
+	QSP_CHAR **strs, *file;
 	count = qspSplitStr(str, QSP_STRSDELIM, &strs);
 	if (!qspCheckGameStatus(strs, count))
 	{
@@ -481,17 +482,18 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 	qspResetTime(qspReCodeGetIntVal(strs[3]));
 	qspCurSelAction = qspReCodeGetIntVal(strs[4]);
 	qspCurSelObject = qspReCodeGetIntVal(strs[5]);
-	if (*strs[6]) qspCurInputLen = QSP_STRLEN(qspCurInput = qspCodeReCode(strs[6], QSP_FALSE));
-	if (*strs[7]) qspCurDescLen = QSP_STRLEN(qspCurDesc = qspCodeReCode(strs[7], QSP_FALSE));
-	if (*strs[8]) qspCurVarsLen = QSP_STRLEN(qspCurVars = qspCodeReCode(strs[8], QSP_FALSE));
-	qspCurLoc = qspReCodeGetIntVal(strs[9]);
-	qspCurIsShowActs = qspReCodeGetIntVal(strs[10]) != 0;
-	qspCurIsShowObjs = qspReCodeGetIntVal(strs[11]) != 0;
-	qspCurIsShowVars = qspReCodeGetIntVal(strs[12]) != 0;
-	qspCurIsShowInput = qspReCodeGetIntVal(strs[13]) != 0;
-	qspTimerInterval = qspReCodeGetIntVal(strs[14]);
-	qspPLFilesCount = qspReCodeGetIntVal(strs[15]);
-	ind = 16;
+	if (*strs[6]) qspViewPath = qspCodeReCode(strs[6], QSP_FALSE);
+	if (*strs[7]) qspCurInputLen = QSP_STRLEN(qspCurInput = qspCodeReCode(strs[7], QSP_FALSE));
+	if (*strs[8]) qspCurDescLen = QSP_STRLEN(qspCurDesc = qspCodeReCode(strs[8], QSP_FALSE));
+	if (*strs[9]) qspCurVarsLen = QSP_STRLEN(qspCurVars = qspCodeReCode(strs[9], QSP_FALSE));
+	qspCurLoc = qspReCodeGetIntVal(strs[10]);
+	qspCurIsShowActs = qspReCodeGetIntVal(strs[11]) != 0;
+	qspCurIsShowObjs = qspReCodeGetIntVal(strs[12]) != 0;
+	qspCurIsShowVars = qspReCodeGetIntVal(strs[13]) != 0;
+	qspCurIsShowInput = qspReCodeGetIntVal(strs[14]) != 0;
+	qspTimerInterval = qspReCodeGetIntVal(strs[15]);
+	qspPLFilesCount = qspReCodeGetIntVal(strs[16]);
+	ind = 17;
 	for (i = 0; i < qspPLFilesCount; ++i)
 		qspPLFiles[i] = qspCodeReCode(strs[ind++], QSP_FALSE);
 	qspCurIncFilesCount = qspReCodeGetIntVal(strs[ind++]);
@@ -566,7 +568,14 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 	qspCallShowWindow(QSP_WIN_VARS, qspCurIsShowVars);
 	qspCallShowWindow(QSP_WIN_INPUT, qspCurIsShowInput);
 	qspCallSetInputStrText(qspCurInput);
-	qspCallShowPicture(0);
+	if (qspViewPath)
+	{
+		file = qspGetAbsFromRelPath(qspViewPath);
+		qspCallShowPicture(file);
+		free(file);
+	}
+	else
+		qspCallShowPicture(0);
 	qspCallCloseFile(0);
 	qspPlayPLFiles();
 	qspCallSetTimer(qspTimerInterval);
