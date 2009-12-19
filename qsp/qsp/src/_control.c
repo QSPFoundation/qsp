@@ -1399,14 +1399,16 @@ AS3_Val QSPOpenSavedGame(void *param, AS3_Val args)
 AS3_Val QSPOpenSavedGameFromString(void *param, AS3_Val args)
 {
 	AS3_Val data;
-	long dataSize;
+	long dataSize, dataLen;
 	QSP_BOOL isRefresh;
 	QSP_CHAR *ptr;
 	AS3_ArrayValue(args, "AS3ValType, IntType, IntType", &data, &dataSize, &isRefresh);
 	qspWait(QSP_TRUE);
-	ptr = (QSP_CHAR *)malloc(dataSize);
+	dataLen = dataSize / sizeof(QSP_CHAR);
+	ptr = (QSP_CHAR *)malloc((dataLen + 1) * sizeof(QSP_CHAR));
 	AS3_ByteArray_seek(data, 0, SEEK_SET);
 	AS3_ByteArray_readBytes(ptr, data, dataSize);
+	ptr[dataLen] = 0;
 	qspPrepareExecution();
 	qspOpenGameStatusFromString(ptr);
 	free(ptr);
