@@ -310,12 +310,12 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	}
 	fseek(f, 0, SEEK_END);
 	fileSize = ftell(f);
-	buf = (char *)malloc(fileSize + 1);
+	buf = (char *)malloc(fileSize + 3);
 	fseek(f, 0, SEEK_SET);
 	fread(buf, 1, fileSize, f);
 	fclose(f);
-	buf[fileSize] = 0;
-	qspOpenQuestFromData(buf, fileSize + 1, fileName, isAddLocs);
+	buf[fileSize] = buf[fileSize + 1] = buf[fileSize + 2] = 0;
+	qspOpenQuestFromData(buf, fileSize + 3, fileName, isAddLocs);
 	free(buf);
 }
 

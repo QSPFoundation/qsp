@@ -1314,12 +1314,13 @@ AS3_Val QSPLoadGameWorldFromData(void *param, AS3_Val args)
 	QSP_CHAR *fileNameWC;
 	AS3_ArrayValue(args, "AS3ValType, IntType, StrType", &data, &dataSize, &fileName);
 	qspWait(QSP_TRUE);
-	ptr = (char *)malloc(dataSize);
+	ptr = (char *)malloc(dataSize + 3);
 	AS3_ByteArray_seek(data, 0, SEEK_SET);
 	AS3_ByteArray_readBytes(ptr, data, dataSize);
+	ptr[dataSize] = ptr[dataSize + 1] = ptr[dataSize + 2] = 0;
 	qspResetError();
 	fileNameWC = qspC2W(fileName);
-	qspOpenQuestFromData(ptr, dataSize, fileNameWC, QSP_FALSE);
+	qspOpenQuestFromData(ptr, dataSize + 3, fileNameWC, QSP_FALSE);
 	free(fileNameWC);
 	free(ptr);
 	if (qspErrorNum)
