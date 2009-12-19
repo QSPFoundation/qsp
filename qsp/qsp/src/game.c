@@ -585,7 +585,7 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 void qspOpenGameStatus(QSP_CHAR *fileName)
 {
 	FILE *f;
-	long fileSize;
+	long fileLen;
 	QSP_CHAR *buf;
 	if (!(f = QSP_FOPEN(fileName, QSP_FMT("rb"))))
 	{
@@ -593,17 +593,12 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 		return;
 	}
 	fseek(f, 0, SEEK_END);
-	if (!(fileSize = ftell(f) / sizeof(QSP_CHAR)))
-	{
-		qspSetError(QSP_ERR_CANTLOADFILE);
-		fclose(f);
-		return;
-	}
-	buf = (QSP_CHAR *)malloc((fileSize + 1) * sizeof(QSP_CHAR));
+	fileLen = ftell(f) / sizeof(QSP_CHAR);
+	buf = (QSP_CHAR *)malloc((fileLen + 1) * sizeof(QSP_CHAR));
 	fseek(f, 0, SEEK_SET);
-	fread(buf, sizeof(QSP_CHAR), fileSize, f);
+	fread(buf, sizeof(QSP_CHAR), fileLen, f);
 	fclose(f);
-	buf[fileSize] = 0;
+	buf[fileLen] = 0;
 	qspOpenGameStatusFromString(buf);
 	free(buf);
 }
