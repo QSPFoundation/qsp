@@ -227,7 +227,7 @@
 } while(0)
 
 /* sizeof(OnigCodePoint) */
-#define WORD_ALIGNMENT_SIZE     SIZEOF_LONG
+#define WORD_ALIGNMENT_SIZE     sizeof(long)
 
 #define GET_ALIGNMENT_PAD_SIZE(addr,pad_size) do {\
   (pad_size) = WORD_ALIGNMENT_SIZE \
@@ -277,7 +277,7 @@ typedef unsigned int  BitStatusType;
 } while (0)
 
 
-#define INT_MAX_LIMIT           ((1UL << (SIZEOF_INT * 8 - 1)) - 1)
+#define INT_MAX_LIMIT           ((1UL << (sizeof(int) * 8 - 1)) - 1)
 
 #define DIGITVAL(code)    ((code) - '0')
 #define ODIGITVAL(code)   DIGITVAL(code)
