@@ -19,7 +19,7 @@
 #include "coding.h"
 #include "text.h"
 
-void qspFreeVariants(QSPVariant *args, long count)
+void qspFreeVariants(QSPVariant *args, int count)
 {
 	while (--count >= 0)
 		if (args[count].IsStr) free(QSP_STR(args[count]));
@@ -37,7 +37,7 @@ QSPVariant qspGetEmptyVariant(QSP_BOOL isStringType)
 
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
 {
-	long num;
+	int num;
 	QSP_CHAR *temp, buf[12];
 	if (val->IsStr)
 	{

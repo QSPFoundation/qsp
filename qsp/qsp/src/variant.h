@@ -30,13 +30,13 @@
 		union
 		{
 			QSP_CHAR *Str;
-			long Num;
+			int Num;
 		} Val;
 		QSP_BOOL IsStr;
 	} QSPVariant;
 
 	/* External functions */
-	void qspFreeVariants(QSPVariant *, long);
+	void qspFreeVariants(QSPVariant *, int);
 	QSPVariant qspGetEmptyVariant(QSP_BOOL);
 	QSP_BOOL qspConvertVariantTo(QSPVariant *, QSP_BOOL);
 	void qspCopyVariant(QSPVariant *, QSPVariant *);

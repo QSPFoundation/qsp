@@ -29,10 +29,10 @@
 	#define QSP_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
 
 	/* External functions */
-	long qspAddText(QSP_CHAR **, QSP_CHAR *, long, long, QSP_BOOL);
-	QSP_CHAR *qspGetNewText(QSP_CHAR *, long);
-	QSP_CHAR *qspGetAddText(QSP_CHAR *, QSP_CHAR *, long, long);
-	QSP_BOOL qspClearText(void **, long *);
+	int qspAddText(QSP_CHAR **, QSP_CHAR *, int, int, QSP_BOOL);
+	QSP_CHAR *qspGetNewText(QSP_CHAR *, int);
+	QSP_CHAR *qspGetAddText(QSP_CHAR *, QSP_CHAR *, int, int);
+	QSP_BOOL qspClearText(void **, int *);
 	QSP_BOOL qspIsInList(QSP_CHAR *, QSP_CHAR);
 	QSP_BOOL qspIsInListEOL(QSP_CHAR *, QSP_CHAR);
 	QSP_BOOL qspIsDigit(QSP_CHAR);
@@ -42,21 +42,21 @@
 	QSP_BOOL qspIsAnyString(QSP_CHAR *);
 	void qspLowerStr(QSP_CHAR *);
 	void qspUpperStr(QSP_CHAR *);
-	int qspStrsNComp(QSP_CHAR *, QSP_CHAR *, long);
+	int qspStrsNComp(QSP_CHAR *, QSP_CHAR *, int);
 	int qspStrsComp(QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspStrCopy(QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspStrChar(QSP_CHAR *, QSP_CHAR);
-	QSP_CHAR *qspStrNCopy(QSP_CHAR *, QSP_CHAR *, long);
-	long qspStrLen(QSP_CHAR *);
+	QSP_CHAR *qspStrNCopy(QSP_CHAR *, QSP_CHAR *, int);
+	int qspStrLen(QSP_CHAR *);
 	QSP_CHAR *qspStrStr(QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspStrPBrk(QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspInStrRChars(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *);
-	QSP_CHAR *qspJoinStrs(QSP_CHAR **, long, QSP_CHAR *);
-	long qspSplitStr(QSP_CHAR *, QSP_CHAR *, QSP_CHAR ***);
-	void qspCopyStrs(QSP_CHAR ***, QSP_CHAR **, long, long);
-	void qspFreeStrs(void **, long);
-	long qspStrToNum(QSP_CHAR *, QSP_CHAR **);
-	QSP_CHAR *qspNumToStr(QSP_CHAR *, long);
+	QSP_CHAR *qspJoinStrs(QSP_CHAR **, int, QSP_CHAR *);
+	int qspSplitStr(QSP_CHAR *, QSP_CHAR *, QSP_CHAR ***);
+	void qspCopyStrs(QSP_CHAR ***, QSP_CHAR **, int, int);
+	void qspFreeStrs(void **, int);
+	int qspStrToNum(QSP_CHAR *, QSP_CHAR **);
+	QSP_CHAR *qspNumToStr(QSP_CHAR *, int);
 	QSP_CHAR *qspStrPos(QSP_CHAR *, QSP_CHAR *, QSP_BOOL);
 	QSP_CHAR *qspReplaceText(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspFormatText(QSP_CHAR *);

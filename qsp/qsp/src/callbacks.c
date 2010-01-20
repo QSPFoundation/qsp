@@ -60,13 +60,13 @@ static void qspRestoreCallState(QSPCallState *state)
 
 void qspInitCallBacks()
 {
-	long i;
+	int i;
 	qspIsInCallBack = QSP_FALSE;
 	for (i = 0; i < QSP_CALL_DUMMY; ++i)
 		qspCallBacks[i] = 0;
 }
 
-void qspSetCallBack(long type, QSP_CALLBACK func)
+void qspSetCallBack(int type, QSP_CALLBACK func)
 {
 	qspCallBacks[type] = func;
 }
@@ -83,7 +83,7 @@ void qspCallDebug(QSP_CHAR *str)
 	}
 }
 
-void qspCallSetTimer(long msecs)
+void qspCallSetTimer(int msecs)
 {
 	/* Здесь устанавливаем интервал таймера */
 	QSPCallState state;
@@ -206,7 +206,7 @@ void qspCallShowPicture(QSP_CHAR *file)
 	}
 }
 
-void qspCallShowWindow(long type, QSP_BOOL isShow)
+void qspCallShowWindow(int type, QSP_BOOL isShow)
 {
 	/* Здесь показываем или скрываем окно */
 	QSPCallState state;
@@ -218,7 +218,7 @@ void qspCallShowWindow(long type, QSP_BOOL isShow)
 	}
 }
 
-void qspCallPlayFile(QSP_CHAR *file, long volume)
+void qspCallPlayFile(QSP_CHAR *file, int volume)
 {
 	/* Здесь начинаем воспроизведение файла с заданной громкостью */
 	QSPCallState state;
@@ -245,7 +245,7 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 	return QSP_FALSE;
 }
 
-void qspCallSleep(long msecs)
+void qspCallSleep(int msecs)
 {
 	/* Здесь ожидаем заданное количество миллисекунд */
 	QSPCallState state;
@@ -257,11 +257,11 @@ void qspCallSleep(long msecs)
 	}
 }
 
-long qspCallGetMSCount()
+int qspCallGetMSCount()
 {
 	/* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
 	QSPCallState state;
-	long count;
+	int count;
 	if (qspCallBacks[QSP_CALL_GETMSCOUNT])
 	{
 		qspSaveCallState(&state);
@@ -301,7 +301,7 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 	/* Здесь вводим текст */
 	QSPCallState state;
 	QSP_CHAR *buffer;
-	long maxLen = 511;
+	int maxLen = 511;
 	if (qspCallBacks[QSP_CALL_INPUTBOX])
 	{
 		qspSaveCallState(&state);
@@ -320,13 +320,13 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 
 void qspInitCallBacks()
 {
-	long i;
+	int i;
 	qspIsInCallBack = QSP_FALSE;
 	for (i = 0; i < QSP_CALL_DUMMY; ++i)
 		qspCallBacks[i].IsSet = QSP_FALSE;
 }
 
-void qspSetCallBack(long type, QSP_CALLBACK func)
+void qspSetCallBack(int type, QSP_CALLBACK func)
 {
 	qspCallBacks[type] = func;
 	AS3_Acquire(qspCallBacks[type].ThisVal);
@@ -358,7 +358,7 @@ void qspCallDebug(QSP_CHAR *str)
 	}
 }
 
-void qspCallSetTimer(long msecs)
+void qspCallSetTimer(int msecs)
 {
 	/* Здесь устанавливаем интервал таймера */
 	QSPCallState state;
@@ -559,7 +559,7 @@ void qspCallShowPicture(QSP_CHAR *file)
 	}
 }
 
-void qspCallShowWindow(long type, QSP_BOOL isShow)
+void qspCallShowWindow(int type, QSP_BOOL isShow)
 {
 	/* Здесь показываем или скрываем окно */
 	QSPCallState state;
@@ -575,7 +575,7 @@ void qspCallShowWindow(long type, QSP_BOOL isShow)
 	}
 }
 
-void qspCallPlayFile(QSP_CHAR *file, long volume)
+void qspCallPlayFile(QSP_CHAR *file, int volume)
 {
 	/* Здесь начинаем воспроизведение файла с заданной громкостью */
 	QSPCallState state;
@@ -628,7 +628,7 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 	return QSP_FALSE;
 }
 
-void qspCallSleep(long msecs)
+void qspCallSleep(int msecs)
 {
 	/* Здесь ожидаем заданное количество миллисекунд */
 	QSPCallState state;
@@ -644,11 +644,11 @@ void qspCallSleep(long msecs)
 	}
 }
 
-long qspCallGetMSCount()
+int qspCallGetMSCount()
 {
 	/* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
 	QSPCallState state;
-	long count;
+	int count;
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_GETMSCOUNT].IsSet)
 	{
@@ -713,7 +713,7 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 	AS3_Val args;
 	char *strUTF8;
 	char *resText;
-	long maxLen = 511;
+	int maxLen = 511;
 	if (qspCallBacks[QSP_CALL_INPUTBOX].IsSet)
 	{
 		qspSaveCallState(&state);

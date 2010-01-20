@@ -281,10 +281,10 @@ void QSPFrame::EnableControls(bool status, bool isExtended)
 
 void QSPFrame::ShowPane(wxWindowID id, bool isShow)
 {
-	long i;
+	int i;
 	wxAuiPaneInfo &pane = m_manager->GetPane(FindWindow(id));
 	wxAuiPaneInfoArray& allPanes = m_manager->GetAllPanes();
-	for (i = (long)allPanes.GetCount() - 1; i >= 0; --i)
+	for (i = (int)allPanes.GetCount() - 1; i >= 0; --i)
 		if (allPanes.Item(i).IsMaximized())
 		{
 			if (&allPanes.Item(i) == &pane)
@@ -309,7 +309,7 @@ void QSPFrame::ShowPane(wxWindowID id, bool isShow)
 
 void QSPFrame::ApplyParams()
 {
-	long numVal;
+	int numVal;
 	QSP_CHAR *strVal;
 	wxColour setBackColor, setFontColor, setLinkColor;
 	wxString setFontName;
@@ -393,7 +393,7 @@ void QSPFrame::ShowError()
 	bool oldIsProcessEvents;
 	wxString wxMessage;
 	QSP_CHAR *loc;
-	long code, actIndex, line;
+	int code, actIndex, line;
 	if (m_isQuit) return;
 	QSPGetLastErrorData(&code, &loc, &actIndex, &line);
 	const QSP_CHAR *desc = QSPGetErrorDesc(code);
@@ -815,10 +815,10 @@ void QSPFrame::OnToggleInput(wxCommandEvent& event)
 
 void QSPFrame::OnToggleCaptions(wxCommandEvent& event)
 {
-	long i;
+	int i;
 	bool isShow = !m_manager->GetPane(m_objects).HasCaption();
 	wxAuiPaneInfoArray& allPanes = m_manager->GetAllPanes();
-	for (i = (long)allPanes.GetCount() - 1; i >= 0; --i)
+	for (i = (int)allPanes.GetCount() - 1; i >= 0; --i)
 		allPanes.Item(i).CaptionVisible(isShow);
 	m_manager->GetPane(m_desc).CaptionVisible(false);
 	m_manager->Update();

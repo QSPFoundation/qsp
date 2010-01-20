@@ -62,7 +62,7 @@
 		#else
 			#define QSP_STRCPY wcscpy
 			#define QSP_STRNCPY wcsncpy
-			#define QSP_STRLEN (long)wcslen
+			#define QSP_STRLEN (int)wcslen
 			#define QSP_STRSTR wcsstr
 			#define QSP_STRCHR wcschr
 			#define QSP_STRCMP wcscmp
@@ -71,7 +71,7 @@
 			#define QSP_CHRLWR towlower
 			#define QSP_CHRUPR towupper
 		#endif
-		#define QSP_WCSTOMBSLEN(a) (long)wcstombs(0, a, 0)
+		#define QSP_WCSTOMBSLEN(a) (int)wcstombs(0, a, 0)
 		#define QSP_WCSTOMBS wcstombs
 		#define QSP_MBTOSB(a) ((a) % 256)
 		#define QSP_ONIG_ENC (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE)
@@ -83,12 +83,12 @@
 		#define QSP_FOPEN fopen
 		#define QSP_STRCPY strcpy
 		#define QSP_STRNCPY strncpy
-		#define QSP_STRLEN (long)strlen
+		#define QSP_STRLEN (int)strlen
 		#define QSP_STRSTR strstr
 		#define QSP_STRCHR strchr
 		#define QSP_STRCMP strcmp
 		#define QSP_STRPBRK strpbrk
-		#define QSP_WCSTOMBSLEN (long)strlen
+		#define QSP_WCSTOMBSLEN (int)strlen
 		#define QSP_WCSTOMBS strncpy
 		#define QSP_MBTOSB(a) ((unsigned char)(a))
 		#if defined(_WIN) || defined(_PSP)

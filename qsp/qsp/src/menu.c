@@ -23,11 +23,11 @@
 #include "variables.h"
 
 QSP_CHAR *qspCurMenuLocs[QSP_MAXMENUITEMS];
-long qspCurMenuItems = 0;
+int qspCurMenuItems = 0;
 
 void qspClearMenu(QSP_BOOL isFirst)
 {
-	long i;
+	int i;
 	if (!isFirst)
 	{
 		for (i = 0; i < qspCurMenuItems; ++i)
@@ -36,9 +36,9 @@ void qspClearMenu(QSP_BOOL isFirst)
 	qspCurMenuItems = 0;
 }
 
-QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
-	long ind, maxItems, len;
+	int ind, maxItems, len;
 	QSPVar *var;
 	QSP_CHAR *imgPath, *str, *pos, *pos2;
 	if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0))) return QSP_FALSE;
@@ -77,7 +77,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 		}
 		if (pos = qspInStrRChars(str, QSP_MENUDELIM, pos2))
 		{
-			len = (long)(pos2 - pos) - 1;
+			len = (int)(pos2 - pos) - 1;
 			imgPath = (qspIsAnyString(++pos2) ? qspGetAbsFromRelPath(pos2) : 0);
 		}
 		else

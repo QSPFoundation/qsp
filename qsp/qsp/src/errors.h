@@ -20,16 +20,16 @@
 #ifndef QSP_ERRSDEFINES
 	#define QSP_ERRSDEFINES
 
-	extern long qspErrorNum;
-	extern long qspErrorLoc;
-	extern long qspErrorLine;
-	extern long qspErrorActIndex;
-	extern long qspRealCurLoc;
-	extern long qspRealLine;
-	extern long qspRealActIndex;
+	extern int qspErrorNum;
+	extern int qspErrorLoc;
+	extern int qspErrorLine;
+	extern int qspErrorActIndex;
+	extern int qspRealCurLoc;
+	extern int qspRealLine;
+	extern int qspRealActIndex;
 
 	/* External functions */
-	void qspSetError(long);
+	void qspSetError(int);
 	void qspResetError();
 
 #endif

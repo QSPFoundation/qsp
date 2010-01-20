@@ -28,7 +28,7 @@
 
 	typedef struct
 	{
-		long Num;
+		int Num;
 		QSP_CHAR *Str;
 	} QSPVarValue;
 
@@ -36,9 +36,9 @@
 	{
 		QSP_CHAR *Name;
 		QSPVarValue *Values;
-		long ValsCount;
+		int ValsCount;
 		QSP_CHAR **Indices;
-		long IndsCount;
+		int IndsCount;
 	} QSPVar;
 
 	extern QSPVar qspVars[QSP_VARSCOUNT];
@@ -50,17 +50,17 @@
 	QSPVar *qspVarReferenceWithType(QSP_CHAR *, QSP_BOOL, QSP_BOOL *);
 	void qspSetVarValueByName(QSP_CHAR *, QSPVariant *);
 	QSP_CHAR *qspGetVarStrValue(QSP_CHAR *);
-	long qspGetVarNumValue(QSP_CHAR *);
+	int qspGetVarNumValue(QSP_CHAR *);
 	QSPVariant qspGetVar(QSP_CHAR *);
-	long qspArraySize(QSP_CHAR *);
-	long qspArrayPos(QSPVariant *, long, QSP_BOOL);
+	int qspArraySize(QSP_CHAR *);
+	int qspArrayPos(QSPVariant *, int, QSP_BOOL);
 	QSPVariant qspArrayMinMaxItem(QSP_CHAR *, QSP_BOOL);
-	long qspGetVarsCount();
-	void qspSetArgs(QSPVar *, QSPVariant *, long);
+	int qspGetVarsCount();
+	void qspSetArgs(QSPVar *, QSPVariant *, int);
 	void qspMoveVar(QSPVar *, QSPVar *);
 	/* Statements */
 	void qspStatementSetVarValue(QSP_CHAR *);
-	QSP_BOOL qspStatementCopyArr(QSPVariant *, long, QSP_CHAR **, char);
-	QSP_BOOL qspStatementKillVar(QSPVariant *, long, QSP_CHAR **, char);
+	QSP_BOOL qspStatementCopyArr(QSPVariant *, int, QSP_CHAR **, char);
+	QSP_BOOL qspStatementKillVar(QSPVariant *, int, QSP_CHAR **, char);
 
 #endif

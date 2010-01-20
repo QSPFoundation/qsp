@@ -19,14 +19,14 @@
 
 static QSP_CHAR *qspStrEnd(QSP_CHAR *);
 
-long qspAddText(QSP_CHAR **dest, QSP_CHAR *val, long destLen, long valLen, QSP_BOOL isCreate)
+int qspAddText(QSP_CHAR **dest, QSP_CHAR *val, int destLen, int valLen, QSP_BOOL isCreate)
 {
-	long ret;
+	int ret;
 	QSP_CHAR *destPtr;
-	if (valLen < 0) valLen = (long)QSP_STRLEN(val);
+	if (valLen < 0) valLen = (int)QSP_STRLEN(val);
 	if (!isCreate && *dest)
 	{
-		if (destLen < 0) destLen = (long)QSP_STRLEN(*dest);
+		if (destLen < 0) destLen = (int)QSP_STRLEN(*dest);
 		ret = destLen + valLen;
 		destPtr = (QSP_CHAR *)realloc(*dest, (ret + 1) * sizeof(QSP_CHAR));
 		*dest = destPtr;
@@ -64,25 +64,25 @@ static QSP_CHAR *qspStrEnd(QSP_CHAR *s)
 
 QSP_CHAR *qspDelSpc(QSP_CHAR *s)
 {
-	long len;
+	int len;
 	QSP_CHAR *str, *begin = qspSkipSpaces(s), *end = qspStrEnd(begin);
 	while (begin < end && qspIsInList(QSP_SPACES, *(end - 1))) --end;
-	len = (long)(end - begin);
+	len = (int)(end - begin);
 	str = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
 	QSP_STRNCPY(str, begin, len);
 	str[len] = 0;
 	return str;
 }
 
-QSP_BOOL qspIsEqual(QSP_CHAR *str1, QSP_CHAR *str2, long maxLen)
+QSP_BOOL qspIsEqual(QSP_CHAR *str1, QSP_CHAR *str2, int maxLen)
 {
-	long delta = 0;
-	while (maxLen-- && !(delta = (long)(*str1 - *str2)) && *str2)
+	int delta = 0;
+	while (maxLen-- && !(delta = (int)(*str1 - *str2)) && *str2)
 		++str1, ++str2;
 	return (delta == 0);
 }
 
-void qspFreeStrs(void **strs, long count, QSP_BOOL isVerify)
+void qspFreeStrs(void **strs, int count, QSP_BOOL isVerify)
 {
 	if (strs)
 	{
@@ -97,7 +97,7 @@ void qspFreeStrs(void **strs, long count, QSP_BOOL isVerify)
 	}
 }
 
-QSP_CHAR *qspNumToStr(QSP_CHAR *buf, long val)
+QSP_CHAR *qspNumToStr(QSP_CHAR *buf, int val)
 {
 	QSP_CHAR temp, *str = buf, *first = str;
 	if (val < 0)

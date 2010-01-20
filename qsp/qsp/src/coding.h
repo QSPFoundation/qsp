@@ -34,10 +34,10 @@
 	QSP_CHAR *qspCodeReCode(QSP_CHAR *, QSP_BOOL);
 	char *qspFromQSPString(QSP_CHAR *);
 	QSP_CHAR *qspGameToQSPString(char *, QSP_BOOL, QSP_BOOL);
-	long qspSplitGameStr(char *, QSP_BOOL, QSP_CHAR *, char ***);
-	long qspReCodeGetIntVal(QSP_CHAR *);
-	long qspCodeWriteIntVal(QSP_CHAR **, long, long, QSP_BOOL);
-	long qspCodeWriteVal(QSP_CHAR **, long, QSP_CHAR *, QSP_BOOL);
+	int qspSplitGameStr(char *, QSP_BOOL, QSP_CHAR *, char ***);
+	int qspReCodeGetIntVal(QSP_CHAR *);
+	int qspCodeWriteIntVal(QSP_CHAR **, int, int, QSP_BOOL);
+	int qspCodeWriteVal(QSP_CHAR **, int, QSP_CHAR *, QSP_BOOL);
 
 	#ifdef _FLASH
 		char *qspW2C(QSP_CHAR *);

@@ -23,16 +23,16 @@
 #include "variables.h"
 
 QSPObj qspCurObjects[QSP_MAXOBJECTS];
-long qspCurObjectsCount = 0;
-long qspCurSelObject = -1;
+int qspCurObjectsCount = 0;
+int qspCurSelObject = -1;
 QSP_BOOL qspIsObjectsChanged = QSP_FALSE;
 QSP_BOOL qspCurIsShowObjs = QSP_TRUE;
 
-static void qspRemoveObject(long);
+static void qspRemoveObject(int);
 
 void qspClearObjects(QSP_BOOL isFirst)
 {
-	long i;
+	int i;
 	if (!isFirst && qspCurObjectsCount)
 	{
 		for (i = 0; i < qspCurObjectsCount; ++i)
@@ -50,7 +50,7 @@ void qspClearObjectsWithNotify()
 {
 	QSPVariant v;
 	QSP_CHAR **objs;
-	long i, oldRefreshCount, oldCount = qspCurObjectsCount;
+	int i, oldRefreshCount, oldCount = qspCurObjectsCount;
 	if (oldCount)
 	{
 		objs = (QSP_CHAR **)malloc(oldCount * sizeof(QSP_CHAR *));
@@ -69,7 +69,7 @@ void qspClearObjectsWithNotify()
 	}
 }
 
-static void qspRemoveObject(long index)
+static void qspRemoveObject(int index)
 {
 	QSPVariant name;
 	if (!(qspCurObjectsCount && index < qspCurObjectsCount)) return;
@@ -89,9 +89,9 @@ static void qspRemoveObject(long index)
 	free(QSP_STR(name));
 }
 
-long qspObjIndex(QSP_CHAR *name)
+int qspObjIndex(QSP_CHAR *name)
 {
-	long i, objNameLen, bufSize;
+	int i, objNameLen, bufSize;
 	QSP_CHAR *uName, *buf;
 	if (!qspCurObjectsCount) return -1;
 	qspUpperStr(uName = qspGetNewText(name, -1));
@@ -119,7 +119,7 @@ long qspObjIndex(QSP_CHAR *name)
 	return -1;
 }
 
-QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSPObj *obj;
 	QSP_CHAR *imgPath;
@@ -140,9 +140,9 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, long count, QSP_CHAR **jumpTo, 
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementDelObj(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
-	long objInd;
+	int objInd;
 	switch (extArg)
 	{
 	case 0:
@@ -159,7 +159,7 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, long count, QSP_CHAR **jumpTo, cha
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementUnSelect(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
 	qspCurSelObject = -1;
 	return QSP_FALSE;

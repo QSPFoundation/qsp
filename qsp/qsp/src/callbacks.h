@@ -34,9 +34,9 @@
 
 	/* External functions */
 	void qspInitCallBacks();
-	void qspSetCallBack(long, QSP_CALLBACK);
+	void qspSetCallBack(int, QSP_CALLBACK);
 	void qspCallDebug(QSP_CHAR *);
-	void qspCallSetTimer(long);
+	void qspCallSetTimer(int);
 	void qspCallRefreshInt(QSP_BOOL);
 	void qspCallSetInputStrText(QSP_CHAR *);
 	void qspCallAddMenuItem(QSP_CHAR *, QSP_CHAR *);
@@ -46,11 +46,11 @@
 	void qspCallShowMessage(QSP_CHAR *);
 	void qspCallShowMenu();
 	void qspCallShowPicture(QSP_CHAR *);
-	void qspCallShowWindow(long, QSP_BOOL);
-	void qspCallPlayFile(QSP_CHAR *, long);
+	void qspCallShowWindow(int, QSP_BOOL);
+	void qspCallPlayFile(QSP_CHAR *, int);
 	QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *);
-	void qspCallSleep(long);
-	long qspCallGetMSCount();
+	void qspCallSleep(int);
+	int qspCallGetMSCount();
 	void qspCallCloseFile(QSP_CHAR *);
 	void qspCallDeleteMenu();
 	QSP_CHAR *qspCallInputBox(QSP_CHAR *);

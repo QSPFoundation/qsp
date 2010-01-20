@@ -187,7 +187,7 @@
 		QSPListBox *m_actions;
 		QSPImgCanvas *m_imgView;
 		wxMenu *m_gameMenu;
-		long m_menuItemId;
+		int m_menuItemId;
 		wxMenu *m_menu;
 		wxMenu *m_fileMenu;
 		wxMenu *m_settingsMenu;

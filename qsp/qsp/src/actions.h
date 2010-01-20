@@ -28,26 +28,26 @@
 		QSP_CHAR *Image;
 		QSP_CHAR *Desc;
 		QSP_CHAR **OnPressLines;
-		long OnPressLinesCount;
-		long Location;
-		long ActIndex;
-		long StartLine;
+		int OnPressLinesCount;
+		int Location;
+		int ActIndex;
+		int StartLine;
 		QSP_BOOL IsManageLines;
 	} QSPCurAct;
 
 	extern QSPCurAct qspCurActions[QSP_MAXACTIONS];
-	extern long qspCurActionsCount;
-	extern long qspCurSelAction;
+	extern int qspCurActionsCount;
+	extern int qspCurSelAction;
 	extern QSP_BOOL qspIsActionsChanged;
 	extern QSP_BOOL qspCurIsShowActs;
 
 	/* External functions */
 	void qspClearActions(QSP_BOOL);
-	void qspAddAction(QSPVariant *, long, QSP_CHAR **, long, long, QSP_BOOL);
-	void qspExecAction(long);
+	void qspAddAction(QSPVariant *, int, QSP_CHAR **, int, int, QSP_BOOL);
+	void qspExecAction(int);
 	QSP_CHAR *qspGetAllActionsAsCode();
 	/* Statements */
 	void qspStatementAddAct(QSP_CHAR *);
-	QSP_BOOL qspStatementDelAct(QSPVariant *, long, QSP_CHAR **, char);
+	QSP_BOOL qspStatementDelAct(QSPVariant *, int, QSP_CHAR **, char);
 
 #endif

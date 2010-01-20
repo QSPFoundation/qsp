@@ -21,14 +21,14 @@
 #include "text.h"
 
 QSP_CHAR *qspPLFiles[QSP_MAXPLFILES];
-long qspPLFilesCount = 0;
+int qspPLFilesCount = 0;
 
-static void qspPlayFile(QSP_CHAR *, long, QSP_BOOL);
-static long qspSearchPlayList(QSP_CHAR *);
+static void qspPlayFile(QSP_CHAR *, int, QSP_BOOL);
+static int qspSearchPlayList(QSP_CHAR *);
 
 void qspClearPlayList(QSP_BOOL isFirst)
 {
-	long i;
+	int i;
 	if (!isFirst)
 	{
 		for (i = 0; i < qspPLFilesCount; ++i)
@@ -37,9 +37,9 @@ void qspClearPlayList(QSP_BOOL isFirst)
 	qspPLFilesCount = 0;
 }
 
-static void qspPlayFile(QSP_CHAR *s, long volume, QSP_BOOL isAddToPlayList)
+static void qspPlayFile(QSP_CHAR *s, int volume, QSP_BOOL isAddToPlayList)
 {
-	long len;
+	int len;
 	QSP_CHAR buf[4], *file;
 	if (qspIsAnyString(s))
 	{
@@ -68,10 +68,10 @@ static void qspPlayFile(QSP_CHAR *s, long volume, QSP_BOOL isAddToPlayList)
 	}
 }
 
-static long qspSearchPlayList(QSP_CHAR *file)
+static int qspSearchPlayList(QSP_CHAR *file)
 {
 	QSP_CHAR *uName, *buf;
-	long i, bufSize, itemLen, len;
+	int i, bufSize, itemLen, len;
 	if (!qspPLFilesCount) return -1;
 	len = QSP_STRLEN(file);
 	qspUpperStr(uName = qspGetNewText(file, len));
@@ -101,7 +101,7 @@ static long qspSearchPlayList(QSP_CHAR *file)
 
 void qspPlayPLFiles()
 {
-	long i;
+	int i;
 	QSP_CHAR *pos;
 	if (!qspPLFilesCount) return;
 	for (i = 0; i < qspPLFilesCount; ++i)
@@ -121,7 +121,7 @@ void qspPlayPLFiles()
 void qspRefreshPlayList()
 {
 	QSP_CHAR **s, *file, *str, *pos;
-	long count = qspPLFilesCount;
+	int count = qspPLFilesCount;
 	if (!count) return;
 	qspCopyStrs(&s, qspPLFiles, 0, count);
 	qspClearPlayList(QSP_FALSE);
@@ -145,16 +145,16 @@ void qspRefreshPlayList()
 	free(s);
 }
 
-QSP_BOOL qspStatementPlayFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementPlayFile(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
-	long volume = (count == 2 ? QSP_NUM(args[1]) : 100);
+	int volume = (count == 2 ? QSP_NUM(args[1]) : 100);
 	qspPlayFile(QSP_STR(args[0]), volume, QSP_TRUE);
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementCloseFile(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementCloseFile(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
-	long pos;
+	int pos;
 	QSP_CHAR *file;
 	if (!qspPLFilesCount) return QSP_FALSE;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))

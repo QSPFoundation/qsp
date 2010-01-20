@@ -64,7 +64,7 @@ void QSPCallBacks::DeInit()
 	FMOD_System_Release(m_sys);
 }
 
-bool QSPCallBacks::GetVarValue(const QSP_CHAR *name, long *num, QSP_CHAR **str)
+bool QSPCallBacks::GetVarValue(const QSP_CHAR *name, int *num, QSP_CHAR **str)
 {
 	if (QSPGetVarValuesCount(name, num) && *num)
 	{
@@ -74,7 +74,7 @@ bool QSPCallBacks::GetVarValue(const QSP_CHAR *name, long *num, QSP_CHAR **str)
 	return false;
 }
 
-void QSPCallBacks::SetTimer(long msecs)
+void QSPCallBacks::SetTimer(int msecs)
 {
 	if (m_frame->GetIsQuit()) return;
 	if (msecs)
@@ -85,8 +85,8 @@ void QSPCallBacks::SetTimer(long msecs)
 
 void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 {
-	static long oldFullRefreshCount = 0;
-	long i, numVal;
+	static int oldFullRefreshCount = 0;
+	int i, numVal;
 	bool isScroll, isCanSave;
 	QSP_CHAR *strVal, *imgPath;
 	if (m_frame->GetIsQuit()) return;
@@ -104,7 +104,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	if (QSPIsVarsDescChanged())
 		m_frame->GetVars()->SetText(wxString(varsDesc), isScroll);
 	// -------------------------------
-	long fullRefreshCount = QSPGetFullRefreshCount();
+	int fullRefreshCount = QSPGetFullRefreshCount();
 	if (oldFullRefreshCount != fullRefreshCount)
 	{
 		isScroll = false;
@@ -118,7 +118,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	m_frame->GetActions()->SetIsShowNums(m_frame->GetIsShowHotkeys());
 	if (QSPIsActionsChanged())
 	{
-		long actionsCount = QSPGetActionsCount();
+		int actionsCount = QSPGetActionsCount();
 		m_frame->GetActions()->BeginItems();
 		for (i = 0; i < actionsCount; ++i)
 		{
@@ -131,7 +131,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	m_frame->GetObjects()->SetIsHtml(m_isHtml);
 	if (QSPIsObjectsChanged())
 	{
-		long objectsCount = QSPGetObjectsCount();
+		int objectsCount = QSPGetObjectsCount();
 		m_frame->GetObjects()->BeginItems();
 		for (i = 0; i < objectsCount; ++i)
 		{
@@ -193,7 +193,7 @@ void QSPCallBacks::CloseFile(const QSP_CHAR *file)
 	}
 }
 
-void QSPCallBacks::PlayFile(const QSP_CHAR *file, long volume)
+void QSPCallBacks::PlayFile(const QSP_CHAR *file, int volume)
 {
 	FMOD_SOUND *newSound;
 	FMOD_CHANNEL *newChannel;
@@ -213,7 +213,7 @@ void QSPCallBacks::PlayFile(const QSP_CHAR *file, long volume)
 	}
 }
 
-void QSPCallBacks::ShowPane(long type, QSP_BOOL isShow)
+void QSPCallBacks::ShowPane(int type, QSP_BOOL isShow)
 {
 	if (m_frame->GetIsQuit()) return;
 	switch (type)
@@ -233,12 +233,12 @@ void QSPCallBacks::ShowPane(long type, QSP_BOOL isShow)
 	}
 }
 
-void QSPCallBacks::Sleep(long msecs)
+void QSPCallBacks::Sleep(int msecs)
 {
 	if (m_frame->GetIsQuit()) return;
 	bool isSave = m_frame->GetGameMenu()->IsEnabled(ID_SAVEGAMESTAT);
 	m_frame->EnableControls(false, true);
-	long i, count = msecs / 50;
+	int i, count = msecs / 50;
 	for (i = 0; i < count; ++i)
 	{
 		wxThread::Sleep(50);
@@ -254,10 +254,10 @@ void QSPCallBacks::Sleep(long msecs)
 	m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, isSave);
 }
 
-long QSPCallBacks::GetMSCount()
+int QSPCallBacks::GetMSCount()
 {
 	static wxStopWatch stopWatch;
-	long ret = stopWatch.Time();
+	int ret = stopWatch.Time();
 	stopWatch.Start();
 	return ret;
 }
@@ -297,7 +297,7 @@ void QSPCallBacks::ShowMenu()
 	m_frame->ShowMenu();
 }
 
-void QSPCallBacks::Input(const QSP_CHAR *text, QSP_CHAR *buffer, long maxLen)
+void QSPCallBacks::Input(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen)
 {
 	if (m_frame->GetIsQuit()) return;
 	RefreshInt(QSP_FALSE);
@@ -351,7 +351,7 @@ void QSPCallBacks::UpdateGamePath()
 	m_frame->GetVars()->SetGamePath(m_gamePath);
 }
 
-bool QSPCallBacks::SetVolume(const QSP_CHAR *file, long volume)
+bool QSPCallBacks::SetVolume(const QSP_CHAR *file, int volume)
 {
 	if (!IsPlay(file)) return false;
 	QSPSounds::iterator elem = m_sounds.find(wxFileName(file, wxPATH_DOS).GetFullPath().Upper());

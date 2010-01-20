@@ -48,7 +48,7 @@ void QSPInputBox::OnChar(wxKeyEvent& event)
 		event.Skip();
 		return;
 	}
-	long count = (long)m_strings.GetCount();
+	int count = (int)m_strings.GetCount();
 	wxString curText(GetValue());
 	m_selIndex = count;
 	if (!count || curText != m_strings.Last())
@@ -68,7 +68,7 @@ void QSPInputBox::OnKeyDown(wxKeyEvent& event)
 		event.Skip();
 		return;
 	}
-	long count = (long)m_strings.GetCount();
+	int count = (int)m_strings.GetCount();
 	wxString curText(GetValue());
 	switch (event.GetKeyCode())
 	{

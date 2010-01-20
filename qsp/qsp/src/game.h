@@ -28,24 +28,24 @@
 	#define QSP_DEFTIMERINTERVAL 500
 
 	extern QSP_CHAR *qspQstPath;
-	extern long qspQstPathLen;
+	extern int qspQstPathLen;
 	extern QSP_CHAR *qspQstFullPath;
-	extern long qspQstCRC;
-	extern long qspCurIncLocsCount;
+	extern int qspQstCRC;
+	extern int qspCurIncLocsCount;
 
 	/* External functions */
 	QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *);
 	void qspClearIncludes(QSP_BOOL);
 	void qspNewGame(QSP_BOOL);
-	void qspOpenQuestFromData(char *, long, QSP_CHAR *, QSP_BOOL);
+	void qspOpenQuestFromData(char *, int, QSP_CHAR *, QSP_BOOL);
 	void qspOpenQuest(QSP_CHAR *, QSP_BOOL);
-	long qspSaveGameStatusToString(QSP_CHAR **);
+	int qspSaveGameStatusToString(QSP_CHAR **);
 	void qspSaveGameStatus(QSP_CHAR *);
 	void qspOpenGameStatusFromString(QSP_CHAR *);
 	void qspOpenGameStatus(QSP_CHAR *);
 	/* Statements */
-	QSP_BOOL qspStatementOpenQst(QSPVariant *, long, QSP_CHAR **, char);
-	QSP_BOOL qspStatementOpenGame(QSPVariant *, long, QSP_CHAR **, char);
-	QSP_BOOL qspStatementSaveGame(QSPVariant *, long, QSP_CHAR **, char);
+	QSP_BOOL qspStatementOpenQst(QSPVariant *, int, QSP_CHAR **, char);
+	QSP_BOOL qspStatementOpenGame(QSPVariant *, int, QSP_CHAR **, char);
+	QSP_BOOL qspStatementSaveGame(QSPVariant *, int, QSP_CHAR **, char);
 
 #endif

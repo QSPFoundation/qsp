@@ -28,7 +28,7 @@
 	{
 		FMOD_CHANNEL *Channel;
 		FMOD_SOUND *Sound;
-		long Volume;
+		int Volume;
 
 		void Free() const
 		{
@@ -44,31 +44,31 @@
 		// Methods
 		static void Init(QSPFrame *frame);
 		static void DeInit();
-		static bool GetVarValue(const QSP_CHAR *name, long *num, QSP_CHAR **str);
+		static bool GetVarValue(const QSP_CHAR *name, int *num, QSP_CHAR **str);
 		static void SetOverallVolume(float coeff);
 
 		// CallBacks
 		static void RefreshInt(QSP_BOOL isRedraw);
-		static void SetTimer(long msecs);
+		static void SetTimer(int msecs);
 		static void SetInputStrText(const QSP_CHAR *text);
 		static QSP_BOOL IsPlay(const QSP_CHAR *file);
 		static void CloseFile(const QSP_CHAR *file);
-		static void PlayFile(const QSP_CHAR *file, long volume);
-		static void ShowPane(long type, QSP_BOOL isShow);
-		static void Sleep(long msecs);
-		static long GetMSCount();
+		static void PlayFile(const QSP_CHAR *file, int volume);
+		static void ShowPane(int type, QSP_BOOL isShow);
+		static void Sleep(int msecs);
+		static int GetMSCount();
 		static void Msg(const QSP_CHAR *str);
 		static void DeleteMenu();
 		static void AddMenuItem(const QSP_CHAR *name, const QSP_CHAR *imgPath);
 		static void ShowMenu();
-		static void Input(const QSP_CHAR *text, QSP_CHAR *buffer, long maxLen);
+		static void Input(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen);
 		static void ShowImage(const QSP_CHAR *file);
 		static void OpenGameStatus();
 		static void SaveGameStatus();
 	private:
 		// Internal methods
 		static void UpdateGamePath();
-		static bool SetVolume(const QSP_CHAR *file, long volume);
+		static bool SetVolume(const QSP_CHAR *file, int volume);
 		static void UpdateSounds();
 
 		// Fields

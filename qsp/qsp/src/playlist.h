@@ -25,14 +25,14 @@
 	#define QSP_MAXPLFILES 500
 
 	extern QSP_CHAR *qspPLFiles[QSP_MAXPLFILES];
-	extern long qspPLFilesCount;
+	extern int qspPLFilesCount;
 
 	/* External functions */
 	void qspClearPlayList(QSP_BOOL);
 	void qspPlayPLFiles();
 	void qspRefreshPlayList();
 	/* Statements */
-	QSP_BOOL qspStatementPlayFile(QSPVariant *, long, QSP_CHAR **, char);
-	QSP_BOOL qspStatementCloseFile(QSPVariant *, long, QSP_CHAR **, char);
+	QSP_BOOL qspStatementPlayFile(QSPVariant *, int, QSP_CHAR **, char);
+	QSP_BOOL qspStatementCloseFile(QSPVariant *, int, QSP_CHAR **, char);
 
 #endif

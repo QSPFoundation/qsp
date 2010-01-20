@@ -30,18 +30,18 @@
 	} QSPObj;
 
 	extern QSPObj qspCurObjects[QSP_MAXOBJECTS];
-	extern long qspCurObjectsCount;
-	extern long qspCurSelObject;
+	extern int qspCurObjectsCount;
+	extern int qspCurSelObject;
 	extern QSP_BOOL qspIsObjectsChanged;
 	extern QSP_BOOL qspCurIsShowObjs;
 
 	/* External functions */
 	void qspClearObjects(QSP_BOOL);
 	void qspClearObjectsWithNotify();
-	long qspObjIndex(QSP_CHAR *);
+	int qspObjIndex(QSP_CHAR *);
 	/* Statements */
-	QSP_BOOL qspStatementAddObject(QSPVariant *, long, QSP_CHAR **, char);
-	QSP_BOOL qspStatementDelObj(QSPVariant *, long, QSP_CHAR **, char);
-	QSP_BOOL qspStatementUnSelect(QSPVariant *, long, QSP_CHAR **, char);
+	QSP_BOOL qspStatementAddObject(QSPVariant *, int, QSP_CHAR **, char);
+	QSP_BOOL qspStatementDelObj(QSPVariant *, int, QSP_CHAR **, char);
+	QSP_BOOL qspStatementUnSelect(QSPVariant *, int, QSP_CHAR **, char);
 
 #endif

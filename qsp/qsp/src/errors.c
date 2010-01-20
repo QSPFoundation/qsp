@@ -17,15 +17,15 @@
 
 #include "errors.h"
 
-long qspErrorNum = 0;
-long qspErrorLoc = -1;
-long qspErrorLine = 0;
-long qspErrorActIndex = -1;
-long qspRealCurLoc = -1;
-long qspRealLine = 0;
-long qspRealActIndex = -1;
+int qspErrorNum = 0;
+int qspErrorLoc = -1;
+int qspErrorLine = 0;
+int qspErrorActIndex = -1;
+int qspRealCurLoc = -1;
+int qspRealLine = 0;
+int qspRealActIndex = -1;
 
-void qspSetError(long num)
+void qspSetError(int num)
 {
 	if (!qspErrorNum)
 	{

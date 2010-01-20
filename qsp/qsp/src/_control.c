@@ -55,7 +55,7 @@ void QSPEnableDebugMode(QSP_BOOL isDebug)
 	qspIsMustWait = QSP_FALSE;
 }
 /* Получение данных текущего состояния */
-void QSPGetCurStateData(QSP_CHAR **loc, long *actIndex, long *line)
+void QSPGetCurStateData(QSP_CHAR **loc, int *actIndex, int *line)
 {
 	qspWait(QSP_TRUE);
 	*loc = (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount ? qspLocs[qspRealCurLoc].Name : 0);
@@ -78,7 +78,7 @@ const QSP_CHAR *QSPGetCompiledDateTime()
 }
 /* ------------------------------------------------------------ */
 /* Количество полных обновлений локаций */
-long QSPGetFullRefreshCount()
+int QSPGetFullRefreshCount()
 {
 	qspWait(QSP_FALSE);
 	return qspFullRefreshCount;
@@ -132,7 +132,7 @@ QSP_BOOL QSPIsVarsDescChanged()
 }
 /* ------------------------------------------------------------ */
 /* Получить значение указанного выражения */
-QSP_BOOL QSPGetExprValue(const QSP_CHAR *expr, QSP_BOOL *isString, long *numVal, QSP_CHAR *strVal, long strValBufSize)
+QSP_BOOL QSPGetExprValue(const QSP_CHAR *expr, QSP_BOOL *isString, int *numVal, QSP_CHAR *strVal, int strValBufSize)
 {
 	QSPVariant v;
 	qspWait(QSP_TRUE);
@@ -167,13 +167,13 @@ void QSPSetInputStrText(const QSP_CHAR *val)
 /* Список действий */
 
 /* Количество действий */
-long QSPGetActionsCount()
+int QSPGetActionsCount()
 {
 	qspWait(QSP_FALSE);
 	return qspCurActionsCount;
 }
 /* Данные действия с указанным индексом */
-void QSPGetActionData(long ind, QSP_CHAR **image, QSP_CHAR **desc)
+void QSPGetActionData(int ind, QSP_CHAR **image, QSP_CHAR **desc)
 {
 	qspWait(QSP_TRUE);
 	if (ind >= 0 && ind < qspCurActionsCount)
@@ -206,7 +206,7 @@ QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh)
 	return QSP_TRUE;
 }
 /* Установить индекс выбранного действия */
-QSP_BOOL QSPSetSelActionIndex(long ind, QSP_BOOL isRefresh)
+QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
@@ -227,7 +227,7 @@ QSP_BOOL QSPSetSelActionIndex(long ind, QSP_BOOL isRefresh)
 	return QSP_TRUE;
 }
 /* Получить индекс выбранного действия */
-long QSPGetSelActionIndex()
+int QSPGetSelActionIndex()
 {
 	qspWait(QSP_FALSE);
 	return qspCurSelAction;
@@ -242,13 +242,13 @@ QSP_BOOL QSPIsActionsChanged()
 /* Список объектов */
 
 /* Количество объектов */
-long QSPGetObjectsCount()
+int QSPGetObjectsCount()
 {
 	qspWait(QSP_FALSE);
 	return qspCurObjectsCount;
 }
 /* Данные объекта с указанным индексом */
-void QSPGetObjectData(long ind, QSP_CHAR **image, QSP_CHAR **desc)
+void QSPGetObjectData(int ind, QSP_CHAR **image, QSP_CHAR **desc)
 {
 	qspWait(QSP_TRUE);
 	if (ind >= 0 && ind < qspCurObjectsCount)
@@ -261,7 +261,7 @@ void QSPGetObjectData(long ind, QSP_CHAR **image, QSP_CHAR **desc)
 	qspIsMustWait = QSP_FALSE;
 }
 /* Установить индекс выбранного объекта */
-QSP_BOOL QSPSetSelObjectIndex(long ind, QSP_BOOL isRefresh)
+QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
@@ -282,7 +282,7 @@ QSP_BOOL QSPSetSelObjectIndex(long ind, QSP_BOOL isRefresh)
 	return QSP_TRUE;
 }
 /* Получить индекс выбранного объекта */
-long QSPGetSelObjectIndex()
+int QSPGetSelObjectIndex()
 {
 	qspWait(QSP_FALSE);
 	return qspCurSelObject;
@@ -295,7 +295,7 @@ QSP_BOOL QSPIsObjectsChanged()
 }
 /* ------------------------------------------------------------ */
 /* Показ / скрытие окон */
-void QSPShowWindow(long type, QSP_BOOL isShow)
+void QSPShowWindow(int type, QSP_BOOL isShow)
 {
 	qspWait(QSP_TRUE);
 	switch (type)
@@ -319,7 +319,7 @@ void QSPShowWindow(long type, QSP_BOOL isShow)
 /* Переменные */
 
 /* Получить количество элементов массива */
-QSP_BOOL QSPGetVarValuesCount(const QSP_CHAR *name, long *count)
+QSP_BOOL QSPGetVarValuesCount(const QSP_CHAR *name, int *count)
 {
 	QSPVar *var;
 	qspWait(QSP_TRUE);
@@ -335,7 +335,7 @@ QSP_BOOL QSPGetVarValuesCount(const QSP_CHAR *name, long *count)
 	return QSP_TRUE;
 }
 /* Получить значения указанного элемента массива */
-QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, long ind, long *numVal, QSP_CHAR **strVal)
+QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, int ind, int *numVal, QSP_CHAR **strVal)
 {
 	QSPVar *var;
 	qspWait(QSP_TRUE);
@@ -352,12 +352,12 @@ QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, long ind, long *numVal, QSP_CHAR 
 	return QSP_TRUE;
 }
 /* Получить максимальное количество переменных */
-long QSPGetMaxVarsCount()
+int QSPGetMaxVarsCount()
 {
 	return QSP_VARSCOUNT;
 }
 /* Получить имя переменной с указанным индексом */
-QSP_BOOL QSPGetVarNameByIndex(long index, QSP_CHAR **name)
+QSP_BOOL QSPGetVarNameByIndex(int index, QSP_CHAR **name)
 {
 	qspWait(QSP_TRUE);
 	if (index < 0 || index >= QSP_VARSCOUNT || !qspVars[index].Name)
@@ -439,7 +439,7 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh)
 /* Ошибки */
 
 /* Получить информацию о последней ошибке */
-void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorActIndex, long *errorLine)
+void QSPGetLastErrorData(int *errorNum, QSP_CHAR **errorLoc, int *errorActIndex, int *errorLine)
 {
 	qspWait(QSP_TRUE);
 	*errorNum = qspErrorNum;
@@ -449,7 +449,7 @@ void QSPGetLastErrorData(long *errorNum, QSP_CHAR **errorLoc, long *errorActInde
 	qspIsMustWait = QSP_FALSE;
 }
 /* Получить описание ошибки по ее номеру */
-const QSP_CHAR *QSPGetErrorDesc(long errorNum)
+const QSP_CHAR *QSPGetErrorDesc(int errorNum)
 {
 	QSP_CHAR *str;
 	switch (errorNum)
@@ -501,7 +501,7 @@ QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *fileName)
 	return QSP_TRUE;
 }
 /* Загрузка новой игры из памяти */
-QSP_BOOL QSPLoadGameWorldFromData(const char *data, long dataSize, const QSP_CHAR *fileName)
+QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR *fileName)
 {
 	qspWait(QSP_TRUE);
 	qspResetError();
@@ -530,9 +530,9 @@ QSP_BOOL QSPSaveGame(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 	return QSP_TRUE;
 }
 /* Сохранение состояния в память */
-QSP_BOOL QSPSaveGameAsString(QSP_CHAR *strBuf, long strBufSize, long *realSize, QSP_BOOL isRefresh)
+QSP_BOOL QSPSaveGameAsString(QSP_CHAR *strBuf, int strBufSize, int *realSize, QSP_BOOL isRefresh)
 {
-	long len, size;
+	int len, size;
 	QSP_CHAR *data;
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
@@ -605,7 +605,7 @@ QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh)
 /* ------------------------------------------------------------ */
 /* Меню */
 /* Ф-я предназначена только для вызова из CallBack'а QSP_CALL_SHOWMENU */
-void QSPSelectMenuItem(long index)
+void QSPSelectMenuItem(int index)
 {
 	QSPVariant arg;
 	if (index >= 0 && index < qspCurMenuItems)
@@ -617,7 +617,7 @@ void QSPSelectMenuItem(long index)
 }
 /* ------------------------------------------------------------ */
 /* Установка CALLBACK'ов */
-void QSPSetCallBack(long type, QSP_CALLBACK func)
+void QSPSetCallBack(int type, QSP_CALLBACK func)
 {
 	qspWait(QSP_TRUE);
 	qspSetCallBack(type, func);
@@ -877,7 +877,7 @@ AS3_Val QSPGetActionsCount(void *param, AS3_Val args)
 /* Данные действия с указанным индексом */
 AS3_Val QSPGetActionData(void *param, AS3_Val args)
 {
-	long ind;
+	int ind;
 	char *imageUTF8;
 	char *descUTF8;
 	AS3_Val res;
@@ -921,7 +921,7 @@ AS3_Val QSPExecuteSelActionCode(void *param, AS3_Val args)
 /* Установить индекс выбранного действия */
 AS3_Val QSPSetSelActionIndex(void *param, AS3_Val args)
 {
-	long ind;
+	int ind;
 	QSP_BOOL isRefresh;
 	AS3_ArrayValue(args, "IntType, IntType", &ind, &isRefresh);
 	qspWait(QSP_TRUE);
@@ -969,7 +969,7 @@ AS3_Val QSPGetObjectsCount(void *param, AS3_Val args)
 /* Данные объекта с указанным индексом */
 AS3_Val QSPGetObjectData(void *param, AS3_Val args)
 {
-	long ind;
+	int ind;
 	char *imageUTF8;
 	char *descUTF8;
 	AS3_Val res;
@@ -991,7 +991,7 @@ AS3_Val QSPGetObjectData(void *param, AS3_Val args)
 /* Установить индекс выбранного объекта */
 AS3_Val QSPSetSelObjectIndex(void *param, AS3_Val args)
 {
-	long ind;
+	int ind;
 	QSP_BOOL isRefresh;
 	AS3_ArrayValue(args, "IntType, IntType", &ind, &isRefresh);
 	qspWait(QSP_TRUE);
@@ -1031,7 +1031,7 @@ AS3_Val QSPIsObjectsChanged(void *param, AS3_Val args)
 /* Показ / скрытие окон */
 AS3_Val QSPShowWindow(void *param, AS3_Val args)
 {
-	long type;
+	int type;
 	QSP_BOOL isShow;
 	AS3_ArrayValue(args, "IntType, IntType", &type, &isShow);
 	qspWait(QSP_TRUE);
@@ -1061,7 +1061,7 @@ AS3_Val QSPGetVarValuesCount(void *param, AS3_Val args)
 {
 	char *name;
 	QSP_CHAR *nameWC;
-	long count;
+	int count;
 	QSPVar *var;
 	AS3_ArrayValue(args, "StrType", &name);
 	qspWait(QSP_TRUE);
@@ -1082,7 +1082,7 @@ AS3_Val QSPGetVarValuesCount(void *param, AS3_Val args)
 AS3_Val QSPGetVarValues(void *param, AS3_Val args)
 {
 	char *name;
-	long ind;
+	int ind;
 	QSP_CHAR *nameWC;
 	char *strUTF8;
 	QSPVar *var;
@@ -1117,7 +1117,7 @@ AS3_Val QSPGetMaxVarsCount(void *param, AS3_Val args)
 /* Получить имя переменной с указанным индексом */
 AS3_Val QSPGetVarNameByIndex(void *param, AS3_Val args)
 {
-	long index;
+	int index;
 	QSP_CHAR *name;
 	char *nameUTF8;
 	AS3_Val res;
@@ -1243,7 +1243,7 @@ AS3_Val QSPGetLastErrorData(void *param, AS3_Val args)
 /* Получить описание ошибки по ее номеру */
 AS3_Val QSPGetErrorDesc(void *param, AS3_Val args)
 {
-	long errorNum;
+	int errorNum;
 	QSP_CHAR *str;
 	char *strUTF8;
 	AS3_Val res;
@@ -1309,7 +1309,7 @@ AS3_Val QSPLoadGameWorldFromData(void *param, AS3_Val args)
 {
 	char *ptr;
 	AS3_Val data;
-	long dataSize;
+	int dataSize;
 	char *fileName;
 	QSP_CHAR *fileNameWC;
 	AS3_ArrayValue(args, "AS3ValType, IntType, StrType", &data, &dataSize, &fileName);
@@ -1355,7 +1355,7 @@ AS3_Val QSPSaveGame(void *param, AS3_Val args)
 /* Сохранение состояния в память */
 AS3_Val QSPSaveGameAsString(void *param, AS3_Val args)
 {
-	long len;
+	int len;
 	QSP_BOOL isRefresh;
 	AS3_Val data;
 	QSP_CHAR *buf;
@@ -1399,7 +1399,7 @@ AS3_Val QSPOpenSavedGame(void *param, AS3_Val args)
 AS3_Val QSPOpenSavedGameFromString(void *param, AS3_Val args)
 {
 	AS3_Val data;
-	long dataSize, dataLen;
+	int dataSize, dataLen;
 	QSP_BOOL isRefresh;
 	QSP_CHAR *ptr;
 	AS3_ArrayValue(args, "AS3ValType, IntType, IntType", &data, &dataSize, &isRefresh);
@@ -1443,7 +1443,7 @@ AS3_Val QSPRestartGame(void *param, AS3_Val args)
 /* Ф-я предназначена только для вызова из CallBack'а QSP_CALL_SHOWMENU */
 AS3_Val QSPSelectMenuItem(void *param, AS3_Val args)
 {
-	long index;
+	int index;
 	QSPVariant arg;
 	AS3_ArrayValue(args, "IntType", &index);
 	if (index >= 0 && index < qspCurMenuItems)
@@ -1458,7 +1458,7 @@ AS3_Val QSPSelectMenuItem(void *param, AS3_Val args)
 /* Установка CALLBACK'ов */
 AS3_Val QSPSetCallBack(void *param, AS3_Val args)
 {
-	long type;
+	int type;
 	AS3_Val thisVal;
 	AS3_Val funcVal;
 	QSP_CALLBACK callBack;

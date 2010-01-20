@@ -25,10 +25,10 @@
 
 QSPLocation *qspLocs = 0;
 QSPLocName *qspLocsNames = 0;
-long qspLocsCount = 0;
-long qspCurLoc = -1;
-long qspRefreshCount = 0;
-long qspFullRefreshCount = 0;
+int qspLocsCount = 0;
+int qspCurLoc = -1;
+int qspRefreshCount = 0;
+int qspFullRefreshCount = 0;
 
 static int qspLocsCompare(const void *, const void *);
 static int qspLocStringCompare(const void *, const void *);
@@ -43,9 +43,9 @@ static int qspLocStringCompare(const void *name, const void *compareTo)
 	return QSP_STRCMP((QSP_CHAR *)name, ((QSPLocName *)compareTo)->Name);
 }
 
-void qspCreateWorld(long start, long locsCount)
+void qspCreateWorld(int start, int locsCount)
 {
-	long i, j;
+	int i, j;
 	for (i = start; i < qspLocsCount; ++i)
 	{
 		free(qspLocsNames[i].Name);
@@ -76,7 +76,7 @@ void qspCreateWorld(long start, long locsCount)
 
 void qspPrepareLocs()
 {
-	long i;
+	int i;
 	for (i = 0; i < qspLocsCount; ++i)
 	{
 		if (qspLocsNames[i].Name) free(qspLocsNames[i].Name);
@@ -86,7 +86,7 @@ void qspPrepareLocs()
 	qsort(qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocsCompare);
 }
 
-long qspLocIndex(QSP_CHAR *name)
+int qspLocIndex(QSP_CHAR *name)
 {
 	QSPLocName *loc;
 	QSP_CHAR *uName;
@@ -104,11 +104,11 @@ long qspLocIndex(QSP_CHAR *name)
 	return -1;
 }
 
-void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
+void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 {
 	QSPVariant args[2];
 	QSP_CHAR *str, **code;
-	long i, count, oldLoc, oldActIndex, oldLine;
+	int i, count, oldLoc, oldActIndex, oldLine;
 	QSPLocation *loc = qspLocs + locInd;
 	oldLoc = qspRealCurLoc;
 	oldActIndex = qspRealActIndex;
@@ -188,7 +188,7 @@ void qspExecLocByIndex(long locInd, QSP_BOOL isChangeDesc)
 
 void qspExecLocByName(QSP_CHAR *name, QSP_BOOL isChangeDesc)
 {
-	long locInd = qspLocIndex(name);
+	int locInd = qspLocIndex(name);
 	if (locInd < 0)
 	{
 		qspSetError(QSP_ERR_LOCNOTFOUND);
@@ -203,10 +203,10 @@ void qspExecLocByVarName(QSP_CHAR *name)
 	if (qspIsAnyString(locName)) qspExecLocByName(locName, QSP_FALSE);
 }
 
-void qspExecLocByNameWithArgs(QSP_CHAR *name, QSPVariant *args, long count)
+void qspExecLocByNameWithArgs(QSP_CHAR *name, QSPVariant *args, int count)
 {
 	QSPVar local, *var;
-	long oldRefreshCount;
+	int oldRefreshCount;
 	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return;
 	qspMoveVar(&local, var);
 	qspSetArgs(var, args, count);
@@ -226,7 +226,7 @@ void qspExecLocByNameWithArgs(QSP_CHAR *name, QSPVariant *args, long count)
 	qspMoveVar(var, &local);
 }
 
-void qspExecLocByVarNameWithArgs(QSP_CHAR *name, QSPVariant *args, long count)
+void qspExecLocByVarNameWithArgs(QSP_CHAR *name, QSPVariant *args, int count)
 {
 	QSP_CHAR *locName = qspGetVarStrValue(name);
 	if (qspIsAnyString(locName)) qspExecLocByNameWithArgs(locName, args, count);
@@ -234,7 +234,7 @@ void qspExecLocByVarNameWithArgs(QSP_CHAR *name, QSPVariant *args, long count)
 
 void qspRefreshCurLoc(QSP_BOOL isChangeDesc)
 {
-	long oldRefreshCount;
+	int oldRefreshCount;
 	qspClearActions(QSP_FALSE);
 	++qspRefreshCount;
 	if (isChangeDesc) ++qspFullRefreshCount;

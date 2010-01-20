@@ -31,8 +31,8 @@
 	QSP_CHAR *qspToQSPString(char *);
 	char *qspQSPToGameString(QSP_CHAR *, QSP_BOOL, QSP_BOOL);
 	QSP_CHAR *qspGameToQSPString(char *, QSP_BOOL, QSP_BOOL);
-	long qspSplitGameStr(char *, QSP_BOOL, QSP_CHAR *, char ***);
-	long qspGameCodeWriteIntVal(char **, long, long, QSP_BOOL, QSP_BOOL);
-	long qspGameCodeWriteVal(char **, long, QSP_CHAR *, QSP_BOOL, QSP_BOOL);
+	int qspSplitGameStr(char *, QSP_BOOL, QSP_CHAR *, char ***);
+	int qspGameCodeWriteIntVal(char **, int, int, QSP_BOOL, QSP_BOOL);
+	int qspGameCodeWriteVal(char **, int, QSP_CHAR *, QSP_BOOL, QSP_BOOL);
 
 #endif

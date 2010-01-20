@@ -27,38 +27,38 @@
 		QSP_CHAR *Image;
 		QSP_CHAR *Desc;
 		QSP_CHAR **OnPressLines;
-		long OnPressLinesCount;
+		int OnPressLinesCount;
 	} QSPLocAct;
 	typedef struct
 	{
 		QSP_CHAR *Name;
 		QSP_CHAR *Desc;
 		QSP_CHAR **OnVisitLines;
-		long OnVisitLinesCount;
+		int OnVisitLinesCount;
 		QSPLocAct Actions[QSP_MAXACTIONS];
 	} QSPLocation;
 	typedef struct
 	{
-		long Index;
+		int Index;
 		QSP_CHAR *Name;
 	} QSPLocName;
 
 	extern QSPLocation *qspLocs;
 	extern QSPLocName *qspLocsNames;
-	extern long qspLocsCount;
-	extern long qspCurLoc;
-	extern long qspRefreshCount;
-	extern long qspFullRefreshCount;
+	extern int qspLocsCount;
+	extern int qspCurLoc;
+	extern int qspRefreshCount;
+	extern int qspFullRefreshCount;
 
 	/* External functions */
-	void qspCreateWorld(long, long);
+	void qspCreateWorld(int, int);
 	void qspPrepareLocs();
-	long qspLocIndex(QSP_CHAR *);
-	void qspExecLocByIndex(long, QSP_BOOL);
+	int qspLocIndex(QSP_CHAR *);
+	void qspExecLocByIndex(int, QSP_BOOL);
 	void qspExecLocByName(QSP_CHAR *, QSP_BOOL);
 	void qspExecLocByVarName(QSP_CHAR *);
-	void qspExecLocByNameWithArgs(QSP_CHAR *, QSPVariant *, long);
-	void qspExecLocByVarNameWithArgs(QSP_CHAR *, QSPVariant *, long);
+	void qspExecLocByNameWithArgs(QSP_CHAR *, QSPVariant *, int);
+	void qspExecLocByVarNameWithArgs(QSP_CHAR *, QSPVariant *, int);
 	void qspRefreshCurLoc(QSP_BOOL);
 
 #endif

@@ -28,7 +28,7 @@ QSPTranslationHelper::~QSPTranslationHelper()
 
 void QSPTranslationHelper::Load(wxConfigBase &config, const wxString &key)
 {
-	long lang;
+	int lang;
 	config.Read(key, &lang, wxLANGUAGE_DEFAULT);
 	if (m_locale) delete m_locale;
 	m_locale = new wxLocale;

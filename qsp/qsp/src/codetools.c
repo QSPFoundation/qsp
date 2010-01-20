@@ -18,13 +18,13 @@
 #include "codetools.h"
 #include "text.h"
 
-static long qspProcessPreformattedStrings(QSP_CHAR *, QSP_CHAR ***);
-static long qspProcessEOLExtensions(QSP_CHAR **, long, QSP_CHAR ***);
+static int qspProcessPreformattedStrings(QSP_CHAR *, QSP_CHAR ***);
+static int qspProcessEOLExtensions(QSP_CHAR **, int, QSP_CHAR ***);
 
-static long qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
+static int qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 {
 	QSP_CHAR **ret, *str, quot = 0;
-	long count = 0, strLen = 0, bufSize = 8, strBufSize = 256;
+	int count = 0, strLen = 0, bufSize = 8, strBufSize = 256;
 	str = (QSP_CHAR *)malloc(strBufSize * sizeof(QSP_CHAR));
 	ret = (QSP_CHAR **)malloc(bufSize * sizeof(QSP_CHAR *));
 	while (*data)
@@ -80,10 +80,10 @@ static long qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 	return count;
 }
 
-static long qspProcessEOLExtensions(QSP_CHAR **s, long count, QSP_CHAR ***strs)
+static int qspProcessEOLExtensions(QSP_CHAR **s, int count, QSP_CHAR ***strs)
 {
 	QSP_CHAR **ret, *str;
-	long len, i = 0, bufSize = 8, newCount = 0;
+	int len, i = 0, bufSize = 8, newCount = 0;
 	ret = (QSP_CHAR **)malloc(bufSize * sizeof(QSP_CHAR *));
 	while (i < count)
 	{
@@ -108,10 +108,10 @@ static long qspProcessEOLExtensions(QSP_CHAR **s, long count, QSP_CHAR ***strs)
 	return newCount;
 }
 
-long qspPreprocessData(QSP_CHAR *data, QSP_CHAR ***strs)
+int qspPreprocessData(QSP_CHAR *data, QSP_CHAR ***strs)
 {
 	QSP_CHAR **s;
-	long res, count = qspProcessPreformattedStrings(data, &s);
+	int res, count = qspProcessPreformattedStrings(data, &s);
 	res = qspProcessEOLExtensions(s, count, strs);
 	qspFreeStrs(s, count);
 	return res;

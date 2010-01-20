@@ -30,15 +30,15 @@
 #include "variables.h"
 
 QSP_CHAR *qspQstPath = 0;
-long qspQstPathLen = 0;
+int qspQstPathLen = 0;
 QSP_CHAR *qspQstFullPath = 0;
-long qspQstCRC = 0;
+int qspQstCRC = 0;
 
 QSP_CHAR *qspCurIncFiles[QSP_MAXINCFILES];
-long qspCurIncFilesCount = 0;
-long qspCurIncLocsCount = 0;
+int qspCurIncFilesCount = 0;
+int qspCurIncLocsCount = 0;
 
-long qspCRCTable[256] =
+int qspCRCTable[256] =
 {
 	0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
 	0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91,
@@ -74,16 +74,16 @@ long qspCRCTable[256] =
 	0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
 };
 
-static long qspCRC(void *, long);
+static int qspCRC(void *, int);
 static void qspOpenIncludes();
 static FILE *qspFileOpen(QSP_CHAR *, QSP_CHAR *);
-static QSP_BOOL qspCheckQuest(char **, long, QSP_BOOL);
-static QSP_BOOL qspCheckGameStatus(QSP_CHAR **, long);
+static QSP_BOOL qspCheckQuest(char **, int, QSP_BOOL);
+static QSP_BOOL qspCheckGameStatus(QSP_CHAR **, int);
 
-static long qspCRC(void *data, long len)
+static int qspCRC(void *data, int len)
 {
 	unsigned char *ptr;
-	long crc = 0;
+	int crc = 0;
 	ptr = (unsigned char *)data;
 	while (len--)
 		crc = (qspCRCTable[(crc & 0xFF) ^ *ptr++] ^ crc >> 8) ^ 0xD202EF8D;
@@ -99,7 +99,7 @@ QSP_CHAR *qspGetAbsFromRelPath(QSP_CHAR *path)
 
 void qspClearIncludes(QSP_BOOL isFirst)
 {
-	long i, count;
+	int i, count;
 	if (!isFirst)
 	{
 		for (i = 0; i < qspCurIncFilesCount; ++i)
@@ -117,7 +117,7 @@ void qspClearIncludes(QSP_BOOL isFirst)
 
 static void qspOpenIncludes()
 {
-	long i;
+	int i;
 	QSP_CHAR *file;
 	for (i = 0; i < qspCurIncFilesCount; ++i)
 	{
@@ -167,9 +167,9 @@ static FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
 	return ret;
 }
 
-static QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
+static QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
 {
-	long i, ind, locsCount, actsCount;
+	int i, ind, locsCount, actsCount;
 	QSP_BOOL isOldFormat;
 	QSP_CHAR *buf = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
 	isOldFormat = QSP_STRCMP(buf, QSP_GAMEID) != 0;
@@ -199,10 +199,10 @@ static QSP_BOOL qspCheckQuest(char **strs, long count, QSP_BOOL isUCS2)
 	return QSP_TRUE;
 }
 
-void qspOpenQuestFromData(char *data, long dataSize, QSP_CHAR *fileName, QSP_BOOL isAddLocs)
+void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 {
 	QSP_BOOL isOldFormat, isUCS2, isAddLoc;
-	long i, j, ind, crc, count, locsCount, actsCount, start, end;
+	int i, j, ind, crc, count, locsCount, actsCount, start, end;
 	QSP_CHAR *buf, *delim;
 	char **strs;
 	if (dataSize < 2)
@@ -291,7 +291,7 @@ void qspOpenQuestFromData(char *data, long dataSize, QSP_CHAR *fileName, QSP_BOO
 	{
 		qspQstFullPath = qspGetAddText(qspQstFullPath, fileName, 0, -1);
 		delim = qspInStrRChars(qspQstFullPath, QSP_PATHDELIMS, 0);
-		qspQstPathLen = (delim ? (long)(delim - qspQstFullPath) + 1 : 0);
+		qspQstPathLen = (delim ? (int)(delim - qspQstFullPath) + 1 : 0);
 		qspQstPath = qspGetAddText(qspQstPath, qspQstFullPath, 0, qspQstPathLen);
 		qspQstCRC = crc;
 		qspCurLoc = -1;
@@ -302,7 +302,7 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 {
 	FILE *f;
 	char *buf;
-	long fileSize;
+	int fileSize;
 	if (!(f = QSP_FOPEN(fileName, QSP_FMT("rb"))))
 	{
 		qspSetError(QSP_ERR_FILENOTFOUND);
@@ -319,10 +319,10 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 	free(buf);
 }
 
-long qspSaveGameStatusToString(QSP_CHAR **buf)
+int qspSaveGameStatusToString(QSP_CHAR **buf)
 {
 	QSP_CHAR *temp;
-	long i, j, len, oldRefreshCount = qspRefreshCount;
+	int i, j, len, oldRefreshCount = qspRefreshCount;
 	qspExecLocByVarName(QSP_FMT("ONGSAVE"));
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
 	*buf = 0;
@@ -338,10 +338,10 @@ long qspSaveGameStatusToString(QSP_CHAR **buf)
 	len = qspCodeWriteVal(buf, len, qspCurDesc, QSP_TRUE);
 	len = qspCodeWriteVal(buf, len, qspCurVars, QSP_TRUE);
 	len = qspCodeWriteIntVal(buf, len, qspCurLoc, QSP_TRUE);
-	len = qspCodeWriteIntVal(buf, len, (long)qspCurIsShowActs, QSP_TRUE);
-	len = qspCodeWriteIntVal(buf, len, (long)qspCurIsShowObjs, QSP_TRUE);
-	len = qspCodeWriteIntVal(buf, len, (long)qspCurIsShowVars, QSP_TRUE);
-	len = qspCodeWriteIntVal(buf, len, (long)qspCurIsShowInput, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, (int)qspCurIsShowActs, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, (int)qspCurIsShowObjs, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, (int)qspCurIsShowVars, QSP_TRUE);
+	len = qspCodeWriteIntVal(buf, len, (int)qspCurIsShowInput, QSP_TRUE);
 	len = qspCodeWriteIntVal(buf, len, qspTimerInterval, QSP_TRUE);
 	len = qspCodeWriteIntVal(buf, len, qspPLFilesCount, QSP_TRUE);
 	for (i = 0; i < qspPLFilesCount; ++i)
@@ -363,7 +363,7 @@ long qspSaveGameStatusToString(QSP_CHAR **buf)
 		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].Location, QSP_TRUE);
 		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].ActIndex, QSP_TRUE);
 		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].StartLine, QSP_TRUE);
-		len = qspCodeWriteIntVal(buf, len, (long)qspCurActions[i].IsManageLines, QSP_TRUE);
+		len = qspCodeWriteIntVal(buf, len, (int)qspCurActions[i].IsManageLines, QSP_TRUE);
 	}
 	len = qspCodeWriteIntVal(buf, len, qspCurObjectsCount, QSP_TRUE);
 	for (i = 0; i < qspCurObjectsCount; ++i)
@@ -396,7 +396,7 @@ long qspSaveGameStatusToString(QSP_CHAR **buf)
 void qspSaveGameStatus(QSP_CHAR *fileName)
 {
 	FILE *f;
-	long len;
+	int len;
 	QSP_CHAR *buf;
 	if (!(f = QSP_FOPEN(fileName, QSP_FMT("wb"))))
 	{
@@ -411,9 +411,9 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 	fclose(f);
 }
 
-static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
+static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, int strsCount)
 {
-	long i, ind, count, lastInd, temp, selAction, selObject;
+	int i, ind, count, lastInd, temp, selAction, selObject;
 	ind = 17;
 	if (ind > strsCount) return QSP_FALSE;
 	if (QSP_STRCMP(strs[0], QSP_SAVEDGAMEID) ||
@@ -467,7 +467,7 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, long strsCount)
 
 void qspOpenGameStatusFromString(QSP_CHAR *str)
 {
-	long i, j, ind, count, varInd, varsCount, valsCount;
+	int i, j, ind, count, varInd, varsCount, valsCount;
 	QSP_CHAR **strs, *file;
 	count = qspSplitStr(str, QSP_STRSDELIM, &strs);
 	if (!qspCheckGameStatus(strs, count))
@@ -585,7 +585,7 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 void qspOpenGameStatus(QSP_CHAR *fileName)
 {
 	FILE *f;
-	long fileLen;
+	int fileLen;
 	QSP_CHAR *buf;
 	if (!(f = QSP_FOPEN(fileName, QSP_FMT("rb"))))
 	{
@@ -603,9 +603,9 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	free(buf);
 }
 
-QSP_BOOL qspStatementOpenQst(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
-	long oldCurIncLocsCount;
+	int oldCurIncLocsCount;
 	QSP_CHAR *file;
 	if (qspIsAnyString(QSP_STR(args[0])))
 	{
@@ -637,7 +637,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, long count, QSP_CHAR **jumpTo, ch
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementOpenGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSP_CHAR *file;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
@@ -651,7 +651,7 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, c
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementSaveGame(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
 	QSP_CHAR *file;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))

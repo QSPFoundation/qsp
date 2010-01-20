@@ -45,7 +45,7 @@
 		// Fields
 		wxString m_text;
 		wxArrayString m_strings;
-		long m_selIndex;
+		int m_selIndex;
 	};
 
 #endif

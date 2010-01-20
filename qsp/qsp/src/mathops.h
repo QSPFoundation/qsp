@@ -27,21 +27,21 @@
 	#define QSP_STACKSIZE 30
 	#define QSP_MAXITEMS 100
 
-	typedef void (*QSP_FUNCTION)(QSPVariant *, long, QSPVariant *);
+	typedef void (*QSP_FUNCTION)(QSPVariant *, int, QSPVariant *);
 
 	typedef struct
 	{
-		long Code;
+		int Code;
 		QSP_CHAR *Name;
-		long NameLen;
+		int NameLen;
 	} QSPMathOpName;
 
 	typedef struct
 	{
 		char Priority;
 		char ResType;
-		long MinArgsCount;
-		long MaxArgsCount;
+		int MinArgsCount;
+		int MaxArgsCount;
 		char ArgsTypes[QSP_OPMAXARGS];
 		QSP_FUNCTION Func;
 	} QSPMathOperation;

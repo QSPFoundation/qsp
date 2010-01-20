@@ -24,13 +24,13 @@
 
 	extern QSP_BOOL qspIsDebug;
 	extern QSP_CHAR *qspCurDesc;
-	extern long qspCurDescLen;
+	extern int qspCurDescLen;
 	extern QSP_CHAR *qspCurVars;
-	extern long qspCurVarsLen;
+	extern int qspCurVarsLen;
 	extern QSP_CHAR *qspCurInput;
-	extern long qspCurInputLen;
+	extern int qspCurInputLen;
 	extern QSP_CHAR *qspViewPath;
-	extern long qspTimerInterval;
+	extern int qspTimerInterval;
 	extern QSP_BOOL qspIsMainDescChanged;
 	extern QSP_BOOL qspIsVarsDescChanged;
 	extern QSP_BOOL qspCurIsShowVars;

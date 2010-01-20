@@ -23,6 +23,6 @@
 	#define QSP_EOLEXT QSP_FMT(" _")
 
 	/* External functions */
-	long qspPreprocessData(QSP_CHAR *, QSP_CHAR ***);
+	int qspPreprocessData(QSP_CHAR *, QSP_CHAR ***);
 
 #endif

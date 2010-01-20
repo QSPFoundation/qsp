@@ -23,16 +23,16 @@
 #include "text.h"
 
 QSPCurAct qspCurActions[QSP_MAXACTIONS];
-long qspCurActionsCount = 0;
-long qspCurSelAction = -1;
+int qspCurActionsCount = 0;
+int qspCurSelAction = -1;
 QSP_BOOL qspIsActionsChanged = QSP_FALSE;
 QSP_BOOL qspCurIsShowActs = QSP_TRUE;
 
-static long qspActIndex(QSP_CHAR *);
+static int qspActIndex(QSP_CHAR *);
 
 void qspClearActions(QSP_BOOL isFirst)
 {
-	long i;
+	int i;
 	if (!isFirst && qspCurActionsCount)
 	{
 		for (i = 0; i < qspCurActionsCount; ++i)
@@ -47,9 +47,9 @@ void qspClearActions(QSP_BOOL isFirst)
 	qspCurSelAction = -1;
 }
 
-static long qspActIndex(QSP_CHAR *name)
+static int qspActIndex(QSP_CHAR *name)
 {
-	long i, actNameLen, bufSize;
+	int i, actNameLen, bufSize;
 	QSP_CHAR *uName, *buf;
 	if (!qspCurActionsCount) return -1;
 	qspUpperStr(uName = qspGetNewText(name, -1));
@@ -77,7 +77,7 @@ static long qspActIndex(QSP_CHAR *name)
 	return -1;
 }
 
-void qspAddAction(QSPVariant *args, long count, QSP_CHAR **code, long start, long end, QSP_BOOL isManageLines)
+void qspAddAction(QSPVariant *args, int count, QSP_CHAR **code, int start, int end, QSP_BOOL isManageLines)
 {
 	QSPCurAct *act;
 	QSP_CHAR *imgPath;
@@ -103,11 +103,11 @@ void qspAddAction(QSPVariant *args, long count, QSP_CHAR **code, long start, lon
 	qspIsActionsChanged = QSP_TRUE;
 }
 
-void qspExecAction(long ind)
+void qspExecAction(int ind)
 {
 	QSPCurAct *act;
 	QSP_CHAR **code;
-	long count, oldLoc, oldActIndex, oldLine;
+	int count, oldLoc, oldActIndex, oldLine;
 	oldLoc = qspRealCurLoc;
 	oldActIndex = qspRealActIndex;
 	oldLine = qspRealLine;
@@ -131,7 +131,7 @@ void qspExecAction(long ind)
 
 QSP_CHAR *qspGetAllActionsAsCode()
 {
-	long len = 0, count, i;
+	int len = 0, count, i;
 	QSP_CHAR *res, *temp;
 	res = qspGetNewText(QSP_FMT(""), 0);
 	for (i = 0; i < qspCurActionsCount; ++i)
@@ -169,7 +169,7 @@ QSP_CHAR *qspGetAllActionsAsCode()
 
 void qspStatementAddAct(QSP_CHAR *s)
 {
-	long oldRefreshCount, count;
+	int oldRefreshCount, count;
 	QSPVariant args[2];
 	QSP_CHAR *code, *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
 	if (!pos)
@@ -187,9 +187,9 @@ void qspStatementAddAct(QSP_CHAR *s)
 	qspFreeVariants(args, count);
 }
 
-QSP_BOOL qspStatementDelAct(QSPVariant *args, long count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
 {
-	long actInd = qspActIndex(QSP_STR(args[0]));
+	int actInd = qspActIndex(QSP_STR(args[0]));
 	if (actInd < 0) return QSP_FALSE;
 	if (qspCurSelAction >= actInd) qspCurSelAction = -1;
 	if (qspCurActions[actInd].Image) free(qspCurActions[actInd].Image);

@@ -26,19 +26,19 @@
 	#define QSP_STATMAXARGS 10
 	#define QSP_STATELSE QSP_FMT("ELSE")
 
-	typedef QSP_BOOL (*QSP_STATEMENT)(QSPVariant *, long, QSP_CHAR **, char);
+	typedef QSP_BOOL (*QSP_STATEMENT)(QSPVariant *, int, QSP_CHAR **, char);
 
 	typedef struct
 	{
-		long Code;
+		int Code;
 		QSP_CHAR *Name;
-		long NameLen;
+		int NameLen;
 	} QSPStatName;
 
 	typedef struct
 	{
-		long MinArgsCount;
-		long MaxArgsCount;
+		int MinArgsCount;
+		int MaxArgsCount;
 		char ArgsTypes[QSP_STATMAXARGS];
 		char ExtArg;
 		QSP_STATEMENT Func;
@@ -104,8 +104,8 @@
 
 	/* External functions */
 	void qspInitStats();
-	long qspGetStatArgs(QSP_CHAR *, long, QSPVariant *);
-	QSP_BOOL qspExecCode(QSP_CHAR **, long, long, long, QSP_CHAR **);
+	int qspGetStatArgs(QSP_CHAR *, int, QSPVariant *);
+	QSP_BOOL qspExecCode(QSP_CHAR **, int, int, int, QSP_CHAR **);
 	void qspExecStringAsCode(QSP_CHAR *);
 
 #endif

@@ -75,6 +75,6 @@
 	#define QSP_FALSE 0
 
 	/* Types */
-	typedef long QSP_BOOL;
+	typedef int QSP_BOOL;
 
 #endif

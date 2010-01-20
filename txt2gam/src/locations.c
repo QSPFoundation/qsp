@@ -18,11 +18,11 @@
 #include "locations.h"
 
 QSPLocation *qspLocs = 0;
-long qspLocsCount = 0;
+int qspLocsCount = 0;
 
-void qspCreateWorld(long locsCount)
+void qspCreateWorld(int locsCount)
 {
-	long i;
+	int i;
 	for (i = 0; i < qspLocsCount; ++i)
 	{
 		free(qspLocs[i].Name);
