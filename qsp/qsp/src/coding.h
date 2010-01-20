@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2009 Valeriy Argunov (nporep AT mail DOT ru) */
+/* Copyright (C) 2005-2010 Valeriy Argunov (nporep AT mail DOT ru) */
 /*
 * This library is free software; you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as published by
