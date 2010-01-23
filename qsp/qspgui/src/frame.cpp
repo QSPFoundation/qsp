@@ -847,6 +847,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 	info.AddDeveloper(wxT("Byte [nporep@mail.ru]"));
 	info.AddDocWriter(wxT("Korwin [tightbow@yandex.ru]"));
 	info.AddArtist(wxT("3dEyes [3deyes@gmail.com]"));
+	info.AddArtist(wxT("AI [gribanov_a@mail.ru]"));
 	info.AddArtist(wxT("Ajenta [ajenta.arrow@gmail.com]"));
 	info.AddArtist(wxT("Alex [dogmar88@mail.ru]"));
 	info.AddArtist(wxT("BalleR [vsevolod_kremyan@mail.ru]"));
