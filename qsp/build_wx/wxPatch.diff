@@ -617,18 +617,6 @@ diff -u -r d:/wx/wxWidgets/src/html/winpars.cpp d:/wx/wx_qsp/src/html/winpars.cp
  
          wxString redirect;
          status = m_windowInterface->OnHTMLOpeningURL(type, myfullurl, &redirect);
-diff -u -r d:/wx/wxWidgets/src/msw/ownerdrw.cpp d:/wx/wx_qsp/src/msw/ownerdrw.cpp
---- d:/wx/wxWidgets/src/msw/ownerdrw.cpp	2009-08-03 18:35:32 +0700
-+++ d:/wx/wx_qsp/src/msw/ownerdrw.cpp	2009-09-28 11:55:27 +0700
-@@ -270,6 +270,8 @@
- 
-     // add a 4-pixel separator, otherwise menus look cluttered
-     *pwidth += 4;
-+    // HzD_Byte's hack
-+    *pheight += 4;
- 
-     // notice that this adjustment must be done after (possibly) changing the
-     // margin width above
 diff -u -r d:/wx/wxWidgets/src/msw/textctrl.cpp d:/wx/wx_qsp/src/msw/textctrl.cpp
 --- d:/wx/wxWidgets/src/msw/textctrl.cpp	2009-08-03 18:35:33 +0700
 +++ d:/wx/wx_qsp/src/msw/textctrl.cpp	2009-09-28 11:55:27 +0700
