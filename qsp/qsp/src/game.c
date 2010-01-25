@@ -603,7 +603,7 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 	free(buf);
 }
 
-QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	int oldCurIncLocsCount;
 	QSP_CHAR *file;
@@ -637,7 +637,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSP_CHAR **jumpTo, cha
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	QSP_CHAR *file;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
@@ -651,7 +651,7 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, ch
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	QSP_CHAR *file;
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))

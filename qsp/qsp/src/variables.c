@@ -540,7 +540,7 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 	if (v.IsStr) free(QSP_STR(v));
 }
 
-QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	QSPVar *dest, *src;
 	if (!(dest = qspVarReferenceWithType(QSP_STR(args[0]), QSP_TRUE, 0))) return QSP_FALSE;
@@ -553,7 +553,7 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSP_CHAR **jumpTo, cha
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementKillVar(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementKillVar(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	if (count == 1)
 		qspRemoveArray(QSP_STR(args[0]));

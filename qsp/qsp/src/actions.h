@@ -48,6 +48,6 @@
 	QSP_CHAR *qspGetAllActionsAsCode();
 	/* Statements */
 	void qspStatementAddAct(QSP_CHAR *);
-	QSP_BOOL qspStatementDelAct(QSPVariant *, int, QSP_CHAR **, char);
+	QSP_BOOL qspStatementDelAct(QSPVariant *, int, QSP_CHAR **, int);
 
 #endif

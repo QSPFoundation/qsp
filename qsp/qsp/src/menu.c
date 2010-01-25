@@ -36,7 +36,7 @@ void qspClearMenu(QSP_BOOL isFirst)
 	qspCurMenuItems = 0;
 }
 
-QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	int ind, maxItems, len;
 	QSPVar *var;

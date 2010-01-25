@@ -30,6 +30,6 @@
 	/* External functions */
 	void qspClearMenu(QSP_BOOL);
 	/* Statements */
-	QSP_BOOL qspStatementShowMenu(QSPVariant *, int, QSP_CHAR **, char);
+	QSP_BOOL qspStatementShowMenu(QSPVariant *, int, QSP_CHAR **, int);
 
 #endif

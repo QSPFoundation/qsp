@@ -187,7 +187,7 @@ void qspStatementAddAct(QSP_CHAR *s)
 	qspFreeVariants(args, count);
 }
 
-QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	int actInd = qspActIndex(QSP_STR(args[0]));
 	if (actInd < 0) return QSP_FALSE;

@@ -32,7 +32,7 @@
 	void qspPlayPLFiles();
 	void qspRefreshPlayList();
 	/* Statements */
-	QSP_BOOL qspStatementPlayFile(QSPVariant *, int, QSP_CHAR **, char);
-	QSP_BOOL qspStatementCloseFile(QSPVariant *, int, QSP_CHAR **, char);
+	QSP_BOOL qspStatementPlayFile(QSPVariant *, int, QSP_CHAR **, int);
+	QSP_BOOL qspStatementCloseFile(QSPVariant *, int, QSP_CHAR **, int);
 
 #endif

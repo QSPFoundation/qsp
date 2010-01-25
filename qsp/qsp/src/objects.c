@@ -119,7 +119,7 @@ int qspObjIndex(QSP_CHAR *name)
 	return -1;
 }
 
-QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	QSPObj *obj;
 	QSP_CHAR *imgPath;
@@ -140,7 +140,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, c
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	int objInd;
 	switch (extArg)
@@ -159,7 +159,7 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSP_CHAR **jumpTo, char
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSP_CHAR **jumpTo, char extArg)
+QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	qspCurSelObject = -1;
 	return QSP_FALSE;

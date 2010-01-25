@@ -38,11 +38,11 @@
 
 	typedef struct
 	{
-		char Priority;
-		char ResType;
+		int Priority;
+		int ResType;
 		int MinArgsCount;
 		int MaxArgsCount;
-		char ArgsTypes[QSP_OPMAXARGS];
+		int ArgsTypes[QSP_OPMAXARGS];
 		QSP_FUNCTION Func;
 	} QSPMathOperation;
 

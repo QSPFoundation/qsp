@@ -31,7 +31,7 @@ QSPMathOpName qspOpsNames[QSP_OPSLEVELS][QSP_MAXOPSNAMES];
 int qspOpsNamesCounts[QSP_OPSLEVELS];
 int qspOpMaxLen = 0;
 
-static void qspAddOperation(int, char, QSP_FUNCTION, char, int, int, ...);
+static void qspAddOperation(int, int, QSP_FUNCTION, int, int, int, ...);
 static void qspAddOpName(int, QSP_CHAR *, int);
 static int qspMathOpsCompare(const void *, const void *);
 static int qspMathOpStringFullCompare(const void *, const void *);
@@ -61,7 +61,7 @@ static void qspFunctionDynEval(QSPVariant *, int, QSPVariant *);
 static void qspFunctionMin(QSPVariant *, int, QSPVariant *);
 static void qspFunctionMax(QSPVariant *, int, QSPVariant *);
 
-static void qspAddOperation(int opCode, char priority, QSP_FUNCTION func, char resType, int minArgs, int maxArgs, ...)
+static void qspAddOperation(int opCode, int priority, QSP_FUNCTION func, int resType, int minArgs, int maxArgs, ...)
 {
 	int i;
 	va_list marker;
@@ -376,7 +376,7 @@ static QSP_CHAR *qspGetString(QSP_CHAR **expr)
 
 static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCodes, int *compArgsCounts)
 {
-	char type;
+	int type;
 	QSPVariant stack[QSP_STACKSIZE], args[QSP_OPMAXARGS], tos;
 	int i, j, oldRefreshCount, opCode, argsCount, len, sp = -1, index = 0;
 	tos.IsStr = QSP_FALSE;
