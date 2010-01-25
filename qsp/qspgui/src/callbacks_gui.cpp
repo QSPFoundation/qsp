@@ -201,7 +201,15 @@ void QSPCallBacks::PlayFile(const QSP_CHAR *file, int volume)
 	if (SetVolume(file, volume)) return;
 	CloseFile(file);
 	wxString strFile(wxFileName(file, wxPATH_DOS).GetFullPath());
+	#if defined(__WXMSW__) || defined(__WXOSX__)
 	if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(strFile.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, 0, &newSound))
+	#else
+	FMOD_CREATESOUNDEXINFO exInfo;
+	memset(&exInfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
+	exInfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
+	exInfo.dlsname = "sound/midi.sf2";
+	if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(strFile.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, &exInfo, &newSound))
+	#endif
 	{
 		UpdateSounds();
 		FMOD_System_PlaySound(m_sys, FMOD_CHANNEL_FREE, newSound, FALSE, &newChannel);
