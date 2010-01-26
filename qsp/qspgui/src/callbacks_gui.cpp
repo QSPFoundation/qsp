@@ -207,7 +207,7 @@ void QSPCallBacks::PlayFile(const QSP_CHAR *file, int volume)
 	FMOD_CREATESOUNDEXINFO exInfo;
 	memset(&exInfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
 	exInfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-	exInfo.dlsname = "sound/midi.sf2";
+	exInfo.dlsname = "sound/midi.dls";
 	if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(strFile.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, &exInfo, &newSound))
 	#endif
 	{
