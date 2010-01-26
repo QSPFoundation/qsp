@@ -3,7 +3,7 @@ WX_QSP_PATH=/home/byte/wx_qsp
 
 LIBQSP_OPT="-D_UNICODE -DNOT_RUBY -DEXPORT"
 QSPGUI_OPT="-D__WXGTK__ -D_UNICODE -DNDEBUG -D_FILE_OFFSET_BITS=64 -I$WX_QSP_PATH/include -I$WX_QSP_PATH/lib/wx/include/gtk2-unicode-static-2.9"
-QSPGUI_LD_OPT="-L$WX_QSP_PATH/lib -L_release -lfmodexp -lqsp -lgtk-x11-2.0 -lgthread-2.0 -lc -lSM -lXxf86vm -ltiff -ljpeg -lwx_gtk2u_aui-2.9 -lwx_gtk2u_html-2.9 -lwx_gtk2u_adv-2.9 -lwx_gtk2u_core-2.9 -lwx_baseu-2.9"
+QSPGUI_LD_OPT="-L$WX_QSP_PATH/lib -L_release -lfmodexp -lqsp -lgtk-x11-2.0 -lgthread-2.0 -lc -lSM -lXxf86vm -ljpeg -lwx_gtk2u_aui-2.9 -lwx_gtk2u_html-2.9 -lwx_gtk2u_adv-2.9 -lwx_gtk2u_core-2.9 -lwx_baseu-2.9"
 
 echo Building libqsp.so...
 gcc -fPIC -shared $LIBQSP_OPT -s -O3 -Os -o _release/libqsp.so `find qsp/src/ -name *.c | tr '\n' ' '`
