@@ -29,9 +29,7 @@ bool QSPApp::OnInit()
 	wxInitAllImageHandlers();
 	QSPInit();
 	// ----------------------
-	wxFileName appPath(argv[0]);
-	appPath.MakeAbsolute();
-	wxString appPathString(appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));
+	wxString appPathString(QSPTools::GetAppPath());
 	m_transhelper = new QSPTranslationHelper(*this, appPathString + wxT("langs"));
 	configPath = appPathString + QSP_CONFIG;
 	if (!(wxFileExists(configPath) || wxFileName::IsDirWritable(appPathString)))

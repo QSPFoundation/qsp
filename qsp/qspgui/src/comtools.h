@@ -19,6 +19,8 @@
 	#define TOOLS_H
 
 	#include <wx/wx.h>
+	#include <wx/filename.h>
+	#include <wx/stdpaths.h>
 
 	class QSPTools
 	{
@@ -26,6 +28,7 @@
 		static wxString GetHexColor(const wxColour& color);
 		static wxString HtmlizeWhitespaces(const wxString& str);
 		static wxString ProceedAsPlain(const wxString& str);
+		static wxString GetAppPath();
 	};
 
 #endif

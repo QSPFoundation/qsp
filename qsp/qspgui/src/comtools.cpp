@@ -129,3 +129,9 @@ wxString QSPTools::ProceedAsPlain(const wxString& str)
 	}
 	return out;
 }
+
+wxString QSPTools::GetAppPath()
+{
+	wxFileName appPath(wxStandardPaths::Get().GetExecutablePath());
+	return appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+}
