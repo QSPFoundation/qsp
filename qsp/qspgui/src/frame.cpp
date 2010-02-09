@@ -944,12 +944,13 @@ void QSPFrame::OnInputTextEnter(wxCommandEvent& event)
 
 void QSPFrame::OnKey(wxKeyEvent& event)
 {
-	int ind;
+	int ind, actsCount;
 	event.Skip();
 	if (IsFullScreen() && event.GetKeyCode() == WXK_ESCAPE)
 		ShowFullScreen(false);
 	else if (m_isProcessEvents && !event.HasModifiers() && wxWindow::FindFocus() != m_input)
 	{
+		actsCount = QSPGetActionsCount();
 		switch (event.GetKeyCode())
 		{
 		case '1': case WXK_NUMPAD1: case WXK_NUMPAD_END: ind = 0; break;
@@ -961,9 +962,13 @@ void QSPFrame::OnKey(wxKeyEvent& event)
 		case '7': case WXK_NUMPAD7: case WXK_NUMPAD_HOME: ind = 6; break;
 		case '8': case WXK_NUMPAD8: case WXK_NUMPAD_UP: ind = 7; break;
 		case '9': case WXK_NUMPAD9: case WXK_NUMPAD_PAGEUP: ind = 8; break;
+		case WXK_SPACE:
+			if (actsCount != 1) return;
+			ind = 0;
+			break;
 		default: return;
 		}
-		if (ind < QSPGetActionsCount())
+		if (ind < actsCount)
 		{
 			wxCommandEvent e;
 			if (QSPSetSelActionIndex(ind, QSP_TRUE))
