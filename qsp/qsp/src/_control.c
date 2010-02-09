@@ -213,7 +213,7 @@ QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL isRefresh)
 	{
 		qspCurSelAction = ind;
 		qspPrepareExecution();
-		qspExecLocByVarName(QSP_FMT("ONACTSEL"));
+		qspExecLocByVarNameWithArgs(QSP_FMT("ONACTSEL"), 0, 0);
 		if (qspErrorNum)
 		{
 			qspIsMustWait = QSP_FALSE;
@@ -268,7 +268,7 @@ QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh)
 	{
 		qspCurSelObject = ind;
 		qspPrepareExecution();
-		qspExecLocByVarName(QSP_FMT("ONOBJSEL"));
+		qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJSEL"), 0, 0);
 		if (qspErrorNum)
 		{
 			qspIsMustWait = QSP_FALSE;
@@ -409,7 +409,7 @@ QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh)
 	{
 		qspIsMustWait = QSP_TRUE;
 		qspPrepareExecution();
-		qspExecLocByVarName(QSP_FMT("COUNTER"));
+		qspExecLocByVarNameWithArgs(QSP_FMT("COUNTER"), 0, 0);
 		if (qspErrorNum)
 		{
 			qspIsMustWait = QSP_FALSE;
@@ -425,7 +425,7 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
-	qspExecLocByVarName(QSP_FMT("USERCOM"));
+	qspExecLocByVarNameWithArgs(QSP_FMT("USERCOM"), 0, 0);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -929,7 +929,7 @@ AS3_Val QSPSetSelActionIndex(void *param, AS3_Val args)
 	{
 		qspCurSelAction = ind;
 		qspPrepareExecution();
-		qspExecLocByVarName(QSP_FMT("ONACTSEL"));
+		qspExecLocByVarNameWithArgs(QSP_FMT("ONACTSEL"), 0, 0);
 		if (qspErrorNum)
 		{
 			qspIsMustWait = QSP_FALSE;
@@ -999,7 +999,7 @@ AS3_Val QSPSetSelObjectIndex(void *param, AS3_Val args)
 	{
 		qspCurSelObject = ind;
 		qspPrepareExecution();
-		qspExecLocByVarName(QSP_FMT("ONOBJSEL"));
+		qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJSEL"), 0, 0);
 		if (qspErrorNum)
 		{
 			qspIsMustWait = QSP_FALSE;
@@ -1188,7 +1188,7 @@ AS3_Val QSPExecCounter(void *param, AS3_Val args)
 	{
 		qspIsMustWait = QSP_TRUE;
 		qspPrepareExecution();
-		qspExecLocByVarName(QSP_FMT("COUNTER"));
+		qspExecLocByVarNameWithArgs(QSP_FMT("COUNTER"), 0, 0);
 		if (qspErrorNum)
 		{
 			qspIsMustWait = QSP_FALSE;
@@ -1206,7 +1206,7 @@ AS3_Val QSPExecUserInput(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "IntType", &isRefresh);
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
-	qspExecLocByVarName(QSP_FMT("USERCOM"));
+	qspExecLocByVarNameWithArgs(QSP_FMT("USERCOM"), 0, 0);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;

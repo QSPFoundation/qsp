@@ -323,7 +323,7 @@ int qspSaveGameStatusToString(QSP_CHAR **buf)
 {
 	QSP_CHAR *temp;
 	int i, j, len, oldRefreshCount = qspRefreshCount;
-	qspExecLocByVarName(QSP_FMT("ONGSAVE"));
+	qspExecLocByVarNameWithArgs(QSP_FMT("ONGSAVE"), 0, 0);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
 	*buf = 0;
 	qspRefreshPlayList();
@@ -579,7 +579,7 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 	qspCallCloseFile(0);
 	qspPlayPLFiles();
 	qspCallSetTimer(qspTimerInterval);
-	qspExecLocByVarName(QSP_FMT("ONGLOAD"));
+	qspExecLocByVarNameWithArgs(QSP_FMT("ONGLOAD"), 0, 0);
 }
 
 void qspOpenGameStatus(QSP_CHAR *fileName)
