@@ -880,7 +880,7 @@ void QSPFrame::OnLinkClicked(wxHtmlLinkEvent& event)
 	if (info.GetEvent()->LeftUp())
 	{
 		href = info.GetHref();
-		if (href[0] == wxT('#'))
+		if (href.StartsWith(wxT("#")))
 		{
 			if (event.GetId() == m_desc->GetId())
 				m_desc->LoadPage(href);
