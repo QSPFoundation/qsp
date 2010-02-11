@@ -50,7 +50,7 @@ static void qspInitVarData(QSPVar *);
 static int qspGetVarTextIndex(QSPVar *, QSP_CHAR *, QSP_BOOL);
 static QSPVar *qspGetVarData(QSP_CHAR *, QSP_BOOL, int *);
 static void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
-static void qspSetVar(QSP_CHAR *, QSPVariant *);
+static void qspSetVar(QSP_CHAR *, QSPVariant *, QSP_CHAR);
 static QSPVariant qspGetVarValueByReference(QSPVar *, int, QSP_BOOL);
 static void qspCopyVar(QSPVar *, QSPVar *);
 
@@ -273,8 +273,9 @@ void qspSetVarValueByName(QSP_CHAR *name, QSPVariant *val)
 	qspSetVarValueByReference(var, 0, val);
 }
 
-static void qspSetVar(QSP_CHAR *name, QSPVariant *val)
+static void qspSetVar(QSP_CHAR *name, QSPVariant *val, QSP_CHAR op)
 {
+	QSPVariant oldVal;
 	QSPVar *var;
 	int index;
 	if (!(var = qspGetVarData(name, QSP_TRUE, &index))) return;
@@ -283,7 +284,40 @@ static void qspSetVar(QSP_CHAR *name, QSPVariant *val)
 		qspSetError(QSP_ERR_TYPEMISMATCH);
 		return;
 	}
-	qspSetVarValueByReference(var, index, val);
+	if (op == QSP_EQUAL[0])
+		qspSetVarValueByReference(var, index, val);
+	else if (op == QSP_ADD[0])
+	{
+		if (*name == QSP_STRCHAR[0])
+		{
+			oldVal = qspGetVarValueByReference(var, index, QSP_TRUE);
+			QSP_STR(oldVal) = qspGetAddText(QSP_STR(oldVal), QSP_PSTR(val), -1, -1);
+			qspSetVarValueByReference(var, index, &oldVal);
+			free(QSP_STR(oldVal));
+		}
+		else
+		{
+			oldVal = qspGetVarValueByReference(var, index, QSP_FALSE);
+			QSP_NUM(oldVal) += QSP_PNUM(val);
+			qspSetVarValueByReference(var, index, &oldVal);
+		}
+	}
+	else if (qspIsInList(QSP_SUB QSP_DIV QSP_MUL, op))
+	{
+		if (*name == QSP_STRCHAR[0])
+		{
+			qspSetError(QSP_ERR_TYPEMISMATCH);
+			return;
+		}
+		oldVal = qspGetVarValueByReference(var, index, QSP_FALSE);
+		if (op == QSP_SUB[0])
+			QSP_NUM(oldVal) -= QSP_PNUM(val);
+		else if (op == QSP_DIV[0])
+			QSP_NUM(oldVal) /= QSP_PNUM(val);
+		else if (op == QSP_MUL[0])
+			QSP_NUM(oldVal) *= QSP_PNUM(val);
+		qspSetVarValueByReference(var, index, &oldVal);
+	}
 }
 
 static QSPVariant qspGetVarValueByReference(QSPVar *var, int ind, QSP_BOOL isStringType)
@@ -523,7 +557,7 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 {
 	QSPVariant v;
 	int oldRefreshCount;
-	QSP_CHAR *name, *pos = qspStrPos(s, QSP_EQUAL, QSP_FALSE);
+	QSP_CHAR ch, *name, *pos = qspStrPos(s, QSP_EQUAL, QSP_FALSE);
 	if (!pos)
 	{
 		qspSetError(QSP_ERR_EQNOTFOUND);
@@ -532,10 +566,12 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 	oldRefreshCount = qspRefreshCount;
 	v = qspExprValue(pos + QSP_LEN(QSP_EQUAL));
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+	if (pos != s && qspIsInList(QSP_ADD QSP_SUB QSP_DIV QSP_MUL, *(pos - 1))) --pos;
+	ch = *pos;
 	*pos = 0;
 	name = qspDelSpc(s);
-	*pos = QSP_EQUAL[0];
-	qspSetVar(name, &v);
+	*pos = ch;
+	qspSetVar(name, &v, ch);
 	free(name);
 	if (v.IsStr) free(QSP_STR(v));
 }
