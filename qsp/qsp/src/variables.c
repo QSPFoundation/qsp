@@ -313,7 +313,14 @@ static void qspSetVar(QSP_CHAR *name, QSPVariant *val, QSP_CHAR op)
 		if (op == QSP_SUB[0])
 			QSP_NUM(oldVal) -= QSP_PNUM(val);
 		else if (op == QSP_DIV[0])
+		{
+			if (!QSP_PNUM(val))
+			{
+				qspSetError(QSP_ERR_DIVBYZERO);
+				return;
+			}
 			QSP_NUM(oldVal) /= QSP_PNUM(val);
+		}
 		else if (op == QSP_MUL[0])
 			QSP_NUM(oldVal) *= QSP_PNUM(val);
 		qspSetVarValueByReference(var, index, &oldVal);
