@@ -279,37 +279,54 @@ static void qspSetVar(QSP_CHAR *name, QSPVariant *val, QSP_CHAR op)
 	QSPVar *var;
 	int index;
 	if (!(var = qspGetVarData(name, QSP_TRUE, &index))) return;
-	if (qspConvertVariantTo(val, *name == QSP_STRCHAR[0]))
-	{
-		qspSetError(QSP_ERR_TYPEMISMATCH);
-		return;
-	}
 	if (op == QSP_EQUAL[0])
-		qspSetVarValueByReference(var, index, val);
-	else if (op == QSP_ADD[0])
 	{
-		if (*name == QSP_STRCHAR[0])
-		{
-			oldVal = qspGetVarValueByReference(var, index, QSP_TRUE);
-			QSP_STR(oldVal) = qspGetAddText(QSP_STR(oldVal), QSP_PSTR(val), -1, -1);
-			qspSetVarValueByReference(var, index, &oldVal);
-			free(QSP_STR(oldVal));
-		}
-		else
-		{
-			oldVal = qspGetVarValueByReference(var, index, QSP_FALSE);
-			QSP_NUM(oldVal) += QSP_PNUM(val);
-			qspSetVarValueByReference(var, index, &oldVal);
-		}
-	}
-	else if (qspIsInList(QSP_SUB QSP_DIV QSP_MUL, op))
-	{
-		if (*name == QSP_STRCHAR[0])
+		if (qspConvertVariantTo(val, *name == QSP_STRCHAR[0]))
 		{
 			qspSetError(QSP_ERR_TYPEMISMATCH);
 			return;
 		}
-		oldVal = qspGetVarValueByReference(var, index, QSP_FALSE);
+		qspSetVarValueByReference(var, index, val);
+	}
+	else if (op == QSP_ADD[0])
+	{
+		oldVal = qspGetVarValueByReference(var, index, *name == QSP_STRCHAR[0]);
+		if (oldVal.IsStr && val->IsStr)
+			QSP_STR(oldVal) = qspGetAddText(QSP_STR(oldVal), QSP_PSTR(val), -1, -1);
+		else if (qspIsCanConvertToNum(&oldVal) && qspIsCanConvertToNum(val))
+		{
+			qspConvertVariantTo(&oldVal, QSP_FALSE);
+			qspConvertVariantTo(val, QSP_FALSE);
+			QSP_NUM(oldVal) += QSP_PNUM(val);
+			qspConvertVariantTo(&oldVal, *name == QSP_STRCHAR[0]);
+		}
+		else
+		{
+			if (!oldVal.IsStr)
+			{
+				qspSetError(QSP_ERR_TYPEMISMATCH);
+				return;
+			}
+			qspConvertVariantTo(val, QSP_TRUE);
+			QSP_STR(oldVal) = qspGetAddText(QSP_STR(oldVal), QSP_PSTR(val), -1, -1);
+		}
+		qspSetVarValueByReference(var, index, &oldVal);
+		if (oldVal.IsStr) free(QSP_STR(oldVal));
+	}
+	else if (qspIsInList(QSP_SUB QSP_DIV QSP_MUL, op))
+	{
+		if (qspConvertVariantTo(val, QSP_FALSE))
+		{
+			qspSetError(QSP_ERR_TYPEMISMATCH);
+			return;
+		}
+		oldVal = qspGetVarValueByReference(var, index, *name == QSP_STRCHAR[0]);
+		if (qspConvertVariantTo(&oldVal, QSP_FALSE))
+		{
+			qspSetError(QSP_ERR_TYPEMISMATCH);
+			free(QSP_STR(oldVal));
+			return;
+		}
 		if (op == QSP_SUB[0])
 			QSP_NUM(oldVal) -= QSP_PNUM(val);
 		else if (op == QSP_DIV[0])
@@ -323,7 +340,9 @@ static void qspSetVar(QSP_CHAR *name, QSPVariant *val, QSP_CHAR op)
 		}
 		else if (op == QSP_MUL[0])
 			QSP_NUM(oldVal) *= QSP_PNUM(val);
+		qspConvertVariantTo(&oldVal, *name == QSP_STRCHAR[0]);
 		qspSetVarValueByReference(var, index, &oldVal);
+		if (oldVal.IsStr) free(QSP_STR(oldVal));
 	}
 }
 
