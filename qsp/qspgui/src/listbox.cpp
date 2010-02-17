@@ -63,9 +63,9 @@ void QSPListBox::SetStandardFonts(int size, const wxString& normal_face, const w
 
 void QSPListBox::RefreshUI()
 {
+	wxON_BLOCK_EXIT_THIS0(QSPListBox::Thaw);
 	Freeze();
 	RefreshAll();
-	Thaw();
 }
 
 void QSPListBox::BeginItems()
@@ -87,12 +87,12 @@ void QSPListBox::EndItems()
 	{
 		m_images = m_newImages;
 		m_descs = m_newDescs;
+		wxON_BLOCK_EXIT_THIS0(QSPListBox::Thaw);
 		Freeze();
 		count = m_descs.GetCount();
 		SetItemCount(count);
 		RefreshAll();
 		if (count) ScrollToRow(0);
-		Thaw();
 	}
 }
 

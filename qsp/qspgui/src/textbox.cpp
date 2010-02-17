@@ -58,10 +58,10 @@ void QSPTextBox::SetIsHtml(bool isHtml, bool isScroll)
 
 void QSPTextBox::RefreshUI(bool isScroll)
 {
+	wxON_BLOCK_EXIT_THIS0(QSPTextBox::Thaw);
 	Freeze();
 	SetPage(wxString::Format(m_outFormat, QSPTools::GetHexColor(GetForegroundColour()).wx_str(), QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_text : QSPTools::ProceedAsPlain(m_text)).wx_str()));
 	if (isScroll) Scroll(0, 0x7FFFFFFF);
-	Thaw();
 }
 
 void QSPTextBox::LoadBackImage(const wxString& fileName)
@@ -101,9 +101,9 @@ void QSPTextBox::SetTextFont(const wxFont& font)
 	if (!m_font.GetFaceName().IsSameAs(fontName, false) || m_font.GetPointSize() != fontSize)
 	{
 		m_font = font;
+		wxON_BLOCK_EXIT_THIS0(QSPTextBox::Thaw);
 		Freeze();
 		SetStandardFonts(fontSize, fontName, fontName);
-		Thaw();
 	}
 }
 

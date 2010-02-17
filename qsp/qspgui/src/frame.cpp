@@ -284,6 +284,8 @@ void QSPFrame::ShowPane(wxWindowID id, bool isShow)
 	int i;
 	wxAuiPaneInfo &pane = m_manager->GetPane(FindWindow(id));
 	wxAuiPaneInfoArray& allPanes = m_manager->GetAllPanes();
+	wxON_BLOCK_EXIT_THIS0(QSPFrame::Thaw);
+	Freeze();
 	for (i = (int)allPanes.GetCount() - 1; i >= 0; --i)
 		if (allPanes.Item(i).IsMaximized())
 		{
