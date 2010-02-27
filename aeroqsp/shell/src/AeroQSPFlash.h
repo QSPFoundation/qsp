@@ -68,7 +68,6 @@
 		bool IsOk() const;
 
 	private:
-		HINSTANCE			_moduleInst;
 		IShockwaveFlash		*_flashInterface;
 		wxActiveXContainer	*_container;
 		wxString CallFlashFunc(const wxString& func, const wxString& argtype = wxEmptyString, const wxString& arg = wxEmptyString) const;
