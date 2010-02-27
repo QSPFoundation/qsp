@@ -170,10 +170,10 @@ QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
 QSPVar *qspVarReferenceWithType(QSP_CHAR *name, QSP_BOOL isCreate, QSP_BOOL *isString)
 {
 	QSPVar *var;
-	QSP_CHAR *varName = qspDelSpc(name);
+	QSP_CHAR *varName = qspDelSpcCanRetSelf(name);
 	if (isString) *isString = (*varName == QSP_STRCHAR[0]);
 	var = qspVarReference(varName, isCreate);
-	free(varName);
+	if (varName != name) free(varName);
 	return var;
 }
 
@@ -595,10 +595,10 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 	if (pos != s && qspIsInList(QSP_ADD QSP_SUB QSP_DIV QSP_MUL, *(pos - 1))) --pos;
 	ch = *pos;
 	*pos = 0;
-	name = qspDelSpc(s);
-	*pos = ch;
+	name = qspDelSpcCanRetSelf(s);
 	qspSetVar(name, &v, ch);
-	free(name);
+	*pos = ch;
+	if (name != s) free(name);
 	if (v.IsStr) free(QSP_STR(v));
 }
 

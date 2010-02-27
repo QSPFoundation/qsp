@@ -369,8 +369,8 @@ static QSP_CHAR *qspGetString(QSP_CHAR **expr)
 	}
 	buf[strLen] = 0;
 	*expr = pos;
-	pos = qspFormatText(buf);
-	free(buf);
+	pos = qspFormatText(buf, QSP_TRUE);
+	if (pos != buf) free(buf);
 	return pos;
 }
 
@@ -1004,7 +1004,7 @@ static void qspFunctionDesc(QSPVariant *args, int count, QSPVariant *tos)
 		qspSetError(QSP_ERR_LOCNOTFOUND);
 		return;
 	}
-	if (!(desc = qspFormatText(qspLocs[index].Desc))) return;
+	if (!(desc = qspFormatText(qspLocs[index].Desc, QSP_FALSE))) return;
 	QSP_PSTR(tos) = desc;
 }
 

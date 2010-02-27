@@ -116,7 +116,7 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 	qspRealCurLoc = locInd;
 	qspRealActIndex = -1;
 	qspRealLine = 0;
-	if (!(str = qspFormatText(loc->Desc)))
+	if (!(str = qspFormatText(loc->Desc, QSP_FALSE)))
 	{
 		qspRealLine = oldLine;
 		qspRealActIndex = oldActIndex;
@@ -142,7 +142,7 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 	{
 		str = loc->Actions[i].Desc;
 		if (!(str && *str)) break;
-		if (!(str = qspFormatText(str)))
+		if (!(str = qspFormatText(str, QSP_FALSE)))
 		{
 			qspRealLine = oldLine;
 			qspRealActIndex = oldActIndex;

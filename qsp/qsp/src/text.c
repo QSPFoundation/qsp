@@ -117,6 +117,20 @@ QSP_CHAR *qspDelSpc(QSP_CHAR *s)
 	return str;
 }
 
+QSP_CHAR *qspDelSpcCanRetSelf(QSP_CHAR *s)
+{
+	int len;
+	QSP_CHAR *str, *origEnd, *begin = qspSkipSpaces(s), *end = qspStrEnd(begin);
+	origEnd = end;
+	while (begin < end && qspIsInList(QSP_SPACES, *(end - 1))) --end;
+	if (begin == s && end == origEnd) return s;
+	len = (int)(end - begin);
+	str = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
+	QSP_STRNCPY(str, begin, len);
+	str[len] = 0;
+	return str;
+}
+
 QSP_BOOL qspIsAnyString(QSP_CHAR *s)
 {
 	return (*qspSkipSpaces(s) != 0);
@@ -423,16 +437,29 @@ QSP_CHAR *qspReplaceText(QSP_CHAR *txt, QSP_CHAR *searchTxt, QSP_CHAR *repTxt)
 	return qspGetAddText(newTxt, txt, txtLen, -1);
 }
 
-QSP_CHAR *qspFormatText(QSP_CHAR *txt)
+QSP_CHAR *qspFormatText(QSP_CHAR *txt, QSP_BOOL canReturnSelf)
 {
 	QSPVariant val;
 	QSP_CHAR *newTxt, *lPos, *rPos;
 	int oldRefreshCount, len, txtLen, oldTxtLen, bufSize;
-	if (qspGetVarNumValue(QSP_FMT("DISABLESUBEX"))) return qspGetNewText(txt, -1);
+	if (qspGetVarNumValue(QSP_FMT("DISABLESUBEX")))
+	{
+		if (canReturnSelf)
+			return txt;
+		else
+			return qspGetNewText(txt, -1);
+	}
+	lPos = QSP_STRSTR(txt, QSP_LSUBEX);
+	if (!lPos)
+	{
+		if (canReturnSelf)
+			return txt;
+		else
+			return qspGetNewText(txt, -1);
+	}
 	bufSize = 256;
 	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	txtLen = oldTxtLen = 0;
-	lPos = QSP_STRSTR(txt, QSP_LSUBEX);
 	oldRefreshCount = qspRefreshCount;
 	while (lPos)
 	{

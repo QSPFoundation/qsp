@@ -39,6 +39,7 @@
 	QSP_CHAR *qspSkipSpaces(QSP_CHAR *);
 	QSP_CHAR *qspStrEnd(QSP_CHAR *);
 	QSP_CHAR *qspDelSpc(QSP_CHAR *);
+	QSP_CHAR *qspDelSpcCanRetSelf(QSP_CHAR *);
 	QSP_BOOL qspIsAnyString(QSP_CHAR *);
 	void qspLowerStr(QSP_CHAR *);
 	void qspUpperStr(QSP_CHAR *);
@@ -59,6 +60,6 @@
 	QSP_CHAR *qspNumToStr(QSP_CHAR *, int);
 	QSP_CHAR *qspStrPos(QSP_CHAR *, QSP_CHAR *, QSP_BOOL);
 	QSP_CHAR *qspReplaceText(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *);
-	QSP_CHAR *qspFormatText(QSP_CHAR *);
+	QSP_CHAR *qspFormatText(QSP_CHAR *, QSP_BOOL);
 
 #endif
