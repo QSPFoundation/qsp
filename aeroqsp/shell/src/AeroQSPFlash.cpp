@@ -36,6 +36,7 @@ AeroQSPFlash::AeroQSPFlash(wxWindow *owner, const wxString &flashPath)
 		_flashInterface->PutBackgroundColor(0x00000000);
 		_flashInterface->PutAllowScriptAccess(wx2bstr(wxT("always")));
 		_flashInterface->DisableLocalSecurity();
+		_flashInterface->PutMenu(0);
 		_container = new wxActiveXContainer(owner, IID_IShockwaveFlash, _flashInterface);
 	}
 }
