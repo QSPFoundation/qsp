@@ -35,7 +35,7 @@ AeroQSPFrame::AeroQSPFrame( const wxString &currentPath, const wxString &filenam
 
 	if (Create(NULL, wxID_ANY, wxT("AeroQSP"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE))
 	{
-		_flash = new AeroQSPFlash(this, _currentPath + wxT("Flash.ocx"));
+		_flash = new AeroQSPFlash(this, _currentPath + wxT("Flash.dll"));
 		if (!_flash->IsOk())
 		{
 			wxMessageBox("Error: Flash not found");
