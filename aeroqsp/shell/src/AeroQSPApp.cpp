@@ -21,10 +21,9 @@ IMPLEMENT_APP(AeroQSPApp)
 
 bool AeroQSPApp::OnInit()
 {
-	wxFileName appPath(argv[0]);
+	wxFileName appPath(wxStandardPaths::Get().GetExecutablePath());
 	_isFullScreen = false;
 	if (!wxApp::OnInit()) return false;
-	appPath.MakeAbsolute();
 	_frame = new AeroQSPFrame(appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR), _filename, _isFullScreen);
 	return true;
 }

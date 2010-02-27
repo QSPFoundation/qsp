@@ -21,6 +21,7 @@
 	#include <wx/wx.h>
 	#include <wx/filename.h>
 	#include <wx/cmdline.h>
+	#include <wx/stdpaths.h>
 	#include "AeroQSPFrame.h"
 
 	class AeroQSPApp : public wxApp
