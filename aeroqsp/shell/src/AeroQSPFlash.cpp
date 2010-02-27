@@ -17,23 +17,34 @@
 
 #include "AeroQSPFlash.h"
 
-AeroQSPFlash::AeroQSPFlash(wxWindow *owner)
+AeroQSPFlash::AeroQSPFlash(wxWindow *owner, const wxString &flashPath)
 {
 	_flashInterface = NULL;
-	HRESULT hr = ::CoCreateInstance(CLSID_ShockwaveFlash, NULL,
-		CLSCTX_INPROC_SERVER, IID_IShockwaveFlash, (void **)&_flashInterface);
+	_moduleInst = CoLoadLibrary(wx2bstr(flashPath), FALSE);
+	if (!_moduleInst) return;
+	CALL_PTR func = (CALL_PTR)GetProcAddress(_moduleInst, "DllGetClassObject");
+	if (!func) return;
+	IClassFactory *factory;
+	UINT nRetCode = func(CLSID_ShockwaveFlash, IID_IClassFactory, (LPVOID *)&factory);
+	if (nRetCode != S_OK) return;
+	factory->AddRef();
+	HRESULT hr = factory->CreateInstance(NULL, IID_IShockwaveFlash, (LPVOID *)&_flashInterface);
+	factory->Release();
 	if (SUCCEEDED(hr))
 	{
+		_flashInterface->AddRef();
 		_flashInterface->PutBackgroundColor(0x00000000);
 		_flashInterface->PutAllowScriptAccess(wx2bstr(wxT("always")));
 		_flashInterface->DisableLocalSecurity();
 		_container = new wxActiveXContainer(owner, IID_IShockwaveFlash, _flashInterface);
+		_moduleInst = NULL;
 	}
 }
 
 AeroQSPFlash::~AeroQSPFlash()
 {
 	if (_flashInterface) _flashInterface->Release();
+	if (_moduleInst) CoFreeLibrary(_moduleInst);
 }
 
 void AeroQSPFlash::LoadEngine( const wxString &movie )

@@ -54,10 +54,12 @@
 		FlashState_Max
 	};
 
+	typedef UINT (CALLBACK *CALL_PTR)(REFCLSID, REFIID, LPVOID *);
+
 	class AeroQSPFlash
 	{
 	public:
-		AeroQSPFlash(wxWindow *owner);
+		AeroQSPFlash(wxWindow *owner, const wxString &flashPath);
 		~AeroQSPFlash();
 		void LoadEngine(const wxString &movie);
 		void LoadGame(const wxString &filename);
@@ -66,6 +68,7 @@
 		bool IsOk() const;
 
 	private:
+		HINSTANCE			_moduleInst;
 		IShockwaveFlash		*_flashInterface;
 		wxActiveXContainer	*_container;
 		wxString CallFlashFunc(const wxString& func, const wxString& argtype = wxEmptyString, const wxString& arg = wxEmptyString) const;
