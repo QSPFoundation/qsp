@@ -62,7 +62,7 @@ AeroQSPFrame::AeroQSPFrame( const wxString &currentPath, const wxString &filenam
 		menuBar->Append(_helpMenu, wxT("&Помощь"));
 		SetMenuBar(menuBar);
 		SetClientSize(800, 600);
-		CenterOnScreen();
+		CenterOnParent();
 		_flash->LoadEngine(_currentPath + wxT("AeroQSP.swf"));
 		_errorTimer.Start(300, true);
 	}
@@ -107,7 +107,7 @@ void AeroQSPFrame::SetUserSize( const wxString &size )
 		if (width != curW || height != curH)
 		{
 			SetClientSize(width, height);
-			CenterOnScreen();
+			CenterOnParent();
 		}
 	}
 }
