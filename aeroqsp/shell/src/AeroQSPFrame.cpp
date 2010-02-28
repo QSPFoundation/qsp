@@ -23,6 +23,7 @@ BEGIN_EVENT_TABLE(AeroQSPFrame, wxFrame)
 	EVT_MENU(ID_EXIT, AeroQSPFrame::OnExit)
 	EVT_MENU(ID_ABOUT, AeroQSPFrame::OnAbout)
 	EVT_TIMER(wxID_ANY, AeroQSPFrame::OnTimer)
+	EVT_SET_FOCUS(AeroQSPFrame::OnFocus)
 	EVT_ACTIVEX(wxID_ANY, AeroQSPFrame::OnFlashEvent)
 END_EVENT_TABLE()
 
@@ -209,4 +210,9 @@ void AeroQSPFrame::OnTimer( wxTimerEvent &event )
 		wxMessageBox("Error: AeroQSP can't be loaded");
 		Close();
 	}
+}
+
+void AeroQSPFrame::OnFocus( wxFocusEvent &event )
+{
+	_flash->SetFocus();
 }

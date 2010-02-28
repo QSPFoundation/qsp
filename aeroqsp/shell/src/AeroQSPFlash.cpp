@@ -92,3 +92,8 @@ bool AeroQSPFlash::IsOk() const
 {
 	return (_flashInterface != NULL);
 }
+
+void AeroQSPFlash::SetFocus()
+{
+	_container->SetFocus();
+}

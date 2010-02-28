@@ -66,6 +66,7 @@
 		wxString GetVersion() const;
 		bool IsLoaded() const;
 		bool IsOk() const;
+		void SetFocus();
 
 	private:
 		IShockwaveFlash		*_flashInterface;

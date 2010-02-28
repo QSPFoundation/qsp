@@ -59,6 +59,7 @@
 		void OnAbout(wxCommandEvent &event);
 		void OnExit(wxCommandEvent &event);
 		void OnTimer(wxTimerEvent &event);
+		void OnFocus(wxFocusEvent &event);
 	};
 
 #endif
