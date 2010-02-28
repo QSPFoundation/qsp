@@ -22,6 +22,8 @@
 	#include <wx/aboutdlg.h>
 	#include "AeroQSPFlash.h"
 
+	#define AERO_VERSION wxT("0.0.2")
+
 	enum
 	{
 		ID_OPENGAME,

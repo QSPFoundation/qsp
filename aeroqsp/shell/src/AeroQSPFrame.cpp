@@ -190,8 +190,8 @@ void AeroQSPFrame::OnAbout( wxCommandEvent &event )
 	wxAboutDialogInfo info;
 	info.SetIcon(wxICON(logo));
 	info.SetName(wxT("AeroQSP"));
-	info.SetCopyright(wxT("Quest Soft, 2001-2009"));
-	info.SetDescription(wxString::Format("Shell version: %s\nQSP version: %s", wxT("0.0.1"), verQSP));
+	info.SetCopyright(wxT("Quest Soft, 2001-2010"));
+	info.SetDescription(wxString::Format("Shell version: %s\nQSP version: %s", AERO_VERSION, verQSP.wx_str()));
 	info.SetWebSite(wxT("http://qsp.su"));
 	info.AddDeveloper(wxT("BaxZzZz [baxzzzz@gmail.com]"));
 	info.AddDeveloper(wxT("Byte [nporep@mail.ru]"));
