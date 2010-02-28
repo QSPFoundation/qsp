@@ -104,7 +104,7 @@ void AeroQSPFrame::SetUserSize( const wxString &size )
 			ShowFullScreen(false);
 		}
 		GetClientSize(&curW, &curH);
-		if (width != curW && height != curH)
+		if (width != curW || height != curH)
 		{
 			SetClientSize(width, height);
 			CenterOnScreen();
