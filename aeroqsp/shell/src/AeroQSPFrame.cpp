@@ -97,6 +97,11 @@ void AeroQSPFrame::SetUserSize( const wxString &size )
 	if (width > 0 && height > 0)
 	{
 		int curW, curH;
+		if (_isFullScreen)
+		{
+			_isFullScreen = false;
+			ShowFullScreen(false);
+		}
 		GetClientSize(&curW, &curH);
 		if (width != curW && height != curH)
 		{
@@ -130,7 +135,7 @@ void AeroQSPFrame::LoadFile(const wxString &filename)
 
 void AeroQSPFrame::OnShowFullScreen( wxCommandEvent &event )
 {
-	_isFullScreen = (_isFullScreen) ? false : true;
+	_isFullScreen = !_isFullScreen;
 	ShowFullScreen(_isFullScreen);
 }
 
