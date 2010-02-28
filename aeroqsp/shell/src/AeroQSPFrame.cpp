@@ -60,7 +60,7 @@ AeroQSPFrame::AeroQSPFrame( const wxString &currentPath, const wxString &filenam
 		menuBar->Append(_fileMenu, wxT("&Игра"));
 		menuBar->Append(_helpMenu, wxT("&Помощь"));
 		SetMenuBar(menuBar);
-		SetClientSize(1024, 768);
+		SetClientSize(800, 600);
 		CenterOnScreen();
 		_flash->LoadEngine(_currentPath + wxT("AeroQSP.swf"));
 		_errorTimer.Start(300, true);
@@ -85,6 +85,35 @@ void AeroQSPFrame::Init()
 	ShowFullScreen(_isFullScreen);
 }
 
+void AeroQSPFrame::SetUserSize( const wxString &size )
+{
+	long width = 800, height = 600;
+	int pos = size.Index(wxT('x'));
+	if (pos > 0 && pos + 1 < size.Length())
+	{
+		size.Mid(0, pos).ToLong(&width);
+		size.Mid(pos + 1).ToLong(&height);
+	}
+	if (width > 0 && height > 0)
+	{
+		int curW, curH;
+		GetClientSize(&curW, &curH);
+		if (width != curW && height != curH)
+		{
+			SetClientSize(width, height);
+			CenterOnScreen();
+		}
+	}
+}
+
+void AeroQSPFrame::SetUserTitle( const wxString &title )
+{
+	if (title.IsEmpty())
+		SetTitle(wxT("AeroQSP"));
+	else
+		SetTitle(title);
+}
+
 void AeroQSPFrame::OnLoadFile( wxCommandEvent &event )
 {
 	wxFileDialog dialog(this, wxT("Открыть игру"), wxEmptyString, wxEmptyString,
@@ -107,6 +136,7 @@ void AeroQSPFrame::OnShowFullScreen( wxCommandEvent &event )
 
 void AeroQSPFrame::OnFlashEvent( wxActiveXEvent &event )
 {
+	wxString str, val;
 	switch (event.GetDispatchId())
 	{
 	case FLASH_DISPID_ONREADYSTATECHANGE:
@@ -135,13 +165,12 @@ void AeroQSPFrame::OnFlashEvent( wxActiveXEvent &event )
 	case FLASH_DISPID_ONPROGRESS:
 		break;
 	case FLASH_DISPID_FSCOMMAND:
-		if (event[0].GetString() == wxT("setTitle"))
-		{
-			wxString str = event[1].GetString();
-			if (str.IsEmpty())
-				str = wxT("AeroQSP");
-			SetTitle(str);
-		}
+		str = event[0].GetString();
+		val = event[1].GetString();
+		if (str == wxT("setTitle"))
+			SetUserTitle(val);
+		else if (str == wxT("setSize"))
+			SetUserSize(val);
 		break;
 	case FLASH_DISPID_FLASHCALL:
 		break;

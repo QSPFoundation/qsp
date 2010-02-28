@@ -51,6 +51,8 @@
 		FlashState		_lastState;
 
 		void Init();
+		void SetUserSize(const wxString &size);
+		void SetUserTitle(const wxString &title);
 		void OnLoadFile(wxCommandEvent &event);
 		void OnShowFullScreen(wxCommandEvent &event);
 		void OnFlashEvent(wxActiveXEvent &event);
