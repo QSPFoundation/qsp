@@ -143,7 +143,7 @@ void qspCallSystem(QSP_CHAR *cmd)
 	}
 }
 
-void qspCallOpenGame()
+void qspCallOpenGame(QSP_CHAR *file)
 {
 	/* «десь позвол€ем пользователю выбрать файл */
 	/* состо€ни€ игры дл€ загрузки и загружаем его */
@@ -151,12 +151,12 @@ void qspCallOpenGame()
 	if (qspCallBacks[QSP_CALL_OPENGAMESTATUS])
 	{
 		qspSaveCallState(&state);
-		qspCallBacks[QSP_CALL_OPENGAMESTATUS]();
+		qspCallBacks[QSP_CALL_OPENGAMESTATUS](file);
 		qspRestoreCallState(&state);
 	}
 }
 
-void qspCallSaveGame()
+void qspCallSaveGame(QSP_CHAR *file)
 {
 	/* «десь позвол€ем пользователю выбрать файл */
 	/* дл€ сохранени€ состо€ни€ игры и сохран€ем */
@@ -165,7 +165,7 @@ void qspCallSaveGame()
 	if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS])
 	{
 		qspSaveCallState(&state);
-		qspCallBacks[QSP_CALL_SAVEGAMESTATUS]();
+		qspCallBacks[QSP_CALL_SAVEGAMESTATUS](file);
 		qspRestoreCallState(&state);
 	}
 }
@@ -460,16 +460,24 @@ void qspCallSystem(QSP_CHAR *cmd)
 	}
 }
 
-void qspCallOpenGame()
+void qspCallOpenGame(QSP_CHAR *file)
 {
 	/* «десь позвол€ем пользователю выбрать файл */
 	/* состо€ни€ игры дл€ загрузки и загружаем его */
 	QSPCallState state;
 	AS3_Val args;
+	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_OPENGAMESTATUS].IsSet)
 	{
 		qspSaveCallState(&state);
-		args = AS3_Array("");
+		if (file)
+		{
+			strUTF8 = qspW2C(file);
+			args = AS3_Array("StrType", strUTF8);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
 		AS3_Call(qspCallBacks[QSP_CALL_OPENGAMESTATUS].FuncVal, qspCallBacks[QSP_CALL_OPENGAMESTATUS].ThisVal, args);
 		AS3_Release(args);
 		flyield();
@@ -477,17 +485,25 @@ void qspCallOpenGame()
 	}
 }
 
-void qspCallSaveGame()
+void qspCallSaveGame(QSP_CHAR *file)
 {
 	/* «десь позвол€ем пользователю выбрать файл */
 	/* дл€ сохранени€ состо€ни€ игры и сохран€ем */
 	/* в нем текущее состо€ние */
 	QSPCallState state;
 	AS3_Val args;
+	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS].IsSet)
 	{
 		qspSaveCallState(&state);
-		args = AS3_Array("");
+		if (file)
+		{
+			strUTF8 = qspW2C(file);
+			args = AS3_Array("StrType", strUTF8);
+			free(strUTF8);
+		}
+		else
+			args = AS3_Array("StrType", 0);
 		AS3_Call(qspCallBacks[QSP_CALL_SAVEGAMESTATUS].FuncVal, qspCallBacks[QSP_CALL_SAVEGAMESTATUS].ThisVal, args);
 		AS3_Release(args);
 		flyield();

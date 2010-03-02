@@ -336,20 +336,30 @@ void QSPCallBacks::ShowImage(const QSP_CHAR *file)
 	m_frame->ShowPane(ID_VIEWPIC, m_frame->GetImgView()->OpenFile(wxString(file)));
 }
 
-void QSPCallBacks::OpenGameStatus()
+void QSPCallBacks::OpenGameStatus(const QSP_CHAR *file)
 {
 	if (m_frame->GetIsQuit()) return;
-	wxFileDialog dialog(m_frame, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
-	if (dialog.ShowModal() == wxID_OK)
-		QSPOpenSavedGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_FALSE);
+	if (file)
+		QSPOpenSavedGame(file, QSP_FALSE);
+	else
+	{
+		wxFileDialog dialog(m_frame, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
+		if (dialog.ShowModal() == wxID_OK)
+			QSPOpenSavedGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_FALSE);
+	}
 }
 
-void QSPCallBacks::SaveGameStatus()
+void QSPCallBacks::SaveGameStatus(const QSP_CHAR *file)
 {
 	if (m_frame->GetIsQuit()) return;
-	wxFileDialog dialog(m_frame, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
-	if (dialog.ShowModal() == wxID_OK)
-		QSPSaveGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_FALSE);
+	if (file)
+		QSPSaveGame(file, QSP_FALSE);
+	else
+	{
+		wxFileDialog dialog(m_frame, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
+		if (dialog.ShowModal() == wxID_OK)
+			QSPSaveGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_FALSE);
+	}
 }
 
 void QSPCallBacks::UpdateGamePath()

@@ -643,11 +643,11 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-		qspOpenGameStatus(file);
+		qspCallOpenGame(file);
 		free(file);
 	}
 	else
-		qspCallOpenGame();
+		qspCallOpenGame(0);
 	return QSP_FALSE;
 }
 
@@ -657,10 +657,10 @@ QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-		qspSaveGameStatus(file);
+		qspCallSaveGame(file);
 		free(file);
 	}
 	else
-		qspCallSaveGame();
+		qspCallSaveGame(0);
 	return QSP_FALSE;
 }

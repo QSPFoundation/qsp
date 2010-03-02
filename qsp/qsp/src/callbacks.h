@@ -41,8 +41,8 @@
 	void qspCallSetInputStrText(QSP_CHAR *);
 	void qspCallAddMenuItem(QSP_CHAR *, QSP_CHAR *);
 	void qspCallSystem(QSP_CHAR *);
-	void qspCallOpenGame();
-	void qspCallSaveGame();
+	void qspCallOpenGame(QSP_CHAR *);
+	void qspCallSaveGame(QSP_CHAR *);
 	void qspCallShowMessage(QSP_CHAR *);
 	void qspCallShowMenu();
 	void qspCallShowPicture(QSP_CHAR *);

@@ -63,8 +63,8 @@
 		static void ShowMenu();
 		static void Input(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen);
 		static void ShowImage(const QSP_CHAR *file);
-		static void OpenGameStatus();
-		static void SaveGameStatus();
+		static void OpenGameStatus(const QSP_CHAR *file);
+		static void SaveGameStatus(const QSP_CHAR *file);
 	private:
 		// Internal methods
 		static void UpdateGamePath();
