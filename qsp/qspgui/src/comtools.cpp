@@ -40,19 +40,44 @@ wxString QSPTools::HtmlizeWhitespaces(const wxString& str)
 				ch = *i;
 				if (quote)
 				{
-					if (ch == wxT('&'))
-						out << wxT("&amp;");
+					if (ch == wxT('\\'))
+					{
+						if (++i == str.end()) break;
+						ch = *i;
+						if (ch == quote)
+						{
+							switch (ch)
+							{
+							case wxT('"'):
+								out << wxT("&quot;");
+								break;
+							case wxT('\''):
+								out << wxT("&apos;");
+								break;
+							}
+						}
+						else
+							out << wxT('\\') << ch;
+					}
 					else
 					{
-						if (ch == wxT('\\'))
+						switch (ch)
 						{
+						case wxT('&'):
+							out << wxT("&amp;");
+							break;
+						case wxT('<'):
+							out << wxT("&lt;");
+							break;
+						case wxT('>'):
+							out << wxT("&gt;");
+							break;
+						default:
+							if (ch == quote)
+								quote = 0;
 							out << ch;
-							if (++i == str.end()) break;
-							ch = *i;
+							break;
 						}
-						else if (ch == quote)
-							quote = 0;
-						out << ch;
 					}
 				}
 				else
