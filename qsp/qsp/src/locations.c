@@ -79,9 +79,8 @@ void qspPrepareLocs()
 	int i;
 	for (i = 0; i < qspLocsCount; ++i)
 	{
-		if (qspLocsNames[i].Name) free(qspLocsNames[i].Name);
 		qspLocsNames[i].Index = i;
-		qspUpperStr(qspLocsNames[i].Name = qspGetNewText(qspLocs[i].Name, -1));
+		qspUpperStr(qspLocsNames[i].Name = qspGetAddText(qspLocsNames[i].Name, qspLocs[i].Name, 0, -1));
 	}
 	qsort(qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocsCompare);
 }
