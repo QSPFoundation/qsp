@@ -88,6 +88,7 @@
 		qspStatP,
 		qspStatRefInt,
 		qspStatSaveGame,
+		qspStatSetObj,
 		qspStatSetTimer,
 		qspStatSet,
 		qspStatShowActs,

@@ -41,6 +41,7 @@
 	int qspObjIndex(QSP_CHAR *);
 	/* Statements */
 	QSP_BOOL qspStatementAddObject(QSPVariant *, int, QSP_CHAR **, int);
+	QSP_BOOL qspStatementSetObject(QSPVariant *, int, QSP_CHAR **, int);
 	QSP_BOOL qspStatementDelObj(QSPVariant *, int, QSP_CHAR **, int);
 	QSP_BOOL qspStatementUnSelect(QSPVariant *, int, QSP_CHAR **, int);
 
