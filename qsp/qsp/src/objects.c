@@ -136,7 +136,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 	obj->Image = imgPath;
 	obj->Desc = qspGetNewText(QSP_STR(args[0]), -1);
 	qspIsObjectsChanged = QSP_TRUE;
-	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args, 1);
+	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args, count);
 	return QSP_FALSE;
 }
 
@@ -144,36 +144,42 @@ QSP_BOOL qspStatementSetObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 {
 	QSPObj *obj;
 	QSPVariant name;
+	QSP_BOOL isDescChanged, isImgChanged;
 	QSP_CHAR *oldImgPath, *newImgPath;
 	int oldRefreshCount, objInd = QSP_NUM(args[0]) - 1;
 	if (!(qspCurObjectsCount && objInd < qspCurObjectsCount)) return QSP_FALSE;
 	if (objInd < 0) objInd = 0;
 	obj = qspCurObjects + objInd;
+	isDescChanged = isImgChanged = QSP_FALSE;
+	name.IsStr = QSP_TRUE;
+	QSP_STR(name) = obj->Desc;
 	oldImgPath = (obj->Image ? obj->Image : QSP_FMT(""));
 	newImgPath = (count == 3 ? QSP_STR(args[2]) : QSP_FMT(""));
-	if (QSP_STRCMP(oldImgPath, newImgPath))
+	if (QSP_STRCMP(oldImgPath, newImgPath) && (qspIsAnyString(oldImgPath) || qspIsAnyString(newImgPath)))
 	{
-		if (count == 3 && qspIsAnyString(QSP_STR(args[2])))
-			obj->Image = qspGetAddText(obj->Image, QSP_STR(args[2]), 0, -1);
+		isImgChanged = QSP_TRUE;
+		if (qspIsAnyString(newImgPath))
+			obj->Image = qspGetAddText(obj->Image, newImgPath, 0, -1);
 		else if (obj->Image)
 		{
 			free(obj->Image);
 			obj->Image = 0;
 		}
-		qspIsObjectsChanged = QSP_TRUE;
 	}
 	if (QSP_STRCMP(obj->Desc, QSP_STR(args[1])))
 	{
-		if (qspCurSelObject >= objInd) qspCurSelObject = -1;
-		name.IsStr = QSP_TRUE;
-		QSP_STR(name) = obj->Desc;
+		isDescChanged = QSP_TRUE;
 		obj->Desc = qspGetNewText(QSP_STR(args[1]), -1);
+	}
+	if (isDescChanged || isImgChanged)
+	{
+		if (qspCurSelObject >= objInd) qspCurSelObject = -1;
 		qspIsObjectsChanged = QSP_TRUE;
 		oldRefreshCount = qspRefreshCount;
 		qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJDEL"), &name, 1);
-		free(QSP_STR(name));
+		if (isDescChanged) free(QSP_STR(name));
 		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-		qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args + 1, 1);
+		qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args + 1, count - 1);
 	}
 	return QSP_FALSE;
 }
