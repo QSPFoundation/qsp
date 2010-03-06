@@ -476,6 +476,7 @@ int qspArrayPos(QSPVariant *args, int argsCount, QSP_BOOL isRegExp)
 		}
 	}
 	count = var->ValsCount;
+	if (ind > count) ind = count;
 	while (ind <= count)
 	{
 		if (val->IsStr)
