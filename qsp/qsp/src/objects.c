@@ -72,8 +72,7 @@ void qspClearObjectsWithNotify()
 static void qspRemoveObject(int index)
 {
 	QSPVariant name;
-	if (!(qspCurObjectsCount && index < qspCurObjectsCount)) return;
-	if (index < 0) index = 0;
+	if (!(index >= 0 && index < qspCurObjectsCount)) return;
 	if (qspCurSelObject >= index) qspCurSelObject = -1;
 	name.IsStr = QSP_TRUE;
 	QSP_STR(name) = qspCurObjects[index].Desc;
@@ -147,8 +146,7 @@ QSP_BOOL qspStatementSetObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 	QSP_BOOL isDescChanged, isImgChanged;
 	QSP_CHAR *oldImgPath, *newImgPath;
 	int oldRefreshCount, objInd = QSP_NUM(args[0]) - 1;
-	if (!(qspCurObjectsCount && objInd < qspCurObjectsCount)) return QSP_FALSE;
-	if (objInd < 0) objInd = 0;
+	if (!(objInd >= 0 && objInd < qspCurObjectsCount)) return QSP_FALSE;
 	obj = qspCurObjects + objInd;
 	isDescChanged = isImgChanged = QSP_FALSE;
 	name.IsStr = QSP_TRUE;

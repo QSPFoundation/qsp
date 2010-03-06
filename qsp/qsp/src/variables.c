@@ -98,8 +98,7 @@ static void qspRemoveArrayItem(QSP_CHAR *name, int index)
 	QSPVar *var;
 	int origIndex;
 	if (!(var = qspVarReferenceWithType(name, QSP_FALSE, 0))) return;
-	if (!(var->ValsCount && index < var->ValsCount)) return;
-	if (index < 0) index = 0;
+	if (!(index >= 0 && index < var->ValsCount)) return;
 	origIndex = index;
 	if (var->Values[index].Str) free(var->Values[index].Str);
 	var->ValsCount--;
@@ -238,7 +237,7 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isSet, int *index)
 				free(QSP_STR(ind));
 			}
 			else
-				*index = (QSP_NUM(ind) >= 0 ? QSP_NUM(ind) : 0);
+				*index = QSP_NUM(ind);
 		}
 		return var;
 	}

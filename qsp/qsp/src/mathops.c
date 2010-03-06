@@ -1011,8 +1011,7 @@ static void qspFunctionDesc(QSPVariant *args, int count, QSPVariant *tos)
 static void qspFunctionGetObj(QSPVariant *args, int count, QSPVariant *tos)
 {
 	int ind = QSP_NUM(args[0]) - 1;
-	if (ind < 0) ind = 0;
-	if (ind < qspCurObjectsCount)
+	if (ind >= 0 && ind < qspCurObjectsCount)
 		QSP_PSTR(tos) = qspGetNewText(qspCurObjects[ind].Desc, -1);
 	else
 		QSP_PSTR(tos) = qspGetNewText(QSP_FMT(""), 0);
