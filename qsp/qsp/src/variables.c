@@ -260,10 +260,13 @@ static void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
 			++oldCount;
 		}
 	}
-	if (val->IsStr)
-		var->Values[ind].Str = qspGetAddText(var->Values[ind].Str, QSP_PSTR(val), 0, -1);
-	else
-		var->Values[ind].Num = QSP_PNUM(val);
+	if (ind >= 0)
+	{
+		if (val->IsStr)
+			var->Values[ind].Str = qspGetAddText(var->Values[ind].Str, QSP_PSTR(val), 0, -1);
+		else
+			var->Values[ind].Num = QSP_PNUM(val);
+	}
 }
 
 void qspSetVarValueByName(QSP_CHAR *name, QSPVariant *val)
@@ -350,7 +353,7 @@ static QSPVariant qspGetVarValueByReference(QSPVar *var, int ind, QSP_BOOL isStr
 {
 	QSPVariant ret;
 	QSP_CHAR *text;
-	if (ind < var->ValsCount)
+	if (ind >= 0 && ind < var->ValsCount)
 	{
 		if (ret.IsStr = isStringType)
 		{
