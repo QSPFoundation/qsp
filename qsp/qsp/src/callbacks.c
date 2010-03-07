@@ -25,35 +25,39 @@
 
 QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
 volatile QSP_BOOL qspIsInCallBack = QSP_FALSE;
+volatile QSP_BOOL qspIsDisableCodeExec = QSP_FALSE;
 
 #ifdef _FLASH
 	AS3_Val result;
 #endif
 
-static void qspSaveCallState(QSPCallState *);
+static void qspSaveCallState(QSPCallState *, QSP_BOOL);
 static void qspRestoreCallState(QSPCallState *);
 
-static void qspSaveCallState(QSPCallState *state)
+static void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec)
 {
 	state->IsInCallBack = qspIsInCallBack;
+	state->IsDisableCodeExec = qspIsDisableCodeExec;
 	state->IsMustWait = qspIsMustWait;
 	state->IsMainDescChanged = qspIsMainDescChanged;
 	state->IsVarsDescChanged = qspIsVarsDescChanged;
 	state->IsObjectsChanged = qspIsObjectsChanged;
 	state->IsActionsChanged = qspIsActionsChanged;
 	qspIsInCallBack = QSP_TRUE;
+	qspIsDisableCodeExec = isDisableCodeExec;
 	qspIsMustWait = QSP_FALSE;
 }
 
 static void qspRestoreCallState(QSPCallState *state)
 {
-	qspResetError();
+	qspIsMustWait = state->IsMustWait;
+	qspIsDisableCodeExec = state->IsDisableCodeExec;
+	qspIsInCallBack = state->IsInCallBack;
 	if (state->IsActionsChanged) qspIsActionsChanged = QSP_TRUE;
 	if (state->IsObjectsChanged) qspIsObjectsChanged = QSP_TRUE;
 	if (state->IsVarsDescChanged) qspIsVarsDescChanged = QSP_TRUE;
 	if (state->IsMainDescChanged) qspIsMainDescChanged = QSP_TRUE;
-	qspIsMustWait = state->IsMustWait;
-	qspIsInCallBack = state->IsInCallBack;
+	qspResetError();
 }
 
 #ifndef _FLASH
@@ -62,6 +66,7 @@ void qspInitCallBacks()
 {
 	int i;
 	qspIsInCallBack = QSP_FALSE;
+	qspIsDisableCodeExec = QSP_FALSE;
 	for (i = 0; i < QSP_CALL_DUMMY; ++i)
 		qspCallBacks[i] = 0;
 }
@@ -77,7 +82,7 @@ void qspCallDebug(QSP_CHAR *str)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_DEBUG])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_DEBUG](str);
 		qspRestoreCallState(&state);
 	}
@@ -89,7 +94,7 @@ void qspCallSetTimer(int msecs)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SETTIMER])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SETTIMER](msecs);
 		qspRestoreCallState(&state);
 	}
@@ -101,7 +106,7 @@ void qspCallRefreshInt(QSP_BOOL isRedraw)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_REFRESHINT])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_REFRESHINT](isRedraw);
 		qspRestoreCallState(&state);
 	}
@@ -113,7 +118,7 @@ void qspCallSetInputStrText(QSP_CHAR *text)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SETINPUTSTRTEXT])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SETINPUTSTRTEXT](text);
 		qspRestoreCallState(&state);
 	}
@@ -125,7 +130,7 @@ void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_ADDMENUITEM])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_ADDMENUITEM](name, imgPath);
 		qspRestoreCallState(&state);
 	}
@@ -137,7 +142,7 @@ void qspCallSystem(QSP_CHAR *cmd)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SYSTEM])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_SYSTEM](cmd);
 		qspRestoreCallState(&state);
 	}
@@ -150,7 +155,7 @@ void qspCallOpenGame(QSP_CHAR *file)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_OPENGAMESTATUS])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_OPENGAMESTATUS](file);
 		qspRestoreCallState(&state);
 	}
@@ -164,7 +169,7 @@ void qspCallSaveGame(QSP_CHAR *file)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_SAVEGAMESTATUS](file);
 		qspRestoreCallState(&state);
 	}
@@ -176,7 +181,7 @@ void qspCallShowMessage(QSP_CHAR *text)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SHOWMSGSTR])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SHOWMSGSTR](text);
 		qspRestoreCallState(&state);
 	}
@@ -188,7 +193,7 @@ void qspCallShowMenu()
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SHOWMENU])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_SHOWMENU]();
 		qspRestoreCallState(&state);
 	}
@@ -200,7 +205,7 @@ void qspCallShowPicture(QSP_CHAR *file)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SHOWIMAGE])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SHOWIMAGE](file);
 		qspRestoreCallState(&state);
 	}
@@ -212,7 +217,7 @@ void qspCallShowWindow(int type, QSP_BOOL isShow)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SHOWWINDOW])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SHOWWINDOW](type, isShow);
 		qspRestoreCallState(&state);
 	}
@@ -224,7 +229,7 @@ void qspCallPlayFile(QSP_CHAR *file, int volume)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_PLAYFILE])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_PLAYFILE](file, volume);
 		qspRestoreCallState(&state);
 	}
@@ -237,7 +242,7 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 	QSP_BOOL isPlaying;
 	if (qspCallBacks[QSP_CALL_ISPLAYINGFILE])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		isPlaying = (QSP_BOOL)qspCallBacks[QSP_CALL_ISPLAYINGFILE](file);
 		qspRestoreCallState(&state);
 		return isPlaying;
@@ -251,7 +256,7 @@ void qspCallSleep(int msecs)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SLEEP])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SLEEP](msecs);
 		qspRestoreCallState(&state);
 	}
@@ -264,7 +269,7 @@ int qspCallGetMSCount()
 	int count;
 	if (qspCallBacks[QSP_CALL_GETMSCOUNT])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		count = qspCallBacks[QSP_CALL_GETMSCOUNT]();
 		qspRestoreCallState(&state);
 		return count;
@@ -278,7 +283,7 @@ void qspCallCloseFile(QSP_CHAR *file)
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_CLOSEFILE])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_CLOSEFILE](file);
 		qspRestoreCallState(&state);
 	}
@@ -290,7 +295,7 @@ void qspCallDeleteMenu()
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_DELETEMENU])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_DELETEMENU]();
 		qspRestoreCallState(&state);
 	}
@@ -304,7 +309,7 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 	int maxLen = 511;
 	if (qspCallBacks[QSP_CALL_INPUTBOX])
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
 		*buffer = 0;
 		qspCallBacks[QSP_CALL_INPUTBOX](text, buffer, maxLen);
@@ -322,6 +327,7 @@ void qspInitCallBacks()
 {
 	int i;
 	qspIsInCallBack = QSP_FALSE;
+	qspIsDisableCodeExec = QSP_FALSE;
 	for (i = 0; i < QSP_CALL_DUMMY; ++i)
 		qspCallBacks[i].IsSet = QSP_FALSE;
 }
@@ -342,7 +348,7 @@ void qspCallDebug(QSP_CHAR *str)
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_DEBUG].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		if (str)
 		{
 			strUTF8 = qspW2C(str);
@@ -365,7 +371,7 @@ void qspCallSetTimer(int msecs)
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_SETTIMER].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		args = AS3_Array("IntType", msecs);
 		AS3_Call(qspCallBacks[QSP_CALL_SETTIMER].FuncVal, qspCallBacks[QSP_CALL_SETTIMER].ThisVal, args);
 		AS3_Release(args);
@@ -381,7 +387,7 @@ void qspCallRefreshInt(QSP_BOOL isRedraw)
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_REFRESHINT].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		args = AS3_Array("IntType", isRedraw);
 		AS3_Call(qspCallBacks[QSP_CALL_REFRESHINT].FuncVal, qspCallBacks[QSP_CALL_REFRESHINT].ThisVal, args);
 		AS3_Release(args);
@@ -398,7 +404,7 @@ void qspCallSetInputStrText(QSP_CHAR *text)
 	char *textUTF8;
 	if (qspCallBacks[QSP_CALL_SETINPUTSTRTEXT].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		if (text)
 		{
 			textUTF8 = qspW2C(text);
@@ -423,7 +429,7 @@ void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
 	char *imgUTF8;
 	if (qspCallBacks[QSP_CALL_ADDMENUITEM].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		nameUTF8 = (name ? qspW2C(name) : 0);
 		imgUTF8 = (imgPath ? qspW2C(imgPath) : 0);
 		args = AS3_Array("StrType, StrType", nameUTF8, imgUTF8);
@@ -444,7 +450,7 @@ void qspCallSystem(QSP_CHAR *cmd)
 	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_SYSTEM].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		if (cmd)
 		{
 			strUTF8 = qspW2C(cmd);
@@ -469,7 +475,7 @@ void qspCallOpenGame(QSP_CHAR *file)
 	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_OPENGAMESTATUS].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		if (file)
 		{
 			strUTF8 = qspW2C(file);
@@ -495,7 +501,7 @@ void qspCallSaveGame(QSP_CHAR *file)
 	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		if (file)
 		{
 			strUTF8 = qspW2C(file);
@@ -519,7 +525,7 @@ void qspCallShowMessage(QSP_CHAR *text)
 	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_SHOWMSGSTR].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		if (text)
 		{
 			strUTF8 = qspW2C(text);
@@ -542,7 +548,7 @@ void qspCallShowMenu()
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_SHOWMENU].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_FALSE);
 		args = AS3_Array("");
 		AS3_Call(qspCallBacks[QSP_CALL_SHOWMENU].FuncVal, qspCallBacks[QSP_CALL_SHOWMENU].ThisVal, args);
 		AS3_Release(args);
@@ -559,7 +565,7 @@ void qspCallShowPicture(QSP_CHAR *file)
 	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_SHOWIMAGE].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		if (file)
 		{
 			strUTF8 = qspW2C(file);
@@ -582,7 +588,7 @@ void qspCallShowWindow(int type, QSP_BOOL isShow)
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_SHOWWINDOW].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		args = AS3_Array("IntType, IntType", type, isShow);
 		AS3_Call(qspCallBacks[QSP_CALL_SHOWWINDOW].FuncVal, qspCallBacks[QSP_CALL_SHOWWINDOW].ThisVal, args);
 		AS3_Release(args);
@@ -599,7 +605,7 @@ void qspCallPlayFile(QSP_CHAR *file, int volume)
 	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_PLAYFILE].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		if (file)
 		{
 			strUTF8 = qspW2C(file);
@@ -624,7 +630,7 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_ISPLAYINGFILE].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		if (file)
 		{
 			strUTF8 = qspW2C(file);
@@ -651,7 +657,7 @@ void qspCallSleep(int msecs)
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_SLEEP].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		args = AS3_Array("IntType", msecs);
 		AS3_Call(qspCallBacks[QSP_CALL_SLEEP].FuncVal, qspCallBacks[QSP_CALL_SLEEP].ThisVal, args);
 		AS3_Release(args);
@@ -668,7 +674,7 @@ int qspCallGetMSCount()
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_GETMSCOUNT].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		args = AS3_Array("");
 		AS3_Call(qspCallBacks[QSP_CALL_GETMSCOUNT].FuncVal, qspCallBacks[QSP_CALL_GETMSCOUNT].ThisVal, args);
 		AS3_Release(args);
@@ -689,7 +695,7 @@ void qspCallCloseFile(QSP_CHAR *file)
 	char *strUTF8;
 	if (qspCallBacks[QSP_CALL_CLOSEFILE].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		if (file)
 		{
 			strUTF8 = qspW2C(file);
@@ -712,7 +718,7 @@ void qspCallDeleteMenu()
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_DELETEMENU].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		args = AS3_Array("");
 		AS3_Call(qspCallBacks[QSP_CALL_DELETEMENU].FuncVal, qspCallBacks[QSP_CALL_DELETEMENU].ThisVal, args);
 		AS3_Release(args);
@@ -732,7 +738,7 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 	int maxLen = 511;
 	if (qspCallBacks[QSP_CALL_INPUTBOX].IsSet)
 	{
-		qspSaveCallState(&state);
+		qspSaveCallState(&state, QSP_TRUE);
 		if (text)
 		{
 			strUTF8 = qspW2C(text);

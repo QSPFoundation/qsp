@@ -23,6 +23,7 @@
 	typedef struct
 	{
 		QSP_BOOL IsInCallBack;
+		QSP_BOOL IsDisableCodeExec;
 		QSP_BOOL IsMustWait;
 		QSP_BOOL IsMainDescChanged;
 		QSP_BOOL IsVarsDescChanged;
@@ -31,6 +32,7 @@
 	} QSPCallState;
 
 	extern volatile QSP_BOOL qspIsInCallBack;
+	extern volatile QSP_BOOL qspIsDisableCodeExec;
 
 	/* External functions */
 	void qspInitCallBacks();

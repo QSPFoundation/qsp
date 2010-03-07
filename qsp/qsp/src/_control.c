@@ -137,6 +137,11 @@ QSP_BOOL QSPGetExprValue(const QSP_CHAR *expr, QSP_BOOL *isString, int *numVal, 
 	QSPVariant v;
 	qspWait(QSP_TRUE);
 	qspResetError();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	v = qspExprValue((QSP_CHAR *)expr);
 	if (qspErrorNum)
 	{
@@ -192,6 +197,11 @@ QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh)
 	if (qspCurSelAction >= 0)
 	{
 		qspPrepareExecution();
+		if (qspIsDisableCodeExec)
+		{
+			qspIsMustWait = QSP_FALSE;
+			return QSP_FALSE;
+		}
 		qspExecAction(qspCurSelAction);
 		if (qspErrorNum)
 		{
@@ -211,8 +221,13 @@ QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL isRefresh)
 	qspWait(QSP_TRUE);
 	if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
 	{
-		qspCurSelAction = ind;
 		qspPrepareExecution();
+		if (qspIsDisableCodeExec)
+		{
+			qspIsMustWait = QSP_FALSE;
+			return QSP_FALSE;
+		}
+		qspCurSelAction = ind;
 		qspExecLocByVarNameWithArgs(QSP_FMT("ONACTSEL"), 0, 0);
 		if (qspErrorNum)
 		{
@@ -266,8 +281,13 @@ QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh)
 	qspWait(QSP_TRUE);
 	if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
 	{
-		qspCurSelObject = ind;
 		qspPrepareExecution();
+		if (qspIsDisableCodeExec)
+		{
+			qspIsMustWait = QSP_FALSE;
+			return QSP_FALSE;
+		}
+		qspCurSelObject = ind;
 		qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJSEL"), 0, 0);
 		if (qspErrorNum)
 		{
@@ -377,6 +397,11 @@ QSP_BOOL QSPExecString(const QSP_CHAR *s, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	qspExecStringAsCode((QSP_CHAR *)s);
 	if (qspErrorNum)
 	{
@@ -392,6 +417,11 @@ QSP_BOOL QSPExecLocationCode(const QSP_CHAR *name, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	qspExecLocByName((QSP_CHAR *)name, QSP_FALSE);
 	if (qspErrorNum)
 	{
@@ -405,7 +435,7 @@ QSP_BOOL QSPExecLocationCode(const QSP_CHAR *name, QSP_BOOL isRefresh)
 /* Выполнение кода локации-счетчика */
 QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh)
 {
-	if (!(qspIsMustWait || qspIsInCallBack))
+	if (!(qspIsMustWait || qspIsInCallBack || qspIsDisableCodeExec))
 	{
 		qspIsMustWait = QSP_TRUE;
 		qspPrepareExecution();
@@ -425,6 +455,11 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	qspExecLocByVarNameWithArgs(QSP_FMT("USERCOM"), 0, 0);
 	if (qspErrorNum)
 	{
@@ -491,6 +526,11 @@ QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *fileName)
 {
 	qspWait(QSP_TRUE);
 	qspResetError();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	qspOpenQuest((QSP_CHAR *)fileName, QSP_FALSE);
 	if (qspErrorNum)
 	{
@@ -505,6 +545,11 @@ QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR
 {
 	qspWait(QSP_TRUE);
 	qspResetError();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	qspOpenQuestFromData((char *)data, dataSize, (QSP_CHAR *)fileName, QSP_FALSE);
 	if (qspErrorNum)
 	{
@@ -519,6 +564,11 @@ QSP_BOOL QSPSaveGame(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	qspSaveGameStatus((QSP_CHAR *)fileName);
 	if (qspErrorNum)
 	{
@@ -536,6 +586,11 @@ QSP_BOOL QSPSaveGameAsString(QSP_CHAR *strBuf, int strBufSize, int *realSize, QS
 	QSP_CHAR *data;
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	if (!(len = qspSaveGameStatusToString(&data)))
 	{
 		*realSize = 0;
@@ -562,6 +617,11 @@ QSP_BOOL QSPOpenSavedGame(const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	qspOpenGameStatus((QSP_CHAR *)fileName);
 	if (qspErrorNum)
 	{
@@ -577,6 +637,11 @@ QSP_BOOL QSPOpenSavedGameFromString(const QSP_CHAR *str, QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	qspOpenGameStatusFromString((QSP_CHAR *)str);
 	if (qspErrorNum)
 	{
@@ -592,6 +657,11 @@ QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh)
 {
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return QSP_FALSE;
+	}
 	qspNewGame(QSP_TRUE);
 	if (qspErrorNum)
 	{
@@ -610,6 +680,7 @@ void QSPSelectMenuItem(int index)
 	QSPVariant arg;
 	if (index >= 0 && index < qspCurMenuItems)
 	{
+		if (qspIsDisableCodeExec) return;
 		arg.IsStr = QSP_FALSE;
 		QSP_NUM(arg) = index + 1;
 		qspExecLocByNameWithArgs(qspCurMenuLocs[index], &arg, 1);
@@ -831,6 +902,11 @@ AS3_Val QSPGetExprValue(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "StrType", &expr);
 	qspWait(QSP_TRUE);
 	qspResetError();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_Null();
+	}
 	exprWC = qspC2W(expr);
 	v = qspExprValue(exprWC);
 	free(exprWC);
@@ -905,6 +981,11 @@ AS3_Val QSPExecuteSelActionCode(void *param, AS3_Val args)
 	if (qspCurSelAction >= 0)
 	{
 		qspPrepareExecution();
+		if (qspIsDisableCodeExec)
+		{
+			qspIsMustWait = QSP_FALSE;
+			return AS3_False();
+		}
 		qspExecAction(qspCurSelAction);
 		if (qspErrorNum)
 		{
@@ -927,8 +1008,13 @@ AS3_Val QSPSetSelActionIndex(void *param, AS3_Val args)
 	qspWait(QSP_TRUE);
 	if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
 	{
-		qspCurSelAction = ind;
 		qspPrepareExecution();
+		if (qspIsDisableCodeExec)
+		{
+			qspIsMustWait = QSP_FALSE;
+			return AS3_False();
+		}
+		qspCurSelAction = ind;
 		qspExecLocByVarNameWithArgs(QSP_FMT("ONACTSEL"), 0, 0);
 		if (qspErrorNum)
 		{
@@ -997,8 +1083,13 @@ AS3_Val QSPSetSelObjectIndex(void *param, AS3_Val args)
 	qspWait(QSP_TRUE);
 	if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
 	{
-		qspCurSelObject = ind;
 		qspPrepareExecution();
+		if (qspIsDisableCodeExec)
+		{
+			qspIsMustWait = QSP_FALSE;
+			return AS3_False();
+		}
+		qspCurSelObject = ind;
 		qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJSEL"), 0, 0);
 		if (qspErrorNum)
 		{
@@ -1146,6 +1237,11 @@ AS3_Val QSPExecString(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "StrType, IntType", &s, &isRefresh);
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	strWC = qspC2W(s);
 	qspExecStringAsCode(strWC);
 	free(strWC);
@@ -1167,6 +1263,11 @@ AS3_Val QSPExecLocationCode(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "StrType, IntType", &name, &isRefresh);
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	nameWC = qspC2W(name);
 	qspExecLocByName(nameWC, QSP_FALSE);
 	free(nameWC);
@@ -1184,7 +1285,7 @@ AS3_Val QSPExecCounter(void *param, AS3_Val args)
 {
 	QSP_BOOL isRefresh;
 	AS3_ArrayValue(args, "IntType", &isRefresh);
-	if (!(qspIsMustWait || qspIsInCallBack))
+	if (!(qspIsMustWait || qspIsInCallBack || qspIsDisableCodeExec))
 	{
 		qspIsMustWait = QSP_TRUE;
 		qspPrepareExecution();
@@ -1206,6 +1307,11 @@ AS3_Val QSPExecUserInput(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "IntType", &isRefresh);
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	qspExecLocByVarNameWithArgs(QSP_FMT("USERCOM"), 0, 0);
 	if (qspErrorNum)
 	{
@@ -1293,6 +1399,11 @@ AS3_Val QSPLoadGameWorld(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "StrType", &fileName);
 	qspWait(QSP_TRUE);
 	qspResetError();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	fileNameWC = qspC2W(fileName);
 	qspOpenQuest(fileNameWC, QSP_FALSE);
 	free(fileNameWC);
@@ -1314,11 +1425,16 @@ AS3_Val QSPLoadGameWorldFromData(void *param, AS3_Val args)
 	QSP_CHAR *fileNameWC;
 	AS3_ArrayValue(args, "AS3ValType, IntType, StrType", &data, &dataSize, &fileName);
 	qspWait(QSP_TRUE);
+	qspResetError();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	ptr = (char *)malloc(dataSize + 3);
 	AS3_ByteArray_seek(data, 0, SEEK_SET);
 	AS3_ByteArray_readBytes(ptr, data, dataSize);
 	ptr[dataSize] = ptr[dataSize + 1] = ptr[dataSize + 2] = 0;
-	qspResetError();
 	fileNameWC = qspC2W(fileName);
 	qspOpenQuestFromData(ptr, dataSize + 3, fileNameWC, QSP_FALSE);
 	free(fileNameWC);
@@ -1340,6 +1456,11 @@ AS3_Val QSPSaveGame(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "StrType, IntType", &fileName, &isRefresh);
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	fileNameWC = qspC2W(fileName);
 	qspSaveGameStatus(fileNameWC);
 	free(fileNameWC);
@@ -1362,6 +1483,11 @@ AS3_Val QSPSaveGameAsString(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "AS3ValType, IntType", &data, &isRefresh);
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	if (!(len = qspSaveGameStatusToString(&buf)))
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -1383,6 +1509,11 @@ AS3_Val QSPOpenSavedGame(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "StrType, IntType", &fileName, &isRefresh);
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	fileNameWC = qspC2W(fileName);
 	qspOpenGameStatus(fileNameWC);
 	free(fileNameWC);
@@ -1404,12 +1535,17 @@ AS3_Val QSPOpenSavedGameFromString(void *param, AS3_Val args)
 	QSP_CHAR *ptr;
 	AS3_ArrayValue(args, "AS3ValType, IntType, IntType", &data, &dataSize, &isRefresh);
 	qspWait(QSP_TRUE);
+	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	dataLen = dataSize / sizeof(QSP_CHAR);
 	ptr = (QSP_CHAR *)malloc((dataLen + 1) * sizeof(QSP_CHAR));
 	AS3_ByteArray_seek(data, 0, SEEK_SET);
 	AS3_ByteArray_readBytes(ptr, data, dataSize);
 	ptr[dataLen] = 0;
-	qspPrepareExecution();
 	qspOpenGameStatusFromString(ptr);
 	free(ptr);
 	if (qspErrorNum)
@@ -1428,6 +1564,11 @@ AS3_Val QSPRestartGame(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "IntType", &isRefresh);
 	qspWait(QSP_TRUE);
 	qspPrepareExecution();
+	if (qspIsDisableCodeExec)
+	{
+		qspIsMustWait = QSP_FALSE;
+		return AS3_False();
+	}
 	qspNewGame(QSP_TRUE);
 	if (qspErrorNum)
 	{
@@ -1448,6 +1589,7 @@ AS3_Val QSPSelectMenuItem(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "IntType", &index);
 	if (index >= 0 && index < qspCurMenuItems)
 	{
+		if (qspIsDisableCodeExec) return AS3_Undefined();
 		arg.IsStr = QSP_FALSE;
 		QSP_NUM(arg) = index + 1;
 		qspExecLocByNameWithArgs(qspCurMenuLocs[index], &arg, 1);
