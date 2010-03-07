@@ -157,25 +157,28 @@ QSP_BOOL qspStatementCloseFile(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 	int pos;
 	QSP_CHAR *file;
 	if (!qspPLFilesCount) return QSP_FALSE;
-	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
+	if (count)
 	{
-		pos = qspSearchPlayList(QSP_STR(args[0]));
-		if (pos >= 0)
+		if (qspIsAnyString(QSP_STR(args[0])))
 		{
-			file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-			qspCallCloseFile(file);
-			free(file);
-			do
+			pos = qspSearchPlayList(QSP_STR(args[0]));
+			if (pos >= 0)
 			{
-				free(qspPLFiles[pos]);
-				--qspPLFilesCount;
-				while (pos < qspPLFilesCount)
+				file = qspGetAbsFromRelPath(QSP_STR(args[0]));
+				qspCallCloseFile(file);
+				free(file);
+				do
 				{
-					qspPLFiles[pos] = qspPLFiles[pos + 1];
-					++pos;
-				}
-				pos = qspSearchPlayList(QSP_STR(args[0]));
-			} while (pos >= 0);
+					free(qspPLFiles[pos]);
+					--qspPLFilesCount;
+					while (pos < qspPLFilesCount)
+					{
+						qspPLFiles[pos] = qspPLFiles[pos + 1];
+						++pos;
+					}
+					pos = qspSearchPlayList(QSP_STR(args[0]));
+				} while (pos >= 0);
+			}
 		}
 	}
 	else
