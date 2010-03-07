@@ -770,7 +770,7 @@ static QSP_BOOL qspStatementRefInt(QSPVariant *args, int count, QSP_CHAR **jumpT
 static QSP_BOOL qspStatementView(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	QSP_CHAR *file;
-	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
+	if (count && qspIsAnyString(QSP_STR(args[0])))
 	{
 		qspViewPath = qspGetAddText(qspViewPath, QSP_STR(args[0]), 0, -1);
 		file = qspGetAbsFromRelPath(qspViewPath);

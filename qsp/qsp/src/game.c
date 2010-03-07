@@ -607,32 +607,30 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSP_CHAR **jumpTo, int
 {
 	int oldCurIncLocsCount;
 	QSP_CHAR *file;
-	if (qspIsAnyString(QSP_STR(args[0])))
+	if (!qspIsAnyString(QSP_STR(args[0]))) return QSP_FALSE;
+	switch (extArg)
 	{
-		switch (extArg)
+	case 0:
+		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
+		qspOpenQuest(file, QSP_FALSE);
+		free(file);
+		if (qspErrorNum) return QSP_FALSE;
+		qspNewGame(QSP_FALSE);
+		break;
+	case 1:
+		if (qspCurIncFilesCount == QSP_MAXINCFILES)
 		{
-		case 0:
-			file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-			qspOpenQuest(file, QSP_FALSE);
-			free(file);
-			if (qspErrorNum) return QSP_FALSE;
-			qspNewGame(QSP_FALSE);
-			break;
-		case 1:
-			if (qspCurIncFilesCount == QSP_MAXINCFILES)
-			{
-				qspSetError(QSP_ERR_CANTINCFILE);
-				return QSP_FALSE;
-			}
-			oldCurIncLocsCount = qspCurIncLocsCount;
-			file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-			qspOpenQuest(file, QSP_TRUE);
-			free(file);
-			if (qspErrorNum) return QSP_FALSE;
-			if (qspCurIncLocsCount != oldCurIncLocsCount)
-				qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(QSP_STR(args[0]), -1);
-			break;
+			qspSetError(QSP_ERR_CANTINCFILE);
+			return QSP_FALSE;
 		}
+		oldCurIncLocsCount = qspCurIncLocsCount;
+		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
+		qspOpenQuest(file, QSP_TRUE);
+		free(file);
+		if (qspErrorNum) return QSP_FALSE;
+		if (qspCurIncLocsCount != oldCurIncLocsCount)
+			qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(QSP_STR(args[0]), -1);
+		break;
 	}
 	return QSP_FALSE;
 }
@@ -640,7 +638,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSP_CHAR **jumpTo, int
 QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	QSP_CHAR *file;
-	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
+	if (count && qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
 		qspCallOpenGame(file);
@@ -654,7 +652,7 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	QSP_CHAR *file;
-	if (count == 1 && qspIsAnyString(QSP_STR(args[0])))
+	if (count && qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
 		qspCallSaveGame(file);
