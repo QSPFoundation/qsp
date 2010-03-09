@@ -508,14 +508,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 				count = qspGetStatArgs(paramPos, statCode, args);
 				*pos = QSP_COLONDELIM[0];
 				if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-				if (statCode == qspStatAct)
-				{
-					qspAddAction(args, count, s, i, endPos, codeOffset > 0);
-					qspFreeVariants(args, count);
-					if (qspErrorNum) break;
-					i = endPos;
-				}
-				else if (statCode == qspStatIf)
+				if (statCode == qspStatIf)
 				{
 					elsePos = qspSearchElse(s, i, endLine);
 					if (QSP_NUM(args[0]))
@@ -540,6 +533,13 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 					}
 					else
 						i = (elsePos < 0 ? endPos : elsePos);
+				}
+				else
+				{
+					qspAddAction(args, count, s, i, endPos, codeOffset > 0);
+					qspFreeVariants(args, count);
+					if (qspErrorNum) break;
+					i = endPos;
 				}
 				continue;
 			}
