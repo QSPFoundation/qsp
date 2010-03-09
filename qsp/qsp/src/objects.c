@@ -157,12 +157,11 @@ QSP_BOOL qspStatementSetObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 	{
 		isImgChanged = QSP_TRUE;
 		if (qspIsAnyString(newImgPath))
-			obj->Image = qspGetAddText(obj->Image, newImgPath, 0, -1);
-		else if (obj->Image)
-		{
-			free(obj->Image);
-			obj->Image = 0;
-		}
+			newImgPath = qspGetAbsFromRelPath(newImgPath);
+		else
+			newImgPath = 0;
+		if (obj->Image) free(obj->Image);
+		obj->Image = newImgPath;
 	}
 	if (QSP_STRCMP(obj->Desc, QSP_STR(args[1])))
 	{
