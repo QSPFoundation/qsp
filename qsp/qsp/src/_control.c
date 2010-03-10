@@ -749,7 +749,7 @@ AS3_Val QSPEnableDebugMode(void *param, AS3_Val args)
 	qspWait(QSP_TRUE);
 	qspIsDebug = isDebug;
 	qspIsMustWait = QSP_FALSE;
-	return AS3_Undefined();
+	return AS3_True();
 }
 /* Получение данных текущего состояния */
 AS3_Val QSPGetCurStateData(void *param, AS3_Val args)
@@ -939,7 +939,7 @@ AS3_Val QSPSetInputStrText(void *param, AS3_Val args)
 	qspCurInputLen = qspAddText(&qspCurInput, valWC, 0, -1, QSP_FALSE);
 	free(valWC);
 	qspIsMustWait = QSP_FALSE;
-	return AS3_Undefined();
+	return AS3_True();
 }
 /* ------------------------------------------------------------ */
 /* Список действий */
@@ -1142,7 +1142,7 @@ AS3_Val QSPShowWindow(void *param, AS3_Val args)
 		break;
 	}
 	qspIsMustWait = QSP_FALSE;
-	return AS3_Undefined();
+	return AS3_True();
 }
 /* ------------------------------------------------------------ */
 /* Переменные */
@@ -1589,12 +1589,12 @@ AS3_Val QSPSelectMenuItem(void *param, AS3_Val args)
 	AS3_ArrayValue(args, "IntType", &index);
 	if (index >= 0 && index < qspCurMenuItems)
 	{
-		if (qspIsDisableCodeExec) return AS3_Undefined();
+		if (qspIsDisableCodeExec) return AS3_True();
 		arg.IsStr = QSP_FALSE;
 		QSP_NUM(arg) = index + 1;
 		qspExecLocByNameWithArgs(qspCurMenuLocs[index], &arg, 1);
 	}
-	return AS3_Undefined();
+	return AS3_True();
 }
 /* ------------------------------------------------------------ */
 /* Установка CALLBACK'ов */
@@ -1610,7 +1610,7 @@ AS3_Val QSPSetCallBack(void *param, AS3_Val args)
 	callBack.FuncVal = funcVal;
 	qspSetCallBack(type, callBack);
 	qspIsMustWait = QSP_FALSE;
-	return AS3_Undefined();
+	return AS3_True();
 }
 /* ------------------------------------------------------------ */
 /* Инициализация */
@@ -1642,7 +1642,7 @@ AS3_Val QSPInit(void *param, AS3_Val args)
 	qspInitCallBacks();
 	qspInitStats();
 	qspInitMath();
-	return AS3_Undefined();
+	return AS3_True();
 }
 /* Деинициализация */
 AS3_Val QSPDeInit(void *param, AS3_Val args)
@@ -1656,7 +1656,7 @@ AS3_Val QSPDeInit(void *param, AS3_Val args)
 	#ifdef _DEBUG
 		mwTerm();
 	#endif
-	return AS3_Undefined();
+	return AS3_True();
 }
 
 AS3_Val QSPReturnValue(void *param, AS3_Val args)
@@ -1666,7 +1666,7 @@ AS3_Val QSPReturnValue(void *param, AS3_Val args)
 	qspWait(QSP_TRUE);
 	qspSetReturnValue(resVal);
 	qspIsMustWait = QSP_FALSE;
-	return AS3_Undefined();
+	return AS3_True();
 }
 
 int main()
