@@ -340,7 +340,9 @@ void QSPCallBacks::OpenGameStatus(const QSP_CHAR *file)
 {
 	if (m_frame->GetIsQuit()) return;
 	if (file)
-		QSPOpenSavedGame(file, QSP_FALSE);
+	{
+		if (wxFileExists(wxString(file))) QSPOpenSavedGame(file, QSP_FALSE);
+	}
 	else
 	{
 		wxFileDialog dialog(m_frame, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
