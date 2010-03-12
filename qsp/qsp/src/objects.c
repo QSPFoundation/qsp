@@ -135,6 +135,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 		qspSetError(QSP_ERR_CANTADDOBJECT);
 		return QSP_FALSE;
 	}
+	if (qspCurSelObject >= objInd) qspCurSelObject = -1;
 	if (count >= 2 && qspIsAnyString(QSP_STR(args[1])))
 		imgPath = qspGetAbsFromRelPath(QSP_STR(args[1]));
 	else
