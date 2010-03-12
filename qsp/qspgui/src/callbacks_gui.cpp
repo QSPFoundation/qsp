@@ -65,16 +65,6 @@ void QSPCallBacks::DeInit()
 	FMOD_System_Release(m_sys);
 }
 
-bool QSPCallBacks::GetVarValue(const QSP_CHAR *name, int *num, QSP_CHAR **str)
-{
-	if (QSPGetVarValuesCount(name, num) && *num)
-	{
-		QSPGetVarValues(name, 0, num, str);
-		return true;
-	}
-	return false;
-}
-
 void QSPCallBacks::SetTimer(int msecs)
 {
 	if (m_frame->GetIsQuit()) return;
@@ -97,9 +87,9 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	const QSP_CHAR *mainDesc = QSPGetMainDesc();
 	const QSP_CHAR *varsDesc = QSPGetVarsDesc();
 	// -------------------------------
-	isScroll = !(GetVarValue(QSP_FMT("DISABLESCROLL"), &numVal, &strVal) && numVal);
-	isCanSave = !(GetVarValue(QSP_FMT("NOSAVE"), &numVal, &strVal) && numVal);
-	m_isHtml = GetVarValue(QSP_FMT("USEHTML"), &numVal, &strVal) && numVal;
+	isScroll = !(QSPGetVarValues(QSP_FMT("DISABLESCROLL"), 0, &numVal, &strVal) && numVal);
+	isCanSave = !(QSPGetVarValues(QSP_FMT("NOSAVE"), 0, &numVal, &strVal) && numVal);
+	m_isHtml = QSPGetVarValues(QSP_FMT("USEHTML"), 0, &numVal, &strVal) && numVal;
 	// -------------------------------
 	m_frame->GetVars()->SetIsHtml(m_isHtml, isScroll);
 	if (QSPIsVarsDescChanged())
@@ -143,7 +133,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	}
 	m_frame->GetObjects()->SetSelection(QSPGetSelObjectIndex());
 	// -------------------------------
-	if (GetVarValue(QSP_FMT("BACKIMAGE"), &numVal, &strVal) && strVal && *strVal)
+	if (QSPGetVarValues(QSP_FMT("BACKIMAGE"), 0, &numVal, &strVal) && strVal && *strVal)
 		m_frame->GetDesc()->LoadBackImage(m_gamePath + strVal);
 	else
 		m_frame->GetDesc()->LoadBackImage(wxEmptyString);

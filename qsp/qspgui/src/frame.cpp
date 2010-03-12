@@ -318,19 +318,19 @@ void QSPFrame::ApplyParams()
 	int setFontSize;
 	bool isRefresh = false;
 	// --------------
-	setBackColor = ((QSPCallBacks::GetVarValue(QSP_FMT("BCOLOR"), &numVal, &strVal) && numVal) ? numVal : m_backColor);
+	setBackColor = ((QSPGetVarValues(QSP_FMT("BCOLOR"), 0, &numVal, &strVal) && numVal) ? numVal : m_backColor);
 	if (setBackColor != m_desc->GetBackgroundColour())
 	{
 		if (ApplyBackColor(setBackColor)) isRefresh = true;
 	}
 	// --------------
-	setFontColor = ((QSPCallBacks::GetVarValue(QSP_FMT("FCOLOR"), &numVal, &strVal) && numVal) ? numVal : m_fontColor);
+	setFontColor = ((QSPGetVarValues(QSP_FMT("FCOLOR"), 0, &numVal, &strVal) && numVal) ? numVal : m_fontColor);
 	if (setFontColor != m_desc->GetForegroundColour())
 	{
 		if (ApplyFontColor(setFontColor)) isRefresh = true;
 	}
 	// --------------
-	setLinkColor = ((QSPCallBacks::GetVarValue(QSP_FMT("LCOLOR"), &numVal, &strVal) && numVal) ? numVal : m_linkColor);
+	setLinkColor = ((QSPGetVarValues(QSP_FMT("LCOLOR"), 0, &numVal, &strVal) && numVal) ? numVal : m_linkColor);
 	if (setLinkColor != m_desc->GetLinkColor())
 	{
 		if (ApplyLinkColor(setLinkColor)) isRefresh = true;
@@ -339,13 +339,13 @@ void QSPFrame::ApplyParams()
 	if (m_isUseFontSize)
 		setFontSize = m_fontSize;
 	else
-		setFontSize = ((QSPCallBacks::GetVarValue(QSP_FMT("FSIZE"), &numVal, &strVal) && numVal) ? numVal : m_fontSize);
+		setFontSize = ((QSPGetVarValues(QSP_FMT("FSIZE"), 0, &numVal, &strVal) && numVal) ? numVal : m_fontSize);
 	if (setFontSize != m_desc->GetTextFont().GetPointSize())
 	{
 		if (ApplyFontSize(setFontSize)) isRefresh = true;
 	}
 	// --------------
-	setFontName = ((QSPCallBacks::GetVarValue(QSP_FMT("FNAME"), &numVal, &strVal) && strVal && *strVal) ? wxString(strVal) : m_fontName);
+	setFontName = ((QSPGetVarValues(QSP_FMT("FNAME"), 0, &numVal, &strVal) && strVal && *strVal) ? wxString(strVal) : m_fontName);
 	if (!setFontName.IsSameAs(m_desc->GetTextFont().GetFaceName(), false))
 	{
 		if (ApplyFontName(setFontName))

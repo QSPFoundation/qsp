@@ -44,7 +44,6 @@
 		// Methods
 		static void Init(QSPFrame *frame);
 		static void DeInit();
-		static bool GetVarValue(const QSP_CHAR *name, int *num, QSP_CHAR **str);
 		static void SetOverallVolume(float coeff);
 
 		// CallBacks
