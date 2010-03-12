@@ -361,7 +361,7 @@ QSP_BOOL QSPGetVarValues(const QSP_CHAR *name, int ind, int *numVal, QSP_CHAR **
 	qspWait(QSP_TRUE);
 	qspResetError();
 	var = qspVarReference((QSP_CHAR *)name, QSP_FALSE);
-	if (qspErrorNum)
+	if (qspErrorNum || ind < 0 || ind >= var->ValsCount)
 	{
 		qspIsMustWait = QSP_FALSE;
 		return QSP_FALSE;
@@ -1184,7 +1184,7 @@ AS3_Val QSPGetVarValues(void *param, AS3_Val args)
 	nameWC = qspC2W(name);
 	var = qspVarReference(nameWC, QSP_FALSE);
 	free(nameWC);
-	if (qspErrorNum)
+	if (qspErrorNum || ind < 0 || ind >= var->ValsCount)
 	{
 		qspIsMustWait = QSP_FALSE;
 		return AS3_Null();
