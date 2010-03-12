@@ -121,63 +121,32 @@ int qspObjIndex(QSP_CHAR *name)
 QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	QSPObj *obj;
+	int i, objInd;
 	QSP_CHAR *imgPath;
+	if (count == 3)
+	{
+		objInd = QSP_NUM(args[2]) - 1;
+		if (!(objInd >= 0 && objInd <= qspCurObjectsCount)) return QSP_FALSE;
+	}
+	else
+		objInd = qspCurObjectsCount;
 	if (qspCurObjectsCount == QSP_MAXOBJECTS)
 	{
 		qspSetError(QSP_ERR_CANTADDOBJECT);
 		return QSP_FALSE;
 	}
-	if (count == 2 && qspIsAnyString(QSP_STR(args[1])))
+	if (count >= 2 && qspIsAnyString(QSP_STR(args[1])))
 		imgPath = qspGetAbsFromRelPath(QSP_STR(args[1]));
 	else
 		imgPath = 0;
-	obj = qspCurObjects + qspCurObjectsCount++;
+	for (i = qspCurObjectsCount; i > objInd; --i)
+		qspCurObjects[i] = qspCurObjects[i - 1];
+	++qspCurObjectsCount;
+	obj = qspCurObjects + objInd;
 	obj->Image = imgPath;
 	obj->Desc = qspGetNewText(QSP_STR(args[0]), -1);
 	qspIsObjectsChanged = QSP_TRUE;
-	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args, count);
-	return QSP_FALSE;
-}
-
-QSP_BOOL qspStatementSetObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
-{
-	QSPObj *obj;
-	QSPVariant name;
-	QSP_BOOL isDescChanged, isImgChanged;
-	QSP_CHAR *oldImgPath, *newImgPath;
-	int oldRefreshCount, objInd = QSP_NUM(args[0]) - 1;
-	if (!(objInd >= 0 && objInd < qspCurObjectsCount)) return QSP_FALSE;
-	obj = qspCurObjects + objInd;
-	isDescChanged = isImgChanged = QSP_FALSE;
-	name.IsStr = QSP_TRUE;
-	QSP_STR(name) = obj->Desc;
-	oldImgPath = (obj->Image ? obj->Image : QSP_FMT(""));
-	newImgPath = (count == 3 ? QSP_STR(args[2]) : QSP_FMT(""));
-	if (QSP_STRCMP(oldImgPath, newImgPath) && (qspIsAnyString(oldImgPath) || qspIsAnyString(newImgPath)))
-	{
-		isImgChanged = QSP_TRUE;
-		if (qspIsAnyString(newImgPath))
-			newImgPath = qspGetAbsFromRelPath(newImgPath);
-		else
-			newImgPath = 0;
-		if (obj->Image) free(obj->Image);
-		obj->Image = newImgPath;
-	}
-	if (QSP_STRCMP(obj->Desc, QSP_STR(args[1])))
-	{
-		isDescChanged = QSP_TRUE;
-		obj->Desc = qspGetNewText(QSP_STR(args[1]), -1);
-	}
-	if (isDescChanged || isImgChanged)
-	{
-		if (qspCurSelObject >= objInd) qspCurSelObject = -1;
-		qspIsObjectsChanged = QSP_TRUE;
-		oldRefreshCount = qspRefreshCount;
-		qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJDEL"), &name, 1);
-		if (isDescChanged) free(QSP_STR(name));
-		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-		qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args + 1, count - 1);
-	}
+	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args, (count < 3 ? count : 2));
 	return QSP_FALSE;
 }
 
