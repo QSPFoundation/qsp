@@ -72,7 +72,7 @@ void qspClearObjectsWithNotify()
 static void qspRemoveObject(int index)
 {
 	QSPVariant name;
-	if (!(index >= 0 && index < qspCurObjectsCount)) return;
+	if (index < 0 || index >= qspCurObjectsCount) return;
 	if (qspCurSelObject >= index) qspCurSelObject = -1;
 	name.IsStr = QSP_TRUE;
 	QSP_STR(name) = qspCurObjects[index].Desc;
@@ -126,7 +126,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 	if (count == 3)
 	{
 		objInd = QSP_NUM(args[2]) - 1;
-		if (!(objInd >= 0 && objInd <= qspCurObjectsCount)) return QSP_FALSE;
+		if (objInd < 0 || objInd > qspCurObjectsCount) return QSP_FALSE;
 	}
 	else
 		objInd = qspCurObjectsCount;
