@@ -335,8 +335,6 @@ void qspInitCallBacks()
 void qspSetCallBack(int type, QSP_CALLBACK func)
 {
 	qspCallBacks[type] = func;
-	AS3_Acquire(qspCallBacks[type].ThisVal);
-	AS3_Acquire(qspCallBacks[type].FuncVal);
 	qspCallBacks[type].IsSet = QSP_TRUE;
 }
 
