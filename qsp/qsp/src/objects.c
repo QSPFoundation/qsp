@@ -153,12 +153,10 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 
 QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
-	int objInd;
 	switch (extArg)
 	{
 	case 0:
-		objInd = qspObjIndex(QSP_STR(args[0]));
-		if (objInd >= 0) qspRemoveObject(objInd);
+		qspRemoveObject(qspObjIndex(QSP_STR(args[0])));
 		break;
 	case 1:
 		if (count)
