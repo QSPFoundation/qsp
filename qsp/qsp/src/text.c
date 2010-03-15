@@ -189,9 +189,9 @@ QSP_CHAR *qspStrNCopy(QSP_CHAR *strDest, QSP_CHAR *strSource, int maxLen)
 
 int qspStrLen(QSP_CHAR *str)
 {
-	QSP_CHAR *eos = str;
-	while (*eos++);
-	return (int)(eos - str - 1);
+	QSP_CHAR *bos = str;
+	while (*str) ++str;
+	return (int)(str - bos);
 }
 
 QSP_CHAR *qspStrStr(QSP_CHAR *str, QSP_CHAR *strSearch)
