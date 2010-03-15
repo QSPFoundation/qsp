@@ -408,6 +408,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\towlower.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\towupper.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\variables.c"
 				>
 			</File>

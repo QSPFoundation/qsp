@@ -200,6 +200,12 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="src/time.h" />
+		<Unit filename="src/towlower.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="src/towupper.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="src/variables.c">
 			<Option compilerVar="CC" />
 		</Unit>
