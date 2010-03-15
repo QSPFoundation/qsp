@@ -198,7 +198,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_WIN;_UNICODE;_DEBUG;NOT_RUBY;EXPORT"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_WIN;_UNICODE;_INTERNAL_WCS;_DEBUG;NOT_RUBY;EXPORT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -278,7 +278,7 @@
 				InlineFunctionExpansion="2"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_WIN;_UNICODE;NOT_RUBY;EXPORT"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;_WIN;_UNICODE;_INTERNAL_WCS;NOT_RUBY;EXPORT"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
