@@ -79,7 +79,7 @@ static void qspAddStatement(int statCode, int extArg, QSP_STATEMENT func, int mi
 
 static void qspAddStatName(int statCode, QSP_CHAR *statName, int level)
 {
-	int count, len = QSP_STRLEN(statName);
+	int count, len = qspStrLen(statName);
 	count = qspStatsNamesCounts[level];
 	qspStatsNames[level][count].Name = statName;
 	qspStatsNames[level][count].NameLen = len;
@@ -91,7 +91,7 @@ static void qspAddStatName(int statCode, QSP_CHAR *statName, int level)
 
 static int qspStatsCompare(const void *statName1, const void *statName2)
 {
-	return QSP_STRCMP(((QSPStatName *)statName1)->Name, ((QSPStatName *)statName2)->Name);
+	return qspStrsComp(((QSPStatName *)statName1)->Name, ((QSPStatName *)statName2)->Name);
 }
 
 static int qspStatStringCompare(const void *name, const void *compareTo)
@@ -308,7 +308,7 @@ static int qspSearchLabel(QSP_CHAR **s, int start, int end, QSP_CHAR *str)
 	{
 		if (*s[start] == QSP_LABEL[0])
 		{
-			pos = QSP_STRCHR(s[start], QSP_STATDELIM[0]);
+			pos = qspStrChar(s[start], QSP_STATDELIM[0]);
 			if (pos)
 			{
 				*pos = 0;
@@ -318,7 +318,7 @@ static int qspSearchLabel(QSP_CHAR **s, int start, int end, QSP_CHAR *str)
 			else
 				buf = qspDelSpc(s[start] + 1);
 			qspUpperStr(buf);
-			if (!QSP_STRCMP(buf, str))
+			if (!qspStrsComp(buf, str))
 			{
 				free(buf);
 				return start;

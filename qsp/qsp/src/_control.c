@@ -151,7 +151,7 @@ QSP_BOOL QSPGetExprValue(const QSP_CHAR *expr, QSP_BOOL *isString, int *numVal, 
 	*isString = v.IsStr;
 	if (v.IsStr)
 	{
-		QSP_STRNCPY(strVal, QSP_STR(v), strValBufSize - 1);
+		qspStrNCopy(strVal, QSP_STR(v), strValBufSize - 1);
 		free(QSP_STR(v));
 		strVal[strValBufSize - 1] = 0;
 	}
@@ -605,7 +605,7 @@ QSP_BOOL QSPSaveGameAsString(QSP_CHAR *strBuf, int strBufSize, int *realSize, QS
 		qspIsMustWait = QSP_FALSE;
 		return QSP_FALSE;
 	}
-	QSP_STRNCPY(strBuf, data, strBufSize - 1);
+	qspStrNCopy(strBuf, data, strBufSize - 1);
 	free(data);
 	strBuf[strBufSize - 1] = 0;
 	qspIsMustWait = QSP_FALSE;

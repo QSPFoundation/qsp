@@ -48,29 +48,9 @@
 		#else
 			#define QSP_FOPEN qspFileOpen
 		#endif
-		#ifdef _INTERNAL_WCS
-			#define QSP_STRCPY qspStrCopy
-			#define QSP_STRNCPY qspStrNCopy
-			#define QSP_STRLEN qspStrLen
-			#define QSP_STRSTR qspStrStr
-			#define QSP_STRCHR qspStrChar
-			#define QSP_STRCMP qspStrsComp
-			#define QSP_STRCOLL qspStrsComp
-			#define QSP_STRPBRK qspStrPBrk
-			#define QSP_CHRLWR qspToWLower
-			#define QSP_CHRUPR qspToWUpper
-		#else
-			#define QSP_STRCPY wcscpy
-			#define QSP_STRNCPY wcsncpy
-			#define QSP_STRLEN (int)wcslen
-			#define QSP_STRSTR wcsstr
-			#define QSP_STRCHR wcschr
-			#define QSP_STRCMP wcscmp
-			#define QSP_STRCOLL wcscmp
-			#define QSP_STRPBRK wcspbrk
-			#define QSP_CHRLWR towlower
-			#define QSP_CHRUPR towupper
-		#endif
+		#define QSP_STRCOLL qspStrsComp
+		#define QSP_CHRLWR qspToWLower
+		#define QSP_CHRUPR qspToWUpper
 		#define QSP_WCSTOMBSLEN(a) (int)wcstombs(0, a, 0)
 		#define QSP_WCSTOMBS wcstombs
 		#define QSP_MBTOSB(a) ((a) % 256)
@@ -81,15 +61,8 @@
 		#define QSP_BTOWC
 	#else
 		#define QSP_FOPEN fopen
-		#define QSP_STRCPY strcpy
-		#define QSP_STRNCPY strncpy
-		#define QSP_STRLEN (int)strlen
-		#define QSP_STRSTR strstr
-		#define QSP_STRCHR strchr
-		#define QSP_STRCMP strcmp
-		#define QSP_STRPBRK strpbrk
-		#define QSP_WCSTOMBSLEN (int)strlen
-		#define QSP_WCSTOMBS strncpy
+		#define QSP_WCSTOMBSLEN qspStrLen
+		#define QSP_WCSTOMBS qspStrNCopy
 		#define QSP_MBTOSB(a) ((unsigned char)(a))
 		#if defined(_WIN) || defined(_PSP)
 			#define QSP_FROM_OS_CHAR
@@ -156,10 +129,5 @@
 
 	/* Variables */
 	extern volatile QSP_BOOL qspIsMustWait;
-
-	#ifdef _INTERNAL_WCS
-		int qspToWLower(int);
-		int qspToWUpper(int);
-	#endif
 
 #endif

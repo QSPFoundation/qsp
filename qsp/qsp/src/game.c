@@ -172,7 +172,7 @@ static QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
 	int i, ind, locsCount, actsCount;
 	QSP_BOOL isOldFormat;
 	QSP_CHAR *buf = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
-	isOldFormat = QSP_STRCMP(buf, QSP_GAMEID) != 0;
+	isOldFormat = qspStrsComp(buf, QSP_GAMEID) != 0;
 	free(buf);
 	ind = (isOldFormat ? 30 : 4);
 	if (ind > count) return QSP_FALSE;
@@ -219,7 +219,7 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL
 		return;
 	}
 	buf = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
-	isOldFormat = QSP_STRCMP(buf, QSP_GAMEID) != 0;
+	isOldFormat = qspStrsComp(buf, QSP_GAMEID) != 0;
 	free(buf);
 	buf = (isOldFormat ?
 		qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE));
@@ -416,9 +416,9 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, int strsCount)
 	int i, ind, count, lastInd, temp, selAction, selObject;
 	ind = 17;
 	if (ind > strsCount) return QSP_FALSE;
-	if (QSP_STRCMP(strs[0], QSP_SAVEDGAMEID) ||
-		QSP_STRCMP(strs[1], QSP_GAMEMINVER) < 0 ||
-		QSP_STRCMP(strs[1], QSP_VER) > 0) return QSP_FALSE;
+	if (qspStrsComp(strs[0], QSP_SAVEDGAMEID) ||
+		qspStrsComp(strs[1], QSP_GAMEMINVER) < 0 ||
+		qspStrsComp(strs[1], QSP_VER) > 0) return QSP_FALSE;
 	if (!qspGetVarNumValue(QSP_FMT("DEBUG")) &&
 		qspReCodeGetIntVal(strs[2]) != qspQstCRC) return QSP_FALSE;
 	selAction = qspReCodeGetIntVal(strs[4]);
@@ -483,9 +483,9 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 	qspCurSelAction = qspReCodeGetIntVal(strs[4]);
 	qspCurSelObject = qspReCodeGetIntVal(strs[5]);
 	if (*strs[6]) qspViewPath = qspCodeReCode(strs[6], QSP_FALSE);
-	if (*strs[7]) qspCurInputLen = QSP_STRLEN(qspCurInput = qspCodeReCode(strs[7], QSP_FALSE));
-	if (*strs[8]) qspCurDescLen = QSP_STRLEN(qspCurDesc = qspCodeReCode(strs[8], QSP_FALSE));
-	if (*strs[9]) qspCurVarsLen = QSP_STRLEN(qspCurVars = qspCodeReCode(strs[9], QSP_FALSE));
+	if (*strs[7]) qspCurInputLen = qspStrLen(qspCurInput = qspCodeReCode(strs[7], QSP_FALSE));
+	if (*strs[8]) qspCurDescLen = qspStrLen(qspCurDesc = qspCodeReCode(strs[8], QSP_FALSE));
+	if (*strs[9]) qspCurVarsLen = qspStrLen(qspCurVars = qspCodeReCode(strs[9], QSP_FALSE));
 	qspCurLoc = qspReCodeGetIntVal(strs[10]);
 	qspCurIsShowActs = qspReCodeGetIntVal(strs[11]) != 0;
 	qspCurIsShowObjs = qspReCodeGetIntVal(strs[12]) != 0;

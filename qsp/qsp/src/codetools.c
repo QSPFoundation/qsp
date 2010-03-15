@@ -90,7 +90,7 @@ static int qspProcessEOLExtensions(QSP_CHAR **s, int count, QSP_CHAR ***strs)
 		len = qspAddText(&str, s[i], 0, -1, QSP_TRUE);
 		if (len >= QSP_LEN(QSP_EOLEXT))
 		{
-			while (!QSP_STRCMP(str + len - QSP_LEN(QSP_EOLEXT), QSP_EOLEXT))
+			while (!qspStrsComp(str + len - QSP_LEN(QSP_EOLEXT), QSP_EOLEXT))
 			{
 				if (++i == count) break;
 				len = qspAddText(&str, s[i], len - QSP_LEN(QSP_EOLEXT), -1, QSP_FALSE);

@@ -35,12 +35,12 @@ static int qspLocStringCompare(const void *, const void *);
 
 static int qspLocsCompare(const void *locName1, const void *locName2)
 {
-	return QSP_STRCMP(((QSPLocName *)locName1)->Name, ((QSPLocName *)locName2)->Name);
+	return qspStrsComp(((QSPLocName *)locName1)->Name, ((QSPLocName *)locName2)->Name);
 }
 
 static int qspLocStringCompare(const void *name, const void *compareTo)
 {
-	return QSP_STRCMP((QSP_CHAR *)name, ((QSPLocName *)compareTo)->Name);
+	return qspStrsComp((QSP_CHAR *)name, ((QSPLocName *)compareTo)->Name);
 }
 
 void qspCreateWorld(int start, int locsCount)
@@ -125,7 +125,7 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 	if (isChangeDesc)
 	{
 		if (qspCurDesc) free(qspCurDesc);
-		qspCurDescLen = QSP_STRLEN(qspCurDesc = str);
+		qspCurDescLen = qspStrLen(qspCurDesc = str);
 		qspIsMainDescChanged = QSP_TRUE;
 	}
 	else

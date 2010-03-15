@@ -62,4 +62,9 @@
 	QSP_CHAR *qspReplaceText(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspFormatText(QSP_CHAR *, QSP_BOOL);
 
+	#ifdef _UNICODE
+		int qspToWLower(int);
+		int qspToWUpper(int);
+	#endif
+
 #endif

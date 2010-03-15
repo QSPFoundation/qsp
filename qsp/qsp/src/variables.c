@@ -134,7 +134,7 @@ QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
 	QSP_CHAR *uName;
 	unsigned char bCode;
 	if (*name == QSP_STRCHAR[0]) ++name;
-	if (!(*name) || qspIsDigit(*name) || QSP_STRPBRK(name, QSP_DELIMS))
+	if (!(*name) || qspIsDigit(*name) || qspStrPBrk(name, QSP_DELIMS))
 	{
 		qspSetError(QSP_ERR_NOTCORRECTNAME);
 		return 0;
@@ -154,7 +154,7 @@ QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
 				free(uName);
 			return var;
 		}
-		if (!QSP_STRCMP(var->Name, uName))
+		if (!qspStrsComp(var->Name, uName))
 		{
 			free(uName);
 			return var;
@@ -182,7 +182,7 @@ static int qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 	int i, n = var->IndsCount;
 	qspUpperStr(uStr = qspGetNewText(str, -1));
 	for (i = 0; i < n; ++i)
-		if (!QSP_STRCMP(var->Indices[i], uStr))
+		if (!qspStrsComp(var->Indices[i], uStr))
 		{
 			free(uStr);
 			return i;
@@ -203,7 +203,7 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isSet, int *index)
 	QSPVar *var;
 	QSPVariant ind;
 	int oldRefreshCount;
-	QSP_CHAR *rPos, *lPos = QSP_STRCHR(s, QSP_LSBRACK[0]);
+	QSP_CHAR *rPos, *lPos = qspStrChar(s, QSP_LSBRACK[0]);
 	if (lPos)
 	{
 		*lPos = 0;
@@ -492,7 +492,7 @@ int qspArrayPos(QSPVariant *args, int argsCount, QSP_BOOL isRegExp)
 					return ind;
 				}
 			}
-			else if (!QSP_STRCMP(str, QSP_PSTR(val)))
+			else if (!qspStrsComp(str, QSP_PSTR(val)))
 				return ind;
 		}
 		else

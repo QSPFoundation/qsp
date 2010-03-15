@@ -98,15 +98,15 @@ int qspObjIndex(QSP_CHAR *name)
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspCurObjectsCount; ++i)
 	{
-		objNameLen = QSP_STRLEN(qspCurObjects[i].Desc);
+		objNameLen = qspStrLen(qspCurObjects[i].Desc);
 		if (objNameLen >= bufSize)
 		{
 			bufSize = objNameLen + 8;
 			buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
 		}
-		QSP_STRCPY(buf, qspCurObjects[i].Desc);
+		qspStrCopy(buf, qspCurObjects[i].Desc);
 		qspUpperStr(buf);
-		if (!QSP_STRCMP(buf, uName))
+		if (!qspStrsComp(buf, uName))
 		{
 			free(uName);
 			free(buf);

@@ -57,15 +57,15 @@ static int qspActIndex(QSP_CHAR *name)
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspCurActionsCount; ++i)
 	{
-		actNameLen = QSP_STRLEN(qspCurActions[i].Desc);
+		actNameLen = qspStrLen(qspCurActions[i].Desc);
 		if (actNameLen >= bufSize)
 		{
 			bufSize = actNameLen + 16;
 			buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
 		}
-		QSP_STRCPY(buf, qspCurActions[i].Desc);
+		qspStrCopy(buf, qspCurActions[i].Desc);
 		qspUpperStr(buf);
-		if (!QSP_STRCMP(buf, uName))
+		if (!qspStrsComp(buf, uName))
 		{
 			free(uName);
 			free(buf);
