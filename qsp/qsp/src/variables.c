@@ -133,9 +133,8 @@ static void qspRemoveArrayItem(QSP_CHAR *name, int index)
 				free(ind->Str);
 				isRemoving = QSP_TRUE;
 			}
-			else if (ind->Index > origIndex)
-				ind->Index--;
-			if (isRemoving) var->Indices[index] = var->Indices[index + 1];
+			if (isRemoving) *ind = var->Indices[index + 1];
+			if (ind->Index > origIndex) ind->Index--;
 		}
 	}
 }
