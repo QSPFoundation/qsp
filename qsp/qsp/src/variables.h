@@ -34,10 +34,16 @@
 
 	typedef struct
 	{
+		int Index;
+		QSP_CHAR *Str;
+	} QSPVarIndex;
+
+	typedef struct
+	{
 		QSP_CHAR *Name;
 		QSPVarValue *Values;
 		int ValsCount;
-		QSP_CHAR **Indices;
+		QSPVarIndex *Indices;
 		int IndsCount;
 	} QSPVar;
 

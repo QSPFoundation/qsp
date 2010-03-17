@@ -44,6 +44,7 @@ unsigned char qspRand8[256] =
 	0xEA, 0x91, 0x34, 0xF6, 0x88, 0x43, 0x99, 0xD6, 0x89, 0x9B, 0x08, 0xF1, 0x5E, 0x1C, 0xB1, 0x13
 };
 
+static int qspIndStringCompare(const void *, const void *);
 static void qspRemoveArray(QSP_CHAR *);
 static void qspRemoveArrayItem(QSP_CHAR *, int);
 static void qspInitVarData(QSPVar *);
@@ -53,6 +54,11 @@ static void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
 static void qspSetVar(QSP_CHAR *, QSPVariant *, QSP_CHAR);
 static QSPVariant qspGetVarValueByReference(QSPVar *, int, QSP_BOOL);
 static void qspCopyVar(QSPVar *, QSPVar *);
+
+static int qspIndStringCompare(const void *name, const void *compareTo)
+{
+	return qspStrsComp((QSP_CHAR *)name, ((QSPVarIndex *)compareTo)->Str);
+}
 
 void qspClearVars(QSP_BOOL isFirst)
 {
@@ -82,7 +88,13 @@ void qspEmptyVar(QSPVar *var)
 			if (var->Values[count].Str) free(var->Values[count].Str);
 		free(var->Values);
 	}
-	qspFreeStrs(var->Indices, var->IndsCount);
+	if (var->Indices)
+	{
+		count = var->IndsCount;
+		while (--count >= 0)
+			free(var->Indices[count].Str);
+		free(var->Indices);
+	}
 	qspInitVarData(var);
 }
 
@@ -96,6 +108,8 @@ static void qspRemoveArray(QSP_CHAR *name)
 static void qspRemoveArrayItem(QSP_CHAR *name, int index)
 {
 	QSPVar *var;
+	QSP_BOOL isRemoving;
+	QSPVarIndex *ind;
 	int origIndex;
 	if (!(var = qspVarReferenceWithType(name, QSP_FALSE, 0))) return;
 	if (index < 0 || index >= var->ValsCount) return;
@@ -109,12 +123,19 @@ static void qspRemoveArrayItem(QSP_CHAR *name, int index)
 	}
 	if (origIndex < var->IndsCount)
 	{
-		free(var->Indices[origIndex]);
+		isRemoving = QSP_FALSE;
 		var->IndsCount--;
-		while (origIndex < var->IndsCount)
+		for (index = 0; index < var->IndsCount; ++index)
 		{
-			var->Indices[origIndex] = var->Indices[origIndex + 1];
-			++origIndex;
+			ind = var->Indices + index;
+			if (ind->Index == origIndex)
+			{
+				free(ind->Str);
+				isRemoving = QSP_TRUE;
+			}
+			else if (ind->Index > origIndex)
+				ind->Index--;
+			if (isRemoving) var->Indices[index] = var->Indices[index + 1];
 		}
 	}
 }
@@ -179,19 +200,31 @@ QSPVar *qspVarReferenceWithType(QSP_CHAR *name, QSP_BOOL isCreate, QSP_BOOL *isS
 static int qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 {
 	QSP_CHAR *uStr;
+	QSPVarIndex *ind;
 	int i, n = var->IndsCount;
 	qspUpperStr(uStr = qspGetNewText(str, -1));
-	for (i = 0; i < n; ++i)
-		if (!qspStrsComp(var->Indices[i], uStr))
+	if (n > 0)
+	{
+		ind = (QSPVarIndex *)bsearch(uStr, var->Indices, n, sizeof(QSPVarIndex), qspIndStringCompare);
+		if (ind)
 		{
 			free(uStr);
-			return i;
+			return ind->Index;
 		}
+	}
 	if (isCreate)
 	{
 		var->IndsCount++;
-		var->Indices = (QSP_CHAR **)realloc(var->Indices, (n + 1) * sizeof(QSP_CHAR *));
-		var->Indices[n] = uStr;
+		var->Indices = (QSPVarIndex *)realloc(var->Indices, (n + 1) * sizeof(QSPVarIndex));
+		i = n - 1;
+		while (i >= 0 && qspStrsComp(var->Indices[i].Str, uStr) > 0)
+		{
+			var->Indices[i + 1] = var->Indices[i];
+			--i;
+		}
+		++i;
+		var->Indices[i].Str = uStr;
+		var->Indices[i].Index = n;
 		return n;
 	}
 	free(uStr);
@@ -420,7 +453,17 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src)
 	else
 		dest->Values = 0;
 	count = dest->IndsCount = src->IndsCount;
-	qspCopyStrs(&dest->Indices, src->Indices, 0, count);
+	if (count)
+	{
+		dest->Indices = (QSPVarIndex *)malloc(count * sizeof(QSPVarIndex));
+		while (--count >= 0)
+		{
+			dest->Indices[count].Index = src->Indices[count].Index;
+			dest->Indices[count].Str = qspGetNewText(src->Indices[count].Str, -1);
+		}
+	}
+	else
+		dest->Indices = 0;
 }
 
 int qspArraySize(QSP_CHAR *name)
