@@ -32,7 +32,7 @@ volatile QSP_BOOL qspIsDisableCodeExec = QSP_FALSE;
 #endif
 
 static void qspSaveCallState(QSPCallState *, QSP_BOOL);
-static void qspRestoreCallState(QSPCallState *);
+static void qspRestoreCallState(QSPCallState *, QSP_BOOL);
 
 static void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec)
 {
@@ -48,7 +48,7 @@ static void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec)
 	qspIsMustWait = QSP_FALSE;
 }
 
-static void qspRestoreCallState(QSPCallState *state)
+static void qspRestoreCallState(QSPCallState *state, QSP_BOOL isResetError)
 {
 	qspIsMustWait = state->IsMustWait;
 	qspIsDisableCodeExec = state->IsDisableCodeExec;
@@ -57,7 +57,7 @@ static void qspRestoreCallState(QSPCallState *state)
 	if (state->IsObjectsChanged) qspIsObjectsChanged = QSP_TRUE;
 	if (state->IsVarsDescChanged) qspIsVarsDescChanged = QSP_TRUE;
 	if (state->IsMainDescChanged) qspIsMainDescChanged = QSP_TRUE;
-	qspResetError();
+	if (isResetError) qspResetError();
 }
 
 #ifndef _FLASH
@@ -84,7 +84,7 @@ void qspCallDebug(QSP_CHAR *str)
 	{
 		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_DEBUG](str);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -96,7 +96,7 @@ void qspCallSetTimer(int msecs)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SETTIMER](msecs);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -108,7 +108,7 @@ void qspCallRefreshInt(QSP_BOOL isRedraw)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_REFRESHINT](isRedraw);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -120,7 +120,7 @@ void qspCallSetInputStrText(QSP_CHAR *text)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SETINPUTSTRTEXT](text);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -132,7 +132,7 @@ void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_ADDMENUITEM](name, imgPath);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -144,7 +144,7 @@ void qspCallSystem(QSP_CHAR *cmd)
 	{
 		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_SYSTEM](cmd);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -157,7 +157,7 @@ void qspCallOpenGame(QSP_CHAR *file)
 	{
 		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_OPENGAMESTATUS](file);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_FALSE);
 	}
 }
 
@@ -171,7 +171,7 @@ void qspCallSaveGame(QSP_CHAR *file)
 	{
 		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_SAVEGAMESTATUS](file);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_FALSE);
 	}
 }
 
@@ -183,7 +183,7 @@ void qspCallShowMessage(QSP_CHAR *text)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SHOWMSGSTR](text);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -195,7 +195,7 @@ void qspCallShowMenu()
 	{
 		qspSaveCallState(&state, QSP_FALSE);
 		qspCallBacks[QSP_CALL_SHOWMENU]();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_FALSE);
 	}
 }
 
@@ -207,7 +207,7 @@ void qspCallShowPicture(QSP_CHAR *file)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SHOWIMAGE](file);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -219,7 +219,7 @@ void qspCallShowWindow(int type, QSP_BOOL isShow)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SHOWWINDOW](type, isShow);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -231,7 +231,7 @@ void qspCallPlayFile(QSP_CHAR *file, int volume)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_PLAYFILE](file, volume);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -244,7 +244,7 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		isPlaying = (QSP_BOOL)qspCallBacks[QSP_CALL_ISPLAYINGFILE](file);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 		return isPlaying;
 	}
 	return QSP_FALSE;
@@ -258,7 +258,7 @@ void qspCallSleep(int msecs)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_SLEEP](msecs);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -271,7 +271,7 @@ int qspCallGetMSCount()
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		count = qspCallBacks[QSP_CALL_GETMSCOUNT]();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 		return count;
 	}
 	return 0;
@@ -285,7 +285,7 @@ void qspCallCloseFile(QSP_CHAR *file)
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_CLOSEFILE](file);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -297,7 +297,7 @@ void qspCallDeleteMenu()
 	{
 		qspSaveCallState(&state, QSP_TRUE);
 		qspCallBacks[QSP_CALL_DELETEMENU]();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -314,7 +314,7 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 		*buffer = 0;
 		qspCallBacks[QSP_CALL_INPUTBOX](text, buffer, maxLen);
 		buffer[maxLen] = 0;
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 	else
 		buffer = qspGetNewText(QSP_FMT(""), 0);
@@ -358,7 +358,7 @@ void qspCallDebug(QSP_CHAR *str)
 		AS3_Call(qspCallBacks[QSP_CALL_DEBUG].FuncVal, qspCallBacks[QSP_CALL_DEBUG].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -374,7 +374,7 @@ void qspCallSetTimer(int msecs)
 		AS3_Call(qspCallBacks[QSP_CALL_SETTIMER].FuncVal, qspCallBacks[QSP_CALL_SETTIMER].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -390,7 +390,7 @@ void qspCallRefreshInt(QSP_BOOL isRedraw)
 		AS3_Call(qspCallBacks[QSP_CALL_REFRESHINT].FuncVal, qspCallBacks[QSP_CALL_REFRESHINT].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -414,7 +414,7 @@ void qspCallSetInputStrText(QSP_CHAR *text)
 		AS3_Call(qspCallBacks[QSP_CALL_SETINPUTSTRTEXT].FuncVal, qspCallBacks[QSP_CALL_SETINPUTSTRTEXT].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -436,7 +436,7 @@ void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
 		AS3_Call(qspCallBacks[QSP_CALL_ADDMENUITEM].FuncVal, qspCallBacks[QSP_CALL_ADDMENUITEM].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -460,7 +460,7 @@ void qspCallSystem(QSP_CHAR *cmd)
 		AS3_Call(qspCallBacks[QSP_CALL_SYSTEM].FuncVal, qspCallBacks[QSP_CALL_SYSTEM].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -485,7 +485,7 @@ void qspCallOpenGame(QSP_CHAR *file)
 		AS3_Call(qspCallBacks[QSP_CALL_OPENGAMESTATUS].FuncVal, qspCallBacks[QSP_CALL_OPENGAMESTATUS].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_FALSE);
 	}
 }
 
@@ -511,7 +511,7 @@ void qspCallSaveGame(QSP_CHAR *file)
 		AS3_Call(qspCallBacks[QSP_CALL_SAVEGAMESTATUS].FuncVal, qspCallBacks[QSP_CALL_SAVEGAMESTATUS].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_FALSE);
 	}
 }
 
@@ -535,7 +535,7 @@ void qspCallShowMessage(QSP_CHAR *text)
 		AS3_Call(qspCallBacks[QSP_CALL_SHOWMSGSTR].FuncVal, qspCallBacks[QSP_CALL_SHOWMSGSTR].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -551,7 +551,7 @@ void qspCallShowMenu()
 		AS3_Call(qspCallBacks[QSP_CALL_SHOWMENU].FuncVal, qspCallBacks[QSP_CALL_SHOWMENU].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_FALSE);
 	}
 }
 
@@ -575,7 +575,7 @@ void qspCallShowPicture(QSP_CHAR *file)
 		AS3_Call(qspCallBacks[QSP_CALL_SHOWIMAGE].FuncVal, qspCallBacks[QSP_CALL_SHOWIMAGE].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -591,7 +591,7 @@ void qspCallShowWindow(int type, QSP_BOOL isShow)
 		AS3_Call(qspCallBacks[QSP_CALL_SHOWWINDOW].FuncVal, qspCallBacks[QSP_CALL_SHOWWINDOW].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -615,7 +615,7 @@ void qspCallPlayFile(QSP_CHAR *file, int volume)
 		AS3_Call(qspCallBacks[QSP_CALL_PLAYFILE].FuncVal, qspCallBacks[QSP_CALL_PLAYFILE].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -642,7 +642,7 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 		flyield();
 		isPlaying = (QSP_BOOL)AS3_IntValue(result);
 		AS3_Release(result);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 		return isPlaying;
 	}
 	return QSP_FALSE;
@@ -660,7 +660,7 @@ void qspCallSleep(int msecs)
 		AS3_Call(qspCallBacks[QSP_CALL_SLEEP].FuncVal, qspCallBacks[QSP_CALL_SLEEP].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -679,7 +679,7 @@ int qspCallGetMSCount()
 		flyield();
 		count = AS3_IntValue(result);
 		AS3_Release(result);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 		return count;
 	}
 	return 0;
@@ -705,7 +705,7 @@ void qspCallCloseFile(QSP_CHAR *file)
 		AS3_Call(qspCallBacks[QSP_CALL_CLOSEFILE].FuncVal, qspCallBacks[QSP_CALL_CLOSEFILE].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -721,7 +721,7 @@ void qspCallDeleteMenu()
 		AS3_Call(qspCallBacks[QSP_CALL_DELETEMENU].FuncVal, qspCallBacks[QSP_CALL_DELETEMENU].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 }
 
@@ -752,7 +752,7 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 		AS3_Release(result);
 		buffer = qspC2W(resText);
 		free(resText);
-		qspRestoreCallState(&state);
+		qspRestoreCallState(&state, QSP_TRUE);
 	}
 	else
 		buffer = qspGetNewText(QSP_FMT(""), 0);
