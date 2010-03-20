@@ -272,8 +272,10 @@ static int qspSearchElse(QSP_CHAR **s, int start, int end)
 		case qspStatIf:
 			if (*(qspStrEnd(s[start]) - 1) == QSP_COLONDELIM[0]) ++c;
 			break;
-		case qspStatElse:
 		case qspStatElseIf:
+			if (*(qspStrEnd(s[start]) - 1) == QSP_COLONDELIM[0] && c == 1) return start;
+			break;
+		case qspStatElse:
 			if (c == 1) return start;
 			break;
 		case qspStatEnd:
