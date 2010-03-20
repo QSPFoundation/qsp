@@ -121,6 +121,7 @@ void qspInitStats()
 	for (i = 0; i < QSP_STATSLEVELS; ++i) qspStatsNamesCounts[i] = 0;
 	qspStatMaxLen = 0;
 	qspAddStatement(qspStatElse, 0, 0, 0, 0);
+	qspAddStatement(qspStatElseIf, 0, 0, 1, 1, 2);
 	qspAddStatement(qspStatEnd, 0, 0, 0, 0);
 	qspAddStatement(qspStatSet, 0, 0, 0, 0);
 	qspAddStatement(qspStatIf, 0, 0, 1, 1, 2);
@@ -171,6 +172,8 @@ void qspInitStats()
 	qspAddStatement(qspStatXGoTo, 0, qspStatementGoTo, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	/* Names */
 	qspAddStatName(qspStatElse, QSP_STATELSE, 2);
+	qspAddStatName(qspStatElseIf, QSP_FMT("ELSEIF"), 1);
+	qspAddStatName(qspStatElseIf, QSP_FMT("ELSE IF"), 1);
 	qspAddStatName(qspStatEnd, QSP_FMT("END"), 2);
 	qspAddStatName(qspStatSet, QSP_FMT("SET"), 2);
 	qspAddStatName(qspStatSet, QSP_FMT("LET"), 2);
@@ -270,6 +273,7 @@ static int qspSearchElse(QSP_CHAR **s, int start, int end)
 			if (*(qspStrEnd(s[start]) - 1) == QSP_COLONDELIM[0]) ++c;
 			break;
 		case qspStatElse:
+		case qspStatElseIf:
 			if (c == 1) return start;
 			break;
 		case qspStatEnd:
@@ -421,6 +425,7 @@ static QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
 		case qspStatComment:
 		case qspStatAct:
 		case qspStatIf:
+		case qspStatElseIf:
 			break;
 		default:
 			oldRefreshCount = qspRefreshCount;
@@ -436,6 +441,7 @@ static QSP_BOOL qspExecString(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	case qspStatLabel:
 	case qspStatComment:
 	case qspStatElse:
+	case qspStatElseIf:
 	case qspStatEnd:
 		return QSP_FALSE;
 	case qspStatUnknown:
@@ -491,7 +497,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 			}
 		}
 		statCode = qspGetStatCode(s[i], &paramPos);
-		if (statCode == qspStatAct || statCode == qspStatIf)
+		if (statCode == qspStatAct || statCode == qspStatIf || statCode == qspStatElseIf)
 		{
 			pos = qspStrEnd(s[i]) - 1;
 			if (*pos == QSP_COLONDELIM[0]) /* Multiline */
@@ -506,7 +512,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 				count = qspGetStatArgs(paramPos, statCode, args);
 				*pos = QSP_COLONDELIM[0];
 				if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-				if (statCode == qspStatIf)
+				if (statCode == qspStatIf || statCode == qspStatElseIf)
 				{
 					elsePos = qspSearchElse(s, i, endLine);
 					if (QSP_NUM(args[0]))

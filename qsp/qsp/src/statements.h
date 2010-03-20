@@ -51,6 +51,7 @@
 		qspStatComment,
 		qspStatAct,
 		qspStatIf,
+		qspStatElseIf,
 		qspStatElse,
 		qspStatEnd,
 		qspStatAddObj,
