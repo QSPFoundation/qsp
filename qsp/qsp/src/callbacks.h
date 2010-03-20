@@ -24,6 +24,7 @@
 	{
 		QSP_BOOL IsInCallBack;
 		QSP_BOOL IsDisableCodeExec;
+		QSP_BOOL IsExitOnError;
 		QSP_BOOL IsMustWait;
 		QSP_BOOL IsMainDescChanged;
 		QSP_BOOL IsVarsDescChanged;
@@ -33,6 +34,7 @@
 
 	extern volatile QSP_BOOL qspIsInCallBack;
 	extern volatile QSP_BOOL qspIsDisableCodeExec;
+	extern volatile QSP_BOOL qspIsExitOnError;
 
 	/* External functions */
 	void qspInitCallBacks();
