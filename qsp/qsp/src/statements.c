@@ -475,7 +475,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 	QSPVariant args[2];
 	QSP_CHAR *jumpToFake, *pos, *paramPos;
 	int i, statCode, count, endPos, elsePos, oldRefreshCount;
-	QSP_BOOL uLevel, isExit = QSP_FALSE;
+	QSP_BOOL uLevel, isExecuted = QSP_FALSE, isExit = QSP_FALSE;
 	oldRefreshCount = qspRefreshCount;
 	/* Prepare temporary data */
 	if (uLevel = !jumpTo)
@@ -520,19 +520,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 						if (elsePos >= 0)
 						{
 							isExit = qspExecCode(s, i, elsePos, codeOffset, jumpTo);
-							if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-							if (**jumpTo)
-							{
-								i = qspSearchLabel(s, startLine, endLine, *jumpTo);
-								if (i < 0)
-								{
-									if (uLevel) qspSetError(QSP_ERR_LABELNOTFOUND);
-									break;
-								}
-								**jumpTo = 0;
-							}
-							else
-								i = endPos;
+							isExecuted = QSP_TRUE;
 						}
 					}
 					else
@@ -545,7 +533,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 					if (qspErrorNum) break;
 					i = endPos;
 				}
-				continue;
+				if (!isExecuted) continue;
 			}
 			else if (statCode == qspStatElseIf)
 			{
@@ -568,36 +556,52 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 				if (QSP_NUM(args[0]))
 				{
 					isExit = qspExecString(pos + 1, jumpTo);
-					if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-					if (**jumpTo)
-					{
-						i = qspSearchLabel(s, startLine, endLine, *jumpTo);
-						if (i < 0)
-						{
-							if (uLevel) qspSetError(QSP_ERR_LABELNOTFOUND);
-							break;
-						}
-						**jumpTo = 0;
-					}
-					else
-						i = endPos;
+					isExecuted = QSP_TRUE;
 				}
 				else
 				{
 					elsePos = qspSearchElse(s, i, endLine);
 					i = (elsePos < 0 ? endPos : elsePos);
 				}
-				continue;
+				if (!isExecuted) continue;
 			}
 		}
-		if (statCode == qspStatElse)
+		else if (statCode == qspStatElse)
 		{
+			endPos = qspSearchEnd(s, ++i, endLine);
+			if (endPos < 0)
+			{
+				qspSetError(QSP_ERR_ENDNOTFOUND);
+				break;
+			}
 			pos = qspSkipSpaces(paramPos);
 			if (*pos == QSP_COLONDELIM[0]) ++pos;
-			isExit = qspExecString(pos, jumpTo);
+			if (*pos)
+			{
+				isExit = qspExecString(pos, jumpTo);
+				isExecuted = QSP_TRUE;
+			}
+			else
+			{
+				elsePos = qspSearchElse(s, i, endLine);
+				if (elsePos >= 0)
+				{
+					isExit = qspExecCode(s, i, elsePos, codeOffset, jumpTo);
+					isExecuted = QSP_TRUE;
+				}
+			}
+			if (!isExecuted) continue;
+		}
+		if (isExecuted)
+		{
+			isExecuted = QSP_FALSE;
+			i = endPos;
 		}
 		else
+		{
 			isExit = qspExecString(s[i], jumpTo);
+			++i;
+		}
 		if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		if (**jumpTo)
 		{
@@ -608,9 +612,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 				break;
 			}
 			**jumpTo = 0;
-			continue;
 		}
-		++i;
 	}
 	if (uLevel) free(jumpToFake);
 	return isExit;
