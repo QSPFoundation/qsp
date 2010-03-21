@@ -499,7 +499,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 		statCode = qspGetStatCode(s[i], &paramPos);
 		if (statCode == qspStatAct || statCode == qspStatIf || statCode == qspStatElseIf)
 		{
-			pos = qspStrEnd(s[i]) - 1;
+			pos = qspStrEnd(paramPos) - 1;
 			if (*pos == QSP_COLONDELIM[0]) /* Multiline */
 			{
 				endPos = qspSearchEnd(s, ++i, endLine);
@@ -538,7 +538,7 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 			}
 			else if (statCode == qspStatElseIf)
 			{
-				pos = qspStrPos(s[i], QSP_COLONDELIM, QSP_FALSE);
+				pos = qspStrPos(paramPos, QSP_COLONDELIM, QSP_FALSE);
 				if (!pos)
 				{
 					qspSetError(QSP_ERR_COLONNOTFOUND);
