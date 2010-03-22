@@ -625,58 +625,60 @@ static QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
 	QSPVariant arg;
 	QSP_BOOL isExit;
 	int oldRefreshCount;
-	QSP_CHAR ch, *uStr, *ePos, *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
+	QSP_CHAR ch, *str1, *str2, *ePos, *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
 	if (!pos)
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return QSP_FALSE;
+	}
+	qspUpperStr(str1 = qspGetNewText(pos, -1));
+	ePos = qspStrPos(str1, QSP_STATELSE, QSP_TRUE);
+	free(str1);
+	if (ePos)
+	{
+		ePos = pos + (ePos - str1);
+		str1 = qspSkipSpaces(pos + 1);
+		if (str1 == ePos)
+		{
+			qspSetError(QSP_ERR_CODENOTFOUND);
+			return QSP_FALSE;
+		}
+		str2 = qspSkipSpaces(ePos + QSP_LEN(QSP_STATELSE));
+		if (!(*str2))
+		{
+			qspSetError(QSP_ERR_CODENOTFOUND);
+			return QSP_FALSE;
+		}
+	}
+	else
+	{
+		str1 = qspSkipSpaces(pos + 1);
+		if (!(*str1))
+		{
+			qspSetError(QSP_ERR_CODENOTFOUND);
+			return QSP_FALSE;
+		}
 	}
 	oldRefreshCount = qspRefreshCount;
 	*pos = 0;
 	qspGetStatArgs(s, qspStatIf, &arg);
 	*pos = QSP_COLONDELIM[0];
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-	qspUpperStr(uStr = qspGetNewText(pos, -1));
-	ePos = qspStrPos(uStr, QSP_STATELSE, QSP_TRUE);
-	free(uStr);
 	if (QSP_NUM(arg))
 	{
 		if (ePos)
 		{
-			ePos = pos + (ePos - uStr);
-			pos = qspSkipSpaces(pos + 1);
-			if (pos == ePos)
-			{
-				qspSetError(QSP_ERR_CODENOTFOUND);
-				return QSP_FALSE;
-			}
 			ch = *ePos;
 			*ePos = 0;
-			isExit = qspExecString(pos, jumpTo);
+			isExit = qspExecString(str1, jumpTo);
 			*ePos = ch;
 			return isExit;
 		}
 		else
-		{
-			pos = qspSkipSpaces(pos + 1);
-			if (!(*pos))
-			{
-				qspSetError(QSP_ERR_CODENOTFOUND);
-				return QSP_FALSE;
-			}
-			return qspExecString(pos, jumpTo);
-		}
+			return qspExecString(str1, jumpTo);
 	}
 	else if (ePos)
-	{
-		pos = qspSkipSpaces(pos + (ePos - uStr) + QSP_LEN(QSP_STATELSE));
-		if (!(*pos))
-		{
-			qspSetError(QSP_ERR_CODENOTFOUND);
-			return QSP_FALSE;
-		}
-		return qspExecString(pos, jumpTo);
-	}
+		return qspExecString(str2, jumpTo);
 	return QSP_FALSE;
 }
 
