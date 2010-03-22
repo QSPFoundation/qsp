@@ -171,7 +171,7 @@ void qspStatementAddAct(QSP_CHAR *s)
 {
 	int oldRefreshCount, count;
 	QSPVariant args[2];
-	QSP_CHAR *code, *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
+	QSP_CHAR *pos = qspStrPos(s, QSP_COLONDELIM, QSP_FALSE);
 	if (!pos)
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
@@ -182,8 +182,14 @@ void qspStatementAddAct(QSP_CHAR *s)
 	count = qspGetStatArgs(s, qspStatAct, args);
 	*pos = QSP_COLONDELIM[0];
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-	code = pos + 1;
-	qspAddAction(args, count, &code, 0, 1, QSP_FALSE);
+	pos = qspSkipSpaces(pos + 1);
+	if (!(*pos))
+	{
+		qspSetError(QSP_ERR_CODENOTFOUND);
+		qspFreeVariants(args, count);
+		return;
+	}
+	qspAddAction(args, count, &pos, 0, 1, QSP_FALSE);
 	qspFreeVariants(args, count);
 }
 

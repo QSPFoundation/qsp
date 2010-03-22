@@ -559,6 +559,7 @@ const QSP_CHAR *QSPGetErrorDesc(int errorNum)
 	case QSP_ERR_CANTADDMENUITEM: str = QSP_FMT("Can't add menu's item!"); break;
 	case QSP_ERR_TOOMANYVARS: str = QSP_FMT("Too many variables!"); break;
 	case QSP_ERR_INCORRECTREGEXP: str = QSP_FMT("Regular expression's error!"); break;
+	case QSP_ERR_CODENOTFOUND: str = QSP_FMT("Code not found!"); break;
 	default: str = QSP_FMT("Unknown error!"); break;
 	}
 	return str;
@@ -1506,6 +1507,7 @@ AS3_Val QSPGetErrorDesc(void *param, AS3_Val args)
 	case QSP_ERR_CANTADDMENUITEM: str = QSP_FMT("Can't add menu's item!"); break;
 	case QSP_ERR_TOOMANYVARS: str = QSP_FMT("Too many variables!"); break;
 	case QSP_ERR_INCORRECTREGEXP: str = QSP_FMT("Regular expression's error!"); break;
+	case QSP_ERR_CODENOTFOUND: str = QSP_FMT("Code not found!"); break;
 	default: str = QSP_FMT("Unknown error!"); break;
 	}
 	strUTF8 = qspW2C(str);

@@ -644,17 +644,39 @@ static QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
 		if (ePos)
 		{
 			ePos = pos + (ePos - uStr);
+			pos = qspSkipSpaces(pos + 1);
+			if (pos == ePos)
+			{
+				qspSetError(QSP_ERR_CODENOTFOUND);
+				return QSP_FALSE;
+			}
 			ch = *ePos;
 			*ePos = 0;
-			isExit = qspExecString(pos + 1, jumpTo);
+			isExit = qspExecString(pos, jumpTo);
 			*ePos = ch;
 			return isExit;
 		}
 		else
-			return qspExecString(pos + 1, jumpTo);
+		{
+			pos = qspSkipSpaces(pos + 1);
+			if (!(*pos))
+			{
+				qspSetError(QSP_ERR_CODENOTFOUND);
+				return QSP_FALSE;
+			}
+			return qspExecString(pos, jumpTo);
+		}
 	}
 	else if (ePos)
-		return qspExecString(pos + (ePos - uStr) + QSP_LEN(QSP_STATELSE), jumpTo);
+	{
+		pos = qspSkipSpaces(pos + (ePos - uStr) + QSP_LEN(QSP_STATELSE));
+		if (!(*pos))
+		{
+			qspSetError(QSP_ERR_CODENOTFOUND);
+			return QSP_FALSE;
+		}
+		return qspExecString(pos, jumpTo);
+	}
 	return QSP_FALSE;
 }
 
