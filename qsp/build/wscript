@@ -1,0 +1,549 @@
+# coding=utf8
+#
+
+# =============== IMPORTS
+
+from __future__ import with_statement
+import os, sys, platform, shutil, re
+import Configure, Options
+from Logs import debug as _debug, error as _error, info as _info, colors_lst as _colors_lst
+import preproc
+
+Configure.autoconfig = 1
+preproc.strict_quotes = 1
+
+_join = os.path.join
+_realpath = os.path.realpath
+_normpath = os.path.normpath
+
+# =============== SETUP
+
+# WAF specific
+VERSION  = "0.0.1"
+APPNAME  = 'QSP'
+REVISION = ''
+srcdir   = '.'
+blddir = "./_work"
+
+# platform specific
+isLinux = (sys.platform in ('Linux', 'linux2'))
+isWindows = (sys.platform == 'win32')
+isLinux64 = isLinux and (platform.architecture()[0] == '64bit')
+isLinux32 = isLinux and not isLinux64
+
+strip = ""
+
+definedBuildTypes = ('x86-release', 'x86-debug')
+
+# Local specific
+#wxSrcDir = '../wxWidgets'
+wxSrcDir = _join(blddir, 'wxWidgets')
+#wxQSPSrcDir = '../wx_qsp'
+wxQSPSrcDir = _join(blddir, 'wx_qsp')
+outputDir = "./output"
+
+fmodLibName = 'fmodexp'
+if isLinux64:
+	fmodLibName += '64'
+	
+extraFilesDir = '../qsp/misc'
+extraFilesDirCommon = _join(extraFilesDir, 'common')
+extraFilesDirPlatform = None
+if isLinux64:
+	extraFilesDirPlatform = _join(extraFilesDir, 'linux_x86_64')
+elif isLinux32:
+	extraFilesDirPlatform = _join(extraFilesDir, 'linux_x86')
+elif isWindows: 
+	extraFilesDirPlatform = _join(extraFilesDir, 'win32')
+	
+wxPatches = ["../qsp/build_wx/wxPatch.diff"]
+	
+svnApp = "svn"
+def _svnGet(destDir):
+	_info("Getting wxWidgets from SVN to '%s' ..." % (destDir))
+	return os.system("%s co http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk %s" % (svnApp, destDir))	
+def _svnUp(destDir): 
+	_info("Updating wxWidgets from SVN to '%s' ..." % (destDir))
+	return os.system("%s up %s" % (svnApp, destDir))	
+def _svnExport(pathFrom, pathTo): 
+	_info("Exporting from '%s' to '%s' ..." % (pathFrom, pathTo))
+	#sys.stdout.flush()
+	return os.system("%s export %s %s" % (svnApp, pathFrom, pathTo))
+	
+patchApp = "patch"
+def _makePatch(patchFile, pathWhere): 
+	_info("Patching '%s' by '%s' ..." % (pathWhere, patchFile))
+	#sys.stdout.flush()
+	return os.system("%s -i %s -d %s -p 3 --binary" % (patchApp, patchFile, pathWhere))
+
+targets = { 'qsplib': {}, 'qspgui': {}}
+targets['qsplib'] = \
+{
+	'path': '../qsp/qsp/src',
+	'name': 'qsplib',
+	'targetName': 'qsp',
+	'type': 'cshlib',
+	'includes': ['.'],
+	'localDeps' : [],
+	'x86-release': \
+	{
+		'defines': ['_UNICODE', 'NOT_RUBY', 'EXPORT', 'NDEBUG'],
+		'cxxflags': '-fPIC -s -O3 -Os'.split(),
+		'libs-system': [],
+		'linkflags': [],
+		'strip': True,
+	},
+	'x86-debug': \
+	{
+		'defines': ['_UNICODE', 'NOT_RUBY', 'EXPORT',],
+		'cxxflags': '-s -O0 -Os'.split(),
+		'libs-system': [],
+		'linkflags': [],
+		'strip': False,
+	},
+}
+
+targets['qspgui'] = \
+{
+	'path': '../qsp/qspgui/src',
+	'name': 'qspgui',
+	'targetName': 'qsp-gui',
+	'type': 'cprogram',
+	'includes': [_join(wxQSPSrcDir, 'include'), 
+				_join(wxQSPSrcDir, 'lib/wx/include/gtk2-unicode-static-2.9')],
+	'localDeps' : ['qsplib'],
+	'x86-release': \
+	{
+		'defines': ['__WXGTK__', '_UNICODE', 'NDEBUG',],
+		'cxxflags': '-s -O3 -Os'.split(), 
+		'libs-system': ['gtk-x11-2.0', 'gthread-2.0', 'c', 'SM', 'Xxf86vm', 'jpeg'],
+		'linkflags': \
+		[
+			'-L'+ _realpath(_join(wxQSPSrcDir, 'lib')),
+			'-l' + fmodLibName,
+			'-lwx_gtk2u_aui-2.9 -lwx_gtk2u_html-2.9 -lwx_gtk2u_adv-2.9 -lwx_gtk2u_core-2.9 -lwx_baseu-2.9',
+			'-Wl,-rpath,.',
+		],
+		'strip': True,
+	},
+	'x86-debug': \
+	{
+		'defines': ['__WXGTK__', '_UNICODE',],
+		'cxxflags': '-s -O0 -Os'.split(),
+		'libs-system': ['gtk-x11-2.0', 'gthread-2.0', 'c', 'SM', 'Xxf86vm', 'jpeg'],
+		'linkflags': \
+		[
+			'-L'+ _realpath(_join(wxQSPSrcDir, 'lib')),
+			'-l' + fmodLibName,
+			'-lwx_gtk2u_aui-2.9 -lwx_gtk2u_html-2.9 -lwx_gtk2u_adv-2.9 -lwx_gtk2u_core-2.9 -lwx_baseu-2.9',
+			'-Wl,-rpath,.',
+		],
+		'strip': False,
+	},
+}
+
+# post process config
+for projectName in targets:
+	for buildType in ('x86-release', 'x86-debug'):
+		buildParams = targets[projectName][buildType]
+		for param in buildParams:
+			if not isinstance(buildParams[param], (tuple, list)):
+				continue
+			buildParams[param] = " ".join(buildParams[param]).split()
+			if isLinux32 and param == 'defines':
+				buildParams[param].append('_FILE_OFFSET_BITS=64')
+
+SRCDIRS = (targets['qsplib']['path'], targets['qspgui']['path'])
+
+def _getQSPVersion():
+	
+	fileName = _join(targets['qsplib']['path'], 'declarations.h')
+	regexpPattern = """\s*#define\s+QSP_VER\s+QSP_FMT\s*\(\s*"\s*(\d\.\d\.\d)\s*"\s*\)"""
+	with open(fileName, 'r') as f:
+		for line in f:
+			m = re.match(regexpPattern, line)
+			if not m:
+				continue
+			return m.group(1)
+	return "0.0.1" 
+
+VERSION  = _getQSPVersion()
+	
+# ===========================================================================
+
+sourceTypes = \
+{
+	'cc'  : ['c'],
+	'cxx' : ['cpp', 'cxx'],
+}
+
+stripTargets = []
+
+def _makeRelPath(srcPath, relToPath):
+	"""
+	Make relative path from srcPath
+	"""
+	if srcPath == relToPath:
+		return '.'
+	prefix = os.path.commonprefix([srcPath, relToPath])
+	if prefix == os.path.sep:
+		return srcPath
+	result = _join((".." + os.path.sep) * \
+		len(relToPath[len(prefix):].split(os.path.sep)), srcPath[len(prefix):])
+	if result[0] == os.path.sep:
+		result = result[1:]
+	return _join('.', result)
+	
+def _copyFile(src, dst, force = True):
+	"""
+	Copy file, force delete if destination exists already
+	"""
+	if force and os.path.exists(dst):
+		os.unlink(dst)
+	shutil.copy2(src, dst)
+	
+# shutil.copytree with "ignore" added only in python 2.6
+def _copyTree(srcPath, dstPath, ignoreNames = []):
+	if not os.path.exists(srcPath):
+		raise IOError("'%s' is not exists" % srcPath)
+	if not os.path.isdir(srcPath):
+		raise IOError("'%s' is not directory" % srcPath)
+		
+	ignoreDirpaths = []
+	for dirpath, dirnames, filenames in os.walk(srcPath):
+		if os.path.basename(dirpath) in ignoreNames:
+			ignoreDirpaths.append(dirpath)
+			continue
+			
+		if len(filter(lambda x: dirpath.startswith(x), ignoreDirpaths)) > 0:
+			continue
+	
+		dstDir = _join(dstPath, _makeRelPath(dirpath, srcPath))
+		if not os.path.exists(dstDir):
+			os.makedirs(dstDir)
+			
+		for fileName in filenames:
+			_copyFile(_join(dirpath, fileName), _join(dstDir, fileName))
+
+def _getBuildFilesList(dirPath, onlyTypes = False):
+
+	filesList = []
+	typeSet = set()
+	
+	for dirpath, dirnames, filenames in os.walk(dirPath):
+
+		# get result
+		for file in filenames:
+			fileExtension = os.path.splitext(file)[1][1:]
+			for type, extensions in sourceTypes.iteritems():
+				if fileExtension in extensions + map(lambda x: x.upper(), extensions):
+
+					typeSet.add(type)
+					if onlyTypes:
+						continue
+
+					# waf не хочет в source абсолютные пути,
+					# требует относительные
+					srcFile = _makeRelPath(
+						_realpath(_join(dirpath, file)), _realpath(srcdir))
+						
+					filesList.append(srcFile)
+
+	if onlyTypes:
+		return typeSet
+
+	return (filesList, typeSet)
+	
+def _getBuildSrcTypes(srcDirs):
+	srcTypes = []
+	for dir in srcDirs:
+		srcTypes.extend(_getBuildFilesList(dir, onlyTypes = True))
+	return srcTypes
+	
+def _getSelectedBuildTypes():
+	if Options.options.buildType:
+		return Options.options.buildType.replace(" ", "").split(",")
+
+	return ['x86-release']
+    
+def _genBuildTask(bld, projectName, buildType, tasks):
+
+	if not os.path.exists(targets[projectName]['path']):
+		_error("'%s' not exist, exit" % targets[projectName]['path'])
+		return None
+
+	taskName = targets[projectName]['name'] + ":" + buildType
+	if taskName in tasks.keys():
+		return tasks[taskName]
+
+	sourceFiles, srcTypes = _getBuildFilesList(targets[projectName]['path'])
+	if len(sourceFiles) == 0:
+		_error("Not found any source files in '%s', project path ignored" % \
+			targets[projectName]['path'])
+		return None
+
+	includes = " ".join(targets[projectName]['includes'])
+
+	localLibs = []
+	for dep in targets[projectName]['localDeps']:
+			
+		projName = dep
+		_t = _genBuildTask(bld, projName, buildType, tasks)
+		if _t is None:
+			continue
+		
+		#includes += " " + _t.includes
+		
+		# only libs must be used
+		if _t.features.find('cstaticlib') > 0 or _t.features.find('cshlib') > 0:
+			localLibs.append(projName)
+
+	targetName = targets[projectName]['name']
+	if 'targetName' in targets[projectName]:
+		targetName = targets[projectName]['targetName']
+	t = bld.new_task_gen \
+	(
+		name         = targets[projectName]['name'],
+		features     = " ".join(srcTypes) + ' ' + targets[projectName]['type'],
+		source       = sourceFiles,
+		target       = targetName,
+		defines      = targets[projectName][buildType]['defines'],
+		lib          = targets[projectName][buildType]['libs-system'],
+		includes     = includes,
+		uselib_local = localLibs,
+	)
+	
+	#print t.features
+	#print t.source
+	#print t.target
+	#print t.defines
+	#print t.lib
+	#print t.includes
+	#print t.uselib_local
+
+	# по умолчанию используется '<n>_.o', где n некий номер (видимо автоматически генерируемый),
+	# который нужен для защиты одновременной сборки в разных контекстах.
+	# однако в нашем случае это только мешает, повторно компилируя уже существующие объектники
+	# и проблем данного хака я не вижу, ибо все равно разные сборки идут в разных variants
+	#t.obj_ext = '.o'
+
+	# такой способ запоминания самый простой, но потенциально проблемный, если в
+	# будущих версиях в этом классе появится одноименная переменная
+	t.buildType = buildType
+	"""
+	я хз почему, но так не работает, собирает косячно, хотя подобный пример
+	есть в официальном мануале, то ли баг, толи я что-то не так сделал
+	"""
+	#t.env = bld.env_of_name(buildType)
+
+	t.env['CXXFLAGS'] = targets[projectName][buildType]['cxxflags']
+	t.env['CCFLAGS'] = t.env['CXXFLAGS']
+	#_debug(t.env.CXXFLAGS)
+
+	t.env.append_value('LINKFLAGS', targets[projectName][buildType]['linkflags'])
+
+	tasks[taskName] = t
+	
+	return t
+	
+#def _copyLangsFiles(ctx):
+		
+	#selectedBuildTypes = _getSelectedBuildTypes()
+	#for buildType in selectedBuildTypes:
+		#_copyTree(langsFilesPath, 
+			#_join(blddir, buildType, langsDirName), 
+			#ignoreNames = ['.svn'])
+			
+	##ctx.install_files('${PREFIX}/'+langsDirName, getFiles(), 
+	##	cwd = srcdir, relative_trick = True)
+	
+def _getWxWidgets(ctx):
+	if os.path.exists(wxSrcDir):
+		# TODO validation of path
+		
+		if _svnUp(wxSrcDir) != 0:
+			_error("SVN up failed")
+			return False
+		return True
+		
+	if _svnGet(wxSrcDir) != 0:
+		_error("SVN checkout failed")
+		return False
+	return True
+
+def _patchWxWidgets(ctx):
+	if os.path.exists(wxQSPSrcDir):
+		# TODO validation of path
+		return True
+		
+	#os.makedirs(wxQSPSrcDir)
+	if _svnExport(wxSrcDir, wxQSPSrcDir) != 0:
+		_error("SVN export failed")
+		return False
+	
+	for patchFilePath in wxPatches:
+		if isLinux:
+			patchFilePathNew = _join(blddir, os.path.basename(patchFilePath))
+			if os.path.exists(patchFilePathNew):
+				os.unlink(patchFilePathNew)
+			os.system("""sed -e 's/\r$//' %s > %s""" % \
+				(patchFilePath, patchFilePathNew))
+			patchFilePath = patchFilePathNew
+		_makePatch(_realpath(patchFilePath), wxQSPSrcDir)
+	
+	return True
+
+def _buildPatchedWxWidgets(ctx):
+	if not os.path.exists(_join(wxQSPSrcDir, 'configure')):
+		_error("Can't found 'configure' in %s, are this directory with wxWidgets?" % wxQSPSrcDir)
+		return False
+	
+	def isWxBuilded():
+		# не универсально, но должно пока работать
+		# TODO: придумать лучшее решение
+		return os.path.exists(_join(wxQSPSrcDir, 'lib', 'libwx_gtk2u_core-2.9.a'))
+	
+	if isWxBuilded():
+		_info("wxWidgets already builded")
+		return True
+		
+	buildCmd = \
+		"(cd %s " + \
+		" && ./configure --without-libtiff --disable-utf8 --disable-shared" + \
+		" && make -j $[`grep -c ^processor /proc/cpuinfo` + 1])"
+	return os.system(buildCmd % wxQSPSrcDir) == 0
+	
+def _getRealTargetName(target):
+	if target['type'] == 'cshlib':
+		return 'lib' + target['targetName'] + '.so' # FIXME how for not linux?
+	return target['targetName']
+	
+def _copyExtraFiles(ctx, extraFilesDir, destDir):
+		
+	selectedBuildTypes = _getSelectedBuildTypes()
+	for buildType in selectedBuildTypes:
+		_copyTree(extraFilesDir, _join(destDir, buildType), ignoreNames = ['.svn'])
+	
+def _preBuild(ctx):
+	if not _getWxWidgets(ctx):
+		sys.exit()
+	if not _patchWxWidgets(ctx):
+		sys.exit()
+	if not _buildPatchedWxWidgets(ctx):
+		sys.exit()
+	
+	_copyExtraFiles(ctx, extraFilesDirCommon, blddir)
+	_copyExtraFiles(ctx, extraFilesDirPlatform, blddir)
+	
+def _postBuild(ctx):
+	for stripTarget in list(set(stripTargets)):
+		_info("Striping " + stripTarget)
+		os.system("%s %s" % (ctx.env.strip, stripTarget))
+		
+	if os.path.exists(outputDir):
+		shutil.rmtree(outputDir)
+	os.makedirs(outputDir)
+	
+	_copyExtraFiles(ctx, extraFilesDirCommon, outputDir)
+	_copyExtraFiles(ctx, extraFilesDirPlatform, outputDir)
+		
+	selectedBuildTypes = _getSelectedBuildTypes()
+	for buildType in selectedBuildTypes:		
+		for tName in ('qsplib', 'qspgui'):
+			fileName = _getRealTargetName(targets[tName])			
+			_copyFile(_join(blddir, buildType, fileName), 
+				_join(outputDir, buildType, fileName))
+	_info("Final files (without objects files and others) can be found in '%s'" \
+		% _realpath(outputDir))
+	
+def _wafCloneTask(task):
+    _t = task.clone(task.buildType)
+
+    # не знаю почему, но clone не копирует env.CXXFLAGS и прочие
+    _t.env.CXXFLAGS  = task.env.CXXFLAGS
+    _t.env.LINKFLAGS = task.env.LINKFLAGS
+    
+    if 'CCFLAGS' in task.env:
+		_t.env['CCFLAGS'] = task.env['CCFLAGS']
+    
+    return _t
+
+###########################################################################
+
+def set_options(opt):
+	
+	opt.add_option('-t', '--buildtype', action='store', type='string',
+		help='Build the selected variants', dest='buildType')
+	
+	srcTypes = _getBuildSrcTypes(SRCDIRS)
+	#srcTypes = _getBuildSrcTypes([targets['qsplib']['path']])
+
+	if 'cc' in srcTypes:
+		opt.tool_options('compiler_cc')
+	if 'cxx' in srcTypes:
+		opt.tool_options('compiler_cxx')
+
+def init():
+	#print('  init called')
+	pass
+
+def configure(conf):
+	#print('  calling the configuration')
+	
+	srcTypes = _getBuildSrcTypes(SRCDIRS)
+
+	if 'cc' in srcTypes:
+		conf.check_tool('compiler_cc')        
+	if 'cxx' in srcTypes:
+		conf.check_tool('compiler_cxx')
+		
+	if isLinux:
+		#conf.check_tool('misc')
+		conf.find_program('strip', var='strip', mandatory = False)
+	
+	conf.find_program(svnApp, var=svnApp, mandatory = True)
+	conf.find_program(patchApp, var=patchApp, mandatory = True)
+	conf.find_program('sed', mandatory = True)
+		
+	libSysDeps = []
+	for projectName in targets:
+		for buildType in _getSelectedBuildTypes():
+			libSysDeps += targets[projectName][buildType]['libs-system']
+		
+	for name in libSysDeps:
+		conf.check(lib = name)
+
+	for buildType in definedBuildTypes:        
+		bEnv = conf.env.copy()
+		bEnv.set_variant(buildType)
+		conf.set_env_name(buildType, bEnv)
+		conf.setenv(buildType)
+		conf.env.CXXFLAGS = []
+
+def build(bld):
+	tasks = {}
+
+	selectedBuildTypes = _getSelectedBuildTypes()
+	for buildType in selectedBuildTypes:
+		#_genBuildTask(bld, 'qsplib', buildType, tasks) # actually not need
+		_genBuildTask(bld, 'qspgui', buildType, tasks)
+	
+	for t in bld.all_task_gen[:]:
+		_t = _wafCloneTask(t)   
+		if t.buildType not in definedBuildTypes:
+			_t.posted = 1
+		t.posted = 1
+		
+		if bld.env.strip and targets[_t.name][_t.buildType]['strip']:			
+			#target = _t.target
+			target = _getRealTargetName(targets[_t.name])
+			#if targets[_t.name]['type'] == 'cshlib':
+				#target = 'lib' + target + '.so' # FIXME how for not linux?
+			stripTargets.append(_realpath(_join(blddir, t.buildType, target)))
+	
+	bld.add_pre_fun(_preBuild)
+	bld.add_post_fun(_postBuild)
+		
+def shutdown():
+    #print('  shutdown called')
+    pass
