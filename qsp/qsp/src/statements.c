@@ -173,7 +173,6 @@ void qspInitStats()
 	/* Names */
 	qspAddStatName(qspStatElse, QSP_STATELSE, 2);
 	qspAddStatName(qspStatElseIf, QSP_FMT("ELSEIF"), 1);
-	qspAddStatName(qspStatElseIf, QSP_FMT("ELSE IF"), 1);
 	qspAddStatName(qspStatEnd, QSP_FMT("END"), 2);
 	qspAddStatName(qspStatSet, QSP_FMT("SET"), 2);
 	qspAddStatName(qspStatSet, QSP_FMT("LET"), 2);
