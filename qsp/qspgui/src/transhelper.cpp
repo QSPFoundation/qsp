@@ -30,12 +30,7 @@ void QSPTranslationHelper::Load(wxConfigBase &config, const wxString &key)
 {
 	int lang;
 	config.Read(key, &lang, wxLANGUAGE_DEFAULT);
-	if (m_locale) delete m_locale;
-	m_locale = new wxLocale;
-	m_locale->Init(lang);
-	m_locale->AddCatalogLookupPathPrefix(m_path);
-	if (!m_locale->AddCatalog(m_app.GetAppName()))
-		m_locale->AddCatalog(m_app.GetAppName() + wxT("_") + m_locale->GetName().Left(2));
+	UpdateLocale(lang);
 }
 
 void QSPTranslationHelper::Save(wxConfigBase &config, const wxString &key) const
@@ -70,13 +65,18 @@ bool QSPTranslationHelper::AskUserForLanguage()
 	int index = wxGetSingleChoiceIndex(_("Select language"), _("Language"), names);
 	if (index >= 0)
 	{
-		if (m_locale) delete m_locale;
-		m_locale = new wxLocale;
-		m_locale->Init(identifiers[index]);
-		m_locale->AddCatalogLookupPathPrefix(m_path);
-		if (!m_locale->AddCatalog(m_app.GetAppName()))
-			m_locale->AddCatalog(m_app.GetAppName() + wxT("_") + m_locale->GetName().Left(2));
+		UpdateLocale(identifiers[index]);
 		return true;
 	}
 	return false;
+}
+
+void QSPTranslationHelper::UpdateLocale(int lang)
+{
+	if (m_locale) delete m_locale;
+	m_locale = new wxLocale;
+	m_locale->Init(lang);
+	m_locale->AddCatalogLookupPathPrefix(m_path);
+	if (!m_locale->AddCatalog(m_app.GetAppName()))
+		m_locale->AddCatalog(m_app.GetAppName() + wxT("_") + m_locale->GetName().Left(2));
 }

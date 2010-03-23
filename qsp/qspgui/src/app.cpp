@@ -25,6 +25,7 @@ bool QSPApp::OnInit()
 	wxInitEvent initEvent;
 	wxString configPath;
 	// ----------------------
+	SetAppName(wxT("qspgui"));
 	wxLog::EnableLogging(false);
 	wxInitAllImageHandlers();
 	QSPInit();

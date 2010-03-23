@@ -34,6 +34,7 @@
 		void Load(wxConfigBase &config, const wxString &key);
 		void Save(wxConfigBase &config, const wxString &key) const;
 		bool AskUserForLanguage();
+		void UpdateLocale(int lang);
 	private:
 		// Fields
 		wxApp &m_app;
