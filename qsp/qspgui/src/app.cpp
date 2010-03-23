@@ -25,13 +25,12 @@ bool QSPApp::OnInit()
 	wxInitEvent initEvent;
 	wxString configPath;
 	// ----------------------
-	SetAppName(QSP_APPNAME);
 	wxLog::EnableLogging(false);
 	wxInitAllImageHandlers();
 	QSPInit();
 	// ----------------------
 	wxString appPathString(QSPTools::GetAppPath());
-	m_transhelper = new QSPTranslationHelper(*this, appPathString + wxT("langs"));
+	m_transhelper = new QSPTranslationHelper(QSP_APPNAME, appPathString + wxT("langs"));
 	configPath = appPathString + QSP_CONFIG;
 	if (!(wxFileExists(configPath) || wxFileName::IsDirWritable(appPathString)))
 		configPath = wxFileName(wxStandardPaths::Get().GetUserConfigDir(), QSP_CONFIG).GetFullPath();

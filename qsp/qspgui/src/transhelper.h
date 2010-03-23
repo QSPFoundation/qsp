@@ -27,7 +27,7 @@
 	{
 	public:
 		// C-tors / D-tor
-		QSPTranslationHelper(wxApp &app, const wxString &path);
+		QSPTranslationHelper(const wxString &appName, const wxString &path);
 		~QSPTranslationHelper();
 
 		// Methods
@@ -37,7 +37,7 @@
 		void UpdateLocale(int lang);
 	private:
 		// Fields
-		wxApp &m_app;
+		wxString m_appName;
 		wxString m_path;
 		wxLocale *m_locale;
 	};

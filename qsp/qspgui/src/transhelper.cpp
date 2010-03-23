@@ -17,7 +17,8 @@
 
 #include "transhelper.h"
 
-QSPTranslationHelper::QSPTranslationHelper(wxApp &app, const wxString &path) : m_app(app), m_path(path), m_locale(0)
+QSPTranslationHelper::QSPTranslationHelper(const wxString &appName, const wxString &path) :
+	m_appName(appName), m_path(path), m_locale(0)
 {
 }
 
@@ -77,6 +78,6 @@ void QSPTranslationHelper::UpdateLocale(int lang)
 	m_locale = new wxLocale;
 	m_locale->Init(lang);
 	m_locale->AddCatalogLookupPathPrefix(m_path);
-	if (!m_locale->AddCatalog(m_app.GetAppName()))
-		m_locale->AddCatalog(m_app.GetAppName() + wxT("_") + m_locale->GetName().Left(2));
+	if (!m_locale->AddCatalog(m_appName))
+		m_locale->AddCatalog(m_appName + wxT("_") + m_locale->GetName().Left(2));
 }
