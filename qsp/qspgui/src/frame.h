@@ -45,6 +45,7 @@
 	#include "icons/about.xpm"
 
 	#define QSP_LOGO _("Quest Soft Player 5")
+	#define QSP_APPNAME wxT("qspgui")
 	#define QSP_CONFIG wxT("qspgui.cfg")
 
 	enum
