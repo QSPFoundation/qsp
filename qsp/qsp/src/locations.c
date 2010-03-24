@@ -226,19 +226,12 @@ void qspExecLocByVarNameWithArgs(QSP_CHAR *name, QSPVariant *args, int count)
 	int ind = 0, oldRefreshCount = qspRefreshCount;
 	while (1)
 	{
-		if (var = qspVarReference(name, QSP_FALSE))
-		{
-			if (ind >= var->ValsCount) break;
-			if (!((locName = var->Values[ind].Str) && qspIsAnyString(locName))) break;
-			qspExecLocByNameWithArgs(locName, args, count);
-			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-			++ind;
-		}
-		else
-		{
-			qspResetError();
-			break;
-		}
+		if (!(var = qspVarReference(name, QSP_FALSE))) break;
+		if (ind >= var->ValsCount) break;
+		if (!((locName = var->Values[ind].Str) && qspIsAnyString(locName))) break;
+		qspExecLocByNameWithArgs(locName, args, count);
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+		++ind;
 	}
 }
 
