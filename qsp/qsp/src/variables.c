@@ -438,7 +438,7 @@ QSPVariant qspGetVar(QSP_CHAR *name)
 static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 {
 	QSP_CHAR *str;
-	int i, maxCount;
+	int i, maxCount, newInd;
 	if (start < 0) start = 0;
 	maxCount = src->ValsCount - start;
 	if (maxCount > 0 && count > 0)
@@ -458,13 +458,13 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 			if (count < maxCount) maxCount = count;
 			dest->IndsCount = maxCount;
 			dest->Indices = (QSPVarIndex *)malloc(maxCount * sizeof(QSPVarIndex));
-			maxCount += start;
 			count = 0;
 			for (i = 0; i < src->IndsCount; ++i)
 			{
-				if (src->Indices[i].Index >= start && src->Indices[i].Index < maxCount)
+				newInd = src->Indices[i].Index - start;
+				if (newInd >= 0 && newInd < maxCount)
 				{
-					dest->Indices[count].Index = src->Indices[i].Index - start;
+					dest->Indices[count].Index = newInd;
 					dest->Indices[count].Str = qspGetNewText(src->Indices[i].Str, -1);
 					++count;
 				}
