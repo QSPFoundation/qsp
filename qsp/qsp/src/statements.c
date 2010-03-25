@@ -133,7 +133,7 @@ void qspInitStats()
 	qspAddStatement(qspStatClose, 0, qspStatementCloseFile, 0, 1, 1);
 	qspAddStatement(qspStatClS, 4, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatCmdClear, 2, qspStatementClear, 0, 0);
-	qspAddStatement(qspStatCopyArr, 0, qspStatementCopyArr, 2, 2, 1, 1);
+	qspAddStatement(qspStatCopyArr, 0, qspStatementCopyArr, 2, 4, 1, 1, 2, 2);
 	qspAddStatement(qspStatDelAct, 0, qspStatementDelAct, 1, 1, 1);
 	qspAddStatement(qspStatDelObj, 0, qspStatementDelObj, 1, 1, 1);
 	qspAddStatement(qspStatDynamic, 0, qspStatementDynamic, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);

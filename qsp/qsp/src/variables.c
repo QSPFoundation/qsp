@@ -53,7 +53,7 @@ static QSPVar *qspGetVarData(QSP_CHAR *, QSP_BOOL, int *);
 static void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
 static void qspSetVar(QSP_CHAR *, QSPVariant *, QSP_CHAR);
 static QSPVariant qspGetVarValueByReference(QSPVar *, int, QSP_BOOL);
-static void qspCopyVar(QSPVar *, QSPVar *);
+static void qspCopyVar(QSPVar *, QSPVar *, int, int);
 
 static int qspIndStringCompare(const void *name, const void *compareTo)
 {
@@ -435,34 +435,53 @@ QSPVariant qspGetVar(QSP_CHAR *name)
 	return qspGetVarValueByReference(var, index, *name == QSP_STRCHAR[0]);
 }
 
-static void qspCopyVar(QSPVar *dest, QSPVar *src)
+static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 {
 	QSP_CHAR *str;
-	int count = dest->ValsCount = src->ValsCount;
-	if (count)
+	int i, maxCount;
+	if (start < 0) start = 0;
+	maxCount = src->ValsCount - start;
+	if (maxCount > 0 && count > 0)
 	{
-		dest->Values = (QSPVarValue *)malloc(count * sizeof(QSPVarValue));
-		while (--count >= 0)
+		if (count < maxCount) maxCount = count;
+		dest->ValsCount = maxCount;
+		dest->Values = (QSPVarValue *)malloc(maxCount * sizeof(QSPVarValue));
+		for (i = 0; i < maxCount; ++i)
 		{
-			dest->Values[count].Num = src->Values[count].Num;
-			str = src->Values[count].Str;
-			dest->Values[count].Str = (str ? qspGetNewText(str, -1) : 0);
+			dest->Values[i].Num = src->Values[i + start].Num;
+			str = src->Values[i + start].Str;
+			dest->Values[i].Str = (str ? qspGetNewText(str, -1) : 0);
+		}
+		maxCount = src->IndsCount - start;
+		if (maxCount > 0)
+		{
+			if (count < maxCount) maxCount = count;
+			dest->IndsCount = maxCount;
+			dest->Indices = (QSPVarIndex *)malloc(maxCount * sizeof(QSPVarIndex));
+			maxCount += start;
+			count = 0;
+			for (i = 0; i < src->IndsCount; ++i)
+			{
+				if (src->Indices[i].Index >= start && src->Indices[i].Index < maxCount)
+				{
+					dest->Indices[count].Index = src->Indices[i].Index - start;
+					dest->Indices[count].Str = qspGetNewText(src->Indices[i].Str, -1);
+					++count;
+				}
+			}
+		}
+		else
+		{
+			dest->IndsCount = 0;
+			dest->Indices = 0;
 		}
 	}
 	else
+	{
+		dest->ValsCount = dest->IndsCount = 0;
 		dest->Values = 0;
-	count = dest->IndsCount = src->IndsCount;
-	if (count)
-	{
-		dest->Indices = (QSPVarIndex *)malloc(count * sizeof(QSPVarIndex));
-		while (--count >= 0)
-		{
-			dest->Indices[count].Index = src->Indices[count].Index;
-			dest->Indices[count].Str = qspGetNewText(src->Indices[count].Str, -1);
-		}
-	}
-	else
 		dest->Indices = 0;
+	}
 }
 
 int qspArraySize(QSP_CHAR *name)
@@ -649,13 +668,16 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 
 QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
+	int start, num;
 	QSPVar *dest, *src;
 	if (!(dest = qspVarReferenceWithType(QSP_STR(args[0]), QSP_TRUE, 0))) return QSP_FALSE;
 	if (!(src = qspVarReferenceWithType(QSP_STR(args[1]), QSP_FALSE, 0))) return QSP_FALSE;
 	if (dest != src)
 	{
+		start = (count >= 3 ? QSP_NUM(args[2]) : 0);
+		num = (count == 4 ? QSP_NUM(args[3]) : src->ValsCount);
 		qspEmptyVar(dest);
-		qspCopyVar(dest, src);
+		qspCopyVar(dest, src, start, num);
 	}
 	return QSP_FALSE;
 }
