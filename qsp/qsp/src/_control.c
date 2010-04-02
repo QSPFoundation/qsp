@@ -45,6 +45,12 @@ static void qspWait(QSP_BOOL isBlock)
 #ifndef _FLASH
 
 /* ------------------------------------------------------------ */
+QSP_BOOL QSPIsInCallBack()
+{
+	qspWait(QSP_FALSE);
+	return qspIsInCallBack;
+}
+/* ------------------------------------------------------------ */
 /* Отладка */
 
 /* Управление режимом отладки */
@@ -822,6 +828,16 @@ void QSPDeInit()
 
 #else
 
+/* ------------------------------------------------------------ */
+AS3_Val QSPIsInCallBack(void *param, AS3_Val args)
+{
+	qspWait(QSP_FALSE);
+	if (qspIsInCallBack)
+		return AS3_True();
+	else
+		return AS3_False();
+}
+/* ------------------------------------------------------------ */
 /* Управление режимом отладки */
 AS3_Val QSPEnableDebugMode(void *param, AS3_Val args)
 {
@@ -1833,6 +1849,7 @@ AS3_Val QSPReturnValue(void *param, AS3_Val args)
 
 int main()
 {
+	AS3_Val isInCallBack = AS3_Function(0, QSPIsInCallBack);
 	AS3_Val enableDebugMode = AS3_Function(0, QSPEnableDebugMode);
 	AS3_Val getCurStateData = AS3_Function(0, QSPGetCurStateData);
 	AS3_Val getVersion = AS3_Function(0, QSPGetVersion);
@@ -1882,7 +1899,7 @@ int main()
 	AS3_Val returnValue = AS3_Function(0, QSPReturnValue);
 
 	AS3_Val result = AS3_Object(
-		"QSPEnableDebugMode:AS3ValType, QSPGetCurStateData:AS3ValType, QSPGetVersion:AS3ValType, "
+		"QSPIsInCallBack:AS3ValType, QSPEnableDebugMode:AS3ValType, QSPGetCurStateData:AS3ValType, QSPGetVersion:AS3ValType, "
 		"QSPGetCompiledDateTime:AS3ValType, QSPGetFullRefreshCount:AS3ValType, QSPGetQstFullPath:AS3ValType, "
 		"QSPGetCurLoc:AS3ValType, QSPGetMainDesc:AS3ValType, QSPIsMainDescChanged:AS3ValType, "
 		"QSPGetVarsDesc:AS3ValType, QSPIsVarsDescChanged:AS3ValType, QSPGetExprValue:AS3ValType, "
@@ -1898,7 +1915,7 @@ int main()
 		"QSPOpenSavedGame:AS3ValType, QSPOpenSavedGameFromString:AS3ValType, QSPRestartGame:AS3ValType, "
 		"QSPSelectMenuItem:AS3ValType, QSPSetCallBack:AS3ValType, QSPInit:AS3ValType, QSPDeInit:AS3ValType, "
 		"QSPReturnValue:AS3ValType",
-		enableDebugMode, getCurStateData, getVersion, getCompiledDateTime, getFullRefreshCount,
+		isInCallBack, enableDebugMode, getCurStateData, getVersion, getCompiledDateTime, getFullRefreshCount,
 		getQstFullPath, getCurLoc, getMainDesc, isMainDescChanged, getVarsDesc, isVarsDescChanged,
 		getExprValue, setInputStrText, getActionsCount, getActionData, executeSelActionCode, setSelActionIndex,
 		getSelActionIndex, isActionsChanged, getObjectsCount, getObjectData, setSelObjectIndex,
@@ -1908,6 +1925,7 @@ int main()
 		openSavedGameFromString, restartGame, selectMenuItem, setCallBack, init, deInit, returnValue);
 
 	// Release
+	AS3_Release(isInCallBack);
 	AS3_Release(enableDebugMode);
 	AS3_Release(getCurStateData);
 	AS3_Release(getVersion);

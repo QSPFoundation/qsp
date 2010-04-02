@@ -134,6 +134,7 @@
 
 	#ifndef _FLASH
 
+		QSP_EXTERN QSP_BOOL QSPIsInCallBack();
 		QSP_EXTERN void QSPEnableDebugMode(QSP_BOOL isDebug);
 		QSP_EXTERN void QSPGetCurStateData(QSP_CHAR **loc, int *actIndex, int *line);
 		QSP_EXTERN const QSP_CHAR *QSPGetVersion();
@@ -183,6 +184,7 @@
 
 	#else
 
+		QSP_EXTERN AS3_Val QSPIsInCallBack(void *param, AS3_Val args);
 		QSP_EXTERN AS3_Val QSPEnableDebugMode(void *param, AS3_Val args);
 		QSP_EXTERN AS3_Val QSPGetCurStateData(void *param, AS3_Val args);
 		QSP_EXTERN AS3_Val QSPGetVersion(void *param, AS3_Val args);
