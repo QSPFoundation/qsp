@@ -277,7 +277,9 @@ void QSPCallBacks::Msg(const QSP_CHAR *str)
 		m_isHtml,
 		m_gamePath
 	);
+	m_frame->EnableControls(false);
 	dialog.ShowModal();
+	m_frame->EnableControls(true);
 }
 
 void QSPCallBacks::DeleteMenu()
@@ -295,7 +297,9 @@ void QSPCallBacks::AddMenuItem(const QSP_CHAR *name, const QSP_CHAR *imgPath)
 void QSPCallBacks::ShowMenu()
 {
 	if (m_frame->GetIsQuit()) return;
+	m_frame->EnableControls(false);
 	m_frame->ShowMenu();
+	m_frame->EnableControls(true);
 }
 
 void QSPCallBacks::Input(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen)
@@ -312,7 +316,9 @@ void QSPCallBacks::Input(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen)
 		m_isHtml,
 		m_gamePath
 	);
+	m_frame->EnableControls(false);
 	dialog.ShowModal();
+	m_frame->EnableControls(true);
 	#ifdef _UNICODE
 		wcsncpy(buffer, dialog.GetText().c_str(), maxLen);
 	#else
@@ -336,7 +342,10 @@ void QSPCallBacks::OpenGameStatus(const QSP_CHAR *file)
 	else
 	{
 		wxFileDialog dialog(m_frame, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
-		if (dialog.ShowModal() == wxID_OK)
+		m_frame->EnableControls(false);
+		int res = dialog.ShowModal();
+		m_frame->EnableControls(true);
+		if (res == wxID_OK)
 			QSPOpenSavedGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_FALSE);
 	}
 }
@@ -349,7 +358,10 @@ void QSPCallBacks::SaveGameStatus(const QSP_CHAR *file)
 	else
 	{
 		wxFileDialog dialog(m_frame, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
-		if (dialog.ShowModal() == wxID_OK)
+		m_frame->EnableControls(false);
+		int res = dialog.ShowModal();
+		m_frame->EnableControls(true);
+		if (res == wxID_OK)
 			QSPSaveGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_FALSE);
 	}
 }
