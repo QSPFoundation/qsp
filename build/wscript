@@ -5,7 +5,7 @@
 
 from __future__ import with_statement
 import os, sys, platform, shutil, re
-import Configure, Options
+import Configure, Options, Scripting, Build
 from Logs import debug as _debug, error as _error, info as _info, colors_lst as _colors_lst
 import preproc
 
@@ -26,7 +26,7 @@ srcdir   = '.'
 blddir = "./_work"
 
 # platform specific
-isLinux = (sys.platform in ('Linux', 'linux2'))
+isLinux = (sys.platform.lower().startswith('linux'))
 isWindows = (sys.platform == 'win32')
 isLinux64 = isLinux and (platform.architecture()[0] == '64bit')
 isLinux32 = isLinux and not isLinux64
@@ -36,11 +36,17 @@ strip = ""
 definedBuildTypes = ('x86-release', 'x86-debug')
 
 # Local specific
-#wxSrcDir = '../wxWidgets'
 wxSrcDir = _join(blddir, 'wxWidgets')
-#wxQSPSrcDir = '../wx_qsp'
 wxQSPSrcDir = _join(blddir, 'wx_qsp')
 outputDir = "./output"
+
+if isWindows:
+	Scripting.g_gz = 'zip'
+	
+defaultInstallPrefix = None
+if isLinux:
+	defaultInstallPrefix = '/opt'
+	Options.default_prefix = defaultInstallPrefix
 
 fmodLibName = 'fmodexp'
 if isLinux64:
@@ -59,14 +65,23 @@ elif isWindows:
 wxPatches = ["../qsp/build_wx/wxPatch.diff"]
 	
 svnApp = "svn"
-def _svnGet(destDir):
+
+def _svnWxGet(destDir, revision = None):
 	_info("Getting wxWidgets from SVN to '%s' ..." % (destDir))
-	return os.system("%s co http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk %s" % (svnApp, destDir))	
-def _svnUp(destDir): 
+	cmd = "%s co http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk %s" % (svnApp, destDir)
+	if revision:
+		cmd += " - r " + revision
+	return os.system(cmd)	
+	
+def _svnWxUp(destDir, revision = None): 
 	_info("Updating wxWidgets from SVN to '%s' ..." % (destDir))
-	return os.system("%s up %s" % (svnApp, destDir))	
-def _svnExport(pathFrom, pathTo): 
-	_info("Exporting from '%s' to '%s' ..." % (pathFrom, pathTo))
+	cmd = "%s up %s" % (svnApp, destDir)
+	if revision:
+		cmd += " - r " + revision
+	return os.system(cmd)	
+	
+def _svnWxExport(pathFrom, pathTo): 
+	_info("Exporting wxWidgets from '%s' to '%s' ..." % (pathFrom, pathTo))
 	#sys.stdout.flush()
 	return os.system("%s export %s %s" % (svnApp, pathFrom, pathTo))
 	
@@ -95,8 +110,8 @@ targets['qsplib'] = \
 	},
 	'x86-debug': \
 	{
-		'defines': ['_UNICODE', 'NOT_RUBY', 'EXPORT',],
-		'cxxflags': '-s -O0 -Os'.split(),
+		'defines': ['_UNICODE', 'NOT_RUBY', 'EXPORT', '_DEBUG'],
+		'cxxflags': '-O0'.split(),
 		'libs-system': [],
 		'linkflags': [],
 		'strip': False,
@@ -122,21 +137,21 @@ targets['qspgui'] = \
 			'-L'+ _realpath(_join(wxQSPSrcDir, 'lib')),
 			'-l' + fmodLibName,
 			'-lwx_gtk2u_aui-2.9 -lwx_gtk2u_html-2.9 -lwx_gtk2u_adv-2.9 -lwx_gtk2u_core-2.9 -lwx_baseu-2.9',
-			'-Wl,-rpath,.',
+			#'-Wl,-rpath,.',
 		],
 		'strip': True,
 	},
 	'x86-debug': \
 	{
-		'defines': ['__WXGTK__', '_UNICODE',],
-		'cxxflags': '-s -O0 -Os'.split(),
+		'defines': ['__WXGTK__', '_UNICODE', '_DEBUG'],
+		'cxxflags': '-O0'.split(),
 		'libs-system': ['gtk-x11-2.0', 'gthread-2.0', 'c', 'SM', 'Xxf86vm', 'jpeg'],
 		'linkflags': \
 		[
 			'-L'+ _realpath(_join(wxQSPSrcDir, 'lib')),
 			'-l' + fmodLibName,
 			'-lwx_gtk2u_aui-2.9 -lwx_gtk2u_html-2.9 -lwx_gtk2u_adv-2.9 -lwx_gtk2u_core-2.9 -lwx_baseu-2.9',
-			'-Wl,-rpath,.',
+			#'-Wl,-rpath,.',
 		],
 		'strip': False,
 	},
@@ -194,6 +209,26 @@ def _makeRelPath(srcPath, relToPath):
 		result = result[1:]
 	return _join('.', result)
 	
+def _getFilesList(srcPath, ignoreNames = []):
+	if not os.path.exists(srcPath):
+		raise IOError("'%s' is not exists" % srcPath)
+	if not os.path.isdir(srcPath):
+		raise IOError("'%s' is not directory" % srcPath)
+		
+	filePathNames = []
+	ignoreDirpaths = []
+	for dirpath, dirnames, filenames in os.walk(srcPath):
+		if os.path.basename(dirpath) in ignoreNames:
+			ignoreDirpaths.append(dirpath)
+			continue
+			
+		if len(filter(lambda x: dirpath.startswith(x), ignoreDirpaths)) > 0:
+			continue
+			
+		for fileName in filenames:
+			filePathNames.append(_join(dirpath, fileName))
+	return filePathNames
+	
 def _copyFile(src, dst, force = True):
 	"""
 	Copy file, force delete if destination exists already
@@ -204,26 +239,19 @@ def _copyFile(src, dst, force = True):
 	
 # shutil.copytree with "ignore" added only in python 2.6
 def _copyTree(srcPath, dstPath, ignoreNames = []):
-	if not os.path.exists(srcPath):
-		raise IOError("'%s' is not exists" % srcPath)
-	if not os.path.isdir(srcPath):
-		raise IOError("'%s' is not directory" % srcPath)
-		
-	ignoreDirpaths = []
-	for dirpath, dirnames, filenames in os.walk(srcPath):
-		if os.path.basename(dirpath) in ignoreNames:
-			ignoreDirpaths.append(dirpath)
-			continue
-			
-		if len(filter(lambda x: dirpath.startswith(x), ignoreDirpaths)) > 0:
-			continue
+	_copyTreeByList(_getFilesList(srcPath, ignoreNames), dstPath, srcPath)
 	
-		dstDir = _join(dstPath, _makeRelPath(dirpath, srcPath))
+def _copyTreeByList(filesList, dstPath, srcPath = None):
+	if srcPath is None:
+		srcPath = os.path.commonprefix(filesList)
+	#print srcPath, dstPath
+	for filePathName in filesList:		
+		srcDir, fileName = os.path.split(filePathName)
+		dstDir = _join(dstPath, _makeRelPath(srcDir, srcPath))
 		if not os.path.exists(dstDir):
 			os.makedirs(dstDir)
-			
-		for fileName in filenames:
-			_copyFile(_join(dirpath, fileName), _join(dstDir, fileName))
+		#print filePathName, dstDir, fileName
+		_copyFile(filePathName, _join(dstDir, fileName))
 
 def _getBuildFilesList(dirPath, onlyTypes = False):
 
@@ -311,6 +339,8 @@ def _genBuildTask(bld, projectName, buildType, tasks):
 		lib          = targets[projectName][buildType]['libs-system'],
 		includes     = includes,
 		uselib_local = localLibs,
+		install_path = "${PREFIX}", # чтобы не пытался разбросать в ${PREFIX}/bin и ${PREFIX}/lib
+		rpath        = ".",
 	)
 	
 	#print t.features
@@ -358,17 +388,29 @@ def _genBuildTask(bld, projectName, buildType, tasks):
 	##	cwd = srcdir, relative_trick = True)
 	
 def _getWxWidgets(ctx):
+	rev = None
+	optWxRevision = Options.options.wxRevision
+	
+	if optWxRevision not in ('notchange', 'latest'):
+		if not optWxRevision.isdigit():
+			_error("SVN revision for wxWidgets must be number or one " + \
+				"of keywords: latest, notchange")
+			return False
+		rev = optWxRevision
+		
 	if os.path.exists(wxSrcDir):
 		# TODO validation of path
 		
-		if _svnUp(wxSrcDir) != 0:
-			_error("SVN up failed")
-			return False
-		return True
+		if optWxRevision != 'notchange':
+			if _svnWxUp(wxSrcDir, rev) != 0:
+				_error("SVN up failed")
+				return False
+			return True
 		
-	if _svnGet(wxSrcDir) != 0:
-		_error("SVN checkout failed")
-		return False
+	else:
+		if _svnWxGet(wxSrcDir, rev) != 0:
+			_error("SVN checkout failed")
+			return False
 	return True
 
 def _patchWxWidgets(ctx):
@@ -377,7 +419,7 @@ def _patchWxWidgets(ctx):
 		return True
 		
 	#os.makedirs(wxQSPSrcDir)
-	if _svnExport(wxSrcDir, wxQSPSrcDir) != 0:
+	if _svnWxExport(wxSrcDir, wxQSPSrcDir) != 0:
 		_error("SVN export failed")
 		return False
 	
@@ -392,16 +434,24 @@ def _patchWxWidgets(ctx):
 		_makePatch(_realpath(patchFilePath), wxQSPSrcDir)
 	
 	return True
-
-def _buildPatchedWxWidgets(ctx):
+	
+def _configurePatchedWxWidgets(ctx):
 	if not os.path.exists(_join(wxQSPSrcDir, 'configure')):
 		_error("Can't found 'configure' in %s, are this directory with wxWidgets?" % wxQSPSrcDir)
 		return False
-	
+		
+	cmd = \
+		"(cd %s " + \
+		" && ./configure --without-libtiff --disable-utf8 --disable-shared)"
+	return os.system(cmd % wxQSPSrcDir) == 0
+
+def _buildPatchedWxWidgets(ctx):
+
 	def isWxBuilded():
 		# не универсально, но должно пока работать
 		# TODO: придумать лучшее решение
-		return os.path.exists(_join(wxQSPSrcDir, 'lib', 'libwx_gtk2u_core-2.9.a'))
+		return os.path.exists(_join(wxQSPSrcDir, 'lib', 
+			ctx.env['staticlib_PATTERN'] % 'wx_gtk2u_core-2.9'))
 	
 	if isWxBuilded():
 		_info("wxWidgets already builded")
@@ -409,31 +459,35 @@ def _buildPatchedWxWidgets(ctx):
 		
 	buildCmd = \
 		"(cd %s " + \
-		" && ./configure --without-libtiff --disable-utf8 --disable-shared" + \
 		" && make -j $[`grep -c ^processor /proc/cpuinfo` + 1])"
 	return os.system(buildCmd % wxQSPSrcDir) == 0
 	
-def _getRealTargetName(target):
+def _getRealTargetName(ctx, target):
 	if target['type'] == 'cshlib':
-		return 'lib' + target['targetName'] + '.so' # FIXME how for not linux?
+		return ctx.env['shlib_PATTERN'] % target['targetName']
 	return target['targetName']
 	
-def _copyExtraFiles(ctx, extraFilesDir, destDir):
+def _getExtraFilesDirs():
+	return (extraFilesDirCommon, extraFilesDirPlatform)
+	
+#def _getExtraFilesList():
+	#fileList = []
+	#for extraFilesDir in _getExtraFilesDirs():
+		#fileList += _getFilesList(extraFilesDir, ignoreNames = ['.svn'])
+	#return fileList
+	
+def _copyExtraFiles(ctx, destDir):
 		
 	selectedBuildTypes = _getSelectedBuildTypes()
 	for buildType in selectedBuildTypes:
-		_copyTree(extraFilesDir, _join(destDir, buildType), ignoreNames = ['.svn'])
+		for extraFilesDir in _getExtraFilesDirs():
+			_copyTree(extraFilesDir, _join(destDir, buildType), ignoreNames = ['.svn'])
 	
 def _preBuild(ctx):
-	if not _getWxWidgets(ctx):
-		sys.exit()
-	if not _patchWxWidgets(ctx):
-		sys.exit()
 	if not _buildPatchedWxWidgets(ctx):
 		sys.exit()
 	
-	_copyExtraFiles(ctx, extraFilesDirCommon, blddir)
-	_copyExtraFiles(ctx, extraFilesDirPlatform, blddir)
+	_copyExtraFiles(ctx, blddir)
 	
 def _postBuild(ctx):
 	for stripTarget in list(set(stripTargets)):
@@ -444,17 +498,23 @@ def _postBuild(ctx):
 		shutil.rmtree(outputDir)
 	os.makedirs(outputDir)
 	
-	_copyExtraFiles(ctx, extraFilesDirCommon, outputDir)
-	_copyExtraFiles(ctx, extraFilesDirPlatform, outputDir)
+	_copyExtraFiles(ctx, outputDir)
 		
 	selectedBuildTypes = _getSelectedBuildTypes()
 	for buildType in selectedBuildTypes:		
 		for tName in ('qsplib', 'qspgui'):
-			fileName = _getRealTargetName(targets[tName])			
+			fileName = _getRealTargetName(ctx, targets[tName])			
 			_copyFile(_join(blddir, buildType, fileName), 
 				_join(outputDir, buildType, fileName))
 	_info("Final files (without objects files and others) can be found in '%s'" \
 		% _realpath(outputDir))
+		
+	#for name in copiedFilePathNames:
+		#destpath = os.path.normpath(ctx.get_install_path("${PREFIX}/" + name, ctx.env))
+		##print destpath
+		#if not os.path.exists(os.path.dirname(destpath)):
+			#os.makedirs(os.path.dirname(destpath))
+		#ctx.do_install(name, destpath)
 	
 def _wafCloneTask(task):
     _t = task.clone(task.buildType)
@@ -462,6 +522,7 @@ def _wafCloneTask(task):
     # не знаю почему, но clone не копирует env.CXXFLAGS и прочие
     _t.env.CXXFLAGS  = task.env.CXXFLAGS
     _t.env.LINKFLAGS = task.env.LINKFLAGS
+    _t.env.PREFIX    = task.env.PREFIX
     
     if 'CCFLAGS' in task.env:
 		_t.env['CCFLAGS'] = task.env['CCFLAGS']
@@ -472,16 +533,18 @@ def _wafCloneTask(task):
 
 def set_options(opt):
 	
+	opt.parser.remove_option("--targets")
+	
 	opt.add_option('-t', '--buildtype', action='store', type='string',
 		help='Build the selected variants', dest='buildType')
-	
-	srcTypes = _getBuildSrcTypes(SRCDIRS)
-	#srcTypes = _getBuildSrcTypes([targets['qsplib']['path']])
+	opt.add_option('--wx-srcdir', action='store', type='string',
+		help='Source dir for wxWidgets', dest='wxSrcDir')
+	opt.add_option('--wx-revision', action='store', type='string', default = 'notchange',
+        help='Set svn revision for sources of wxWidgets, can be number ' + \
+        'or one of keywords: latest, notchange [default: notchange]', dest='wxRevision')
 
-	if 'cc' in srcTypes:
-		opt.tool_options('compiler_cc')
-	if 'cxx' in srcTypes:
-		opt.tool_options('compiler_cxx')
+	opt.tool_options('compiler_cc')
+	opt.tool_options('compiler_cxx')
 
 def init():
 	#print('  init called')
@@ -492,19 +555,23 @@ def configure(conf):
 	
 	srcTypes = _getBuildSrcTypes(SRCDIRS)
 
+	# === check compiler
 	if 'cc' in srcTypes:
 		conf.check_tool('compiler_cc')        
 	if 'cxx' in srcTypes:
 		conf.check_tool('compiler_cxx')
 		
+	# === check tools
 	if isLinux:
-		#conf.check_tool('misc')
+		#conf.check_tool('misc')	
 		conf.find_program('strip', var='strip', mandatory = False)
 	
 	conf.find_program(svnApp, var=svnApp, mandatory = True)
 	conf.find_program(patchApp, var=patchApp, mandatory = True)
 	conf.find_program('sed', mandatory = True)
+	conf.find_program('grep', mandatory = True)
 		
+	# === check system libs
 	libSysDeps = []
 	for projectName in targets:
 		for buildType in _getSelectedBuildTypes():
@@ -512,7 +579,24 @@ def configure(conf):
 		
 	for name in libSysDeps:
 		conf.check(lib = name)
+		
+	# === check wxWidgets
+	wxConfigPathName = _join(wxQSPSrcDir, 'wx-config')
+	if not _getWxWidgets(conf):
+		raise Configure.ConfigurationError("Getting of wxWidgets failed")
+		
+	if not _patchWxWidgets(conf):
+		raise Configure.ConfigurationError("Patching of wxWidgets failed")
+		
+	if not os.path.exists(wxConfigPathName):
+		if not _configurePatchedWxWidgets(conf):
+			raise Configure.ConfigurationError("Configuration of wxWidgets failed")
+		
+	conf.check_cfg(path = wxConfigPathName, 
+			args='--cflags --cxxflags --libs', 
+			package='', uselib_store='WX')
 
+	# === configure build types
 	for buildType in definedBuildTypes:        
 		bEnv = conf.env.copy()
 		bEnv.set_variant(buildType)
@@ -521,6 +605,14 @@ def configure(conf):
 		conf.env.CXXFLAGS = []
 
 def build(bld):
+
+	global wxSrcDir
+	if Options.options.wxSrcDir:
+		wxSrcDir = Options.options.wxSrcDir
+		
+	if defaultInstallPrefix is not None:
+		bld.env.PREFIX = defaultInstallPrefix
+		
 	tasks = {}
 
 	selectedBuildTypes = _getSelectedBuildTypes()
@@ -534,12 +626,16 @@ def build(bld):
 			_t.posted = 1
 		t.posted = 1
 		
-		if bld.env.strip and targets[_t.name][_t.buildType]['strip']:			
+		if bld.env.strip and targets[_t.name][_t.buildType]['strip']:
 			#target = _t.target
-			target = _getRealTargetName(targets[_t.name])
-			#if targets[_t.name]['type'] == 'cshlib':
-				#target = 'lib' + target + '.so' # FIXME how for not linux?
+			target = _getRealTargetName(bld, targets[_t.name])
 			stripTargets.append(_realpath(_join(blddir, t.buildType, target)))
+			
+	for extraFilesDir in _getExtraFilesDirs():
+		filesList = map(lambda x: _makeRelPath(x, _realpath(extraFilesDir)),
+			map(_realpath, _getFilesList(extraFilesDir, ignoreNames = ['.svn'])))
+		bld.install_files('${PREFIX}', filesList, relative_trick = True,
+			cwd = bld.path.find_dir(extraFilesDir))
 	
 	bld.add_pre_fun(_preBuild)
 	bld.add_post_fun(_postBuild)
@@ -547,3 +643,9 @@ def build(bld):
 def shutdown():
     #print('  shutdown called')
     pass
+    
+def dist():
+	# TODO
+	_error('This command does not implemented')
+    
+distcheck = dist
