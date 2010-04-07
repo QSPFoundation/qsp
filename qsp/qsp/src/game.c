@@ -553,7 +553,7 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 				++ind;
 			}
 		}
-		valsCount = qspVars[varInd].IndsCount = qspReCodeGetIntVal(strs[ind++]);
+		valsCount = qspVars[varInd].IndsBufSize = qspVars[varInd].IndsCount = qspReCodeGetIntVal(strs[ind++]);
 		if (valsCount)
 		{
 			qspVars[varInd].Indices = (QSPVarIndex *)malloc(valsCount * sizeof(QSPVarIndex));

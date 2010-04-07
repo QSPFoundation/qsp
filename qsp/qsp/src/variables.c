@@ -145,6 +145,7 @@ static void qspInitVarData(QSPVar *var)
 	var->ValsCount = 0;
 	var->Indices = 0;
 	var->IndsCount = 0;
+	var->IndsBufSize = 0;
 }
 
 QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
@@ -214,7 +215,11 @@ static int qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 	if (isCreate)
 	{
 		var->IndsCount++;
-		var->Indices = (QSPVarIndex *)realloc(var->Indices, (n + 1) * sizeof(QSPVarIndex));
+		if (var->IndsBufSize == n)
+		{
+			var->IndsBufSize += 8;
+			var->Indices = (QSPVarIndex *)realloc(var->Indices, var->IndsBufSize * sizeof(QSPVarIndex));
+		}
 		i = n - 1;
 		while (i >= 0 && qspStrsComp(var->Indices[i].Str, uStr) > 0)
 		{
@@ -456,7 +461,7 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 		if (maxCount > 0)
 		{
 			if (count < maxCount) maxCount = count;
-			dest->IndsCount = maxCount;
+			dest->IndsBufSize = dest->IndsCount = maxCount;
 			dest->Indices = (QSPVarIndex *)malloc(maxCount * sizeof(QSPVarIndex));
 			count = 0;
 			for (i = 0; i < src->IndsCount; ++i)
@@ -472,13 +477,13 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 		}
 		else
 		{
-			dest->IndsCount = 0;
+			dest->IndsBufSize = dest->IndsCount = 0;
 			dest->Indices = 0;
 		}
 	}
 	else
 	{
-		dest->ValsCount = dest->IndsCount = 0;
+		dest->ValsCount = dest->IndsBufSize = dest->IndsCount = 0;
 		dest->Values = 0;
 		dest->Indices = 0;
 	}
@@ -640,6 +645,7 @@ void qspMoveVar(QSPVar *dest, QSPVar *src)
 	dest->ValsCount = src->ValsCount;
 	dest->Indices = src->Indices;
 	dest->IndsCount = src->IndsCount;
+	dest->IndsBufSize = src->IndsBufSize;
 	qspInitVarData(src);
 }
 

@@ -45,6 +45,7 @@
 		int ValsCount;
 		QSPVarIndex *Indices;
 		int IndsCount;
+		int IndsBufSize;
 	} QSPVar;
 
 	extern QSPVar qspVars[QSP_VARSCOUNT];
