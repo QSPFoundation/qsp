@@ -542,9 +542,10 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 	{
 		varInd = qspReCodeGetIntVal(strs[ind++]);
 		qspVars[varInd].Name = qspCodeReCode(strs[ind++], QSP_FALSE);
-		valsCount = qspVars[varInd].ValsCount = qspReCodeGetIntVal(strs[ind++]);
+		valsCount = qspReCodeGetIntVal(strs[ind++]);
 		if (valsCount)
 		{
+			qspVars[varInd].ValsCount = valsCount;
 			qspVars[varInd].Values = (QSPVarValue *)malloc(valsCount * sizeof(QSPVarValue));
 			for (j = 0; j < valsCount; ++j)
 			{
@@ -553,9 +554,10 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 				++ind;
 			}
 		}
-		valsCount = qspVars[varInd].IndsBufSize = qspVars[varInd].IndsCount = qspReCodeGetIntVal(strs[ind++]);
+		valsCount = qspReCodeGetIntVal(strs[ind++]);
 		if (valsCount)
 		{
+			qspVars[varInd].IndsBufSize = qspVars[varInd].IndsCount = valsCount;
 			qspVars[varInd].Indices = (QSPVarIndex *)malloc(valsCount * sizeof(QSPVarIndex));
 			for (j = 0; j < valsCount; ++j)
 			{
