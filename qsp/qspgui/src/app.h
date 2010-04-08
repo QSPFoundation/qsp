@@ -20,6 +20,7 @@
 
 	#include <wx/wx.h>
 	#include <wx/stdpaths.h>
+	#include <wx/clipbrd.h>
 	#include "frame.h"
 	#include "callbacks_gui.h"
 	#include "transhelper.h"

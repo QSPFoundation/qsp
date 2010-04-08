@@ -69,5 +69,6 @@ int QSPApp::OnExit()
 	QSPDeInit();
 	QSPCallBacks::DeInit();
 	delete m_transhelper;
+	wxTheClipboard->Flush();
 	return wxApp::OnExit();
 }
