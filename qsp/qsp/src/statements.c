@@ -612,12 +612,30 @@ QSP_BOOL qspExecCode(QSP_CHAR **s, int startLine, int endLine, int codeOffset, Q
 	return isExit;
 }
 
-void qspExecStringAsCode(QSP_CHAR *s)
+void qspExecStringAsCodeWithArgs(QSP_CHAR *s, QSPVariant *args, int count)
 {
 	QSP_CHAR **strs;
-	int count = qspPreprocessData(s, &strs);
+	QSPVar local, *var;
+	int oldRefreshCount;
+	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return;
+	qspMoveVar(&local, var);
+	qspSetArgs(var, args, count);
+	count = qspPreprocessData(s, &strs);
+	oldRefreshCount = qspRefreshCount;
 	qspExecCode(strs, 0, count, 0, 0);
 	qspFreeStrs(strs, count);
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+	{
+		qspEmptyVar(&local);
+		return;
+	}
+	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE)))
+	{
+		qspEmptyVar(&local);
+		return;
+	}
+	qspEmptyVar(var);
+	qspMoveVar(var, &local);
 }
 
 static QSP_BOOL qspStatementIf(QSP_CHAR *s, QSP_CHAR **jumpTo)
@@ -880,24 +898,6 @@ static QSP_BOOL qspStatementExec(QSPVariant *args, int count, QSP_CHAR **jumpTo,
 
 static QSP_BOOL qspStatementDynamic(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
-	QSPVar local, *var;
-	int oldRefreshCount;
-	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return QSP_FALSE;
-	qspMoveVar(&local, var);
-	qspSetArgs(var, args + 1, count - 1);
-	oldRefreshCount = qspRefreshCount;
-	qspExecStringAsCode(QSP_STR(args[0]));
-	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-	{
-		qspEmptyVar(&local);
-		return QSP_FALSE;
-	}
-	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE)))
-	{
-		qspEmptyVar(&local);
-		return QSP_FALSE;
-	}
-	qspEmptyVar(var);
-	qspMoveVar(var, &local);
+	qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1);
 	return QSP_FALSE;
 }

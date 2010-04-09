@@ -443,7 +443,7 @@ QSP_BOOL QSPExecString(const QSP_CHAR *s, QSP_BOOL isRefresh)
 		qspIsMustWait = QSP_FALSE;
 		return QSP_FALSE;
 	}
-	qspExecStringAsCode((QSP_CHAR *)s);
+	qspExecStringAsCodeWithArgs((QSP_CHAR *)s, 0, 0);
 	if (qspErrorNum)
 	{
 		qspIsMustWait = QSP_FALSE;
@@ -1375,7 +1375,7 @@ AS3_Val QSPExecString(void *param, AS3_Val args)
 		return AS3_False();
 	}
 	strWC = qspC2W(s);
-	qspExecStringAsCode(strWC);
+	qspExecStringAsCodeWithArgs(strWC, 0, 0);
 	free(strWC);
 	if (qspErrorNum)
 	{

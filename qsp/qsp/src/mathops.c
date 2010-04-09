@@ -45,6 +45,7 @@ static QSPVariant qspValue(int, QSPVariant *, int *, int *);
 static void qspCompileExprPushOpCode(int *, int *, int *, int *, int);
 static void qspAppendToCompiled(int, int *, QSPVariant *, int *, int *, int, QSPVariant);
 static int qspCompileExpression(QSP_CHAR *, QSPVariant *, int *, int *);
+static void qspApplyResult(QSPVar *, QSPVariant *);
 static void qspFunctionStrComp(QSPVariant *, int, QSPVariant *);
 static void qspFunctionStrFind(QSPVariant *, int, QSPVariant *);
 static void qspFunctionStrPos(QSPVariant *, int, QSPVariant *);
@@ -856,6 +857,29 @@ QSPVariant qspExprValue(QSP_CHAR *expr)
 	return qspValue(itemsCount, compValues, compOpCodes, compArgsCounts);
 }
 
+static void qspApplyResult(QSPVar *varRes, QSPVariant *tos)
+{
+	QSP_CHAR *text;
+	if (varRes->ValsCount)
+	{
+		if (text = varRes->Values[0].Str)
+		{
+			tos->IsStr = QSP_TRUE;
+			QSP_PSTR(tos) = qspGetNewText(text, -1);
+		}
+		else
+		{
+			tos->IsStr = QSP_FALSE;
+			QSP_PNUM(tos) = varRes->Values[0].Num;
+		}
+	}
+	else
+	{
+		tos->IsStr = QSP_TRUE;
+		QSP_PSTR(tos) = qspGetNewText(QSP_FMT(""), 0);
+	}
+}
+
 static void qspFunctionStrComp(QSPVariant *args, int count, QSPVariant *tos)
 {
 	OnigUChar *tempBeg, *tempEnd;
@@ -1074,7 +1098,6 @@ static void qspFunctionReplace(QSPVariant *args, int count, QSPVariant *tos)
 
 static void qspFunctionFunc(QSPVariant *args, int count, QSPVariant *tos)
 {
-	QSP_CHAR *text;
 	int oldRefreshCount;
 	QSPVar result, *varRes;
 	if (!(varRes = qspVarReference(QSP_VARRES, QSP_TRUE))) return;
@@ -1091,49 +1114,32 @@ static void qspFunctionFunc(QSPVariant *args, int count, QSPVariant *tos)
 		qspEmptyVar(&result);
 		return;
 	}
-	if (varRes->ValsCount)
-	{
-		if (text = varRes->Values[0].Str)
-		{
-			tos->IsStr = QSP_TRUE;
-			QSP_PSTR(tos) = qspGetNewText(text, -1);
-		}
-		else
-		{
-			tos->IsStr = QSP_FALSE;
-			QSP_PNUM(tos) = varRes->Values[0].Num;
-		}
-	}
-	else
-	{
-		tos->IsStr = QSP_TRUE;
-		QSP_PSTR(tos) = qspGetNewText(QSP_FMT(""), 0);
-	}
+	qspApplyResult(varRes, tos);
 	qspEmptyVar(varRes);
 	qspMoveVar(varRes, &result);
 }
 
 static void qspFunctionDynEval(QSPVariant *args, int count, QSPVariant *tos)
 {
-	QSPVar local, *var;
 	int oldRefreshCount;
-	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return;
-	qspMoveVar(&local, var);
-	qspSetArgs(var, args + 1, count - 1);
+	QSPVar result, *varRes;
+	if (!(varRes = qspVarReference(QSP_VARRES, QSP_TRUE))) return;
+	qspMoveVar(&result, varRes);
 	oldRefreshCount = qspRefreshCount;
-	*tos = qspExprValue(QSP_STR(args[0]));
+	qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
-		qspEmptyVar(&local);
+		qspEmptyVar(&result);
 		return;
 	}
-	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE)))
+	if (!(varRes = qspVarReference(QSP_VARRES, QSP_TRUE)))
 	{
-		qspEmptyVar(&local);
+		qspEmptyVar(&result);
 		return;
 	}
-	qspEmptyVar(var);
-	qspMoveVar(var, &local);
+	qspApplyResult(varRes, tos);
+	qspEmptyVar(varRes);
+	qspMoveVar(varRes, &result);
 }
 
 static void qspFunctionMin(QSPVariant *args, int count, QSPVariant *tos)
