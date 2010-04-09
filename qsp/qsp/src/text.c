@@ -366,13 +366,13 @@ QSP_CHAR *qspNumToStr(QSP_CHAR *buf, int val)
 QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 {
 	QSP_BOOL isLastDelim;
-	int strLen, c1, c2;
+	int strLen, c1, c2, c3;
 	QSP_CHAR quot, *pos = qspStrStr(txt, str);
 	if (!pos) return 0;
-	if (!(isIsolated || qspStrPBrk(txt, QSP_QUOTS QSP_LRBRACK QSP_LSBRACK))) return pos;
+	if (!(isIsolated || qspStrPBrk(txt, QSP_QUOTS QSP_LQUOT QSP_LRBRACK QSP_LSBRACK))) return pos;
 	strLen = qspStrLen(str);
 	pos = qspStrEnd(txt) - strLen + 1;
-	c1 = c2 = 0;
+	c1 = c2 = c3 = 0;
 	isLastDelim = QSP_TRUE;
 	while (txt < pos)
 	{
@@ -387,12 +387,22 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 		if (*txt == QSP_LRBRACK[0])
 			++c1;
 		else if (*txt == QSP_RRBRACK[0])
-			--c1;
+		{
+			if (c1) --c1;
+		}
 		else if (*txt == QSP_LSBRACK[0])
 			++c2;
 		else if (*txt == QSP_RSBRACK[0])
-			--c2;
-		if (!(c1 || c2))
+		{
+			if (c2) --c2;
+		}
+		else if (*txt == QSP_LQUOT[0])
+			++c3;
+		else if (*txt == QSP_RQUOT[0])
+		{
+			if (c3) --c3;
+		}
+		if (!(c1 || c2 || c3))
 		{
 			if (isIsolated)
 			{

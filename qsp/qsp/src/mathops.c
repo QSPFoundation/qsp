@@ -41,6 +41,7 @@ static QSP_CHAR *qspGetName(QSP_CHAR **);
 static int qspFunctionOpCode(QSP_CHAR *);
 static int qspOperatorOpCode(QSP_CHAR **);
 static QSP_CHAR *qspGetString(QSP_CHAR **);
+static QSP_CHAR *qspGetQString(QSP_CHAR **);
 static QSPVariant qspValue(int, QSPVariant *, int *, int *);
 static void qspCompileExprPushOpCode(int *, int *, int *, int *, int);
 static void qspAppendToCompiled(int, int *, QSPVariant *, int *, int *, int, QSPVariant);
@@ -375,6 +376,21 @@ static QSP_CHAR *qspGetString(QSP_CHAR **expr)
 	return pos;
 }
 
+static QSP_CHAR *qspGetQString(QSP_CHAR **expr)
+{
+	QSP_CHAR *buf = *expr, *pos = qspStrPos(buf, QSP_RQUOT, QSP_FALSE);
+	if (!pos)
+	{
+		qspSetError(QSP_ERR_QUOTNOTFOUND);
+		return 0;
+	}
+	buf = qspGetNewText(buf + 1, (int)(pos - buf - 1));
+	*expr = pos + 1;
+	pos = qspFormatText(buf, QSP_TRUE);
+	if (pos != buf) free(buf);
+	return pos;
+}
+
 static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCodes, int *compArgsCounts)
 {
 	int type;
@@ -644,7 +660,7 @@ static int qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, int *compOp
 				qspSetError(QSP_ERR_UNKNOWNACTION);
 				break;
 			}
-			if ((opCode == qspOpAnd || opCode == qspOpOr || opCode == qspOpMod) && !qspIsInList(QSP_SPACES QSP_QUOTS QSP_LRBRACK, *s))
+			if ((opCode == qspOpAnd || opCode == qspOpOr || opCode == qspOpMod) && !qspIsInList(QSP_SPACES QSP_QUOTS QSP_LQUOT QSP_LRBRACK, *s))
 			{
 				qspSetError(QSP_ERR_SYNTAX);
 				break;
@@ -725,6 +741,19 @@ static int qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, int *compOp
 			else if (qspIsInList(QSP_QUOTS, *s))
 			{
 				if (!(name = qspGetString(&s))) break;
+				v.IsStr = QSP_TRUE;
+				QSP_STR(v) = name;
+				qspAppendToCompiled(qspOpValue, &itemsCount, compValues, compOpCodes, compArgsCounts, 0, v);
+				if (qspErrorNum)
+				{
+					free(QSP_STR(v));
+					break;
+				}
+				waitForOperator = QSP_TRUE;
+			}
+			else if (*s == QSP_LQUOT[0])
+			{
+				if (!(name = qspGetQString(&s))) break;
 				v.IsStr = QSP_TRUE;
 				QSP_STR(v) = name;
 				qspAppendToCompiled(qspOpValue, &itemsCount, compValues, compOpCodes, compArgsCounts, 0, v);

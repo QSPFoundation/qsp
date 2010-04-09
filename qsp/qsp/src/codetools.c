@@ -24,12 +24,12 @@ static int qspProcessEOLExtensions(QSP_CHAR **, int, QSP_CHAR ***);
 static int qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 {
 	QSP_CHAR **ret, *str, quot = 0;
-	int count = 0, strLen = 0, bufSize = 8, strBufSize = 256;
+	int count = 0, quotsCount = 0, strLen = 0, bufSize = 8, strBufSize = 256;
 	str = (QSP_CHAR *)malloc(strBufSize * sizeof(QSP_CHAR));
 	ret = (QSP_CHAR **)malloc(bufSize * sizeof(QSP_CHAR *));
 	while (*data)
 	{
-		if (quot || qspStrsNComp(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM)))
+		if (quotsCount || quot || qspStrsNComp(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM)))
 		{
 			if (++strLen >= strBufSize)
 			{
@@ -54,8 +54,17 @@ static int qspProcessPreformattedStrings(QSP_CHAR *data, QSP_CHAR ***strs)
 						quot = 0;
 				}
 			}
-			else if (qspIsInList(QSP_QUOTS, *data))
-				quot = *data;
+			else
+			{
+				if (*data == QSP_LQUOT[0])
+					++quotsCount;
+				else if (*data == QSP_RQUOT[0])
+				{
+					if (quotsCount) --quotsCount;
+				}
+				else if (qspIsInList(QSP_QUOTS, *data))
+					quot = *data;
+			}
 			++data;
 		}
 		else
