@@ -121,21 +121,19 @@ static void qspRemoveArrayItem(QSP_CHAR *name, int index)
 		var->Values[index] = var->Values[index + 1];
 		++index;
 	}
-	if (origIndex < var->IndsCount)
+	isRemoving = QSP_FALSE;
+	for (index = 0; index < var->IndsCount; ++index)
 	{
-		isRemoving = QSP_FALSE;
-		var->IndsCount--;
-		for (index = 0; index < var->IndsCount; ++index)
+		ind = var->Indices + index;
+		if (ind->Index == origIndex)
 		{
-			ind = var->Indices + index;
-			if (ind->Index == origIndex)
-			{
-				free(ind->Str);
-				isRemoving = QSP_TRUE;
-			}
-			if (isRemoving) *ind = var->Indices[index + 1];
-			if (ind->Index > origIndex) ind->Index--;
+			free(ind->Str);
+			var->IndsCount--;
+			if (index == var->IndsCount) break;
+			isRemoving = QSP_TRUE;
 		}
+		if (isRemoving) *ind = var->Indices[index + 1];
+		if (ind->Index > origIndex) ind->Index--;
 	}
 }
 
@@ -227,6 +225,7 @@ static int qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 			--i;
 		}
 		++i;
+		n = var->ValsCount;
 		var->Indices[i].Str = uStr;
 		var->Indices[i].Index = n;
 		return n;
@@ -457,29 +456,25 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 			str = src->Values[i + start].Str;
 			dest->Values[i].Str = (str ? qspGetNewText(str, -1) : 0);
 		}
-		maxCount = src->IndsCount - start;
-		if (maxCount > 0)
+		dest->IndsBufSize = 0;
+		dest->Indices = 0;
+		count = 0;
+		for (i = 0; i < src->IndsCount; ++i)
 		{
-			if (count < maxCount) maxCount = count;
-			dest->IndsBufSize = dest->IndsCount = maxCount;
-			dest->Indices = (QSPVarIndex *)malloc(maxCount * sizeof(QSPVarIndex));
-			count = 0;
-			for (i = 0; i < src->IndsCount; ++i)
+			newInd = src->Indices[i].Index - start;
+			if (newInd >= 0 && newInd < maxCount)
 			{
-				newInd = src->Indices[i].Index - start;
-				if (newInd >= 0 && newInd < maxCount)
+				if (count == dest->IndsBufSize)
 				{
-					dest->Indices[count].Index = newInd;
-					dest->Indices[count].Str = qspGetNewText(src->Indices[i].Str, -1);
-					++count;
+					dest->IndsBufSize += 16;
+					dest->Indices = (QSPVarIndex *)realloc(dest->Indices, dest->IndsBufSize * sizeof(QSPVarIndex));
 				}
+				dest->Indices[count].Index = newInd;
+				dest->Indices[count].Str = qspGetNewText(src->Indices[i].Str, -1);
+				++count;
 			}
 		}
-		else
-		{
-			dest->IndsBufSize = dest->IndsCount = 0;
-			dest->Indices = 0;
-		}
+		dest->IndsCount = count;
 	}
 	else
 	{
