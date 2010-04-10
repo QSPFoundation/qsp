@@ -23,6 +23,8 @@
 	#define QSP_STRSDELIM QSP_FMT("\r\n")
 	#define QSP_SPACES QSP_FMT(" \t")
 	#define QSP_QUOTS QSP_FMT("'\"")
+	#define QSP_LQUOT QSP_FMT("{")
+	#define QSP_RQUOT QSP_FMT("}")
 
 	/* Helpers */
 	#define QSP_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
