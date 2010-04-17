@@ -149,8 +149,8 @@ QSP_CHAR *qspGetAllActionsAsCode()
 		}
 		len = qspAddText(&res, QSP_FMT("':"), len, 2, QSP_FALSE);
 		count = qspCurActions[i].OnPressLinesCount;
-		if (count == 1 && qspIsAnyString(qspCurActions[i].OnPressLines[0].Str))
-			len = qspAddText(&res, qspCurActions[i].OnPressLines[0].Str, len, -1, QSP_FALSE);
+		if (count == 1 && qspIsAnyString(qspCurActions[i].OnPressLines->Str))
+			len = qspAddText(&res, qspCurActions[i].OnPressLines->Str, len, -1, QSP_FALSE);
 		else
 		{
 			if (count >= 2)

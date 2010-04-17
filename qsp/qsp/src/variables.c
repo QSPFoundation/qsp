@@ -410,7 +410,7 @@ QSP_CHAR *qspGetVarStrValue(QSP_CHAR *name)
 	{
 		if (var->ValsCount)
 		{
-			text = var->Values[0].Str;
+			text = var->Values->Str;
 			if (text) return text;
 		}
 	}
@@ -424,7 +424,7 @@ int qspGetVarNumValue(QSP_CHAR *name)
 	QSPVar *var;
 	if (var = qspVarReference(name, QSP_FALSE))
 	{
-		if (var->ValsCount) return var->Values[0].Num;
+		if (var->ValsCount) return var->Values->Num;
 	}
 	else
 		qspResetError();
