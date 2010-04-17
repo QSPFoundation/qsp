@@ -17,6 +17,7 @@
 
 #include "declarations.h"
 #include "actions.h"
+#include "codetools.h"
 #include "variant.h"
 
 #ifndef QSP_LOCSDEFINES
@@ -26,14 +27,14 @@
 	{
 		QSP_CHAR *Image;
 		QSP_CHAR *Desc;
-		QSP_CHAR **OnPressLines;
+		QSPLineOfCode *OnPressLines;
 		int OnPressLinesCount;
 	} QSPLocAct;
 	typedef struct
 	{
 		QSP_CHAR *Name;
 		QSP_CHAR *Desc;
-		QSP_CHAR **OnVisitLines;
+		QSPLineOfCode *OnVisitLines;
 		int OnVisitLinesCount;
 		QSPLocAct Actions[QSP_MAXACTIONS];
 	} QSPLocation;

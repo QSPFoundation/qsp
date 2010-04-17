@@ -21,7 +21,6 @@
 	#define QSP_TEXTDEFINES
 
 	#define QSP_STRSDELIM QSP_FMT("\r\n")
-	#define QSP_STRSALTDELIM QSP_FMT("|\r\r|")
 	#define QSP_LSUBEX QSP_FMT("<<")
 	#define QSP_RSUBEX QSP_FMT(">>")
 

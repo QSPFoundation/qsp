@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "codetools.h"
 #include "variant.h"
 
 #ifndef QSP_ACTSDEFINES
@@ -27,7 +28,7 @@
 	{
 		QSP_CHAR *Image;
 		QSP_CHAR *Desc;
-		QSP_CHAR **OnPressLines;
+		QSPLineOfCode *OnPressLines;
 		int OnPressLinesCount;
 		int Location;
 		int ActIndex;
@@ -43,11 +44,11 @@
 
 	/* External functions */
 	void qspClearActions(QSP_BOOL);
-	void qspAddAction(QSPVariant *, int, QSP_CHAR **, int, int, QSP_BOOL);
+	void qspAddAction(QSPVariant *, int, QSPLineOfCode *, int, int, QSP_BOOL);
 	void qspExecAction(int);
 	QSP_CHAR *qspGetAllActionsAsCode();
 	/* Statements */
-	void qspStatementAddAct(QSP_CHAR *);
+	void qspStatementAddAct(QSPLineOfCode *, int, int);
 	QSP_BOOL qspStatementDelAct(QSPVariant *, int, QSP_CHAR **, int);
 
 #endif

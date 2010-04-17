@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "codetools.h"
 #include "variant.h"
 
 #ifndef QSP_STATSDEFINES
@@ -106,7 +107,8 @@
 	/* External functions */
 	void qspInitStats();
 	int qspGetStatArgs(QSP_CHAR *, int, QSPVariant *);
-	QSP_BOOL qspExecCode(QSP_CHAR **, int, int, int, QSP_CHAR **);
+	QSP_BOOL qspExecCode(QSPLineOfCode *, int, int, int, QSP_CHAR **);
 	void qspExecStringAsCodeWithArgs(QSP_CHAR *, QSPVariant *, int);
+	void qspInitLineOfCode(QSPLineOfCode *, QSP_CHAR *, int);
 
 #endif

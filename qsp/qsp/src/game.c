@@ -25,6 +25,7 @@
 #include "locations.h"
 #include "objects.h"
 #include "playlist.h"
+#include "statements.h"
 #include "text.h"
 #include "time.h"
 #include "variables.h"
@@ -321,7 +322,6 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 
 int qspSaveGameStatusToString(QSP_CHAR **buf)
 {
-	QSP_CHAR *temp;
 	int i, j, len, oldRefreshCount = qspRefreshCount;
 	qspExecLocByVarNameWithArgs(QSP_FMT("ONGSAVE"), 0, 0);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
@@ -357,9 +357,12 @@ int qspSaveGameStatusToString(QSP_CHAR **buf)
 		else
 			len = qspCodeWriteVal(buf, len, 0, QSP_FALSE);
 		len = qspCodeWriteVal(buf, len, qspCurActions[i].Desc, QSP_TRUE);
-		temp = qspJoinStrs(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount, QSP_STRSALTDELIM);
-		len = qspCodeWriteVal(buf, len, temp, QSP_TRUE);
-		free(temp);
+		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].OnPressLinesCount, QSP_TRUE);
+		for (j = 0; j < qspCurActions[i].OnPressLinesCount; ++j)
+		{
+			len = qspCodeWriteVal(buf, len, qspCurActions[i].OnPressLines[j].Str, QSP_TRUE);
+			len = qspCodeWriteIntVal(buf, len, qspCurActions[i].OnPressLines[j].LineNum, QSP_TRUE);
+		}
 		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].Location, QSP_TRUE);
 		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].ActIndex, QSP_TRUE);
 		len = qspCodeWriteIntVal(buf, len, qspCurActions[i].StartLine, QSP_TRUE);
@@ -416,7 +419,7 @@ void qspSaveGameStatus(QSP_CHAR *fileName)
 
 static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, int strsCount)
 {
-	int i, ind, count, lastInd, temp, selAction, selObject;
+	int i, j, ind, count, linesCount, lastInd, temp, selAction, selObject;
 	ind = 17;
 	if (ind > strsCount) return QSP_FALSE;
 	if (qspStrsComp(strs[0], QSP_SAVEDGAMEID) ||
@@ -435,14 +438,24 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, int strsCount)
 	if (temp < 0 || temp > QSP_MAXINCFILES || (ind += temp) > strsCount) return QSP_FALSE;
 	if (ind + 1 > strsCount) return QSP_FALSE;
 	count = qspReCodeGetIntVal(strs[ind++]);
-	if (count < 0 || count > QSP_MAXACTIONS || selAction >= count || (ind + 7 * count) > strsCount) return QSP_FALSE;
+	if (count < 0 || count > QSP_MAXACTIONS || selAction >= count) return QSP_FALSE;
 	for (i = 0; i < count; ++i)
 	{
-		ind += 3;
+		if ((ind += 2) > strsCount) return QSP_FALSE;
+		if (ind + 1 > strsCount) return QSP_FALSE;
+		linesCount = qspReCodeGetIntVal(strs[ind++]);
+		if (linesCount < 0 || (ind + 2 * linesCount) > strsCount) return QSP_FALSE;
+		for (j = 0; j < linesCount; ++j)
+		{
+			++ind;
+			if (qspReCodeGetIntVal(strs[ind++]) < 0) return QSP_FALSE;
+		}
+		if (ind + 1 > strsCount) return QSP_FALSE;
 		if (qspReCodeGetIntVal(strs[ind++]) < 0) return QSP_FALSE;
-		++ind;
+		if (++ind > strsCount) return QSP_FALSE;
+		if (ind + 1 > strsCount) return QSP_FALSE;
 		if (qspReCodeGetIntVal(strs[ind++]) < 0) return QSP_FALSE;
-		++ind;
+		if (++ind > strsCount) return QSP_FALSE;
 	}
 	if (ind + 1 > strsCount) return QSP_FALSE;
 	temp = qspReCodeGetIntVal(strs[ind++]);
@@ -515,9 +528,18 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 			qspCurActions[i].Image = 0;
 		++ind;
 		qspCurActions[i].Desc = qspCodeReCode(strs[ind++], QSP_FALSE);
-		str = qspCodeReCode(strs[ind++], QSP_FALSE);
-		qspCurActions[i].OnPressLinesCount = qspSplitStr(str, QSP_STRSALTDELIM, &qspCurActions[i].OnPressLines);
-		free(str);
+		valsCount = qspCurActions[i].OnPressLinesCount = qspReCodeGetIntVal(strs[ind++]);
+		if (valsCount)
+		{
+			qspCurActions[i].OnPressLines = (QSPLineOfCode *)malloc(valsCount * sizeof(QSPLineOfCode));
+			for (j = 0; j < valsCount; ++j)
+			{
+				qspInitLineOfCode(qspCurActions[i].OnPressLines + j, qspCodeReCode(strs[ind++], QSP_FALSE), 0);
+				qspCurActions[i].OnPressLines[j].LineNum = qspReCodeGetIntVal(strs[ind++]);
+			}
+		}
+		else
+			qspCurActions[i].OnPressLines = 0;
 		qspCurActions[i].Location = qspReCodeGetIntVal(strs[ind++]);
 		qspCurActions[i].ActIndex = qspReCodeGetIntVal(strs[ind++]);
 		qspCurActions[i].StartLine = qspReCodeGetIntVal(strs[ind++]);

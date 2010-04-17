@@ -22,7 +22,27 @@
 
 	#define QSP_EOLEXT QSP_FMT(" _")
 
+	typedef struct
+	{
+		int Stat;
+		int EndPos;
+		int ParamPos;
+	} QSPCachedStat;
+
+	typedef struct
+	{
+		QSP_CHAR *Str;
+		int LineNum;
+		QSP_BOOL IsMultiline;
+		QSP_CHAR *Label;
+		QSPCachedStat *Stats;
+		int StatsCount;
+	} QSPLineOfCode;
+
 	/* External functions */
-	int qspPreprocessData(QSP_CHAR *, QSP_CHAR ***);
+	void qspFreePrepLines(QSPLineOfCode *, int);
+	void qspCopyPrepLines(QSPLineOfCode **, QSPLineOfCode *, int, int);
+	QSP_CHAR *qspJoinPrepLines(QSPLineOfCode *, int, QSP_CHAR *);
+	int qspPreprocessData(QSP_CHAR *, QSPLineOfCode **);
 
 #endif

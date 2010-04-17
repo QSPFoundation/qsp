@@ -22,6 +22,7 @@
 #include "game.h"
 #include "locations.h"
 #include "objects.h"
+#include "statements.h"
 #include "text.h"
 #include "time.h"
 #include "variables.h"

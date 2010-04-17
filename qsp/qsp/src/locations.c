@@ -51,13 +51,13 @@ void qspCreateWorld(int start, int locsCount)
 		free(qspLocsNames[i].Name);
 		free(qspLocs[i].Name);
 		free(qspLocs[i].Desc);
-		qspFreeStrs(qspLocs[i].OnVisitLines, qspLocs[i].OnVisitLinesCount);
+		qspFreePrepLines(qspLocs[i].OnVisitLines, qspLocs[i].OnVisitLinesCount);
 		for (j = 0; j < QSP_MAXACTIONS; ++j)
 			if (qspLocs[i].Actions[j].Desc)
 			{
 				if (qspLocs[i].Actions[j].Image) free(qspLocs[i].Actions[j].Image);
 				free(qspLocs[i].Actions[j].Desc);
-				qspFreeStrs(qspLocs[i].Actions[j].OnPressLines, qspLocs[i].Actions[j].OnPressLinesCount);
+				qspFreePrepLines(qspLocs[i].Actions[j].OnPressLines, qspLocs[i].Actions[j].OnPressLinesCount);
 			}
 	}
 	if (qspLocsCount != locsCount)
@@ -106,7 +106,8 @@ int qspLocIndex(QSP_CHAR *name)
 void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 {
 	QSPVariant args[2];
-	QSP_CHAR *str, **code;
+	QSP_CHAR *str;
+	QSPLineOfCode *code;
 	int i, count, oldLoc, oldActIndex, oldLine;
 	QSPLocation *loc = qspLocs + locInd;
 	oldLoc = qspRealCurLoc;
@@ -176,9 +177,9 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
 	else
 	{
 		count = loc->OnVisitLinesCount;
-		qspCopyStrs(&code, loc->OnVisitLines, 0, count);
+		qspCopyPrepLines(&code, loc->OnVisitLines, 0, count);
 		qspExecCode(code, 0, count, 1, 0);
-		qspFreeStrs(code, count);
+		qspFreePrepLines(code, count);
 	}
 	qspRealLine = oldLine;
 	qspRealActIndex = oldActIndex;
