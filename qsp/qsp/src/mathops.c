@@ -385,11 +385,8 @@ static QSP_CHAR *qspGetQString(QSP_CHAR **expr)
 		qspSetError(QSP_ERR_QUOTNOTFOUND);
 		return 0;
 	}
-	buf = qspGetNewText(buf + 1, (int)(pos - buf - 1));
 	*expr = pos + 1;
-	pos = qspFormatText(buf, QSP_TRUE);
-	if (pos != buf) free(buf);
-	return pos;
+	return qspGetNewText(buf + 1, (int)(pos - buf - 1));
 }
 
 static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCodes, int *compArgsCounts)
