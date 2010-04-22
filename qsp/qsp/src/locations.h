@@ -59,6 +59,6 @@
 	void qspExecLocByName(QSP_CHAR *, QSP_BOOL);
 	void qspExecLocByNameWithArgs(QSP_CHAR *, QSPVariant *, int);
 	void qspExecLocByVarNameWithArgs(QSP_CHAR *, QSPVariant *, int);
-	void qspRefreshCurLoc(QSP_BOOL);
+	void qspRefreshCurLoc(QSP_BOOL, QSPVariant *, int);
 
 #endif

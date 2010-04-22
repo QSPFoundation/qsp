@@ -925,18 +925,14 @@ static QSP_BOOL qspStatementGoSub(QSPVariant *args, int count, QSP_CHAR **jumpTo
 
 static QSP_BOOL qspStatementGoTo(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
-	QSPVar *var;
 	int locInd = qspLocIndex(QSP_STR(args[0]));
 	if (locInd < 0)
 	{
 		qspSetError(QSP_ERR_LOCNOTFOUND);
 		return QSP_FALSE;
 	}
-	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return QSP_FALSE;
-	qspEmptyVar(var);
-	qspSetArgs(var, args + 1, count - 1);
 	qspCurLoc = locInd;
-	qspRefreshCurLoc(extArg);
+	qspRefreshCurLoc(extArg, args + 1, count - 1);
 	return QSP_FALSE;
 }
 

@@ -153,7 +153,7 @@ void qspNewGame(QSP_BOOL isReset)
 		qspCallCloseFile(0);
 		qspCallSetTimer(QSP_DEFTIMERINTERVAL);
 	}
-	qspRefreshCurLoc(QSP_TRUE);
+	qspRefreshCurLoc(QSP_TRUE, 0, 0);
 }
 
 static FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)

@@ -236,9 +236,13 @@ void qspExecLocByVarNameWithArgs(QSP_CHAR *name, QSPVariant *args, int count)
 	}
 }
 
-void qspRefreshCurLoc(QSP_BOOL isChangeDesc)
+void qspRefreshCurLoc(QSP_BOOL isChangeDesc, QSPVariant *args, int count)
 {
+	QSPVar *var;
 	int oldRefreshCount;
+	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return;
+	qspEmptyVar(var);
+	qspSetArgs(var, args, count);
 	qspClearActions(QSP_FALSE);
 	++qspRefreshCount;
 	if (isChangeDesc) ++qspFullRefreshCount;
@@ -246,5 +250,5 @@ void qspRefreshCurLoc(QSP_BOOL isChangeDesc)
 	qspExecLocByIndex(qspCurLoc, isChangeDesc);
 	if (qspErrorNum) return;
 	if (qspRefreshCount == oldRefreshCount)
-		qspExecLocByVarNameWithArgs(QSP_FMT("ONNEWLOC"), 0, 0);
+		qspExecLocByVarNameWithArgs(QSP_FMT("ONNEWLOC"), args, count);
 }
