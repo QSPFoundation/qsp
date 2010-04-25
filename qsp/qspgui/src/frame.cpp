@@ -139,10 +139,10 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	helpAboutItem->SetBitmap(wxBitmap(about_xpm));
 	helpMenu->Append(helpAboutItem);
 	// ------------
-	menuBar->Append(m_fileMenu, wxEmptyString);
-	menuBar->Append(m_gameMenu, wxEmptyString);
-	menuBar->Append(m_settingsMenu, wxEmptyString);
-	menuBar->Append(helpMenu, wxEmptyString);
+	menuBar->Append(m_fileMenu, wxT("-"));
+	menuBar->Append(m_gameMenu, wxT("-"));
+	menuBar->Append(m_settingsMenu, wxT("-"));
+	menuBar->Append(helpMenu, wxT("-"));
 	SetMenuBar(menuBar);
 	// --------------------------------------
 	m_manager = new wxAuiManager(this);

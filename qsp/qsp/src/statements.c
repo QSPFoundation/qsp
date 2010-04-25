@@ -649,7 +649,11 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 		case qspStatElse:
 			delimLen = 0;
 			delimPos = qspSkipSpaces(paramPos);
-			if (*delimPos == QSP_COLONDELIM[0]) ++delimPos;
+			if (*delimPos == QSP_COLONDELIM[0])
+			{
+				++delimPos;
+				paramPos = delimPos;
+			}
 			break;
 		default:
 			delimLen = 1;
@@ -704,13 +708,17 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 					delimPos = qspStrPos(buf, QSP_STATDELIM, QSP_FALSE);
 					if (elsePos)
 					{
-						if ((delimPos && elsePos < delimPos) || !delimPos)
+						if (!delimPos || elsePos < delimPos)
 						{
 							if (statCode == qspStatElse)
 							{
 								delimLen = 0;
 								delimPos = qspSkipSpaces(paramPos);
-								if (*delimPos == QSP_COLONDELIM[0]) ++delimPos;
+								if (*delimPos == QSP_COLONDELIM[0])
+								{
+									++delimPos;
+									paramPos = delimPos;
+								}
 							}
 							else if (buf < elsePos)
 							{
@@ -739,20 +747,23 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 				break;
 		}
 	}
-	line->StatsCount++;
-	line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
-	line->Stats[count].Stat = statCode;
-	line->Stats[count].EndPos = (int)(qspStrEnd(buf) - str);
-	if (paramPos)
-		line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
-	else
-		line->Stats[count].ParamPos = statPos;
+	if (*buf || !count)
+	{
+		line->StatsCount++;
+		line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
+		line->Stats[count].Stat = statCode;
+		line->Stats[count].EndPos = (int)(qspStrEnd(buf) - str);
+		if (paramPos)
+			line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
+		else
+			line->Stats[count].ParamPos = statPos;
+	}
 	switch (line->Stats->Stat)
 	{
 	case qspStatAct:
 	case qspStatIf:
 	case qspStatElseIf:
-		line->IsMultiline = (*(qspStrEnd(buf) - 1) == QSP_COLONDELIM[0]);
+		line->IsMultiline = (line->StatsCount == 1 && *(line->Str + line->Stats->EndPos) == QSP_COLONDELIM[0]);
 		break;
 	default:
 		line->IsMultiline = QSP_FALSE;
