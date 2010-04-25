@@ -649,11 +649,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 		case qspStatElse:
 			delimLen = 0;
 			delimPos = qspSkipSpaces(paramPos);
-			if (*delimPos == QSP_COLONDELIM[0])
-			{
-				++delimPos;
-				paramPos = delimPos;
-			}
+			if (*delimPos == QSP_COLONDELIM[0]) paramPos = ++delimPos;
 			break;
 		default:
 			delimLen = 1;
@@ -714,11 +710,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 							{
 								delimLen = 0;
 								delimPos = qspSkipSpaces(paramPos);
-								if (*delimPos == QSP_COLONDELIM[0])
-								{
-									++delimPos;
-									paramPos = delimPos;
-								}
+								if (*delimPos == QSP_COLONDELIM[0]) paramPos = ++delimPos;
 							}
 							else if (buf < elsePos)
 							{
