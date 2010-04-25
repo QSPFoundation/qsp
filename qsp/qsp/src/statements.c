@@ -617,7 +617,7 @@ void qspExecStringAsCodeWithArgs(QSP_CHAR *s, QSPVariant *args, int count)
 
 void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 {
-	int statCode, delimLen, statPos, count = 0;
+	int statCode, statPos, count = 0;
 	QSP_CHAR ch, *delimPos, *temp, *buf, *elsePos = 0, *paramPos = 0;
 	line->Str = str;
 	line->LineNum = lineNum;
@@ -631,7 +631,6 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 		switch (statCode)
 		{
 		case qspStatAct:
-			delimLen = 1;
 			delimPos = qspStrPos(buf, QSP_COLONDELIM, QSP_FALSE);
 			break;
 		case qspStatIf:
@@ -639,21 +638,16 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 			elsePos = qspStrPos(temp, QSP_STATELSE, QSP_TRUE);
 			if (elsePos) elsePos = buf + (elsePos - temp);
 			free(temp);
-			delimLen = 1;
 			delimPos = qspStrPos(buf, QSP_COLONDELIM, QSP_FALSE);
 			break;
 		case qspStatElseIf:
-			delimLen = 1;
 			delimPos = qspStrPos(buf, QSP_COLONDELIM, QSP_FALSE);
 			break;
 		case qspStatElse:
-			delimLen = 0;
 			delimPos = qspSkipSpaces(paramPos);
-			if (*delimPos == QSP_COLONDELIM[0]) delimPos = qspSkipSpaces(delimPos + 1);
-			paramPos = delimPos;
+			if (*delimPos == QSP_COLONDELIM[0]) ++delimPos;
 			break;
 		default:
-			delimLen = 1;
 			delimPos = qspStrPos(buf, QSP_STATDELIM, QSP_FALSE);
 			if (statCode == qspStatUnknown && buf != delimPos)
 			{
@@ -680,8 +674,11 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 			else
 				line->Stats[count].ParamPos = statPos;
 			++count;
+			if (statCode == qspStatElse || delimPos == elsePos)
+				buf = qspSkipSpaces(delimPos);
+			else
+				buf = qspSkipSpaces(delimPos + 1);
 			paramPos = 0;
-			buf = qspSkipSpaces(delimPos + delimLen);
 			statCode = qspGetStatCode(buf, &paramPos);
 			statPos = (int)(buf - str);
 			if (*buf && statCode != qspStatComment && statCode != qspStatElseIf)
@@ -689,7 +686,6 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 				switch (statCode)
 				{
 				case qspStatAct:
-					delimLen = 1;
 					delimPos = qspStrPos(buf, QSP_COLONDELIM, QSP_FALSE);
 					break;
 				case qspStatIf:
@@ -697,11 +693,9 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 					elsePos = qspStrPos(temp, QSP_STATELSE, QSP_TRUE);
 					if (elsePos) elsePos = buf + (elsePos - temp);
 					free(temp);
-					delimLen = 1;
 					delimPos = qspStrPos(buf, QSP_COLONDELIM, QSP_FALSE);
 					break;
 				default:
-					delimLen = 1;
 					delimPos = qspStrPos(buf, QSP_STATDELIM, QSP_FALSE);
 					if (elsePos)
 					{
@@ -709,16 +703,11 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 						{
 							if (statCode == qspStatElse)
 							{
-								delimLen = 0;
 								delimPos = qspSkipSpaces(paramPos);
-								if (*delimPos == QSP_COLONDELIM[0]) delimPos = qspSkipSpaces(delimPos + 1);
-								paramPos = delimPos;
+								if (*delimPos == QSP_COLONDELIM[0]) ++delimPos;
 							}
 							else if (buf < elsePos)
-							{
-								delimLen = 0;
 								delimPos = elsePos;
-							}
 						}
 					}
 					if (statCode == qspStatUnknown && buf != delimPos)
@@ -741,23 +730,20 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 				break;
 		}
 	}
-	if (*buf || !count)
-	{
-		line->StatsCount++;
-		line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
-		line->Stats[count].Stat = statCode;
-		line->Stats[count].EndPos = (int)(qspStrEnd(buf) - str);
-		if (paramPos)
-			line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
-		else
-			line->Stats[count].ParamPos = statPos;
-	}
+	line->StatsCount++;
+	line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
+	line->Stats[count].Stat = statCode;
+	line->Stats[count].EndPos = (int)(qspStrEnd(buf) - str);
+	if (paramPos)
+		line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
+	else
+		line->Stats[count].ParamPos = statPos;
 	switch (line->Stats->Stat)
 	{
 	case qspStatAct:
 	case qspStatIf:
 	case qspStatElseIf:
-		line->IsMultiline = (line->StatsCount == 1 && *(line->Str + line->Stats->EndPos) == QSP_COLONDELIM[0]);
+		line->IsMultiline = (*(qspStrEnd(buf) - 1) == QSP_COLONDELIM[0]);
 		break;
 	default:
 		line->IsMultiline = QSP_FALSE;
