@@ -646,6 +646,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 		case qspStatElse:
 			delimPos = qspSkipSpaces(paramPos);
 			if (*delimPos == QSP_COLONDELIM[0]) ++delimPos;
+			if (!(*delimPos)) delimPos = 0;
 			break;
 		default:
 			delimPos = qspStrPos(buf, QSP_STATDELIM, QSP_FALSE);
