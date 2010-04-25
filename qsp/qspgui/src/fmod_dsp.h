@@ -361,7 +361,7 @@ typedef enum
     FMOD_DSP_DELAY_CH13,     /* Channel #13 Delay in ms.  0  to 10000.  Default = 0. */
     FMOD_DSP_DELAY_CH14,     /* Channel #14 Delay in ms.  0  to 10000.  Default = 0. */
     FMOD_DSP_DELAY_CH15,     /* Channel #15 Delay in ms.  0  to 10000.  Default = 0. */
-    FMOD_DSP_DELAY_MAXDELAY, /* Maximum delay in ms.  0  to 1000.  Default = 10. */
+    FMOD_DSP_DELAY_MAXDELAY, /* Maximum delay in ms.  0  to 10000.  Default = 10. */
 } FMOD_DSP_DELAY;
 
 
@@ -699,8 +699,6 @@ typedef enum
     This is a high quality I3DL2 based reverb which improves greatly on FMOD_DSP_REVERB.
     On top of the I3DL2 property set, "Dry Level" is also included to allow the dry mix to be changed.
     
-    Currently FMOD_DSP_SFXREVERB_REFLECTIONSLEVEL, FMOD_DSP_SFXREVERB_REFLECTIONSDELAY and FMOD_DSP_SFXREVERB_REVERBDELAY are not enabled but will come in future versions.
-    
     These properties can be set with presets in FMOD_REVERB_PRESETS.
 
     [PLATFORMS]
@@ -717,7 +715,7 @@ typedef enum
 typedef enum
 {
     FMOD_DSP_SFXREVERB_DRYLEVEL,            /* Dry Level      : Mix level of dry signal in output in mB.  Ranges from -10000.0 to 0.0.  Default is 0. */
-    FMOD_DSP_SFXREVERB_ROOM,                /* Room           : Room effect level at low frequencies in mB.  Ranges from -10000.0 to 0.0.  Default is 0.0. */
+    FMOD_DSP_SFXREVERB_ROOM,                /* Room           : Room effect level at low frequencies in mB.  Ranges from -10000.0 to 0.0.  Default is -10000.0. */
     FMOD_DSP_SFXREVERB_ROOMHF,              /* Room HF        : Room effect high-frequency level re. low frequency level in mB.  Ranges from -10000.0 to 0.0.  Default is 0.0. */
     FMOD_DSP_SFXREVERB_ROOMROLLOFFFACTOR,   /* Room Rolloff   : Like DS3D flRolloffFactor but for room effect.  Ranges from 0.0 to 10.0. Default is 10.0 */
     FMOD_DSP_SFXREVERB_DECAYTIME,           /* Decay Time     : Reverberation decay time at low-frequencies in seconds.  Ranges from 0.1 to 20.0. Default is 1.0. */
