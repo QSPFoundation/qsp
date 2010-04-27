@@ -668,18 +668,15 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 		isSkipDelim = QSP_TRUE;
 		while (delimPos)
 		{
-			if (statCode != qspStatUnknown)
-			{
-				line->StatsCount++;
-				line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
-				line->Stats[count].Stat = statCode;
-				line->Stats[count].EndPos = (int)(delimPos - str);
-				if (paramPos)
-					line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
-				else
-					line->Stats[count].ParamPos = statPos;
-				++count;
-			}
+			line->StatsCount++;
+			line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
+			line->Stats[count].Stat = statCode;
+			line->Stats[count].EndPos = (int)(delimPos - str);
+			if (paramPos)
+				line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
+			else
+				line->Stats[count].ParamPos = statPos;
+			++count;
 			if (isSkipDelim)
 				buf = qspSkipSpaces(delimPos + 1);
 			else
@@ -746,17 +743,14 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 				break;
 		}
 	}
-	if (!count || statCode != qspStatUnknown)
-	{
-		line->StatsCount++;
-		line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
-		line->Stats[count].Stat = statCode;
-		line->Stats[count].EndPos = (int)(qspStrEnd(buf) - str);
-		if (paramPos)
-			line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
-		else
-			line->Stats[count].ParamPos = statPos;
-	}
+	line->StatsCount++;
+	line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
+	line->Stats[count].Stat = statCode;
+	line->Stats[count].EndPos = (int)(qspStrEnd(buf) - str);
+	if (paramPos)
+		line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
+	else
+		line->Stats[count].ParamPos = statPos;
 	switch (line->Stats->Stat)
 	{
 	case qspStatAct:
