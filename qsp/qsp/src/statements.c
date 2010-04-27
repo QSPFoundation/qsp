@@ -617,6 +617,7 @@ void qspExecStringAsCodeWithArgs(QSP_CHAR *s, QSPVariant *args, int count)
 
 void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 {
+	QSP_BOOL isSkipDelim;
 	int statCode, statPos, count = 0;
 	QSP_CHAR ch, *delimPos, *temp, *buf, *elsePos = 0, *paramPos = 0;
 	line->Str = str;
@@ -664,6 +665,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 			}
 			break;
 		}
+		isSkipDelim = QSP_TRUE;
 		while (delimPos)
 		{
 			line->StatsCount++;
@@ -675,10 +677,13 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 			else
 				line->Stats[count].ParamPos = statPos;
 			++count;
-			if (statCode == qspStatElse || delimPos == elsePos)
-				buf = qspSkipSpaces(delimPos);
-			else
+			if (isSkipDelim)
 				buf = qspSkipSpaces(delimPos + 1);
+			else
+			{
+				buf = qspSkipSpaces(delimPos);
+				isSkipDelim = QSP_TRUE;
+			}
 			paramPos = 0;
 			statCode = qspGetStatCode(buf, &paramPos);
 			statPos = (int)(buf - str);
@@ -706,9 +711,16 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 							{
 								delimPos = qspSkipSpaces(paramPos);
 								if (*delimPos == QSP_COLONDELIM[0]) ++delimPos;
+								if (*delimPos)
+									isSkipDelim = QSP_FALSE;
+								else
+									delimPos = 0;
 							}
 							else if (buf < elsePos)
+							{
 								delimPos = elsePos;
+								isSkipDelim = QSP_FALSE;
+							}
 						}
 					}
 					if (statCode == qspStatUnknown && buf != delimPos)
