@@ -25,16 +25,15 @@
 		QSP_BOOL IsInCallBack;
 		QSP_BOOL IsDisableCodeExec;
 		QSP_BOOL IsExitOnError;
-		QSP_BOOL IsMustWait;
 		QSP_BOOL IsMainDescChanged;
 		QSP_BOOL IsVarsDescChanged;
 		QSP_BOOL IsObjectsChanged;
 		QSP_BOOL IsActionsChanged;
 	} QSPCallState;
 
-	extern volatile QSP_BOOL qspIsInCallBack;
-	extern volatile QSP_BOOL qspIsDisableCodeExec;
-	extern volatile QSP_BOOL qspIsExitOnError;
+	extern QSP_BOOL qspIsInCallBack;
+	extern QSP_BOOL qspIsDisableCodeExec;
+	extern QSP_BOOL qspIsExitOnError;
 
 	/* External functions */
 	void qspInitCallBacks();

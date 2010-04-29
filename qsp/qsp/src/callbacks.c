@@ -24,9 +24,9 @@
 #include "text.h"
 
 QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
-volatile QSP_BOOL qspIsInCallBack = QSP_FALSE;
-volatile QSP_BOOL qspIsDisableCodeExec = QSP_FALSE;
-volatile QSP_BOOL qspIsExitOnError = QSP_FALSE;
+QSP_BOOL qspIsInCallBack = QSP_FALSE;
+QSP_BOOL qspIsDisableCodeExec = QSP_FALSE;
+QSP_BOOL qspIsExitOnError = QSP_FALSE;
 
 #ifdef _FLASH
 	AS3_Val result;
@@ -40,7 +40,6 @@ static void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec, QS
 	state->IsInCallBack = qspIsInCallBack;
 	state->IsDisableCodeExec = qspIsDisableCodeExec;
 	state->IsExitOnError = qspIsExitOnError;
-	state->IsMustWait = qspIsMustWait;
 	state->IsMainDescChanged = qspIsMainDescChanged;
 	state->IsVarsDescChanged = qspIsVarsDescChanged;
 	state->IsObjectsChanged = qspIsObjectsChanged;
@@ -48,13 +47,11 @@ static void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec, QS
 	qspIsInCallBack = QSP_TRUE;
 	qspIsDisableCodeExec = isDisableCodeExec;
 	qspIsExitOnError = isExitOnError;
-	qspIsMustWait = QSP_FALSE;
 }
 
 static void qspRestoreCallState(QSPCallState *state)
 {
 	if (!qspIsExitOnError) qspResetError();
-	qspIsMustWait = state->IsMustWait;
 	qspIsExitOnError = state->IsExitOnError;
 	qspIsDisableCodeExec = state->IsDisableCodeExec;
 	qspIsInCallBack = state->IsInCallBack;

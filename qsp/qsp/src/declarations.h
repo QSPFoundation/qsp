@@ -129,7 +129,4 @@
 	#define QSP_MUL QSP_FMT("*")
 	#define QSP_DELIMS QSP_FMT(" \t&'\"()[]=!<>+-/*:,{}")
 
-	/* Variables */
-	extern volatile QSP_BOOL qspIsMustWait;
-
 #endif
