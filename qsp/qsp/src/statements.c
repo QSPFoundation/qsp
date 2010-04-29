@@ -756,7 +756,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 				}
 			}
 			else
-				break;
+				delimPos = 0;
 		}
 	}
 	line->StatsCount++;
