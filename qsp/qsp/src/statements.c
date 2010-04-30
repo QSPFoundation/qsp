@@ -618,7 +618,7 @@ void qspExecStringAsCodeWithArgs(QSP_CHAR *s, QSPVariant *args, int count)
 void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 {
 	QSP_BOOL isInLoop;
-	int statCode, statPos, count = 0;
+	int statCode, count = 0;
 	QSP_CHAR ch, *nextPos, *temp, *buf, *elsePos, *delimPos = 0, *paramPos = 0;
 	line->Str = str;
 	line->LineNum = lineNum;
@@ -626,7 +626,6 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 	line->Stats = 0;
 	buf = qspSkipSpaces(str);
 	statCode = qspGetStatCode(buf, &paramPos);
-	statPos = (int)(buf - str);
 	if (*buf && statCode != qspStatComment)
 	{
 		isInLoop = QSP_TRUE;
@@ -692,12 +691,11 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 			if (paramPos)
 				line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
 			else
-				line->Stats[count].ParamPos = statPos;
+				line->Stats[count].ParamPos = (int)(buf - str);
 			++count;
 			buf = qspSkipSpaces(nextPos);
 			paramPos = 0;
 			statCode = qspGetStatCode(buf, &paramPos);
-			statPos = (int)(buf - str);
 			if (*buf && statCode != qspStatComment)
 			{
 				switch (statCode)
@@ -775,7 +773,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 	if (paramPos)
 		line->Stats[count].ParamPos = (int)(qspSkipSpaces(paramPos) - str);
 	else
-		line->Stats[count].ParamPos = statPos;
+		line->Stats[count].ParamPos = (int)(buf - str);
 	switch (line->Stats->Stat)
 	{
 	case qspStatAct:
