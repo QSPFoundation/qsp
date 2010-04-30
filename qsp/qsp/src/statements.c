@@ -742,7 +742,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 							delimPos = (*nextPos ? nextPos : 0);
 							elsePos = 0;
 						}
-						else if (elsePos < delimPos && buf < elsePos)
+						else if ((!delimPos || elsePos < delimPos) && buf < elsePos)
 							nextPos = delimPos = elsePos;
 					}
 					if (statCode == qspStatUnknown && buf != delimPos)
