@@ -812,7 +812,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSP_CHAR **jumpTo)
 {
 	QSPVariant arg;
-	int i, elseStat, oldRefreshCount;
+	int i, c, elseStat, oldRefreshCount;
 	QSP_CHAR *pos = s->Str + s->Stats[startStat].EndPos;
 	if (*pos != QSP_COLONDELIM[0])
 	{
@@ -820,9 +820,19 @@ static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSP
 		return QSP_FALSE;
 	}
 	elseStat = 0;
-	for (i = endStat - 1; i > startStat; --i)
+	c = 1;
+	for (i = startStat + 1; i < endStat; ++i)
 	{
-		if (s->Stats[i].Stat == qspStatElse)
+		switch (s->Stats[i].Stat)
+		{
+		case qspStatIf:
+			++c;
+			break;
+		case qspStatElse:
+			--c;
+			break;
+		}
+		if (!c)
 		{
 			elseStat = i;
 			break;
