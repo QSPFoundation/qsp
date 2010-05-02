@@ -615,6 +615,27 @@ void qspExecStringAsCodeWithArgs(QSP_CHAR *s, QSPVariant *args, int count)
 	qspMoveVar(var, &local);
 }
 
+QSP_CHAR *qspGetLineLabel(QSP_CHAR *str)
+{
+	QSP_CHAR *delimPos;
+	str = qspSkipSpaces(str);
+	if (*str == QSP_LABEL[0])
+	{
+		delimPos = qspStrChar(str, QSP_STATDELIM[0]);
+		if (delimPos)
+		{
+			*delimPos = 0;
+			str = qspDelSpc(str + 1);
+			*delimPos = QSP_STATDELIM[0];
+		}
+		else
+			str = qspDelSpc(str + 1);
+		qspUpperStr(str);
+		return str;
+	}
+	return 0;
+}
+
 void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 {
 	QSP_BOOL isInLoop;
@@ -779,28 +800,13 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 	case qspStatAct:
 	case qspStatIf:
 	case qspStatElseIf:
-		line->IsMultiline = (*(qspStrEnd(buf) - 1) == QSP_COLONDELIM[0]);
+		line->IsMultiline = (line->StatsCount == 1 && *(str + line->Stats->EndPos) == QSP_COLONDELIM[0]);
 		break;
 	default:
 		line->IsMultiline = QSP_FALSE;
 		break;
 	}
-	if (line->Stats->Stat == qspStatLabel)
-	{
-		delimPos = qspStrChar(str, QSP_STATDELIM[0]);
-		if (delimPos)
-		{
-			*delimPos = 0;
-			buf = qspDelSpc(str + 1);
-			*delimPos = QSP_STATDELIM[0];
-		}
-		else
-			buf = qspDelSpc(str + 1);
-		qspUpperStr(buf);
-		line->Label = buf;
-	}
-	else
-		line->Label = 0;
+	line->Label = qspGetLineLabel(str);
 }
 
 static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSP_CHAR **jumpTo)

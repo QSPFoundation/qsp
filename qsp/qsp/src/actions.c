@@ -190,7 +190,7 @@ void qspStatementAddAct(QSPLineOfCode *s, int statPos, int endPos)
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
 	++statPos;
 	code.Str = pos + 1;
-	code.Label = 0;
+	code.Label = qspGetLineLabel(code.Str);
 	code.LineNum = 0;
 	code.IsMultiline = QSP_FALSE;
 	pos = s->Str + s->Stats[endPos - 1].EndPos;
@@ -210,6 +210,7 @@ void qspStatementAddAct(QSPLineOfCode *s, int statPos, int endPos)
 	*pos = ch;
 	qspFreeVariants(args, count);
 	free(code.Stats);
+	if (code.Label) free(code.Label);
 }
 
 QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
