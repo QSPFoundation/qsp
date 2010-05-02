@@ -820,7 +820,7 @@ static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSP
 		return QSP_FALSE;
 	}
 	elseStat = 0;
-	for (i = startStat + 1; i < endStat; ++i)
+	for (i = endStat - 1; i > startStat; --i)
 	{
 		if (s->Stats[i].Stat == qspStatElse)
 		{
