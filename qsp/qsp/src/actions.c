@@ -194,6 +194,7 @@ void qspStatementAddAct(QSPLineOfCode *s, int statPos, int endPos)
 	code.LineNum = 0;
 	code.IsMultiline = QSP_FALSE;
 	pos = s->Str + s->Stats[endPos - 1].EndPos;
+	if (*pos == QSP_COLONDELIM[0]) ++pos;
 	ch = *pos;
 	*pos = 0;
 	code.StatsCount = endPos - statPos;
