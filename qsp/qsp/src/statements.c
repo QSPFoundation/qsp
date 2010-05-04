@@ -732,6 +732,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 				default:
 					delimPos = qspStrPos(buf, QSP_STATDELIM, QSP_FALSE);
 					if (delimPos) nextPos = delimPos + 1;
+					if (elsePos && buf >= elsePos) elsePos = 0;
 					if (!elsePos && isSearchElse)
 					{
 						elsePos = qspStrPos(uStr + (buf - str), QSP_STATELSE, QSP_TRUE);
@@ -740,18 +741,10 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 						else
 							isSearchElse = QSP_FALSE;
 					}
-					if (elsePos)
+					if (elsePos && (!delimPos || elsePos < delimPos))
 					{
-						if (buf < elsePos)
-						{
-							if (!delimPos || elsePos < delimPos)
-							{
-								nextPos = delimPos = elsePos;
-								elsePos = 0;
-							}
-						}
-						else
-							elsePos = 0;
+						nextPos = delimPos = elsePos;
+						elsePos = 0;
 					}
 					if (statCode == qspStatUnknown && buf != delimPos)
 					{
