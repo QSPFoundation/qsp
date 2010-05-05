@@ -79,5 +79,5 @@ void QSPTranslationHelper::UpdateLocale(int lang)
 	m_locale->Init(lang);
 	m_locale->AddCatalogLookupPathPrefix(m_path);
 	if (!m_locale->AddCatalog(m_appName))
-		m_locale->AddCatalog(m_appName + wxT("_") + m_locale->GetName().Left(2));
+		m_locale->AddCatalog(m_appName + wxT('_') + m_locale->GetName().BeforeFirst(wxT('_')));
 }
