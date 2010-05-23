@@ -101,7 +101,6 @@ void qspPlayPLFiles()
 {
 	int i;
 	QSP_CHAR *pos;
-	if (!qspPLFilesCount) return;
 	for (i = 0; i < qspPLFilesCount; ++i)
 	{
 		pos = qspStrChar(qspPLFiles[i], QSP_PLVOLUMEDELIM[0]);
