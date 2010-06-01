@@ -29,14 +29,18 @@ QSPTranslationHelper::~QSPTranslationHelper()
 
 void QSPTranslationHelper::Load(wxConfigBase &config, const wxString &key)
 {
-	int lang;
-	config.Read(key, &lang, wxLANGUAGE_DEFAULT);
-	UpdateLocale(lang);
+	wxString langName;
+	config.Read(key, &langName, wxEmptyString);
+	const wxLanguageInfo *langinfo = wxLocale::FindLanguageInfo(langName);
+	if (langinfo)
+		UpdateLocale(langinfo->Language);
+	else
+		UpdateLocale(wxLANGUAGE_DEFAULT);
 }
 
 void QSPTranslationHelper::Save(wxConfigBase &config, const wxString &key) const
 {
-	config.Write(key, m_locale ? m_locale->GetLanguage() : wxLANGUAGE_UNKNOWN);
+	config.Write(key, m_locale ? m_locale->GetCanonicalName() : wxEmptyString);
 }
 
 bool QSPTranslationHelper::AskUserForLanguage()
@@ -79,5 +83,5 @@ void QSPTranslationHelper::UpdateLocale(int lang)
 	m_locale->Init(lang);
 	m_locale->AddCatalogLookupPathPrefix(m_path);
 	if (!m_locale->AddCatalog(m_appName))
-		m_locale->AddCatalog(m_appName + wxT('_') + m_locale->GetName().BeforeFirst(wxT('_')));
+		m_locale->AddCatalog(m_appName + wxT('_') + m_locale->GetCanonicalName().BeforeFirst(wxT('_')));
 }
