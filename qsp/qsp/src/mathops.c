@@ -914,7 +914,7 @@ static void qspFunctionStrComp(QSPVariant *args, int count, QSPVariant *tos)
 	OnigErrorInfo onigInfo;
 	tempBeg = (OnigUChar *)QSP_STR(args[1]);
 	tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[1]));
-	if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL, &onigInfo))
+	if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
 		qspSetError(QSP_ERR_INCORRECTREGEXP);
 	else
 	{
@@ -934,7 +934,7 @@ static void qspFunctionStrFind(QSPVariant *args, int count, QSPVariant *tos)
 	OnigErrorInfo onigInfo;
 	tempBeg = (OnigUChar *)QSP_STR(args[1]);
 	tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[1]));
-	if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL, &onigInfo))
+	if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
 		qspSetError(QSP_ERR_INCORRECTREGEXP);
 	else
 	{
@@ -964,7 +964,7 @@ static void qspFunctionStrPos(QSPVariant *args, int count, QSPVariant *tos)
 	OnigErrorInfo onigInfo;
 	tempBeg = (OnigUChar *)QSP_STR(args[1]);
 	tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[1]));
-	if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL, &onigInfo))
+	if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
 		qspSetError(QSP_ERR_INCORRECTREGEXP);
 	else
 	{

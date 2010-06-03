@@ -530,7 +530,7 @@ int qspArrayPos(QSPVariant *args, int argsCount, QSP_BOOL isRegExp)
 	{
 		tempBeg = (OnigUChar *)QSP_PSTR(val);
 		tempEnd = (OnigUChar *)qspStrEnd(QSP_PSTR(val));
-		if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL, &onigInfo))
+		if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
 		{
 			qspSetError(QSP_ERR_INCORRECTREGEXP);
 			return -1;
