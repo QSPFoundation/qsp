@@ -1,0 +1,299 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: German 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-08-08 13:24+1100\n"
+"PO-Revision-Date: 2010-06-05 16:21+0600\n"
+"Last-Translator: Byte <nporep@mail.ru>\n"
+"Language-Team: German <nporep@mail.ru>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+msgid "&About...\tCtrl-H"
+msgstr "&Über Programm...\tCtrl-H"
+
+msgid "&Actions\tCtrl-2"
+msgstr "&Aktionen\tCtrl-2"
+
+msgid "&Captions\tCtrl-5"
+msgstr "&Titeln\tCtrl-5"
+
+msgid "&Game"
+msgstr "&Spiel"
+
+msgid "&Help"
+msgstr "&Hilfe"
+
+msgid "&Hotkeys for actions\tCtrl-6"
+msgstr "&Hot Keys für Aktionen\tCtrl-6"
+
+msgid "&Input area\tCtrl-4"
+msgstr "&Eingabefeld\tCtrl-4"
+
+msgid "&Objects\tCtrl-1"
+msgstr "&Objekte\tCtrl-1"
+
+msgid "&Open game...\tAlt-O"
+msgstr "&Spiel öffnen...\tAlt-O"
+
+msgid "&Open saved game...\tCtrl-O"
+msgstr "&Savegame laden...\tCtrl-O"
+
+msgid "&Quest"
+msgstr "&Quest"
+
+msgid "&Quit\tAlt-X"
+msgstr "&Schließen\tAlt-X"
+
+msgid "&Restart game\tAlt-N"
+msgstr "&Neustarten\tAlt-N"
+
+msgid "&Save game...\tCtrl-S"
+msgstr "&Spiel speichern...\tCtrl-S"
+
+msgid "&Settings"
+msgstr "&Einstellungen"
+
+msgid "&Show / Hide"
+msgstr "&Anzeigen / Verstecken"
+
+msgid "A&dditional desc\tCtrl-3"
+msgstr "&Zusätzliche Beschreibung\tCtrl-3"
+
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "Additional desc"
+msgstr "Zusätzliche Bescheibung"
+
+msgid "Bracket not found!"
+msgstr "Die Anzahl der öffnenden und schließenden Klammern stimmt nicht überein!"
+
+msgid "Brackets not found!"
+msgstr "Die Klammern wurden nicht gefunden!"
+
+msgid "Can't add action!"
+msgstr "Aktion kann nicht hinzugefügt werden!"
+
+msgid "Can't add file!"
+msgstr "Datei kann nicht hinzugefügt werden!"
+
+msgid "Can't add menu's item!"
+msgstr "Menüstelle kann nicht hinzugefügt werden!"
+
+msgid "Can't add object!"
+msgstr "Das Objekt kann nicht hinzugefügt werden!"
+
+msgid "Can't load file!"
+msgstr "Die Datei kann nicht geladen werden!"
+
+msgid "Cancel"
+msgstr "Absagen"
+
+msgid ""
+"Code: %ld\n"
+"Desc: %s"
+msgstr ""
+"Fehlerkode: %ld\n"
+"Beschreibung: %s"
+
+msgid "Default"
+msgstr "Default"
+
+msgid "Division by zero!"
+msgstr "Dieviedeirt durch 0!"
+
+msgid "Error"
+msgstr "Fehler"
+
+msgid "File not found!"
+msgstr "Angegebene Datei ist nicht zugänglich bzw. wurde nicht gefunden!"
+
+msgid "Game not loaded!"
+msgstr "Spiel wurde nicht geladen!"
+
+msgid "Incorrect arguments' count!"
+msgstr "Die Anzahl von Operators- oder Funktionsargumenten ist nicht korrekt!"
+
+msgid "Incorrect variable's name!"
+msgstr "Variablename ist nicht korrekt!"
+
+msgid "Info"
+msgstr "Informationen"
+
+msgid "Input area"
+msgstr "Eingabefeld"
+
+msgid "Input data"
+msgstr "Datenangabe"
+
+msgid "Label not found!"
+msgstr "Angegebene Marke wurde nicht gefunden!"
+
+msgid "Language"
+msgstr "Sprache"
+
+msgid "Location not found!"
+msgstr "Es gibt keine Stelle mit angegebenen Namen!"
+
+msgid ""
+"Location: %s\n"
+"Area: %s\n"
+"Line: %ld\n"
+"Code: %ld\n"
+"Desc: %s"
+msgstr ""
+"Stelle: %s\n"
+"Platz: %s\n"
+"Zeile: %ld\n"
+"Fehlerkode: %ld\n"
+"Beschreibung: %s"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Objects"
+msgstr "Objekte"
+
+msgid "Preview"
+msgstr "Vorschau"
+
+msgid "QSP games (*.qsp;*.gam)|*.qsp;*.gam"
+msgstr "QSP-Spieldateien (*.qsp;*.gam)|*.qsp;*.gam"
+
+msgid "Quest Soft Player 5"
+msgstr "Quest Soft Player 5"
+
+msgid "Quote not found!"
+msgstr "Anführungszeichen am Ende des Textes wurde nicht gefunden!"
+
+msgid "Regular expression's error!"
+msgstr "Fehler beim Kompilierung vom regulären Ausdruck!"
+
+msgid "Saved game files (*.sav)|*.sav"
+msgstr "QSP-Savegamedateien (*.sav)|*.sav"
+
+msgid "&Font"
+msgstr "&Schriftart"
+
+msgid "&Colors"
+msgstr "&Farben"
+
+msgid "&Always use selected font's size"
+msgstr "&Immer die ausgewählte Schriftgröße benutzten"
+
+msgid "Select &background's color...\tAlt-B"
+msgstr "&Hintergrundsfarbe auswählen...\tAlt-B"
+
+msgid "Select &font...\tAlt-F"
+msgstr "&Schriftart auswählen...\tAlt-F"
+
+msgid "Select &language...\tAlt-L"
+msgstr "&Sprache auswählen...\tAlt-L"
+
+msgid "Select background's color"
+msgstr "Wählen Sie eine Farbe für Hintergrund"
+
+msgid "Select file to save"
+msgstr "Wählen Sie eine Datei für Speichern"
+
+msgid "Select font"
+msgstr "Wählen Sie einen Schriftart"
+
+msgid "Select font's &color...\tAlt-C"
+msgstr "&Schriftfarbe auswählen...\tAlt-C"
+
+msgid "Select font's color"
+msgstr "Wählen Sie eine Schriftfarbe aus"
+
+msgid "Select game file"
+msgstr "Wählen Sie die Datei des Spieles"
+
+msgid "Select l&inks' color...\tAlt-I"
+msgstr "Farbe für &Links auswählen...\tAlt-I"
+
+msgid "Select language"
+msgstr "Wählen Sie eine Sprache aus"
+
+msgid "Select links' color"
+msgstr "Wählen Sie eine Farbe für Links"
+
+msgid "Select saved game file"
+msgstr "Wählen Sie eine Savegamedatei aus"
+
+msgid "Sign [:] not found!"
+msgstr "Symbol [:] nicht gefunden!"
+
+msgid "Sign [=] not found!"
+msgstr "Symbol [=] nicht gefunden!"
+
+msgid "Stack overflow!"
+msgstr "Stack-Überlauf!"
+
+msgid "Syntax error!"
+msgstr "Syntaxfehler!"
+
+msgid "Too many items in expression!"
+msgstr "Zu viele Elemente im Ausdruck!"
+
+msgid "Too many variables!"
+msgstr "Zu viele Variablen mit dem gleichen Hash!"
+
+msgid "Type mismatch!"
+msgstr "Unstimmigkeit von Datentypen!"
+
+msgid "Unknown action!"
+msgstr "Unbekannte Aktion!"
+
+msgid "Unknown error!"
+msgstr "Unbekannter Fehler!"
+
+msgid ""
+"Version: %s\n"
+"Engine Compiled: %s\n"
+"GUI Compiled: %s"
+msgstr ""
+"Version: %s\n"
+"Interpretator kompiliert am: %s\n"
+"Schnittstelle kompiliert am: %s"
+
+msgid "Window / Fullscreen &mode\tAlt-Enter"
+msgstr "Fenster- / Fullscreen-&Modus\tAlt-Enter"
+
+msgid "[end] not found!"
+msgstr "Vielzeilige Operatoren müssen mit dem Wort [end] abgeschlossen werden!"
+
+msgid "on action"
+msgstr "bei Bearbeitung der Aktion"
+
+msgid "on visit"
+msgstr "beim Besuch"
+
+msgid "Sound &volume"
+msgstr "&Lautstärke"
+
+msgid "No sound\tAlt-1"
+msgstr "Kein Ton\tAlt-1"
+
+msgid "20%\tAlt-2"
+msgstr "20%\tAlt-2"
+
+msgid "40%\tAlt-3"
+msgstr "40%\tAlt-3"
+
+msgid "60%\tAlt-4"
+msgstr "60%\tAlt-4"
+
+msgid "80%\tAlt-5"
+msgstr "80%\tAlt-5"
+
+msgid "Initial volume\tAlt-6"
+msgstr "Voreingestellte Lautstärke\tAlt-6"
+
+msgid "Code not found!"
+msgstr "Der einzeilige Operator ist nicht korrekt!"
+
