@@ -31,11 +31,16 @@ void QSPTranslationHelper::Load(wxConfigBase &config, const wxString &key)
 {
 	wxString langName;
 	config.Read(key, &langName, wxEmptyString);
-	const wxLanguageInfo *langinfo = wxLocale::FindLanguageInfo(langName);
-	if (langinfo)
-		UpdateLocale(langinfo->Language);
-	else
+	if (langName.IsEmpty())
 		UpdateLocale(wxLANGUAGE_DEFAULT);
+	else
+	{
+		const wxLanguageInfo *langinfo = wxLocale::FindLanguageInfo(langName);
+		if (langinfo)
+			UpdateLocale(langinfo->Language);
+		else
+			UpdateLocale(wxLANGUAGE_DEFAULT);
+	}
 }
 
 void QSPTranslationHelper::Save(wxConfigBase &config, const wxString &key) const
