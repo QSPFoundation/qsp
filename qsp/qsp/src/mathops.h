@@ -73,6 +73,7 @@
 
 		qspOpFirst_Function,
 		qspOpNot = qspOpFirst_Function,
+		qspOpLoc,
 		qspOpObj,
 		qspOpMin,
 		qspOpMax,

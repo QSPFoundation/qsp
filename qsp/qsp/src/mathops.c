@@ -152,6 +152,7 @@ void qspInitMath()
 	qspAddOperation(qspOpComma, 0, 0, 0, 0, 0);
 	qspAddOperation(qspOpAnd, 7, 0, 2, 2, 2, 2, 2);
 	qspAddOperation(qspOpOr, 6, 0, 2, 2, 2, 2, 2);
+	qspAddOperation(qspOpLoc, 8, 0, 2, 1, 1, 1);
 	qspAddOperation(qspOpObj, 8, 0, 2, 1, 1, 1);
 	qspAddOperation(qspOpNot, 8, 0, 2, 1, 1, 2);
 	qspAddOperation(qspOpMin, 30, qspFunctionMin, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -212,6 +213,7 @@ void qspInitMath()
 	qspAddOpName(qspOpComma, QSP_COMMA, 1);
 	qspAddOpName(qspOpAnd, QSP_FMT("AND"), 1);
 	qspAddOpName(qspOpOr, QSP_FMT("OR"), 1);
+	qspAddOpName(qspOpLoc, QSP_FMT("LOC"), 1);
 	qspAddOpName(qspOpObj, QSP_FMT("OBJ"), 1);
 	qspAddOpName(qspOpNot, QSP_FMT("NO"), 1);
 	qspAddOpName(qspOpMin, QSP_FMT("MIN"), 1);
@@ -504,6 +506,9 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 				break;
 			case qspOpMinus:
 				QSP_NUM(tos) = -QSP_NUM(args[0]);
+				break;
+			case qspOpLoc:
+				QSP_NUM(tos) = -(qspLocIndex(QSP_STR(args[0])) >= 0);
 				break;
 			case qspOpObj:
 				QSP_NUM(tos) = -(qspObjIndex(QSP_STR(args[0])) >= 0);
