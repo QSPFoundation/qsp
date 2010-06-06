@@ -54,12 +54,8 @@ bool QSPTranslationHelper::AskUserForLanguage()
 	wxArrayInt identifiers;
 	wxString filename;
 	const wxLanguageInfo *langinfo;
-	wxString name(wxLocale::GetLanguageName(wxLANGUAGE_DEFAULT));
-	if (!name.IsEmpty())
-	{
-		names.Add(_("Default"));
-		identifiers.Add(wxLANGUAGE_DEFAULT);
-	}
+	names.Add(_("Default"));
+	identifiers.Add(wxLANGUAGE_DEFAULT);
 	wxDir dir(m_path);
 	if (dir.IsOpened())
 	{
