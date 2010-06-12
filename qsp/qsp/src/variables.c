@@ -443,39 +443,38 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 {
 	QSP_CHAR *str;
 	int i, maxCount, newInd;
+	if (count <= 0) return;
 	if (start < 0) start = 0;
 	maxCount = src->ValsCount - start;
-	if (maxCount > 0 && count > 0)
+	if (maxCount <= 0) return;
+	if (count < maxCount) maxCount = count;
+	dest->ValsCount = maxCount;
+	dest->Values = (QSPVarValue *)malloc(maxCount * sizeof(QSPVarValue));
+	for (i = 0; i < maxCount; ++i)
 	{
-		if (count < maxCount) maxCount = count;
-		dest->ValsCount = maxCount;
-		dest->Values = (QSPVarValue *)malloc(maxCount * sizeof(QSPVarValue));
-		for (i = 0; i < maxCount; ++i)
-		{
-			dest->Values[i].Num = src->Values[i + start].Num;
-			str = src->Values[i + start].Str;
-			dest->Values[i].Str = (str ? qspGetNewText(str, -1) : 0);
-		}
-		dest->IndsBufSize = 0;
-		dest->Indices = 0;
-		count = 0;
-		for (i = 0; i < src->IndsCount; ++i)
-		{
-			newInd = src->Indices[i].Index - start;
-			if (newInd >= 0 && newInd < maxCount)
-			{
-				if (count == dest->IndsBufSize)
-				{
-					dest->IndsBufSize += 16;
-					dest->Indices = (QSPVarIndex *)realloc(dest->Indices, dest->IndsBufSize * sizeof(QSPVarIndex));
-				}
-				dest->Indices[count].Index = newInd;
-				dest->Indices[count].Str = qspGetNewText(src->Indices[i].Str, -1);
-				++count;
-			}
-		}
-		dest->IndsCount = count;
+		dest->Values[i].Num = src->Values[i + start].Num;
+		str = src->Values[i + start].Str;
+		dest->Values[i].Str = (str ? qspGetNewText(str, -1) : 0);
 	}
+	dest->IndsBufSize = 0;
+	dest->Indices = 0;
+	count = 0;
+	for (i = 0; i < src->IndsCount; ++i)
+	{
+		newInd = src->Indices[i].Index - start;
+		if (newInd >= 0 && newInd < maxCount)
+		{
+			if (count == dest->IndsBufSize)
+			{
+				dest->IndsBufSize += 16;
+				dest->Indices = (QSPVarIndex *)realloc(dest->Indices, dest->IndsBufSize * sizeof(QSPVarIndex));
+			}
+			dest->Indices[count].Index = newInd;
+			dest->Indices[count].Str = qspGetNewText(src->Indices[i].Str, -1);
+			++count;
+		}
+	}
+	dest->IndsCount = count;
 }
 
 int qspArraySize(QSP_CHAR *name)
