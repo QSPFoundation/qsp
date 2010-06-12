@@ -111,7 +111,7 @@ targets['qsplib'] = \
 	'x86-debug': \
 	{
 		'defines': ['_UNICODE', 'NOT_RUBY', 'EXPORT', '_DEBUG'],
-		'cxxflags': '-O0'.split(),
+		'cxxflags': '-fPIC -g -O0'.split(),
 		'libs-system': [],
 		'linkflags': [],
 		'strip': False,
@@ -144,7 +144,7 @@ targets['qspgui'] = \
 	'x86-debug': \
 	{
 		'defines': ['__WXGTK__', '_UNICODE', '_DEBUG'],
-		'cxxflags': '-O0'.split(),
+		'cxxflags': '-g -O0'.split(),
 		'libs-system': ['gtk-x11-2.0', 'gthread-2.0', 'c', 'SM', 'Xxf86vm', 'jpeg'],
 		'linkflags': \
 		[
