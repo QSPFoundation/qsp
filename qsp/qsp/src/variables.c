@@ -443,10 +443,13 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 {
 	QSP_CHAR *str;
 	int i, maxCount, newInd;
-	if (count <= 0) return;
 	if (start < 0) start = 0;
 	maxCount = src->ValsCount - start;
-	if (maxCount <= 0) return;
+	if (count <= 0 || maxCount <= 0)
+	{
+		qspInitVarData(dest);
+		return;
+	}
 	if (count < maxCount) maxCount = count;
 	dest->ValsCount = maxCount;
 	dest->Values = (QSPVarValue *)malloc(maxCount * sizeof(QSPVarValue));
