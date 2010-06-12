@@ -476,12 +476,6 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 		}
 		dest->IndsCount = count;
 	}
-	else
-	{
-		dest->ValsCount = dest->IndsBufSize = dest->IndsCount = 0;
-		dest->Values = 0;
-		dest->Indices = 0;
-	}
 }
 
 int qspArraySize(QSP_CHAR *name)
