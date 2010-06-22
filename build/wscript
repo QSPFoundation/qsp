@@ -459,7 +459,9 @@ def _buildPatchedWxWidgets(ctx):
 		
 	buildCmd = \
 		"(cd %s " + \
-		" && make -j $[`grep -c ^processor /proc/cpuinfo` + 1])"
+		" && make -j 2)"
+		# $[...] не работает в Ubuntu
+		#" && make -j $[`grep -c ^processor /proc/cpuinfo` + 1])"
 	return os.system(buildCmd % wxQSPSrcDir) == 0
 	
 def _getRealTargetName(ctx, target):
