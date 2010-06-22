@@ -45,7 +45,7 @@ void QSPTranslationHelper::Load(wxConfigBase &config, const wxString &key)
 
 void QSPTranslationHelper::Save(wxConfigBase &config, const wxString &key) const
 {
-	config.Write(key, m_locale ? m_locale->GetCanonicalName() : wxEmptyString);
+	config.Write(key, m_locale ? m_locale->GetCanonicalName() : wxString(wxEmptyString));
 }
 
 bool QSPTranslationHelper::AskUserForLanguage()

@@ -318,19 +318,19 @@ void QSPFrame::ApplyParams()
 	int setFontSize;
 	bool isRefresh = false;
 	// --------------
-	setBackColor = ((QSPGetVarValues(QSP_FMT("BCOLOR"), 0, &numVal, &strVal) && numVal) ? numVal : m_backColor);
+	setBackColor = ((QSPGetVarValues(QSP_FMT("BCOLOR"), 0, &numVal, &strVal) && numVal) ? wxColour(numVal) : m_backColor);
 	if (setBackColor != m_desc->GetBackgroundColour())
 	{
 		if (ApplyBackColor(setBackColor)) isRefresh = true;
 	}
 	// --------------
-	setFontColor = ((QSPGetVarValues(QSP_FMT("FCOLOR"), 0, &numVal, &strVal) && numVal) ? numVal : m_fontColor);
+	setFontColor = ((QSPGetVarValues(QSP_FMT("FCOLOR"), 0, &numVal, &strVal) && numVal) ? wxColour(numVal) : m_fontColor);
 	if (setFontColor != m_desc->GetForegroundColour())
 	{
 		if (ApplyFontColor(setFontColor)) isRefresh = true;
 	}
 	// --------------
-	setLinkColor = ((QSPGetVarValues(QSP_FMT("LCOLOR"), 0, &numVal, &strVal) && numVal) ? numVal : m_linkColor);
+	setLinkColor = ((QSPGetVarValues(QSP_FMT("LCOLOR"), 0, &numVal, &strVal) && numVal) ? wxColour(numVal) : m_linkColor);
 	if (setLinkColor != m_desc->GetLinkColor())
 	{
 		if (ApplyLinkColor(setLinkColor)) isRefresh = true;
