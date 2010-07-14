@@ -33,7 +33,7 @@ void AeroQSPApp::OnInitCmdLine( wxCmdLineParser& parser )
 	parser.DisableLongOptions();
 	parser.AddSwitch(wxT("f"), wxT("f"), wxT("Run in fullscreen mode."), wxCMD_LINE_PARAM_OPTIONAL);
 	parser.AddSwitch(wxT("h"), wxT("h"), wxT("Get this help."), wxCMD_LINE_PARAM_OPTIONAL);
-	parser.AddParam(wxT("game_file.zip"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL);
+	parser.AddParam(wxT("game_file.aqsp"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL);
 }
 
 bool AeroQSPApp::OnCmdLineParsed( wxCmdLineParser& parser )

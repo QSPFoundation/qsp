@@ -123,7 +123,7 @@ void AeroQSPFrame::SetUserTitle( const wxString &title )
 void AeroQSPFrame::OnLoadFile( wxCommandEvent &event )
 {
 	wxFileDialog dialog(this, wxT("Открыть игру"), wxEmptyString, wxEmptyString,
-		wxT("Архивы игр QSP (*.zip)|*.zip"), wxFD_OPEN);
+		wxT("Игры AeroQSP (*.aqsp)|*.aqsp"), wxFD_OPEN);
 	dialog.CenterOnParent();
 	if (dialog.ShowModal() == wxID_OK)
 		LoadFile(dialog.GetPath());
