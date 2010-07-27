@@ -149,7 +149,7 @@ void qspInitMath()
 	qspAddOperation(qspOpLt, 10, 0, 2, 2, 2, 0, 0);
 	qspAddOperation(qspOpGt, 10, 0, 2, 2, 2, 0, 0);
 	qspAddOperation(qspOpAppend, 4, 0, 1, 2, 2, 1, 1);
-	qspAddOperation(qspOpComma, 0, 0, 0, 0, 0);
+	qspAddOperation(qspOpComma, 0, 0, 1, 2, 2, 1, 1);
 	qspAddOperation(qspOpAnd, 7, 0, 2, 2, 2, 2, 2);
 	qspAddOperation(qspOpOr, 6, 0, 2, 2, 2, 2, 2);
 	qspAddOperation(qspOpLoc, 8, 0, 2, 1, 1, 1);
@@ -486,6 +486,11 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 				len = qspAddText(&QSP_STR(tos), QSP_STR(args[0]), 0, -1, QSP_TRUE);
 				QSP_STR(tos) = qspGetAddText(QSP_STR(tos), QSP_STR(args[1]), len, -1);
 				break;
+			case qspOpComma:
+				len = qspAddText(&QSP_STR(tos), QSP_STR(args[0]), 0, -1, QSP_TRUE);
+				len = qspAddText(&QSP_STR(tos), QSP_VALSDELIM, len, QSP_LEN(QSP_VALSDELIM), QSP_FALSE);
+				QSP_STR(tos) = qspGetAddText(QSP_STR(tos), QSP_STR(args[1]), len, -1);
+				break;
 			case qspOpEq:
 				QSP_NUM(tos) = -(!qspAutoConvertCompare(args, args + 1));
 				break;
@@ -705,15 +710,18 @@ static int qspCompileExpression(QSP_CHAR *s, QSPVariant *compValues, int *compOp
 					--argSp;
 				break;
 			case qspOpComma:
-				if (!opSp || opStack[opSp - 1] < qspOpFirst_Function)
+				if (opSp && opStack[opSp - 1] >= qspOpFirst_Function)
 				{
-					qspSetError(QSP_ERR_SYNTAX);
-					break;
+					if (++argStack[argSp] > qspOps[opStack[opSp - 1]].MaxArgsCount)
+					{
+						qspSetError(QSP_ERR_ARGSCOUNT);
+						break;
+					}
 				}
-				if (++argStack[argSp] > qspOps[opStack[opSp - 1]].MaxArgsCount)
+				else
 				{
-					qspSetError(QSP_ERR_ARGSCOUNT);
-					break;
+					qspCompileExprPushOpCode(opStack, &opSp, argStack, &argSp, qspOpComma);
+					if (qspErrorNum) break;
 				}
 				waitForOperator = QSP_FALSE;
 				break;
