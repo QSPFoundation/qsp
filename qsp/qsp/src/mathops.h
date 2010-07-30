@@ -26,7 +26,7 @@
 	#define QSP_OPMAXARGS 10
 	#define QSP_STACKSIZE 30
 	#define QSP_MAXITEMS 100
-	#define QSP_VALSDELIM QSP_FMT("~~")
+	#define QSP_VALSDELIM QSP_FMT("|")
 
 	typedef void (*QSP_FUNCTION)(QSPVariant *, int, QSPVariant *);
 
