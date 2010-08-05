@@ -540,8 +540,8 @@ static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
 		else
 		{
 			elsePos = qspSearchElse(s, ind, endLine);
-			*isContinue = QSP_TRUE;
 			*lineInd = (elsePos < 0 ? endPos : elsePos);
+			*isContinue = QSP_TRUE;
 		}
 		break;
 	case qspStatElse:
