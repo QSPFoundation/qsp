@@ -983,7 +983,6 @@ static QSP_CHAR *qspPrepareForLoop(QSP_CHAR *paramPos, QSPVar *local, QSP_CHAR *
 	if (!(var = qspVarReference(varName, QSP_TRUE)))
 	{
 		free(varName);
-		free(QSP_STR(initValue));
 		return 0;
 	}
 	qspMoveVar(local, var);
