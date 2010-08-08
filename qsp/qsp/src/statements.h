@@ -26,6 +26,8 @@
 	#define QSP_MAXSTATSNAMES 100
 	#define QSP_STATMAXARGS 10
 	#define QSP_STATELSE QSP_FMT("ELSE")
+	#define QSP_STATFORTO QSP_FMT("TO")
+	#define QSP_STATFORSTEP QSP_FMT("STEP")
 
 	typedef QSP_BOOL (*QSP_STATEMENT)(QSPVariant *, int, QSP_CHAR **, int);
 
@@ -51,6 +53,7 @@
 		qspStatLabel,
 		qspStatComment,
 		qspStatAct,
+		qspStatFor,
 		qspStatIf,
 		qspStatElseIf,
 		qspStatElse,

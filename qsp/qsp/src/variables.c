@@ -50,9 +50,7 @@ static void qspRemoveArrayItem(QSP_CHAR *, int);
 static void qspInitVarData(QSPVar *);
 static int qspGetVarTextIndex(QSPVar *, QSP_CHAR *, QSP_BOOL);
 static QSPVar *qspGetVarData(QSP_CHAR *, QSP_BOOL, int *);
-static void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
 static void qspSetVar(QSP_CHAR *, QSPVariant *, QSP_CHAR);
-static QSPVariant qspGetVarValueByReference(QSPVar *, int, QSP_BOOL);
 static void qspCopyVar(QSPVar *, QSPVar *, int, int);
 
 static int qspIndStringCompare(const void *name, const void *compareTo)
@@ -281,7 +279,7 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isSet, int *index)
 	return qspVarReference(s, isSet);
 }
 
-static void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
+void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
 {
 	int count, oldCount = var->ValsCount;
 	if (ind >= oldCount)
@@ -302,13 +300,6 @@ static void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
 		else
 			var->Values[ind].Num = QSP_PNUM(val);
 	}
-}
-
-void qspSetVarValueByName(QSP_CHAR *name, QSPVariant *val)
-{
-	QSPVar *var;
-	if (!(var = qspVarReference(name, QSP_TRUE))) return;
-	qspSetVarValueByReference(var, 0, val);
 }
 
 static void qspSetVar(QSP_CHAR *name, QSPVariant *val, QSP_CHAR op)
@@ -384,7 +375,7 @@ static void qspSetVar(QSP_CHAR *name, QSPVariant *val, QSP_CHAR op)
 	}
 }
 
-static QSPVariant qspGetVarValueByReference(QSPVar *var, int ind, QSP_BOOL isStringType)
+QSPVariant qspGetVarValueByReference(QSPVar *var, int ind, QSP_BOOL isStringType)
 {
 	QSPVariant ret;
 	QSP_CHAR *text;

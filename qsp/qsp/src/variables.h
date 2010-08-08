@@ -55,7 +55,8 @@
 	void qspEmptyVar(QSPVar *);
 	QSPVar *qspVarReference(QSP_CHAR *, QSP_BOOL);
 	QSPVar *qspVarReferenceWithType(QSP_CHAR *, QSP_BOOL, QSP_BOOL *);
-	void qspSetVarValueByName(QSP_CHAR *, QSPVariant *);
+	void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
+	QSPVariant qspGetVarValueByReference(QSPVar *, int, QSP_BOOL);
 	QSP_CHAR *qspGetVarStrValue(QSP_CHAR *);
 	int qspGetVarNumValue(QSP_CHAR *);
 	QSPVariant qspGetVar(QSP_CHAR *);
