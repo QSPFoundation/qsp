@@ -49,6 +49,13 @@
 
 	enum
 	{
+		qspFlowExecute,
+		qspFlowSkip,
+		qspFlowContinue
+	};
+
+	enum
+	{
 		qspStatUnknown,
 		qspStatLabel,
 		qspStatComment,

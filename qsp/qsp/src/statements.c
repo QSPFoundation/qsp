@@ -43,8 +43,8 @@ static int qspSearchElse(QSPLineOfCode *, int, int);
 static int qspSearchEnd(QSPLineOfCode *, int, int);
 static int qspSearchLabel(QSPLineOfCode *, int, int, QSP_CHAR *);
 static QSP_BOOL qspExecString(QSPLineOfCode *, int, int, QSP_CHAR **);
-static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *, int, int, QSP_CHAR **, int *, QSP_BOOL *, QSP_BOOL *);
-static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *, int, int, QSP_CHAR **, int *, QSP_BOOL *, QSP_BOOL *);
+static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *, int, int, QSP_CHAR **, int *, int *);
+static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *, int, int, QSP_CHAR **, int *, int *);
 static QSP_BOOL qspStatementIf(QSPLineOfCode *, int, int, QSP_CHAR **);
 static QSP_CHAR *qspPrepareForLoop(QSP_CHAR *, QSPVar *, QSP_CHAR **, QSP_CHAR **);
 static QSP_BOOL qspCheckForLoop(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, int *);
@@ -462,7 +462,7 @@ static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSP_
 }
 
 static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset,
-	QSP_CHAR **jumpTo, int *lineInd, QSP_BOOL *isExecuted, QSP_BOOL *isContinue)
+	QSP_CHAR **jumpTo, int *lineInd, int *action)
 {
 	QSPVariant args[2];
 	QSPLineOfCode *line;
@@ -493,17 +493,17 @@ static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
 			if (elsePos < 0)
 			{
 				*lineInd = ind + 1;
-				*isContinue = QSP_TRUE;
+				*action = qspFlowContinue;
 				return QSP_FALSE;
 			}
 			*lineInd = endLine;
-			*isExecuted = QSP_TRUE;
+			*action = qspFlowSkip;
 			return qspExecCode(s, ind + 1, elsePos, codeOffset, jumpTo);
 		}
 		else
 		{
 			*lineInd = (elsePos < 0 ? endLine : elsePos);
-			*isContinue = QSP_TRUE;
+			*action = qspFlowContinue;
 		}
 		break;
 	case qspStatAct:
@@ -517,18 +517,18 @@ static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
 		qspFreeVariants(args, count);
 		if (qspErrorNum) return QSP_FALSE;
 		*lineInd = endLine;
-		*isContinue = QSP_TRUE;
+		*action = qspFlowContinue;
 		break;
 	case qspStatFor:
 		*lineInd = endLine;
-		*isExecuted = QSP_TRUE;
+		*action = qspFlowSkip;
 		return qspStatementMultilineFor(s, endLine, ind, codeOffset, jumpTo);
 	}
 	return QSP_FALSE;
 }
 
 static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset,
-	QSP_CHAR **jumpTo, int *lineInd, QSP_BOOL *isExecuted, QSP_BOOL *isContinue)
+	QSP_CHAR **jumpTo, int *lineInd, int *action)
 {
 	QSPVariant arg;
 	QSPLineOfCode *line;
@@ -559,14 +559,14 @@ static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
 		if (QSP_NUM(arg))
 		{
 			*lineInd = endLine;
-			*isExecuted = QSP_TRUE;
+			*action = qspFlowSkip;
 			return qspExecString(line, 1, line->StatsCount, jumpTo);
 		}
 		else
 		{
 			elsePos = qspSearchElse(s, ind + 1, endLine);
 			*lineInd = (elsePos < 0 ? endLine : elsePos);
-			*isContinue = QSP_TRUE;
+			*action = qspFlowContinue;
 		}
 		break;
 	case qspStatElse:
@@ -579,7 +579,7 @@ static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
 		if (line->StatsCount > 1)
 		{
 			*lineInd = endLine;
-			*isExecuted = QSP_TRUE;
+			*action = qspFlowSkip;
 			return qspExecString(line, 1, line->StatsCount, jumpTo);
 		}
 		else
@@ -588,11 +588,11 @@ static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
 			if (elsePos < 0)
 			{
 				*lineInd = ind + 1;
-				*isContinue = QSP_TRUE;
+				*action = qspFlowContinue;
 				return QSP_FALSE;
 			}
 			*lineInd = endLine;
-			*isExecuted = QSP_TRUE;
+			*action = qspFlowSkip;
 			return qspExecCode(s, ind + 1, elsePos, codeOffset, jumpTo);
 		}
 		break;
@@ -604,8 +604,8 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
 {
 	QSPLineOfCode *line;
 	QSP_CHAR *jumpToFake;
-	int i, oldRefreshCount;
-	QSP_BOOL uLevel, isContinue = QSP_FALSE, isExecuted = QSP_FALSE, isExit = QSP_FALSE;
+	QSP_BOOL uLevel, isExit = QSP_FALSE;
+	int i, oldRefreshCount, action = qspFlowExecute;
 	oldRefreshCount = qspRefreshCount;
 	/* Prepare temporary data */
 	if (uLevel = !jumpTo)
@@ -628,17 +628,17 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
 			}
 		}
 		if (line->IsMultiline)
-			isExit = qspExecMultilineCode(s, endLine, codeOffset, jumpTo, &i, &isExecuted, &isContinue);
+			isExit = qspExecMultilineCode(s, endLine, codeOffset, jumpTo, &i, &action);
 		else
-			isExit = qspExecSinglelineCode(s, endLine, codeOffset, jumpTo, &i, &isExecuted, &isContinue);
+			isExit = qspExecSinglelineCode(s, endLine, codeOffset, jumpTo, &i, &action);
 		if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-		if (isContinue)
+		if (action == qspFlowContinue)
 		{
-			isContinue = QSP_FALSE;
+			action = qspFlowExecute;
 			continue;
 		}
-		if (isExecuted)
-			isExecuted = QSP_FALSE;
+		if (action == qspFlowSkip)
+			action = qspFlowExecute;
 		else
 		{
 			isExit = qspExecString(line, 0, line->StatsCount, jumpTo);
