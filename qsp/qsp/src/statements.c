@@ -1071,15 +1071,15 @@ static QSP_BOOL qspStatementSinglelineFor(QSPLineOfCode *s, int startStat, int e
 	QSP_BOOL isExit;
 	QSPVar local, *var;
 	int curStep, oldRefreshCount;
-	QSP_CHAR *endPos, *paramPos, *toPos, *stepPos, *varName;
+	QSP_CHAR *endPos, *toPos, *stepPos, *varName;
 	endPos = s->Str + s->Stats[startStat].EndPos;
 	if (*endPos != QSP_COLONDELIM[0])
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return QSP_FALSE;
 	}
-	paramPos = s->Str + s->Stats[startStat].ParamPos;
-	if (!(varName = qspPrepareForLoop(paramPos, &local, &toPos, &stepPos))) return QSP_FALSE;
+	if (!(varName = qspPrepareForLoop(s->Str + s->Stats[startStat].ParamPos, &local, &toPos, &stepPos)))
+		return QSP_FALSE;
 	curStep = 1;
 	oldRefreshCount = qspRefreshCount;
 	while (1)
@@ -1127,9 +1127,9 @@ static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *s, int endLine, int line
 	int curStep, oldRefreshCount;
 	QSP_CHAR *endPos, *toPos, *stepPos, *varName;
 	QSPLineOfCode *line = s + lineInd;
-	endPos = line->Str + line->Stats->EndPos;
 	if (!(varName = qspPrepareForLoop(line->Str + line->Stats->ParamPos, &local, &toPos, &stepPos)))
 		return QSP_FALSE;
+	endPos = line->Str + line->Stats->EndPos;
 	curStep = 1;
 	++lineInd;
 	oldRefreshCount = qspRefreshCount;
