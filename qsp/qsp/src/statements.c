@@ -955,7 +955,7 @@ static QSP_CHAR *qspPrepareForLoop(QSP_CHAR *paramPos, QSPVar *local, QSP_CHAR *
 	toPos = qspStrPos(uStr + (eqPos - paramPos) + QSP_LEN(QSP_EQUAL), QSP_STATFORTO, QSP_TRUE);
 	if (!toPos)
 	{
-		qspSetError(QSP_ERR_EQNOTFOUND);
+		qspSetError(QSP_ERR_SYNTAX);
 		free(varName);
 		free(uStr);
 		return 0;
