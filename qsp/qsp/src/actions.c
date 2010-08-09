@@ -167,7 +167,7 @@ QSP_CHAR *qspGetAllActionsAsCode()
 	return res;
 }
 
-void qspStatementAddAct(QSPLineOfCode *s, int statPos, int endPos)
+void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
 {
 	QSPVariant args[2];
 	QSPLineOfCode code;
@@ -212,6 +212,22 @@ void qspStatementAddAct(QSPLineOfCode *s, int statPos, int endPos)
 	qspFreeVariants(args, count);
 	free(code.Stats);
 	if (code.Label) free(code.Label);
+}
+
+void qspStatementMultilineAddAct(QSPLineOfCode *s, int endLine, int lineInd, QSP_BOOL isManageLines)
+{
+	QSPVariant args[2];
+	int count, oldRefreshCount;
+	QSP_CHAR *pos;
+	QSPLineOfCode *line = s + lineInd;
+	pos = line->Str + line->Stats->EndPos;
+	oldRefreshCount = qspRefreshCount;
+	*pos = 0;
+	count = qspGetStatArgs(line->Str + line->Stats->ParamPos, qspStatAct, args);
+	*pos = QSP_COLONDELIM[0];
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+	qspAddAction(args, count, s, lineInd + 1, endLine, isManageLines);
+	qspFreeVariants(args, count);
 }
 
 QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)

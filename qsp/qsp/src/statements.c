@@ -424,8 +424,8 @@ static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSP_
 		case qspStatElseIf:
 			return QSP_FALSE;
 		case qspStatAct:
-			qspStatementAddAct(s, i, endStat);
-			return QSP_FALSE;
+			qspStatementSinglelineAddAct(s, i, endStat);
+			break;
 		case qspStatIf:
 			return qspStatementIf(s, i, endStat, jumpTo);
 		case qspStatFor:
@@ -464,10 +464,10 @@ static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSP_
 static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset,
 	QSP_CHAR **jumpTo, int *lineInd, int *action)
 {
-	QSPVariant args[2];
+	QSPVariant arg;
 	QSPLineOfCode *line;
 	QSP_CHAR *pos;
-	int ind, count, statCode, elsePos, oldRefreshCount;
+	int ind, statCode, elsePos, oldRefreshCount;
 	ind = *lineInd;
 	endLine = qspSearchEnd(s, ind + 1, endLine);
 	if (endLine < 0)
@@ -484,11 +484,11 @@ static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
 		pos = line->Str + line->Stats->EndPos;
 		oldRefreshCount = qspRefreshCount;
 		*pos = 0;
-		qspGetStatArgs(line->Str + line->Stats->ParamPos, statCode, args);
+		qspGetStatArgs(line->Str + line->Stats->ParamPos, statCode, &arg);
 		*pos = QSP_COLONDELIM[0];
 		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
 		elsePos = qspSearchElse(s, ind + 1, endLine);
-		if (QSP_NUM(args[0]))
+		if (QSP_NUM(arg))
 		{
 			if (elsePos < 0)
 			{
@@ -507,17 +507,9 @@ static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
 		}
 		break;
 	case qspStatAct:
-		pos = line->Str + line->Stats->EndPos;
-		oldRefreshCount = qspRefreshCount;
-		*pos = 0;
-		count = qspGetStatArgs(line->Str + line->Stats->ParamPos, qspStatAct, args);
-		*pos = QSP_COLONDELIM[0];
-		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-		qspAddAction(args, count, s, ind + 1, endLine, codeOffset > 0);
-		qspFreeVariants(args, count);
-		if (qspErrorNum) return QSP_FALSE;
 		*lineInd = endLine;
 		*action = qspFlowContinue;
+		qspStatementMultilineAddAct(s, endLine, ind, codeOffset > 0);
 		break;
 	case qspStatFor:
 		*lineInd = endLine;
