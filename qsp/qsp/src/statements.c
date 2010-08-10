@@ -943,8 +943,8 @@ static QSP_CHAR *qspPrepareForLoop(QSP_CHAR *paramPos, QSPVar *local, QSP_CHAR *
 		free(varName);
 		return 0;
 	}
-	qspUpperStr(uStr = qspGetNewText(paramPos, -1));
-	toPos = qspStrPos(uStr + (eqPos - paramPos) + QSP_LEN(QSP_EQUAL), QSP_STATFORTO, QSP_TRUE);
+	qspUpperStr(uStr = qspGetNewText(eqPos, -1));
+	toPos = qspStrPos(uStr + QSP_LEN(QSP_EQUAL), QSP_STATFORTO, QSP_TRUE);
 	if (!toPos)
 	{
 		qspSetError(QSP_ERR_SYNTAX);
@@ -952,9 +952,9 @@ static QSP_CHAR *qspPrepareForLoop(QSP_CHAR *paramPos, QSPVar *local, QSP_CHAR *
 		free(uStr);
 		return 0;
 	}
-	toPos = paramPos + (toPos - uStr);
-	stepPos = qspStrPos(uStr + (toPos - paramPos) + QSP_LEN(QSP_STATFORTO), QSP_STATFORSTEP, QSP_TRUE);
-	if (stepPos) stepPos = paramPos + (stepPos - uStr);
+	toPos = eqPos + (toPos - uStr);
+	stepPos = qspStrPos(uStr + (toPos - eqPos) + QSP_LEN(QSP_STATFORTO), QSP_STATFORSTEP, QSP_TRUE);
+	if (stepPos) stepPos = eqPos + (stepPos - uStr);
 	free(uStr);
 	oldRefreshCount = qspRefreshCount;
 	*toPos = 0;
