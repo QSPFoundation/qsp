@@ -133,8 +133,8 @@ void qspInitStats()
 	qspAddStatement(qspStatIf, 0, 0, 1, 1, 2);
 	qspAddStatement(qspStatAct, 0, 0, 1, 2, 1, 1);
 	qspAddStatement(qspStatFor, 0, 0, 0, 0);
+	qspAddStatement(qspStatAddLib, 1, qspStatementOpenQst, 1, 1, 1);
 	qspAddStatement(qspStatAddObj, 0, qspStatementAddObject, 1, 3, 1, 1, 2);
-	qspAddStatement(qspStatAddQst, 1, qspStatementOpenQst, 1, 1, 1);
 	qspAddStatement(qspStatClA, 3, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatCloseAll, 1, qspStatementCloseFile, 0, 0);
 	qspAddStatement(qspStatClose, 0, qspStatementCloseFile, 0, 1, 1);
@@ -142,6 +142,7 @@ void qspInitStats()
 	qspAddStatement(qspStatCmdClear, 2, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatCopyArr, 0, qspStatementCopyArr, 2, 4, 1, 1, 2, 2);
 	qspAddStatement(qspStatDelAct, 0, qspStatementDelAct, 1, 1, 1);
+	qspAddStatement(qspStatDelLib, 6, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatDelObj, 0, qspStatementDelObj, 1, 1, 1);
 	qspAddStatement(qspStatDynamic, 0, qspStatementDynamic, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddStatement(qspStatExec, 0, qspStatementExec, 1, 1, 1);
@@ -151,7 +152,6 @@ void qspInitStats()
 	qspAddStatement(qspStatJump, 0, qspStatementJump, 1, 1, 1);
 	qspAddStatement(qspStatKillAll, 5, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatKillObj, 1, qspStatementDelObj, 0, 1, 2);
-	qspAddStatement(qspStatKillQst, 6, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatKillVar, 0, qspStatementKillVar, 0, 2, 1, 2);
 	qspAddStatement(qspStatMenu, 0, qspStatementShowMenu, 1, 3, 1, 2, 2);
 	qspAddStatement(qspStatMClear, 1, qspStatementClear, 0, 0);
@@ -186,9 +186,9 @@ void qspInitStats()
 	qspAddStatName(qspStatIf, QSP_FMT("IF"), 2);
 	qspAddStatName(qspStatAct, QSP_FMT("ACT"), 2);
 	qspAddStatName(qspStatFor, QSP_FMT("FOR"), 2);
+	qspAddStatName(qspStatAddLib, QSP_FMT("ADDLIB"), 2);
 	qspAddStatName(qspStatAddObj, QSP_FMT("ADDOBJ"), 2);
 	qspAddStatName(qspStatAddObj, QSP_FMT("ADD OBJ"), 2);
-	qspAddStatName(qspStatAddQst, QSP_FMT("ADDQST"), 2);
 	qspAddStatName(qspStatClA, QSP_FMT("CLA"), 2);
 	qspAddStatName(qspStatCloseAll, QSP_FMT("CLOSE ALL"), 1);
 	qspAddStatName(qspStatClose, QSP_FMT("CLOSE"), 2);
@@ -198,6 +198,7 @@ void qspInitStats()
 	qspAddStatName(qspStatCopyArr, QSP_FMT("COPYARR"), 2);
 	qspAddStatName(qspStatDelAct, QSP_FMT("DELACT"), 2);
 	qspAddStatName(qspStatDelAct, QSP_FMT("DEL ACT"), 2);
+	qspAddStatName(qspStatDelLib, QSP_FMT("DELLIB"), 2);
 	qspAddStatName(qspStatDelObj, QSP_FMT("DELOBJ"), 2);
 	qspAddStatName(qspStatDelObj, QSP_FMT("DEL OBJ"), 2);
 	qspAddStatName(qspStatDynamic, QSP_FMT("DYNAMIC"), 2);
@@ -210,7 +211,6 @@ void qspInitStats()
 	qspAddStatName(qspStatJump, QSP_FMT("JUMP"), 2);
 	qspAddStatName(qspStatKillAll, QSP_FMT("KILLALL"), 2);
 	qspAddStatName(qspStatKillObj, QSP_FMT("KILLOBJ"), 2);
-	qspAddStatName(qspStatKillQst, QSP_FMT("KILLQST"), 2);
 	qspAddStatName(qspStatKillVar, QSP_FMT("KILLVAR"), 2);
 	qspAddStatName(qspStatMenu, QSP_FMT("MENU"), 2);
 	qspAddStatName(qspStatMClear, QSP_FMT("*CLEAR"), 2);
