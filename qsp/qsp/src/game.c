@@ -342,11 +342,13 @@ void qspOpenQuest(QSP_CHAR *fileName, QSP_BOOL isAddLocs)
 
 int qspSaveGameStatusToString(QSP_CHAR **buf)
 {
+	QSP_CHAR *locName;
 	int i, j, len, oldRefreshCount = qspRefreshCount;
 	qspExecLocByVarNameWithArgs(QSP_FMT("ONGSAVE"), 0, 0);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
 	*buf = 0;
 	qspRefreshPlayList();
+	locName = (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : 0);
 	len = qspCodeWriteVal(buf, 0, QSP_SAVEDGAMEID, QSP_FALSE);
 	len = qspCodeWriteVal(buf, len, QSP_VER, QSP_FALSE);
 	len = qspCodeWriteIntVal(buf, len, qspQstCRC, QSP_TRUE);
@@ -357,7 +359,7 @@ int qspSaveGameStatusToString(QSP_CHAR **buf)
 	len = qspCodeWriteVal(buf, len, qspCurInput, QSP_TRUE);
 	len = qspCodeWriteVal(buf, len, qspCurDesc, QSP_TRUE);
 	len = qspCodeWriteVal(buf, len, qspCurVars, QSP_TRUE);
-	len = qspCodeWriteIntVal(buf, len, qspCurLoc, QSP_TRUE);
+	len = qspCodeWriteVal(buf, len, locName, QSP_TRUE);
 	len = qspCodeWriteIntVal(buf, len, (int)qspCurIsShowActs, QSP_TRUE);
 	len = qspCodeWriteIntVal(buf, len, (int)qspCurIsShowObjs, QSP_TRUE);
 	len = qspCodeWriteIntVal(buf, len, (int)qspCurIsShowVars, QSP_TRUE);
@@ -449,7 +451,6 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, int strsCount)
 		qspReCodeGetIntVal(strs[2]) != qspQstCRC) return QSP_FALSE;
 	selAction = qspReCodeGetIntVal(strs[4]);
 	selObject = qspReCodeGetIntVal(strs[5]);
-	if (qspReCodeGetIntVal(strs[10]) < 0) return QSP_FALSE;
 	if (qspReCodeGetIntVal(strs[15]) < 0) return QSP_FALSE;
 	temp = qspReCodeGetIntVal(strs[16]);
 	if (temp < 0 || temp > QSP_MAXPLFILES || (ind += temp) > strsCount) return QSP_FALSE;
@@ -504,7 +505,7 @@ static QSP_BOOL qspCheckGameStatus(QSP_CHAR **strs, int strsCount)
 void qspOpenGameStatusFromString(QSP_CHAR *str)
 {
 	int i, j, ind, count, varInd, varsCount, valsCount;
-	QSP_CHAR **strs, *file;
+	QSP_CHAR **strs, *file, *locName;
 	count = qspSplitStr(str, QSP_STRSDELIM, &strs);
 	if (!qspCheckGameStatus(strs, count))
 	{
@@ -522,7 +523,7 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 	if (*strs[7]) qspCurInputLen = qspStrLen(qspCurInput = qspCodeReCode(strs[7], QSP_FALSE));
 	if (*strs[8]) qspCurDescLen = qspStrLen(qspCurDesc = qspCodeReCode(strs[8], QSP_FALSE));
 	if (*strs[9]) qspCurVarsLen = qspStrLen(qspCurVars = qspCodeReCode(strs[9], QSP_FALSE));
-	qspCurLoc = qspReCodeGetIntVal(strs[10]);
+	locName = qspCodeReCode(strs[10], QSP_FALSE);
 	qspCurIsShowActs = qspReCodeGetIntVal(strs[11]) != 0;
 	qspCurIsShowObjs = qspReCodeGetIntVal(strs[12]) != 0;
 	qspCurIsShowVars = qspReCodeGetIntVal(strs[13]) != 0;
@@ -611,7 +612,8 @@ void qspOpenGameStatusFromString(QSP_CHAR *str)
 	qspFreeStrs(strs, count);
 	qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_TRUE;
 	qspOpenIncludes();
-	if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
+	qspCurLoc = qspLocIndex(locName);
+	free(locName);
 	if (qspErrorNum) return;
 	qspCallShowWindow(QSP_WIN_ACTS, qspCurIsShowActs);
 	qspCallShowWindow(QSP_WIN_OBJS, qspCurIsShowObjs);
