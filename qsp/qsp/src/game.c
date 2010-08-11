@@ -76,6 +76,7 @@ int qspCRCTable[256] =
 };
 
 static int qspCRC(void *, int);
+static void qspIncludeFile(QSP_CHAR *);
 static void qspOpenIncludes();
 static FILE *qspFileOpen(QSP_CHAR *, QSP_CHAR *);
 static QSP_BOOL qspCheckQuest(char **, int, QSP_BOOL);
@@ -114,6 +115,25 @@ void qspClearIncludes(QSP_BOOL isFirst)
 	}
 	qspCurIncFilesCount = 0;
 	qspCurIncLocsCount = 0;
+}
+
+static void qspIncludeFile(QSP_CHAR *s)
+{
+	QSP_CHAR *file;
+	int oldCurIncLocsCount;
+	if (!qspIsAnyString(s)) return;
+	if (qspCurIncFilesCount == QSP_MAXINCFILES)
+	{
+		qspSetError(QSP_ERR_CANTINCFILE);
+		return;
+	}
+	oldCurIncLocsCount = qspCurIncLocsCount;
+	file = qspGetAbsFromRelPath(s);
+	qspOpenQuest(file, QSP_TRUE);
+	free(file);
+	if (qspErrorNum) return;
+	if (qspCurIncLocsCount != oldCurIncLocsCount)
+		qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(s, -1);
 }
 
 static void qspOpenIncludes()
@@ -635,31 +655,21 @@ void qspOpenGameStatus(QSP_CHAR *fileName)
 
 QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
-	int oldCurIncLocsCount;
 	QSP_CHAR *file;
-	if (!qspIsAnyString(QSP_STR(args[0]))) return QSP_FALSE;
 	switch (extArg)
 	{
 	case 0:
-		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-		qspOpenQuest(file, QSP_FALSE);
-		free(file);
-		if (qspErrorNum) return QSP_FALSE;
-		qspNewGame(QSP_FALSE);
+		if (qspIsAnyString(QSP_STR(args[0])))
+		{
+			file = qspGetAbsFromRelPath(QSP_STR(args[0]));
+			qspOpenQuest(file, QSP_FALSE);
+			free(file);
+			if (qspErrorNum) return QSP_FALSE;
+			qspNewGame(QSP_FALSE);
+		}
 		break;
 	case 1:
-		if (qspCurIncFilesCount == QSP_MAXINCFILES)
-		{
-			qspSetError(QSP_ERR_CANTINCFILE);
-			return QSP_FALSE;
-		}
-		oldCurIncLocsCount = qspCurIncLocsCount;
-		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-		qspOpenQuest(file, QSP_TRUE);
-		free(file);
-		if (qspErrorNum) return QSP_FALSE;
-		if (qspCurIncLocsCount != oldCurIncLocsCount)
-			qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(QSP_STR(args[0]), -1);
+		qspIncludeFile(QSP_STR(args[0]));
 		break;
 	}
 	return QSP_FALSE;
