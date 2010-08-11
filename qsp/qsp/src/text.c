@@ -456,18 +456,14 @@ QSP_CHAR *qspFormatText(QSP_CHAR *txt, QSP_BOOL canReturnSelf)
 	int oldRefreshCount, len, txtLen, oldTxtLen, bufSize;
 	if (qspGetVarNumValue(QSP_FMT("DISABLESUBEX")))
 	{
-		if (canReturnSelf)
-			return txt;
-		else
-			return qspGetNewText(txt, -1);
+		if (canReturnSelf) return txt;
+		return qspGetNewText(txt, -1);
 	}
 	lPos = qspStrStr(txt, QSP_LSUBEX);
 	if (!lPos)
 	{
-		if (canReturnSelf)
-			return txt;
-		else
-			return qspGetNewText(txt, -1);
+		if (canReturnSelf) return txt;
+		return qspGetNewText(txt, -1);
 	}
 	bufSize = 256;
 	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
