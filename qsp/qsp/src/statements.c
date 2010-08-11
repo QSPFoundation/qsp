@@ -51,6 +51,8 @@ static QSP_BOOL qspCheckForLoop(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, 
 static void qspEndForLoop(QSP_CHAR *, int);
 static QSP_BOOL qspStatementSinglelineFor(QSPLineOfCode *, int, int, QSP_CHAR **);
 static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *, int, int, int, QSP_CHAR **);
+static QSP_BOOL qspStatementSinglelineLocal(QSPLineOfCode *, int, int, QSP_CHAR **);
+static QSP_BOOL qspStatementMultilineLocal(QSPLineOfCode *, int, int, int, QSP_CHAR **);
 static QSP_BOOL qspStatementAddText(QSPVariant *, int, QSP_CHAR **, int);
 static QSP_BOOL qspStatementClear(QSPVariant *, int, QSP_CHAR **, int);
 static QSP_BOOL qspStatementExit(QSPVariant *, int, QSP_CHAR **, int);
@@ -133,6 +135,7 @@ void qspInitStats()
 	qspAddStatement(qspStatIf, 0, 0, 1, 1, 2);
 	qspAddStatement(qspStatAct, 0, 0, 1, 2, 1, 1);
 	qspAddStatement(qspStatFor, 0, 0, 0, 0);
+	qspAddStatement(qspStatLocal, 0, 0, 0, 0);
 	qspAddStatement(qspStatAddLib, 1, qspStatementOpenQst, 1, 1, 1);
 	qspAddStatement(qspStatAddObj, 0, qspStatementAddObject, 1, 3, 1, 1, 2);
 	qspAddStatement(qspStatClA, 3, qspStatementClear, 0, 0);
@@ -186,6 +189,7 @@ void qspInitStats()
 	qspAddStatName(qspStatIf, QSP_FMT("IF"), 2);
 	qspAddStatName(qspStatAct, QSP_FMT("ACT"), 2);
 	qspAddStatName(qspStatFor, QSP_FMT("FOR"), 2);
+	qspAddStatName(qspStatLocal, QSP_FMT("LOCAL"), 2);
 	qspAddStatName(qspStatAddLib, QSP_FMT("ADDLIB"), 2);
 	qspAddStatName(qspStatAddObj, QSP_FMT("ADDOBJ"), 2);
 	qspAddStatName(qspStatAddObj, QSP_FMT("ADD OBJ"), 2);
@@ -278,6 +282,7 @@ static int qspSearchElse(QSPLineOfCode *s, int start, int end)
 		{
 		case qspStatAct:
 		case qspStatFor:
+		case qspStatLocal:
 		case qspStatIf:
 			if (s->IsMultiline) ++c;
 			break;
@@ -305,6 +310,7 @@ static int qspSearchEnd(QSPLineOfCode *s, int start, int end)
 		{
 		case qspStatAct:
 		case qspStatFor:
+		case qspStatLocal:
 		case qspStatIf:
 			if (s->IsMultiline) ++c;
 			break;
@@ -425,11 +431,13 @@ static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSP_
 			return QSP_FALSE;
 		case qspStatAct:
 			qspStatementSinglelineAddAct(s, i, endStat);
-			break;
+			return QSP_FALSE;
 		case qspStatIf:
 			return qspStatementIf(s, i, endStat, jumpTo);
 		case qspStatFor:
 			return qspStatementSinglelineFor(s, i, endStat, jumpTo);
+		case qspStatLocal:
+			return qspStatementSinglelineLocal(s, i, endStat, jumpTo);
 		case qspStatSet:
 			if (i < s->StatsCount - 1)
 			{
@@ -515,6 +523,10 @@ static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
 		*lineInd = endLine;
 		*action = qspFlowSkip;
 		return qspStatementMultilineFor(s, endLine, ind, codeOffset, jumpTo);
+	case qspStatLocal:
+		*lineInd = endLine;
+		*action = qspFlowSkip;
+		return qspStatementMultilineLocal(s, endLine, ind, codeOffset, jumpTo);
 	}
 	return QSP_FALSE;
 }
@@ -719,6 +731,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 		{
 		case qspStatAct:
 		case qspStatFor:
+		case qspStatLocal:
 		case qspStatIf:
 		case qspStatElseIf:
 			delimPos = qspStrPos(buf, QSP_COLONDELIM, QSP_FALSE);
@@ -780,6 +793,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 				{
 				case qspStatAct:
 				case qspStatFor:
+				case qspStatLocal:
 				case qspStatIf:
 				case qspStatElseIf:
 					delimPos = qspStrPos(buf, QSP_COLONDELIM, QSP_FALSE);
@@ -847,6 +861,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 	{
 	case qspStatAct:
 	case qspStatFor:
+	case qspStatLocal:
 	case qspStatIf:
 	case qspStatElseIf:
 		line->IsMultiline = (line->StatsCount == 1 && *(str + line->Stats->EndPos) == QSP_COLONDELIM[0]);
@@ -1173,6 +1188,17 @@ static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *s, int endLine, int line
 	free(varName);
 	qspEmptyVar(var);
 	qspMoveVar(var, &local);
+	return QSP_FALSE;
+}
+
+static QSP_BOOL qspStatementSinglelineLocal(QSPLineOfCode *s, int startStat, int endStat, QSP_CHAR **jumpTo)
+{
+	return QSP_FALSE;
+}
+
+static QSP_BOOL qspStatementMultilineLocal(QSPLineOfCode *s, int endLine, int lineInd,
+	int codeOffset, QSP_CHAR **jumpTo)
+{
 	return QSP_FALSE;
 }
 

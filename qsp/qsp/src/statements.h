@@ -61,6 +61,7 @@
 		qspStatComment,
 		qspStatAct,
 		qspStatFor,
+		qspStatLocal,
 		qspStatIf,
 		qspStatElseIf,
 		qspStatElse,
