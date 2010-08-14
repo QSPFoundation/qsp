@@ -17,7 +17,7 @@
 
 #ifdef _FLASH
 
-#include "flash.h"
+#include "../../declarations.h"
 #include "../../text.h"
 
 static int qspUTF8_mbtowc(wchar_t *pwc, unsigned char *s, int n)

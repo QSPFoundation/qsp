@@ -17,7 +17,6 @@
 
 #ifdef _FLASH
 
-#include "flash.h"
 #include "../../declarations.h"
 #include "../../actions.h"
 #include "../../callbacks.h"
