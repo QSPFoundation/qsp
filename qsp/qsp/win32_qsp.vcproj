@@ -498,15 +498,15 @@
 					Name="flash"
 					>
 					<File
-						RelativePath=".\src\bindings\flash\_control.c"
+						RelativePath=".\src\bindings\flash\flash_callbacks.c"
 						>
 					</File>
 					<File
-						RelativePath=".\src\bindings\flash\callbacks.c"
+						RelativePath=".\src\bindings\flash\flash_control.c"
 						>
 					</File>
 					<File
-						RelativePath=".\src\bindings\flash\encodings.c"
+						RelativePath=".\src\bindings\flash\flash_encodings.c"
 						>
 					</File>
 				</Filter>
@@ -629,7 +629,7 @@
 				Name="bindings"
 				>
 				<File
-					RelativePath=".\src\bindings\config.h"
+					RelativePath=".\src\bindings\bindings_config.h"
 					>
 				</File>
 				<Filter
