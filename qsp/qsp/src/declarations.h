@@ -36,6 +36,7 @@
 
 /* -------- */
 
+#include "bindings/config.h"
 #include "qsp.h"
 #include "onig/oniguruma.h"
 

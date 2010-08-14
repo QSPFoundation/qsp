@@ -18,10 +18,6 @@
 #ifndef QSP_H
 	#define QSP_H
 
-	#ifdef _FLASH
-		#include <AS3.h>
-	#endif
-
 	#ifdef EXPORT
 		#ifdef _WIN
 			#define QSP_EXTERN __declspec(dllexport)
@@ -95,10 +91,8 @@
 	};
 
 	#ifdef _UNICODE
-		#ifndef _FLASH
+		#ifndef QSP_CUSTOM_BINDING
 			typedef wchar_t QSP_CHAR;
-		#else
-			typedef unsigned short QSP_CHAR;
 		#endif
 		#define QSP_FMT2(x) L##x
 		#define QSP_FMT(x) QSP_FMT2(x)
@@ -112,27 +106,17 @@
 	#define QSP_TRUE 1
 	#define QSP_FALSE 0
 
-	#ifndef _FLASH
+	#ifndef QSP_CUSTOM_BINDING
 		#ifdef __cplusplus
 			typedef int (*QSP_CALLBACK)(...);
 		#else
 			typedef int (*QSP_CALLBACK)();
 		#endif
-	#else
-		typedef struct
+
+		#ifdef __cplusplus
+		extern "C"
 		{
-			QSP_BOOL IsSet;
-			AS3_Val ThisVal;
-			AS3_Val FuncVal;
-		} QSP_CALLBACK;
-	#endif
-
-	#ifdef __cplusplus
-	extern "C"
-	{
-	#endif
-
-	#ifndef _FLASH
+		#endif
 
 		QSP_EXTERN QSP_BOOL QSPIsInCallBack();
 		QSP_EXTERN void QSPEnableDebugMode(QSP_BOOL isDebug);
@@ -182,61 +166,10 @@
 		QSP_EXTERN void QSPInit();
 		QSP_EXTERN void QSPDeInit();
 
-	#else
+		#ifdef __cplusplus
+		}
+		#endif
 
-		QSP_EXTERN AS3_Val QSPIsInCallBack(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPEnableDebugMode(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetCurStateData(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetVersion(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetCompiledDateTime(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetFullRefreshCount(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetQstFullPath(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetCurLoc(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetMainDesc(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPIsMainDescChanged(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetVarsDesc(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPIsVarsDescChanged(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetExprValue(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPSetInputStrText(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetActionsCount(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetActionData(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPExecuteSelActionCode(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPSetSelActionIndex(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetSelActionIndex(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPIsActionsChanged(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetObjectsCount(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetObjectData(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPSetSelObjectIndex(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetSelObjectIndex(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPIsObjectsChanged(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPShowWindow(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetVarValuesCount(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetVarValues(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetMaxVarsCount(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetVarNameByIndex(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPExecString(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPExecCounter(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPExecUserInput(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPExecLocationCode(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetLastErrorData(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPGetErrorDesc(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPLoadGameWorld(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPLoadGameWorldFromData(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPSaveGame(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPSaveGameAsString(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPOpenSavedGame(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPOpenSavedGameFromString(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPRestartGame(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPSelectMenuItem(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPSetCallBack(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPInit(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPDeInit(void *param, AS3_Val args);
-		QSP_EXTERN AS3_Val QSPReturnValue(void *param, AS3_Val args);
-
-	#endif
-
-	#ifdef __cplusplus
-	}
 	#endif
 
 #endif

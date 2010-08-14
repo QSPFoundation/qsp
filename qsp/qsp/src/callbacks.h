@@ -31,11 +31,15 @@
 		QSP_BOOL IsActionsChanged;
 	} QSPCallState;
 
+	extern QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
 	extern QSP_BOOL qspIsInCallBack;
 	extern QSP_BOOL qspIsDisableCodeExec;
 	extern QSP_BOOL qspIsExitOnError;
 
 	/* External functions */
+	void qspSaveCallState(QSPCallState *, QSP_BOOL, QSP_BOOL);
+	void qspRestoreCallState(QSPCallState *);
+
 	void qspInitCallBacks();
 	void qspSetCallBack(int, QSP_CALLBACK);
 	void qspCallDebug(QSP_CHAR *);
@@ -57,9 +61,5 @@
 	void qspCallCloseFile(QSP_CHAR *);
 	void qspCallDeleteMenu();
 	QSP_CHAR *qspCallInputBox(QSP_CHAR *);
-
-	#ifdef _FLASH
-		void qspSetReturnValue(AS3_Val res);
-	#endif
 
 #endif

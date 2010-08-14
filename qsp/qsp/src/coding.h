@@ -39,9 +39,4 @@
 	int qspCodeWriteIntVal(QSP_CHAR **, int, int, QSP_BOOL);
 	int qspCodeWriteVal(QSP_CHAR **, int, QSP_CHAR *, QSP_BOOL);
 
-	#ifdef _FLASH
-		char *qspW2C(QSP_CHAR *);
-		QSP_CHAR *qspC2W(char *);
-	#endif
-
 #endif

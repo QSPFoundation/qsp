@@ -491,6 +491,26 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="bindings"
+				>
+				<Filter
+					Name="flash"
+					>
+					<File
+						RelativePath=".\src\bindings\flash\_control.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\bindings\flash\callbacks.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\bindings\flash\encodings.c"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -604,6 +624,22 @@
 					RelativePath=".\src\onig\st.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="bindings"
+				>
+				<File
+					RelativePath=".\src\bindings\config.h"
+					>
+				</File>
+				<Filter
+					Name="flash"
+					>
+					<File
+						RelativePath=".\src\bindings\flash\flash.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
