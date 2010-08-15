@@ -489,6 +489,14 @@
 						RelativePath=".\src\onig\enc\utf32_le.c"
 						>
 					</File>
+					<File
+						RelativePath=".\src\onig\enc\utf16_be.c"
+						>
+					</File>
+					<File
+						RelativePath=".\src\onig\enc\utf32_be.c"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
