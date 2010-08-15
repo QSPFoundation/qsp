@@ -1,1 +1,0 @@
-GUI frontends for qsp
