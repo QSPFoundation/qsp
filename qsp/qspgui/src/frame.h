@@ -56,6 +56,7 @@
 		ID_NEWGAME,
 		ID_OPENGAMESTAT,
 		ID_SAVEGAMESTAT,
+		ID_QUICKSAVE,
 		ID_VOLUME,
 		ID_VOLUME0,
 		ID_VOLUME20,
@@ -149,6 +150,7 @@
 		void OnNewGame(wxCommandEvent& event);
 		void OnOpenGameStat(wxCommandEvent& event);
 		void OnSaveGameStat(wxCommandEvent& event);
+		void OnQuickSave(wxCommandEvent& event);
 		void OnSelectFont(wxCommandEvent& event);
 		void OnUseFontSize(wxCommandEvent& event);
 		void OnSelectFontColor(wxCommandEvent& event);
@@ -177,6 +179,7 @@
 
 		// Fields
 		bool m_isGameOpened;
+		wxString m_savedGamePath;
 		wxString m_configPath;
 		wxString m_configDefPath;
 		QSPTranslationHelper *m_transhelper;

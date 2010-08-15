@@ -28,6 +28,7 @@ BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
 	EVT_MENU(ID_NEWGAME, QSPFrame::OnNewGame)
 	EVT_MENU(ID_OPENGAMESTAT, QSPFrame::OnOpenGameStat)
 	EVT_MENU(ID_SAVEGAMESTAT, QSPFrame::OnSaveGameStat)
+	EVT_MENU(ID_QUICKSAVE, QSPFrame::OnQuickSave)
 	EVT_MENU(ID_SELECTFONT, QSPFrame::OnSelectFont)
 	EVT_MENU(ID_USEFONTSIZE, QSPFrame::OnUseFontSize)
 	EVT_MENU(ID_SELECTFONTCOLOR, QSPFrame::OnSelectFontColor)
@@ -95,6 +96,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	wxMenuItem *gameSaveItem = new wxMenuItem(m_gameMenu, ID_SAVEGAMESTAT, wxT("-"));
 	gameSaveItem->SetBitmap(wxBitmap(statussave_xpm));
 	m_gameMenu->Append(gameSaveItem);
+	m_gameMenu->Append(ID_QUICKSAVE, wxT("-"));
 	// ------------
 	wxMenu *wndsMenu = new wxMenu;
 	wndsMenu->Append(ID_TOGGLEOBJS, wxT("-"));
@@ -162,6 +164,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	// --------------------------------------
 	SetMinClientSize(wxSize(450, 300));
 	SetOverallVolume(100);
+	m_savedGamePath.Clear();
 	m_isQuit = false;
 	m_isGameOpened = false;
 }
@@ -269,6 +272,7 @@ void QSPFrame::EnableControls(bool status, bool isExtended)
 	m_fileMenu->Enable(ID_NEWGAME, status);
 	m_gameMenu->Enable(ID_OPENGAMESTAT, status);
 	m_gameMenu->Enable(ID_SAVEGAMESTAT, status);
+	m_gameMenu->Enable(ID_QUICKSAVE, status);
 	m_settingsMenu->Enable(ID_TOGGLEOBJS, status);
 	m_settingsMenu->Enable(ID_TOGGLEACTS, status);
 	m_settingsMenu->Enable(ID_TOGGLEDESC, status);
@@ -444,6 +448,7 @@ void QSPFrame::ReCreateGUI()
 	menuBar->SetLabel(wxID_EXIT, _("&Quit\tAlt-X"));
 	menuBar->SetLabel(ID_OPENGAMESTAT, _("&Open saved game...\tCtrl-O"));
 	menuBar->SetLabel(ID_SAVEGAMESTAT, _("&Save game...\tCtrl-S"));
+	menuBar->SetLabel(ID_QUICKSAVE, _("&Quicksave\tF2"));
 	menuBar->SetLabel(ID_TOGGLEOBJS, _("&Objects\tCtrl-1"));
 	menuBar->SetLabel(ID_TOGGLEACTS, _("&Actions\tCtrl-2"));
 	menuBar->SetLabel(ID_TOGGLEDESC, _("A&dditional desc\tCtrl-3"));
@@ -609,6 +614,7 @@ void QSPFrame::OpenGameFile(const wxString& path)
 		if (m_isQuit) return;
 		UpdateTitle();
 		EnableControls(true);
+		m_savedGamePath.Clear();
 	}
 	else
 		ShowError();
@@ -672,7 +678,20 @@ void QSPFrame::OnOpenGameStat(wxCommandEvent& event)
 void QSPFrame::OnSaveGameStat(wxCommandEvent& event)
 {
 	wxFileDialog dialog(this, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
-	if (dialog.ShowModal() == wxID_OK && !QSPSaveGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_TRUE))
+	if (dialog.ShowModal() == wxID_OK)
+	{
+		if (QSPSaveGame((const QSP_CHAR *)dialog.GetPath().c_str(), QSP_TRUE))
+			m_savedGamePath = dialog.GetPath();
+		else
+			ShowError();
+	}
+}
+
+void QSPFrame::OnQuickSave(wxCommandEvent& event)
+{
+	if (m_savedGamePath.IsEmpty())
+		OnSaveGameStat(event);
+	else if (!QSPSaveGame((const QSP_CHAR *)m_savedGamePath.c_str(), QSP_TRUE))
 		ShowError();
 }
 
