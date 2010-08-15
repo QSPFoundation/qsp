@@ -196,12 +196,7 @@ static QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
 	isOldFormat = qspStrsComp(buf, QSP_GAMEID) != 0;
 	free(buf);
 	ind = (isOldFormat ? 30 : 4);
-	/* here */
-	if (ind > count)
-	{
-	printf("Here3 %d, %d", ind, count);
-	return QSP_FALSE;
-	}
+	if (ind > count) return QSP_FALSE;
 	buf = (isOldFormat ?
 		qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE));
 	locsCount = qspStrToNum(buf, 0);
@@ -233,7 +228,6 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL
 	char **strs;
 	if (dataSize < 2)
 	{
-		printf("Here!\n");
 		qspSetError(QSP_ERR_CANTLOADFILE);
 		return;
 	}
@@ -241,7 +235,6 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_CHAR *fileName, QSP_BOOL
 	count = qspSplitGameStr(data, isUCS2 = !data[1], QSP_STRSDELIM, &strs);
 	if (!qspCheckQuest(strs, count, isUCS2))
 	{
-		printf("Here2!\n");
 		qspSetError(QSP_ERR_CANTLOADFILE);
 		qspFreeStrs(strs, count);
 		return;
