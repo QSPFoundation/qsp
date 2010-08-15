@@ -291,18 +291,6 @@ QSP_CHAR *qspCodeReCode(QSP_CHAR *str, QSP_BOOL isCode)
 	return buf;
 }
 
-char *qspFromQSPString(QSP_CHAR *s)
-{
-	#ifdef _FLASH
-		return qspW2C(s);
-	#else
-		int len = QSP_WCSTOMBSLEN(s) + 1;
-		char *ret = (char *)malloc(len);
-		QSP_WCSTOMBS(ret, s, len);
-		return ret;
-	#endif
-}
-
 static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 {
 	unsigned short uCh, *ptr;
@@ -489,3 +477,15 @@ int qspCodeWriteVal(QSP_CHAR **s, int len, QSP_CHAR *val, QSP_BOOL isCode)
 	}
 	return qspAddText(s, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
 }
+
+#ifndef QSP_CUSTOM_BINDING
+
+char *qspFromQSPString(QSP_CHAR *s)
+{
+	int len = QSP_WCSTOMBSLEN(s) + 1;
+	char *ret = (char *)malloc(len);
+	QSP_WCSTOMBS(ret, s, len);
+	return ret;
+}
+
+#endif

@@ -154,6 +154,11 @@ QSP_CHAR *qspC2W(char *src)
 	return dst;
 }
 
+char *qspFromQSPString(QSP_CHAR *s)
+{
+	return qspW2C(s);
+}
+
 #else
 
 static void qspDummyFunc()
