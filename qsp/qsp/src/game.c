@@ -180,8 +180,8 @@ static FILE *qspFileOpen(QSP_CHAR *fileName, QSP_CHAR *fileMode)
 {
 	FILE *ret;
 	char *file, *mode;
-	file = qspFromQSPString(fileName);
-	mode = qspFromQSPString(fileMode);
+	file = qspToSysString(fileName);
+	mode = qspToSysString(fileMode);
 	ret = fopen(file, mode);
 	free(file);
 	free(mode);

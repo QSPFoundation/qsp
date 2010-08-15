@@ -480,7 +480,7 @@ int qspCodeWriteVal(QSP_CHAR **s, int len, QSP_CHAR *val, QSP_BOOL isCode)
 
 #ifndef QSP_CUSTOM_BINDING
 
-char *qspFromQSPString(QSP_CHAR *s)
+char *qspToSysString(QSP_CHAR *s)
 {
 	int len = QSP_WCSTOMBSLEN(s) + 1;
 	char *ret = (char *)malloc(len);
