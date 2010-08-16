@@ -482,19 +482,19 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\qsp\onig\enc\utf16_le.c"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\qsp\onig\enc\utf32_le.c"
-						>
-					</File>
-					<File
 						RelativePath="..\..\..\qsp\onig\enc\utf16_be.c"
 						>
 					</File>
 					<File
+						RelativePath="..\..\..\qsp\onig\enc\utf16_le.c"
+						>
+					</File>
+					<File
 						RelativePath="..\..\..\qsp\onig\enc\utf32_be.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\qsp\onig\enc\utf32_le.c"
 						>
 					</File>
 				</Filter>
@@ -510,11 +510,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\qsp\bindings\flash\flash_control.c"
+						RelativePath="..\..\..\qsp\bindings\flash\flash_coding.c"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\qsp\bindings\flash\flash_encodings.c"
+						RelativePath="..\..\..\qsp\bindings\flash\flash_control.c"
 						>
 					</File>
 				</Filter>
