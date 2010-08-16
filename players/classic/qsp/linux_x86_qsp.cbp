@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="qsp" />
+		<Option pch_mode="0" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="../_release/libqsp.so" prefix_auto="0" extension_auto="0" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
+					<Add option="-O3" />
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+					<Add option="-DNOT_RUBY" />
+					<Add option="-DEXPORT" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Release Unicode">
+				<Option output="../_release/libqsp.so" prefix_auto="0" extension_auto="0" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
+					<Add option="-O3" />
+					<Add option="-O2" />
+					<Add option="-O1" />
+					<Add option="-O" />
+					<Add option="-D_UNICODE" />
+					<Add option="-DNOT_RUBY" />
+					<Add option="-DEXPORT" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Debug">
+				<Option output="../_debug/libqsp.so" prefix_auto="0" extension_auto="0" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-D_DEBUG" />
+					<Add option="-DNOT_RUBY" />
+					<Add option="-DEXPORT" />
+				</Compiler>
+			</Target>
+			<Target title="Debug Unicode">
+				<Option output="../_debug/libqsp.so" prefix_auto="0" extension_auto="0" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-D_UNICODE" />
+					<Add option="-D_DEBUG" />
+					<Add option="-DNOT_RUBY" />
+					<Add option="-DEXPORT" />
+				</Compiler>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="Release;" />
+		</VirtualTargets>
+		<Unit filename="../../../qsp/_control.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/actions.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/actions.h" />
+		<Unit filename="../../../qsp/callbacks.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/callbacks.h" />
+		<Unit filename="../../../qsp/codetools.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/codetools.h" />
+		<Unit filename="../../../qsp/coding.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/coding.h" />
+		<Unit filename="../../../qsp/common.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/common.h" />
+		<Unit filename="../../../qsp/declarations.h" />
+		<Unit filename="../../../qsp/errors.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/errors.h" />
+		<Unit filename="../../../qsp/game.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/game.h" />
+		<Unit filename="../../../qsp/locations.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/locations.h" />
+		<Unit filename="../../../qsp/mathops.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/mathops.h" />
+		<Unit filename="../../../qsp/memwatch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/memwatch.h" />
+		<Unit filename="../../../qsp/menu.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/menu.h" />
+		<Unit filename="../../../qsp/objects.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/objects.h" />
+		<Unit filename="../../../qsp/onig/config.h" />
+		<Unit filename="../../../qsp/onig/enc/ascii.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/enc/cp1251.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/enc/koi8_r.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/enc/unicode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/enc/utf16_le.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/enc/utf32_le.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/oniguruma.h" />
+		<Unit filename="../../../qsp/onig/regcomp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/regenc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/regenc.h" />
+		<Unit filename="../../../qsp/onig/regerror.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/regexec.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/regint.h" />
+		<Unit filename="../../../qsp/onig/regparse.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/regparse.h" />
+		<Unit filename="../../../qsp/onig/regsyntax.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/regtrav.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/regversion.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/st.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/onig/st.h" />
+		<Unit filename="../../../qsp/playlist.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/playlist.h" />
+		<Unit filename="../../../qsp/qsp.h" />
+		<Unit filename="../../../qsp/statements.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/statements.h" />
+		<Unit filename="../../../qsp/text.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/text.h" />
+		<Unit filename="../../../qsp/time.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/time.h" />
+		<Unit filename="../../../qsp/towlower.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/towupper.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/variables.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/variables.h" />
+		<Unit filename="../../../qsp/variant.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../qsp/variant.h" />
+		<Extensions>
+			<code_completion />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

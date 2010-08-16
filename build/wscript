@@ -52,7 +52,7 @@ fmodLibName = 'fmodexp'
 if isLinux64:
 	fmodLibName += '64'
 	
-extraFilesDir = '../qsp/misc'
+extraFilesDir = '../players/classic/misc'
 extraFilesDirCommon = _join(extraFilesDir, 'common')
 extraFilesDirPlatform = None
 if isLinux64:
@@ -62,7 +62,7 @@ elif isLinux32:
 elif isWindows: 
 	extraFilesDirPlatform = _join(extraFilesDir, 'win32')
 	
-wxPatches = ["../qsp/build_wx/wxPatch.diff"]
+wxPatches = ["../players/classic/build_wx/wxPatch.diff"]
 	
 svnApp = "svn"
 
@@ -94,7 +94,7 @@ def _makePatch(patchFile, pathWhere):
 targets = { 'qsplib': {}, 'qspgui': {}}
 targets['qsplib'] = \
 {
-	'path': '../qsp/qsp/src',
+	'path': '../qsp',
 	'name': 'qsplib',
 	'targetName': 'qsp',
 	'type': 'cshlib',
@@ -120,7 +120,7 @@ targets['qsplib'] = \
 
 targets['qspgui'] = \
 {
-	'path': '../qsp/qspgui/src',
+	'path': '../players/classic/qspgui/src',
 	'name': 'qspgui',
 	'targetName': 'qsp-gui',
 	'type': 'cprogram',
