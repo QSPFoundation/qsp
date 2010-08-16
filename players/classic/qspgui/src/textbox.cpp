@@ -41,7 +41,7 @@ QSPTextBox::QSPTextBox(wxWindow *parent, wxWindowID id) : wxHtmlWindow(parent, i
 	m_outFormat = wxString::Format(
 		wxT("<HTML><META HTTP-EQUIV = \"Content-Type\" CONTENT = \"text/html; charset=%s\">")
 		wxT("<BODY><FONT COLOR = #%%s>%%s</FONT></BODY></HTML>"),
-		wxFontMapper::GetEncodingName(m_font.GetEncoding()).wx_str()
+		wxFontMapper::GetEncodingName(wxLocale::GetSystemEncoding()).wx_str()
 	);
 	wxString fontName(m_font.GetFaceName());
 	SetStandardFonts(m_font.GetPointSize(), fontName, fontName);
