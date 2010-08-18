@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: English 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:13+1100\n"
-"PO-Revision-Date: 2010-03-23 23:15+0600\n"
+"PO-Revision-Date: 2010-08-19 02:25+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: English <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -296,4 +296,7 @@ msgstr "Initial volume\tAlt-6"
 
 msgid "Code not found!"
 msgstr "Code not found!"
+
+msgid "[to] not found!"
+msgstr "[to] not found!"
 

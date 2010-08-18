@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Ukrainian 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:24+1100\n"
-"PO-Revision-Date: 2010-03-23 23:15+0600\n"
+"PO-Revision-Date: 2010-08-19 02:26+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: Ukrainian <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -71,7 +71,7 @@ msgid "Additional desc"
 msgstr "Додадкове описування"
 
 msgid "Bracket not found!"
-msgstr "Не відповідна кількість відкриваючих та закриваючих скобок!"
+msgstr "Нэ відповідна кількість відкриваючих та закриваючих скобок!"
 
 msgid "Brackets not found!"
 msgstr "В виразі відсутні скобки!"
@@ -111,10 +111,10 @@ msgid "Error"
 msgstr "Помилка"
 
 msgid "File not found!"
-msgstr "Вказанный файл недоступний або не знайдений!"
+msgstr "Вказанный файл недоступний або нэ знайдений!"
 
 msgid "Game not loaded!"
-msgstr "Гра не завантажена!"
+msgstr "Гра нэ завантажена!"
 
 msgid "Incorrect arguments' count!"
 msgstr "Невірне число аргументів оператора / функції!"
@@ -132,13 +132,13 @@ msgid "Input data"
 msgstr "Ввод даних"
 
 msgid "Label not found!"
-msgstr "Вказаная мітка не знайдена!"
+msgstr "Вказаная мітка нэ знайдена!"
 
 msgid "Language"
 msgstr "Мова"
 
 msgid "Location not found!"
-msgstr "Локація с заданою назвою не існує!"
+msgstr "Локація с заданою назвою нэ існує!"
 
 msgid ""
 "Location: %s\n"
@@ -226,10 +226,10 @@ msgid "Select saved game file"
 msgstr "Виберіть файл для завантаження"
 
 msgid "Sign [:] not found!"
-msgstr "Знак [:] не знайдено!"
+msgstr "Знак [:] нэ знайдено!"
 
 msgid "Sign [=] not found!"
-msgstr "Знак [=] не знайдено!"
+msgstr "Знак [=] нэ знайдено!"
 
 msgid "Stack overflow!"
 msgstr "Переповнення стеку!"
@@ -296,4 +296,7 @@ msgstr "Початкова гучність\tAlt-6"
 
 msgid "Code not found!"
 msgstr "Невірний запис однострокового оператора!"
+
+msgid "[to] not found!"
+msgstr "Слово [to] нэ знайдэно!"
 
