@@ -190,9 +190,9 @@ static int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **
 	while (i < count)
 	{
 		len = qspAddText(&str, s[i].Str, 0, -1, QSP_TRUE);
-		if (len >= QSP_LEN(QSP_EOLEXT))
+		if (len >= QSP_LEN(QSP_PREEOLEXT QSP_EOLEXT))
 		{
-			while (!qspStrsComp(str + len - QSP_LEN(QSP_EOLEXT), QSP_EOLEXT))
+			while (!qspStrsComp(str + len - QSP_LEN(QSP_PREEOLEXT QSP_EOLEXT), QSP_PREEOLEXT QSP_EOLEXT))
 			{
 				if (++i == count) break;
 				len = qspAddText(&str, s[i].Str, len - QSP_LEN(QSP_EOLEXT), -1, QSP_FALSE);

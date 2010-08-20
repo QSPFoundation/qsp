@@ -20,7 +20,8 @@
 #ifndef QSP_CODETOOLSDEFINES
 	#define QSP_CODETOOLSDEFINES
 
-	#define QSP_EOLEXT QSP_FMT(" _")
+	#define QSP_EOLEXT QSP_FMT("_")
+	#define QSP_PREEOLEXT QSP_FMT(" ")
 
 	typedef struct
 	{
