@@ -1,5 +1,5 @@
 /* ========================================================================================== */
-/* FMOD Ex - DSP header file. Copyright (c), Firelight Technologies Pty, Ltd. 2004-2009.      */
+/* FMOD Ex - DSP header file. Copyright (c), Firelight Technologies Pty, Ltd. 2004-2010.      */
 /*                                                                                            */
 /* Use this header if you are interested in delving deeper into the FMOD software mixing /    */
 /* DSP engine.  In this header you can find parameter structures for FMOD system reigstered   */
@@ -37,7 +37,7 @@ typedef FMOD_RESULT (F_CALLBACK *FMOD_DSP_DIALOGCALLBACK)     (FMOD_DSP_STATE *d
     To get them to be active, first create the unit, then add it somewhere into the DSP network, either at the front of the network near the soundcard unit to affect the global output (by using System::getDSPHead), or on a single channel (using Channel::getDSPHead).
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]
     System::createDSPByType
@@ -67,6 +67,7 @@ typedef enum
     FMOD_DSP_TYPE_LOWPASS_SIMPLE,     /* This unit filters sound using a simple lowpass with no resonance, but has flexible cutoff and is fast. */
     FMOD_DSP_TYPE_DELAY,              /* This unit produces different delays on individual channels of the sound. */
     FMOD_DSP_TYPE_TREMOLO,            /* This unit produces a tremolo / chopper effect on the sound. */
+    FMOD_DSP_TYPE_LADSPAPLUGIN,       /* This unit allows the use of LADSPA standard plugins. */
     FMOD_DSP_TYPE_FORCEINT = 65536    /* Makes sure this enum is signed 32bit. */
 } FMOD_DSP_TYPE;
 
@@ -78,8 +79,8 @@ typedef enum
     Structure to define a parameter for a DSP unit.
 
     [REMARKS]
-    Members marked with [in] mean the variable can be written to.  The user can set the value.
-    Members marked with [out] mean the variable is modified by FMOD and is for reading purposes only.  Do not change this value.
+    Members marked with [r] mean the variable is modified by FMOD and is for reading purposes only.  Do not change this value.
+    Members marked with [w] mean the variable can be written to.  The user can set the value.
     
     The step parameter tells the gui or application that the parameter has a certain granularity.
     For example in the example of cutoff frequency with a range from 100.0 to 22050.0 you might only want the selection to be in 10hz increments.  For this you would simply use 10.0 as the step value.
@@ -89,7 +90,7 @@ typedef enum
     A step value of 0.0 would mean the full floating point range is accessable.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]    
     System::createDSP
@@ -98,12 +99,12 @@ typedef enum
 */
 typedef struct FMOD_DSP_PARAMETERDESC
 {
-    float       min;                                /* [in] Minimum value of the parameter (ie 100.0). */
-    float       max;                                /* [in] Maximum value of the parameter (ie 22050.0). */
-    float       defaultval;                         /* [in] Default value of parameter. */
-    char        name[16];                           /* [in] Name of the parameter to be displayed (ie "Cutoff frequency"). */
-    char        label[16];                          /* [in] Short string to be put next to value to denote the unit type (ie "hz"). */
-    const char *description;                        /* [in] Description of the parameter to be displayed as a help item / tooltip for this parameter. */
+    float       min;                                /* [w] Minimum value of the parameter (ie 100.0). */
+    float       max;                                /* [w] Maximum value of the parameter (ie 22050.0). */
+    float       defaultval;                         /* [w] Default value of parameter. */
+    char        name[16];                           /* [w] Name of the parameter to be displayed (ie "Cutoff frequency"). */
+    char        label[16];                          /* [w] Short string to be put next to value to denote the unit type (ie "hz"). */
+    const char *description;                        /* [w] Description of the parameter to be displayed as a help item / tooltip for this parameter. */
 } FMOD_DSP_PARAMETERDESC;
 
 
@@ -114,15 +115,15 @@ typedef struct FMOD_DSP_PARAMETERDESC
     When creating a DSP unit, declare one of these and provide the relevant callbacks and name for FMOD to use when it creates and uses a DSP unit of this type.
 
     [REMARKS]
-    Members marked with [in] mean the variable can be written to.  The user can set the value.
-    Members marked with [out] mean the variable is modified by FMOD and is for reading purposes only.  Do not change this value.
+    Members marked with [r] mean the variable is modified by FMOD and is for reading purposes only.  Do not change this value.
+    Members marked with [w] mean the variable can be written to.  The user can set the value.
     
     There are 2 different ways to change a parameter in this architecture.
     One is to use DSP::setParameter / DSP::getParameter.  This is platform independant and is dynamic, so new unknown plugins can have their parameters enumerated and used.
     The other is to use DSP::showConfigDialog.  This is platform specific and requires a GUI, and will display a dialog box to configure the plugin.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]    
     System::createDSP
@@ -131,23 +132,23 @@ typedef struct FMOD_DSP_PARAMETERDESC
 */
 typedef struct FMOD_DSP_DESCRIPTION
 {
-    char                         name[32];           /* [in] Name of the unit to be displayed in the network. */
-    unsigned int                 version;            /* [in] Plugin writer's version number. */
-    int                          channels;           /* [in] Number of channels.  Use 0 to process whatever number of channels is currently in the network.  >0 would be mostly used if the unit is a unit that only generates sound. */
-    FMOD_DSP_CREATECALLBACK      create;             /* [in] Create callback.  This is called when DSP unit is created.  Can be null. */
-    FMOD_DSP_RELEASECALLBACK     release;            /* [in] Release callback.  This is called just before the unit is freed so the user can do any cleanup needed for the unit.  Can be null. */
-    FMOD_DSP_RESETCALLBACK       reset;              /* [in] Reset callback.  This is called by the user to reset any history buffers that may need resetting for a filter, when it is to be used or re-used for the first time to its initial clean state.  Use to avoid clicks or artifacts. */
-    FMOD_DSP_READCALLBACK        read;               /* [in] Read callback.  Processing is done here.  Can be null. */
-    FMOD_DSP_SETPOSITIONCALLBACK setposition;        /* [in] Set position callback.  This is called if the unit wants to update its position info but not process data, or reset a cursor position internally if it is reading data from a certain source.  Can be null. */
+    char                         name[32];           /* [w] Name of the unit to be displayed in the network. */
+    unsigned int                 version;            /* [w] Plugin writer's version number. */
+    int                          channels;           /* [w] Number of channels.  Use 0 to process whatever number of channels is currently in the network.  >0 would be mostly used if the unit is a unit that only generates sound. */
+    FMOD_DSP_CREATECALLBACK      create;             /* [w] Create callback.  This is called when DSP unit is created.  Can be null. */
+    FMOD_DSP_RELEASECALLBACK     release;            /* [w] Release callback.  This is called just before the unit is freed so the user can do any cleanup needed for the unit.  Can be null. */
+    FMOD_DSP_RESETCALLBACK       reset;              /* [w] Reset callback.  This is called by the user to reset any history buffers that may need resetting for a filter, when it is to be used or re-used for the first time to its initial clean state.  Use to avoid clicks or artifacts. */
+    FMOD_DSP_READCALLBACK        read;               /* [w] Read callback.  Processing is done here.  Can be null. */
+    FMOD_DSP_SETPOSITIONCALLBACK setposition;        /* [w] Set position callback.  This is called if the unit wants to update its position info but not process data, or reset a cursor position internally if it is reading data from a certain source.  Can be null. */
 
-    int                          numparameters;      /* [in] Number of parameters used in this filter.  The user finds this with DSP::getNumParameters */
-    FMOD_DSP_PARAMETERDESC      *paramdesc;          /* [in] Variable number of parameter structures. */
-    FMOD_DSP_SETPARAMCALLBACK    setparameter;       /* [in] This is called when the user calls DSP::setParameter.  Can be null. */
-    FMOD_DSP_GETPARAMCALLBACK    getparameter;       /* [in] This is called when the user calls DSP::getParameter.  Can be null. */
-    FMOD_DSP_DIALOGCALLBACK      config;             /* [in] This is called when the user calls DSP::showConfigDialog.  Can be used to display a dialog to configure the filter.  Can be null. */
-    int                          configwidth;        /* [in] Width of config dialog graphic if there is one.  0 otherwise.*/
-    int                          configheight;       /* [in] Height of config dialog graphic if there is one.  0 otherwise.*/
-    void                        *userdata;           /* [in] Optional. Specify 0 to ignore. This is user data to be attached to the DSP unit during creation.  Access via DSP::getUserData. */
+    int                          numparameters;      /* [w] Number of parameters used in this filter.  The user finds this with DSP::getNumParameters */
+    FMOD_DSP_PARAMETERDESC      *paramdesc;          /* [w] Variable number of parameter structures. */
+    FMOD_DSP_SETPARAMCALLBACK    setparameter;       /* [w] This is called when the user calls DSP::setParameter.  Can be null. */
+    FMOD_DSP_GETPARAMCALLBACK    getparameter;       /* [w] This is called when the user calls DSP::getParameter.  Can be null. */
+    FMOD_DSP_DIALOGCALLBACK      config;             /* [w] This is called when the user calls DSP::showConfigDialog.  Can be used to display a dialog to configure the filter.  Can be null. */
+    int                          configwidth;        /* [w] Width of config dialog graphic if there is one.  0 otherwise.*/
+    int                          configheight;       /* [w] Height of config dialog graphic if there is one.  0 otherwise.*/
+    void                        *userdata;           /* [w] Optional. Specify 0 to ignore. This is user data to be attached to the DSP unit during creation.  Access via DSP::getUserData. */
 } FMOD_DSP_DESCRIPTION;
 
 
@@ -158,11 +159,11 @@ typedef struct FMOD_DSP_DESCRIPTION
     DSP plugin structure that is passed into each callback.
 
     [REMARKS]
-    Members marked with [in] mean the variable can be written to.  The user can set the value.
-    Members marked with [out] mean the variable is modified by FMOD and is for reading purposes only.  Do not change this value.
+    Members marked with [r] mean the variable is modified by FMOD and is for reading purposes only.  Do not change this value.
+    Members marked with [w] mean the variable can be written to.  The user can set the value.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]
     FMOD_DSP_DESCRIPTION
@@ -170,9 +171,9 @@ typedef struct FMOD_DSP_DESCRIPTION
 */
 struct FMOD_DSP_STATE
 {
-    FMOD_DSP      *instance;      /* [out] Handle to the DSP hand the user created.  Not to be modified.  C++ users cast to FMOD::DSP to use.  */
-    void          *plugindata;    /* [in] Plugin writer created data the output author wants to attach to this object. */
-	unsigned short speakermask;	  /* Specifies which speakers the DSP effect is active on */
+    FMOD_DSP      *instance;      /* [r] Handle to the DSP hand the user created.  Not to be modified.  C++ users cast to FMOD::DSP to use.  */
+    void          *plugindata;    /* [w] Plugin writer created data the output author wants to attach to this object. */
+	unsigned short speakermask;	  /* [w] Specifies which speakers the DSP effect is active on */
 };
 
 
@@ -194,7 +195,7 @@ struct FMOD_DSP_STATE
     [REMARKS]
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -218,7 +219,7 @@ typedef enum
     [REMARKS]
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -249,7 +250,7 @@ typedef enum
     The effective maximum cutoff is about 8060hz.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -273,7 +274,7 @@ typedef enum
     [REMARKS]
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -304,7 +305,7 @@ typedef enum
     If a channel echo is set to a lower number than the sound's channel count that is coming in, it will not echo the sound.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -335,7 +336,7 @@ typedef enum
     
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -378,7 +379,7 @@ typedef enum
     Flange depth is a percentage of a 10ms shift from the original signal.  Anything above 10ms is not considered flange because to the ear it begins to 'echo' so 10ms is the highest value possible.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -410,7 +411,7 @@ typedef enum
     The LFO can be synchronized using the FMOD_DSP_TREMOLO_PHASE parameter which sets its instantaneous phase.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -440,7 +441,7 @@ typedef enum
     [REMARKS]
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -469,7 +470,7 @@ typedef enum
     To avoid very sudden changes in volume level based on small samples of new data, fmod fades towards the desired amplification which makes for smooth gain control.  The fadetime parameter can control this.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -499,7 +500,7 @@ typedef enum
     When a frequency has its gain set to 1.0, the sound will be unaffected and represents the original signal exactly.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -539,7 +540,7 @@ typedef enum
     If a channel pitch shift is set to a lower number than the sound's channel count that is coming in, it will not pitch shift the sound.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -569,7 +570,7 @@ typedef enum
     This unit also could be used to do a simple echo, or a flange effect. 
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -602,7 +603,7 @@ typedef enum
     This reverb is limited to stereo processing only, and may be removed in the future.  It is recommended to use FMOD_DSP_SFXREVERB instead which is higher quality and supports 5.1 and 7.1 output.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter
@@ -637,7 +638,7 @@ typedef enum
     For multichannel signals (>2) there will be no echo on those channels.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::SetParameter
@@ -672,7 +673,7 @@ typedef enum
     
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::SetParameter
@@ -702,7 +703,7 @@ typedef enum
     These properties can be set with presets in FMOD_REVERB_PRESETS.
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::SetParameter
@@ -742,7 +743,7 @@ typedef enum
     [REMARKS]
 
     [PLATFORMS]
-    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, Solaris, iPhone
+    Win32, Win64, Linux, Linux64, Macintosh, Xbox360, PlayStation 2, PlayStation Portable, PlayStation 3, Wii, iPhone
 
     [SEE_ALSO]      
     DSP::setParameter

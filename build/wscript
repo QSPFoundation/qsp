@@ -48,7 +48,7 @@ if isLinux:
 	defaultInstallPrefix = '/opt'
 	Options.default_prefix = defaultInstallPrefix
 
-fmodLibName = 'fmodexp'
+fmodLibName = 'fmodex'
 if isLinux64:
 	fmodLibName += '64'
 	

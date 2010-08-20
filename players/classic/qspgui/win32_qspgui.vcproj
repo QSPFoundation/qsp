@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib wxmsw29d_core.lib wxbase29d.lib wxmsw29d_html.lib wxmsw29d_adv.lib wxmsw29d_aui.lib wxzlibd.lib wxtiffd.lib wxjpegd.lib wxpngd.lib comctl32.lib fmodexp_vc.lib qsp.lib"
+				AdditionalDependencies="rpcrt4.lib wxmsw29d_core.lib wxbase29d.lib wxmsw29d_html.lib wxmsw29d_adv.lib wxmsw29d_aui.lib wxzlibd.lib wxtiffd.lib wxjpegd.lib wxpngd.lib comctl32.lib fmodex_vc.lib qsp.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(OutDir);misc\win32\libs"
@@ -142,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib wxmsw29_core.lib wxbase29.lib wxmsw29_html.lib wxmsw29_adv.lib wxmsw29_aui.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib comctl32.lib fmodexp_vc.lib qsp.lib"
+				AdditionalDependencies="rpcrt4.lib wxmsw29_core.lib wxbase29.lib wxmsw29_html.lib wxmsw29_adv.lib wxmsw29_aui.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib comctl32.lib fmodex_vc.lib qsp.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(OutDir);misc\win32\libs"
@@ -223,7 +223,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib wxmsw29ud_core.lib wxbase29ud.lib wxmsw29ud_html.lib wxmsw29ud_adv.lib wxmsw29ud_aui.lib wxzlibd.lib wxtiffd.lib wxjpegd.lib wxpngd.lib comctl32.lib fmodexp_vc.lib qsp.lib"
+				AdditionalDependencies="rpcrt4.lib wxmsw29ud_core.lib wxbase29ud.lib wxmsw29ud_html.lib wxmsw29ud_adv.lib wxmsw29ud_aui.lib wxzlibd.lib wxtiffd.lib wxjpegd.lib wxpngd.lib comctl32.lib fmodex_vc.lib qsp.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(OutDir);misc\win32\libs"
@@ -304,7 +304,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="rpcrt4.lib wxmsw29u_core.lib wxbase29u.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_aui.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib comctl32.lib fmodexp_vc.lib qsp.lib"
+				AdditionalDependencies="rpcrt4.lib wxmsw29u_core.lib wxbase29u.lib wxmsw29u_html.lib wxmsw29u_adv.lib wxmsw29u_aui.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib comctl32.lib fmodex_vc.lib qsp.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(OutDir);misc\win32\libs"

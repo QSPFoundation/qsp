@@ -25,7 +25,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="../misc/linux_x86/libfmodexp.so" />
+					<Add option="../misc/linux_x86/libfmodex.so" />
 					<Add option="../_release/libqsp.so" />
 					<Add library="wx_gtk2_aui-2.9" />
 					<Add library="wx_gtk2_html-2.9" />
@@ -61,7 +61,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="../misc/linux_x86/libfmodexp.so" />
+					<Add option="../misc/linux_x86/libfmodex.so" />
 					<Add option="../_release/libqsp.so" />
 					<Add library="wx_gtk2u_aui-2.9" />
 					<Add library="wx_gtk2u_html-2.9" />
@@ -91,7 +91,7 @@
 					<Add directory="/home/byte/wx_qsp/_build_debug/lib/wx/include/gtk2-ansi-debug-static-2.9" />
 				</Compiler>
 				<Linker>
-					<Add option="../misc/linux_x86/libfmodexp.so" />
+					<Add option="../misc/linux_x86/libfmodex.so" />
 					<Add option="../_debug/libqsp.so" />
 					<Add library="wx_gtk2d_aui-2.9" />
 					<Add library="wx_gtk2d_html-2.9" />
@@ -122,7 +122,7 @@
 					<Add directory="/home/byte/wx_qsp/_build_debug_unicode/lib/wx/include/gtk2-unicode-debug-static-2.9" />
 				</Compiler>
 				<Linker>
-					<Add option="../misc/linux_x86/libfmodexp.so" />
+					<Add option="../misc/linux_x86/libfmodex.so" />
 					<Add option="../_debug/libqsp.so" />
 					<Add library="wx_gtk2ud_aui-2.9" />
 					<Add library="wx_gtk2ud_html-2.9" />

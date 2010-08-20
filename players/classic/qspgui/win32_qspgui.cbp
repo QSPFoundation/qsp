@@ -38,7 +38,7 @@
 					<Add library="oleaut32" />
 					<Add library="ole32" />
 					<Add library="uuid" />
-					<Add library="fmodexp" />
+					<Add library="fmodex" />
 					<Add library="qsp" />
 					<Add directory="misc\win32\libs" />
 					<Add directory="..\_release" />
@@ -76,7 +76,7 @@
 					<Add library="oleaut32" />
 					<Add library="ole32" />
 					<Add library="uuid" />
-					<Add library="fmodexp" />
+					<Add library="fmodex" />
 					<Add library="qsp" />
 					<Add directory="misc\win32\libs" />
 					<Add directory="..\_release" />
