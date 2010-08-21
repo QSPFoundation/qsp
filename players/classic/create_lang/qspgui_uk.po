@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Ukrainian 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:24+1100\n"
-"PO-Revision-Date: 2010-08-22 03:46+0600\n"
+"PO-Revision-Date: 2010-08-22 03:57+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: Ukrainian <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -77,19 +77,19 @@ msgid "Brackets not found!"
 msgstr "В виразі відсутні скобки!"
 
 msgid "Can't add action!"
-msgstr "Неможливо додати дію!"
+msgstr "Нэможливо додати дію!"
 
 msgid "Can't add file!"
-msgstr "Неможливо додати файл!"
+msgstr "Нэможливо додати файл!"
 
 msgid "Can't add menu's item!"
-msgstr "Неможливо додати пункт меню!"
+msgstr "Нэможливо додати пункт меню!"
 
 msgid "Can't add object!"
-msgstr "Неможливо додати об`єкт!"
+msgstr "Нэможливо додати об`єкт!"
 
 msgid "Can't load file!"
-msgstr "Неможливо завантажити файл!"
+msgstr "Нэможливо завантажити файл!"
 
 msgid "Cancel"
 msgstr "Скасувати"
@@ -111,16 +111,16 @@ msgid "Error"
 msgstr "Помилка"
 
 msgid "File not found!"
-msgstr "Вказанный файл недоступний або нэ знайдений!"
+msgstr "Вказанный файл нэдоступний або нэ знайдений!"
 
 msgid "Game not loaded!"
 msgstr "Гра нэ завантажена!"
 
 msgid "Incorrect arguments' count!"
-msgstr "Невірне число аргументів оператора / функції!"
+msgstr "Нэвірне число аргументів оператора / функції!"
 
 msgid "Incorrect variable's name!"
-msgstr "Недопустима назва змінної / масива!"
+msgstr "Нэдопустима назва змінної / масива!"
 
 msgid "Info"
 msgstr "Інформація"
@@ -244,13 +244,13 @@ msgid "Too many variables!"
 msgstr "Занадто багато змінних з однаковим хешем!"
 
 msgid "Type mismatch!"
-msgstr "Невідповідність типів даних!"
+msgstr "Нэвідповідність типів даних!"
 
 msgid "Unknown action!"
-msgstr "Невідома дія!"
+msgstr "Нэвідома дія!"
 
 msgid "Unknown error!"
-msgstr "Невідома помилка!"
+msgstr "Нэвідома помилка!"
 
 msgid ""
 "Version: %s\n"
@@ -295,7 +295,7 @@ msgid "Initial volume\tAlt-6"
 msgstr "Початкова гучність\tAlt-6"
 
 msgid "Code not found!"
-msgstr "Невірний запис однострокового оператора!"
+msgstr "Нэвірний запис однострокового оператора!"
 
 msgid "[to] not found!"
 msgstr "Слово [to] нэ знайдэно!"
