@@ -447,8 +447,8 @@ void QSPFrame::ReCreateGUI()
 	menuBar->SetLabel(ID_NEWGAME, _("&Restart game\tAlt-N"));
 	menuBar->SetLabel(wxID_EXIT, _("&Quit\tAlt-X"));
 	menuBar->SetLabel(ID_OPENGAMESTAT, _("&Open saved game...\tCtrl-O"));
-	menuBar->SetLabel(ID_SAVEGAMESTAT, _("&Save game...\tCtrl-S"));
-	menuBar->SetLabel(ID_QUICKSAVE, _("&Quicksave\tF2"));
+	menuBar->SetLabel(ID_SAVEGAMESTAT, _("&Save game..."));
+	menuBar->SetLabel(ID_QUICKSAVE, _("&Quicksave\tCtrl-S"));
 	menuBar->SetLabel(ID_TOGGLEOBJS, _("&Objects\tCtrl-1"));
 	menuBar->SetLabel(ID_TOGGLEACTS, _("&Actions\tCtrl-2"));
 	menuBar->SetLabel(ID_TOGGLEDESC, _("A&dditional desc\tCtrl-3"));

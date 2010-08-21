@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Ukrainian 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-08-08 13:24+1100\n"
-"PO-Revision-Date: 2010-08-19 02:26+0600\n"
+"PO-Revision-Date: 2010-08-22 03:46+0600\n"
 "Last-Translator: Byte <nporep@mail.ru>\n"
 "Language-Team: Ukrainian <nporep@mail.ru>\n"
 "MIME-Version: 1.0\n"
@@ -52,8 +52,8 @@ msgstr "&Вийти\tAlt-X"
 msgid "&Restart game\tAlt-N"
 msgstr "&Розпочати спочатку\tAlt-N"
 
-msgid "&Save game...\tCtrl-S"
-msgstr "З&берегти стан гри...\tCtrl-S"
+msgid "&Save game..."
+msgstr "З&берегти стан гри..."
 
 msgid "&Settings"
 msgstr "&Налаштування"
@@ -299,4 +299,7 @@ msgstr "Невірний запис однострокового операто�
 
 msgid "[to] not found!"
 msgstr "Слово [to] нэ знайдэно!"
+
+msgid "&Quicksave\tCtrl-S"
+msgstr "&Швыдкэ збэригання\tCtrl-S"
 
