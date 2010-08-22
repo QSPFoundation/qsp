@@ -229,7 +229,7 @@ static int qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 		return n;
 	}
 	free(uStr);
-	return var->ValsCount;
+	return -1;
 }
 
 static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isSet, int *index)
