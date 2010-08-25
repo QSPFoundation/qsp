@@ -18,12 +18,16 @@
 #ifndef QSP_BINDINGSCONFIG
 	#define QSP_BINDINGSCONFIG
 
-	#ifdef _FLASH
+	#if defined(_FLASH) || defined(_JAVA)
 		#define QSP_CUSTOM_BINDING
 	#endif
 
 	#ifdef _FLASH
 		#include "flash/flash.h"
+	#endif
+
+	#ifdef _JAVA
+		#include "java/java.h"
 	#endif
 
 #endif
