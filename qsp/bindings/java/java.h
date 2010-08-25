@@ -3,6 +3,10 @@
 #ifndef QSP_JAVADEFINES
 	#define QSP_JAVADEFINES
 
+	#ifdef _UNICODE
+		typedef wchar_t QSP_CHAR;
+	#endif
+
 	#ifdef __cplusplus
 		typedef int (*QSP_CALLBACK)(...);
 	#else
