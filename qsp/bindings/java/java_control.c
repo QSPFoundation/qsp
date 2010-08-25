@@ -15,6 +15,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#ifdef _JAVA
+
 #include "../../declarations.h"
 #include "../../actions.h"
 #include "../../callbacks.h"
@@ -31,8 +33,6 @@
 #include "../../time.h"
 #include "../../variables.h"
 #include "../../variant.h"
-
-#ifdef _JAVA
 
 /* ------------------------------------------------------------ */
 void QSPIsInCallBack(QSP_BOOL *res)
@@ -744,6 +744,4 @@ static void qspDummyFunc()
 {
 }
 
-
 #endif
-

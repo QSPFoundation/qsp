@@ -15,6 +15,8 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#ifdef _JAVA
+
 #include "../../declarations.h"
 #include "../../callbacks.h"
 #include "../../actions.h"
@@ -283,4 +285,11 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 		buffer = qspGetNewText(QSP_FMT(""), 0);
 	return buffer;
 }
-
+
+#else
+
+static void qspDummyFunc()
+{
+}
+
+#endif

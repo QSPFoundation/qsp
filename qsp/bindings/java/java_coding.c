@@ -1,7 +1,7 @@
-#include "../../coding.h"
-#include "../../text.h"
-
 #ifdef _JAVA
+
+#include "../../declarations.h"
+#include "../../text.h"
 
 char *qspToSysString(QSP_CHAR *s)
 {
@@ -9,6 +9,12 @@ char *qspToSysString(QSP_CHAR *s)
 	char *ret = (char *)malloc(len);
 	QSP_WCSTOMBS(ret, s, len);
 	return ret;
+}
+
+#else
+
+static void qspDummyFunc()
+{
 }
 
 #endif
