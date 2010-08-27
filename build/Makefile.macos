@@ -1,0 +1,109 @@
+# QSP classic player Makefile for Mac OS
+# Pretty dumb, but will work
+
+# This Makefile supposes that it's living in the build directory
+
+# Targets:
+#	extraclean - kill everuthing, that've been created by building procedure
+#	wx - build wxWidgets only
+# 	libqsp.dylib - build libqsp only
+#	qspplayer - build the client
+
+LIBQSPOBJ = ../qsp/_control.o \
+			../qsp/actions.o \
+			../qsp/callbacks.o \
+			../qsp/codetools.o \
+			../qsp/coding.o \
+			../qsp/common.o \
+			../qsp/errors.o \
+			../qsp/game.o \
+			../qsp/locations.o \
+			../qsp/mathops.o \
+			../qsp/memwatch.o \
+			../qsp/menu.o \
+			../qsp/objects.o \
+			../qsp/playlist.o \
+			../qsp/statements.o \
+			../qsp/text.o \
+			../qsp/time.o \
+			../qsp/towlower.o \
+			../qsp/towupper.o \
+			../qsp/variables.o \
+			../qsp/variant.o \
+			../qsp/onig/regcomp.o \
+			../qsp/onig/regenc.o \
+			../qsp/onig/regerror.o \
+			../qsp/onig/regexec.o \
+			../qsp/onig/regparse.o \
+			../qsp/onig/regsyntax.o \
+			../qsp/onig/regtrav.o \
+			../qsp/onig/regversion.o \
+			../qsp/onig/st.o \
+			../qsp/onig/enc/ascii.o \
+			../qsp/onig/enc/cp1251.o \
+			../qsp/onig/enc/koi8_r.o \
+			../qsp/onig/enc/unicode.o \
+			../qsp/onig/enc/utf16_be.o \
+			../qsp/onig/enc/utf16_le.o \
+			../qsp/onig/enc/utf32_be.o \
+			../qsp/onig/enc/utf32_le.o
+
+LIBQSPCCFLAGS = -fPIC -dynamiclib -D_UNICODE -DNOT_RUBY -DEXPORT
+
+.PHONY = all clean extraclean wx
+CC = g++
+all: clean qspplayer
+
+.cpp.o:
+	$(CC) -c `wxWidgets/wx-config --cxxflags` $< -o $@
+	
+.c.o:
+	gcc -c -fPIC -D_UNICODE -DNOT_RUBY -DEXPORT $< -o $@
+
+wx:
+	svn checkout http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk wxWidgets
+	patch -i `pwd`/../players/classic/build_wx/wxPatch.diff -d wxWidgets -p 3 --binary
+	cd wxWidgets && ./configure --enable-monolithic --disable-tiff -with-osx_cocoa && make -j3
+
+	
+libqsp.dylib: $(LIBQSPOBJ)
+	$(CC) $(LIBQSPCCFLAGS) -install_name @executable_path/../Frameworks/libqsp.dylib -o ../qsp/libqsp.dylib $(LIBQSPOBJ)
+
+qspplayer: wx libqsp.dylib
+
+	# Create the bundle (simple directory with .app at the end of its name)
+	mkdir -p ../QspPlayer.app/Contents/MacOS
+	mkdir -p ../QspPlayer.app/Contents/Frameworks
+	mkdir -p ../QspPlayer.app/Contents/Resources
+	
+	# Copying the libraries into the bundle
+	# Warning! libfmodex.dylib should be inside players/classic/misc/macos directory!
+	cp ../qsp/libqsp.dylib ../QspPlayer.app/Contents/Frameworks
+	cp wxWidgets/lib/libwx_osx_cocoau-2.9.2.0.0.dylib ../QspPlayer.app/Contents/Frameworks
+	cp ../players/classic/misc/macos/libfmodex.dylib ../QspPlayer.app/Contents/Frameworks
+	
+	# Building the player binary and copying it to the bundle
+	$(CC) `wxWidgets/wx-config --cxxflags --libs` `find ../players/classic/qspgui/src -name *.cpp` ../QspPlayer.app/Contents/Frameworks/libqsp.dylib ../QspPlayer.app/Contents/Frameworks/libfmodex.dylib -headerpad_max_install_names -o QspPlayer -Wall  
+	mv QspPlayer ../QspPlayer.app/Contents/MacOS
+	
+	# Copying the localization files
+	cp -r ../players/classic/misc/common/* ../QspPlayer.app/Contents/MacOS
+	find ../QspPlayer.app/ -name .svn -type d -exec rm -rf {} +
+	
+	# Fixing up the paths in libraries(for dynamic linker to work correctly) 
+	install_name_tool -change ./libfmodex.dylib @executable_path/../Frameworks/libfmodex.dylib ../QspPlayer.app/Contents/MacOS/QspPlayer 
+	install_name_tool -change $(CURDIR)/wxWidgets/lib/libwx_osx_cocoau-2.9.2.0.0.dylib @executable_path/../Frameworks/libwx_osx_cocoau-2.9.2.0.0.dylib ../QspPlayer.app/Contents/MacOS/QspPlayer
+	
+	# Embedding the icon
+	cp ../players/classic/misc/macos/icon.icns ../QspPlayer.app/Contents/Resources
+	cp ../players/classic/misc/macos/Info.plist ../QspPlayer.app/Contents
+	
+	# Enjoy!
+	
+clean:
+	rm -rf wxWidgets
+	rm -f `find ../players/classic -name *.o`
+	rm -f $(LIBQSPOBJ) ../qsp/libqsp.dylib
+	rm -rf ../QspPlayer.app
+
+
