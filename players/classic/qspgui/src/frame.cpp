@@ -48,7 +48,7 @@ BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
 	EVT_MENU(ID_VOLUME60, QSPFrame::OnVolume)
 	EVT_MENU(ID_VOLUME80, QSPFrame::OnVolume)
 	EVT_MENU(ID_VOLUME100, QSPFrame::OnVolume)
-	EVT_MENU(ID_ABOUT, QSPFrame::OnAbout)
+	EVT_MENU(wxID_ABOUT, QSPFrame::OnAbout)
 	EVT_HTML_LINK_CLICKED(ID_MAINDESC, QSPFrame::OnLinkClicked)
 	EVT_HTML_LINK_CLICKED(ID_VARSDESC, QSPFrame::OnLinkClicked)
 	EVT_LISTBOX(ID_OBJECTS, QSPFrame::OnObjectChange)
@@ -137,7 +137,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	m_settingsMenu->Append(ID_SELECTLANG, wxT("-"));
 	// ------------
 	wxMenu *helpMenu = new wxMenu;
-	wxMenuItem *helpAboutItem = new wxMenuItem(helpMenu, ID_ABOUT, wxT("-"));
+	wxMenuItem *helpAboutItem = new wxMenuItem(helpMenu, wxID_ABOUT, wxT("-"));
 	helpAboutItem->SetBitmap(wxBitmap(about_xpm));
 	helpMenu->Append(helpAboutItem);
 	// ------------
@@ -472,7 +472,7 @@ void QSPFrame::ReCreateGUI()
 	menuBar->SetLabel(ID_VOLUME100, _("Initial volume\tAlt-6"));
 	menuBar->SetLabel(ID_TOGGLEWINMODE, _("Window / Fullscreen &mode\tAlt-Enter"));
 	menuBar->SetLabel(ID_SELECTLANG, _("Select &language...\tAlt-L"));
-	menuBar->SetLabel(ID_ABOUT, _("&About...\tCtrl-H"));
+	menuBar->SetLabel(wxID_ABOUT, _("&About...\tCtrl-H"));
 	// --------------------------------------
 	m_manager->GetPane(wxT("imgview")).Caption(_("Preview"));
 	m_manager->GetPane(wxT("objs")).Caption(_("Objects"));
