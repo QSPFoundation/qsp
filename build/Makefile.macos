@@ -48,7 +48,7 @@ LIBQSPOBJ = ../qsp/_control.o \
 			../qsp/onig/enc/utf32_be.o \
 			../qsp/onig/enc/utf32_le.o
 
-LIBQSPCCFLAGS = -fPIC -dynamiclib -D_UNICODE -DNOT_RUBY -DEXPORT
+LIBQSPCCFLAGS = -fPIC -D_UNICODE -DNOT_RUBY -DEXPORT
 
 .PHONY = all clean extraclean wx
 CC = g++
@@ -56,18 +56,17 @@ all: clean qspplayer
 
 .cpp.o:
 	$(CC) -c `wxWidgets/wx-config --cxxflags` $< -o $@
-	
+
 .c.o:
-	gcc -c -fPIC -D_UNICODE -DNOT_RUBY -DEXPORT $< -o $@
+	gcc -c $(LIBQSPCCFLAGS) $< -o $@
 
 wx:
 	svn checkout http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk wxWidgets
 	patch -i `pwd`/../players/classic/build_wx/wxPatch.diff -d wxWidgets -p 3 --binary
 	cd wxWidgets && ./configure --enable-monolithic --disable-tiff -with-osx_cocoa && make -j3
 
-	
 libqsp.dylib: $(LIBQSPOBJ)
-	$(CC) $(LIBQSPCCFLAGS) -install_name @executable_path/../Frameworks/libqsp.dylib -o ../qsp/libqsp.dylib $(LIBQSPOBJ)
+	$(CC) $(LIBQSPCCFLAGS) -dynamiclib -install_name @executable_path/../Frameworks/libqsp.dylib -o ../qsp/libqsp.dylib $(LIBQSPOBJ)
 
 qspplayer: wx libqsp.dylib
 
