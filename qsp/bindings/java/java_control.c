@@ -497,6 +497,7 @@ void QSPGetErrorDesc(QSP_CHAR *res, int errorNum)
 	case QSP_ERR_TOOMANYVARS: str = QSP_FMT("Too many variables!"); break;
 	case QSP_ERR_INCORRECTREGEXP: str = QSP_FMT("Regular expression's error!"); break;
 	case QSP_ERR_CODENOTFOUND: str = QSP_FMT("Code not found!"); break;
+	case QSP_ERR_TONOTFOUND: str = QSP_FMT("[to] not found!"); break;
 	default: str = QSP_FMT("Unknown error!"); break;
 	}
 	*res = str;
@@ -674,7 +675,7 @@ void QSPRestartGame(QSP_BOOL *res, QSP_BOOL isRefresh)
 		return;
 	}
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
-	return QSP_TRUE;
+	*res = QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
 /* Μενώ */
