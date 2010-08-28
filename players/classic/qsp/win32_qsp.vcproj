@@ -518,6 +518,22 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="java"
+					>
+					<File
+						RelativePath="..\..\..\qsp\bindings\java\java_callbacks.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\qsp\bindings\java\java_coding.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\qsp\bindings\java\java_control.c"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -645,6 +661,14 @@
 					>
 					<File
 						RelativePath="..\..\..\qsp\bindings\flash\flash.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="java"
+					>
+					<File
+						RelativePath="..\..\..\qsp\bindings\java\java.h"
 						>
 					</File>
 				</Filter>

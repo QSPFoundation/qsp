@@ -34,7 +34,7 @@
 	void QSPEnableDebugMode(QSP_BOOL isDebug);
 	void QSPGetCurStateData(QSP_CHAR **loc, int *actIndex, int *line);
 	void QSPGetVersion(const QSP_CHAR* *res);
-	void QSPGetCompiledDateTime(QSP_CHAR *res);
+	void QSPGetCompiledDateTime(const QSP_CHAR* *res);
 	void QSPGetFullRefreshCount(int *res);
 	void QSPGetQstFullPath(const QSP_CHAR* *res);
 	void QSPGetCurLoc(const QSP_CHAR* *res);
@@ -65,7 +65,7 @@
 	void QSPExecCounter(QSP_BOOL *res, QSP_BOOL isRefresh);
 	void QSPExecUserInput(QSP_BOOL *res, QSP_BOOL isRefresh);
 	void QSPGetLastErrorData(int *errorNum, QSP_CHAR **errorLoc, int *errorActIndex, int *errorLine);
-	void QSPGetErrorDesc(QSP_CHAR *res, int errorNum);
+	void QSPGetErrorDesc(const QSP_CHAR* *res, int errorNum);
 	void QSPLoadGameWorld(QSP_BOOL *res, const QSP_CHAR *fileName);
 	void QSPLoadGameWorldFromData(QSP_BOOL *res, const char *data, int dataSize, const QSP_CHAR *fileName);
 	void QSPSaveGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh);
