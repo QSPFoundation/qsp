@@ -890,7 +890,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 	info.AddArtist(wxT("rrock.ru [rrock.ru@gmail.com]"));
 	info.AddArtist(wxT("WladySpb [wladyspb@mail.ru]"));
 	// ----
-	wxAboutBox(info);
+	wxAboutBox(info, this);
 }
 
 void QSPFrame::OnLinkClicked(wxHtmlLinkEvent& event)
