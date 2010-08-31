@@ -372,7 +372,7 @@ void ShowHelp()
 	printf("Using:\n");
 	printf("  txt2gam [txt file] [output file] [options]\n");
 	printf("Options:\n");
-	printf("  u, U - Unicode (UCS-2 / UTF-16) mode, default is ANSI mode\n");
+	printf("  a, A - ANSI mode, default is Unicode (UCS-2 / UTF-16) mode\n");
 	printf("  o, O - Save game in old format, default is new format\n");
 	printf("  s[char], S[char] - 'Begin of loc' character, default is '%c'\n", QSP_FROM_OS_CHAR(QSP_STARTLOC[0]));
 	printf("  e[char], E[char] - 'End of loc' character, default is '%c'\n", QSP_FROM_OS_CHAR(QSP_ENDLOC[0]));
@@ -410,7 +410,7 @@ int main(int argc, char **argv)
 	isExtractStrs = QSP_FALSE;
 	isGetQStrings = QSP_FALSE;
 	isOldFormat = QSP_FALSE;
-	isUCS2 = QSP_FALSE;
+	isUCS2 = QSP_TRUE;
 	passwd = QSP_PASSWD;
 	isFreePass = QSP_FALSE;
 	locStart = QSP_STARTLOC[0];
@@ -422,8 +422,8 @@ int main(int argc, char **argv)
 		case 'o': case 'O':
 			isOldFormat = QSP_TRUE;
 			break;
-		case 'u': case 'U':
-			isUCS2 = QSP_TRUE;
+		case 'a': case 'A':
+			isUCS2 = QSP_FALSE;
 			break;
 		case 's': case 'S':
 		case 'e': case 'E':
