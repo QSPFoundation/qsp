@@ -262,8 +262,8 @@ void QSPFrame::LoadSettings()
 	if (h > dispRect.GetHeight()) h = dispRect.GetHeight();
 	if (x < dispRect.GetLeft()) x = dispRect.GetLeft();
 	if (y < dispRect.GetTop()) y = dispRect.GetTop();
-	if (x + w > dispRect.GetRight()) x = dispRect.GetRight() - w;
-	if (y + h > dispRect.GetBottom()) y = dispRect.GetBottom() - h;
+	if (x + w - 1 > dispRect.GetRight()) x = dispRect.GetRight() - w + 1;
+	if (y + h - 1 > dispRect.GetBottom()) y = dispRect.GetBottom() - h + 1;
 	// --------------------------
 	SetSize(x, y, w, h);
 	ShowPane(ID_VIEWPIC, false);
