@@ -253,8 +253,19 @@ void QSPFrame::LoadSettings()
 	m_settingsMenu->Check(ID_USEFONTSIZE, m_isUseFontSize);
 	m_manager->LoadPerspective(panels);
 	m_manager->RestoreMaximizedPane();
-	SetClientSize(w, h);
-	Move(x, y);
+	// Check for correct position
+	wxSize winSize(ClientToWindowSize(wxSize(w, h)));
+	w = winSize.GetWidth();
+	h = winSize.GetHeight();
+	wxRect dispRect(wxGetClientDisplayRect());
+	if (w > dispRect.GetWidth()) w = dispRect.GetWidth();
+	if (h > dispRect.GetHeight()) h = dispRect.GetHeight();
+	if (x < dispRect.GetLeft()) x = dispRect.GetLeft();
+	if (y < dispRect.GetTop()) y = dispRect.GetTop();
+	if (x + w > dispRect.GetRight()) x = dispRect.GetRight() - w;
+	if (y + h > dispRect.GetBottom()) y = dispRect.GetBottom() - h;
+	// --------------------------
+	SetSize(x, y, w, h);
 	ShowPane(ID_VIEWPIC, false);
 	ShowPane(ID_ACTIONS, true);
 	ShowPane(ID_OBJECTS, true);
