@@ -63,7 +63,7 @@ all: clean qspplayer
 wx:
 	svn checkout http://svn.wxwidgets.org/svn/wx/wxWidgets/trunk wxWidgets
 	patch -i `pwd`/../players/classic/build_wx/wxPatch.diff -d wxWidgets -p 3 --binary
-	cd wxWidgets && ./configure --enable-monolithic --disable-tiff -with-osx_cocoa && make -j3
+	cd wxWidgets && ./configure --enable-monolithic --disable-tiff --disable-utf8 --with-osx_cocoa && make -j3
 
 libqsp.dylib: $(LIBQSPOBJ)
 	$(CC) $(LIBQSPCCFLAGS) -dynamiclib -install_name @executable_path/../Frameworks/libqsp.dylib -o ../qsp/libqsp.dylib $(LIBQSPOBJ)
