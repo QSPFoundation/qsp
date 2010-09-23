@@ -846,8 +846,17 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 		}
 		free(uStr);
 	}
-	line->StatsCount++;
-	line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
+	// Check for ELSE IF
+	if (count == 1 && delimPos && line->Stats->Stat == qspStatElse && statCode == qspStatIf)
+	{
+		count = 0;
+		statCode = qspStatElseIf;
+	}
+	else
+	{
+		line->StatsCount++;
+		line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
+	}
 	line->Stats[count].Stat = statCode;
 	if (delimPos)
 		line->Stats[count].EndPos = (int)(delimPos - str);
