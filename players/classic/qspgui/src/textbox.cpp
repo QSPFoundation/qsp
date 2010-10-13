@@ -58,9 +58,11 @@ void QSPTextBox::SetIsHtml(bool isHtml, bool isScroll)
 
 void QSPTextBox::RefreshUI(bool isScroll)
 {
+	wxString color(QSPTools::GetHexColor(GetForegroundColour()));
+	wxString text(QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_text : QSPTools::ProceedAsPlain(m_text)));
 	wxON_BLOCK_EXIT_THIS0(QSPTextBox::Thaw);
 	Freeze();
-	SetPage(wxString::Format(m_outFormat, QSPTools::GetHexColor(GetForegroundColour()).wx_str(), QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_text : QSPTools::ProceedAsPlain(m_text)).wx_str()));
+	SetPage(wxString::Format(m_outFormat, color.wx_str(), text.wx_str()));
 	if (isScroll) Scroll(0, 0x7FFFFFFF);
 }
 
