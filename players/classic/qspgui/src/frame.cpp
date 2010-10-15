@@ -93,10 +93,10 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	wxMenuItem *gameOpenItem = new wxMenuItem(m_gameMenu, ID_OPENGAMESTAT, wxT("-"));
 	gameOpenItem->SetBitmap(wxBitmap(statusopen_xpm));
 	m_gameMenu->Append(gameOpenItem);
-	wxMenuItem *gameSaveItem = new wxMenuItem(m_gameMenu, ID_SAVEGAMESTAT, wxT("-"));
+	m_gameMenu->Append(ID_SAVEGAMESTAT, wxT("-"));
+	wxMenuItem *gameSaveItem = new wxMenuItem(m_gameMenu, ID_QUICKSAVE, wxT("-"));
 	gameSaveItem->SetBitmap(wxBitmap(statussave_xpm));
 	m_gameMenu->Append(gameSaveItem);
-	m_gameMenu->Append(ID_QUICKSAVE, wxT("-"));
 	// ------------
 	wxMenu *wndsMenu = new wxMenu;
 	wndsMenu->Append(ID_TOGGLEOBJS, wxT("-"));
