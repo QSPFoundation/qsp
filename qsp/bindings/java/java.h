@@ -24,11 +24,7 @@
 		typedef wchar_t QSP_CHAR;
 	#endif
 
-	#ifdef __cplusplus
-		typedef int (*QSP_CALLBACK)(...);
-	#else
-		typedef int (*QSP_CALLBACK)();
-	#endif
+	typedef int QSP_CALLBACK;
 
 	void QSPIsInCallBack(QSP_BOOL *res);
 	void QSPEnableDebugMode(QSP_BOOL isDebug);
@@ -74,7 +70,7 @@
 	void QSPOpenSavedGameFromString(QSP_BOOL *res, const QSP_CHAR *str, QSP_BOOL isRefresh);
 	void QSPRestartGame(QSP_BOOL *res, QSP_BOOL isRefresh);
 	void QSPSelectMenuItem(int index);
-	//void QSPSetCallBack(int type, QSP_CALLBACK func);
+	void QSPSetCallBack(int type, QSP_CALLBACK func);
 	void QSPInit();
 	void QSPDeInit();
 

@@ -40,14 +40,14 @@ void QSPIsInCallBack(QSP_BOOL *res)
 	*res = qspIsInCallBack;
 }
 /* ------------------------------------------------------------ */
-/* Отладка */
+/* РћС‚Р»Р°РґРєР° */
 
-/* Управление режимом отладки */
+/* РЈРїСЂР°РІР»РµРЅРёРµ СЂРµР¶РёРјРѕРј РѕС‚Р»Р°РґРєРё */
 void QSPEnableDebugMode(QSP_BOOL isDebug)
 {
 	qspIsDebug = isDebug;
 }
-/* Получение данных текущего состояния */
+/* РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ */
 void QSPGetCurStateData(QSP_CHAR **loc, int *actIndex, int *line)
 {
 	*loc = (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount ? qspLocs[qspRealCurLoc].Name : 0);
@@ -55,64 +55,64 @@ void QSPGetCurStateData(QSP_CHAR **loc, int *actIndex, int *line)
 	*line = qspRealLine;
 }
 /* ------------------------------------------------------------ */
-/* Информация о версии */
+/* РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РІРµСЂСЃРёРё */
 
-/* Версия */
+/* Р’РµСЂСЃРёСЏ */
 void QSPGetVersion(const QSP_CHAR* *res)
 {
 	*res = QSP_VER;
 }
-/* Дата и время компиляции */
+/* Р”Р°С‚Р° Рё РІСЂРµРјСЏ РєРѕРјРїРёР»СЏС†РёРё */
 void QSPGetCompiledDateTime(const QSP_CHAR* *res)
 {
 	*res = QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__);
 }
 /* ------------------------------------------------------------ */
-/* Количество полных обновлений локаций */
+/* РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕР»РЅС‹С… РѕР±РЅРѕРІР»РµРЅРёР№ Р»РѕРєР°С†РёР№ */
 void QSPGetFullRefreshCount(int *res)
 {
 	*res = qspFullRefreshCount;
 }
 /* ------------------------------------------------------------ */
-/* Полный путь к загруженному файлу игры */
+/* РџРѕР»РЅС‹Р№ РїСѓС‚СЊ Рє Р·Р°РіСЂСѓР¶РµРЅРЅРѕРјСѓ С„Р°Р№Р»Сѓ РёРіСЂС‹ */
 void QSPGetQstFullPath(const QSP_CHAR* *res)
 {
 	*res = qspQstFullPath;
 }
 /* ------------------------------------------------------------ */
-/* Название текущей локации */
+/* РќР°Р·РІР°РЅРёРµ С‚РµРєСѓС‰РµР№ Р»РѕРєР°С†РёРё */
 void QSPGetCurLoc(const QSP_CHAR* *res)
 {
 	*res = (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : 0);
 }
 /* ------------------------------------------------------------ */
-/* Основное описание локации */
+/* РћСЃРЅРѕРІРЅРѕРµ РѕРїРёСЃР°РЅРёРµ Р»РѕРєР°С†РёРё */
 
-/* Текст основного окна описания локации */
+/* РўРµРєСЃС‚ РѕСЃРЅРѕРІРЅРѕРіРѕ РѕРєРЅР° РѕРїРёСЃР°РЅРёСЏ Р»РѕРєР°С†РёРё */
 void QSPGetMainDesc(const QSP_CHAR* *res)
 {
 	*res = qspCurDesc;
 }
-/* Возможность изменения текста основного описания */
+/* Р’РѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ С‚РµРєСЃС‚Р° РѕСЃРЅРѕРІРЅРѕРіРѕ РѕРїРёСЃР°РЅРёСЏ */
 void QSPIsMainDescChanged(QSP_BOOL *res)
 {
 	*res = qspIsMainDescChanged;
 }
 /* ------------------------------------------------------------ */
-/* Дополнительное описание локации */
+/* Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕРїРёСЃР°РЅРёРµ Р»РѕРєР°С†РёРё */
 
-/* Текст дополнительного окна описания локации */
+/* РўРµРєСЃС‚ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РѕРєРЅР° РѕРїРёСЃР°РЅРёСЏ Р»РѕРєР°С†РёРё */
 void QSPGetVarsDesc(const QSP_CHAR* *res)
 {
 	*res = qspCurVars;
 }
-/* Возможность изменения текста дополнительного описания */
+/* Р’РѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ С‚РµРєСЃС‚Р° РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РѕРїРёСЃР°РЅРёСЏ */
 void QSPIsVarsDescChanged(QSP_BOOL *res)
 {
 	*res = qspIsVarsDescChanged;
 }
 /* ------------------------------------------------------------ */
-/* Получить значение указанного выражения */
+/* РџРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ */
 void QSPGetExprValue(QSP_BOOL *res, const QSP_CHAR *expr, QSP_BOOL *isString, int *numVal, QSP_CHAR *strVal, int strValBufSize)
 {
 	QSPVariant v;
@@ -145,20 +145,20 @@ void QSPGetExprValue(QSP_BOOL *res, const QSP_CHAR *expr, QSP_BOOL *isString, in
 	*res = QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
-/* Текст строки ввода */
+/* РўРµРєСЃС‚ СЃС‚СЂРѕРєРё РІРІРѕРґР° */
 void QSPSetInputStrText(const QSP_CHAR *val)
 {
 	qspCurInputLen = qspAddText(&qspCurInput, (QSP_CHAR *)val, 0, -1, QSP_FALSE);
 }
 /* ------------------------------------------------------------ */
-/* Список действий */
+/* РЎРїРёСЃРѕРє РґРµР№СЃС‚РІРёР№ */
 
-/* Количество действий */
+/* РљРѕР»РёС‡РµСЃС‚РІРѕ РґРµР№СЃС‚РІРёР№ */
 void QSPGetActionsCount(int* res)
 {
 	*res = qspCurActionsCount;
 }
-/* Данные действия с указанным индексом */
+/* Р”Р°РЅРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј */
 void QSPGetActionData(int ind, QSP_CHAR **image, QSP_CHAR **desc)
 {
 	if (ind >= 0 && ind < qspCurActionsCount)
@@ -169,7 +169,7 @@ void QSPGetActionData(int ind, QSP_CHAR **image, QSP_CHAR **desc)
 	else
 		*image = *desc = 0;
 }
-/* Выполнение кода выбранного действия */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґРµР№СЃС‚РІРёСЏ */
 void QSPExecuteSelActionCode(QSP_BOOL *res, QSP_BOOL isRefresh)
 {
 	if (qspCurSelAction >= 0)
@@ -195,7 +195,7 @@ void QSPExecuteSelActionCode(QSP_BOOL *res, QSP_BOOL isRefresh)
 	}
 	*res = QSP_TRUE;
 }
-/* Установить индекс выбранного действия */
+/* РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РёРЅРґРµРєСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґРµР№СЃС‚РІРёСЏ */
 void QSPSetSelActionIndex(QSP_BOOL *res, int ind, QSP_BOOL isRefresh)
 {
 	if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
@@ -222,25 +222,25 @@ void QSPSetSelActionIndex(QSP_BOOL *res, int ind, QSP_BOOL isRefresh)
 	}
 	*res = QSP_TRUE;
 }
-/* Получить индекс выбранного действия */
+/* РџРѕР»СѓС‡РёС‚СЊ РёРЅРґРµРєСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґРµР№СЃС‚РІРёСЏ */
 void QSPGetSelActionIndex(int *res)
 {
 	*res = qspCurSelAction;
 }
-/* Возможность изменения списка действий */
+/* Р’РѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ СЃРїРёСЃРєР° РґРµР№СЃС‚РІРёР№ */
 void QSPIsActionsChanged(QSP_BOOL *res)
 {
 	*res = qspIsActionsChanged;
 }
 /* ------------------------------------------------------------ */
-/* Список объектов */
+/* РЎРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ */
 
-/* Количество объектов */
+/* РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±СЉРµРєС‚РѕРІ */
 void QSPGetObjectsCount(int *res)
 {
 	*res = qspCurObjectsCount;
 }
-/* Данные объекта с указанным индексом */
+/* Р”Р°РЅРЅС‹Рµ РѕР±СЉРµРєС‚Р° СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј */
 void QSPGetObjectData(int ind, QSP_CHAR **image, QSP_CHAR **desc)
 {
 	if (ind >= 0 && ind < qspCurObjectsCount)
@@ -251,7 +251,7 @@ void QSPGetObjectData(int ind, QSP_CHAR **image, QSP_CHAR **desc)
 	else
 		*image = *desc = 0;
 }
-/* Установить индекс выбранного объекта */
+/* РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РёРЅРґРµРєСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° */
 void QSPSetSelObjectIndex(QSP_BOOL *res, int ind, QSP_BOOL isRefresh)
 {
 	if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
@@ -278,18 +278,18 @@ void QSPSetSelObjectIndex(QSP_BOOL *res, int ind, QSP_BOOL isRefresh)
 	}
 	*res = QSP_TRUE;
 }
-/* Получить индекс выбранного объекта */
+/* РџРѕР»СѓС‡РёС‚СЊ РёРЅРґРµРєСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° */
 void QSPGetSelObjectIndex(int* res)
 {
 	*res = qspCurSelObject;
 }
-/* Возможность изменения списка объектов */
+/* Р’РѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ СЃРїРёСЃРєР° РѕР±СЉРµРєС‚РѕРІ */
 void QSPIsObjectsChanged(QSP_BOOL *res)
 {
 	*res = qspIsObjectsChanged;
 }
 /* ------------------------------------------------------------ */
-/* Показ / скрытие окон */
+/* РџРѕРєР°Р· / СЃРєСЂС‹С‚РёРµ РѕРєРѕРЅ */
 void QSPShowWindow(int type, QSP_BOOL isShow)
 {
 	switch (type)
@@ -309,9 +309,9 @@ void QSPShowWindow(int type, QSP_BOOL isShow)
 	}
 }
 /* ------------------------------------------------------------ */
-/* Переменные */
+/* РџРµСЂРµРјРµРЅРЅС‹Рµ */
 
-/* Получить количество элементов массива */
+/* РџРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР° */
 void QSPGetVarValuesCount(QSP_BOOL *res, const QSP_CHAR *name, int *count)
 {
 	QSPVar *var;
@@ -330,7 +330,7 @@ void QSPGetVarValuesCount(QSP_BOOL *res, const QSP_CHAR *name, int *count)
 	*count = var->ValsCount;
 	*res = QSP_TRUE;
 }
-/* Получить значения указанного элемента массива */
+/* РџРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёСЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР° */
 void QSPGetVarValues(QSP_BOOL *res, const QSP_CHAR *name, int ind, int *numVal, QSP_CHAR **strVal)
 {
 	QSPVar *var;
@@ -350,12 +350,12 @@ void QSPGetVarValues(QSP_BOOL *res, const QSP_CHAR *name, int ind, int *numVal, 
 	*strVal = var->Values[ind].Str;
 	*res = QSP_TRUE;
 }
-/* Получить максимальное количество переменных */
+/* РџРѕР»СѓС‡РёС‚СЊ РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРµСЂРµРјРµРЅРЅС‹С… */
 void QSPGetMaxVarsCount(int *res)
 {
 	*res = QSP_VARSCOUNT;
 }
-/* Получить имя переменной с указанным индексом */
+/* РџРѕР»СѓС‡РёС‚СЊ РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј */
 void QSPGetVarNameByIndex(QSP_BOOL *res, int index, QSP_CHAR **name)
 {
 	if (index < 0 || index >= QSP_VARSCOUNT || !qspVars[index].Name)
@@ -367,9 +367,9 @@ void QSPGetVarNameByIndex(QSP_BOOL *res, int index, QSP_CHAR **name)
 	*res = QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
-/* Выполнение кода */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° */
 
-/* Выполнение строки кода */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ СЃС‚СЂРѕРєРё РєРѕРґР° */
 void QSPExecString(QSP_BOOL *res, const QSP_CHAR *s, QSP_BOOL isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum)
@@ -392,7 +392,7 @@ void QSPExecString(QSP_BOOL *res, const QSP_CHAR *s, QSP_BOOL isRefresh)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	*res = QSP_TRUE;
 }
-/* Выполнение кода указанной локации */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° СѓРєР°Р·Р°РЅРЅРѕР№ Р»РѕРєР°С†РёРё */
 void QSPExecLocationCode(QSP_BOOL *res, const QSP_CHAR *name, QSP_BOOL isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum)
@@ -415,7 +415,7 @@ void QSPExecLocationCode(QSP_BOOL *res, const QSP_CHAR *name, QSP_BOOL isRefresh
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	*res = QSP_TRUE;
 }
-/* Выполнение кода локации-счетчика */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° Р»РѕРєР°С†РёРё-СЃС‡РµС‚С‡РёРєР° */
 void QSPExecCounter(QSP_BOOL *res, QSP_BOOL isRefresh)
 {
 	if (!qspIsInCallBack)
@@ -431,7 +431,7 @@ void QSPExecCounter(QSP_BOOL *res, QSP_BOOL isRefresh)
 	}
 	*res = QSP_TRUE;
 }
-/* Выполнение кода локации-обработчика строки ввода */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° Р»РѕРєР°С†РёРё-РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃС‚СЂРѕРєРё РІРІРѕРґР° */
 void QSPExecUserInput(QSP_BOOL *res, QSP_BOOL isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum)
@@ -455,9 +455,9 @@ void QSPExecUserInput(QSP_BOOL *res, QSP_BOOL isRefresh)
 	*res = QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
-/* Ошибки */
+/* РћС€РёР±РєРё */
 
-/* Получить информацию о последней ошибке */
+/* РџРѕР»СѓС‡РёС‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РїРѕСЃР»РµРґРЅРµР№ РѕС€РёР±РєРµ */
 void QSPGetLastErrorData(int *errorNum, QSP_CHAR **errorLoc, int *errorActIndex, int *errorLine)
 {
 	*errorNum = qspErrorNum;
@@ -465,15 +465,15 @@ void QSPGetLastErrorData(int *errorNum, QSP_CHAR **errorLoc, int *errorActIndex,
 	*errorActIndex = qspErrorActIndex;
 	*errorLine = qspErrorLine;
 }
-/* Получить описание ошибки по ее номеру */
+/* РџРѕР»СѓС‡РёС‚СЊ РѕРїРёСЃР°РЅРёРµ РѕС€РёР±РєРё РїРѕ РµРµ РЅРѕРјРµСЂСѓ */
 void QSPGetErrorDesc(const QSP_CHAR* *res, int errorNum)
 {
 	*res = qspGetErrorDesc(errorNum);
 }
 /* ------------------------------------------------------------ */
-/* Управление игрой */
+/* РЈРїСЂР°РІР»РµРЅРёРµ РёРіСЂРѕР№ */
 
-/* Загрузка новой игры из файла */
+/* Р—Р°РіСЂСѓР·РєР° РЅРѕРІРѕР№ РёРіСЂС‹ РёР· С„Р°Р№Р»Р° */
 void QSPLoadGameWorld(QSP_BOOL *res, const QSP_CHAR *fileName)
 {
 	if (qspIsExitOnError && qspErrorNum)
@@ -495,7 +495,7 @@ void QSPLoadGameWorld(QSP_BOOL *res, const QSP_CHAR *fileName)
 	}
 	*res = QSP_TRUE;
 }
-/* Загрузка новой игры из памяти */
+/* Р—Р°РіСЂСѓР·РєР° РЅРѕРІРѕР№ РёРіСЂС‹ РёР· РїР°РјСЏС‚Рё */
 void QSPLoadGameWorldFromData(QSP_BOOL *res, const char *data, int dataSize, const QSP_CHAR *fileName)
 {
 	if (qspIsExitOnError && qspErrorNum)
@@ -517,7 +517,7 @@ void QSPLoadGameWorldFromData(QSP_BOOL *res, const char *data, int dataSize, con
 	}
 	*res = QSP_TRUE;
 }
-/* Сохранение состояния в файл */
+/* РЎРѕС…СЂР°РЅРµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ С„Р°Р№Р» */
 void QSPSaveGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum)
@@ -540,7 +540,7 @@ void QSPSaveGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	*res = QSP_TRUE;
 }
-/* Сохранение состояния в память */
+/* РЎРѕС…СЂР°РЅРµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РїР°РјСЏС‚СЊ */
 void QSPSaveGameAsString(QSP_BOOL *res, QSP_CHAR *strBuf, int strBufSize, int *realSize, QSP_BOOL isRefresh)
 {
 	int len, size;
@@ -576,7 +576,7 @@ void QSPSaveGameAsString(QSP_BOOL *res, QSP_CHAR *strBuf, int strBufSize, int *r
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	*res = QSP_TRUE;
 }
-/* Загрузка состояния из файла */
+/* Р—Р°РіСЂСѓР·РєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РёР· С„Р°Р№Р»Р° */
 void QSPOpenSavedGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum)
@@ -599,7 +599,7 @@ void QSPOpenSavedGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefres
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	*res = QSP_TRUE;
 }
-/* Загрузка состояния из памяти */
+/* Р—Р°РіСЂСѓР·РєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РёР· РїР°РјСЏС‚Рё */
 void QSPOpenSavedGameFromString(QSP_BOOL *res, const QSP_CHAR *str, QSP_BOOL isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum)
@@ -622,7 +622,7 @@ void QSPOpenSavedGameFromString(QSP_BOOL *res, const QSP_CHAR *str, QSP_BOOL isR
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	*res = QSP_TRUE;
 }
-/* Перезапуск игры */
+/* РџРµСЂРµР·Р°РїСѓСЃРє РёРіСЂС‹ */
 void QSPRestartGame(QSP_BOOL *res, QSP_BOOL isRefresh)
 {
 	if (qspIsExitOnError && qspErrorNum)
@@ -646,8 +646,8 @@ void QSPRestartGame(QSP_BOOL *res, QSP_BOOL isRefresh)
 	*res = QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
-/* Меню */
-/* Ф-я предназначена только для вызова из CallBack'а QSP_CALL_SHOWMENU */
+/* РњРµРЅСЋ */
+/* Р¤-СЏ РїСЂРµРґРЅР°Р·РЅР°С‡РµРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ РІС‹Р·РѕРІР° РёР· CallBack'Р° QSP_CALL_SHOWMENU */
 void QSPSelectMenuItem(int index)
 {
 	QSPVariant arg;
@@ -660,13 +660,13 @@ void QSPSelectMenuItem(int index)
 	}
 }
 /* ------------------------------------------------------------ */
-/* Установка CALLBACK'ов */
+/* РЈСЃС‚Р°РЅРѕРІРєР° CALLBACK'РѕРІ */
 void QSPSetCallBack(int type, QSP_CALLBACK func)
 {
 	qspSetCallBack(type, func);
 }
 /* ------------------------------------------------------------ */
-/* Инициализация */
+/* РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ */
 void QSPInit()
 {
 	#ifdef _DEBUG
@@ -695,7 +695,7 @@ void QSPInit()
 	qspInitStats();
 	qspInitMath();
 }
-/* Деинициализация */
+/* Р”РµРёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ */
 void QSPDeInit()
 {
 	qspMemClear(QSP_FALSE);

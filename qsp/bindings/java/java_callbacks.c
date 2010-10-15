@@ -26,6 +26,8 @@
 #include "../../objects.h"
 #include "../../text.h"
 
+extern int _call_java(int a, int b, int c, int d);
+
 void qspInitCallBacks()
 {
 	int i;
@@ -43,172 +45,172 @@ void qspSetCallBack(int type, QSP_CALLBACK func)
 
 void qspCallDebug(QSP_CHAR *str)
 {
-	/* Здесь передаем управление отладчику */
+	/* Р—РґРµСЃСЊ РїРµСЂРµРґР°РµРј СѓРїСЂР°РІР»РµРЅРёРµ РѕС‚Р»Р°РґС‡РёРєСѓ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_DEBUG])
 	{
 		qspSaveCallState(&state, QSP_FALSE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_DEBUG](str);
+		_call_java(QSP_CALL_DEBUG, (int)qspCallBacks[QSP_CALL_DEBUG], (int)str, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallSetTimer(int msecs)
 {
-	/* Здесь устанавливаем интервал таймера */
+	/* Р—РґРµСЃСЊ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РёРЅС‚РµСЂРІР°Р» С‚Р°Р№РјРµСЂР° */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SETTIMER])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_SETTIMER](msecs);
+		_call_java(QSP_CALL_SETTIMER, (int)qspCallBacks[QSP_CALL_SETTIMER], (int)msecs, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallRefreshInt(QSP_BOOL isRedraw)
 {
-	/* Здесь выполняем обновление интерфейса */
+	/* Р—РґРµСЃСЊ РІС‹РїРѕР»РЅСЏРµРј РѕР±РЅРѕРІР»РµРЅРёРµ РёРЅС‚РµСЂС„РµР№СЃР° */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_REFRESHINT])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_REFRESHINT](isRedraw);
+		_call_java(QSP_CALL_REFRESHINT, (int)qspCallBacks[QSP_CALL_REFRESHINT], (int)isRedraw, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallSetInputStrText(QSP_CHAR *text)
 {
-	/* Здесь устанавливаем текст строки ввода */
+	/* Р—РґРµСЃСЊ СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј С‚РµРєСЃС‚ СЃС‚СЂРѕРєРё РІРІРѕРґР° */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SETINPUTSTRTEXT])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_SETINPUTSTRTEXT](text);
+		_call_java(QSP_CALL_SETINPUTSTRTEXT, (int)qspCallBacks[QSP_CALL_SETINPUTSTRTEXT], (int)text, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
 {
-	/* Здесь добавляем пункт меню */
+	/* Р—РґРµСЃСЊ РґРѕР±Р°РІР»СЏРµРј РїСѓРЅРєС‚ РјРµРЅСЋ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_ADDMENUITEM])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_ADDMENUITEM](name, imgPath);
+		_call_java(QSP_CALL_ADDMENUITEM, (int)qspCallBacks[QSP_CALL_ADDMENUITEM], (int)name, (int)imgPath);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallSystem(QSP_CHAR *cmd)
 {
-	/* Здесь выполняем системный вызов */
+	/* Р—РґРµСЃСЊ РІС‹РїРѕР»РЅСЏРµРј СЃРёСЃС‚РµРјРЅС‹Р№ РІС‹Р·РѕРІ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SYSTEM])
 	{
 		qspSaveCallState(&state, QSP_FALSE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_SYSTEM](cmd);
+		_call_java(QSP_CALL_SYSTEM, (int)qspCallBacks[QSP_CALL_SYSTEM], (int)cmd, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallOpenGame(QSP_CHAR *file)
 {
-	/* Здесь позволяем пользователю выбрать файл */
-	/* состояния игры для загрузки и загружаем его */
+	/* Р—РґРµСЃСЊ РїРѕР·РІРѕР»СЏРµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ РІС‹Р±СЂР°С‚СЊ С„Р°Р№Р» */
+	/* СЃРѕСЃС‚РѕСЏРЅРёСЏ РёРіСЂС‹ РґР»СЏ Р·Р°РіСЂСѓР·РєРё Рё Р·Р°РіСЂСѓР¶Р°РµРј РµРіРѕ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_OPENGAMESTATUS])
 	{
 		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
-		qspCallBacks[QSP_CALL_OPENGAMESTATUS](file);
+		_call_java(QSP_CALL_OPENGAMESTATUS, (int)qspCallBacks[QSP_CALL_OPENGAMESTATUS], (int)file, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallSaveGame(QSP_CHAR *file)
 {
-	/* Здесь позволяем пользователю выбрать файл */
-	/* для сохранения состояния игры и сохраняем */
-	/* в нем текущее состояние */
+	/* Р—РґРµСЃСЊ РїРѕР·РІРѕР»СЏРµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ РІС‹Р±СЂР°С‚СЊ С„Р°Р№Р» */
+	/* РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ РёРіСЂС‹ Рё СЃРѕС…СЂР°РЅСЏРµРј */
+	/* РІ РЅРµРј С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS])
 	{
 		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
-		qspCallBacks[QSP_CALL_SAVEGAMESTATUS](file);
+		_call_java(QSP_CALL_SAVEGAMESTATUS, (int)qspCallBacks[QSP_CALL_SAVEGAMESTATUS], (int)file, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallShowMessage(QSP_CHAR *text)
 {
-	/* Здесь показываем сообщение */
+	/* Р—РґРµСЃСЊ РїРѕРєР°Р·С‹РІР°РµРј СЃРѕРѕР±С‰РµРЅРёРµ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SHOWMSGSTR])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_SHOWMSGSTR](text);
+		_call_java(QSP_CALL_SHOWMSGSTR, (int)qspCallBacks[QSP_CALL_SHOWMSGSTR], (int)text, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallShowMenu()
 {
-	/* Здесь показываем меню */
+	/* Р—РґРµСЃСЊ РїРѕРєР°Р·С‹РІР°РµРј РјРµРЅСЋ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SHOWMENU])
 	{
 		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
-		qspCallBacks[QSP_CALL_SHOWMENU]();
+		_call_java(QSP_CALL_SHOWMENU, (int)qspCallBacks[QSP_CALL_SHOWMENU], 0, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallShowPicture(QSP_CHAR *file)
 {
-	/* Здесь показываем изображение */
+	/* Р—РґРµСЃСЊ РїРѕРєР°Р·С‹РІР°РµРј РёР·РѕР±СЂР°Р¶РµРЅРёРµ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SHOWIMAGE])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_SHOWIMAGE](file);
+		_call_java(QSP_CALL_SHOWIMAGE, (int)qspCallBacks[QSP_CALL_SHOWIMAGE], (int)file, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallShowWindow(int type, QSP_BOOL isShow)
 {
-	/* Здесь показываем или скрываем окно */
+	/* Р—РґРµСЃСЊ РїРѕРєР°Р·С‹РІР°РµРј РёР»Рё СЃРєСЂС‹РІР°РµРј РѕРєРЅРѕ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SHOWWINDOW])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_SHOWWINDOW](type, isShow);
+		_call_java(QSP_CALL_SHOWWINDOW, (int)qspCallBacks[QSP_CALL_SHOWWINDOW], (int)type, (int)isShow);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallPlayFile(QSP_CHAR *file, int volume)
 {
-	/* Здесь начинаем воспроизведение файла с заданной громкостью */
+	/* Р—РґРµСЃСЊ РЅР°С‡РёРЅР°РµРј РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёРµ С„Р°Р№Р»Р° СЃ Р·Р°РґР°РЅРЅРѕР№ РіСЂРѕРјРєРѕСЃС‚СЊСЋ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_PLAYFILE])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_PLAYFILE](file, volume);
+		_call_java(QSP_CALL_PLAYFILE, (int)qspCallBacks[QSP_CALL_PLAYFILE], (int)file, (int)volume);
 		qspRestoreCallState(&state);
 	}
 }
 
 QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 {
-	/* Здесь проверяем, проигрывается ли файл */
+	/* Р—РґРµСЃСЊ РїСЂРѕРІРµСЂСЏРµРј, РїСЂРѕРёРіСЂС‹РІР°РµС‚СЃСЏ Р»Рё С„Р°Р№Р» */
 	QSPCallState state;
 	QSP_BOOL isPlaying;
 	if (qspCallBacks[QSP_CALL_ISPLAYINGFILE])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		isPlaying = (QSP_BOOL)qspCallBacks[QSP_CALL_ISPLAYINGFILE](file);
+		isPlaying = (QSP_BOOL)_call_java(QSP_CALL_ISPLAYINGFILE, (int)qspCallBacks[QSP_CALL_ISPLAYINGFILE], (int)file, 0);
 		qspRestoreCallState(&state);
 		return isPlaying;
 	}
@@ -217,25 +219,25 @@ QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
 
 void qspCallSleep(int msecs)
 {
-	/* Здесь ожидаем заданное количество миллисекунд */
+	/* Р—РґРµСЃСЊ РѕР¶РёРґР°РµРј Р·Р°РґР°РЅРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РјРёР»Р»РёСЃРµРєСѓРЅРґ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_SLEEP])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_SLEEP](msecs);
+		_call_java(QSP_CALL_SLEEP, (int)qspCallBacks[QSP_CALL_SLEEP], (int)msecs, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 int qspCallGetMSCount()
 {
-	/* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
+	/* Р—РґРµСЃСЊ РїРѕР»СѓС‡Р°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ РјРёР»Р»РёСЃРµРєСѓРЅРґ, РїСЂРѕС€РµРґС€РёС… СЃ РјРѕРјРµРЅС‚Р° РїРѕСЃР»РµРґРЅРµРіРѕ РІС‹Р·РѕРІР° С„СѓРЅРєС†РёРё */
 	QSPCallState state;
 	int count;
 	if (qspCallBacks[QSP_CALL_GETMSCOUNT])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		count = qspCallBacks[QSP_CALL_GETMSCOUNT]();
+		count = _call_java(QSP_CALL_GETMSCOUNT, (int)qspCallBacks[QSP_CALL_GETMSCOUNT], 0, 0);
 		qspRestoreCallState(&state);
 		return count;
 	}
@@ -244,31 +246,31 @@ int qspCallGetMSCount()
 
 void qspCallCloseFile(QSP_CHAR *file)
 {
-	/* Здесь выполняем закрытие файла */
+	/* Р—РґРµСЃСЊ РІС‹РїРѕР»РЅСЏРµРј Р·Р°РєСЂС‹С‚РёРµ С„Р°Р№Р»Р° */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_CLOSEFILE])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_CLOSEFILE](file);
+		_call_java(QSP_CALL_CLOSEFILE, (int)qspCallBacks[QSP_CALL_CLOSEFILE], (int)file, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 void qspCallDeleteMenu()
 {
-	/* Здесь удаляем текущее меню */
+	/* Р—РґРµСЃСЊ СѓРґР°Р»СЏРµРј С‚РµРєСѓС‰РµРµ РјРµРЅСЋ */
 	QSPCallState state;
 	if (qspCallBacks[QSP_CALL_DELETEMENU])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_DELETEMENU]();
+		_call_java(QSP_CALL_DELETEMENU, (int)qspCallBacks[QSP_CALL_DELETEMENU], 0, 0);
 		qspRestoreCallState(&state);
 	}
 }
 
 QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 {
-	/* Здесь вводим текст */
+	/* Р—РґРµСЃСЊ РІРІРѕРґРёРј С‚РµРєСЃС‚ */
 	QSPCallState state;
 	QSP_CHAR *buffer;
 	int maxLen = 511;
@@ -277,7 +279,8 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
 		buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
 		*buffer = 0;
-		qspCallBacks[QSP_CALL_INPUTBOX](text, buffer, maxLen);
+		//_call_java(QSP_CALL_INPUTBOX, (int)qspCallBacks[QSP_CALL_INPUTBOX], text, buffer, maxLen);
+		_call_java(QSP_CALL_INPUTBOX, (int)qspCallBacks[QSP_CALL_INPUTBOX], (int)text, (int)buffer);
 		buffer[maxLen] = 0;
 		qspRestoreCallState(&state);
 	}
