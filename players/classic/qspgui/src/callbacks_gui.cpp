@@ -93,7 +93,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	isCanSave = !(QSPGetVarValues(QSP_FMT("NOSAVE"), 0, &numVal, &strVal) && numVal);
 	m_isHtml = QSPGetVarValues(QSP_FMT("USEHTML"), 0, &numVal, &strVal) && numVal;
 	// -------------------------------
-	m_frame->GetVars()->SetIsHtml(m_isHtml, isScroll);
+	m_frame->GetVars()->SetIsHtml(m_isHtml);
 	if (QSPIsVarsDescChanged())
 		m_frame->GetVars()->SetText(wxString(varsDesc), isScroll);
 	// -------------------------------
@@ -103,7 +103,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 		isScroll = false;
 		oldFullRefreshCount = fullRefreshCount;
 	}
-	m_frame->GetDesc()->SetIsHtml(m_isHtml, isScroll);
+	m_frame->GetDesc()->SetIsHtml(m_isHtml);
 	if (QSPIsMainDescChanged())
 		m_frame->GetDesc()->SetText(wxString(mainDesc), isScroll);
 	// -------------------------------

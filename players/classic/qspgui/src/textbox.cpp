@@ -47,12 +47,12 @@ QSPTextBox::QSPTextBox(wxWindow *parent, wxWindowID id) : wxHtmlWindow(parent, i
 	SetStandardFonts(m_font.GetPointSize(), fontName, fontName);
 }
 
-void QSPTextBox::SetIsHtml(bool isHtml, bool isScroll)
+void QSPTextBox::SetIsHtml(bool isHtml)
 {
 	if (m_isUseHtml != isHtml)
 	{
 		m_isUseHtml = isHtml;
-		RefreshUI(isScroll);
+		RefreshUI();
 	}
 }
 
@@ -91,6 +91,11 @@ void QSPTextBox::SetText(const wxString& text, bool isScroll)
 {
 	if (m_text != text)
 	{
+		if (isScroll)
+		{
+			if (m_text.IsEmpty() || !text.StartsWith(m_text))
+				isScroll = false;
+		}
 		m_text = text;
 		RefreshUI(isScroll);
 	}

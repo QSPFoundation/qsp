@@ -36,7 +36,7 @@
 		void LoadBackImage(const wxString& fileName);
 
 		// Accessors
-		void SetIsHtml(bool isHtml, bool isScroll = false);
+		void SetIsHtml(bool isHtml);
 		void SetText(const wxString& text, bool isScroll = false);
 		void SetTextFont(const wxFont& font);
 		wxFont GetTextFont() const { return m_font; }
