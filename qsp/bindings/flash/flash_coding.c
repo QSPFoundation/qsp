@@ -15,9 +15,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#include "../../declarations.h"
+
 #ifdef _FLASH
 
-#include "../../declarations.h"
 #include "../../text.h"
 
 static int qspUTF8_mbtowc(wchar_t *pwc, unsigned char *s, int n)
@@ -157,12 +158,6 @@ QSP_CHAR *qspC2W(char *src)
 char *qspToSysString(QSP_CHAR *s)
 {
 	return qspW2C(s);
-}
-
-#else
-
-static void qspDummyFunc()
-{
 }
 
 #endif

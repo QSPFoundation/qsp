@@ -9,7 +9,9 @@
 # 	libqsp.dylib - build libqsp only
 #	qspplayer - build the client
 
-LIBQSPOBJ = ../qsp/_control.o \
+LIBQSPOBJ = ../qsp/bindings/default/default_control.o \
+			../qsp/bindings/default/default_callbacks.o \
+			../qsp/bindings/default/default_coding.o \
 			../qsp/actions.o \
 			../qsp/callbacks.o \
 			../qsp/codetools.o \

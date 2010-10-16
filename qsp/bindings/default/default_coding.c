@@ -15,27 +15,18 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#ifndef QSP_BINDINGSCONFIG
-	#define QSP_BINDINGSCONFIG
+#include "../../declarations.h"
 
-	/* Flash binding */
-	#ifdef _FLASH
-		#define QSP_BINDING
-		#include "flash/flash.h"
-	#endif
+#ifdef _DEFAULT_BINDING
 
-	/* Java binding */
-	#ifdef _JAVA
-		#define QSP_BINDING
-		#include "java/java.h"
-	#endif
+#include "../../text.h"
 
-	/* Place your bindings here */
-
-	#ifndef QSP_BINDING
-		#define QSP_BINDING
-		#define _DEFAULT_BINDING
-		#include "default/qsp_default.h"
-	#endif
+char *qspToSysString(QSP_CHAR *s)
+{
+	int len = QSP_WCSTOMBSLEN(s) + 1;
+	char *ret = (char *)malloc(len);
+	QSP_WCSTOMBS(ret, s, len);
+	return ret;
+}
 
 #endif

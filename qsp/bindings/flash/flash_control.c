@@ -15,9 +15,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#include "../../declarations.h"
+
 #ifdef _FLASH
 
-#include "../../declarations.h"
 #include "../../actions.h"
 #include "../../callbacks.h"
 #include "../../coding.h"
@@ -879,12 +880,6 @@ int main()
 	AS3_LibInit(result);
 
 	return 0;
-}
-
-#else
-
-static void qspDummyFunc()
-{
 }
 
 #endif

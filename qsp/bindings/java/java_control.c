@@ -15,9 +15,10 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#include "../../declarations.h"
+
 #ifdef _JAVA
 
-#include "../../declarations.h"
 #include "../../actions.h"
 #include "../../callbacks.h"
 #include "../../coding.h"
@@ -705,12 +706,6 @@ void QSPDeInit()
 	#ifdef _DEBUG
 		mwTerm();
 	#endif
-}
-
-#else
-
-static void qspDummyFunc()
-{
 }
 
 #endif

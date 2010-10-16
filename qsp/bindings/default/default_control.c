@@ -15,24 +15,25 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
-#include "declarations.h"
-#include "actions.h"
-#include "callbacks.h"
-#include "coding.h"
-#include "common.h"
-#include "errors.h"
-#include "game.h"
-#include "locations.h"
-#include "mathops.h"
-#include "menu.h"
-#include "objects.h"
-#include "statements.h"
-#include "text.h"
-#include "time.h"
-#include "variables.h"
-#include "variant.h"
+#include "../../declarations.h"
 
-#ifndef QSP_CUSTOM_BINDING
+#ifdef _DEFAULT_BINDING
+
+#include "../../actions.h"
+#include "../../callbacks.h"
+#include "../../coding.h"
+#include "../../common.h"
+#include "../../errors.h"
+#include "../../game.h"
+#include "../../locations.h"
+#include "../../mathops.h"
+#include "../../menu.h"
+#include "../../objects.h"
+#include "../../statements.h"
+#include "../../text.h"
+#include "../../time.h"
+#include "../../variables.h"
+#include "../../variant.h"
 
 /* ------------------------------------------------------------ */
 QSP_BOOL QSPIsInCallBack()
@@ -515,12 +516,6 @@ void QSPDeInit()
 	#ifdef _DEBUG
 		mwTerm();
 	#endif
-}
-
-#else
-
-static void qspDummyFunc()
-{
 }
 
 #endif

@@ -477,15 +477,3 @@ int qspCodeWriteVal(QSP_CHAR **s, int len, QSP_CHAR *val, QSP_BOOL isCode)
 	}
 	return qspAddText(s, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
 }
-
-#ifndef QSP_CUSTOM_BINDING
-
-char *qspToSysString(QSP_CHAR *s)
-{
-	int len = QSP_WCSTOMBSLEN(s) + 1;
-	char *ret = (char *)malloc(len);
-	QSP_WCSTOMBS(ret, s, len);
-	return ret;
-}
-
-#endif

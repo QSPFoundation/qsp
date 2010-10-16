@@ -340,10 +340,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\qsp\_control.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\qsp\actions.c"
 				>
 			</File>
@@ -503,6 +499,22 @@
 				Name="bindings"
 				>
 				<Filter
+					Name="default"
+					>
+					<File
+						RelativePath="..\..\..\qsp\bindings\default\default_callbacks.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\qsp\bindings\default\default_coding.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\qsp\bindings\default\default_control.c"
+						>
+					</File>
+				</Filter>
+				<Filter
 					Name="flash"
 					>
 					<File
@@ -656,6 +668,14 @@
 					RelativePath="..\..\..\qsp\bindings\bindings_config.h"
 					>
 				</File>
+				<Filter
+					Name="default"
+					>
+					<File
+						RelativePath="..\..\..\qsp\bindings\default\qsp_default.h"
+						>
+					</File>
+				</Filter>
 				<Filter
 					Name="flash"
 					>

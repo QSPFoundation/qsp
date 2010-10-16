@@ -472,6 +472,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\qsp_default.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\textbox.h"
 				>
 			</File>
