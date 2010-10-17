@@ -30,7 +30,7 @@ unsigned char qspCP1251ToKOI8RTable[] =
 	0xD2, 0xD3, 0xD4, 0xD5, 0xC6, 0xC8, 0xC3, 0xDE, 0xDB, 0xDD, 0xDF, 0xD9, 0xD8, 0xDC, 0xC0, 0xD1
 };
 
-wchar_t qspKOI8RToUnicodeTable[] =
+int qspKOI8RToUnicodeTable[] =
 {
 	0x2500, 0x2502, 0x250C, 0x2510, 0x2514, 0x2518, 0x251C, 0x2524,
 	0x252C, 0x2534, 0x253C, 0x2580, 0x2584, 0x2588, 0x258C, 0x2590,
@@ -50,7 +50,7 @@ wchar_t qspKOI8RToUnicodeTable[] =
 	0x042C, 0x042B, 0x0417, 0x0428, 0x042D, 0x0429, 0x0427, 0x042A
 };
 
-wchar_t qspCP1251ToUnicodeTable[] =
+int qspCP1251ToUnicodeTable[] =
 {
 	0x0402, 0x0403, 0x201A, 0x0453, 0x201E, 0x2026, 0x2020, 0x2021,
 	0x20AC, 0x2030, 0x0409, 0x2039, 0x040A, 0x040C, 0x040B, 0x040F,
@@ -194,8 +194,8 @@ static int qspUCS2StrLen(char *);
 static char *qspUCS2StrStr(char *, char *);
 static char qspDirectConvertSB(char, unsigned char *);
 static char qspReverseConvertSB(char, unsigned char *);
-static wchar_t qspDirectConvertUC(char, wchar_t *);
-static char qspReverseConvertUC(wchar_t, wchar_t *);
+static int qspDirectConvertUC(char, int *);
+static char qspReverseConvertUC(int, int *);
 static char *qspQSPToGameString(QSP_CHAR *, QSP_BOOL, QSP_BOOL);
 
 static int qspUCS2StrLen(char *str)
@@ -244,13 +244,13 @@ static char qspReverseConvertSB(char ch, unsigned char *table)
 	return 0x20;
 }
 
-static wchar_t qspDirectConvertUC(char ch, wchar_t *table)
+static int qspDirectConvertUC(char ch, int *table)
 {
 	unsigned char ch2 = (unsigned char)ch;
 	return (ch2 >= 0x80 ? table[ch2 - 0x80] : ch);
 }
 
-static char qspReverseConvertUC(wchar_t ch, wchar_t *table)
+static char qspReverseConvertUC(int ch, int *table)
 {
 	int i;
 	if (ch < 0x80) return (char)ch;

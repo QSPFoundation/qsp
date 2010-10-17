@@ -546,6 +546,22 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="android"
+					>
+					<File
+						RelativePath="..\..\..\qsp\bindings\android\android_callbacks.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\qsp\bindings\android\android_coding.c"
+						>
+					</File>
+					<File
+						RelativePath="..\..\..\qsp\bindings\android\android_control.c"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -689,6 +705,14 @@
 					>
 					<File
 						RelativePath="..\..\..\qsp\bindings\java\java.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="android"
+					>
+					<File
+						RelativePath="..\..\..\qsp\bindings\android\android.h"
 						>
 					</File>
 				</Filter>

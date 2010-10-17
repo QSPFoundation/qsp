@@ -25,7 +25,7 @@
 #include <string.h>
 #include <android/log.h>
 
-static int qspUTF8_mbtowc(QSP_CHAR *pwc, unsigned char *s, int n)
+static int qspUTF8_mbtowc(int *pwc, unsigned char *s, int n)
 {
 	unsigned char c = s[0];
 	if (c < 0x80)
@@ -39,8 +39,8 @@ static int qspUTF8_mbtowc(QSP_CHAR *pwc, unsigned char *s, int n)
 	{
 		if (n < 2) return 0;
 		if (!((s[1] ^ 0x80) < 0x40)) return 0;
-		*pwc = ((QSP_CHAR)(c & 0x1f) << 6)
-			| (QSP_CHAR)(s[1] ^ 0x80);
+		*pwc = ((int)(c & 0x1f) << 6)
+			| (int)(s[1] ^ 0x80);
 		return 2;
 	}
 	else if (c < 0xf0)
@@ -49,38 +49,38 @@ static int qspUTF8_mbtowc(QSP_CHAR *pwc, unsigned char *s, int n)
 		if (!((s[1] ^ 0x80) < 0x40 && (s[2] ^ 0x80) < 0x40
 			&& (c >= 0xe1 || s[1] >= 0xa0)))
 			return 0;
-		*pwc = ((QSP_CHAR)(c & 0x0f) << 12)
-			| ((QSP_CHAR)(s[1] ^ 0x80) << 6)
-			| (QSP_CHAR)(s[2] ^ 0x80);
+		*pwc = ((int)(c & 0x0f) << 12)
+			| ((int)(s[1] ^ 0x80) << 6)
+			| (int)(s[2] ^ 0x80);
 		return 3;
 	}
-	else if (c < 0xf8 && sizeof(QSP_CHAR) * 8 >= 32)
+	else if (c < 0xf8)
 	{
 		if (n < 4) return 0;
 		if (!((s[1] ^ 0x80) < 0x40 && (s[2] ^ 0x80) < 0x40
 			&& (s[3] ^ 0x80) < 0x40 && (c >= 0xf1 || s[1] >= 0x90)))
 			return 0;
-		*pwc = ((QSP_CHAR)(c & 0x07) << 18)
-			| ((QSP_CHAR)(s[1] ^ 0x80) << 12)
-			| ((QSP_CHAR)(s[2] ^ 0x80) << 6)
-			| (QSP_CHAR)(s[3] ^ 0x80);
+		*pwc = ((int)(c & 0x07) << 18)
+			| ((int)(s[1] ^ 0x80) << 12)
+			| ((int)(s[2] ^ 0x80) << 6)
+			| (int)(s[3] ^ 0x80);
 		return 4;
 	}
-	else if (c < 0xfc && sizeof(QSP_CHAR) * 8 >= 32)
+	else if (c < 0xfc)
 	{
 		if (n < 5) return 0;
 		if (!((s[1] ^ 0x80) < 0x40 && (s[2] ^ 0x80) < 0x40
 			&& (s[3] ^ 0x80) < 0x40 && (s[4] ^ 0x80) < 0x40
 			&& (c >= 0xf9 || s[1] >= 0x88)))
 			return 0;
-		*pwc = ((QSP_CHAR)(c & 0x03) << 24)
-			| ((QSP_CHAR)(s[1] ^ 0x80) << 18)
-			| ((QSP_CHAR)(s[2] ^ 0x80) << 12)
-			| ((QSP_CHAR)(s[3] ^ 0x80) << 6)
-			| (QSP_CHAR)(s[4] ^ 0x80);
+		*pwc = ((int)(c & 0x03) << 24)
+			| ((int)(s[1] ^ 0x80) << 18)
+			| ((int)(s[2] ^ 0x80) << 12)
+			| ((int)(s[3] ^ 0x80) << 6)
+			| (int)(s[4] ^ 0x80);
 		return 5;
 	}
-	else if (c < 0xfe && sizeof(QSP_CHAR) * 8 >= 32)
+	else if (c < 0xfe)
 	{
 		if (n < 6) return 0;
 		if (!((s[1] ^ 0x80) < 0x40 && (s[2] ^ 0x80) < 0x40
@@ -88,19 +88,19 @@ static int qspUTF8_mbtowc(QSP_CHAR *pwc, unsigned char *s, int n)
 			&& (s[5] ^ 0x80) < 0x40
 			&& (c >= 0xfd || s[1] >= 0x84)))
 			return 0;
-		*pwc = ((QSP_CHAR)(c & 0x01) << 30)
-			| ((QSP_CHAR)(s[1] ^ 0x80) << 24)
-			| ((QSP_CHAR)(s[2] ^ 0x80) << 18)
-			| ((QSP_CHAR)(s[3] ^ 0x80) << 12)
-			| ((QSP_CHAR)(s[4] ^ 0x80) << 6)
-			| (QSP_CHAR)(s[5] ^ 0x80);
+		*pwc = ((int)(c & 0x01) << 30)
+			| ((int)(s[1] ^ 0x80) << 24)
+			| ((int)(s[2] ^ 0x80) << 18)
+			| ((int)(s[3] ^ 0x80) << 12)
+			| ((int)(s[4] ^ 0x80) << 6)
+			| (int)(s[5] ^ 0x80);
 		return 6;
 	}
 	else
 		return 0;
 }
 
-static int qspUTF8_wctomb(unsigned char *r, QSP_CHAR wc, int n)
+static int qspUTF8_wctomb(unsigned char *r, int wc, int n)
 {
 	int count;
 	if (wc < 0x80)
@@ -109,24 +109,24 @@ static int qspUTF8_wctomb(unsigned char *r, QSP_CHAR wc, int n)
 		count = 2;
 	else if (wc < 0x10000)
 		count = 3;
+	else if (wc < 0x200000)
+		count = 4;
+	else if (wc < 0x4000000)
+		count = 5;
+	else if (wc <= 0x7fffffff)
+		count = 6;
 	else
 		return 0;
 	if (n < count) return 0;
 	switch (count)
 	{
+	case 6: r[5] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x4000000;
+	case 5: r[4] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x200000;
+	case 4: r[3] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x10000;
 	case 3: r[2] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0x800;
 	case 2: r[1] = 0x80 | (wc & 0x3f); wc = wc >> 6; wc |= 0xc0;
-/*	case 2:
-	{
-		char y = 0x80 | (wc & 0x3f);
-		char x = 0xc0 | (wc >> 6);
-		r[1] = y;
-		r[0] = x;
-	}	
-		break;*/
 	case 1: r[0] = wc;
-	}	
-
+	}
 	return count;
 }
 
@@ -146,8 +146,7 @@ char *qspW2C(QSP_CHAR *src)
 
 QSP_CHAR *qspC2W(char *src)
 {
-	int ret;
-	QSP_CHAR ch;
+	int ret, ch;
 	QSP_CHAR *dst = (QSP_CHAR *)malloc((strlen(src) + 1) * sizeof(QSP_CHAR));
 	QSP_CHAR *s = dst;
 	while ((ret = qspUTF8_mbtowc(&ch, src, 3)) && ch)
