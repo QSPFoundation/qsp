@@ -22,6 +22,11 @@
 
 	#ifdef _UNICODE
 		typedef wchar_t QSP_CHAR;
+		#define QSP_WCSTOMBSLEN(a) (int)wcstombs(0, a, 0)
+		#define QSP_WCSTOMBS wcstombs
+	#else
+		#define QSP_WCSTOMBSLEN qspStrLen
+		#define QSP_WCSTOMBS qspStrNCopy
 	#endif
 
 	#ifdef __cplusplus

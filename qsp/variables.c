@@ -159,7 +159,7 @@ QSPVar *qspVarReference(QSP_CHAR *name, QSP_BOOL isCreate)
 	qspUpperStr(uName = qspGetNewText(name, -1));
 	bCode = 0;
 	for (i = 0; uName[i]; ++i)
-		bCode = qspRand8[bCode ^ QSP_MBTOSB(uName[i])];
+		bCode = qspRand8[bCode ^ (unsigned char)uName[i]];
 	var = qspVars + QSP_VARSSEEK * bCode;
 	for (i = 0; i < QSP_VARSSEEK; ++i)
 	{
