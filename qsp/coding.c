@@ -304,7 +304,7 @@ static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 		{
 			while (--len >= 0)
 			{
-				uCh = QSP_BTOWC(s[len]);
+				uCh = (unsigned short)QSP_BTOWC(s[len]);
 				if (uCh == QSP_CODREMOV)
 					uCh = (unsigned short)-QSP_CODREMOV;
 				else
@@ -316,7 +316,7 @@ static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 		{
 			while (--len >= 0)
 			{
-				uCh = QSP_BTOWC(s[len]);
+				uCh = (unsigned short)QSP_BTOWC(s[len]);
 				ptr[len] = QSP_FIXBYTESORDER(uCh);
 			}
 		}
@@ -387,13 +387,13 @@ QSP_CHAR *qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded)
 					ch = QSP_CODREMOV;
 				else
 					ch += QSP_CODREMOV;
-				ret[len] = QSP_TO_OS_CHAR(ch);
+				ret[len] = (QSP_CHAR)QSP_TO_OS_CHAR(ch);
 			}
 		}
 		else
 		{
 			while (--len >= 0)
-				ret[len] = QSP_TO_OS_CHAR(s[len]);
+				ret[len] = (QSP_CHAR)QSP_TO_OS_CHAR(s[len]);
 		}
 	}
 	return ret;
