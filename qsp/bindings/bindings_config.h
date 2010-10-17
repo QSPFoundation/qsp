@@ -30,6 +30,12 @@
 		#include "java/java.h"
 	#endif
 
+	/* Android binding */
+	#ifdef _ANDROID
+		#define QSP_BINDING
+		#include "android/android.h"
+	#endif
+
 	/* Place your bindings here */
 
 	#ifndef QSP_BINDING
