@@ -542,7 +542,7 @@ void QSPSaveGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh)
 	*res = QSP_TRUE;
 }
 /* Сохранение состояния в память */
-void QSPSaveGameAsString(QSP_BOOL *res, QSP_CHAR *strBuf, int strBufSize, int *realSize, QSP_BOOL isRefresh)
+void QSPSaveGameAsData(QSP_BOOL *res, void *buf, int bufSize, int *realSize, QSP_BOOL isRefresh)
 {
 	int len, size;
 	QSP_CHAR *data;
@@ -563,17 +563,16 @@ void QSPSaveGameAsString(QSP_BOOL *res, QSP_CHAR *strBuf, int strBufSize, int *r
 		*res = QSP_FALSE;
 		return;
 	}
-	size = len + 1;
+	size = len * sizeof(QSP_CHAR);
 	*realSize = size;
-	if (size > strBufSize)
+	if (size > bufSize)
 	{
 		free(data);
 		*res = QSP_FALSE;
 		return;
 	}
-	qspStrNCopy(strBuf, data, strBufSize - 1);
+	memcpy(buf, data, size);
 	free(data);
-	strBuf[strBufSize - 1] = 0;
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	*res = QSP_TRUE;
 }
@@ -601,8 +600,10 @@ void QSPOpenSavedGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefres
 	*res = QSP_TRUE;
 }
 /* Загрузка состояния из памяти */
-void QSPOpenSavedGameFromString(QSP_BOOL *res, const QSP_CHAR *str, QSP_BOOL isRefresh)
+void QSPOpenSavedGameFromData(QSP_BOOL *res, const void *data, int dataSize, QSP_BOOL isRefresh)
 {
+	int dataLen;
+	QSP_CHAR *ptr;
 	if (qspIsExitOnError && qspErrorNum)
 	{
 		*res = QSP_FALSE;
@@ -614,7 +615,12 @@ void QSPOpenSavedGameFromString(QSP_BOOL *res, const QSP_CHAR *str, QSP_BOOL isR
 		*res = QSP_FALSE;
 		return;
 	}
-	qspOpenGameStatusFromString((QSP_CHAR *)str);
+	dataLen = dataSize / sizeof(QSP_CHAR);
+	ptr = (QSP_CHAR *)malloc((dataLen + 1) * sizeof(QSP_CHAR));
+	memcpy(ptr, data, dataSize);
+	ptr[dataLen] = 0;
+	qspOpenGameStatusFromString(ptr);
+	free(ptr);
 	if (qspErrorNum)
 	{
 		*res = QSP_FALSE;

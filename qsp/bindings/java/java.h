@@ -65,9 +65,9 @@
 	void QSPLoadGameWorld(QSP_BOOL *res, const QSP_CHAR *fileName);
 	void QSPLoadGameWorldFromData(QSP_BOOL *res, const char *data, int dataSize, const QSP_CHAR *fileName);
 	void QSPSaveGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh);
-	void QSPSaveGameAsString(QSP_BOOL *res, QSP_CHAR *strBuf, int strBufSize, int *realSize, QSP_BOOL isRefresh);
+	void QSPSaveGameAsData(QSP_BOOL *res, void *buf, int bufSize, int *realSize, QSP_BOOL isRefresh);
 	void QSPOpenSavedGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh);
-	void QSPOpenSavedGameFromString(QSP_BOOL *res, const QSP_CHAR *str, QSP_BOOL isRefresh);
+	void QSPOpenSavedGameFromData(QSP_BOOL *res, const void *data, int dataSize, QSP_BOOL isRefresh);
 	void QSPRestartGame(QSP_BOOL *res, QSP_BOOL isRefresh);
 	void QSPSelectMenuItem(int index);
 	void QSPSetCallBack(int type, QSP_CALLBACK func);
