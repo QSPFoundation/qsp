@@ -63,7 +63,7 @@
 	void QSPGetLastErrorData(int *errorNum, QSP_CHAR **errorLoc, int *errorActIndex, int *errorLine);
 	void QSPGetErrorDesc(const QSP_CHAR* *res, int errorNum);
 	void QSPLoadGameWorld(QSP_BOOL *res, const QSP_CHAR *fileName);
-	void QSPLoadGameWorldFromData(QSP_BOOL *res, const char *data, int dataSize, const QSP_CHAR *fileName);
+	void QSPLoadGameWorldFromData(QSP_BOOL *res, const void *data, int dataSize, const QSP_CHAR *fileName);
 	void QSPSaveGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh);
 	void QSPSaveGameAsData(QSP_BOOL *res, void *buf, int bufSize, int *realSize, QSP_BOOL isRefresh);
 	void QSPOpenSavedGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh);

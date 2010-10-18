@@ -377,12 +377,17 @@ QSP_BOOL QSPLoadGameWorld(const QSP_CHAR *fileName)
 	return QSP_TRUE;
 }
 /* Загрузка новой игры из памяти */
-QSP_BOOL QSPLoadGameWorldFromData(const char *data, int dataSize, const QSP_CHAR *fileName)
+QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, const QSP_CHAR *fileName)
 {
+	char *ptr;
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspResetError();
 	if (qspIsDisableCodeExec) return QSP_FALSE;
-	qspOpenQuestFromData((char *)data, dataSize, (QSP_CHAR *)fileName, QSP_FALSE);
+	ptr = (char *)malloc(dataSize + 3);
+	memcpy(ptr, data, dataSize);
+	ptr[dataSize] = ptr[dataSize + 1] = ptr[dataSize + 2] = 0;
+	qspOpenQuestFromData(ptr, dataSize + 3, (QSP_CHAR *)fileName, QSP_FALSE);
+	free(ptr);
 	if (qspErrorNum) return QSP_FALSE;
 	return QSP_TRUE;
 }
