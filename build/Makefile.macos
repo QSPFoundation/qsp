@@ -4,10 +4,10 @@
 # This Makefile supposes that it's living in the build directory
 
 # Targets:
-#	extraclean - kill everuthing, that've been created by building procedure
+#	extraclean - kill everything, that've been created by building procedure
 #	wx - build wxWidgets only
 # 	libqsp.dylib - build libqsp only
-#	qspplayer - build the client
+#	qspplayer - build the client only
 
 LIBQSPOBJ = ../qsp/bindings/default/default_control.o \
 			../qsp/bindings/default/default_callbacks.o \
@@ -54,7 +54,7 @@ LIBQSPCCFLAGS = -fPIC -D_UNICODE -DNOT_RUBY -DEXPORT
 
 .PHONY = all clean extraclean wx
 CC = g++
-all: clean qspplayer
+all: clean wx qspplayer
 
 .cpp.o:
 	$(CC) -c `wxWidgets/wx-config --cxxflags` $< -o $@
@@ -70,7 +70,7 @@ wx:
 libqsp.dylib: $(LIBQSPOBJ)
 	$(CC) $(LIBQSPCCFLAGS) -dynamiclib -install_name @executable_path/../Frameworks/libqsp.dylib -o ../qsp/libqsp.dylib $(LIBQSPOBJ)
 
-qspplayer: wx libqsp.dylib
+qspplayer: libqsp.dylib
 
 	# Create the bundle (simple directory with .app at the end of its name)
 	mkdir -p ../QspPlayer.app/Contents/MacOS
