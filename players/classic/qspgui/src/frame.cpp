@@ -419,14 +419,14 @@ void QSPFrame::ShowError()
 			_("Location: %s\nArea: %s\nLine: %ld\nCode: %ld\nDesc: %s"),
 			wxString(loc).wx_str(),
 			(actIndex < 0 ? _("on visit").wx_str() : _("on action").wx_str()),
-			(unsigned int)line,
-			(unsigned int)code,
+			(size_t)line,
+			(size_t)code,
 			wxGetTranslation(desc).wx_str()
 		);
 	else
 		wxMessage = wxString::Format(
 			_("Code: %ld\nDesc: %s"),
-			(unsigned int)code,
+			(size_t)code,
 			wxGetTranslation(desc).wx_str()
 		);
 	wxMessageDialog dialog(this, wxMessage, _("Error"), wxOK | wxICON_ERROR);
