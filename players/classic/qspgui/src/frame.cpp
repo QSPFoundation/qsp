@@ -413,21 +413,21 @@ void QSPFrame::ShowError()
 	int code, actIndex, line;
 	if (m_isQuit) return;
 	QSPGetLastErrorData(&code, &loc, &actIndex, &line);
-	const QSP_CHAR *desc = QSPGetErrorDesc(code);
+	wxString desc(QSPGetErrorDesc(code));
 	if (loc)
 		wxMessage = wxString::Format(
 			_("Location: %s\nArea: %s\nLine: %ld\nCode: %ld\nDesc: %s"),
-			loc,
-			(actIndex < 0 ? _("on visit") : _("on action")),
-			line,
-			code,
-			wxGetTranslation(desc)
+			wxString(loc).wx_str(),
+			(actIndex < 0 ? _("on visit").wx_str() : _("on action").wx_str()),
+			(unsigned int)line,
+			(unsigned int)code,
+			wxGetTranslation(desc).wx_str()
 		);
 	else
 		wxMessage = wxString::Format(
 			_("Code: %ld\nDesc: %s"),
-			code,
-			wxGetTranslation(desc)
+			(unsigned int)code,
+			wxGetTranslation(desc).wx_str()
 		);
 	wxMessageDialog dialog(this, wxMessage, _("Error"), wxOK | wxICON_ERROR);
 	oldIsProcessEvents = m_isProcessEvents;
@@ -868,11 +868,14 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 	info.SetIcon(wxIcon(logo_big_xpm));
 	info.SetName(QSP_LOGO);
 	info.SetCopyright(wxT("Byte Soft, 2001-2010"));
+	wxString version(QSPGetVersion());
+	wxString libCompiledDate(QSPGetCompiledDateTime());
+	wxString guiCompiledDate(wxT(__DATE__) wxT(", ") wxT(__TIME__));
 	info.SetDescription(wxString::Format(
 		_("Version: %s\nEngine Compiled: %s\nGUI Compiled: %s"),
-		QSPGetVersion(),
-		QSPGetCompiledDateTime(),
-		wxT(__DATE__) wxT(", ") wxT(__TIME__)
+		version.wx_str(),
+		libCompiledDate.wx_str(),
+		guiCompiledDate.wx_str()
 	));
 	info.SetWebSite(wxT("http://qsp.su"));
 	// ----
