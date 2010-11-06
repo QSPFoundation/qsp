@@ -147,7 +147,8 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 	obj->Image = imgPath;
 	obj->Desc = qspGetNewText(QSP_STR(args[0]), -1);
 	qspIsObjectsChanged = QSP_TRUE;
-	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args, (count < 3 ? count : 2));
+	if (count == 3) count = 2;
+	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args, count);
 	return QSP_FALSE;
 }
 
