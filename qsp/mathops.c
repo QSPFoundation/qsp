@@ -176,9 +176,9 @@ void qspInitMath()
 	qspAddOperation(qspOpStrFind, 30, qspFunctionStrFind, 1, 2, 3, 1, 1, 2);
 	qspAddOperation(qspOpStrPos, 30, qspFunctionStrPos, 2, 2, 3, 1, 1, 2);
 	qspAddOperation(qspOpMid, 30, qspFunctionMid, 1, 2, 3, 1, 2, 2);
-	qspAddOperation(qspOpArrPos, 30, 0, 2, 2, 3, 0, 0, 0);
-	qspAddOperation(qspOpArrComp, 30, 0, 2, 2, 3, 0, 0, 0);
-	qspAddOperation(qspOpInstr, 30, qspFunctionInstr, 2, 2, 3, 0, 1, 1);
+	qspAddOperation(qspOpArrPos, 30, 0, 2, 2, 3, 1, 0, 2);
+	qspAddOperation(qspOpArrComp, 30, 0, 2, 2, 3, 1, 0, 2);
+	qspAddOperation(qspOpInstr, 30, qspFunctionInstr, 2, 2, 3, 1, 1, 2);
 	qspAddOperation(qspOpReplace, 30, qspFunctionReplace, 1, 2, 3, 1, 1, 1);
 	qspAddOperation(qspOpFunc, 30, qspFunctionFunc, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 	qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -1097,29 +1097,18 @@ static void qspFunctionIsPlay(QSPVariant *args, int count, QSPVariant *tos)
 static void qspFunctionInstr(QSPVariant *args, int count, QSPVariant *tos)
 {
 	int beg;
-	QSP_CHAR *txt, *str;
-	if (qspConvertVariantTo(args, count == 2))
-	{
-		qspSetError(QSP_ERR_TYPEMISMATCH);
-		return;
-	}
+	QSP_CHAR *str;
 	if (count == 2)
-	{
-		txt = QSP_STR(args[0]);
-		str = QSP_STR(args[1]);
 		beg = 0;
-	}
 	else
 	{
-		txt = QSP_STR(args[1]);
-		str = QSP_STR(args[2]);
-		beg = QSP_NUM(args[0]) - 1;
+		beg = QSP_NUM(args[2]) - 1;
 		if (beg < 0) beg = 0;
 	}
-	if (beg < qspStrLen(txt))
+	if (beg < qspStrLen(QSP_STR(args[0])))
 	{
-		str = qspStrStr(txt + beg, str);
-		QSP_PNUM(tos) = (str ? (int)(str - txt) + 1 : 0);
+		str = qspStrStr(QSP_STR(args[0]) + beg, QSP_STR(args[1]));
+		QSP_PNUM(tos) = (str ? (int)(str - QSP_STR(args[0])) + 1 : 0);
 	}
 	else
 		QSP_PNUM(tos) = 0;

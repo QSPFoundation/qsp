@@ -488,26 +488,15 @@ int qspArrayPos(QSPVariant *args, int argsCount, QSP_BOOL isRegExp)
 	regex_t *onigExp;
 	OnigErrorInfo onigInfo;
 	QSP_BOOL isString;
-	if (qspConvertVariantTo(args, argsCount == 2))
-	{
-		qspSetError(QSP_ERR_TYPEMISMATCH);
-		return -1;
-	}
 	if (argsCount == 2)
-	{
-		str = QSP_STR(args[0]);
 		ind = 0;
-		val = args + 1;
-	}
 	else
 	{
-		qspConvertVariantTo(args + 1, QSP_TRUE);
-		str = QSP_STR(args[1]);
-		ind = QSP_NUM(args[0]);
-		val = args + 2;
+		ind = QSP_NUM(args[2]);
 		if (ind < 0) ind = 0;
 	}
-	if (!(var = qspVarReferenceWithType(str, QSP_FALSE, &isString))) return -1;
+	if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, &isString))) return -1;
+	val = args + 1;
 	if (qspConvertVariantTo(val, isRegExp || isString))
 	{
 		qspSetError(QSP_ERR_TYPEMISMATCH);
