@@ -61,7 +61,7 @@
 	int qspGetVarNumValue(QSP_CHAR *);
 	QSPVariant qspGetVar(QSP_CHAR *);
 	int qspArraySize(QSP_CHAR *);
-	int qspArrayPos(QSPVariant *, int, QSP_BOOL);
+	int qspArrayPos(QSP_CHAR *, QSPVariant *, int, QSP_BOOL);
 	QSPVariant qspArrayMinMaxItem(QSP_CHAR *, QSP_BOOL);
 	int qspGetVarsCount();
 	void qspSetArgs(QSPVar *, QSPVariant *, int);

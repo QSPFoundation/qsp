@@ -478,25 +478,16 @@ int qspArraySize(QSP_CHAR *name)
 	return var->ValsCount;
 }
 
-int qspArrayPos(QSPVariant *args, int argsCount, QSP_BOOL isRegExp)
+int qspArrayPos(QSP_CHAR *varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 {
-	int num, count, ind;
+	int num, count;
 	QSPVar *var;
-	QSPVariant *val;
 	QSP_CHAR *str;
 	OnigUChar *tempBeg, *tempEnd;
 	regex_t *onigExp;
 	OnigErrorInfo onigInfo;
 	QSP_BOOL isString;
-	if (argsCount == 2)
-		ind = 0;
-	else
-	{
-		ind = QSP_NUM(args[2]);
-		if (ind < 0) ind = 0;
-	}
-	if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, &isString))) return -1;
-	val = args + 1;
+	if (!(var = qspVarReferenceWithType(varName, QSP_FALSE, &isString))) return -1;
 	if (qspConvertVariantTo(val, isRegExp || isString))
 	{
 		qspSetError(QSP_ERR_TYPEMISMATCH);
@@ -513,7 +504,10 @@ int qspArrayPos(QSPVariant *args, int argsCount, QSP_BOOL isRegExp)
 		}
 	}
 	count = var->ValsCount;
-	if (ind > count) ind = count;
+	if (ind < 0)
+		ind = 0;
+	else if (ind > count)
+		ind = count;
 	while (ind <= count)
 	{
 		if (val->IsStr)
