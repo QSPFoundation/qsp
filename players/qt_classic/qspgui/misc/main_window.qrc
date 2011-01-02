@@ -1,4 +1,11 @@
 <RCC>
-    <qresource prefix="main_window">
+    <qresource prefix="/menu">
+        <file alias="open">icons/open.xpm</file>
+        <file alias="about">icons/about.xpm</file>
+        <file alias="exit">icons/exit.xpm</file>
+        <file alias="new">icons/new.xpm</file>
+        <file alias="statusopen">icons/statusopen.xpm</file>
+        <file alias="statussave">icons/statussave.xpm</file>
+        <file alias="windowmode">icons/windowmode.xpm</file>
     </qresource>
 </RCC>

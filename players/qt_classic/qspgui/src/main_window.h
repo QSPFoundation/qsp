@@ -18,6 +18,22 @@ private:
 	QMenu*		_fileMenu;
 	QMenu*		_gameMenu;
 	QMenu*		_settingsMenu;
+private slots:
+	void OnOpenGame();
+	void OnRestartGame();
+	void OnExit();
+	void OnOpenSavedGame();
+	void OnSaveGame();
+	void OnOptions();
+	void OnAbout();
+	void OnToggleObjs();
+	void OnToggleActs();
+	void OnToggleDesc();
+	void OnToggleInput();
+	void OnToggleCaptions();
+	void OnToggleHotkeys();
+	void OnToggleWinMode();
+	void OnChangeSoundVolume();
 };
 
 } // namespace Ui
