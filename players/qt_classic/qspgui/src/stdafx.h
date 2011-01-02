@@ -2,3 +2,5 @@
 #include <QtGui>
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
+#include <QtGui/QDockWidget>
+#include <QtGui/QListWidget>

@@ -1,5 +1,12 @@
-#ifndef MAIN_WINDOW_H
-#define MAIN_WINDOW_H
+#ifndef _MAIN_WINDOW_H_
+#define _MAIN_WINDOW_H_
+
+#include "qsp_textbox.h"
+#include "qsp_listbox.h"
+#include "qsp_inputbox.h"
+#include "qsp_imgcanvas.h"
+
+#define TITLE "Quest Soft Player 5"
 
 namespace Ui
 {
@@ -11,13 +18,25 @@ class MainWindow : public QMainWindow
 public:
 	MainWindow(QWidget* parent = NULL, Qt::WFlags flags = 0);
 	~MainWindow();
-
 private:
 	void CreateMenuBar();
+	void CreateDockWindows();
 private:
-	QMenu*		_fileMenu;
-	QMenu*		_gameMenu;
-	QMenu*		_settingsMenu;
+		static QString value();
+
+	QMenu*			_fileMenu;
+	QMenu*			_gameMenu;
+	QMenu*			_settingsMenu;
+	QMenu*			_showHideMenu;
+	QspTextBox*		_mainDescTextBox;
+	QspListBox*		_objectsListBox;
+	QspListBox*		_actionsListBox;
+	QspTextBox*		_descTextBox;
+	QspInputBox*	_inputTextBox;
+	QDockWidget*	_objectsWidget;
+	QDockWidget*	_actionsWidget;
+	QDockWidget*	_descWidget;
+	QDockWidget*	_inputWidget;
 private slots:
 	void OnOpenGame();
 	void OnRestartGame();
@@ -26,10 +45,6 @@ private slots:
 	void OnSaveGame();
 	void OnOptions();
 	void OnAbout();
-	void OnToggleObjs();
-	void OnToggleActs();
-	void OnToggleDesc();
-	void OnToggleInput();
 	void OnToggleCaptions();
 	void OnToggleHotkeys();
 	void OnToggleWinMode();
@@ -38,4 +53,4 @@ private slots:
 
 } // namespace Ui
 
-#endif // MAIN_WINDOW_H
+#endif // _MAIN_WINDOW_H_

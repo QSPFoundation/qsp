@@ -203,6 +203,54 @@
 					</FileConfiguration>
 				</File>
 			</Filter>
+			<Filter
+				Name="qsp_textbox"
+				>
+				<File
+					RelativePath=".\src\qsp_textbox.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\qsp_textbox.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="qsp_listbox"
+				>
+				<File
+					RelativePath=".\src\qsp_listbox.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\qsp_listbox.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="qsp_imgcanvas"
+				>
+				<File
+					RelativePath=".\src\qsp_imgcanvas.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\qsp_imgcanvas.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="qsp_inputbox"
+				>
+				<File
+					RelativePath=".\src\qsp_inputbox.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\qsp_inputbox.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="precompiled"
