@@ -118,7 +118,7 @@
 	/* External functions */
 	void qspInitStats();
 	int qspGetStatArgs(QSP_CHAR *, int, QSPVariant *);
-	QSP_BOOL qspExecCode(QSPLineOfCode *, int, int, int, QSP_CHAR **);
+	QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *, int, int, QSP_BOOL);
 	void qspExecStringAsCodeWithArgs(QSP_CHAR *, QSPVariant *, int);
 	QSP_CHAR *qspGetLineLabel(QSP_CHAR *);
 	void qspInitLineOfCode(QSPLineOfCode *, QSP_CHAR *, int);

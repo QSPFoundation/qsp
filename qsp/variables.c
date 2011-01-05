@@ -23,6 +23,9 @@
 #include "text.h"
 
 QSPVar qspVars[QSP_VARSCOUNT];
+QSPVar **qspSavedLocalVars;
+int *qspSavedLocalVarsCounts = 0;
+int qspSavedLocalGroupsCount = 0;
 
 unsigned char qspRand8[256] =
 {
@@ -428,6 +431,74 @@ QSPVariant qspGetVar(QSP_CHAR *name)
 	int index;
 	if (!(var = qspGetVarData(name, QSP_FALSE, &index))) return qspGetEmptyVariant(QSP_FALSE);
 	return qspGetVarValueByReference(var, index, *name == QSP_STRCHAR[0]);
+}
+
+void qspPrepareGlobalVars()
+{
+	int i, j;
+	QSPVar *var;
+	for (i = qspSavedLocalGroupsCount - 1; i >= 0; --i)
+	{
+		for (j = qspSavedLocalVarsCounts[i] - 1; j >= 0; --j)
+		{
+			if (!(var = qspVarReference(qspSavedLocalVars[i][j].Name, QSP_TRUE))) return 0;
+			qspEmptyVar(var);
+			qspMoveVar(var, &qspSavedLocalVars[i][j]);
+		}
+	}
+}
+
+int qspPrepareLocalVars(QSPVar **vars)
+{
+	QSPVar *var, *savedVars;
+	int i, j, ind = 0, varsCount = 0;
+	for (i = qspSavedLocalGroupsCount - 1; i >= 0; --i)
+		varsCount += qspSavedLocalVarsCounts[i];
+	savedVars = (QSPVar *)malloc(varsCount * sizeof(QSPVar));
+	for (i = qspSavedLocalGroupsCount - 1; i >= 0; --i)
+	{
+		for (j = qspSavedLocalVarsCounts[i] - 1; j >= 0; --j)
+		{
+			if (!(var = qspVarReference(qspSavedLocalVars[i][j].Name, QSP_TRUE)))
+			{
+				while (--ind >= 0)
+					qspEmptyVar(savedVars + ind);
+				free(savedVars);
+				return 0;
+			}
+			qspMoveVar(savedVars + ind, var);
+			qspMoveVar(var, &qspSavedLocalVars[i][j]);
+			++ind;
+		}
+	}
+	*vars = savedVars;
+	return varsCount;
+}
+
+void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVar **savedLocalVars, int *savedLocalVarsCount, int groupsCount)
+{
+	QSPVar *var;
+	int i, j, ind = 0;
+	for (i = groupsCount - 1; i >= 0; --i)
+	{
+		for (j = savedLocalVarsCount[i] - 1; j >= 0; --j)
+		{
+			if (!(var = qspVarReference(savedLocalVars[i][j].Name, QSP_TRUE)))
+			{
+				while (ind < varsCount)
+				{
+					qspEmptyVar(savedVars + ind);
+					++ind;
+				}
+				free(savedVars);
+				return;
+			}
+			qspMoveVar(&savedLocalVars[i][j], var);
+			qspMoveVar(var, savedVars + ind);
+			++ind;
+		}
+	}
+	free(savedVars);
 }
 
 static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)

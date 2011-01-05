@@ -55,7 +55,7 @@
 	void qspCreateWorld(int, int);
 	void qspPrepareLocs();
 	int qspLocIndex(QSP_CHAR *);
-	void qspExecLocByIndex(int, QSP_BOOL);
+	void qspExecLocByIndex(int, QSP_BOOL, QSP_BOOL);
 	void qspExecLocByName(QSP_CHAR *, QSP_BOOL);
 	void qspExecLocByNameWithArgs(QSP_CHAR *, QSPVariant *, int);
 	void qspExecLocByVarNameWithArgs(QSP_CHAR *, QSPVariant *, int);

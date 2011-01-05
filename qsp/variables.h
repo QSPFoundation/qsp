@@ -49,6 +49,9 @@
 	} QSPVar;
 
 	extern QSPVar qspVars[QSP_VARSCOUNT];
+	extern QSPVar **qspSavedLocalVars;
+	extern int *qspSavedLocalVarsCounts;
+	extern int qspSavedLocalGroupsCount;
 
 	/* External functions */
 	void qspClearVars(QSP_BOOL);
@@ -60,6 +63,9 @@
 	QSP_CHAR *qspGetVarStrValue(QSP_CHAR *);
 	int qspGetVarNumValue(QSP_CHAR *);
 	QSPVariant qspGetVar(QSP_CHAR *);
+	void qspPrepareGlobalVars();
+	int qspPrepareLocalVars(QSPVar **);
+	void qspRestoreLocalVars(QSPVar *, int, QSPVar **, int *, int);
 	int qspArraySize(QSP_CHAR *);
 	int qspArrayPos(QSP_CHAR *, QSPVariant *, int, QSP_BOOL);
 	QSPVariant qspArrayMinMaxItem(QSP_CHAR *, QSP_BOOL);

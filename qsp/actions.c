@@ -117,11 +117,11 @@ void qspExecAction(int ind)
 	count = act->OnPressLinesCount;
 	qspCopyPrepLines(&code, act->OnPressLines, 0, count);
 	if (act->IsManageLines)
-		qspExecCode(code, 0, count, act->StartLine + 1, 0);
+		qspExecTopCodeWithLocals(code, count, act->StartLine + 1, QSP_FALSE);
 	else
 	{
 		qspRealLine = act->StartLine;
-		qspExecCode(code, 0, count, 0, 0);
+		qspExecTopCodeWithLocals(code, count, 0, QSP_FALSE);
 	}
 	qspFreePrepLines(code, count);
 	qspRealLine = oldLine;

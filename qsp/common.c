@@ -51,6 +51,8 @@ void qspPrepareExecution()
 
 void qspMemClear(QSP_BOOL isFirst)
 {
+	int i, j;
+	QSPVar *savedVars;
 	qspClearIncludes(isFirst);
 	qspClearVars(isFirst);
 	qspClearObjects(isFirst);
@@ -71,6 +73,21 @@ void qspMemClear(QSP_BOOL isFirst)
 		}
 		if (qspCurInput) free(qspCurInput);
 		if (qspViewPath) free(qspViewPath);
+		for (i = qspSavedLocalGroupsCount - 1; i >= 0; --i)
+		{
+			savedVars = qspSavedLocalVars[i];
+			if (savedVars)
+			{
+				for (j = qspSavedLocalVarsCounts[i] - 1; j >= 0; --j)
+				{
+					free(savedVars[j].Name);
+					qspEmptyVar(savedVars + j);
+				}
+				free(savedVars);
+			}
+		}
+		if (qspSavedLocalVars) free(qspSavedLocalVars);
+		if (qspSavedLocalVarsCounts) free(qspSavedLocalVarsCounts);
 	}
 	qspCurDesc = 0;
 	qspCurDescLen = 0;
@@ -79,6 +96,9 @@ void qspMemClear(QSP_BOOL isFirst)
 	qspCurInput = 0;
 	qspCurInputLen = 0;
 	qspViewPath = 0;
+	qspSavedLocalVars = 0;
+	qspSavedLocalVarsCounts = 0;
+	qspSavedLocalGroupsCount = 0;
 }
 
 void qspSetSeed(unsigned int seed)
