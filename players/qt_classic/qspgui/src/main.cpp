@@ -4,9 +4,8 @@
 int main(int argc, char *argv[])
 {
 	QApplication application(argc, argv);
-
-// 	application.setStyle("plastique"); 
-// 	application.setPalette(application.style()->standardPalette());
+	application.setApplicationName("Quest Soft Player");
+	application.setApplicationVersion("5.0.0");
 
 	Ui::MainWindow window;
 	window.show();

@@ -10,8 +10,7 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags flags) :
 	setMinimumSize(QSize(300, 200));
 	setWindowTitle(TITLE);
 	setDockNestingEnabled(true);
-
-	resize( 640, 480 );
+	resize(850, 650);
 
 	// Set QMainWindow in the center of desktop
 	QRect rect = geometry();
@@ -23,11 +22,37 @@ MainWindow::MainWindow(QWidget* parent, Qt::WFlags flags) :
 
 	CreateDockWindows();
 	CreateMenuBar();
+
+	LoadSettings();
 }
 
 MainWindow::~MainWindow()
 {
+	
+}
 
+void MainWindow::LoadSettings()
+{
+	QSettings settings(QApplication::applicationDirPath() + "/config.cfg", QSettings::IniFormat);
+	
+	setGeometry(settings.value("mainWindow/geometry").toRect());
+	restoreState(settings.value("mainWindow/windowState").toByteArray());
+
+	if (settings.value("mainWindow/isMaximized").toBool())
+ 		showMaximized();
+}
+
+void MainWindow::SaveSettings()
+{
+	QSettings settings(QApplication::applicationDirPath() + "/config.cfg", QSettings::IniFormat);
+
+	bool maximized = isMaximized();
+
+	if (maximized) showNormal();
+
+	settings.setValue("mainWindow/geometry", geometry());
+	settings.setValue("mainWindow/windowState", saveState());
+	settings.setValue("mainWindow/isMaximized", maximized);
 }
 
 void MainWindow::CreateMenuBar()
@@ -48,7 +73,7 @@ void MainWindow::CreateMenuBar()
 
 	// Exit item
 	_fileMenu->addAction(QIcon(":/menu/exit"), tr("Exit"),
-		this, SLOT(OnExit()), QKeySequence(Qt::ALT + Qt::Key_X));
+		this, SLOT(close()), QKeySequence(Qt::ALT + Qt::Key_X));
 	//------------------------------------------------------------------
 	// Game menu
 	_gameMenu = menuBar()->addMenu(tr("&Game"));
@@ -129,7 +154,7 @@ void MainWindow::CreateDockWindows()
 
 	// "Actions" widget
 	_actionsWidget = new QDockWidget(tr("Actions"), this);
-	addDockWidget(Qt::RightDockWidgetArea, _actionsWidget, Qt::Vertical);
+	addDockWidget(Qt::BottomDockWidgetArea, _actionsWidget, Qt::Vertical);
 	_actionsListBox = new QspListBox(this);
 	_actionsWidget->setWidget(_actionsListBox);
 
@@ -141,11 +166,12 @@ void MainWindow::CreateDockWindows()
 
 	// "Input area" widget
 	_inputWidget = new QDockWidget(tr("Input area"), this);
-	addDockWidget(Qt::TopDockWidgetArea, _inputWidget, Qt::Vertical);
+	addDockWidget(Qt::BottomDockWidgetArea, _inputWidget, Qt::Vertical);
 	_inputTextBox = new QspInputBox(this);
 	_inputWidget->setWidget(_inputTextBox);
-}
 
+	splitDockWidget(_actionsWidget, _inputWidget, Qt::Vertical);
+}
 
 void MainWindow::OnOpenGame()
 {
@@ -157,9 +183,10 @@ void MainWindow::OnRestartGame()
 
 }
 
-void MainWindow::OnExit()
+void MainWindow::closeEvent(QCloseEvent *event)
 {
-	close();
+	SaveSettings();
+	QMainWindow::closeEvent(event);
 }
 
 void MainWindow::OnAbout()

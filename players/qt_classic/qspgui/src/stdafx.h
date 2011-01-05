@@ -4,3 +4,4 @@
 #include <QtGui/QMainWindow>
 #include <QtGui/QDockWidget>
 #include <QtGui/QListWidget>
+#include <QtCore/QSettings>

@@ -7,6 +7,7 @@
 #include "qsp_imgcanvas.h"
 
 #define TITLE "Quest Soft Player 5"
+#define SETTINGS_FILENAME "settings.ini"
 
 namespace Ui
 {
@@ -21,8 +22,10 @@ public:
 private:
 	void CreateMenuBar();
 	void CreateDockWindows();
+	void LoadSettings();
+	void SaveSettings();
+	void closeEvent(QCloseEvent *event);
 private:
-		static QString value();
 
 	QMenu*			_fileMenu;
 	QMenu*			_gameMenu;
@@ -40,7 +43,6 @@ private:
 private slots:
 	void OnOpenGame();
 	void OnRestartGame();
-	void OnExit();
 	void OnOpenSavedGame();
 	void OnSaveGame();
 	void OnOptions();
