@@ -313,13 +313,6 @@ QSP_BOOL QSPExecString(const QSP_CHAR *s, QSP_BOOL isRefresh)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return QSP_TRUE;
 }
-/* Выполнение кода первой локации */
-QSP_BOOL QSPExecLocationCodeByIndex()
-{
-	qspPrepareExecution();
-	qspExecLocByIndex(0, QSP_TRUE);
-	return QSP_TRUE;
-}
 /* Выполнение кода указанной локации */
 QSP_BOOL QSPExecLocationCode(const QSP_CHAR *name, QSP_BOOL isRefresh)
 {
