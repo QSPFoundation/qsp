@@ -441,7 +441,7 @@ void qspPrepareGlobalVars()
 	{
 		for (j = qspSavedLocalVarsCounts[i] - 1; j >= 0; --j)
 		{
-			if (!(var = qspVarReference(qspSavedLocalVars[i][j].Name, QSP_TRUE))) return 0;
+			if (!(var = qspVarReference(qspSavedLocalVars[i][j].Name, QSP_TRUE))) return;
 			qspEmptyVar(var);
 			qspMoveVar(var, &qspSavedLocalVars[i][j]);
 		}
