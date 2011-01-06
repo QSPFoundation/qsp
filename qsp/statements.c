@@ -733,10 +733,10 @@ QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *s, int endLine, int codeOffset,
 {
 	QSP_BOOL isExit;
 	QSPVar *savedVars, **savedLocalVars;
-	int i, oldRefreshCount, varsCount, groupsCount, *savedLocalVarsCount;
+	int i, oldRefreshCount, varsCount, groupsCount, *savedLocalVarsCounts;
 	groupsCount = qspSavedLocalGroupsCount;
 	savedLocalVars = qspSavedLocalVars;
-	savedLocalVarsCount = qspSavedLocalVarsCounts;
+	savedLocalVarsCounts = qspSavedLocalVarsCounts;
 	if (isNewLoc)
 		qspPrepareGlobalVars();
 	else
@@ -775,12 +775,12 @@ QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *s, int endLine, int codeOffset,
 	{
 		qspRestoreVarsList(qspSavedLocalVars[0], qspSavedLocalVarsCounts[0]);
 		if (!isNewLoc)
-			qspRestoreLocalVars(savedVars, varsCount, savedLocalVars, savedLocalVarsCount, groupsCount);
+			qspRestoreLocalVars(savedVars, varsCount, savedLocalVars, savedLocalVarsCounts, groupsCount);
 	}
 	if (qspSavedLocalVars) free(qspSavedLocalVars);
 	if (qspSavedLocalVarsCounts) free(qspSavedLocalVarsCounts);
 	qspSavedLocalVars = savedLocalVars;
-	qspSavedLocalVarsCounts = savedLocalVarsCount;
+	qspSavedLocalVarsCounts = savedLocalVarsCounts;
 	qspSavedLocalGroupsCount = groupsCount;
 	return isExit;
 }

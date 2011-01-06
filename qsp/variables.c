@@ -475,13 +475,13 @@ int qspPrepareLocalVars(QSPVar **vars)
 	return varsCount;
 }
 
-void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVar **savedLocalVars, int *savedLocalVarsCount, int groupsCount)
+void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVar **savedLocalVars, int *savedLocalVarsCounts, int groupsCount)
 {
 	QSPVar *var;
 	int i, j, ind = 0;
 	for (i = groupsCount - 1; i >= 0; --i)
 	{
-		for (j = savedLocalVarsCount[i] - 1; j >= 0; --j)
+		for (j = savedLocalVarsCounts[i] - 1; j >= 0; --j)
 		{
 			if (!(var = qspVarReference(savedLocalVars[i][j].Name, QSP_TRUE)))
 			{
