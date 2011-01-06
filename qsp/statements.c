@@ -734,14 +734,14 @@ QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *s, int endLine, int codeOffset,
 	QSP_BOOL isExit;
 	QSPVar *savedVars, **savedLocalVars;
 	int i, oldRefreshCount, varsCount, groupsCount, *savedLocalVarsCounts;
-	groupsCount = qspSavedLocalGroupsCount;
-	savedLocalVars = qspSavedLocalVars;
-	savedLocalVarsCounts = qspSavedLocalVarsCounts;
 	if (isNewLoc)
 		qspPrepareGlobalVars();
 	else
 		varsCount = qspPrepareLocalVars(&savedVars);
 	if (qspErrorNum) return QSP_FALSE;
+	groupsCount = qspSavedLocalGroupsCount;
+	savedLocalVars = qspSavedLocalVars;
+	savedLocalVarsCounts = qspSavedLocalVarsCounts;
 	qspSavedLocalGroupsCount = 1;
 	qspSavedLocalVars = (QSPVar **)malloc(sizeof(QSPVar *));
 	qspSavedLocalVarsCounts = (int *)malloc(sizeof(int));
