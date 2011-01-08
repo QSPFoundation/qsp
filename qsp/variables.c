@@ -501,6 +501,14 @@ void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVar **savedLocalVa
 	free(savedVars);
 }
 
+void qspClearLocalVars(QSPVar *savedVars, int varsCount)
+{
+	int i;
+	for (i = 0; i < varsCount; ++i)
+		qspEmptyVar(savedVars + i);
+	free(savedVars);
+}
+
 static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 {
 	QSP_CHAR *str;

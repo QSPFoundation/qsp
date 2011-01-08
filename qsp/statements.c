@@ -56,6 +56,7 @@ static QSP_BOOL qspStatementSinglelineFor(QSPLineOfCode *, int, int, QSP_CHAR **
 static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *, int, int, int, QSP_CHAR **);
 static int qspGetVarsList(QSP_CHAR *, QSPVar **);
 static void qspRestoreVarsList(QSPVar *, int);
+static void qspClearVarsList(QSPVar *, int);
 static void qspStatementLocal(QSP_CHAR *);
 static QSP_BOOL qspStatementAddText(QSPVariant *, int, QSP_CHAR **, int);
 static QSP_BOOL qspStatementClear(QSPVariant *, int, QSP_CHAR **, int);
@@ -662,8 +663,7 @@ static QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int co
 static QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSP_CHAR **jumpTo)
 {
 	QSP_BOOL isExit;
-	QSPVar *savedVars;
-	int i, oldRefreshCount, ind = qspSavedLocalGroupsCount;
+	int oldRefreshCount, ind = qspSavedLocalGroupsCount;
 	qspSavedLocalVars = (QSPVar **)realloc(qspSavedLocalVars, (ind + 1) * sizeof(QSPVar *));
 	qspSavedLocalVarsCounts = (int *)realloc(qspSavedLocalVarsCounts, (ind + 1) * sizeof(int));
 	qspSavedLocalVars[ind] = 0;
@@ -676,16 +676,7 @@ static QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int 
 		if (qspSavedLocalGroupsCount)
 		{
 			--qspSavedLocalGroupsCount;
-			savedVars = qspSavedLocalVars[ind];
-			if (savedVars)
-			{
-				for (i = qspSavedLocalVarsCounts[ind] - 1; i >= 0; --i)
-				{
-					free(savedVars[i].Name);
-					qspEmptyVar(savedVars + i);
-				}
-				free(savedVars);
-			}
+			qspClearVarsList(qspSavedLocalVars[ind], qspSavedLocalVarsCounts[ind]);
 		}
 		return QSP_FALSE;
 	}
@@ -697,8 +688,7 @@ static QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int 
 static QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSP_CHAR **jumpTo)
 {
 	QSP_BOOL isExit;
-	QSPVar *savedVars;
-	int i, oldRefreshCount, ind = qspSavedLocalGroupsCount;
+	int oldRefreshCount, ind = qspSavedLocalGroupsCount;
 	qspSavedLocalVars = (QSPVar **)realloc(qspSavedLocalVars, (ind + 1) * sizeof(QSPVar *));
 	qspSavedLocalVarsCounts = (int *)realloc(qspSavedLocalVarsCounts, (ind + 1) * sizeof(int));
 	qspSavedLocalVars[ind] = 0;
@@ -711,16 +701,7 @@ static QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int end
 		if (qspSavedLocalGroupsCount)
 		{
 			--qspSavedLocalGroupsCount;
-			savedVars = qspSavedLocalVars[ind];
-			if (savedVars)
-			{
-				for (i = qspSavedLocalVarsCounts[ind] - 1; i >= 0; --i)
-				{
-					free(savedVars[i].Name);
-					qspEmptyVar(savedVars + i);
-				}
-				free(savedVars);
-			}
+			qspClearVarsList(qspSavedLocalVars[ind], qspSavedLocalVarsCounts[ind]);
 		}
 		return QSP_FALSE;
 	}
@@ -733,7 +714,7 @@ QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *s, int endLine, int codeOffset,
 {
 	QSP_BOOL isExit;
 	QSPVar *savedVars, **savedLocalVars;
-	int i, oldRefreshCount, varsCount, groupsCount, *savedLocalVarsCounts;
+	int oldRefreshCount, varsCount, groupsCount, *savedLocalVarsCounts;
 	if (isNewLoc)
 		qspPrepareGlobalVars();
 	else
@@ -751,31 +732,21 @@ QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *s, int endLine, int codeOffset,
 	isExit = qspExecCode(s, 0, endLine, codeOffset, 0);
 	if (oldRefreshCount != qspRefreshCount || qspErrorNum)
 	{
-		if (!isNewLoc)
-		{
-			for (i = 0; i < varsCount; ++i)
-				qspEmptyVar(savedVars + i);
-			free(savedVars);
-		}
 		if (qspSavedLocalGroupsCount)
-		{
-			savedVars = qspSavedLocalVars[0];
-			if (savedVars)
-			{
-				for (i = qspSavedLocalVarsCounts[0] - 1; i >= 0; --i)
-				{
-					free(savedVars[i].Name);
-					qspEmptyVar(savedVars + i);
-				}
-				free(savedVars);
-			}
-		}
+			qspClearVarsList(qspSavedLocalVars[0], qspSavedLocalVarsCounts[0]);
+		if (!isNewLoc)
+			qspClearLocalVars(savedVars, varsCount);
 	}
 	else
 	{
 		qspRestoreVarsList(qspSavedLocalVars[0], qspSavedLocalVarsCounts[0]);
 		if (!isNewLoc)
-			qspRestoreLocalVars(savedVars, varsCount, savedLocalVars, savedLocalVarsCounts, groupsCount);
+		{
+			if (qspErrorNum)
+				qspClearLocalVars(savedVars, varsCount);
+			else
+				qspRestoreLocalVars(savedVars, varsCount, savedLocalVars, savedLocalVarsCounts, groupsCount);
+		}
 	}
 	if (qspSavedLocalVars) free(qspSavedLocalVars);
 	if (qspSavedLocalVarsCounts) free(qspSavedLocalVarsCounts);
@@ -1423,6 +1394,20 @@ static void qspRestoreVarsList(QSPVar *vars, int varsCount)
 			free(vars[i].Name);
 			qspEmptyVar(var);
 			qspMoveVar(var, vars + i);
+		}
+		free(vars);
+	}
+}
+
+static void qspClearVarsList(QSPVar *vars, int varsCount)
+{
+	int i;
+	if (vars)
+	{
+		for (i = 0; i < varsCount; ++i)
+		{
+			free(vars[i].Name);
+			qspEmptyVar(vars + i);
 		}
 		free(vars);
 	}

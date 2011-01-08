@@ -66,6 +66,7 @@
 	void qspPrepareGlobalVars();
 	int qspPrepareLocalVars(QSPVar **);
 	void qspRestoreLocalVars(QSPVar *, int, QSPVar **, int *, int);
+	void qspClearLocalVars(QSPVar *, int);
 	int qspArraySize(QSP_CHAR *);
 	int qspArrayPos(QSP_CHAR *, QSPVariant *, int, QSP_BOOL);
 	QSPVariant qspArrayMinMaxItem(QSP_CHAR *, QSP_BOOL);
