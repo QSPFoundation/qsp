@@ -54,9 +54,6 @@ static QSP_BOOL qspCheckForLoop(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, 
 static void qspEndForLoop(QSP_CHAR *, int);
 static QSP_BOOL qspStatementSinglelineFor(QSPLineOfCode *, int, int, QSP_CHAR **);
 static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *, int, int, int, QSP_CHAR **);
-static int qspGetVarsList(QSP_CHAR *, QSPVar **);
-static void qspRestoreVarsList(QSPVar *, int);
-static void qspClearVarsList(QSPVar *, int);
 static void qspStatementLocal(QSP_CHAR *);
 static QSP_BOOL qspStatementAddText(QSPVariant *, int, QSP_CHAR **, int);
 static QSP_BOOL qspStatementClear(QSPVariant *, int, QSP_CHAR **, int);
@@ -1288,129 +1285,6 @@ static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *s, int endLine, int line
 	qspEmptyVar(var);
 	qspMoveVar(var, &local);
 	return QSP_FALSE;
-}
-
-static int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
-{
-	QSP_BOOL isVarFound;
-	QSPVar *savedVars, *var;
-	QSP_CHAR *varName, *pos;
-	int i, ind, bufSize, count, oldCount;
-	s = qspSkipSpaces(s);
-	if (!(*s))
-	{
-		qspSetError(QSP_ERR_SYNTAX);
-		return 0;
-	}
-	count = 0;
-	bufSize = 8;
-	savedVars = (QSPVar *)malloc(bufSize * sizeof(QSPVar));
-	ind = qspSavedLocalGroupsCount - 1;
-	oldCount = qspSavedLocalVarsCounts[ind];
-	isVarFound = QSP_FALSE;
-	while (1)
-	{
-		pos = qspStrPos(s, QSP_COMMA, QSP_FALSE);
-		if (pos)
-		{
-			*pos = 0;
-			varName = qspDelSpc(s);
-			*pos = QSP_COMMA[0];
-		}
-		else
-			varName = qspDelSpc(s);
-		// TODO: Remove "$" sign if one exists
-		qspUpperStr(varName);
-		for (i = 0; i < oldCount; ++i)
-		{
-			if (!qspStrsComp(varName, qspSavedLocalVars[ind][i].Name))
-			{
-				isVarFound = QSP_TRUE;
-				break;
-			}
-		}
-		if (isVarFound)
-		{
-			isVarFound = QSP_FALSE;
-			free(varName);
-		}
-		else
-		{
-			if (!(var = qspVarReference(varName, QSP_FALSE)))
-			{
-				free(varName);
-				break;
-			}
-			if (count == bufSize)
-			{
-				bufSize <<= 1;
-				savedVars = (QSPVar *)realloc(savedVars, bufSize * sizeof(QSPVar));
-			}
-			qspMoveVar(savedVars + count, var);
-			savedVars[count].Name = varName;
-			++count;
-		}
-		if (!pos) break;
-		s = qspSkipSpaces(pos + QSP_LEN(QSP_COMMA));
-		if (!(*s))
-		{
-			qspSetError(QSP_ERR_SYNTAX);
-			break;
-		}
-	}
-	if (qspErrorNum)
-	{
-		for (i = 0; i < count; ++i)
-		{
-			free(savedVars[i].Name);
-			qspEmptyVar(savedVars + i);
-		}
-		free(savedVars);
-		return 0;
-	}
-	*vars = savedVars;
-	return count;
-}
-
-static void qspRestoreVarsList(QSPVar *vars, int varsCount)
-{
-	int i;
-	QSPVar *var;
-	if (vars)
-	{
-		for (i = 0; i < varsCount; ++i)
-		{
-			if (!(var = qspVarReference(vars[i].Name, QSP_TRUE)))
-			{
-				while (i < varsCount)
-				{
-					free(vars[i].Name);
-					qspEmptyVar(vars + i);
-					++i;
-				}
-				free(vars);
-				return;
-			}
-			free(vars[i].Name);
-			qspEmptyVar(var);
-			qspMoveVar(var, vars + i);
-		}
-		free(vars);
-	}
-}
-
-static void qspClearVarsList(QSPVar *vars, int varsCount)
-{
-	int i;
-	if (vars)
-	{
-		for (i = 0; i < varsCount; ++i)
-		{
-			free(vars[i].Name);
-			qspEmptyVar(vars + i);
-		}
-		free(vars);
-	}
 }
 
 static void qspStatementLocal(QSP_CHAR *s)
