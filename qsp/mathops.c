@@ -369,7 +369,7 @@ static QSP_CHAR *qspGetString(QSP_CHAR **expr)
 		if (*pos == quot && *(++pos) != quot) break;
 		if (++strLen >= bufSize)
 		{
-			bufSize <<= 1;
+			bufSize += 128;
 			buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
 		}
 		buf[strLen - 1] = *pos;

@@ -562,7 +562,7 @@ int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
 			}
 			if (count == bufSize)
 			{
-				bufSize <<= 1;
+				bufSize += 8;
 				savedVars = (QSPVar *)realloc(savedVars, bufSize * sizeof(QSPVar));
 			}
 			qspMoveVar(savedVars + count, var);

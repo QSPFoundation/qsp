@@ -272,7 +272,7 @@ int qspSplitStr(QSP_CHAR *str, QSP_CHAR *delim, QSP_CHAR ***res)
 		newStr[allocChars] = 0;
 		if (++count > bufSize)
 		{
-			bufSize <<= 1;
+			bufSize += 16;
 			ret = (QSP_CHAR **)realloc(ret, bufSize * sizeof(QSP_CHAR *));
 		}
 		ret[count - 1] = newStr;

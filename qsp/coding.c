@@ -419,7 +419,7 @@ int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSP_CHAR *delim, char ***res)
 			newStr[allocChars] = 0;
 		if (++count > bufSize)
 		{
-			bufSize <<= 1;
+			bufSize += 16;
 			ret = (char **)realloc(ret, bufSize * sizeof(char *));
 		}
 		ret[count - 1] = newStr;
