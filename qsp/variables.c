@@ -23,9 +23,8 @@
 #include "text.h"
 
 QSPVar qspVars[QSP_VARSCOUNT];
-QSPVar **qspSavedLocalVars;
-int *qspSavedLocalVarsCounts = 0;
-int qspSavedLocalGroupsCount = 0;
+QSPVarsGroup *qspSavedVarsGroups = 0;
+int qspSavedVarsGroupsCount = 0;
 
 unsigned char qspRand8[256] =
 {
@@ -437,13 +436,13 @@ void qspPrepareGlobalVars()
 {
 	int i, j;
 	QSPVar *var;
-	for (i = qspSavedLocalGroupsCount - 1; i >= 0; --i)
+	for (i = qspSavedVarsGroupsCount - 1; i >= 0; --i)
 	{
-		for (j = qspSavedLocalVarsCounts[i] - 1; j >= 0; --j)
+		for (j = qspSavedVarsGroups[i].VarsCount - 1; j >= 0; --j)
 		{
-			if (!(var = qspVarReference(qspSavedLocalVars[i][j].Name, QSP_TRUE))) return;
+			if (!(var = qspVarReference(qspSavedVarsGroups[i].Vars[j].Name, QSP_TRUE))) return;
 			qspEmptyVar(var);
-			qspMoveVar(var, &qspSavedLocalVars[i][j]);
+			qspMoveVar(var, &qspSavedVarsGroups[i].Vars[j]);
 		}
 	}
 }
@@ -452,8 +451,8 @@ int qspPrepareLocalVars(QSPVar **vars)
 {
 	QSPVar *var, *savedVars;
 	int i, j, ind, varsCount = 0;
-	for (i = qspSavedLocalGroupsCount - 1; i >= 0; --i)
-		varsCount += qspSavedLocalVarsCounts[i];
+	for (i = qspSavedVarsGroupsCount - 1; i >= 0; --i)
+		varsCount += qspSavedVarsGroups[i].VarsCount;
 	if (!varsCount)
 	{
 		*vars = 0;
@@ -461,11 +460,11 @@ int qspPrepareLocalVars(QSPVar **vars)
 	}
 	savedVars = (QSPVar *)malloc(varsCount * sizeof(QSPVar));
 	ind = 0;
-	for (i = qspSavedLocalGroupsCount - 1; i >= 0; --i)
+	for (i = qspSavedVarsGroupsCount - 1; i >= 0; --i)
 	{
-		for (j = qspSavedLocalVarsCounts[i] - 1; j >= 0; --j)
+		for (j = qspSavedVarsGroups[i].VarsCount - 1; j >= 0; --j)
 		{
-			if (!(var = qspVarReference(qspSavedLocalVars[i][j].Name, QSP_TRUE)))
+			if (!(var = qspVarReference(qspSavedVarsGroups[i].Vars[j].Name, QSP_TRUE)))
 			{
 				while (--ind >= 0)
 					qspEmptyVar(savedVars + ind);
@@ -473,7 +472,7 @@ int qspPrepareLocalVars(QSPVar **vars)
 				return 0;
 			}
 			qspMoveVar(savedVars + ind, var);
-			qspMoveVar(var, &qspSavedLocalVars[i][j]);
+			qspMoveVar(var, &qspSavedVarsGroups[i].Vars[j]);
 			++ind;
 		}
 	}
@@ -481,7 +480,7 @@ int qspPrepareLocalVars(QSPVar **vars)
 	return varsCount;
 }
 
-void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVar **savedLocalVars, int *savedLocalVarsCounts, int groupsCount)
+void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGroups, int groupsCount)
 {
 	QSPVar *var;
 	int i, j, ind;
@@ -490,9 +489,9 @@ void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVar **savedLocalVa
 		ind = 0;
 		for (i = groupsCount - 1; i >= 0; --i)
 		{
-			for (j = savedLocalVarsCounts[i] - 1; j >= 0; --j)
+			for (j = savedGroups[i].VarsCount - 1; j >= 0; --j)
 			{
-				if (!(var = qspVarReference(savedLocalVars[i][j].Name, QSP_TRUE)))
+				if (!(var = qspVarReference(savedGroups[i].Vars[j].Name, QSP_TRUE)))
 				{
 					while (ind < varsCount)
 					{
@@ -502,7 +501,7 @@ void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVar **savedLocalVa
 					free(savedVars);
 					return;
 				}
-				qspMoveVar(&savedLocalVars[i][j], var);
+				qspMoveVar(&savedGroups[i].Vars[j], var);
 				qspMoveVar(var, savedVars + ind);
 				++ind;
 			}
@@ -537,8 +536,8 @@ int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
 	count = 0;
 	bufSize = 8;
 	savedVars = (QSPVar *)malloc(bufSize * sizeof(QSPVar));
-	ind = qspSavedLocalGroupsCount - 1;
-	oldCount = qspSavedLocalVarsCounts[ind];
+	ind = qspSavedVarsGroupsCount - 1;
+	oldCount = qspSavedVarsGroups[ind].VarsCount;
 	isVarFound = QSP_FALSE;
 	while (1)
 	{
@@ -555,7 +554,7 @@ int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
 		qspUpperStr(varName);
 		for (i = 0; i < oldCount; ++i)
 		{
-			if (!qspStrsComp(varName, qspSavedLocalVars[ind][i].Name))
+			if (!qspStrsComp(varName, qspSavedVarsGroups[ind].Vars[i].Name))
 			{
 				isVarFound = QSP_TRUE;
 				break;

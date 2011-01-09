@@ -48,10 +48,15 @@
 		int IndsBufSize;
 	} QSPVar;
 
+	typedef struct
+	{
+		QSPVar *Vars;
+		int VarsCount;
+	} QSPVarsGroup;
+
 	extern QSPVar qspVars[QSP_VARSCOUNT];
-	extern QSPVar **qspSavedLocalVars;
-	extern int *qspSavedLocalVarsCounts;
-	extern int qspSavedLocalGroupsCount;
+	extern QSPVarsGroup *qspSavedVarsGroups;
+	extern int qspSavedVarsGroupsCount;
 
 	/* External functions */
 	void qspClearVars(QSP_BOOL);
@@ -65,7 +70,7 @@
 	QSPVariant qspGetVar(QSP_CHAR *);
 	void qspPrepareGlobalVars();
 	int qspPrepareLocalVars(QSPVar **);
-	void qspRestoreLocalVars(QSPVar *, int, QSPVar **, int *, int);
+	void qspRestoreLocalVars(QSPVar *, int, QSPVarsGroup *, int);
 	void qspClearLocalVars(QSPVar *, int);
 	int qspGetVarsList(QSP_CHAR *, QSPVar **);
 	void qspRestoreVarsList(QSPVar *, int);
