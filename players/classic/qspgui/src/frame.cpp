@@ -441,9 +441,13 @@ void QSPFrame::ShowError()
 
 void QSPFrame::UpdateTitle()
 {
-	SetTitle(QSP_LOGO);
+	wxString title(QSP_LOGO);
+	#ifdef _DEBUG
+		title = wxString::Format(wxT("%s (DEBUG)"), title.wx_str());
+	#endif
 	if (m_configPath != m_configDefPath)
-		SetTitle(wxString::Format(wxT("%s [+]"), GetTitle().wx_str()));
+		title = wxString::Format(wxT("%s [+]"), title.wx_str());
+	SetTitle(title);
 }
 
 void QSPFrame::ReCreateGUI()
