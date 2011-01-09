@@ -163,7 +163,7 @@ int qspCallShowMenu()
 	if (qspCallBacks[QSP_CALL_SHOWMENU])
 	{
 		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
-		index = (int)_call_java(QSP_CALL_SHOWMENU, (int)qspCallBacks[QSP_CALL_SHOWMENU], 0, 0);
+		index = _call_java(QSP_CALL_SHOWMENU, (int)qspCallBacks[QSP_CALL_SHOWMENU], 0, 0);
 		qspRestoreCallState(&state);
 		return index;
 	}

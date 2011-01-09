@@ -259,7 +259,7 @@ int qspCallShowMenu()
 		AS3_Call(qspCallBacks[QSP_CALL_SHOWMENU].FuncVal, qspCallBacks[QSP_CALL_SHOWMENU].ThisVal, args);
 		AS3_Release(args);
 		flyield();
-		index = (int)AS3_IntValue(result);
+		index = AS3_IntValue(result);
 		AS3_Release(result);
 		qspRestoreCallState(&state);
 		return index;
