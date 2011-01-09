@@ -24,11 +24,6 @@
 	#define QSP_MAXMENUITEMS 100
 	#define QSP_MENUDELIM QSP_FMT(":")
 
-	extern QSP_CHAR *qspCurMenuLocs[QSP_MAXMENUITEMS];
-	extern int qspCurMenuItems;
-
-	/* External functions */
-	void qspClearMenu(QSP_BOOL);
 	/* Statements */
 	QSP_BOOL qspStatementShowMenu(QSPVariant *, int, QSP_CHAR **, int);
 

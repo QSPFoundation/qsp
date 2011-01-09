@@ -81,7 +81,6 @@
 	QSP_EXTERN QSP_BOOL QSPOpenSavedGame(const QSP_CHAR *file, QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
-	QSP_EXTERN void QSPSelectMenuItem(int ind);
 	QSP_EXTERN void QSPSetCallBack(int type, QSP_CALLBACK func);
 	QSP_EXTERN void QSPInit();
 	QSP_EXTERN void QSPDeInit();

@@ -155,16 +155,19 @@ void qspCallShowMessage(QSP_CHAR *text)
 	}
 }
 
-void qspCallShowMenu()
+int qspCallShowMenu()
 {
 	/* Здесь показываем меню */
 	QSPCallState state;
+	int index;
 	if (qspCallBacks[QSP_CALL_SHOWMENU])
 	{
 		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
-		_call_java(QSP_CALL_SHOWMENU, (int)qspCallBacks[QSP_CALL_SHOWMENU], 0, 0);
+		index = (int)_call_java(QSP_CALL_SHOWMENU, (int)qspCallBacks[QSP_CALL_SHOWMENU], 0, 0);
 		qspRestoreCallState(&state);
+		return index;
 	}
+	return -1;
 }
 
 void qspCallShowPicture(QSP_CHAR *file)

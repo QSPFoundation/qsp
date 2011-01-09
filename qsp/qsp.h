@@ -77,7 +77,7 @@
 		QSP_CALL_SHOWWINDOW, /* void func(int type, QSP_BOOL isShow) */
 		QSP_CALL_DELETEMENU, /* void func() */
 		QSP_CALL_ADDMENUITEM, /* void func(const QSP_CHAR *name, const QSP_CHAR *imgPath) */
-		QSP_CALL_SHOWMENU, /* void func() */
+		QSP_CALL_SHOWMENU, /* int func() */
 		QSP_CALL_SHOWMSGSTR, /* void func(const QSP_CHAR *str) */
 		QSP_CALL_REFRESHINT, /* void func(QSP_BOOL isRedraw) */
 		QSP_CALL_SETTIMER, /* void func(int msecs) */

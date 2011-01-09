@@ -400,9 +400,11 @@ void QSPFrame::AddMenuItem(const wxString &name, const wxString &imgPath)
 	++m_menuItemId;
 }
 
-void QSPFrame::ShowMenu()
+int QSPFrame::ShowMenu()
 {
+	m_menuIndex = -1;
 	PopupMenu(m_menu);
+	return m_menuIndex;
 }
 
 void QSPFrame::ShowError()
@@ -658,7 +660,7 @@ void QSPFrame::OnTimer(wxTimerEvent& event)
 
 void QSPFrame::OnMenu(wxCommandEvent& event)
 {
-	QSPSelectMenuItem(event.GetId() - ID_BEGOFDYNMENU);
+	m_menuIndex = event.GetId() - ID_BEGOFDYNMENU;
 }
 
 void QSPFrame::OnQuit(wxCommandEvent& event)

@@ -80,7 +80,6 @@
 	QSP_EXTERN AS3_Val QSPOpenSavedGame(void *param, AS3_Val args);
 	QSP_EXTERN AS3_Val QSPOpenSavedGameFromData(void *param, AS3_Val args);
 	QSP_EXTERN AS3_Val QSPRestartGame(void *param, AS3_Val args);
-	QSP_EXTERN AS3_Val QSPSelectMenuItem(void *param, AS3_Val args);
 	QSP_EXTERN AS3_Val QSPSetCallBack(void *param, AS3_Val args);
 	QSP_EXTERN AS3_Val QSPInit(void *param, AS3_Val args);
 	QSP_EXTERN AS3_Val QSPDeInit(void *param, AS3_Val args);

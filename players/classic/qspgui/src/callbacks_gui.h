@@ -59,7 +59,7 @@
 		static void Msg(const QSP_CHAR *str);
 		static void DeleteMenu();
 		static void AddMenuItem(const QSP_CHAR *name, const QSP_CHAR *imgPath);
-		static void ShowMenu();
+		static int ShowMenu();
 		static void Input(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen);
 		static void ShowImage(const QSP_CHAR *file);
 		static void OpenGameStatus(const QSP_CHAR *file);

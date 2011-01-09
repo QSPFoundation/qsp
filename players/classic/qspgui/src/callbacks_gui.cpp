@@ -296,12 +296,13 @@ void QSPCallBacks::AddMenuItem(const QSP_CHAR *name, const QSP_CHAR *imgPath)
 	m_frame->AddMenuItem(wxString(name), wxString(imgPath));
 }
 
-void QSPCallBacks::ShowMenu()
+int QSPCallBacks::ShowMenu()
 {
-	if (m_frame->GetIsQuit()) return;
+	if (m_frame->GetIsQuit()) return -1;
 	m_frame->EnableControls(false);
-	m_frame->ShowMenu();
+	int index = m_frame->ShowMenu();
 	m_frame->EnableControls(true);
+	return index;
 }
 
 void QSPCallBacks::Input(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen)

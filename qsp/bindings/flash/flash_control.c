@@ -668,23 +668,6 @@ AS3_Val QSPRestartGame(void *param, AS3_Val args)
 	return AS3_True();
 }
 /* ------------------------------------------------------------ */
-/* Меню */
-/* Ф-я предназначена только для вызова из CallBack'а QSP_CALL_SHOWMENU */
-AS3_Val QSPSelectMenuItem(void *param, AS3_Val args)
-{
-	int index;
-	QSPVariant arg;
-	AS3_ArrayValue(args, "IntType", &index);
-	if (index >= 0 && index < qspCurMenuItems)
-	{
-		if (qspIsDisableCodeExec) return AS3_True();
-		arg.IsStr = QSP_FALSE;
-		QSP_NUM(arg) = index + 1;
-		qspExecLocByNameWithArgs(qspCurMenuLocs[index], &arg, 1);
-	}
-	return AS3_True();
-}
-/* ------------------------------------------------------------ */
 /* Установка CALLBACK'ов */
 AS3_Val QSPSetCallBack(void *param, AS3_Val args)
 {
@@ -795,7 +778,6 @@ int main()
 	AS3_Val openSavedGame = AS3_FunctionAsync(0, QSPOpenSavedGame);
 	AS3_Val openSavedGameFromData = AS3_FunctionAsync(0, QSPOpenSavedGameFromData);
 	AS3_Val restartGame = AS3_FunctionAsync(0, QSPRestartGame);
-	AS3_Val selectMenuItem = AS3_FunctionAsync(0, QSPSelectMenuItem);
 	AS3_Val setCallBack = AS3_Function(0, QSPSetCallBack);
 	AS3_Val init = AS3_Function(0, QSPInit);
 	AS3_Val deInit = AS3_Function(0, QSPDeInit);
@@ -816,8 +798,7 @@ int main()
 		"QSPGetLastErrorData:AS3ValType, QSPGetErrorDesc:AS3ValType, QSPLoadGameWorld:AS3ValType, "
 		"QSPLoadGameWorldFromData:AS3ValType, QSPSaveGame:AS3ValType, QSPSaveGameAsData:AS3ValType, "
 		"QSPOpenSavedGame:AS3ValType, QSPOpenSavedGameFromData:AS3ValType, QSPRestartGame:AS3ValType, "
-		"QSPSelectMenuItem:AS3ValType, QSPSetCallBack:AS3ValType, QSPInit:AS3ValType, QSPDeInit:AS3ValType, "
-		"QSPReturnValue:AS3ValType",
+		"QSPSetCallBack:AS3ValType, QSPInit:AS3ValType, QSPDeInit:AS3ValType, QSPReturnValue:AS3ValType",
 		isInCallBack, enableDebugMode, getCurStateData, getVersion, getCompiledDateTime, getFullRefreshCount,
 		getQstFullPath, getCurLoc, getMainDesc, isMainDescChanged, getVarsDesc, isVarsDescChanged,
 		getExprValue, setInputStrText, getActionsCount, getActionData, executeSelActionCode, setSelActionIndex,
@@ -825,7 +806,7 @@ int main()
 		getSelObjectIndex, isObjectsChanged, showWindow, getVarValuesCount, getVarValues, getMaxVarsCount,
 		getVarNameByIndex, execString, execLocationCode, execCounter, execUserInput, getLastErrorData,
 		getErrorDesc, loadGameWorld, loadGameWorldFromData, saveGame, saveGameAsData, openSavedGame,
-		openSavedGameFromData, restartGame, selectMenuItem, setCallBack, init, deInit, returnValue);
+		openSavedGameFromData, restartGame, setCallBack, init, deInit, returnValue);
 
 	// Release
 	AS3_Release(isInCallBack);
@@ -871,7 +852,6 @@ int main()
 	AS3_Release(openSavedGame);
 	AS3_Release(openSavedGameFromData);
 	AS3_Release(restartGame);
-	AS3_Release(selectMenuItem);
 	AS3_Release(setCallBack);
 	AS3_Release(init);
 	AS3_Release(deInit);

@@ -51,7 +51,7 @@
 	void qspCallOpenGame(QSP_CHAR *);
 	void qspCallSaveGame(QSP_CHAR *);
 	void qspCallShowMessage(QSP_CHAR *);
-	void qspCallShowMenu();
+	int qspCallShowMenu();
 	void qspCallShowPicture(QSP_CHAR *);
 	void qspCallShowWindow(int, QSP_BOOL);
 	void qspCallPlayFile(QSP_CHAR *, int);

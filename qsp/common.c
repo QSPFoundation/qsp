@@ -56,7 +56,6 @@ void qspMemClear(QSP_BOOL isFirst)
 	qspClearVars(isFirst);
 	qspClearObjects(isFirst);
 	qspClearActions(isFirst);
-	qspClearMenu(isFirst);
 	qspClearPlayList(isFirst);
 	if (!isFirst)
 	{

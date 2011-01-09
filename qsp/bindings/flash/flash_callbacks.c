@@ -246,10 +246,11 @@ void qspCallShowMessage(QSP_CHAR *text)
 	}
 }
 
-void qspCallShowMenu()
+int qspCallShowMenu()
 {
 	/* Здесь показываем меню */
 	QSPCallState state;
+	int index;
 	AS3_Val args;
 	if (qspCallBacks[QSP_CALL_SHOWMENU].IsSet)
 	{
@@ -258,8 +259,12 @@ void qspCallShowMenu()
 		AS3_Call(qspCallBacks[QSP_CALL_SHOWMENU].FuncVal, qspCallBacks[QSP_CALL_SHOWMENU].ThisVal, args);
 		AS3_Release(args);
 		flyield();
+		index = (int)AS3_IntValue(result);
+		AS3_Release(result);
 		qspRestoreCallState(&state);
+		return index;
 	}
+	return -1;
 }
 
 void qspCallShowPicture(QSP_CHAR *file)

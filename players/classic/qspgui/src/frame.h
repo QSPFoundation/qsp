@@ -110,7 +110,7 @@
 		void ApplyParams();
 		void DeleteMenu();
 		void AddMenuItem(const wxString &name, const wxString &imgPath);
-		void ShowMenu();
+		int ShowMenu();
 
 		// Accessors
 		wxTimer *GetTimer() const { return m_timer; }
@@ -207,6 +207,7 @@
 		bool m_isQuit;
 		bool m_isShowHotkeys;
 		int m_volume;
+		int m_menuIndex;
 	};
 
 #endif

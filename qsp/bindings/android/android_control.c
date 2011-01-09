@@ -468,20 +468,6 @@ QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh)
 	return QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
-/* Меню */
-/* Ф-я предназначена только для вызова из CallBack'а QSP_CALL_SHOWMENU */
-void QSPSelectMenuItem(int index)
-{
-	QSPVariant arg;
-	if (index >= 0 && index < qspCurMenuItems)
-	{
-		if (qspIsDisableCodeExec) return;
-		arg.IsStr = QSP_FALSE;
-		QSP_NUM(arg) = index + 1;
-		qspExecLocByNameWithArgs(qspCurMenuLocs[index], &arg, 1);
-	}
-}
-/* ------------------------------------------------------------ */
 /* Установка CALLBACK'ов */
 void QSPSetCallBack(int type, QSP_CALLBACK func)
 {

@@ -69,7 +69,6 @@
 	void QSPOpenSavedGame(QSP_BOOL *res, const QSP_CHAR *fileName, QSP_BOOL isRefresh);
 	void QSPOpenSavedGameFromData(QSP_BOOL *res, const void *data, int dataSize, QSP_BOOL isRefresh);
 	void QSPRestartGame(QSP_BOOL *res, QSP_BOOL isRefresh);
-	void QSPSelectMenuItem(int index);
 	void QSPSetCallBack(int type, QSP_CALLBACK func);
 	void QSPInit();
 	void QSPDeInit();
