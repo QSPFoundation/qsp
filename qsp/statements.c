@@ -758,7 +758,7 @@ void qspExecStringAsCodeWithArgs(QSP_CHAR *s, QSPVariant *args, int count)
 	qspSetArgs(var, args, count);
 	count = qspPreprocessData(s, &strs);
 	oldRefreshCount = qspRefreshCount;
-	qspExecTopCodeWithLocals(strs, count, 0, QSP_FALSE);
+	qspExecCodeBlockWithLocals(strs, 0, count, 0, 0);
 	qspFreePrepLines(strs, count);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
