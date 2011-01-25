@@ -197,11 +197,13 @@ void qspExecLocByName(QSP_CHAR *name, QSP_BOOL isChangeDesc)
 	qspExecLocByIndex(locInd, isChangeDesc, QSP_FALSE);
 }
 
-void qspExecLocByNameWithArgs(QSP_CHAR *name, QSPVariant *args, int count)
+void qspExecLocByNameWithArgs(QSP_CHAR *name, QSPVariant *args, int count, QSPVariant *res)
 {
-	QSPVar local, *var;
+	QSPVar local, result, *var, *varRes;
 	int oldRefreshCount;
+	if (!(varRes = qspVarReference(QSP_VARRES, QSP_TRUE))) return;
 	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return;
+	qspMoveVar(&result, varRes);
 	qspMoveVar(&local, var);
 	qspSetArgs(var, args, count);
 	oldRefreshCount = qspRefreshCount;
@@ -209,15 +211,25 @@ void qspExecLocByNameWithArgs(QSP_CHAR *name, QSPVariant *args, int count)
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
 		qspEmptyVar(&local);
+		qspEmptyVar(&result);
 		return;
 	}
 	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE)))
 	{
 		qspEmptyVar(&local);
+		qspEmptyVar(&result);
 		return;
 	}
 	qspEmptyVar(var);
 	qspMoveVar(var, &local);
+	if (!(varRes = qspVarReference(QSP_VARRES, QSP_TRUE)))
+	{
+		qspEmptyVar(&result);
+		return;
+	}
+	if (res) qspApplyResult(varRes, res);
+	qspEmptyVar(varRes);
+	qspMoveVar(varRes, &result);
 }
 
 void qspExecLocByVarNameWithArgs(QSP_CHAR *name, QSPVariant *args, int count)
@@ -230,7 +242,7 @@ void qspExecLocByVarNameWithArgs(QSP_CHAR *name, QSPVariant *args, int count)
 		if (!(var = qspVarReference(name, QSP_FALSE))) break;
 		if (ind >= var->ValsCount) break;
 		if (!((locName = var->Values[ind].Str) && qspIsAnyString(locName))) break;
-		qspExecLocByNameWithArgs(locName, args, count);
+		qspExecLocByNameWithArgs(locName, args, count, 0);
 		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		++ind;
 	}

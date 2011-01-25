@@ -80,6 +80,7 @@
 	QSPVariant qspArrayMinMaxItem(QSP_CHAR *, QSP_BOOL);
 	int qspGetVarsCount();
 	void qspSetArgs(QSPVar *, QSPVariant *, int);
+	void qspApplyResult(QSPVar *, QSPVariant *);
 	void qspMoveVar(QSPVar *, QSPVar *);
 	/* Statements */
 	void qspStatementSetVarValue(QSP_CHAR *);

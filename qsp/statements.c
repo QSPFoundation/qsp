@@ -748,12 +748,14 @@ QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *s, int endLine, int codeOffset,
 	return isExit;
 }
 
-void qspExecStringAsCodeWithArgs(QSP_CHAR *s, QSPVariant *args, int count)
+void qspExecStringAsCodeWithArgs(QSP_CHAR *s, QSPVariant *args, int count, QSPVariant *res)
 {
 	QSPLineOfCode *strs;
-	QSPVar local, *var;
+	QSPVar local, result, *var, *varRes;
 	int oldRefreshCount;
+	if (!(varRes = qspVarReference(QSP_VARRES, QSP_TRUE))) return;
 	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE))) return;
+	qspMoveVar(&result, varRes);
 	qspMoveVar(&local, var);
 	qspSetArgs(var, args, count);
 	count = qspPreprocessData(s, &strs);
@@ -763,15 +765,25 @@ void qspExecStringAsCodeWithArgs(QSP_CHAR *s, QSPVariant *args, int count)
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 	{
 		qspEmptyVar(&local);
+		qspEmptyVar(&result);
 		return;
 	}
 	if (!(var = qspVarReference(QSP_VARARGS, QSP_TRUE)))
 	{
 		qspEmptyVar(&local);
+		qspEmptyVar(&result);
 		return;
 	}
 	qspEmptyVar(var);
 	qspMoveVar(var, &local);
+	if (!(varRes = qspVarReference(QSP_VARRES, QSP_TRUE)))
+	{
+		qspEmptyVar(&result);
+		return;
+	}
+	if (res) qspApplyResult(varRes, res);
+	qspEmptyVar(varRes);
+	qspMoveVar(varRes, &result);
 }
 
 QSP_CHAR *qspGetLineLabel(QSP_CHAR *str)
@@ -1393,7 +1405,7 @@ static QSP_BOOL qspStatementExit(QSPVariant *args, int count, QSP_CHAR **jumpTo,
 
 static QSP_BOOL qspStatementGoSub(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
-	qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1);
+	qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0);
 	return QSP_FALSE;
 }
 
@@ -1498,6 +1510,6 @@ static QSP_BOOL qspStatementExec(QSPVariant *args, int count, QSP_CHAR **jumpTo,
 
 static QSP_BOOL qspStatementDynamic(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
-	qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1);
+	qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0);
 	return QSP_FALSE;
 }

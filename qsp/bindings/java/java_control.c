@@ -384,7 +384,7 @@ void QSPExecString(QSP_BOOL *res, const QSP_CHAR *s, QSP_BOOL isRefresh)
 		*res = QSP_FALSE;
 		return;
 	}
-	qspExecStringAsCodeWithArgs((QSP_CHAR *)s, 0, 0);
+	qspExecStringAsCodeWithArgs((QSP_CHAR *)s, 0, 0, 0);
 	if (qspErrorNum)
 	{
 		*res = QSP_FALSE;

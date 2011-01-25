@@ -88,7 +88,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 		{
 			arg.IsStr = QSP_FALSE;
 			QSP_NUM(arg) = ind + 1;
-			qspExecLocByNameWithArgs(menuLocs[ind], &arg, 1);
+			qspExecLocByNameWithArgs(menuLocs[ind], &arg, 1, 0);
 		}
 		while (--itemsCount >= 0)
 			free(menuLocs[itemsCount]);

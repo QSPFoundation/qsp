@@ -818,6 +818,29 @@ void qspSetArgs(QSPVar *var, QSPVariant *args, int count)
 		qspSetVarValueByReference(var, count, args + count);
 }
 
+void qspApplyResult(QSPVar *varRes, QSPVariant *res)
+{
+	QSP_CHAR *text;
+	if (varRes->ValsCount)
+	{
+		if (text = varRes->Values[0].Str)
+		{
+			res->IsStr = QSP_TRUE;
+			QSP_PSTR(res) = qspGetNewText(text, -1);
+		}
+		else
+		{
+			res->IsStr = QSP_FALSE;
+			QSP_PNUM(res) = varRes->Values[0].Num;
+		}
+	}
+	else
+	{
+		res->IsStr = QSP_TRUE;
+		QSP_PSTR(res) = qspGetNewText(QSP_FMT(""), 0);
+	}
+}
+
 void qspMoveVar(QSPVar *dest, QSPVar *src)
 {
 	dest->Values = src->Values;

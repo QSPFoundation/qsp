@@ -119,7 +119,7 @@
 	void qspInitStats();
 	int qspGetStatArgs(QSP_CHAR *, int, QSPVariant *);
 	QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *, int, int, QSP_BOOL);
-	void qspExecStringAsCodeWithArgs(QSP_CHAR *, QSPVariant *, int);
+	void qspExecStringAsCodeWithArgs(QSP_CHAR *, QSPVariant *, int, QSPVariant *);
 	QSP_CHAR *qspGetLineLabel(QSP_CHAR *);
 	void qspInitLineOfCode(QSPLineOfCode *, QSP_CHAR *, int);
 

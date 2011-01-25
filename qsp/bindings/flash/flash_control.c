@@ -453,7 +453,7 @@ AS3_Val QSPExecString(void *param, AS3_Val args)
 	qspPrepareExecution();
 	if (qspIsDisableCodeExec) return AS3_False();
 	strWC = qspC2W(s);
-	qspExecStringAsCodeWithArgs(strWC, 0, 0);
+	qspExecStringAsCodeWithArgs(strWC, 0, 0, 0);
 	free(strWC);
 	if (qspErrorNum) return AS3_False();
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
