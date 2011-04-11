@@ -21,6 +21,7 @@
 	#include <wx/wx.h>
 	#include <wx/filename.h>
 	#include <wx/stdpaths.h>
+	#include <wx/scopeguard.h>
 
 	class QSPTools
 	{

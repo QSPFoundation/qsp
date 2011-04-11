@@ -136,7 +136,7 @@ targets['qspgui'] = \
 		[
 			'-L'+ _realpath(_join(wxQSPSrcDir, 'lib')),
 			'-l' + fmodLibName,
-			'-lwx_gtk2u_aui-2.9 -lwx_gtk2u_html-2.9 -lwx_gtk2u_adv-2.9 -lwx_gtk2u_core-2.9 -lwx_baseu-2.9',
+			'-lwx_gtk2u_aui-2.9 -lwx_gtk2u_html-2.9 -lwx_gtk2u_adv-2.9 -lwx_gtk2u_core-2.9 -lwx_baseu-2.9 -lgdk-x11-2.0 -lgdk_pixbuf-2.0 -lcairo',
 			#'-Wl,-rpath,.',
 		],
 		'strip': True,
