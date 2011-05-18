@@ -526,8 +526,8 @@ int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
 	QSPVariant v;
 	QSP_BOOL isVarFound;
 	QSPVar *savedVars, *var;
-	QSP_CHAR *varName, *pos, *eqPos, *brPos;
-	int i, ind, bufSize, count, oldCount, oldRefreshCount;
+	QSP_CHAR *varName, *pos, *eqPos, *temp;
+	int i, ind, varIndex, bufSize, count, oldCount, oldRefreshCount;
 	s = qspSkipSpaces(s);
 	if (!(*s))
 	{
@@ -554,22 +554,13 @@ int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
 			eqPos = qspStrPos(s, QSP_EQUAL, QSP_FALSE);
 		if (eqPos)
 		{
-			if (pos)
-			{
-				*pos = 0;
-				v = qspExprValue(eqPos + QSP_LEN(QSP_EQUAL));
-				*pos = QSP_COMMA[0];
-			}
-			else
-				v = qspExprValue(eqPos + QSP_LEN(QSP_EQUAL));
-			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 			*eqPos = 0;
-			brPos = qspStrChar(s, QSP_LSBRACK[0]);
-			if (brPos)
+			temp = qspStrChar(s, QSP_LSBRACK[0]);
+			if (temp)
 			{
-				*brPos = 0;
+				*temp = 0;
 				varName = (*s == QSP_STRCHAR[0] ? qspDelSpc(s + 1) : qspDelSpc(s));
-				*brPos = QSP_LSBRACK[0];
+				*temp = QSP_LSBRACK[0];
 			}
 			else
 				varName = (*s == QSP_STRCHAR[0] ? qspDelSpc(s + 1) : qspDelSpc(s));
@@ -606,6 +597,42 @@ int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
 				}
 			}
 		}
+		if (eqPos)
+		{
+			if (pos)
+			{
+				*pos = 0;
+				v = qspExprValue(eqPos + QSP_LEN(QSP_EQUAL));
+				*pos = QSP_COMMA[0];
+			}
+			else
+				v = qspExprValue(eqPos + QSP_LEN(QSP_EQUAL));
+			if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+			{
+				free(varName);
+				break;
+			}
+			*eqPos = 0;
+			temp = qspDelSpcCanRetSelf(s);
+			if (!(var = qspGetVarData(temp, QSP_TRUE, &varIndex)))
+			{
+				*eqPos = QSP_EQUAL[0];
+				if (temp != s) free(temp);
+				if (v.IsStr) free(QSP_STR(v));
+				free(varName);
+				break;
+			}
+			*eqPos = QSP_EQUAL[0];
+			if (temp != s) free(temp);
+		}
+		else if (!isVarFound)
+		{
+			if (!(var = qspVarReference(varName, QSP_TRUE)))
+			{
+				free(varName);
+				break;
+			}
+		}
 		if (isVarFound)
 		{
 			isVarFound = QSP_FALSE;
@@ -613,12 +640,6 @@ int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
 		}
 		else
 		{
-			if (!(var = qspVarReference(varName, QSP_FALSE)))
-			{
-				free(varName);
-				if (eqPos && v.IsStr) free(QSP_STR(v));
-				break;
-			}
 			if (count == bufSize)
 			{
 				bufSize += 8;
@@ -630,13 +651,14 @@ int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
 		}
 		if (eqPos)
 		{
-			*eqPos = 0;
-			varName = qspDelSpcCanRetSelf(s);
-			qspSetVar(varName, &v, QSP_EQUAL[0]);
-			*eqPos = QSP_EQUAL[0];
-			if (varName != s) free(varName);
+			if (qspConvertVariantTo(&v, *s == QSP_STRCHAR[0]))
+			{
+				qspSetError(QSP_ERR_TYPEMISMATCH);
+				free(QSP_STR(v));
+				break;
+			}
+			qspSetVarValueByReference(var, varIndex, &v);
 			if (v.IsStr) free(QSP_STR(v));
-			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		}
 		if (!pos) break;
 		s = qspSkipSpaces(pos + QSP_LEN(QSP_COMMA));
