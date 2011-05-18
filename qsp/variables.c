@@ -627,7 +627,7 @@ int qspGetVarsList(QSP_CHAR *s, QSPVar **vars)
 		}
 		else if (!isVarFound)
 		{
-			if (!(var = qspVarReference(varName, QSP_TRUE)))
+			if (!(var = qspVarReference(varName, QSP_FALSE)))
 			{
 				free(varName);
 				break;
