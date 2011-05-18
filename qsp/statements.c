@@ -446,6 +446,7 @@ static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSP_
 			}
 			else
 				qspStatementLocal(s->Str + s->Stats[i].ParamPos);
+			if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
 			break;
 		case qspStatSet:
 			if (i < s->StatsCount - 1)
@@ -457,6 +458,7 @@ static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSP_
 			}
 			else
 				qspStatementSetVarValue(s->Str + s->Stats[i].ParamPos);
+			if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
 			break;
 		default:
 			if (i < s->StatsCount - 1)
@@ -1296,10 +1298,10 @@ static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *s, int endLine, int line
 
 static void qspStatementLocal(QSP_CHAR *s)
 {
-	int i, ind, count, varsCount;
 	QSPVar *savedVars;
+	int i, ind, count, varsCount, oldRefreshCount = qspRefreshCount;
 	varsCount = qspGetVarsList(s, &savedVars);
-	if (qspErrorNum) return;
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
 	if (varsCount)
 	{
 		ind = qspSavedVarsGroupsCount - 1;
