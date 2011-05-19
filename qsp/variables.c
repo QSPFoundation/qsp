@@ -239,22 +239,22 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isSet, int *index)
 	QSPVar *var;
 	QSPVariant ind;
 	int oldRefreshCount;
-	QSP_CHAR *rPos, *lPos = qspStrChar(s, QSP_LSBRACK[0]);
+	QSP_CHAR *temp, *rPos, *lPos = qspStrChar(s, QSP_LSBRACK[0]);
 	if (lPos)
 	{
-		*lPos = 0;
-		var = qspVarReference(s, isSet);
-		*lPos = QSP_LSBRACK[0];
-		if (!var) return 0;
 		rPos = qspStrPos(lPos, QSP_RSBRACK, QSP_FALSE);
 		if (!rPos)
 		{
 			qspSetError(QSP_ERR_BRACKNOTFOUND);
 			return 0;
 		}
-		s = qspSkipSpaces(lPos + 1);
-		if (s == rPos)
+		temp = qspSkipSpaces(lPos + 1);
+		if (temp == rPos)
 		{
+			*lPos = 0;
+			var = qspVarReference(s, isSet);
+			*lPos = QSP_LSBRACK[0];
+			if (!var) return 0;
 			if (isSet)
 				*index = var->ValsCount;
 			else
@@ -264,9 +264,17 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isSet, int *index)
 		{
 			oldRefreshCount = qspRefreshCount;
 			*rPos = 0;
-			ind = qspExprValue(s);
+			ind = qspExprValue(temp);
 			*rPos = QSP_RSBRACK[0];
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
+			*lPos = 0;
+			var = qspVarReference(s, isSet);
+			*lPos = QSP_LSBRACK[0];
+			if (!var)
+			{
+				if (ind.IsStr) free(QSP_STR(ind));
+				return 0;
+			}
 			if (ind.IsStr)
 			{
 				*index = qspGetVarTextIndex(var, QSP_STR(ind), isSet);
