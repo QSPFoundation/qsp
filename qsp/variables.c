@@ -956,6 +956,28 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 	if (v.IsStr) free(QSP_STR(v));
 }
 
+void qspStatementLocal(QSP_CHAR *s)
+{
+	QSPVar *savedVars;
+	int i, ind, count, varsCount, oldRefreshCount = qspRefreshCount;
+	varsCount = qspGetVarsList(s, &savedVars);
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+	if (varsCount)
+	{
+		ind = qspSavedVarsGroupsCount - 1;
+		count = qspSavedVarsGroups[ind].VarsCount;
+		qspSavedVarsGroups[ind].Vars = (QSPVar *)realloc(qspSavedVarsGroups[ind].Vars, (count + varsCount) * sizeof(QSPVar));
+		for (i = 0; i < varsCount; ++i)
+		{
+			qspSavedVarsGroups[ind].Vars[count].Name = savedVars[i].Name;
+			qspMoveVar(qspSavedVarsGroups[ind].Vars + count, savedVars + i);
+			++count;
+		}
+		qspSavedVarsGroups[ind].VarsCount = count;
+	}
+	free(savedVars);
+}
+
 QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
 {
 	int start, num;

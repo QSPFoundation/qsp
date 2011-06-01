@@ -54,7 +54,6 @@ static QSP_BOOL qspCheckForLoop(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, 
 static void qspEndForLoop(QSP_CHAR *, int);
 static QSP_BOOL qspStatementSinglelineFor(QSPLineOfCode *, int, int, QSP_CHAR **);
 static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *, int, int, int, QSP_CHAR **);
-static void qspStatementLocal(QSP_CHAR *);
 static QSP_BOOL qspStatementAddText(QSPVariant *, int, QSP_CHAR **, int);
 static QSP_BOOL qspStatementClear(QSPVariant *, int, QSP_CHAR **, int);
 static QSP_BOOL qspStatementExit(QSPVariant *, int, QSP_CHAR **, int);
@@ -1294,28 +1293,6 @@ static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *s, int endLine, int line
 	qspEmptyVar(var);
 	qspMoveVar(var, &local);
 	return QSP_FALSE;
-}
-
-static void qspStatementLocal(QSP_CHAR *s)
-{
-	QSPVar *savedVars;
-	int i, ind, count, varsCount, oldRefreshCount = qspRefreshCount;
-	varsCount = qspGetVarsList(s, &savedVars);
-	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-	if (varsCount)
-	{
-		ind = qspSavedVarsGroupsCount - 1;
-		count = qspSavedVarsGroups[ind].VarsCount;
-		qspSavedVarsGroups[ind].Vars = (QSPVar *)realloc(qspSavedVarsGroups[ind].Vars, (count + varsCount) * sizeof(QSPVar));
-		for (i = 0; i < varsCount; ++i)
-		{
-			qspSavedVarsGroups[ind].Vars[count].Name = savedVars[i].Name;
-			qspMoveVar(qspSavedVarsGroups[ind].Vars + count, savedVars + i);
-			++count;
-		}
-		qspSavedVarsGroups[ind].VarsCount = count;
-	}
-	free(savedVars);
 }
 
 static QSP_BOOL qspStatementAddText(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)

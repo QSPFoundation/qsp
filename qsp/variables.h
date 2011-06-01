@@ -84,6 +84,7 @@
 	void qspMoveVar(QSPVar *, QSPVar *);
 	/* Statements */
 	void qspStatementSetVarValue(QSP_CHAR *);
+	void qspStatementLocal(QSP_CHAR *);
 	QSP_BOOL qspStatementCopyArr(QSPVariant *, int, QSP_CHAR **, int);
 	QSP_BOOL qspStatementKillVar(QSPVariant *, int, QSP_CHAR **, int);
 
