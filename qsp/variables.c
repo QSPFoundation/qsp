@@ -814,6 +814,7 @@ void qspStatementLocal(QSP_CHAR *s)
 		return;
 	}
 	groupInd = qspSavedVarsGroupsCount - 1;
+	count = qspSavedVarsGroups[groupInd].VarsCount;
 	oldRefreshCount = qspRefreshCount;
 	isVarFound = QSP_FALSE;
 	while (1)
@@ -862,7 +863,6 @@ void qspStatementLocal(QSP_CHAR *s)
 				varName = (*s == QSP_STRCHAR[0] ? qspDelSpc(s + 1) : qspDelSpc(s));
 		}
 		qspUpperStr(varName);
-		count = qspSavedVarsGroups[groupInd].VarsCount;
 		for (i = 0; i < count; ++i)
 		{
 			if (!qspStrsComp(varName, qspSavedVarsGroups[groupInd].Vars[i].Name))
@@ -900,11 +900,10 @@ void qspStatementLocal(QSP_CHAR *s)
 		}
 		else
 		{
-			count = qspSavedVarsGroups[groupInd].VarsCount;
 			qspSavedVarsGroups[groupInd].Vars = (QSPVar *)realloc(qspSavedVarsGroups[groupInd].Vars, (count + 1) * sizeof(QSPVar));
 			qspMoveVar(qspSavedVarsGroups[groupInd].Vars + count, var);
 			qspSavedVarsGroups[groupInd].Vars[count].Name = varName;
-			qspSavedVarsGroups[groupInd].VarsCount = count + 1;
+			qspSavedVarsGroups[groupInd].VarsCount = ++count;
 		}
 		if (eqPos)
 		{
