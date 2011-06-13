@@ -806,7 +806,7 @@ void qspStatementLocal(QSP_CHAR *s)
 	QSP_BOOL isVarFound;
 	QSPVar *var;
 	QSP_CHAR *varName, *pos, *eqPos, *temp;
-	int i, groupInd, varIndex, count, oldRefreshCount;
+	int i, groupInd, varIndex, count, bufSize, oldRefreshCount;
 	s = qspSkipSpaces(s);
 	if (!(*s))
 	{
@@ -815,6 +815,8 @@ void qspStatementLocal(QSP_CHAR *s)
 	}
 	groupInd = qspSavedVarsGroupsCount - 1;
 	count = qspSavedVarsGroups[groupInd].VarsCount;
+	bufSize = count + 4;
+	qspSavedVarsGroups[groupInd].Vars = (QSPVar *)realloc(qspSavedVarsGroups[groupInd].Vars, bufSize * sizeof(QSPVar));
 	oldRefreshCount = qspRefreshCount;
 	isVarFound = QSP_FALSE;
 	while (1)
@@ -900,7 +902,11 @@ void qspStatementLocal(QSP_CHAR *s)
 		}
 		else
 		{
-			qspSavedVarsGroups[groupInd].Vars = (QSPVar *)realloc(qspSavedVarsGroups[groupInd].Vars, (count + 1) * sizeof(QSPVar));
+			if (count == bufSize)
+			{
+				bufSize = count + 4;
+				qspSavedVarsGroups[groupInd].Vars = (QSPVar *)realloc(qspSavedVarsGroups[groupInd].Vars, bufSize * sizeof(QSPVar));
+			}
 			qspMoveVar(qspSavedVarsGroups[groupInd].Vars + count, var);
 			qspSavedVarsGroups[groupInd].Vars[count].Name = varName;
 			qspSavedVarsGroups[groupInd].VarsCount = ++count;
