@@ -213,9 +213,9 @@ static int qspGetVarTextIndex(QSPVar *var, QSP_CHAR *str, QSP_BOOL isCreate)
 	if (isCreate)
 	{
 		var->IndsCount++;
-		if (var->IndsBufSize == n)
+		if (n >= var->IndsBufSize)
 		{
-			var->IndsBufSize += 8;
+			var->IndsBufSize = n + 8;
 			var->Indices = (QSPVarIndex *)realloc(var->Indices, var->IndsBufSize * sizeof(QSPVarIndex));
 		}
 		i = n - 1;
@@ -598,9 +598,9 @@ static void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 		newInd = src->Indices[i].Index - start;
 		if (newInd >= 0 && newInd < maxCount)
 		{
-			if (count == dest->IndsBufSize)
+			if (count >= dest->IndsBufSize)
 			{
-				dest->IndsBufSize += 16;
+				dest->IndsBufSize = count + 16;
 				dest->Indices = (QSPVarIndex *)realloc(dest->Indices, dest->IndsBufSize * sizeof(QSPVarIndex));
 			}
 			dest->Indices[count].Index = newInd;
@@ -902,7 +902,7 @@ void qspStatementLocal(QSP_CHAR *s)
 		}
 		else
 		{
-			if (count == bufSize)
+			if (count >= bufSize)
 			{
 				bufSize = count + 4;
 				qspSavedVarsGroups[groupInd].Vars = (QSPVar *)realloc(qspSavedVarsGroups[groupInd].Vars, bufSize * sizeof(QSPVar));
