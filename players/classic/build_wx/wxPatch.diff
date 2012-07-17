@@ -1,53 +1,7 @@
-diff -u -r d:/wx/wxWidgets/Makefile.in d:/wx/wx_qsp/Makefile.in
---- d:/wx/wxWidgets/Makefile.in	2010-07-15 00:09:56 +0700
-+++ d:/wx/wx_qsp/Makefile.in	2010-07-17 12:47:57 +0700
-@@ -16706,8 +16706,8 @@
- monodll_gtk_aboutdlg.o: $(srcdir)/src/gtk/aboutdlg.cpp $(MONODLL_ODEP)
- 	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/gtk/aboutdlg.cpp
- 
--monodll_animate.o: $(srcdir)/src/gtk/animate.cpp $(MONODLL_ODEP)
--	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/gtk/animate.cpp
-+monodll_animate.o: $(srcdir)/src/generic/animateg.cpp $(MONODLL_ODEP)
-+	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/generic/animateg.cpp
- 
- monodll_gtk_bmpcbox.o: $(srcdir)/src/gtk/bmpcbox.cpp $(MONODLL_ODEP)
- 	$(CXXC) -c -o $@ $(MONODLL_CXXFLAGS) $(srcdir)/src/gtk/bmpcbox.cpp
-@@ -21908,8 +21908,8 @@
- monolib_gtk_aboutdlg.o: $(srcdir)/src/gtk/aboutdlg.cpp $(MONOLIB_ODEP)
- 	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/gtk/aboutdlg.cpp
- 
--monolib_animate.o: $(srcdir)/src/gtk/animate.cpp $(MONOLIB_ODEP)
--	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/gtk/animate.cpp
-+monolib_animate.o: $(srcdir)/src/generic/animateg.cpp $(MONOLIB_ODEP)
-+	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/generic/animateg.cpp
- 
- monolib_gtk_bmpcbox.o: $(srcdir)/src/gtk/bmpcbox.cpp $(MONOLIB_ODEP)
- 	$(CXXC) -c -o $@ $(MONOLIB_CXXFLAGS) $(srcdir)/src/gtk/bmpcbox.cpp
-@@ -34406,8 +34406,8 @@
- advdll_gtk_aboutdlg.o: $(srcdir)/src/gtk/aboutdlg.cpp $(ADVDLL_ODEP)
- 	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/gtk/aboutdlg.cpp
- 
--advdll_animate.o: $(srcdir)/src/gtk/animate.cpp $(ADVDLL_ODEP)
--	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/gtk/animate.cpp
-+advdll_animate.o: $(srcdir)/src/generic/animateg.cpp $(ADVDLL_ODEP)
-+	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/generic/animateg.cpp
- 
- advdll_gtk_bmpcbox.o: $(srcdir)/src/gtk/bmpcbox.cpp $(ADVDLL_ODEP)
- 	$(CXXC) -c -o $@ $(ADVDLL_CXXFLAGS) $(srcdir)/src/gtk/bmpcbox.cpp
-@@ -34739,8 +34739,8 @@
- advlib_gtk_aboutdlg.o: $(srcdir)/src/gtk/aboutdlg.cpp $(ADVLIB_ODEP)
- 	$(CXXC) -c -o $@ $(ADVLIB_CXXFLAGS) $(srcdir)/src/gtk/aboutdlg.cpp
- 
--advlib_animate.o: $(srcdir)/src/gtk/animate.cpp $(ADVLIB_ODEP)
--	$(CXXC) -c -o $@ $(ADVLIB_CXXFLAGS) $(srcdir)/src/gtk/animate.cpp
-+advlib_animate.o: $(srcdir)/src/generic/animateg.cpp $(ADVLIB_ODEP)
-+	$(CXXC) -c -o $@ $(ADVLIB_CXXFLAGS) $(srcdir)/src/generic/animateg.cpp
- 
- advlib_gtk_bmpcbox.o: $(srcdir)/src/gtk/bmpcbox.cpp $(ADVLIB_ODEP)
- 	$(CXXC) -c -o $@ $(ADVLIB_CXXFLAGS) $(srcdir)/src/gtk/bmpcbox.cpp
-diff -u -r d:/wx/wxWidgets/include/wx/animate.h d:/wx/wx_qsp/include/wx/animate.h
---- d:/wx/wxWidgets/include/wx/animate.h	2009-05-09 19:27:30 +0700
-+++ d:/wx/wx_qsp/include/wx/animate.h	2010-07-17 12:47:57 +0700
+Index: include/wx/animate.h
+===================================================================
+--- include/wx/animate.h	(revision 72127)
++++ include/wx/animate.h	(working copy)
 @@ -115,11 +115,15 @@
  // include the platform-specific version of the wxAnimationCtrl class
  // ----------------------------------------------------------------------------
@@ -64,9 +18,10 @@ diff -u -r d:/wx/wxWidgets/include/wx/animate.h d:/wx/wx_qsp/include/wx/animate.
  
  #endif // wxUSE_ANIMATIONCTRL
  
-diff -u -r d:/wx/wxWidgets/include/wx/animdecod.h d:/wx/wx_qsp/include/wx/animdecod.h
---- d:/wx/wxWidgets/include/wx/animdecod.h	2010-01-07 01:06:59 +0600
-+++ d:/wx/wx_qsp/include/wx/animdecod.h	2010-07-17 12:47:57 +0700
+Index: include/wx/animdecod.h
+===================================================================
+--- include/wx/animdecod.h	(revision 72127)
++++ include/wx/animdecod.h	(working copy)
 @@ -145,6 +145,9 @@
      // the transparent colour for this frame if any or wxNullColour.
      virtual wxColour GetTransparentColour(unsigned int frame) const = 0;
@@ -77,9 +32,10 @@ diff -u -r d:/wx/wxWidgets/include/wx/animdecod.h d:/wx/wx_qsp/include/wx/animde
      // get global data
      wxSize GetAnimationSize() const { return m_szAnimation; }
      wxColour GetBackgroundColour() const { return m_background; }
-diff -u -r d:/wx/wxWidgets/include/wx/aui/floatpane.h d:/wx/wx_qsp/include/wx/aui/floatpane.h
---- d:/wx/wxWidgets/include/wx/aui/floatpane.h	2009-08-21 17:59:07 +0700
-+++ d:/wx/wx_qsp/include/wx/aui/floatpane.h	2010-07-17 12:47:57 +0700
+Index: include/wx/aui/floatpane.h
+===================================================================
+--- include/wx/aui/floatpane.h	(revision 72127)
++++ include/wx/aui/floatpane.h	(working copy)
 @@ -32,6 +32,8 @@
  class WXDLLIMPEXP_AUI wxAuiFloatingFrame : public wxAuiFloatingFrameBaseClass
  {
@@ -87,7 +43,7 @@ diff -u -r d:/wx/wxWidgets/include/wx/aui/floatpane.h d:/wx/wx_qsp/include/wx/au
 +    // HzD_Byte's hack
 +    /*
      wxAuiFloatingFrame(wxWindow* parent,
-                    wxAuiManager* owner_mgr,
+                    wxAuiManager* ownerMgr,
                     const wxAuiPaneInfo& pane,
 @@ -40,6 +42,15 @@
                                  wxFRAME_NO_TASKBAR | wxFRAME_FLOAT_ON_PARENT |
@@ -105,9 +61,10 @@ diff -u -r d:/wx/wxWidgets/include/wx/aui/floatpane.h d:/wx/wx_qsp/include/wx/au
      virtual ~wxAuiFloatingFrame();
      void SetPaneWindow(const wxAuiPaneInfo& pane);
      wxAuiManager* GetOwnerManager() const;
-diff -u -r d:/wx/wxWidgets/include/wx/generic/animate.h d:/wx/wx_qsp/include/wx/generic/animate.h
---- d:/wx/wxWidgets/include/wx/generic/animate.h	2009-05-09 19:27:24 +0700
-+++ d:/wx/wx_qsp/include/wx/generic/animate.h	2010-07-17 12:47:57 +0700
+Index: include/wx/generic/animate.h
+===================================================================
+--- include/wx/generic/animate.h	(revision 72127)
++++ include/wx/generic/animate.h	(working copy)
 @@ -27,8 +27,13 @@
      wxAnimation(const wxString &name, wxAnimationType type = wxANIMATION_TYPE_ANY)
          { LoadFile(name, type); }
@@ -135,9 +92,10 @@ diff -u -r d:/wx/wxWidgets/include/wx/generic/animate.h d:/wx/wx_qsp/include/wx/
  private:
      typedef wxAnimationCtrlBase base_type;
      DECLARE_DYNAMIC_CLASS(wxAnimationCtrl)
-diff -u -r d:/wx/wxWidgets/include/wx/gifdecod.h d:/wx/wx_qsp/include/wx/gifdecod.h
---- d:/wx/wxWidgets/include/wx/gifdecod.h	2009-08-21 17:59:18 +0700
-+++ d:/wx/wx_qsp/include/wx/gifdecod.h	2010-07-17 12:47:57 +0700
+Index: include/wx/gifdecod.h
+===================================================================
+--- include/wx/gifdecod.h	(revision 72127)
++++ include/wx/gifdecod.h	(working copy)
 @@ -66,8 +66,11 @@
      virtual long GetDelay(unsigned int frame) const;
  
@@ -150,9 +108,10 @@ diff -u -r d:/wx/wxWidgets/include/wx/gifdecod.h d:/wx/wx_qsp/include/wx/gifdeco
  
      // load function which returns more info than just Load():
      wxGIFErrorCode LoadGIF( wxInputStream& stream );
-diff -u -r d:/wx/wxWidgets/include/wx/htmllbox.h d:/wx/wx_qsp/include/wx/htmllbox.h
---- d:/wx/wxWidgets/include/wx/htmllbox.h	2009-05-09 19:27:30 +0700
-+++ d:/wx/wx_qsp/include/wx/htmllbox.h	2010-07-17 12:47:57 +0700
+Index: include/wx/htmllbox.h
+===================================================================
+--- include/wx/htmllbox.h	(revision 72127)
++++ include/wx/htmllbox.h	(working copy)
 @@ -130,7 +130,8 @@
      // ensure that the given item is cached
      void CacheItem(size_t n) const;
@@ -182,13 +141,14 @@ diff -u -r d:/wx/wxWidgets/include/wx/htmllbox.h d:/wx/wx_qsp/include/wx/htmllbo
  
      // it calls our GetSelectedTextColour() and GetSelectedTextBgColour()
      friend class wxHtmlListBoxStyle;
-diff -u -r d:/wx/wxWidgets/src/aui/floatpane.cpp d:/wx/wx_qsp/src/aui/floatpane.cpp
---- d:/wx/wxWidgets/src/aui/floatpane.cpp	2010-06-06 21:21:25 +0700
-+++ d:/wx/wx_qsp/src/aui/floatpane.cpp	2010-07-17 12:47:57 +0700
-@@ -145,10 +145,13 @@
-         SetClientSize(size);
-     }
- 
+Index: src/aui/floatpane.cpp
+===================================================================
+--- src/aui/floatpane.cpp	(revision 72127)
++++ src/aui/floatpane.cpp	(working copy)
+@@ -133,10 +133,13 @@
+     // pane.floating_size from inside it so we must also record its original
+     // value before doing it.
+     const bool hasFloatingSize = pane.floating_size != wxDefaultSize;
 +    // HzD_Byte's hack
 +    /*
      if (pane.IsFixed())
@@ -196,13 +156,14 @@ diff -u -r d:/wx/wxWidgets/src/aui/floatpane.cpp d:/wx/wx_qsp/src/aui/floatpane.
          SetWindowStyleFlag(GetWindowStyleFlag() & ~wxRESIZE_BORDER);
      }
 +    */
- }
  
- wxAuiManager* wxAuiFloatingFrame::GetOwnerManager() const
-diff -u -r d:/wx/wxWidgets/src/aui/framemanager.cpp d:/wx/wx_qsp/src/aui/framemanager.cpp
---- d:/wx/wxWidgets/src/aui/framemanager.cpp	2010-06-06 21:21:25 +0700
-+++ d:/wx/wx_qsp/src/aui/framemanager.cpp	2010-07-17 12:47:57 +0700
-@@ -2603,6 +2603,8 @@
+     if ( hasFloatingSize )
+     {
+Index: src/aui/framemanager.cpp
+===================================================================
+--- src/aui/framemanager.cpp	(revision 72127)
++++ src/aui/framemanager.cpp	(working copy)
+@@ -2671,6 +2671,8 @@
                  p.window->Refresh();
                  p.window->Update();
              }
@@ -211,9 +172,10 @@ diff -u -r d:/wx/wxWidgets/src/aui/framemanager.cpp d:/wx/wx_qsp/src/aui/framema
          }
      }
  
-diff -u -r d:/wx/wxWidgets/src/common/filesys.cpp d:/wx/wx_qsp/src/common/filesys.cpp
---- d:/wx/wxWidgets/src/common/filesys.cpp	2010-04-12 15:26:29 +0700
-+++ d:/wx/wx_qsp/src/common/filesys.cpp	2010-07-17 12:47:57 +0700
+Index: src/common/filesys.cpp
+===================================================================
+--- src/common/filesys.cpp	(revision 72127)
++++ src/common/filesys.cpp	(working copy)
 @@ -633,7 +633,8 @@
          path = path.Mid(2);
  #endif
@@ -222,11 +184,12 @@ diff -u -r d:/wx/wxWidgets/src/common/filesys.cpp d:/wx/wx_qsp/src/common/filesy
 +    // HzD_Byte's hack
 +    // path = wxURI::Unescape(path);
  
- #ifdef __WXMSW__
+ #ifdef __WINDOWS__
      // file urls either start with a forward slash (local harddisk),
-diff -u -r d:/wx/wxWidgets/src/generic/animateg.cpp d:/wx/wx_qsp/src/generic/animateg.cpp
---- d:/wx/wxWidgets/src/generic/animateg.cpp	2009-08-21 17:59:06 +0700
-+++ d:/wx/wx_qsp/src/generic/animateg.cpp	2010-07-17 12:47:57 +0700
+Index: src/generic/animateg.cpp
+===================================================================
+--- src/generic/animateg.cpp	(revision 72127)
++++ src/generic/animateg.cpp	(working copy)
 @@ -277,6 +277,8 @@
      m_currentFrame = 0;
      m_looped = false;
@@ -288,7 +251,7 @@ diff -u -r d:/wx/wxWidgets/src/generic/animateg.cpp d:/wx/wx_qsp/src/generic/ani
  
  void wxAnimationCtrl::DisposeToBackground()
 @@ -630,7 +653,13 @@
-         // NOTE: we draw the bitmap explicitely ignoring the mask (if any);
+         // NOTE: we draw the bitmap explicitly ignoring the mask (if any);
          //       i.e. we don't want to combine the backing store with the
          //       possibly wrong preexisting contents of the window!
 -        dc.DrawBitmap(m_backingStore, 0, 0, false /* no mask */);
@@ -323,10 +286,11 @@ diff -u -r d:/wx/wxWidgets/src/generic/animateg.cpp d:/wx/wx_qsp/src/generic/ani
      }
  }
  
-diff -u -r d:/wx/wxWidgets/src/generic/scrlwing.cpp d:/wx/wx_qsp/src/generic/scrlwing.cpp
---- d:/wx/wxWidgets/src/generic/scrlwing.cpp	2010-07-15 00:09:42 +0700
-+++ d:/wx/wx_qsp/src/generic/scrlwing.cpp	2010-07-17 12:47:57 +0700
-@@ -567,6 +567,8 @@
+Index: src/generic/scrlwing.cpp
+===================================================================
+--- src/generic/scrlwing.cpp	(revision 72127)
++++ src/generic/scrlwing.cpp	(working copy)
+@@ -568,6 +568,8 @@
          m_win->SetScrollPos(wxVERTICAL, m_yScrollPosition);
      }
  
@@ -335,7 +299,7 @@ diff -u -r d:/wx/wxWidgets/src/generic/scrlwing.cpp d:/wx/wx_qsp/src/generic/scr
      if ( needsRefresh )
      {
          m_targetWindow->Refresh(true, GetScrollRect());
-@@ -575,6 +577,10 @@
+@@ -576,6 +578,10 @@
      {
          m_targetWindow->ScrollWindow(dx, dy, GetScrollRect());
      }
@@ -346,9 +310,10 @@ diff -u -r d:/wx/wxWidgets/src/generic/scrlwing.cpp d:/wx/wx_qsp/src/generic/scr
  }
  
  int wxScrollHelperBase::CalcScrollInc(wxScrollWinEvent& event)
-diff -u -r d:/wx/wxWidgets/src/html/htmlwin.cpp d:/wx/wx_qsp/src/html/htmlwin.cpp
---- d:/wx/wxWidgets/src/html/htmlwin.cpp	2010-07-01 20:56:43 +0700
-+++ d:/wx/wx_qsp/src/html/htmlwin.cpp	2010-07-17 12:47:57 +0700
+Index: src/html/htmlwin.cpp
+===================================================================
+--- src/html/htmlwin.cpp	(revision 72127)
++++ src/html/htmlwin.cpp	(working copy)
 @@ -465,7 +465,8 @@
      // ...and run the parser on it:
      wxClientDC *dc = new wxClientDC(this);
@@ -359,9 +324,10 @@ diff -u -r d:/wx/wxWidgets/src/html/htmlwin.cpp d:/wx/wx_qsp/src/html/htmlwin.cp
      SetBackgroundImage(wxNullBitmap);
  
      m_Parser->SetDC(dc);
-diff -u -r d:/wx/wxWidgets/src/html/m_image.cpp d:/wx/wx_qsp/src/html/m_image.cpp
---- d:/wx/wxWidgets/src/html/m_image.cpp	2010-07-15 00:09:32 +0700
-+++ d:/wx/wx_qsp/src/html/m_image.cpp	2010-07-17 12:47:57 +0700
+Index: src/html/m_image.cpp
+===================================================================
+--- src/html/m_image.cpp	(revision 72127)
++++ src/html/m_image.cpp	(working copy)
 @@ -307,6 +307,9 @@
      wxBitmap           *m_bitmap;
      int                 m_align;
@@ -562,9 +528,10 @@ diff -u -r d:/wx/wxWidgets/src/html/m_image.cpp d:/wx/wx_qsp/src/html/m_image.cp
  }
  
  wxHtmlLinkInfo *wxHtmlImageCell::GetLink( int x, int y ) const
-diff -u -r d:/wx/wxWidgets/src/html/m_links.cpp d:/wx/wx_qsp/src/html/m_links.cpp
---- d:/wx/wxWidgets/src/html/m_links.cpp	2009-05-09 19:22:47 +0700
-+++ d:/wx/wx_qsp/src/html/m_links.cpp	2010-07-17 12:47:57 +0700
+Index: src/html/m_links.cpp
+===================================================================
+--- src/html/m_links.cpp	(revision 72127)
++++ src/html/m_links.cpp	(working copy)
 @@ -76,7 +76,10 @@
              if (tag.HasParam( wxT("TARGET") )) target = tag.GetParam( wxT("TARGET") );
              m_WParser->SetActualColor(m_WParser->GetLinkColor());
@@ -577,9 +544,10 @@ diff -u -r d:/wx/wxWidgets/src/html/m_links.cpp d:/wx/wx_qsp/src/html/m_links.cp
              m_WParser->GetContainer()->InsertCell(new wxHtmlFontCell(m_WParser->CreateCurrentFont()));
              m_WParser->SetLink(wxHtmlLinkInfo(name, target));
  
-diff -u -r d:/wx/wxWidgets/src/html/winpars.cpp d:/wx/wx_qsp/src/html/winpars.cpp
---- d:/wx/wxWidgets/src/html/winpars.cpp	2010-07-01 20:56:43 +0700
-+++ d:/wx/wx_qsp/src/html/winpars.cpp	2010-07-17 12:47:57 +0700
+Index: src/html/winpars.cpp
+===================================================================
+--- src/html/winpars.cpp	(revision 72127)
++++ src/html/winpars.cpp	(working copy)
 @@ -55,6 +55,8 @@
      m_whitespaceMode = Whitespace_Normal;
      m_lastWordCell = NULL;
@@ -616,10 +584,11 @@ diff -u -r d:/wx/wxWidgets/src/html/winpars.cpp d:/wx/wx_qsp/src/html/winpars.cp
  
          wxString redirect;
          status = m_windowInterface->OnHTMLOpeningURL(type, myfullurl, &redirect);
-diff -u -r d:/wx/wxWidgets/src/msw/textctrl.cpp d:/wx/wx_qsp/src/msw/textctrl.cpp
---- d:/wx/wxWidgets/src/msw/textctrl.cpp	2010-06-16 22:03:10 +0700
-+++ d:/wx/wx_qsp/src/msw/textctrl.cpp	2010-07-17 12:47:57 +0700
-@@ -1844,6 +1844,8 @@
+Index: src/msw/textctrl.cpp
+===================================================================
+--- src/msw/textctrl.cpp	(revision 72127)
++++ src/msw/textctrl.cpp	(working copy)
+@@ -1875,6 +1875,8 @@
                  // Insert tab since calling the default Windows handler
                  // doesn't seem to do it
                  WriteText(wxT("\t"));
@@ -628,9 +597,10 @@ diff -u -r d:/wx/wxWidgets/src/msw/textctrl.cpp d:/wx/wx_qsp/src/msw/textctrl.cp
                  return;
              }
              break;
-diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/Editor.cxx d:/wx/wx_qsp/src/stc/scintilla/src/Editor.cxx
---- d:/wx/wxWidgets/src/stc/scintilla/src/Editor.cxx	2010-04-12 15:26:27 +0700
-+++ d:/wx/wx_qsp/src/stc/scintilla/src/Editor.cxx	2010-07-17 12:47:57 +0700
+Index: src/stc/scintilla/src/Editor.cxx
+===================================================================
+--- src/stc/scintilla/src/Editor.cxx	(revision 72127)
++++ src/stc/scintilla/src/Editor.cxx	(working copy)
 @@ -23,6 +23,8 @@
  #include "Platform.h"
  
@@ -686,9 +656,10 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/Editor.cxx d:/wx/wx_qsp/src/stc
  }
  
  bool Editor::Idle() {
-diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/scintilla/src/LexVB.cxx
---- d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx	2010-03-31 08:58:32 +0700
-+++ d:/wx/wx_qsp/src/stc/scintilla/src/LexVB.cxx	2010-07-17 12:51:27 +0700
+Index: src/stc/scintilla/src/LexVB.cxx
+===================================================================
+--- src/stc/scintilla/src/LexVB.cxx	(revision 72127)
++++ src/stc/scintilla/src/LexVB.cxx	(working copy)
 @@ -1,8 +1,8 @@
  // Scintilla source code edit control
  /** @file LexVB.cxx
@@ -700,7 +671,7 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
  // The License.txt file describes the conditions under which this software may be distributed.
  
  #include <stdlib.h>
-@@ -24,283 +24,247 @@
+@@ -24,285 +24,249 @@
  using namespace Scintilla;
  #endif
  
@@ -763,25 +734,25 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 +	if (curLine > 0) commentState = (styler.GetLineState(curLine - 1) >> 8) & 0xFF;
  
  	styler.StartAt(startPos);
--
++	StyleContext sc(startPos, length, initStyle, styler);
+ 
 -	int visibleChars = 0;
 -	int fileNbDigits = 0;
 -
 -	// Do not leak onto next line
 -	if (initStyle == SCE_B_STRINGEOL || initStyle == SCE_B_COMMENT || initStyle == SCE_B_PREPROCESSOR) {
 -		initStyle = SCE_B_DEFAULT;
--	}
--
- 	StyleContext sc(startPos, length, initStyle, styler);
- 
--	for (; sc.More(); sc.Forward()) {
 +	if (sc.state != SCE_B_STRING && sc.state != SCE_B_STRINGEOL &&
 +		sc.state != SCE_B_PREPROCESSOR && sc.state != SCE_B_DATE &&
 +		sc.state != SCE_B_ASM && sc.state != SCE_B_ERROR &&
 +		!commentState) {
 +		sc.SetState(SCE_B_CONSTANT); // Begin of line
-+	}
+ 	}
  
+-	StyleContext sc(startPos, length, initStyle, styler);
+-
+-	for (; sc.More(); sc.Forward()) {
+-
 +	while (sc.More()) {
  		if (sc.state == SCE_B_OPERATOR) {
  			sc.SetState(SCE_B_DEFAULT);
@@ -799,9 +770,26 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 -				if (!vbScriptSyntax && IsTypeCharacter(sc.ch)) {
 -					sc.Forward();	// Skip it
 -					skipType = true;
--				}
++				if (keywords.InList(s)) {
++					sc.ChangeState(SCE_B_KEYWORD);
++				} else if (keywords2.InList(s)) {
++					sc.ChangeState(SCE_B_KEYWORD2);
++				} else if (keywords3.InList(s)) {
++					sc.ChangeState(SCE_B_KEYWORD3);
++				} else if (keywords4.InList(s)) {
++					sc.ChangeState(SCE_B_KEYWORD4);
+ 				}
 -				if (sc.ch == ']') {
--					sc.Forward();
++				sc.SetState(SCE_B_DEFAULT);
++			}
++		} else if (sc.state == SCE_B_NUMBER) {
++			if (!IsANumberChar(sc.ch)) {
++				sc.SetState(SCE_B_DEFAULT);
++			}
++		} else if (sc.state == SCE_B_STRING) { // String 1
++			if (sc.ch == '\'') {
++				if (sc.chNext == '\'') {
+ 					sc.Forward();
 -				}
 -				char s[100];
 -				sc.GetCurrentLowered(s, sizeof(s));
@@ -810,7 +798,7 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 -				}
 -				if (strcmp(s, "rem") == 0) {
 -					sc.ChangeState(SCE_B_COMMENT);
--				} else {
+ 				} else {
 -					if (keywords.InList(s)) {
 -						sc.ChangeState(SCE_B_KEYWORD);
 -					} else if (keywords2.InList(s)) {
@@ -821,35 +809,18 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 -						sc.ChangeState(SCE_B_KEYWORD4);
 -					}	// Else, it is really an identifier...
 -					sc.SetState(SCE_B_DEFAULT);
-+				if (keywords.InList(s)) {
-+					sc.ChangeState(SCE_B_KEYWORD);
-+				} else if (keywords2.InList(s)) {
-+					sc.ChangeState(SCE_B_KEYWORD2);
-+				} else if (keywords3.InList(s)) {
-+					sc.ChangeState(SCE_B_KEYWORD3);
-+				} else if (keywords4.InList(s)) {
-+					sc.ChangeState(SCE_B_KEYWORD4);
++					sc.ForwardSetState(SCE_B_DEFAULT);
  				}
-+				sc.SetState(SCE_B_DEFAULT);
  			}
- 		} else if (sc.state == SCE_B_NUMBER) {
+-		} else if (sc.state == SCE_B_NUMBER) {
 -			// We stop the number definition on non-numerical non-dot non-eE non-sign char
 -			// Also accepts A-F for hex. numbers
 -			if (!IsANumberChar(sc.ch) && !(tolower(sc.ch) >= 'a' && tolower(sc.ch) <= 'f')) {
-+			if (!IsANumberChar(sc.ch)) {
- 				sc.SetState(SCE_B_DEFAULT);
- 			}
+-				sc.SetState(SCE_B_DEFAULT);
+-			}
 -		} else if (sc.state == SCE_B_STRING) {
 -			// VB doubles quotes to preserve them, so just end this string
 -			// state now as a following quote will start again
-+		} else if (sc.state == SCE_B_STRING) { // String 1
-+			if (sc.ch == '\'') {
-+				if (sc.chNext == '\'') {
-+					sc.Forward();
-+				} else {
-+					sc.ForwardSetState(SCE_B_DEFAULT);
-+				}
-+			}
 +		} else if (sc.state == SCE_B_STRINGEOL) { // String 2
  			if (sc.ch == '\"') {
  				if (sc.chNext == '\"') {
@@ -869,17 +840,6 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 -			if (sc.atLineEnd) {
 -				visibleChars = 0;
 -				sc.ForwardSetState(SCE_B_DEFAULT);
--			}
--		} else if (sc.state == SCE_B_PREPROCESSOR) {
--			if (sc.atLineEnd) {
--				visibleChars = 0;
--				sc.ForwardSetState(SCE_B_DEFAULT);
--			}
--		} else if (sc.state == SCE_B_FILENUMBER) {
--			if (IsADigit(sc.ch)) {
--				fileNbDigits++;
--				if (fileNbDigits > 3) {
--					sc.ChangeState(SCE_B_DATE);
 +		} else if (sc.state == SCE_B_PREPROCESSOR) { // String 1 in the comment
 +			if (sc.ch == '\'') {
 +				if (sc.chNext == '\'') {
@@ -887,20 +847,30 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 +				} else {
 +					sc.ForwardSetState(SCE_B_COMMENT);
 +				}
-+			}
+ 			}
+-		} else if (sc.state == SCE_B_PREPROCESSOR) {
+-			if (sc.atLineEnd) {
+-				visibleChars = 0;
+-				sc.ForwardSetState(SCE_B_DEFAULT);
 +		} else if (sc.state == SCE_B_DATE) { // String 2 in the comment
 +			if (sc.ch == '\"') {
 +				if (sc.chNext == '\"') {
 +					sc.Forward();
 +				} else {
 +					sc.ForwardSetState(SCE_B_COMMENT);
- 				}
++				}
+ 			}
+-		} else if (sc.state == SCE_B_FILENUMBER) {
+-			if (IsADigit(sc.ch)) {
+-				fileNbDigits++;
+-				if (fileNbDigits > 3) {
+-					sc.ChangeState(SCE_B_DATE);
+-				}
 -			} else if (sc.ch == '\r' || sc.ch == '\n' || sc.ch == ',') {
 -				// Regular uses: Close #1; Put #1, ...; Get #1, ... etc.
 -				// Too bad if date is format #27, Oct, 2003# or something like that...
 -				// Use regular number state
 -				sc.ChangeState(SCE_B_NUMBER);
-+			}
 +		} else if (sc.state == SCE_B_ASM) { // Continue line
 +			if (sc.atLineStart || (sc.ch != ' ' && sc.ch != '\t' && !sc.atLineEnd)) {
  				sc.SetState(SCE_B_DEFAULT);
@@ -909,10 +879,13 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 -				sc.ForwardSetState(SCE_B_DEFAULT);
 -			} else {
 -				sc.ChangeState(SCE_B_DATE);
--			}
+ 			}
 -			if (sc.state != SCE_B_FILENUMBER) {
 -				fileNbDigits = 0;
--			}
++		} else if (sc.state == SCE_B_ERROR) { // Continue line in the comment
++			if (sc.atLineStart || (sc.ch != ' ' && sc.ch != '\t' && !sc.atLineEnd)) {
++				sc.SetState(SCE_B_COMMENT);
+ 			}
 -		} else if (sc.state == SCE_B_DATE) {
 -			if (sc.atLineEnd) {
 -				visibleChars = 0;
@@ -920,13 +893,20 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 -				sc.ForwardSetState(SCE_B_DEFAULT);
 -			} else if (sc.ch == '#') {
 -				sc.ForwardSetState(SCE_B_DEFAULT);
- 			}
--		}
+-			}
+ 		}
 -
 -		if (sc.state == SCE_B_DEFAULT) {
 -			if (sc.ch == '\'') {
-+		} else if (sc.state == SCE_B_ERROR) { // Continue line in the comment
-+			if (sc.atLineStart || (sc.ch != ' ' && sc.ch != '\t' && !sc.atLineEnd)) {
++		if (sc.state == SCE_B_DEFAULT || sc.state == SCE_B_CONSTANT) {
++			if (sc.ch == ' ' && sc.chNext == '_') {
++				sc.SetState(SCE_B_ASM); // Continue line
++				sc.Forward();
++			} else if (sc.ch == '\'') {
++				sc.SetState(SCE_B_STRING); // String 1
++			} else if (sc.ch == '\"') {
++				sc.SetState(SCE_B_STRINGEOL); // String 2
++			} else if (sc.state == SCE_B_CONSTANT && sc.ch == '!') {
  				sc.SetState(SCE_B_COMMENT);
 -			} else if (sc.ch == '\"') {
 -				sc.SetState(SCE_B_STRING);
@@ -941,28 +921,17 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 -				sc.SetState(SCE_B_FILENUMBER);
 -			} else if (sc.ch == '&' && tolower(sc.chNext) == 'h') {
 -				// Hexadecimal number
--				sc.SetState(SCE_B_NUMBER);
--				sc.Forward();
--			} else if (sc.ch == '&' && tolower(sc.chNext) == 'o') {
--				// Octal number
--				sc.SetState(SCE_B_NUMBER);
-+			}
-+		}
-+		if (sc.state == SCE_B_DEFAULT || sc.state == SCE_B_CONSTANT) {
-+			if (sc.ch == ' ' && sc.chNext == '_') {
-+				sc.SetState(SCE_B_ASM); // Continue line
- 				sc.Forward();
--			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
-+			} else if (sc.ch == '\'') {
-+				sc.SetState(SCE_B_STRING); // String 1
-+			} else if (sc.ch == '\"') {
-+				sc.SetState(SCE_B_STRINGEOL); // String 2
-+			} else if (sc.state == SCE_B_CONSTANT && sc.ch == '!') {
-+				sc.SetState(SCE_B_COMMENT);
 +			} else if (sc.state == SCE_B_CONSTANT && sc.ch == ':') {
 +				sc.SetState(SCE_B_LABEL);
 +			} else if (IsADigit(sc.ch)) {
  				sc.SetState(SCE_B_NUMBER);
+-				sc.Forward();
+-			} else if (sc.ch == '&' && tolower(sc.chNext) == 'o') {
+-				// Octal number
+-				sc.SetState(SCE_B_NUMBER);
+-				sc.Forward();
+-			} else if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext))) {
+-				sc.SetState(SCE_B_NUMBER);
 -			} else if (IsAWordStart(sc.ch) || (sc.ch == '[')) {
 +			} else if (IsAWordStart(sc.ch)) {
  				sc.SetState(SCE_B_IDENTIFIER);
@@ -974,7 +943,7 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 +					sc.ForwardSetState(SCE_B_CONSTANT); // Begin of line
 +					continue;
 +				}
-+			}
+ 			}
 +		} else if (sc.state == SCE_B_COMMENT) {
 +			if (sc.ch == ' ' && sc.chNext == '_') {
 +				sc.SetState(SCE_B_ERROR); // Continue line in the comment
@@ -983,11 +952,9 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 +				sc.SetState(SCE_B_PREPROCESSOR); // String 1 in the comment
 +			} else if (sc.ch == '\"') {
 +				sc.SetState(SCE_B_DATE); // String 2 in the comment
- 			}
++			}
  		}
 -
--		if (sc.atLineEnd) {
--			visibleChars = 0;
 +		if (sc.state != SCE_B_STRING && sc.state != SCE_B_STRINGEOL &&
 +			sc.state != SCE_B_PREPROCESSOR && sc.state != SCE_B_DATE) {
 +			if (sc.ch == '{') {
@@ -1002,10 +969,9 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 +				--lineState;
 +				if (commentState) --commentState;
 +			}
- 		}
--		if (!IsASpace(sc.ch)) {
--			visibleChars++;
-+		if (sc.atLineEnd) {
++		}
+ 		if (sc.atLineEnd) {
+-			visibleChars = 0;
 +			styler.SetLineState(curLine++, ((commentState & 0xFF) << 8) | (lineState & 0xFF));
 +			if (sc.state != SCE_B_STRING && sc.state != SCE_B_STRINGEOL &&
 +				sc.state != SCE_B_PREPROCESSOR && sc.state != SCE_B_DATE &&
@@ -1014,6 +980,9 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 +				sc.SetState(SCE_B_CONSTANT); // Begin of line
 +			}
  		}
+-		if (!IsASpace(sc.ch)) {
+-			visibleChars++;
+-		}
 +		sc.Forward();
  	}
 -
@@ -1034,7 +1003,15 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
  		sc.GetCurrentLowered(s, sizeof(s));
 -		if (skipType) {
 -			s[strlen(s) - 1] = '\0';
--		}
++		if (keywords.InList(s)) {
++			sc.ChangeState(SCE_B_KEYWORD);
++		} else if (keywords2.InList(s)) {
++			sc.ChangeState(SCE_B_KEYWORD2);
++		} else if (keywords3.InList(s)) {
++			sc.ChangeState(SCE_B_KEYWORD3);
++		} else if (keywords4.InList(s)) {
++			sc.ChangeState(SCE_B_KEYWORD4);
+ 		}
 -		if (strcmp(s, "rem") == 0) {
 -			sc.ChangeState(SCE_B_COMMENT);
 -		} else {
@@ -1048,15 +1025,7 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 -				sc.ChangeState(SCE_B_KEYWORD4);
 -			}	// Else, it is really an identifier...
 -			sc.SetState(SCE_B_DEFAULT);
-+		if (keywords.InList(s)) {
-+			sc.ChangeState(SCE_B_KEYWORD);
-+		} else if (keywords2.InList(s)) {
-+			sc.ChangeState(SCE_B_KEYWORD2);
-+		} else if (keywords3.InList(s)) {
-+			sc.ChangeState(SCE_B_KEYWORD3);
-+		} else if (keywords4.InList(s)) {
-+			sc.ChangeState(SCE_B_KEYWORD4);
- 		}
+-		}
  	}
 -
  	sc.Complete();
@@ -1131,16 +1100,18 @@ diff -u -r d:/wx/wxWidgets/src/stc/scintilla/src/LexVB.cxx d:/wx/wx_qsp/src/stc/
 -static void ColouriseVBNetDoc(unsigned int startPos, int length, int initStyle,
 -                           WordList *keywordlists[], Accessor &styler) {
 -	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler, false);
--}
--
--static void ColouriseVBScriptDoc(unsigned int startPos, int length, int initStyle,
--                           WordList *keywordlists[], Accessor &styler) {
--	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler, true);
 +static void ColouriseVBNetDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[], Accessor &styler) {
 +	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler);
  }
  
+-static void ColouriseVBScriptDoc(unsigned int startPos, int length, int initStyle,
+-                           WordList *keywordlists[], Accessor &styler) {
+-	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler, true);
+-}
+-
  static const char * const vbWordListDesc[] = {
+ 	"Keywords",
+ 	"user1",
 @@ -312,5 +276,4 @@
  };
  
