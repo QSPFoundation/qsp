@@ -1,2 +1,6 @@
-c:\msys\bin\diff -u -r d:/wx/wxWidgets d:/wx/wx_qsp > d:\wx\wxPatch.diff
+SET BUILD_PATH=%~dp0\..
+SET WX_PATH=%BUILD_PATH%\wxWidgets
+
+cd /d "%WX_PATH%"
+svn diff > "%BUILD_PATH%\wxPatch.diff"
 pause
