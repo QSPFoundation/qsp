@@ -55,6 +55,18 @@
     <ClCompile Include="source\main_window_presenter.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="source\settings.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_menu_bar.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_menu_bar.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="source\menu_bar.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="resource\main_window.qrc">
@@ -64,6 +76,9 @@
       <Filter>include</Filter>
     </CustomBuild>
     <CustomBuild Include="include\i_main_window_view.h">
+      <Filter>include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\menu_bar.h">
       <Filter>include</Filter>
     </CustomBuild>
   </ItemGroup>
@@ -78,6 +93,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\i_main_window_presenter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\settings.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

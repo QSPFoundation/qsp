@@ -4,11 +4,11 @@
 namespace QGen
 {
 
-MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
-	: QMainWindow(parent, flags)
+MainWindow::MainWindow(Settings* settings, QWidget *parent, Qt::WFlags flags)
+	:	QMainWindow(parent, flags),
+		_settings(settings)
 {
-	createActions();
-	createMenus();
+	createMenuBar();
 }
 
 MainWindow::~MainWindow()
@@ -21,14 +21,10 @@ void MainWindow::createActions()
 
 }
 
-void MainWindow::createMenus()
+void MainWindow::createMenuBar()
 {
-	_gameMenu	= menuBar()->addMenu(tr("&Game"));
-	_utilsMenu	= menuBar()->addMenu(tr("&Utilities"));
-	_locsMenu	= menuBar()->addMenu(tr("&Locations"));
-	_textMenu	= menuBar()->addMenu(tr("&Text"));
-	_viewMenu	= menuBar()->addMenu(tr("&View"));
-	_helpMenu	= menuBar()->addMenu(tr("&Help"));
+	_menuBar = new MenuBar(NULL, _settings);
+	setMenuBar(_menuBar);
 }
 
 void MainWindow::createToolBar()
