@@ -52,6 +52,9 @@
     <ClCompile Include="precompiled\precompiled.cpp">
       <Filter>precompiled</Filter>
     </ClCompile>
+    <ClCompile Include="source\main_window_presenter.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="resource\main_window.qrc">
@@ -60,10 +63,22 @@
     <CustomBuild Include="include\main_window.h">
       <Filter>include</Filter>
     </CustomBuild>
+    <CustomBuild Include="include\i_main_window_view.h">
+      <Filter>include</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="precompiled\precompiled.h">
       <Filter>precompiled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\main_window_presenter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\i_main_window_model.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\i_main_window_presenter.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
