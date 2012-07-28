@@ -49,12 +49,12 @@ void MenuBar::createGameMenu()
 
 	_gameMenu	= addMenu(tr("&Game"));
 
-	_exportMenu	= new QMenu(tr("&Export"));
-	_importMenu	= new QMenu(tr("&Import"));
+	_exportSubMenu	= new QMenu(tr("&Export"));
+	_importSubMenu	= new QMenu(tr("&Import"));
 
-	_exportMenu->addAction(_exportTextAct);
-	_exportMenu->addAction(_exportText2GamAct);
-	_importMenu->addAction(_importText2GamAct);
+	_exportSubMenu->addAction(_exportTextAct);
+	_exportSubMenu->addAction(_exportText2GamAct);
+	_importSubMenu->addAction(_importText2GamAct);
 
 	_gameMenu->addAction(_newGameAct);
 	_gameMenu->addAction(_openGameAct);
@@ -62,8 +62,8 @@ void MenuBar::createGameMenu()
 	_gameMenu->addAction(_saveGameAct);
 	_gameMenu->addAction(_saveAsGameAct);
 	_gameMenu->addSeparator();
-	_gameMenu->addMenu(_exportMenu);
-	_gameMenu->addMenu(_importMenu);
+	_gameMenu->addMenu(_exportSubMenu);
+	_gameMenu->addMenu(_importSubMenu);
 	_gameMenu->addSeparator();
 	_gameMenu->addAction(_exitAppAct);
 }
@@ -101,7 +101,100 @@ void MenuBar::createUtilsMenu()
 
 void MenuBar::createLocsMenu()
 {
+	_createLocAct = new QAction(tr("&Create..."), this);
+	_createLocAct->setShortcut(Qt::Key_F7);
+	_createLocAct->setStatusTip(tr("Create location"));
+
+	_renameLocAct = new QAction(tr("&Rename..."), this);
+	_renameLocAct->setShortcut(Qt::Key_F6);
+	_renameLocAct->setStatusTip(tr("Rename location"));
+
+	_deleteLocAct = new QAction(tr("&Delete"), this);
+	_deleteLocAct->setShortcut(Qt::Key_F8);
+	_deleteLocAct->setStatusTip(tr("Delete location"));
+
+	_createFolderAct = new QAction(tr("Create folder..."), this);
+	_createFolderAct->setStatusTip(tr("Create folder for locations"));
+	
+	_renameFolderAct = new QAction(tr("Rename folder..."), this);
+	_renameFolderAct->setStatusTip(tr("Rename selected folder"));
+
+	_deleteFolderAct = new QAction(tr("Delete folder"), this);
+	_deleteFolderAct->setStatusTip(tr("Delete folder, but keep locations"));
+
+	_copyLocAct = new QAction(tr("&Copy"), this);
+	_copyLocAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_C);
+	_copyLocAct->setStatusTip(tr("Copy selected location to clipboard"));
+
+	_pasteLocAct = new QAction(tr("&Paste"), this);
+	_pasteLocAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_V);
+	_pasteLocAct->setStatusTip(tr("Paste location from clipboard"));
+
+	_replaceLocAct = new QAction(tr("&Replace"), this);
+	_replaceLocAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_R);
+	_replaceLocAct->setStatusTip(tr("Replace selected location with clipboard data"));
+
+	_pasteInLocAct = new QAction(tr("P&aste in..."), this);
+	_pasteInLocAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_N);
+	_pasteInLocAct->setStatusTip(tr("Paste clipboard data to the new location"));
+
+	_clearLocAct = new QAction(tr("C&lear"), this);
+	_clearLocAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_D);
+	_clearLocAct->setStatusTip(tr("Clear location"));
+
+	_createActAct = new QAction(tr("&Create"), this);
+	_createActAct->setShortcut(Qt::ALT + Qt::Key_F7);
+	_createActAct->setStatusTip(tr("Create action on selected location"));
+	
+	_renameActAct = new QAction(tr("&Rename..."), this);
+	_renameActAct->setShortcut(Qt::ALT + Qt::Key_F6);
+	_renameActAct->setStatusTip(tr("Rename selected action"));
+
+	_deleteActAct = new QAction(tr("&Delete"), this);
+	_deleteActAct->setShortcut(Qt::ALT + Qt::Key_F8);
+	_deleteActAct->setStatusTip("Delete selected action");
+
+	_deleteAllActAct = new QAction(tr("D&elete all"), this);
+	_deleteAllActAct->setShortcut(Qt::ALT + Qt::Key_F10);
+	_deleteAllActAct->setStatusTip("Delete all actions");
+
+	_sortLocAscAct = new QAction(tr("So&rt ascending"), this);
+	_sortLocAscAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_O);
+	
+	_sortLocDescAct = new QAction(tr("Sor&t descending"), this);
+	_sortLocDescAct->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_P);
+
+	_jumpLocAct = new QAction(tr("G&o to selected location"), this);
+	_jumpLocAct->setShortcut(Qt::CTRL + Qt::Key_G);
+
 	_locsMenu = addMenu(tr("&Locations"));
+
+	_actionsSubMenu = new QMenu(tr("&Actions"));
+	_actionsSubMenu->addAction(_createActAct);
+	_actionsSubMenu->addAction(_renameActAct);
+	_actionsSubMenu->addAction(_deleteActAct);
+	_actionsSubMenu->addAction(_deleteAllActAct);
+
+	_locsMenu->addAction(_createLocAct);
+	_locsMenu->addAction(_renameLocAct);
+	_locsMenu->addAction(_deleteLocAct);
+	_locsMenu->addSeparator();
+	_locsMenu->addAction(_createFolderAct);
+	_locsMenu->addAction(_renameFolderAct);
+	_locsMenu->addAction(_deleteFolderAct);
+	_locsMenu->addSeparator();
+	_locsMenu->addAction(_copyLocAct);
+	_locsMenu->addAction(_pasteLocAct);
+	_locsMenu->addAction(_replaceLocAct);
+	_locsMenu->addAction(_pasteInLocAct);
+	_locsMenu->addAction(_clearLocAct);
+	_locsMenu->addSeparator();
+	_locsMenu->addMenu(_actionsSubMenu);
+	_locsMenu->addSeparator();
+	_locsMenu->addAction(_sortLocAscAct);
+	_locsMenu->addAction(_sortLocDescAct);
+	_locsMenu->addSeparator();
+	_locsMenu->addAction(_jumpLocAct);
 }
 
 void MenuBar::createTextMenu()

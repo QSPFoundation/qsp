@@ -29,8 +29,9 @@ private:
 	QMenu*		_textMenu;
 	QMenu*		_viewMenu;
 	QMenu*		_helpMenu;
-	QMenu*		_exportMenu;
-	QMenu*		_importMenu;
+	QMenu*		_exportSubMenu;
+	QMenu*		_importSubMenu;
+	QMenu*		_actionsSubMenu;
 
 	QAction*	_newGameAct;
 	QAction*	_openGameAct;
@@ -47,6 +48,27 @@ private:
 	QAction*	_spellcheckAct;
 	QAction*	_gameInfoAct;
 	QAction*	_settingsAct;
+
+	QAction*	_createLocAct;
+	QAction*	_renameLocAct;
+	QAction*	_deleteLocAct;
+	QAction*	_createFolderAct;
+	QAction*	_renameFolderAct;
+	QAction*	_deleteFolderAct;
+	QAction*	_copyLocAct;
+	QAction*	_pasteLocAct;
+	QAction*	_replaceLocAct;
+	QAction*	_pasteInLocAct;
+	QAction*	_clearLocAct;
+
+	QAction*	_createActAct;
+	QAction*	_renameActAct;
+	QAction*	_deleteActAct;
+	QAction*	_deleteAllActAct;
+
+	QAction*	_sortLocAscAct;
+	QAction*	_sortLocDescAct;
+	QAction*	_jumpLocAct;
 };
 
 } // namespace QGen
