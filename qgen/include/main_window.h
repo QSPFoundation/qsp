@@ -18,7 +18,6 @@ private slots:
 	
 private:
 	void createMenuBar();
-	void createActions();
 	void createToolBar();
 	void createStatusBar();
 

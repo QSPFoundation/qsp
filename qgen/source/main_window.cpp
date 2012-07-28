@@ -16,15 +16,10 @@ MainWindow::~MainWindow()
 
 }
 
-void MainWindow::createActions()
-{
-
-}
-
 void MainWindow::createMenuBar()
 {
 	_menuBar = new MenuBar(NULL, _settings);
-	setMenuBar(_menuBar);
+	QMainWindow::setMenuBar(_menuBar);
 }
 
 void MainWindow::createToolBar()

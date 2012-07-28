@@ -1,4 +1,8 @@
 <RCC>
-    <qresource prefix="main_window">
+    <qresource prefix="/main_window">
+        <file>menu_game_new.png</file>
+        <file>menu_game_exit.png</file>
+        <file>menu_game_open.png</file>
+        <file>menu_game_save.png</file>
     </qresource>
 </RCC>
