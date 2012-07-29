@@ -367,14 +367,7 @@ int qspGetStatArgs(QSP_CHAR *s, int statCode, QSPVariant *args)
 				break;
 			}
 			pos = qspStrPos(s, QSP_COMMA, QSP_FALSE);
-			if (pos)
-			{
-				*pos = 0;
-				args[count] = qspExprValue(s);
-				*pos = QSP_COMMA[0];
-			}
-			else
-				args[count] = qspExprValue(s);
+			args[count] = qspExprValuePartial(s, pos);
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 			type = qspStats[statCode].ArgsTypes[count];
 			if (type && qspConvertVariantTo(args + count, type == 1))
@@ -794,14 +787,7 @@ QSP_CHAR *qspGetLineLabel(QSP_CHAR *str)
 	if (*str == QSP_LABEL[0])
 	{
 		delimPos = qspStrChar(str, QSP_STATDELIM[0]);
-		if (delimPos)
-		{
-			*delimPos = 0;
-			str = qspDelSpc(str + 1);
-			*delimPos = QSP_STATDELIM[0];
-		}
-		else
-			str = qspDelSpc(str + 1);
+		str = qspDelSpcPartial(str + 1, delimPos);
 		qspUpperStr(str);
 		return str;
 	}

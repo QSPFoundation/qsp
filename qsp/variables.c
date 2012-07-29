@@ -832,38 +832,15 @@ void qspStatementLocal(QSP_CHAR *s)
 			eqPos = qspStrPos(s, QSP_EQUAL, QSP_FALSE);
 		if (eqPos)
 		{
-			if (pos)
-			{
-				*pos = 0;
-				v = qspExprValue(eqPos + QSP_LEN(QSP_EQUAL));
-				*pos = QSP_COMMA[0];
-			}
-			else
-				v = qspExprValue(eqPos + QSP_LEN(QSP_EQUAL));
+			v = qspExprValuePartial(eqPos + QSP_LEN(QSP_EQUAL), pos);
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
 			*eqPos = 0;
 			temp = qspStrChar(s, QSP_LSBRACK[0]);
-			if (temp)
-			{
-				*temp = 0;
-				varName = (*s == QSP_STRCHAR[0] ? qspDelSpc(s + 1) : qspDelSpc(s));
-				*temp = QSP_LSBRACK[0];
-			}
-			else
-				varName = (*s == QSP_STRCHAR[0] ? qspDelSpc(s + 1) : qspDelSpc(s));
+			varName = (*s == QSP_STRCHAR[0] ? qspDelSpcPartial(s + 1, temp) : qspDelSpcPartial(s, temp));
 			*eqPos = QSP_EQUAL[0];
 		}
 		else
-		{
-			if (pos)
-			{
-				*pos = 0;
-				varName = (*s == QSP_STRCHAR[0] ? qspDelSpc(s + 1) : qspDelSpc(s));
-				*pos = QSP_COMMA[0];
-			}
-			else
-				varName = (*s == QSP_STRCHAR[0] ? qspDelSpc(s + 1) : qspDelSpc(s));
-		}
+			varName = (*s == QSP_STRCHAR[0] ? qspDelSpcPartial(s + 1, pos) : qspDelSpcPartial(s, pos));
 		qspUpperStr(varName);
 		for (i = 0; i < count; ++i)
 		{

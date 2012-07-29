@@ -38,6 +38,7 @@
 	QSP_CHAR *qspSkipSpaces(QSP_CHAR *);
 	QSP_CHAR *qspStrEnd(QSP_CHAR *);
 	QSP_CHAR *qspDelSpc(QSP_CHAR *);
+	QSP_CHAR *qspDelSpcPartial(QSP_CHAR *, QSP_CHAR *);
 	QSP_CHAR *qspDelSpcCanRetSelf(QSP_CHAR *);
 	QSP_BOOL qspIsAnyString(QSP_CHAR *);
 	void qspLowerStr(QSP_CHAR *);

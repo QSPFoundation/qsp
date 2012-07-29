@@ -121,5 +121,6 @@
 	/* External functions */
 	void qspInitMath();
 	QSPVariant qspExprValue(QSP_CHAR *);
+	QSPVariant qspExprValuePartial(QSP_CHAR *, QSP_CHAR *);
 
 #endif

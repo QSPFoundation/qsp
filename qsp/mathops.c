@@ -892,6 +892,21 @@ QSPVariant qspExprValue(QSP_CHAR *expr)
 	return qspValue(itemsCount, compValues, compOpCodes, compArgsCounts);
 }
 
+QSPVariant qspExprValuePartial(QSP_CHAR *expr, QSP_CHAR *pos)
+{
+	QSPVariant res;
+	QSP_CHAR ch;
+	if (pos)
+	{
+		ch = *pos;
+		*pos = 0;
+		res = qspExprValue(expr);
+		*pos = ch;
+		return res;
+	}
+	return qspExprValue(expr);
+}
+
 static void qspFunctionStrComp(QSPVariant *args, int count, QSPVariant *tos)
 {
 	OnigUChar *tempBeg, *tempEnd;
