@@ -119,14 +119,14 @@ QSP_CHAR *qspDelSpc(QSP_CHAR *s)
 
 QSP_CHAR *qspDelSpcPartial(QSP_CHAR *s, QSP_CHAR *pos)
 {
-	QSP_CHAR ch, *str;
+	QSP_CHAR ch, *res;
 	if (pos)
 	{
 		ch = *pos;
 		*pos = 0;
-		str = qspDelSpc(s);
+		res = qspDelSpc(s);
 		*pos = ch;
-		return str;
+		return res;
 	}
 	return qspDelSpc(s);
 }
@@ -434,6 +434,20 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 		++txt;
 	}
 	return 0;
+}
+
+QSP_CHAR *qspStrPosPartial(QSP_CHAR *txt, QSP_CHAR *pos, QSP_CHAR *str, QSP_BOOL isIsolated)
+{
+	QSP_CHAR ch, *res;
+	if (pos)
+	{
+		ch = *pos;
+		*pos = 0;
+		res = qspStrPos(txt, str, isIsolated);
+		*pos = ch;
+		return res;
+	}
+	return qspStrPos(txt, str, isIsolated);
 }
 
 QSP_CHAR *qspReplaceText(QSP_CHAR *txt, QSP_CHAR *searchTxt, QSP_CHAR *repTxt)

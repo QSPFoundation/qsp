@@ -843,14 +843,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 			}
 			if (statCode == qspStatUnknown && buf != delimPos)
 			{
-				if (delimPos)
-				{
-					*delimPos = 0;
-					temp = qspStrPos(buf, QSP_EQUAL, QSP_FALSE);
-					*delimPos = QSP_STATDELIM[0];
-				}
-				else
-					temp = qspStrPos(buf, QSP_EQUAL, QSP_FALSE);
+				temp = qspStrPosPartial(buf, delimPos, QSP_EQUAL, QSP_FALSE);
 				statCode = (temp ? qspStatSet : qspStatMPL);
 			}
 			break;
@@ -908,15 +901,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 					}
 					if (statCode == qspStatUnknown && buf != delimPos)
 					{
-						if (delimPos)
-						{
-							ch = *delimPos;
-							*delimPos = 0;
-							temp = qspStrPos(buf, QSP_EQUAL, QSP_FALSE);
-							*delimPos = ch;
-						}
-						else
-							temp = qspStrPos(buf, QSP_EQUAL, QSP_FALSE);
+						temp = qspStrPosPartial(buf, delimPos, QSP_EQUAL, QSP_FALSE);
 						statCode = (temp ? qspStatSet : qspStatMPL);
 					}
 					break;

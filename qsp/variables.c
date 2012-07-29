@@ -822,14 +822,7 @@ void qspStatementLocal(QSP_CHAR *s)
 	while (1)
 	{
 		pos = qspStrPos(s, QSP_COMMA, QSP_FALSE);
-		if (pos)
-		{
-			*pos = 0;
-			eqPos = qspStrPos(s, QSP_EQUAL, QSP_FALSE);
-			*pos = QSP_COMMA[0];
-		}
-		else
-			eqPos = qspStrPos(s, QSP_EQUAL, QSP_FALSE);
+		eqPos = qspStrPosPartial(s, pos, QSP_EQUAL, QSP_FALSE);
 		if (eqPos)
 		{
 			v = qspExprValuePartial(eqPos + QSP_LEN(QSP_EQUAL), pos);
