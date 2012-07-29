@@ -199,7 +199,38 @@ void MenuBar::createLocsMenu()
 
 void MenuBar::createTextMenu()
 {
+	_undoTextAct = new QAction(QIcon(""), tr("&Undo"), this);
+	_undoTextAct->setShortcut(QKeySequence::Undo);
+	
+	_redoTextAct = new QAction(QIcon(""), tr("&Redo"), this);
+	_redoTextAct->setShortcut(QKeySequence::Redo);
+
+	_cutTextAct = new QAction(QIcon(""), tr("&Cut"), this);
+	_cutTextAct->setShortcut(QKeySequence::Cut);
+
+	_copyTextAct = new QAction(QIcon(""), tr("C&opy"), this);
+	_copyTextAct->setShortcut(QKeySequence::Copy);
+
+	_pasteTextAct = new QAction(QIcon(""), tr("&Paste"), this);
+	_pasteTextAct->setShortcut(QKeySequence::Paste);
+
+	_deleteTextAct = new QAction(QIcon(""), tr("&Delete"), this);
+	_deleteTextAct->setShortcut(QKeySequence::Delete);
+
+	_selectAllTextAct = new QAction(QIcon(""), tr("S&elect all"), this);
+	_selectAllTextAct->setShortcut(QKeySequence::SelectAll);
+
 	_textMenu = addMenu(tr("&Text"));
+
+	_textMenu->addAction(_undoTextAct);
+	_textMenu->addAction(_redoTextAct);
+	_textMenu->addSeparator();
+	_textMenu->addAction(_cutTextAct);
+	_textMenu->addAction(_copyTextAct);
+	_textMenu->addAction(_pasteTextAct);
+	_textMenu->addAction(_deleteTextAct);
+	_textMenu->addSeparator();
+	_textMenu->addAction(_selectAllTextAct);
 }
 
 void MenuBar::createViewMenu()

@@ -69,6 +69,14 @@ private:
 	QAction*	_sortLocAscAct;
 	QAction*	_sortLocDescAct;
 	QAction*	_jumpLocAct;
+
+	QAction*	_undoTextAct;
+	QAction*	_redoTextAct;
+	QAction*	_cutTextAct;
+	QAction*	_copyTextAct;
+	QAction*	_pasteTextAct;
+	QAction*	_deleteTextAct;
+	QAction*	_selectAllTextAct;
 };
 
 } // namespace QGen
