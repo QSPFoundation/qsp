@@ -1037,7 +1037,7 @@ static void qspFunctionRand(QSPVariant *args, int count, QSPVariant *tos)
 {
 	int min, max;
 	min = QSP_NUM(args[0]);
-	max = (count == 2 ? QSP_NUM(args[1]) : 0);
+	max = (count == 2 ? QSP_NUM(args[1]) : 1);
 	if (min > max)
 	{
 		min = max;
