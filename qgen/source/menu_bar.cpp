@@ -235,7 +235,42 @@ void MenuBar::createTextMenu()
 
 void MenuBar::createViewMenu()
 {
+	_toolBarAct = new QAction(tr("&Toolbar"), this);
+	_locsListAct = new QAction(tr("&Locations list"), this);
+	_statusBarAct = new QAction(tr("&Statusbar"), this);
+
+	_closeAllTabsAct = new QAction(tr("&Close all tabs"), this);
+	_closeAllTabsAct->setShortcut(Qt::CTRL + Qt::ALT + Qt::Key_F4);
+	
+	_closeAllTabsExCurrAct = new QAction(tr("Close all tabs &except current"), this);
+
+	_closeCurrentTabAct = new QAction(tr("Close c&urrent tab"), this);
+	_closeCurrentTabAct->setShortcut(Qt::CTRL + Qt::Key_F4);
+
+	_pinUnpinTabAct = new QAction(tr("Pin/Unpin &tab"), this);
+	
+	_showHideLocsDescAct = new QAction(tr("Show/Hide location's &description"), this);
+	_showHideLocsDescAct->setShortcut(Qt::CTRL + Qt::ALT + Qt::Key_D);
+
+	_showHideLocsActsAct = new QAction(tr("Show/Hide location's &actions"), this);
+	_showHideLocsActsAct->setShortcut(Qt::CTRL + Qt::ALT + Qt::Key_A);
+	
+	_windowsListMenu = new QMenu(tr("&Windows list"));
+	_windowsListMenu->addAction(_toolBarAct);
+	_windowsListMenu->addAction(_locsListAct);
+	_windowsListMenu->addAction(_statusBarAct);
+
 	_viewMenu = addMenu(tr("&View"));
+	_viewMenu->addMenu(_windowsListMenu);
+	_viewMenu->addSeparator();
+	_viewMenu->addAction(_closeAllTabsAct);
+	_viewMenu->addAction(_closeAllTabsExCurrAct);
+	_viewMenu->addAction(_closeCurrentTabAct);
+	_viewMenu->addSeparator();
+	_viewMenu->addAction(_pinUnpinTabAct);
+	_viewMenu->addSeparator();
+	_viewMenu->addAction(_showHideLocsDescAct);
+	_viewMenu->addAction(_showHideLocsActsAct);
 }
 
 void MenuBar::createHelpMenu()

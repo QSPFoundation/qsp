@@ -32,6 +32,7 @@ private:
 	QMenu*		_exportSubMenu;
 	QMenu*		_importSubMenu;
 	QMenu*		_actionsSubMenu;
+	QMenu*		_windowsListMenu;
 
 	QAction*	_newGameAct;
 	QAction*	_openGameAct;
@@ -77,6 +78,17 @@ private:
 	QAction*	_pasteTextAct;
 	QAction*	_deleteTextAct;
 	QAction*	_selectAllTextAct;
+
+	QAction*	_toolBarAct;
+	QAction*	_locsListAct;
+	QAction*	_statusBarAct;
+	QAction*	_closeAllTabsAct;
+	QAction*	_closeAllTabsExCurrAct;
+	QAction*	_closeCurrentTabAct;
+	QAction*	_pinUnpinTabAct;
+	QAction*	_showHideLocsDescAct;
+	QAction*	_showHideLocsActsAct;
+
 };
 
 } // namespace QGen
