@@ -275,7 +275,20 @@ void MenuBar::createViewMenu()
 
 void MenuBar::createHelpMenu()
 {
+	_helpAct = new QAction(tr("&Help"), this);
+	_helpAct->setShortcut(QKeySequence::HelpContents);
+	
+	_helpByKeywordAct = new QAction(tr("Help by &keyword"), this);
+	_helpByKeywordAct->setShortcut(QKeySequence::WhatsThis);
+
+	_aboutAct = new QAction(tr("&About..."), this);
+
 	_helpMenu = addMenu(tr("&Help"));
+
+	_helpMenu->addAction(_helpAct);
+	_helpMenu->addAction(_helpByKeywordAct);
+	_helpMenu->addSeparator();
+	_helpMenu->addAction(_aboutAct);
 }
 
 } // namespace QGen

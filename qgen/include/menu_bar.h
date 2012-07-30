@@ -89,6 +89,9 @@ private:
 	QAction*	_showHideLocsDescAct;
 	QAction*	_showHideLocsActsAct;
 
+	QAction*	_helpAct;
+	QAction*	_helpByKeywordAct;
+	QAction*	_aboutAct;
 };
 
 } // namespace QGen
