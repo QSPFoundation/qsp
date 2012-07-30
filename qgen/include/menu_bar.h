@@ -12,6 +12,59 @@ class MenuBar : public QMenuBar
 public:
 	MenuBar(QWidget* parent, Settings* settings);
 
+signals:
+	void createNewGame();
+	void openGame();
+	void mergeGame();
+	void saveGame();
+	void saveAsGame();
+	void exitApp();
+	void exportText();
+	void exportText2Gam();
+	void importText2Gam();
+	void runGame();
+	void find();
+	void spellcheck();
+	void gameInfo();
+	void setSettings();
+	void createLocation();
+	void renameLocation();
+	void deleteLocation();
+	void createFolder();
+	void renameFolder();
+	void deleteFolder();
+	void copyLocation();
+	void pasteLocation();
+	void replaceLocation();
+	void pasteInLocation();
+	void clearLocation();
+	void createAction();
+	void renameAction();
+	void deleteAction();
+	void deleteAllAction();
+	void sortLocationAsc();
+	void sortLocationDesc();
+	void jumpLocation();
+	void undoText();
+	void redoText();
+	void cutText();
+	void copyText();
+	void pasteText();
+	void deleteText();
+	void selectAllText();
+	void showToolBar(bool show);
+	void showLocsList(bool show);
+	void showStatusBar(bool show);
+	void closeAllTabs();
+	void closeAllTabsExcCur();
+	void closeCurrentTab();
+	void pinTab();
+	void hideLocsDesc();
+	void hideLocsActs();
+	void showHelp();
+	void showHelpByKeyword();
+	void showAbout();
+
 private:
 	void createMenus();
 	void createGameMenu();
@@ -83,11 +136,11 @@ private:
 	QAction*	_locsListAct;
 	QAction*	_statusBarAct;
 	QAction*	_closeAllTabsAct;
-	QAction*	_closeAllTabsExCurrAct;
+	QAction*	_closeAllTabsExcCurAct;
 	QAction*	_closeCurrentTabAct;
 	QAction*	_pinUnpinTabAct;
-	QAction*	_showHideLocsDescAct;
-	QAction*	_showHideLocsActsAct;
+	QAction*	_hideLocsDescAct;
+	QAction*	_hideLocsActsAct;
 
 	QAction*	_helpAct;
 	QAction*	_helpByKeywordAct;
