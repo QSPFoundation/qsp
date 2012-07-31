@@ -18,13 +18,12 @@ MenuBar::MenuBar(QWidget* parent, Settings* settings )
 
 void MenuBar::createGameMenu()
 {
-	_newGameAct = new QAction(QIcon(":/main_window/menu_game_new.png"), tr("&New"), this);
+	_newGameAct = new QAction(QIcon(":/main_window/menu_game_new.xpm"), tr("&New"), this);
 	_newGameAct->setShortcuts(QKeySequence::New);
 	_newGameAct->setStatusTip(tr("Create a new game"));
 	connect(_newGameAct, SIGNAL(triggered()), this, SIGNAL(createNewGame()));
 
-
-	_openGameAct = new QAction(QIcon(":/main_window/menu_game_open.png"), tr("&Open..."), this);
+	_openGameAct = new QAction(QIcon(":/main_window/menu_file_open.xpm"), tr("&Open..."), this);
 	_openGameAct->setShortcuts(QKeySequence::Open);
 	_openGameAct->setStatusTip(tr("Open game file"));
 	connect(_newGameAct, SIGNAL(triggered()), this, SIGNAL(openGame()));
@@ -34,7 +33,7 @@ void MenuBar::createGameMenu()
 	_mergeGameAct->setStatusTip(tr("Add locations from another game"));
 	connect(_mergeGameAct, SIGNAL(triggered()), this, SIGNAL(mergeGame()));
 
-	_saveGameAct = new QAction(QIcon(":/main_window/menu_game_save.png"), tr("&Save"), this);
+	_saveGameAct = new QAction(QIcon(":/main_window/menu_file_save.xpm"), tr("&Save"), this);
 	_saveGameAct->setShortcuts(QKeySequence::Save);
 	_saveGameAct->setStatusTip(tr("Save game"));
 	connect(_saveGameAct, SIGNAL(triggered()), this, SIGNAL(saveGame()));
@@ -53,11 +52,11 @@ void MenuBar::createGameMenu()
 	_importText2GamAct = new QAction(tr("Text file in TXT2GAM format..."), this);
 	connect(_importText2GamAct, SIGNAL(triggered()), this, SIGNAL(importText2Gam()));
 
-	_exitAppAct = new QAction(QIcon(":/main_window/menu_game_exit.png"), tr("&Exit"), this);
+	_exitAppAct = new QAction(QIcon(":/main_window/menu_exit.xpm"), tr("&Exit"), this);
 	_exitAppAct->setShortcuts(QKeySequence::Quit);
 	_exitAppAct->setStatusTip(tr("Close program"));
 	connect(_exitAppAct, SIGNAL(triggered()), this, SIGNAL(exitApp()));
-	
+
 	_gameMenu	= addMenu(tr("&Game"));
 
 	_exportSubMenu	= new QMenu(tr("&Export"));
@@ -81,22 +80,21 @@ void MenuBar::createGameMenu()
 
 void MenuBar::createUtilsMenu()
 {
-	_runGameAct = new QAction(QIcon(""), tr("&Run game"), this);
+	_runGameAct = new QAction(QIcon(":/main_window/menu_game_play.xpm"), tr("&Run game"), this);
 	_runGameAct->setShortcuts(QKeySequence::Refresh);
 	_runGameAct->setStatusTip(tr("Run current game"));
 	connect(_runGameAct, SIGNAL(triggered()), this, SIGNAL(runGame()));
 
-	_findAct = new QAction(QIcon(""), tr("&Find / Replace"), this);
+	_findAct = new QAction(QIcon(":/main_window/menu_text_search.xpm"), tr("&Find / Replace"), this);
 	_findAct->setShortcuts(QKeySequence::Find);
 	_findAct->setStatusTip(tr("Find / replace some text"));
 	connect(_findAct, SIGNAL(triggered()), this, SIGNAL(find()));
 
-	_spellcheckAct = new QAction(QIcon(), tr("&Check spelling..."), this);
+	_spellcheckAct = new QAction(tr("&Check spelling..."), this);
 	_spellcheckAct->setStatusTip(tr("Check spelling of some text"));
 	connect(_spellcheckAct, SIGNAL(triggered()), this, SIGNAL(spellcheck()));
 
-	_gameInfoAct = new QAction(QIcon(), tr("&Game info"), this);
-
+	_gameInfoAct = new QAction(QIcon(":/main_window/menu_game_info.xpm"), tr("&Game info"), this);
 	_gameInfoAct->setShortcut(Qt::CTRL + Qt::Key_I);
 	_gameInfoAct->setStatusTip(tr("Show short statistics"));
 	connect(_gameInfoAct, SIGNAL(triggered()), this, SIGNAL(gameInfo()));
@@ -233,31 +231,31 @@ void MenuBar::createLocsMenu()
 
 void MenuBar::createTextMenu()
 {
-	_undoTextAct = new QAction(QIcon(""), tr("&Undo"), this);
+	_undoTextAct = new QAction(QIcon(":/main_window/menu_undo.xpm"), tr("&Undo"), this);
 	_undoTextAct->setShortcut(QKeySequence::Undo);
 	connect(_undoTextAct, SIGNAL(triggered()), this, SIGNAL(undoText()));
 	
-	_redoTextAct = new QAction(QIcon(""), tr("&Redo"), this);
+	_redoTextAct = new QAction(QIcon(":/main_window/menu_redo.xpm"), tr("&Redo"), this);
 	_redoTextAct->setShortcut(QKeySequence::Redo);
 	connect(_redoTextAct, SIGNAL(triggered()), this, SIGNAL(redoText()));
 
-	_cutTextAct = new QAction(QIcon(""), tr("&Cut"), this);
+	_cutTextAct = new QAction(QIcon(":/main_window/menu_text_cut.xpm"), tr("&Cut"), this);
 	_cutTextAct->setShortcut(QKeySequence::Cut);
 	connect(_cutTextAct, SIGNAL(triggered()), this, SIGNAL(cutText()));
 
-	_copyTextAct = new QAction(QIcon(""), tr("C&opy"), this);
+	_copyTextAct = new QAction(QIcon(":/main_window/menu_text_copy.xpm"), tr("C&opy"), this);
 	_copyTextAct->setShortcut(QKeySequence::Copy);
 	connect(_copyTextAct, SIGNAL(triggered()), this, SIGNAL(copyText()));
 
-	_pasteTextAct = new QAction(QIcon(""), tr("&Paste"), this);
+	_pasteTextAct = new QAction(QIcon(":/main_window/menu_text_paste.xpm"), tr("&Paste"), this);
 	_pasteTextAct->setShortcut(QKeySequence::Paste);
 	connect(_pasteTextAct, SIGNAL(triggered()), this, SIGNAL(pasteText()));
 
-	_deleteTextAct = new QAction(QIcon(""), tr("&Delete"), this);
+	_deleteTextAct = new QAction(QIcon(":/main_window/menu_text_delete.xpm"), tr("&Delete"), this);
 	_deleteTextAct->setShortcut(QKeySequence::Delete);
 	connect(_deleteTextAct, SIGNAL(triggered()), this, SIGNAL(deleteText()));
 
-	_selectAllTextAct = new QAction(QIcon(""), tr("S&elect all"), this);
+	_selectAllTextAct = new QAction(tr("S&elect all"), this);
 	_selectAllTextAct->setShortcut(QKeySequence::SelectAll);
 	connect(_selectAllTextAct, SIGNAL(triggered()), this, SIGNAL(selectAllText()));
 
@@ -332,11 +330,11 @@ void MenuBar::createViewMenu()
 
 void MenuBar::createHelpMenu()
 {
-	_helpAct = new QAction(tr("&Help"), this);
+	_helpAct = new QAction(QIcon(":/main_window/menu_help.xpm"), tr("&Help"), this);
 	_helpAct->setShortcut(QKeySequence::HelpContents);
 	connect(_helpAct, SIGNAL(triggered()), this, SIGNAL(showHelp()));
 	
-	_helpByKeywordAct = new QAction(tr("Help by &keyword"), this);
+	_helpByKeywordAct = new QAction(QIcon(":/main_window/menu_help_search.xpm"), tr("Help by &keyword"), this);
 	_helpByKeywordAct->setShortcut(QKeySequence::WhatsThis);
 	connect(_helpByKeywordAct, SIGNAL(triggered()), this, SIGNAL(showHelpByKeyword()));
 
@@ -352,3 +350,4 @@ void MenuBar::createHelpMenu()
 }
 
 } // namespace QGen
+
