@@ -8,26 +8,11 @@ MainWindow::MainWindow(Settings* settings, QWidget *parent, Qt::WFlags flags)
 	:	QMainWindow(parent, flags),
 		_settings(settings)
 {
-	createMenuBar();
+	setMenuBar(new MenuBar(parent, _settings));
+	addToolBar(new ToolBar(parent, _settings));
 }
 
 MainWindow::~MainWindow()
-{
-
-}
-
-void MainWindow::createMenuBar()
-{
-	_menuBar = new MenuBar(NULL, _settings);
-	QMainWindow::setMenuBar(_menuBar);
-}
-
-void MainWindow::createToolBar()
-{
-
-}
-
-void MainWindow::createStatusBar()
 {
 
 }

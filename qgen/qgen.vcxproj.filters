@@ -67,6 +67,15 @@
     <ClCompile Include="source\menu_bar.cpp">
       <Filter>source</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_tool_bar.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_tool_bar.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="source\tool_bar.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="resource\main_window.qrc">
@@ -79,6 +88,9 @@
       <Filter>include</Filter>
     </CustomBuild>
     <CustomBuild Include="include\menu_bar.h">
+      <Filter>include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\tool_bar.h">
       <Filter>include</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -3,6 +3,7 @@
 
 #include "i_main_window_view.h"
 #include "menu_bar.h"
+#include "tool_bar.h"
 
 namespace QGen
 {
@@ -17,12 +18,8 @@ public:
 private slots:
 	
 private:
-	void createMenuBar();
-	void createToolBar();
-	void createStatusBar();
 
 private:
-	MenuBar*	_menuBar;
 	Settings*	_settings;
 };
 
