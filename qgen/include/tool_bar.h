@@ -13,6 +13,21 @@ public:
 	ToolBar(QWidget* parent, Settings* settings);
 
 signals:
+	void createLocation();
+	void renameLocation();
+	void deleteLocation();
+	void openGame();
+	void saveGame();
+	void saveGameAs();
+	void runGame();
+	void gameInfo();
+	void undoText();
+	void redoText();
+	void copyLocation();
+	void pasteLocation();
+	void clearLocation();
+	void find();
+	void setSettings();
 
 private:
 	void Create();
