@@ -12,6 +12,8 @@ class ToolBar : public QToolBar
 public:
 	ToolBar(QWidget* parent, Settings* settings);
 
+signals:
+
 private:
 	void Create();
 
