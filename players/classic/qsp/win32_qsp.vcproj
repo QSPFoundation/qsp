@@ -392,6 +392,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\qsp\regexp.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\qsp\statements.c"
 				>
 			</File>
@@ -627,6 +631,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\qsp\qsp.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\qsp\regexp.h"
 				>
 			</File>
 			<File
