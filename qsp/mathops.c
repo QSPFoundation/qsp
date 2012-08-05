@@ -22,6 +22,7 @@
 #include "game.h"
 #include "locations.h"
 #include "objects.h"
+#include "regexp.h"
 #include "statements.h"
 #include "text.h"
 #include "time.h"
@@ -909,77 +910,29 @@ QSPVariant qspExprValuePartial(QSP_CHAR *expr, QSP_CHAR *pos)
 
 static void qspFunctionStrComp(QSPVariant *args, int count, QSPVariant *tos)
 {
-	OnigUChar *tempBeg, *tempEnd;
-	regex_t *onigExp;
-	OnigErrorInfo onigInfo;
-	tempBeg = (OnigUChar *)QSP_STR(args[1]);
-	tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[1]));
-	if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
-		qspSetError(QSP_ERR_INCORRECTREGEXP);
-	else
-	{
-		tempBeg = (OnigUChar *)QSP_STR(args[0]);
-		tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[0]));
-		QSP_PNUM(tos) = -(onig_match(onigExp, tempBeg, tempEnd, tempBeg, 0, ONIG_OPTION_NONE) == tempEnd - tempBeg);
-		onig_free(onigExp);
-	}
+	regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
+	if (!regExp) return;
+	QSP_PNUM(tos) = -(qspRegExpStrMatch(regExp, QSP_STR(args[0])));
 }
 
 static void qspFunctionStrFind(QSPVariant *args, int count, QSPVariant *tos)
 {
-	int len, pos;
-	OnigUChar *tempBeg, *tempEnd;
-	regex_t *onigExp;
-	OnigRegion *onigReg;
-	OnigErrorInfo onigInfo;
-	tempBeg = (OnigUChar *)QSP_STR(args[1]);
-	tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[1]));
-	if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
-		qspSetError(QSP_ERR_INCORRECTREGEXP);
+	regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
+	if (!regExp) return;
+	if (count == 3 && QSP_NUM(args[2]) >= 0)
+		QSP_PSTR(tos) = qspRegExpStrFind(regExp, QSP_STR(args[0]), QSP_NUM(args[2]));
 	else
-	{
-		onigReg = onig_region_new();
-		tempBeg = (OnigUChar *)QSP_STR(args[0]);
-		tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[0]));
-		pos = ((count == 3 && QSP_NUM(args[2]) >= 0) ? QSP_NUM(args[2]) : 0);
-		if (onig_search(onigExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0 &&
-			pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
-		{
-			len = (onigReg->end[pos] - onigReg->beg[pos]) / sizeof(QSP_CHAR);
-			QSP_PSTR(tos) = qspGetNewText((QSP_CHAR *)(tempBeg + onigReg->beg[pos]), len);
-		}
-		else
-			QSP_PSTR(tos) = qspGetNewText(QSP_FMT(""), 0);
-		onig_region_free(onigReg, 1);
-		onig_free(onigExp);
-	}
+		QSP_PSTR(tos) = qspRegExpStrFind(regExp, QSP_STR(args[0]), 0);
 }
 
 static void qspFunctionStrPos(QSPVariant *args, int count, QSPVariant *tos)
 {
-	int pos;
-	OnigUChar *tempBeg, *tempEnd;
-	regex_t *onigExp;
-	OnigRegion *onigReg;
-	OnigErrorInfo onigInfo;
-	tempBeg = (OnigUChar *)QSP_STR(args[1]);
-	tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[1]));
-	if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
-		qspSetError(QSP_ERR_INCORRECTREGEXP);
+	regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
+	if (!regExp) return;
+	if (count == 3 && QSP_NUM(args[2]) >= 0)
+		QSP_PNUM(tos) = qspRegExpStrPos(regExp, QSP_STR(args[0]), QSP_NUM(args[2]));
 	else
-	{
-		onigReg = onig_region_new();
-		tempBeg = (OnigUChar *)QSP_STR(args[0]);
-		tempEnd = (OnigUChar *)qspStrEnd(QSP_STR(args[0]));
-		pos = ((count == 3 && QSP_NUM(args[2]) >= 0) ? QSP_NUM(args[2]) : 0);
-		if (onig_search(onigExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0 &&
-			pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
-			QSP_PNUM(tos) = onigReg->beg[pos] / sizeof(QSP_CHAR) + 1;
-		else
-			QSP_PNUM(tos) = 0;
-		onig_region_free(onigReg, 1);
-		onig_free(onigExp);
-	}
+		QSP_PNUM(tos) = qspRegExpStrPos(regExp, QSP_STR(args[0]), 0);
 }
 
 static void qspFunctionRGB(QSPVariant *args, int count, QSPVariant *tos)

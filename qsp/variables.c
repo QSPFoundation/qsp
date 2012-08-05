@@ -20,6 +20,7 @@
 #include "errors.h"
 #include "locations.h"
 #include "mathops.h"
+#include "regexp.h"
 #include "text.h"
 
 QSPVar qspVars[QSP_VARSCOUNT];
@@ -623,9 +624,7 @@ int qspArrayPos(QSP_CHAR *varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 	int num, count;
 	QSPVar *var;
 	QSP_CHAR *str;
-	OnigUChar *tempBeg, *tempEnd;
-	regex_t *onigExp;
-	OnigErrorInfo onigInfo;
+	regex_t *regExp;
 	QSP_BOOL isString;
 	if (!(var = qspVarReferenceWithType(varName, QSP_FALSE, &isString))) return -1;
 	if (qspConvertVariantTo(val, isRegExp || isString))
@@ -635,13 +634,8 @@ int qspArrayPos(QSP_CHAR *varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 	}
 	if (isRegExp)
 	{
-		tempBeg = (OnigUChar *)QSP_PSTR(val);
-		tempEnd = (OnigUChar *)qspStrEnd(QSP_PSTR(val));
-		if (onig_new(&onigExp, tempBeg, tempEnd, ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
-		{
-			qspSetError(QSP_ERR_INCORRECTREGEXP);
-			return -1;
-		}
+		regExp = qspRegExpGetCompiled(QSP_PSTR(val));
+		if (!regExp) return -1;
 	}
 	count = var->ValsCount;
 	if (ind < 0)
@@ -655,13 +649,7 @@ int qspArrayPos(QSP_CHAR *varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 			if (!(ind < count && (str = var->Values[ind].Str))) str = QSP_FMT("");
 			if (isRegExp)
 			{
-				tempBeg = (OnigUChar *)str;
-				tempEnd = (OnigUChar *)qspStrEnd(str);
-				if (onig_match(onigExp, tempBeg, tempEnd, tempBeg, 0, ONIG_OPTION_NONE) == tempEnd - tempBeg)
-				{
-					onig_free(onigExp);
-					return ind;
-				}
+				if (qspRegExpStrMatch(regExp, str)) return ind;
 			}
 			else if (!qspStrsComp(str, QSP_PSTR(val)))
 				return ind;
@@ -673,7 +661,6 @@ int qspArrayPos(QSP_CHAR *varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 		}
 		++ind;
 	}
-	if (isRegExp) onig_free(onigExp);
 	return -1;
 }
 

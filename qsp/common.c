@@ -55,6 +55,7 @@ void qspMemClear(QSP_BOOL isFirst)
 	qspClearObjects(isFirst);
 	qspClearActions(isFirst);
 	qspClearPlayList(isFirst);
+	qspClearRegExps(isFirst);
 	if (!isFirst)
 	{
 		if (qspCurDesc)
