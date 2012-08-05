@@ -19,12 +19,6 @@
 #include "errors.h"
 #include "text.h"
 
-typedef struct
-{
-	QSP_CHAR *Text;
-	regex_t *CompiledExp;
-} QSPRegExp;
-
 int qspCompiledRegExpsCurInd = 0;
 QSPRegExp qspCompiledRegExps[QSP_MAXCACHEDREGEXPS];
 

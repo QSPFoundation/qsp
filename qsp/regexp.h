@@ -22,6 +22,12 @@
 
 	#define QSP_MAXCACHEDREGEXPS 10
 
+	typedef struct
+	{
+		QSP_CHAR *Text;
+		regex_t *CompiledExp;
+	} QSPRegExp;
+
 	/* External functions */
 	void qspClearRegExps(QSP_BOOL);
 	regex_t *qspRegExpGetCompiled(QSP_CHAR *);
