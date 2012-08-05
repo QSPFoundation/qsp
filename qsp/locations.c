@@ -53,12 +53,14 @@ void qspCreateWorld(int start, int locsCount)
 		free(qspLocs[i].Desc);
 		qspFreePrepLines(qspLocs[i].OnVisitLines, qspLocs[i].OnVisitLinesCount);
 		for (j = 0; j < QSP_MAXACTIONS; ++j)
+		{
 			if (qspLocs[i].Actions[j].Desc)
 			{
 				if (qspLocs[i].Actions[j].Image) free(qspLocs[i].Actions[j].Image);
 				free(qspLocs[i].Actions[j].Desc);
 				qspFreePrepLines(qspLocs[i].Actions[j].OnPressLines, qspLocs[i].Actions[j].OnPressLinesCount);
 			}
+		}
 	}
 	if (qspLocsCount != locsCount)
 	{
