@@ -90,13 +90,8 @@ int qspLocIndex(QSP_CHAR *name)
 	QSPLocName *loc;
 	QSP_CHAR *uName;
 	if (!qspLocsCount) return -1;
-	uName = qspDelSpc(name);
-	if (!(*uName))
-	{
-		free(uName);
-		return -1;
-	}
-	qspUpperStr(uName);
+	if (!(*name)) return -1;
+	qspUpperStr(uName = qspDelSpc(name));
 	loc = (QSPLocName *)bsearch(uName, qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocStringCompare);
 	free(uName);
 	if (loc) return loc->Index;
