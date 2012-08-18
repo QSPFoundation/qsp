@@ -38,13 +38,14 @@ QSPVariant qspGetEmptyVariant(QSP_BOOL isStringType)
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
 {
 	int num;
-	QSP_CHAR *temp, buf[12];
+	QSP_CHAR buf[12];
+	QSP_BOOL isValid;
 	if (val->IsStr)
 	{
 		if (!isToString)
 		{
-			num = qspStrToNum(QSP_PSTR(val), &temp);
-			if (*temp) return QSP_TRUE;
+			num = qspStrToNum(QSP_PSTR(val), &isValid);
+			if (!isValid) return QSP_TRUE;
 			free(QSP_PSTR(val));
 			QSP_PNUM(val) = num;
 			val->IsStr = QSP_FALSE;
@@ -68,11 +69,11 @@ void qspCopyVariant(QSPVariant *dest, QSPVariant *src)
 
 QSP_BOOL qspIsCanConvertToNum(QSPVariant *val)
 {
-	QSP_CHAR *temp;
+	QSP_BOOL isValid;
 	if (val->IsStr)
 	{
-		qspStrToNum(QSP_PSTR(val), &temp);
-		if (*temp) return QSP_FALSE;
+		qspStrToNum(QSP_PSTR(val), &isValid);
+		if (!isValid) return QSP_FALSE;
 	}
 	return QSP_TRUE;
 }

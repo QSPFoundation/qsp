@@ -56,7 +56,7 @@
 	int qspSplitStr(QSP_CHAR *, QSP_CHAR *, QSP_CHAR ***);
 	void qspCopyStrs(QSP_CHAR ***, QSP_CHAR **, int, int);
 	void qspFreeStrs(void **, int);
-	int qspStrToNum(QSP_CHAR *, QSP_CHAR **);
+	int qspStrToNum(QSP_CHAR *, QSP_BOOL *);
 	QSP_CHAR *qspNumToStr(QSP_CHAR *, int);
 	QSP_CHAR *qspStrPos(QSP_CHAR *, QSP_CHAR *, QSP_BOOL);
 	QSP_CHAR *qspStrPosPartial(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, QSP_BOOL);

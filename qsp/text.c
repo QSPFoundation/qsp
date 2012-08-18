@@ -325,9 +325,9 @@ void qspFreeStrs(void **strs, int count)
 	}
 }
 
-int qspStrToNum(QSP_CHAR *s, QSP_CHAR **endChar)
+int qspStrToNum(QSP_CHAR *s, QSP_BOOL *isValid)
 {
-	int num = 0;
+	int num;
 	QSP_BOOL isNeg = QSP_FALSE;
 	s = qspSkipSpaces(s);
 	if (*s == QSP_FMT('-'))
@@ -337,16 +337,27 @@ int qspStrToNum(QSP_CHAR *s, QSP_CHAR **endChar)
 	}
 	else if (*s == QSP_FMT('+'))
 		++s;
-	while (qspIsDigit(*s))
+	if (qspIsDigit(*s))
 	{
-		num = num * 10 + (*s - QSP_FMT('0'));
-		++s;
+		num = 0;
+		do
+		{
+			num = num * 10 + (*s - QSP_FMT('0'));
+			++s;
+		} while (qspIsDigit(*s));
 	}
-	if (endChar)
+	else
 	{
-		*endChar = qspSkipSpaces(s);
-		if (**endChar) return 0;
+		if (isValid) *isValid = QSP_FALSE;
+		return 0;
 	}
+	s = qspSkipSpaces(s);
+	if (*s)
+	{
+		if (isValid) *isValid = QSP_FALSE;
+		return 0;
+	}
+	if (isValid) *isValid = QSP_TRUE;
 	if (isNeg) return -num;
 	return num;
 }
