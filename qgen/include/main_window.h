@@ -4,6 +4,7 @@
 #include "i_main_window_view.h"
 #include "menu_bar.h"
 #include "tool_bar.h"
+#include "locations_list_box.h"
 
 namespace QGen
 {
@@ -18,11 +19,17 @@ public:
 private slots:
 	
 private:
+	void createDockWindows();
 
 private:
-	Settings*	_settings;
+	Settings*			_settings;
+	MenuBar*			_menuBar;
+	ToolBar*			_toolBar;
+	QStatusBar*			_statusBar;
+	LocationsListBox*	_locsListBox;
 };
 
 } // namespace QGen
 
 #endif // __QGEN_MAIN_WINDOW_H__
+
