@@ -1,6 +1,6 @@
 Index: include/wx/animate.h
 ===================================================================
---- include/wx/animate.h	(revision 72127)
+--- include/wx/animate.h	(revision 73311)
 +++ include/wx/animate.h	(working copy)
 @@ -115,11 +115,15 @@
  // include the platform-specific version of the wxAnimationCtrl class
@@ -20,7 +20,7 @@ Index: include/wx/animate.h
  
 Index: include/wx/animdecod.h
 ===================================================================
---- include/wx/animdecod.h	(revision 72127)
+--- include/wx/animdecod.h	(revision 73311)
 +++ include/wx/animdecod.h	(working copy)
 @@ -145,6 +145,9 @@
      // the transparent colour for this frame if any or wxNullColour.
@@ -34,7 +34,7 @@ Index: include/wx/animdecod.h
      wxColour GetBackgroundColour() const { return m_background; }
 Index: include/wx/aui/floatpane.h
 ===================================================================
---- include/wx/aui/floatpane.h	(revision 72127)
+--- include/wx/aui/floatpane.h	(revision 73311)
 +++ include/wx/aui/floatpane.h	(working copy)
 @@ -32,6 +32,8 @@
  class WXDLLIMPEXP_AUI wxAuiFloatingFrame : public wxAuiFloatingFrameBaseClass
@@ -63,7 +63,7 @@ Index: include/wx/aui/floatpane.h
      wxAuiManager* GetOwnerManager() const;
 Index: include/wx/generic/animate.h
 ===================================================================
---- include/wx/generic/animate.h	(revision 72127)
+--- include/wx/generic/animate.h	(revision 73311)
 +++ include/wx/generic/animate.h	(working copy)
 @@ -27,8 +27,13 @@
      wxAnimation(const wxString &name, wxAnimationType type = wxANIMATION_TYPE_ANY)
@@ -94,7 +94,7 @@ Index: include/wx/generic/animate.h
      DECLARE_DYNAMIC_CLASS(wxAnimationCtrl)
 Index: include/wx/gifdecod.h
 ===================================================================
---- include/wx/gifdecod.h	(revision 72127)
+--- include/wx/gifdecod.h	(revision 73311)
 +++ include/wx/gifdecod.h	(working copy)
 @@ -66,8 +66,11 @@
      virtual long GetDelay(unsigned int frame) const;
@@ -110,7 +110,7 @@ Index: include/wx/gifdecod.h
      wxGIFErrorCode LoadGIF( wxInputStream& stream );
 Index: include/wx/htmllbox.h
 ===================================================================
---- include/wx/htmllbox.h	(revision 72127)
+--- include/wx/htmllbox.h	(revision 73311)
 +++ include/wx/htmllbox.h	(working copy)
 @@ -130,7 +130,8 @@
      // ensure that the given item is cached
@@ -143,7 +143,7 @@ Index: include/wx/htmllbox.h
      friend class wxHtmlListBoxStyle;
 Index: src/aui/floatpane.cpp
 ===================================================================
---- src/aui/floatpane.cpp	(revision 72127)
+--- src/aui/floatpane.cpp	(revision 73311)
 +++ src/aui/floatpane.cpp	(working copy)
 @@ -133,10 +133,13 @@
      // pane.floating_size from inside it so we must also record its original
@@ -161,7 +161,7 @@ Index: src/aui/floatpane.cpp
      {
 Index: src/aui/framemanager.cpp
 ===================================================================
---- src/aui/framemanager.cpp	(revision 72127)
+--- src/aui/framemanager.cpp	(revision 73311)
 +++ src/aui/framemanager.cpp	(working copy)
 @@ -2671,6 +2671,8 @@
                  p.window->Refresh();
@@ -174,7 +174,7 @@ Index: src/aui/framemanager.cpp
  
 Index: src/common/filesys.cpp
 ===================================================================
---- src/common/filesys.cpp	(revision 72127)
+--- src/common/filesys.cpp	(revision 73311)
 +++ src/common/filesys.cpp	(working copy)
 @@ -633,7 +633,8 @@
          path = path.Mid(2);
@@ -188,7 +188,7 @@ Index: src/common/filesys.cpp
      // file urls either start with a forward slash (local harddisk),
 Index: src/generic/animateg.cpp
 ===================================================================
---- src/generic/animateg.cpp	(revision 72127)
+--- src/generic/animateg.cpp	(revision 73311)
 +++ src/generic/animateg.cpp	(working copy)
 @@ -277,6 +277,8 @@
      m_currentFrame = 0;
@@ -288,9 +288,9 @@ Index: src/generic/animateg.cpp
  
 Index: src/generic/scrlwing.cpp
 ===================================================================
---- src/generic/scrlwing.cpp	(revision 72127)
+--- src/generic/scrlwing.cpp	(revision 73311)
 +++ src/generic/scrlwing.cpp	(working copy)
-@@ -568,6 +568,8 @@
+@@ -544,6 +544,8 @@
          m_win->SetScrollPos(wxVERTICAL, m_yScrollPosition);
      }
  
@@ -299,7 +299,7 @@ Index: src/generic/scrlwing.cpp
      if ( needsRefresh )
      {
          m_targetWindow->Refresh(true, GetScrollRect());
-@@ -576,6 +578,10 @@
+@@ -552,6 +554,10 @@
      {
          m_targetWindow->ScrollWindow(dx, dy, GetScrollRect());
      }
@@ -312,7 +312,7 @@ Index: src/generic/scrlwing.cpp
  int wxScrollHelperBase::CalcScrollInc(wxScrollWinEvent& event)
 Index: src/html/htmlwin.cpp
 ===================================================================
---- src/html/htmlwin.cpp	(revision 72127)
+--- src/html/htmlwin.cpp	(revision 73311)
 +++ src/html/htmlwin.cpp	(working copy)
 @@ -465,7 +465,8 @@
      // ...and run the parser on it:
@@ -326,9 +326,9 @@ Index: src/html/htmlwin.cpp
      m_Parser->SetDC(dc);
 Index: src/html/m_image.cpp
 ===================================================================
---- src/html/m_image.cpp	(revision 72127)
+--- src/html/m_image.cpp	(revision 73311)
 +++ src/html/m_image.cpp	(working copy)
-@@ -307,6 +307,9 @@
+@@ -312,6 +312,9 @@
      wxBitmap           *m_bitmap;
      int                 m_align;
      int                 m_bmpW, m_bmpH;
@@ -338,7 +338,7 @@ Index: src/html/m_image.cpp
      bool                m_bmpWpercent:1;
      bool                m_bmpHpresent:1;
      bool                m_showFrame:1;
-@@ -358,6 +361,8 @@
+@@ -364,6 +367,8 @@
      m_bitmap = NULL;
      m_bmpW   = w;
      m_bmpH   = h;
@@ -347,7 +347,7 @@ Index: src/html/m_image.cpp
      m_align  = align;
      m_bmpWpercent = wpercent;
      m_bmpHpresent = hpresent;
-@@ -389,20 +394,30 @@
+@@ -395,20 +400,30 @@
                      if ( m_gifDecoder->LoadGIF(*s) == wxGIF_OK )
                      {
                          wxImage img;
@@ -379,7 +379,7 @@ Index: src/html/m_image.cpp
                          {
                              wxDELETE(m_gifDecoder);
                          }
-@@ -424,6 +439,8 @@
+@@ -430,6 +445,8 @@
          }
          else // input==NULL, use "broken image" bitmap
          {
@@ -388,7 +388,7 @@ Index: src/html/m_image.cpp
              if ( m_bmpW == wxDefaultCoord && m_bmpH == wxDefaultCoord )
              {
                  m_bmpW = 29;
-@@ -437,6 +454,9 @@
+@@ -443,6 +460,9 @@
              }
              m_bitmap =
                  new wxBitmap(wxArtProvider::GetBitmap(wxART_MISSING_IMAGE));
@@ -398,7 +398,7 @@ Index: src/html/m_image.cpp
          }
      }
      //else: ignore the 0-sized images used sometimes on the Web pages
-@@ -454,10 +474,30 @@
+@@ -460,10 +480,30 @@
          ww = img.GetWidth();
          hh = img.GetHeight();
  
@@ -429,7 +429,7 @@ Index: src/html/m_image.cpp
  
          // Only scale the bitmap at the rendering stage,
          // so we don't lose quality twice
-@@ -469,7 +509,8 @@
+@@ -475,7 +515,8 @@
          }
          else
  */
@@ -439,7 +439,7 @@ Index: src/html/m_image.cpp
      }
  #endif
  }
-@@ -484,7 +525,8 @@
+@@ -500,7 +541,8 @@
      if (m_nCurrFrame == m_gifDecoder->GetFrameCount())
          m_nCurrFrame = 0;
  
@@ -449,7 +449,7 @@ Index: src/html/m_image.cpp
      {
          m_physX = m_physY = 0;
          for (wxHtmlCell *cell = this; cell; cell = cell->GetParent())
-@@ -503,18 +545,35 @@
+@@ -519,18 +561,35 @@
           m_gifDecoder->ConvertToImage(m_nCurrFrame, &img) )
      {
  #if !defined(__WXMSW__) || wxUSE_WXDIB
@@ -488,7 +488,7 @@ Index: src/html/m_image.cpp
          win->Refresh(img.HasMask(), &rect);
      }
  
-@@ -540,6 +599,16 @@
+@@ -556,6 +615,16 @@
          m_Width  = static_cast<int>(m_scale*m_bmpW);
          m_Height = static_cast<int>(m_scale*m_bmpH);
      }
@@ -505,7 +505,7 @@ Index: src/html/m_image.cpp
  
      switch (m_align)
      {
-@@ -580,8 +649,11 @@
+@@ -596,8 +665,11 @@
          dc.SetBrush(*wxTRANSPARENT_BRUSH);
          dc.SetPen(*wxBLACK_PEN);
          dc.DrawRectangle(x + m_PosX, y + m_PosY, m_Width, m_Height);
@@ -518,7 +518,7 @@ Index: src/html/m_image.cpp
      if ( m_bitmap )
      {
          // We add in the scaling from the desired bitmap width
-@@ -601,6 +673,9 @@
+@@ -617,6 +689,9 @@
                                   (int) ((y + m_PosY) / (imageScaleY)), true);
          dc.SetUserScale(us_x, us_y);
      }
@@ -530,10 +530,10 @@ Index: src/html/m_image.cpp
  wxHtmlLinkInfo *wxHtmlImageCell::GetLink( int x, int y ) const
 Index: src/html/m_links.cpp
 ===================================================================
---- src/html/m_links.cpp	(revision 72127)
+--- src/html/m_links.cpp	(revision 73311)
 +++ src/html/m_links.cpp	(working copy)
-@@ -76,7 +76,10 @@
-             if (tag.HasParam( wxT("TARGET") )) target = tag.GetParam( wxT("TARGET") );
+@@ -85,7 +85,10 @@
+             // set default styles, might get overridden by ApplyStyle
              m_WParser->SetActualColor(m_WParser->GetLinkColor());
              m_WParser->GetContainer()->InsertCell(new wxHtmlColourCell(m_WParser->GetLinkColor()));
 -            m_WParser->SetFontUnderlined(true);
@@ -546,9 +546,9 @@ Index: src/html/m_links.cpp
  
 Index: src/html/winpars.cpp
 ===================================================================
---- src/html/winpars.cpp	(revision 72127)
+--- src/html/winpars.cpp	(revision 73311)
 +++ src/html/winpars.cpp	(working copy)
-@@ -55,6 +55,8 @@
+@@ -56,6 +56,8 @@
      m_whitespaceMode = Whitespace_Normal;
      m_lastWordCell = NULL;
      m_posColumn = 0;
@@ -557,7 +557,7 @@ Index: src/html/winpars.cpp
  
      {
          int i, j, k, l, m;
-@@ -212,7 +214,8 @@
+@@ -213,7 +215,8 @@
  
      m_UseLink = false;
      m_Link = wxHtmlLinkInfo( wxEmptyString );
@@ -565,9 +565,9 @@ Index: src/html/winpars.cpp
 +    // HzD_Byte's hack
 +    // m_LinkColor.Set(0, 0, 0xFF);
      m_ActualColor.Set(0, 0, 0);
-     m_Align = wxHTML_ALIGN_LEFT;
-     m_ScriptMode = wxHTML_SCRIPT_NORMAL;
-@@ -298,6 +301,8 @@
+     const wxColour windowColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW) ;
+     m_ActualBackgroundColor = m_windowInterface
+@@ -301,6 +304,8 @@
      {
          wxString myfullurl(myurl);
  
@@ -576,7 +576,7 @@ Index: src/html/winpars.cpp
          // consider url as absolute path first
          wxURI current(myurl);
          myfullurl = current.BuildUnescapedURI();
-@@ -326,6 +331,7 @@
+@@ -329,6 +334,7 @@
                  }
              }
          }
@@ -586,9 +586,9 @@ Index: src/html/winpars.cpp
          status = m_windowInterface->OnHTMLOpeningURL(type, myfullurl, &redirect);
 Index: src/msw/textctrl.cpp
 ===================================================================
---- src/msw/textctrl.cpp	(revision 72127)
+--- src/msw/textctrl.cpp	(revision 73311)
 +++ src/msw/textctrl.cpp	(working copy)
-@@ -1875,6 +1875,8 @@
+@@ -1892,6 +1892,8 @@
                  // Insert tab since calling the default Windows handler
                  // doesn't seem to do it
                  WriteText(wxT("\t"));
@@ -597,69 +597,10 @@ Index: src/msw/textctrl.cpp
                  return;
              }
              break;
-Index: src/stc/scintilla/src/Editor.cxx
+Index: src/stc/scintilla/lexers/LexVB.cxx
 ===================================================================
---- src/stc/scintilla/src/Editor.cxx	(revision 72127)
-+++ src/stc/scintilla/src/Editor.cxx	(working copy)
-@@ -23,6 +23,8 @@
- #include "Platform.h"
- 
- #include "Scintilla.h"
-+// HzD_Byte's hack
-+#include "SciLexer.h"
- 
- #include "SplitVector.h"
- #include "Partitioning.h"
-@@ -1651,6 +1653,8 @@
- 			        SC_MARKNUM_FOLDEROPEN);
- 			int folderEnd = SubstituteMarkerIfEmpty(SC_MARKNUM_FOLDEREND,
- 			        SC_MARKNUM_FOLDER);
-+			// HzD_Byte's hack
-+			bool showNum = true;
- 
- 			while ((visibleLine < cs.LinesDisplayed()) && yposScreen < rcMargin.bottom) {
- 
-@@ -1659,6 +1663,15 @@
- 				int lineDoc = cs.DocFromDisplay(visibleLine);
- 				PLATFORM_ASSERT(cs.GetVisible(lineDoc));
- 				bool firstSubLine = visibleLine == cs.DisplayFromDoc(lineDoc);
-+				// HzD_Byte's hack
-+				if (vs.ms[margin].style == SC_MARGIN_NUMBER && lineDoc > 0)
-+				{
-+					char style = pdoc->StyleAt(pdoc->LineEnd(lineDoc - 1));
-+					int lineState = pdoc->GetLineState(lineDoc - 1);
-+					showNum = (style != SCE_B_STRING && style != SCE_B_STRINGEOL &&
-+						style != SCE_B_PREPROCESSOR && style != SCE_B_DATE &&
-+						style != SCE_B_ASM && style != SCE_B_ERROR && !lineState);
-+				}
- 
- 				// Decide which fold indicator should be displayed
- 				level = pdoc->GetLevel(lineDoc);
-@@ -1730,7 +1743,11 @@
- 				if (vs.ms[margin].style == SC_MARGIN_NUMBER) {
- 					char number[100];
- 					number[0] = '\0';
-+					// HzD_Byte's hack
-+					/*
- 					if (firstSubLine)
-+					*/
-+					if (firstSubLine && showNum)
- 						sprintf(number, "%d", lineDoc + 1);
- 					if (foldFlags & SC_FOLDFLAG_LEVELNUMBERS) {
- 						int lev = pdoc->GetLevel(lineDoc);
-@@ -6005,6 +6022,8 @@
- 			NotifyDwelling(ptMouseLast, dwelling);
- 		}
- 	}
-+	// HzD_Byte's hack
-+	Redraw();
- }
- 
- bool Editor::Idle() {
-Index: src/stc/scintilla/src/LexVB.cxx
-===================================================================
---- src/stc/scintilla/src/LexVB.cxx	(revision 72127)
-+++ src/stc/scintilla/src/LexVB.cxx	(working copy)
+--- src/stc/scintilla/lexers/LexVB.cxx	(revision 73311)
++++ src/stc/scintilla/lexers/LexVB.cxx	(working copy)
 @@ -1,8 +1,8 @@
  // Scintilla source code edit control
  /** @file LexVB.cxx
@@ -671,7 +612,7 @@ Index: src/stc/scintilla/src/LexVB.cxx
  // The License.txt file describes the conditions under which this software may be distributed.
  
  #include <stdlib.h>
-@@ -24,285 +24,249 @@
+@@ -27,285 +27,249 @@
  using namespace Scintilla;
  #endif
  
@@ -1112,10 +1053,71 @@ Index: src/stc/scintilla/src/LexVB.cxx
  static const char * const vbWordListDesc[] = {
  	"Keywords",
  	"user1",
-@@ -312,5 +276,4 @@
+@@ -315,5 +279,4 @@
  };
  
  LexerModule lmVB(SCLEX_VB, ColouriseVBNetDoc, "vb", FoldVBDoc, vbWordListDesc);
 -LexerModule lmVBScript(SCLEX_VBSCRIPT, ColouriseVBScriptDoc, "vbscript", FoldVBDoc, vbWordListDesc);
 -
 +LexerModule lmVBScript(SCLEX_VBSCRIPT, ColouriseVBNetDoc, "vbscript", FoldVBDoc, vbWordListDesc);
+Index: src/stc/scintilla/src/Editor.cxx
+===================================================================
+--- src/stc/scintilla/src/Editor.cxx	(revision 73311)
++++ src/stc/scintilla/src/Editor.cxx	(working copy)
+@@ -21,6 +21,8 @@
+ 
+ #include "ILexer.h"
+ #include "Scintilla.h"
++// HzD_Byte's hack
++#include "SciLexer.h"
+ 
+ #include "SplitVector.h"
+ #include "Partitioning.h"
+@@ -1831,6 +1833,8 @@
+ 			        SC_MARKNUM_FOLDEROPEN);
+ 			int folderEnd = SubstituteMarkerIfEmpty(SC_MARKNUM_FOLDEREND,
+ 			        SC_MARKNUM_FOLDER);
++			// HzD_Byte's hack
++			bool showNum = true;
+ 
+ 			while ((visibleLine < cs.LinesDisplayed()) && yposScreen < rcMargin.bottom) {
+ 
+@@ -1840,6 +1844,15 @@
+ 				bool firstSubLine = visibleLine == cs.DisplayFromDoc(lineDoc);
+ 				bool lastSubLine = visibleLine == (cs.DisplayFromDoc(lineDoc + 1) - 1);
+ 
++				// HzD_Byte's hack
++				if (vs.ms[margin].style == SC_MARGIN_NUMBER && lineDoc > 0)
++				{
++					char style = pdoc->StyleAt(pdoc->LineEnd(lineDoc - 1));
++					int lineState = pdoc->GetLineState(lineDoc - 1);
++					showNum = (style != SCE_B_STRING && style != SCE_B_STRINGEOL &&
++						style != SCE_B_PREPROCESSOR && style != SCE_B_DATE &&
++						style != SCE_B_ASM && style != SCE_B_ERROR && !lineState);
++				}
+ 				int marks = pdoc->GetMark(lineDoc);
+ 				if (!firstSubLine)
+ 					marks = 0;
+@@ -1943,7 +1956,13 @@
+ 				if (vs.ms[margin].style == SC_MARGIN_NUMBER) {
+ 					if (firstSubLine) {
+ 						char number[100];
++						// HzD_Byte's hack
++						/*
+ 						sprintf(number, "%d", lineDoc + 1);
++						*/
++						number[0] = 0;
++						if (showNum)
++							sprintf(number, "%d", lineDoc + 1);
+ 						if (foldFlags & SC_FOLDFLAG_LEVELNUMBERS) {
+ 							int lev = pdoc->GetLevel(lineDoc);
+ 							sprintf(number, "%c%c %03X %03X",
+@@ -6621,6 +6640,8 @@
+ 			NotifyDwelling(ptMouseLast, dwelling);
+ 		}
+ 	}
++	// HzD_Byte's hack
++	Redraw();
+ }
+ 
+ bool Editor::Idle() {
