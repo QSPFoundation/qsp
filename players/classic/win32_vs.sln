@@ -1,11 +1,8 @@
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qspgui", "qspgui\win32_qspgui.vcproj", "{40B3607A-EA2B-483F-8B4C-C9145A2F1903}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC} = {9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qspgui", "qspgui\win32_qspgui.vcxproj", "{40B3607A-EA2B-483F-8B4C-C9145A2F1903}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qsp", "qsp\win32_qsp.vcproj", "{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qsp", "qsp\win32_qsp.vcxproj", "{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

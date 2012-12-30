@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\onig">
+      <UniqueIdentifier>{419275c8-e9ab-49f8-bb69-3248466e3fd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\onig\enc">
+      <UniqueIdentifier>{6f5e1acd-9392-434b-990a-7f36e8095e13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bindings">
+      <UniqueIdentifier>{f51aa269-a985-4161-a25a-4737c82f7976}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bindings\default">
+      <UniqueIdentifier>{df46f898-4ef5-4b20-879f-dd2befad0472}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bindings\flash">
+      <UniqueIdentifier>{8ed7c54f-5e62-4214-bd10-7e9ba003a584}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bindings\java">
+      <UniqueIdentifier>{7de700b7-a394-4d72-95ce-d63d7eccd196}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bindings\android">
+      <UniqueIdentifier>{00ee28ae-f1da-4f95-86d5-8dd4473bc796}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\onig">
+      <UniqueIdentifier>{b4cc91b2-7381-48ed-a390-3a7b51e4a6f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bindings">
+      <UniqueIdentifier>{077343ed-d833-456e-ad5b-b6192f67c733}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bindings\default">
+      <UniqueIdentifier>{747a4e36-c306-4a5d-b562-af0947fbaa38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bindings\flash">
+      <UniqueIdentifier>{56577aed-ac4a-4a5c-97eb-6adc016ea759}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bindings\java">
+      <UniqueIdentifier>{3221109e-86ba-41c5-9e99-6ef799dc9f14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bindings\android">
+      <UniqueIdentifier>{45857454-effc-48cf-863f-9469943ce2d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\qsp\actions.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\callbacks.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\codetools.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\coding.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\errors.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\game.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\locations.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\mathops.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\memwatch.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\menu.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\objects.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\playlist.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\regexp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\statements.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\text.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\time.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\towlower.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\towupper.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\variables.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\variant.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\regcomp.c">
+      <Filter>Source Files\onig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\regenc.c">
+      <Filter>Source Files\onig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\regerror.c">
+      <Filter>Source Files\onig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\regexec.c">
+      <Filter>Source Files\onig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\regparse.c">
+      <Filter>Source Files\onig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\regsyntax.c">
+      <Filter>Source Files\onig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\regtrav.c">
+      <Filter>Source Files\onig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\regversion.c">
+      <Filter>Source Files\onig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\st.c">
+      <Filter>Source Files\onig</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\enc\ascii.c">
+      <Filter>Source Files\onig\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\enc\cp1251.c">
+      <Filter>Source Files\onig\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\enc\koi8_r.c">
+      <Filter>Source Files\onig\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\enc\unicode.c">
+      <Filter>Source Files\onig\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\enc\utf16_be.c">
+      <Filter>Source Files\onig\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\enc\utf16_le.c">
+      <Filter>Source Files\onig\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\enc\utf32_be.c">
+      <Filter>Source Files\onig\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\onig\enc\utf32_le.c">
+      <Filter>Source Files\onig\enc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\default\default_callbacks.c">
+      <Filter>Source Files\bindings\default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\default\default_coding.c">
+      <Filter>Source Files\bindings\default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\default\default_control.c">
+      <Filter>Source Files\bindings\default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\flash\flash_callbacks.c">
+      <Filter>Source Files\bindings\flash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\flash\flash_coding.c">
+      <Filter>Source Files\bindings\flash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\flash\flash_control.c">
+      <Filter>Source Files\bindings\flash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\java\java_callbacks.c">
+      <Filter>Source Files\bindings\java</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\java\java_coding.c">
+      <Filter>Source Files\bindings\java</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\java\java_control.c">
+      <Filter>Source Files\bindings\java</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\android\android_callbacks.c">
+      <Filter>Source Files\bindings\android</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\android\android_coding.c">
+      <Filter>Source Files\bindings\android</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\android\android_control.c">
+      <Filter>Source Files\bindings\android</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\qsp\actions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\callbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\codetools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\coding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\declarations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\errors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\locations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\mathops.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\memwatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\objects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\playlist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\qsp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\regexp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\statements.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\variables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\variant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\onig\config.h">
+      <Filter>Header Files\onig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\onig\oniguruma.h">
+      <Filter>Header Files\onig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\onig\regenc.h">
+      <Filter>Header Files\onig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\onig\regint.h">
+      <Filter>Header Files\onig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\onig\regparse.h">
+      <Filter>Header Files\onig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\onig\st.h">
+      <Filter>Header Files\onig</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\bindings\bindings_config.h">
+      <Filter>Header Files\bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\bindings\default\qsp_default.h">
+      <Filter>Header Files\bindings\default</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\bindings\flash\flash.h">
+      <Filter>Header Files\bindings\flash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\bindings\java\java.h">
+      <Filter>Header Files\bindings\java</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\qsp\bindings\android\android.h">
+      <Filter>Header Files\bindings\android</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

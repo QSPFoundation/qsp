@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\animwin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\callbacks_gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\comtools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgcanvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\initevent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\inputbox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\inputdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\listbox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\msgdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textbox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\transhelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\animwin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\app.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\callbacks_gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\comtools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fmod.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fmod_codec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fmod_dsp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fmod_memoryinfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgcanvas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\initevent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inputbox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\inputdlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\listbox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\msgdlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qsp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qsp_default.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\textbox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\transhelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icons\logo.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="misc\win32\rsc\res.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

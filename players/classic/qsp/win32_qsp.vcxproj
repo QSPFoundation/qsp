@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug Unicode|Win32">
+      <Configuration>Debug Unicode</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release Unicode|Win32">
+      <Configuration>Release Unicode</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>qsp</ProjectName>
+    <ProjectGuid>{9DB406E1-D8B8-41AA-91D2-A3C5E3FD7CAC}</ProjectGuid>
+    <RootNamespace>qsp</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>../_debug\</OutDir>
+    <IntDir>../_debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>../_release\</OutDir>
+    <IntDir>../_release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
+    <OutDir>../_debug\</OutDir>
+    <IntDir>../_debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">
+    <OutDir>../_release\</OutDir>
+    <IntDir>../_release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_WIN;_DEBUG;NOT_RUBY;EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_WIN;NOT_RUBY;EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_WIN;_UNICODE;_DEBUG;NOT_RUBY;EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_WIN;_UNICODE;NOT_RUBY;EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\qsp\actions.c" />
+    <ClCompile Include="..\..\..\qsp\callbacks.c" />
+    <ClCompile Include="..\..\..\qsp\codetools.c" />
+    <ClCompile Include="..\..\..\qsp\coding.c" />
+    <ClCompile Include="..\..\..\qsp\common.c" />
+    <ClCompile Include="..\..\..\qsp\errors.c" />
+    <ClCompile Include="..\..\..\qsp\game.c" />
+    <ClCompile Include="..\..\..\qsp\locations.c" />
+    <ClCompile Include="..\..\..\qsp\mathops.c" />
+    <ClCompile Include="..\..\..\qsp\memwatch.c" />
+    <ClCompile Include="..\..\..\qsp\menu.c" />
+    <ClCompile Include="..\..\..\qsp\objects.c" />
+    <ClCompile Include="..\..\..\qsp\playlist.c" />
+    <ClCompile Include="..\..\..\qsp\regexp.c" />
+    <ClCompile Include="..\..\..\qsp\statements.c" />
+    <ClCompile Include="..\..\..\qsp\text.c" />
+    <ClCompile Include="..\..\..\qsp\time.c" />
+    <ClCompile Include="..\..\..\qsp\towlower.c" />
+    <ClCompile Include="..\..\..\qsp\towupper.c" />
+    <ClCompile Include="..\..\..\qsp\variables.c" />
+    <ClCompile Include="..\..\..\qsp\variant.c" />
+    <ClCompile Include="..\..\..\qsp\onig\regcomp.c" />
+    <ClCompile Include="..\..\..\qsp\onig\regenc.c" />
+    <ClCompile Include="..\..\..\qsp\onig\regerror.c" />
+    <ClCompile Include="..\..\..\qsp\onig\regexec.c" />
+    <ClCompile Include="..\..\..\qsp\onig\regparse.c" />
+    <ClCompile Include="..\..\..\qsp\onig\regsyntax.c" />
+    <ClCompile Include="..\..\..\qsp\onig\regtrav.c" />
+    <ClCompile Include="..\..\..\qsp\onig\regversion.c" />
+    <ClCompile Include="..\..\..\qsp\onig\st.c" />
+    <ClCompile Include="..\..\..\qsp\onig\enc\ascii.c" />
+    <ClCompile Include="..\..\..\qsp\onig\enc\cp1251.c" />
+    <ClCompile Include="..\..\..\qsp\onig\enc\koi8_r.c" />
+    <ClCompile Include="..\..\..\qsp\onig\enc\unicode.c" />
+    <ClCompile Include="..\..\..\qsp\onig\enc\utf16_be.c" />
+    <ClCompile Include="..\..\..\qsp\onig\enc\utf16_le.c" />
+    <ClCompile Include="..\..\..\qsp\onig\enc\utf32_be.c" />
+    <ClCompile Include="..\..\..\qsp\onig\enc\utf32_le.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\default\default_callbacks.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\default\default_coding.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\default\default_control.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\flash\flash_callbacks.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\flash\flash_coding.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\flash\flash_control.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\java\java_callbacks.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\java\java_coding.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\java\java_control.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\android\android_callbacks.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\android\android_coding.c" />
+    <ClCompile Include="..\..\..\qsp\bindings\android\android_control.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\qsp\actions.h" />
+    <ClInclude Include="..\..\..\qsp\callbacks.h" />
+    <ClInclude Include="..\..\..\qsp\codetools.h" />
+    <ClInclude Include="..\..\..\qsp\coding.h" />
+    <ClInclude Include="..\..\..\qsp\common.h" />
+    <ClInclude Include="..\..\..\qsp\declarations.h" />
+    <ClInclude Include="..\..\..\qsp\errors.h" />
+    <ClInclude Include="..\..\..\qsp\game.h" />
+    <ClInclude Include="..\..\..\qsp\locations.h" />
+    <ClInclude Include="..\..\..\qsp\mathops.h" />
+    <ClInclude Include="..\..\..\qsp\memwatch.h" />
+    <ClInclude Include="..\..\..\qsp\menu.h" />
+    <ClInclude Include="..\..\..\qsp\objects.h" />
+    <ClInclude Include="..\..\..\qsp\playlist.h" />
+    <ClInclude Include="..\..\..\qsp\qsp.h" />
+    <ClInclude Include="..\..\..\qsp\regexp.h" />
+    <ClInclude Include="..\..\..\qsp\statements.h" />
+    <ClInclude Include="..\..\..\qsp\text.h" />
+    <ClInclude Include="..\..\..\qsp\time.h" />
+    <ClInclude Include="..\..\..\qsp\variables.h" />
+    <ClInclude Include="..\..\..\qsp\variant.h" />
+    <ClInclude Include="..\..\..\qsp\onig\config.h" />
+    <ClInclude Include="..\..\..\qsp\onig\oniguruma.h" />
+    <ClInclude Include="..\..\..\qsp\onig\regenc.h" />
+    <ClInclude Include="..\..\..\qsp\onig\regint.h" />
+    <ClInclude Include="..\..\..\qsp\onig\regparse.h" />
+    <ClInclude Include="..\..\..\qsp\onig\st.h" />
+    <ClInclude Include="..\..\..\qsp\bindings\bindings_config.h" />
+    <ClInclude Include="..\..\..\qsp\bindings\default\qsp_default.h" />
+    <ClInclude Include="..\..\..\qsp\bindings\flash\flash.h" />
+    <ClInclude Include="..\..\..\qsp\bindings\java\java.h" />
+    <ClInclude Include="..\..\..\qsp\bindings\android\android.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
