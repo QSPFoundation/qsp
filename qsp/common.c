@@ -21,6 +21,7 @@
 #include "game.h"
 #include "objects.h"
 #include "playlist.h"
+#include "regexp.h"
 #include "variables.h"
 
 static unsigned int qspRandX[55], qspRandY[256], qspRandZ;
