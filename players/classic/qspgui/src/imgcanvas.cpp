@@ -24,6 +24,7 @@ BEGIN_EVENT_TABLE(QSPImgCanvas, wxWindow)
 	EVT_PAINT(QSPImgCanvas::OnPaint)
 	EVT_KEY_UP(QSPImgCanvas::OnKeyUp)
 	EVT_MOUSEWHEEL(QSPImgCanvas::OnMouseWheel)
+	EVT_LEFT_DOWN(QSPImgCanvas::OnMouseClick)
 END_EVENT_TABLE()
 
 QSPImgCanvas::QSPImgCanvas(wxWindow *parent, wxWindowID id) : wxWindow(parent, id, wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxFULL_REPAINT_ON_RESIZE)
@@ -139,6 +140,12 @@ void QSPImgCanvas::OnKeyUp(wxKeyEvent& event)
 }
 
 void QSPImgCanvas::OnMouseWheel(wxMouseEvent& event)
+{
+	event.Skip();
+	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
+}
+
+void QSPImgCanvas::OnMouseClick(wxMouseEvent& event)
 {
 	event.Skip();
 	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);

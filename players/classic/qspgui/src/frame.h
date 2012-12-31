@@ -121,8 +121,9 @@
 		QSPListBox *GetObjects() const { return m_objects; }
 		QSPImgCanvas *GetImgView() const { return m_imgView; }
 		wxMenu *GetGameMenu() const { return m_gameMenu; }
-		bool GetIsShowHotkeys() const { return m_isShowHotkeys; }
-		bool GetIsQuit() const { return m_isQuit; }
+		bool IsShowHotkeys() const { return m_isShowHotkeys; }
+		bool IsQuit() const { return m_isQuit; }
+		bool IsKeyPressedWhileDisabled() const { return m_keyPressedWhileDisabled; }
 	protected:
 		// Internal methods
 		void ShowError();
@@ -174,6 +175,7 @@
 		void OnInputTextChange(wxCommandEvent& event);
 		void OnInputTextEnter(wxCommandEvent& event);
 		void OnKey(wxKeyEvent& event);
+		void OnMouseClick(wxMouseEvent& event);
 		void OnWheel(wxMouseEvent& event);
 		void OnPaneClose(wxAuiManagerEvent& event);
 		void OnDropFiles(wxDropFilesEvent& event);
@@ -205,6 +207,7 @@
 		bool m_isUseFontSize;
 		bool m_isProcessEvents;
 		bool m_isQuit;
+		bool m_keyPressedWhileDisabled;
 		bool m_isShowHotkeys;
 		int m_volume;
 		int m_menuIndex;

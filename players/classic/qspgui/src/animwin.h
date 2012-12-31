@@ -35,6 +35,7 @@
 		// Events
 		void OnKeyUp(wxKeyEvent& event);
 		void OnMouseWheel(wxMouseEvent& event);
+		void OnMouseClick(wxMouseEvent& event);
 	};
 
 #endif

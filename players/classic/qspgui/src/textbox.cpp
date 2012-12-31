@@ -24,6 +24,7 @@ BEGIN_EVENT_TABLE(QSPTextBox, wxHtmlWindow)
 	EVT_ERASE_BACKGROUND(QSPTextBox::OnEraseBackground)
 	EVT_KEY_UP(QSPTextBox::OnKeyUp)
 	EVT_MOUSEWHEEL(QSPTextBox::OnMouseWheel)
+	EVT_LEFT_DOWN(QSPTextBox::OnMouseClick)
 END_EVENT_TABLE()
 
 wxHtmlOpeningStatus QSPTextBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
@@ -133,6 +134,12 @@ void QSPTextBox::OnMouseWheel(wxMouseEvent& event)
 	event.Skip();
 	if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
 		event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
+}
+
+void QSPTextBox::OnMouseClick(wxMouseEvent& event)
+{
+	event.Skip();
+	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }
 
 void QSPTextBox::OnSize(wxSizeEvent& event)

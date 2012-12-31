@@ -21,7 +21,7 @@ IMPLEMENT_CLASS(QSPListBox, wxHtmlListBox)
 
 BEGIN_EVENT_TABLE(QSPListBox, wxHtmlListBox)
 	EVT_MOTION(QSPListBox::OnMouseMove)
-	EVT_LEFT_DOWN(QSPListBox::OnLeftDown)
+	EVT_LEFT_DOWN(QSPListBox::OnMouseClick)
 	EVT_CHAR(QSPListBox::OnChar)
 	EVT_KEY_UP(QSPListBox::OnKeyUp)
 	EVT_MOUSEWHEEL(QSPListBox::OnMouseWheel)
@@ -185,9 +185,10 @@ void QSPListBox::OnMouseMove(wxMouseEvent& event)
 	}
 }
 
-void QSPListBox::OnLeftDown(wxMouseEvent& event)
+void QSPListBox::OnMouseClick(wxMouseEvent& event)
 {
 	event.Skip();
+	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 	if (m_type == LB_EXTENDED) OnLeftDClick(event);
 }
 

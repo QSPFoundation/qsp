@@ -43,6 +43,7 @@
 		void OnPaint(wxPaintEvent &event);
 		void OnKeyUp(wxKeyEvent& event);
 		void OnMouseWheel(wxMouseEvent& event);
+		void OnMouseClick(wxMouseEvent& event);
 
 		// Fields
 		bool m_isAnim;

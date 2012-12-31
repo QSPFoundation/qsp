@@ -62,7 +62,7 @@
 
 		// Events
 		void OnMouseMove(wxMouseEvent& event);
-		void OnLeftDown(wxMouseEvent& event);
+		void OnMouseClick(wxMouseEvent& event);
 		void OnChar(wxKeyEvent& event);
 		void OnKeyUp(wxKeyEvent& event);
 		void OnMouseWheel(wxMouseEvent& event);

@@ -58,6 +58,7 @@ BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
 	EVT_ENTER(ID_INPUT, QSPFrame::OnInputTextEnter)
 	EVT_KEY_UP(QSPFrame::OnKey)
 	EVT_MOUSEWHEEL(QSPFrame::OnWheel)
+	EVT_LEFT_DOWN(QSPFrame::OnMouseClick)
 	EVT_AUI_PANE_CLOSE(QSPFrame::OnPaneClose)
 	EVT_DROP_FILES(QSPFrame::OnDropFiles)
 END_EVENT_TABLE()
@@ -166,6 +167,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper
 	SetOverallVolume(100);
 	m_savedGamePath.Clear();
 	m_isQuit = false;
+	m_keyPressedWhileDisabled = false;
 	m_isGameOpened = false;
 }
 
@@ -292,6 +294,7 @@ void QSPFrame::EnableControls(bool status, bool isExtended)
 	m_actions->Enable(status);
 	m_input->SetEditable(status);
 	m_isProcessEvents = status;
+	m_keyPressedWhileDisabled = false;
 }
 
 void QSPFrame::ShowPane(wxWindowID id, bool isShow)
@@ -985,13 +988,21 @@ void QSPFrame::OnInputTextEnter(wxCommandEvent& event)
 
 void QSPFrame::OnKey(wxKeyEvent& event)
 {
-	int ind, actsCount;
 	event.Skip();
+	// Exit fullscreen mode
 	if (IsFullScreen() && event.GetKeyCode() == WXK_ESCAPE)
-		ShowFullScreen(false);
-	else if (m_isProcessEvents && !event.HasModifiers() && wxWindow::FindFocus() != m_input)
 	{
-		actsCount = QSPGetActionsCount();
+		ShowFullScreen(false);
+		return;
+	}
+	// Process key pressed event
+	if (event.GetKeyCode() == WXK_SPACE)
+		m_keyPressedWhileDisabled = true;
+	// Process action shortcut
+	if (m_isProcessEvents && !event.HasModifiers() && wxWindow::FindFocus() != m_input)
+	{
+		int ind = -1;
+		int actsCount = QSPGetActionsCount();
 		switch (event.GetKeyCode())
 		{
 		case '1': case WXK_NUMPAD1: case WXK_NUMPAD_END: ind = 0; break;
@@ -1004,12 +1015,10 @@ void QSPFrame::OnKey(wxKeyEvent& event)
 		case '8': case WXK_NUMPAD8: case WXK_NUMPAD_UP: ind = 7; break;
 		case '9': case WXK_NUMPAD9: case WXK_NUMPAD_PAGEUP: ind = 8; break;
 		case WXK_SPACE:
-			if (actsCount != 1) return;
-			ind = 0;
+			if (actsCount == 1) ind = 0;
 			break;
-		default: return;
 		}
-		if (ind < actsCount)
+		if (ind >= 0 && ind < actsCount)
 		{
 			wxCommandEvent e;
 			if (QSPSetSelActionIndex(ind, QSP_TRUE))
@@ -1024,6 +1033,12 @@ void QSPFrame::OnWheel(wxMouseEvent& event)
 {
 	wxWindow *win = wxFindWindowAtPoint(wxGetMousePosition());
 	if (win) win->ScrollLines(-event.GetWheelRotation() / event.GetWheelDelta() * event.GetLinesPerAction());
+}
+
+void QSPFrame::OnMouseClick(wxMouseEvent& event)
+{
+	event.Skip();
+	m_keyPressedWhileDisabled = true;
 }
 
 void QSPFrame::OnPaneClose(wxAuiManagerEvent& event)

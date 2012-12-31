@@ -22,6 +22,7 @@ IMPLEMENT_CLASS(QSPAnimWin, wxAnimationCtrl)
 BEGIN_EVENT_TABLE(QSPAnimWin, wxAnimationCtrl)
 	EVT_KEY_UP(QSPAnimWin::OnKeyUp)
 	EVT_MOUSEWHEEL(QSPAnimWin::OnMouseWheel)
+	EVT_LEFT_DOWN(QSPAnimWin::OnMouseClick)
 END_EVENT_TABLE()
 
 QSPAnimWin::QSPAnimWin(wxWindow *parent) :
@@ -42,6 +43,12 @@ void QSPAnimWin::OnKeyUp(wxKeyEvent& event)
 }
 
 void QSPAnimWin::OnMouseWheel(wxMouseEvent& event)
+{
+	event.Skip();
+	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
+}
+
+void QSPAnimWin::OnMouseClick(wxMouseEvent& event)
 {
 	event.Skip();
 	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
