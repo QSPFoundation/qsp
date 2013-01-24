@@ -912,7 +912,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 		}
 		free(uStr);
 	}
-	// Check for ELSE IF
+	/* Check for ELSE IF */
 	if (count == 1 && delimPos && line->Stats->Stat == qspStatElse && statCode == qspStatIf &&
 		*(str + line->Stats->ParamPos) != QSP_COLONDELIM[0])
 	{
