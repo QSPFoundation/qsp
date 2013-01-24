@@ -28,6 +28,9 @@
 	#define QSP_MAXITEMS 100
 	#define QSP_VALSDELIM QSP_FMT("|")
 
+	/* Helpers */
+	#define QSP_TOBOOL(x) (-(x))
+
 	typedef void (*QSP_FUNCTION)(QSPVariant *, int, QSPVariant *);
 
 	typedef struct

@@ -325,6 +325,26 @@ void qspFreeStrs(void **strs, int count)
 	}
 }
 
+QSP_BOOL qspIsNumber(QSP_CHAR *s)
+{
+	s = qspSkipSpaces(s);
+	if (*s == QSP_FMT('-'))
+		++s;
+	else if (*s == QSP_FMT('+'))
+		++s;
+	if (qspIsDigit(*s))
+	{
+		do
+		{
+			++s;
+		} while (qspIsDigit(*s));
+	}
+	else
+		return QSP_FALSE;
+	s = qspSkipSpaces(s);
+	return !(*s);
+}
+
 int qspStrToNum(QSP_CHAR *s, QSP_BOOL *isValid)
 {
 	int num;
@@ -337,6 +357,11 @@ int qspStrToNum(QSP_CHAR *s, QSP_BOOL *isValid)
 	}
 	else if (*s == QSP_FMT('+'))
 		++s;
+	else if (!(*s)) /* special case, i.e. empty string must be convertible to 0 */
+	{
+		if (isValid) *isValid = QSP_TRUE;
+		return 0;
+	}
 	if (qspIsDigit(*s))
 	{
 		num = 0;

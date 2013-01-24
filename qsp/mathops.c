@@ -494,31 +494,25 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 				QSP_STR(tos) = qspGetAddText(QSP_STR(tos), QSP_STR(args[1]), len, -1);
 				break;
 			case qspOpEq:
-				QSP_NUM(tos) = -(!qspAutoConvertCompare(args, args + 1));
+				QSP_NUM(tos) = QSP_TOBOOL(!qspAutoConvertCompare(args, args + 1));
 				break;
 			case qspOpLt:
-				QSP_NUM(tos) = -(qspAutoConvertCompare(args, args + 1) < 0);
+				QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) < 0);
 				break;
 			case qspOpGt:
-				QSP_NUM(tos) = -(qspAutoConvertCompare(args, args + 1) > 0);
+				QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) > 0);
 				break;
 			case qspOpLeq:
-				QSP_NUM(tos) = -(qspAutoConvertCompare(args, args + 1) <= 0);
+				QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) <= 0);
 				break;
 			case qspOpGeq:
-				QSP_NUM(tos) = -(qspAutoConvertCompare(args, args + 1) >= 0);
+				QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) >= 0);
 				break;
 			case qspOpNe:
-				QSP_NUM(tos) = -(qspAutoConvertCompare(args, args + 1) != 0);
+				QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) != 0);
 				break;
 			case qspOpMinus:
 				QSP_NUM(tos) = -QSP_NUM(args[0]);
-				break;
-			case qspOpLoc:
-				QSP_NUM(tos) = -(qspLocIndex(QSP_STR(args[0])) >= 0);
-				break;
-			case qspOpObj:
-				QSP_NUM(tos) = -(qspObjIndex(QSP_STR(args[0])) >= 0);
 				break;
 			case qspOpNot:
 				QSP_NUM(tos) = ~QSP_NUM(args[0]);
@@ -530,6 +524,12 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 				QSP_NUM(tos) = QSP_NUM(args[0]) | QSP_NUM(args[1]);
 				break;
 			/* Embedded functions -------------------------------------------------------------- */
+			case qspOpLoc:
+				QSP_NUM(tos) = QSP_TOBOOL(qspLocIndex(QSP_STR(args[0])) >= 0);
+				break;
+			case qspOpObj:
+				QSP_NUM(tos) = QSP_TOBOOL(qspObjIndex(QSP_STR(args[0])) >= 0);
+				break;
 			case qspOpIIf:
 				qspCopyVariant(&tos, QSP_NUM(args[0]) ? args + 1 : args + 2);
 				break;
@@ -537,7 +537,10 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 				QSP_NUM(tos) = qspStrLen(QSP_STR(args[0]));
 				break;
 			case qspOpIsNum:
-				QSP_NUM(tos) = -qspIsCanConvertToNum(args);
+				if (args[0].IsStr)
+					QSP_NUM(tos) = QSP_TOBOOL(qspIsNumber(QSP_STR(args[0])));
+				else
+					QSP_NUM(tos) = QSP_TOBOOL(QSP_TRUE);
 				break;
 			case qspOpLCase:
 				qspLowerStr(QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]), -1));
@@ -912,7 +915,7 @@ static void qspFunctionStrComp(QSPVariant *args, int count, QSPVariant *tos)
 {
 	regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
 	if (!regExp) return;
-	QSP_PNUM(tos) = -(qspRegExpStrMatch(regExp, QSP_STR(args[0])));
+	QSP_PNUM(tos) = QSP_TOBOOL(qspRegExpStrMatch(regExp, QSP_STR(args[0])));
 }
 
 static void qspFunctionStrFind(QSPVariant *args, int count, QSPVariant *tos)
@@ -1027,11 +1030,11 @@ static void qspFunctionIsPlay(QSPVariant *args, int count, QSPVariant *tos)
 	if (qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-		QSP_PNUM(tos) = -(qspCallIsPlayingFile(file) != 0);
+		QSP_PNUM(tos) = QSP_TOBOOL(qspCallIsPlayingFile(file) != 0);
 		free(file);
 	}
 	else
-		QSP_PNUM(tos) = 0;
+		QSP_PNUM(tos) = QSP_TOBOOL(QSP_FALSE);
 }
 
 static void qspFunctionInstr(QSPVariant *args, int count, QSPVariant *tos)

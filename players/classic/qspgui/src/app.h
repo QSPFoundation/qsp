@@ -32,6 +32,8 @@
 		virtual bool OnInit();
 		virtual int OnExit();
 	protected:
+		void InitUI();
+		bool GetAutoRunEvent(wxInitEvent& initEvent);
 		// Fields
 		QSPTranslationHelper *m_transhelper;
 	};
