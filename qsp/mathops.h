@@ -29,7 +29,7 @@
 	#define QSP_VALSDELIM QSP_FMT("|")
 
 	/* Helpers */
-	#define QSP_TOBOOL(x) (-(x))
+	#define QSP_TOBOOL(x) (-((x) != 0))
 
 	typedef void (*QSP_FUNCTION)(QSPVariant *, int, QSPVariant *);
 

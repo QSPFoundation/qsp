@@ -798,7 +798,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSP_CHAR *str, int lineNum)
 {
 	QSP_BOOL isInLoop, isSearchElse;
 	int statCode, count = 0;
-	QSP_CHAR ch, *uStr, *nextPos, *temp, *buf, *elsePos, *delimPos = 0, *paramPos = 0;
+	QSP_CHAR *uStr, *nextPos, *temp, *buf, *elsePos, *delimPos = 0, *paramPos = 0;
 	line->Str = str;
 	line->LineNum = lineNum;
 	line->StatsCount = 0;

@@ -55,6 +55,7 @@ static int qspGetVarTextIndex(QSPVar *, QSP_CHAR *, QSP_BOOL);
 static QSPVar *qspGetVarData(QSP_CHAR *, QSP_BOOL, int *);
 static void qspSetVar(QSP_CHAR *, QSPVariant *, QSP_CHAR);
 static void qspCopyVar(QSPVar *, QSPVar *, int, int);
+static void qspSetVarValue(QSP_CHAR *, QSPVariant *, QSP_CHAR);
 
 static int qspIndStringCompare(const void *name, const void *compareTo)
 {
@@ -764,6 +765,94 @@ void qspMoveVar(QSPVar *dest, QSPVar *src)
 	qspInitVarData(src);
 }
 
+static void qspSetVarValue(QSP_CHAR *name, QSPVariant *v, QSP_CHAR op)
+{
+	QSPVariant v2;
+	QSP_BOOL isSingleValue, notFirstValue = QSP_FALSE;
+	QSP_CHAR *newValPos, *newCommaPos, *valPos, *commaPos = name;
+	int oldRefreshCount = qspRefreshCount;
+	if (v->IsStr)
+	{
+		valPos = QSP_PSTR(v);
+		isSingleValue = QSP_FALSE; /* Multiple values by default */
+	}
+	else
+		isSingleValue = QSP_TRUE;
+	while (1)
+	{
+		newCommaPos = qspStrPos(commaPos, QSP_COMMA, QSP_FALSE);
+		if (newCommaPos)
+		{
+			*newCommaPos = 0;
+			if (isSingleValue)
+			{
+				if (notFirstValue)
+					qspSetVar(commaPos, &v2, op);
+				else
+					qspSetVar(commaPos, v, op);
+				if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+				{
+					*newCommaPos = QSP_COMMA[0];
+					break;
+				}
+			}
+			else
+			{
+				newValPos = qspStrStr(valPos, QSP_VALSDELIM);
+				if (newValPos)
+				{
+					notFirstValue = QSP_TRUE;
+					v2.IsStr = QSP_TRUE;
+					QSP_STR(v2) = qspGetNewText(valPos, (int)(newValPos - valPos));
+					qspSetVar(commaPos, &v2, op);
+					if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+					{
+						*newCommaPos = QSP_COMMA[0];
+						break;
+					}
+					if (v2.IsStr) free(QSP_STR(v2));
+					valPos = newValPos + QSP_LEN(QSP_VALSDELIM);
+				}
+				else /* The last value */
+				{
+					isSingleValue = QSP_TRUE;
+					if (notFirstValue)
+					{
+						v2.IsStr = QSP_TRUE;
+						QSP_STR(v2) = qspGetNewText(valPos, -1);
+						qspSetVar(commaPos, &v2, op);
+					}
+					else
+						qspSetVar(commaPos, v, op);
+					if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+					{
+						*newCommaPos = QSP_COMMA[0];
+						break;
+					}
+				}
+			}
+			*newCommaPos = QSP_COMMA[0];
+		}
+		else /* The last variable */
+		{
+			if (notFirstValue) /* Not a first value */
+			{
+				if (!isSingleValue)
+				{
+					v2.IsStr = QSP_TRUE;
+					QSP_STR(v2) = qspGetNewText(valPos, -1);
+				}
+				qspSetVar(commaPos, &v2, op);
+			}
+			else
+				qspSetVar(commaPos, v, op);
+			break;
+		}
+		commaPos = newCommaPos + QSP_LEN(QSP_COMMA);
+	}
+	if (notFirstValue && v2.IsStr) free(QSP_STR(v2));
+}
+
 void qspStatementSetVarValue(QSP_CHAR *s)
 {
 	QSPVariant v;
@@ -781,7 +870,7 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 	ch = *pos;
 	*pos = 0;
 	name = qspDelSpcCanRetSelf(s);
-	qspSetVar(name, &v, ch);
+	qspSetVarValue(name, &v, ch);
 	*pos = ch;
 	if (name != s) free(name);
 	if (v.IsStr) free(QSP_STR(v));
@@ -852,7 +941,7 @@ void qspStatementLocal(QSP_CHAR *s)
 				return;
 			}
 		}
-		if (isVarFound)
+		if (isVarFound) /* Already exists */
 		{
 			isVarFound = QSP_FALSE;
 			free(varName);
