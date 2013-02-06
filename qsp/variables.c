@@ -890,9 +890,7 @@ void qspStatementLocal(QSP_CHAR *s)
 		return;
 	}
 	groupInd = qspSavedVarsGroupsCount - 1;
-	count = qspSavedVarsGroups[groupInd].VarsCount;
-	bufSize = count + 4;
-	qspSavedVarsGroups[groupInd].Vars = (QSPVar *)realloc(qspSavedVarsGroups[groupInd].Vars, bufSize * sizeof(QSPVar));
+	count = bufSize = qspSavedVarsGroups[groupInd].VarsCount;
 	oldRefreshCount = qspRefreshCount;
 	isVarFound = QSP_FALSE;
 	while (1)
@@ -908,9 +906,10 @@ void qspStatementLocal(QSP_CHAR *s)
 			varName = (*s == QSP_STRCHAR[0] ? qspDelSpcPartial(s + 1, temp) : qspDelSpcPartial(s, temp));
 			*eqPos = QSP_EQUAL[0];
 		}
-		else
+		else /* Don't support declaration of the array element */
 			varName = (*s == QSP_STRCHAR[0] ? qspDelSpcPartial(s + 1, pos) : qspDelSpcPartial(s, pos));
 		qspUpperStr(varName);
+		/* Check for the existence */
 		for (i = 0; i < count; ++i)
 		{
 			if (!qspStrsComp(varName, qspSavedVarsGroups[groupInd].Vars[i].Name))
@@ -919,6 +918,7 @@ void qspStatementLocal(QSP_CHAR *s)
 				break;
 			}
 		}
+		/* Get variable's data */
 		if (eqPos)
 		{
 			*eqPos = 0;
@@ -933,7 +933,7 @@ void qspStatementLocal(QSP_CHAR *s)
 				return;
 			}
 		}
-		else if (!isVarFound)
+		else if (!isVarFound) /* Ignore variable if it already exists and we are not in the assignment */
 		{
 			if (!(var = qspVarReference(varName, QSP_FALSE)))
 			{
@@ -948,6 +948,7 @@ void qspStatementLocal(QSP_CHAR *s)
 		}
 		else
 		{
+			/* Add variable to the local group */
 			if (count >= bufSize)
 			{
 				bufSize = count + 4;
