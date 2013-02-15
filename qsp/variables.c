@@ -56,6 +56,7 @@ static QSPVar *qspGetVarData(QSP_CHAR *, QSP_BOOL, int *);
 static void qspSetVar(QSP_CHAR *, QSPVariant *, QSP_CHAR);
 static void qspCopyVar(QSPVar *, QSPVar *, int, int);
 static void qspSetVarValue(QSP_CHAR *, QSPVariant *, QSP_CHAR);
+static QSP_CHAR *qspGetVarNameOnly(QSP_CHAR *);
 
 static int qspIndStringCompare(const void *name, const void *compareTo)
 {
@@ -250,13 +251,13 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isSet, int *index)
 			qspSetError(QSP_ERR_BRACKNOTFOUND);
 			return 0;
 		}
+		*lPos = 0;
+		var = qspVarReference(s, isSet);
+		*lPos = QSP_LSBRACK[0];
+		if (!var) return 0;
 		temp = qspSkipSpaces(lPos + 1);
 		if (temp == rPos)
 		{
-			*lPos = 0;
-			var = qspVarReference(s, isSet);
-			*lPos = QSP_LSBRACK[0];
-			if (!var) return 0;
 			if (isSet)
 				*index = var->ValsCount;
 			else
@@ -269,14 +270,6 @@ static QSPVar *qspGetVarData(QSP_CHAR *s, QSP_BOOL isSet, int *index)
 			ind = qspExprValue(temp);
 			*rPos = QSP_RSBRACK[0];
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
-			*lPos = 0;
-			var = qspVarReference(s, isSet);
-			*lPos = QSP_LSBRACK[0];
-			if (!var)
-			{
-				if (ind.IsStr) free(QSP_STR(ind));
-				return 0;
-			}
 			if (ind.IsStr)
 			{
 				*index = qspGetVarTextIndex(var, QSP_STR(ind), isSet);
@@ -876,13 +869,20 @@ void qspStatementSetVarValue(QSP_CHAR *s)
 	if (v.IsStr) free(QSP_STR(v));
 }
 
+static QSP_CHAR *qspGetVarNameOnly(QSP_CHAR *s)
+{
+	QSP_CHAR *brackPos = qspStrChar(s, QSP_LSBRACK[0]);
+	if (brackPos) return qspGetNewText(s, (int)(brackPos - s));
+	return qspDelSpc(s);
+}
+
 void qspStatementLocal(QSP_CHAR *s)
 {
 	QSPVariant v;
-	QSP_BOOL isVarFound;
 	QSPVar *var;
-	QSP_CHAR *varName, *pos, *eqPos, *temp;
-	int i, groupInd, varIndex, count, bufSize, oldRefreshCount;
+	QSP_BOOL isVarFound;
+	QSP_CHAR *curPos, *varName, *commaPos, *eqPos;
+	int i, groupInd, count, bufSize, oldRefreshCount;
 	s = qspSkipSpaces(s);
 	if (!(*s))
 	{
@@ -891,23 +891,24 @@ void qspStatementLocal(QSP_CHAR *s)
 	}
 	groupInd = qspSavedVarsGroupsCount - 1;
 	count = bufSize = qspSavedVarsGroups[groupInd].VarsCount;
-	oldRefreshCount = qspRefreshCount;
 	isVarFound = QSP_FALSE;
+	curPos = s;
+	eqPos = qspStrPos(curPos, QSP_EQUAL, QSP_FALSE);
+	if (eqPos) *eqPos = 0;
 	while (1)
 	{
-		pos = qspStrPos(s, QSP_COMMA, QSP_FALSE);
-		eqPos = qspStrPosPartial(s, pos, QSP_EQUAL, QSP_FALSE);
-		if (eqPos)
+		/* Skip type char */
+		if (*curPos == QSP_STRCHAR[0]) ++curPos;
+		/* Get variable's name */
+		commaPos = qspStrPos(curPos, QSP_COMMA, QSP_FALSE);
+		if (commaPos)
 		{
-			v = qspExprValuePartial(eqPos + QSP_LEN(QSP_EQUAL), pos);
-			if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-			*eqPos = 0;
-			temp = qspStrChar(s, QSP_LSBRACK[0]);
-			varName = (*s == QSP_STRCHAR[0] ? qspDelSpcPartial(s + 1, temp) : qspDelSpcPartial(s, temp));
-			*eqPos = QSP_EQUAL[0];
+			*commaPos = 0;
+			varName = (eqPos ? qspGetVarNameOnly(curPos) : qspDelSpc(curPos));
+			*commaPos = QSP_COMMA[0];
 		}
-		else /* Don't support declaration of the array element */
-			varName = (*s == QSP_STRCHAR[0] ? qspDelSpcPartial(s + 1, pos) : qspDelSpcPartial(s, pos));
+		else
+			varName = (eqPos ? qspGetVarNameOnly(curPos) : qspDelSpc(curPos));
 		qspUpperStr(varName);
 		/* Check for the existence */
 		for (i = 0; i < count; ++i)
@@ -919,36 +920,21 @@ void qspStatementLocal(QSP_CHAR *s)
 			}
 		}
 		/* Get variable's data */
-		if (eqPos)
+		if (isVarFound)
 		{
-			*eqPos = 0;
-			temp = qspDelSpcCanRetSelf(s);
-			var = qspGetVarData(temp, QSP_TRUE, &varIndex);
-			*eqPos = QSP_EQUAL[0];
-			if (temp != s) free(temp);
-			if (!var)
-			{
-				if (v.IsStr) free(QSP_STR(v));
-				free(varName);
-				return;
-			}
-		}
-		else if (!isVarFound) /* Ignore variable if it already exists and we are not in the assignment */
-		{
-			if (!(var = qspVarReference(varName, QSP_FALSE)))
-			{
-				free(varName);
-				return;
-			}
-		}
-		if (isVarFound) /* Already exists */
-		{
+			/* Already exists */
 			isVarFound = QSP_FALSE;
 			free(varName);
 		}
 		else
 		{
 			/* Add variable to the local group */
+			if (!(var = qspVarReference(varName, QSP_FALSE)))
+			{
+				free(varName);
+				if (eqPos) *eqPos = QSP_EQUAL[0];
+				return;
+			}
 			if (count >= bufSize)
 			{
 				bufSize = count + 4;
@@ -958,24 +944,29 @@ void qspStatementLocal(QSP_CHAR *s)
 			qspSavedVarsGroups[groupInd].Vars[count].Name = varName;
 			qspSavedVarsGroups[groupInd].VarsCount = ++count;
 		}
-		if (eqPos)
-		{
-			if (qspConvertVariantTo(&v, *s == QSP_STRCHAR[0]))
-			{
-				qspSetError(QSP_ERR_TYPEMISMATCH);
-				free(QSP_STR(v));
-				return;
-			}
-			qspSetVarValueByReference(var, varIndex, &v);
-			if (v.IsStr) free(QSP_STR(v));
-		}
-		if (!pos) return;
-		s = qspSkipSpaces(pos + QSP_LEN(QSP_COMMA));
-		if (!(*s))
+		if (!commaPos) break;
+		curPos = qspSkipSpaces(commaPos + QSP_LEN(QSP_COMMA));
+		if (!(*curPos))
 		{
 			qspSetError(QSP_ERR_SYNTAX);
+			if (eqPos) *eqPos = QSP_EQUAL[0];
 			return;
 		}
+	}
+	if (eqPos)
+	{
+		oldRefreshCount = qspRefreshCount;
+		v = qspExprValue(eqPos + QSP_LEN(QSP_EQUAL));
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+		{
+			*eqPos = QSP_EQUAL[0];
+			return;
+		}
+		varName = qspDelSpcCanRetSelf(s);
+		qspSetVarValue(varName, &v, QSP_EQUAL[0]);
+		if (varName != s) free(varName);
+		if (v.IsStr) free(QSP_STR(v));
+		*eqPos = QSP_EQUAL[0];
 	}
 }
 

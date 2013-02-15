@@ -117,20 +117,6 @@ QSP_CHAR *qspDelSpc(QSP_CHAR *s)
 	return str;
 }
 
-QSP_CHAR *qspDelSpcPartial(QSP_CHAR *s, QSP_CHAR *pos)
-{
-	QSP_CHAR ch, *res;
-	if (pos)
-	{
-		ch = *pos;
-		*pos = 0;
-		res = qspDelSpc(s);
-		*pos = ch;
-		return res;
-	}
-	return qspDelSpc(s);
-}
-
 QSP_CHAR *qspDelSpcCanRetSelf(QSP_CHAR *s)
 {
 	int len;

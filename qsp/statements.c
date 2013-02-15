@@ -787,7 +787,14 @@ QSP_CHAR *qspGetLineLabel(QSP_CHAR *str)
 	if (*str == QSP_LABEL[0])
 	{
 		delimPos = qspStrChar(str, QSP_STATDELIM[0]);
-		str = qspDelSpcPartial(str + 1, delimPos);
+		if (delimPos)
+		{
+			*delimPos = 0;
+			str = qspDelSpc(str + 1);
+			*delimPos = QSP_STATDELIM[0];
+		}
+		else
+			str = qspDelSpc(str + 1);
 		qspUpperStr(str);
 		return str;
 	}
