@@ -42,24 +42,23 @@
 
 	void qspInitCallBacks();
 	void qspSetCallBack(int, QSP_CALLBACK);
-	void qspCallDebug(QSP_CHAR *);
+	void qspCallDebug(QSPString str);
 	void qspCallSetTimer(int);
 	void qspCallRefreshInt(QSP_BOOL);
-	void qspCallSetInputStrText(QSP_CHAR *);
-	void qspCallAddMenuItem(QSP_CHAR *, QSP_CHAR *);
-	void qspCallSystem(QSP_CHAR *);
-	void qspCallOpenGame(QSP_CHAR *);
-	void qspCallSaveGame(QSP_CHAR *);
-	void qspCallShowMessage(QSP_CHAR *);
+	void qspCallSetInputStrText(QSPString text);
+	void qspCallAddMenuItem(QSPString name, QSPString imgPath);
+	void qspCallSystem(QSPString cmd);
+	void qspCallOpenGame(QSPString file);
+	void qspCallSaveGame(QSPString file);
+	void qspCallShowMessage(QSPString text);
 	int qspCallShowMenu();
-	void qspCallShowPicture(QSP_CHAR *);
+	void qspCallShowPicture(QSPString file);
 	void qspCallShowWindow(int, QSP_BOOL);
-	void qspCallPlayFile(QSP_CHAR *, int);
-	QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *);
+	void qspCallPlayFile(QSPString file, int volume);
+	QSP_BOOL qspCallIsPlayingFile(QSPString file);
 	void qspCallSleep(int);
-	int qspCallGetMSCount();
-	void qspCallCloseFile(QSP_CHAR *);
+	void qspCallCloseFile(QSPString file);
 	void qspCallDeleteMenu();
-	QSP_CHAR *qspCallInputBox(QSP_CHAR *);
+	QSPString qspCallInputBox(QSPString text);
 
 #endif

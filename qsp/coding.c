@@ -196,7 +196,7 @@ static char qspDirectConvertSB(char, unsigned char *);
 static char qspReverseConvertSB(char, unsigned char *);
 static int qspDirectConvertUC(char, int *);
 static char qspReverseConvertUC(int, int *);
-static char *qspQSPToGameString(QSP_CHAR *, QSP_BOOL, QSP_BOOL);
+static char *qspQSPToGameString(QSPString s, QSP_BOOL isUCS2, QSP_BOOL isCode);
 
 static int qspUCS2StrLen(char *str)
 {
@@ -259,41 +259,43 @@ static char qspReverseConvertUC(int ch, int *table)
 	return 0x20;
 }
 
-QSP_CHAR *qspCodeReCode(QSP_CHAR *str, QSP_BOOL isCode)
+QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode)
 {
-	int len = qspStrLen(str);
-	QSP_CHAR ch, *buf = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
-	buf[len] = 0;
+	int curLen, len = qspStrLen(str);
+	QSP_CHAR ch, *origBuf, *buf = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
+	origBuf = str.Str;
+	curLen = len;
 	if (isCode)
 	{
-		while (--len >= 0)
+		while (--curLen >= 0)
 		{
-			ch = str[len];
+			ch = origBuf[curLen];
 			if (ch == QSP_CODREMOV)
 				ch = (QSP_CHAR)-QSP_CODREMOV;
 			else
 				ch -= QSP_CODREMOV;
-			buf[len] = ch;
+			buf[curLen] = ch;
 		}
 	}
 	else
 	{
-		while (--len >= 0)
+		while (--curLen >= 0)
 		{
-			ch = str[len];
+			ch = origBuf[curLen];
 			if (ch == (QSP_CHAR)-QSP_CODREMOV)
 				ch = QSP_CODREMOV;
 			else
 				ch += QSP_CODREMOV;
-			buf[len] = ch;
+			buf[curLen] = ch;
 		}
 	}
-	return buf;
+	return qspStringFromLen(buf, len);
 }
 
-static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
+static char *qspQSPToGameString(QSPString s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 {
 	unsigned short uCh, *ptr;
+	QSP_CHAR *origBuf = s.Str;
 	int len = qspStrLen(s);
 	char ch, *ret = (char *)malloc((len + 1) * (isUCS2 ? 2 : 1));
 	if (isUCS2)
@@ -304,7 +306,7 @@ static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 		{
 			while (--len >= 0)
 			{
-				uCh = (unsigned short)QSP_BTOWC(s[len]);
+				uCh = (unsigned short)origBuf[len];
 				if (uCh == QSP_CODREMOV)
 					uCh = (unsigned short)-QSP_CODREMOV;
 				else
@@ -316,7 +318,7 @@ static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 		{
 			while (--len >= 0)
 			{
-				uCh = (unsigned short)QSP_BTOWC(s[len]);
+				uCh = (unsigned short)origBuf[len];
 				ptr[len] = QSP_FIXBYTESORDER(uCh);
 			}
 		}
@@ -328,7 +330,7 @@ static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 		{
 			while (--len >= 0)
 			{
-				ch = QSP_FROM_OS_CHAR(s[len]);
+				ch = QSP_FROM_OS_CHAR(origBuf[len]);
 				if (ch == QSP_CODREMOV)
 					ch = -QSP_CODREMOV;
 				else
@@ -339,40 +341,40 @@ static char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 		else
 		{
 			while (--len >= 0)
-				ret[len] = QSP_FROM_OS_CHAR(s[len]);
+				ret[len] = QSP_FROM_OS_CHAR(origBuf[len]);
 		}
 	}
 	return ret;
 }
 
-QSP_CHAR *qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded)
+QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded)
 {
 	char ch;
 	unsigned short uCh, *ptr;
-	int len = (isUCS2 ? qspUCS2StrLen(s) : (int)strlen(s));
-	QSP_CHAR *ret = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
-	ret[len] = 0;
+	int curLen, len = (isUCS2 ? qspUCS2StrLen(s) : (int)strlen(s));
+	QSP_CHAR *ret = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
+	curLen = len;
 	if (isUCS2)
 	{
 		ptr = (unsigned short *)s;
 		if (isCoded)
 		{
-			while (--len >= 0)
+			while (--curLen >= 0)
 			{
-				uCh = QSP_FIXBYTESORDER(ptr[len]);
+				uCh = QSP_FIXBYTESORDER(ptr[curLen]);
 				if (uCh == (unsigned short)-QSP_CODREMOV)
 					uCh = QSP_CODREMOV;
 				else
 					uCh += QSP_CODREMOV;
-				ret[len] = QSP_WCTOB(uCh);
+				ret[curLen] = uCh;
 			}
 		}
 		else
 		{
-			while (--len >= 0)
+			while (--curLen >= 0)
 			{
-				uCh = QSP_FIXBYTESORDER(ptr[len]);
-				ret[len] = QSP_WCTOB(uCh);
+				uCh = QSP_FIXBYTESORDER(ptr[curLen]);
+				ret[curLen] = uCh;
 			}
 		}
 	}
@@ -380,26 +382,26 @@ QSP_CHAR *qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded)
 	{
 		if (isCoded)
 		{
-			while (--len >= 0)
+			while (--curLen >= 0)
 			{
-				ch = s[len];
+				ch = s[curLen];
 				if (ch == -QSP_CODREMOV)
 					ch = QSP_CODREMOV;
 				else
 					ch += QSP_CODREMOV;
-				ret[len] = (QSP_CHAR)QSP_TO_OS_CHAR(ch);
+				ret[curLen] = (QSP_CHAR)QSP_TO_OS_CHAR(ch);
 			}
 		}
 		else
 		{
-			while (--len >= 0)
-				ret[len] = (QSP_CHAR)QSP_TO_OS_CHAR(s[len]);
+			while (--curLen >= 0)
+				ret[curLen] = (QSP_CHAR)QSP_TO_OS_CHAR(s[curLen]);
 		}
 	}
-	return ret;
+	return qspStringFromLen(ret, len);
 }
 
-int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSP_CHAR *delim, char ***res)
+int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSPString delim, char ***res)
 {
 	char *delimStr, *newStr, **ret, *found, *curPos = str;
 	int charSize, delimSize, allocChars, count = 0, bufSize = 8;
@@ -437,43 +439,43 @@ int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSP_CHAR *delim, char ***res)
 	return count;
 }
 
-int qspReCodeGetIntVal(QSP_CHAR *val)
+int qspReCodeGetIntVal(QSPString val)
 {
 	int num;
-	QSP_CHAR *temp = qspCodeReCode(val, QSP_FALSE);
+	QSPString temp = qspCodeReCode(val, QSP_FALSE);
 	num = qspStrToNum(temp, 0);
-	free(temp);
+	qspFreeString(temp);
 	return num;
 }
 
-int qspCodeWriteIntVal(QSP_CHAR **s, int len, int val, QSP_BOOL isCode)
+void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL isCode)
 {
-	QSP_CHAR buf[12], *temp;
-	qspNumToStr(buf, val);
+	QSP_CHAR buf[12];
+	QSPString temp, str = qspNumToStr(buf, val);
 	if (isCode)
 	{
-		temp = qspCodeReCode(buf, QSP_TRUE);
-		len = qspAddText(s, temp, len, -1, QSP_FALSE);
-		free(temp);
+		temp = qspCodeReCode(str, QSP_TRUE);
+		qspAddText(s, temp, QSP_FALSE);
+		qspFreeString(temp);
 	}
 	else
-		len = qspAddText(s, buf, len, -1, QSP_FALSE);
-	return qspAddText(s, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
+		qspAddText(s, str, QSP_FALSE);
+	qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
 }
 
-int qspCodeWriteVal(QSP_CHAR **s, int len, QSP_CHAR *val, QSP_BOOL isCode)
+void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL isCode)
 {
-	QSP_CHAR *temp;
-	if (val)
+	QSPString temp;
+	if (val.Str)
 	{
 		if (isCode)
 		{
 			temp = qspCodeReCode(val, QSP_TRUE);
-			len = qspAddText(s, temp, len, -1, QSP_FALSE);
-			free(temp);
+			qspAddText(s, temp, QSP_FALSE);
+			qspFreeString(temp);
 		}
 		else
-			len = qspAddText(s, val, len, -1, QSP_FALSE);
+			qspAddText(s, val, QSP_FALSE);
 	}
-	return qspAddText(s, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
+	qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
 }

@@ -31,6 +31,6 @@
 	/* External functions */
 	void qspSetError(int);
 	void qspResetError();
-	QSP_CHAR *qspGetErrorDesc(int);
+	QSPString qspGetErrorDesc(int errorNum);
 
 #endif

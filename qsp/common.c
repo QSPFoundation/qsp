@@ -22,18 +22,16 @@
 #include "objects.h"
 #include "playlist.h"
 #include "regexp.h"
+#include "text.h"
 #include "variables.h"
 
 static unsigned int qspRandX[55], qspRandY[256], qspRandZ;
 static int qspRandI, qspRandJ;
 QSP_BOOL qspIsDebug = QSP_FALSE;
-QSP_CHAR *qspCurDesc = 0;
-int qspCurDescLen = 0;
-QSP_CHAR *qspCurVars = 0;
-int qspCurVarsLen = 0;
-QSP_CHAR *qspCurInput = 0;
-int qspCurInputLen = 0;
-QSP_CHAR *qspViewPath = 0;
+QSPString qspCurDesc;
+QSPString qspCurVars;
+QSPString qspCurInput;
+QSPString qspViewPath;
 int qspTimerInterval = 0;
 QSP_BOOL qspIsMainDescChanged = QSP_FALSE;
 QSP_BOOL qspIsVarsDescChanged = QSP_FALSE;
@@ -59,29 +57,22 @@ void qspMemClear(QSP_BOOL isFirst)
 	qspClearRegExps(isFirst);
 	if (!isFirst)
 	{
-		if (qspCurDesc)
-		{
-			free(qspCurDesc);
-			if (qspCurDescLen) qspIsMainDescChanged = QSP_TRUE;
-		}
-		if (qspCurVars)
-		{
-			free(qspCurVars);
-			if (qspCurVarsLen) qspIsVarsDescChanged = QSP_TRUE;
-		}
-		if (qspCurInput) free(qspCurInput);
-		if (qspViewPath) free(qspViewPath);
+		if (!qspIsEmpty(qspCurDesc)) qspIsMainDescChanged = QSP_TRUE;
+		if (!qspIsEmpty(qspCurVars)) qspIsVarsDescChanged = QSP_TRUE;
+
+		qspFreeString(qspCurDesc);
+		qspFreeString(qspCurVars);
+		qspFreeString(qspCurInput);
+		qspFreeString(qspViewPath);
+
 		for (i = qspSavedVarsGroupsCount - 1; i >= 0; --i)
 			qspClearVarsList(qspSavedVarsGroups[i].Vars, qspSavedVarsGroups[i].VarsCount);
 		if (qspSavedVarsGroups) free(qspSavedVarsGroups);
 	}
-	qspCurDesc = 0;
-	qspCurDescLen = 0;
-	qspCurVars = 0;
-	qspCurVarsLen = 0;
-	qspCurInput = 0;
-	qspCurInputLen = 0;
-	qspViewPath = 0;
+	qspCurDesc = qspNullString;
+	qspCurVars = qspNullString;
+	qspCurInput = qspNullString;
+	qspViewPath = qspNullString;
 	qspSavedVarsGroups = 0;
 	qspSavedVarsGroupsCount = 0;
 }

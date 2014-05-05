@@ -23,12 +23,13 @@
 #include "text.h"
 #include "variables.h"
 
-QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
+QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
 	QSPVar *var;
 	QSPVariant arg;
-	int ind, itemsCount, maxItems, len;
-	QSP_CHAR *menuLocs[QSP_MAXMENUITEMS], *imgPath, *str, *pos, *pos2;
+	int ind, itemsCount, maxItems;
+	QSPString menuLocs[QSP_MAXMENUITEMS], imgPath, str;
+	QSP_CHAR *pos, *pos2;
 	if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0))) return QSP_FALSE;
 	qspCallDeleteMenu();
 	if (count == 1)
@@ -52,8 +53,9 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 	while (ind < var->ValsCount)
 	{
 		if (itemsCount == maxItems) break;
-		if (!((str = var->Values[ind].Str) && qspIsAnyString(str))) break;
-		if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM, 0)))
+		str = var->Values[ind].Str;
+		if (!(str.Str && qspIsAnyString(str))) break;
+		if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM)))
 		{
 			qspSetError(QSP_ERR_COLONNOTFOUND);
 			return QSP_FALSE;
@@ -63,22 +65,20 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 			qspSetError(QSP_ERR_CANTADDMENUITEM);
 			return QSP_FALSE;
 		}
-		if (pos = qspInStrRChars(str, QSP_MENUDELIM, pos2))
+		if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
 		{
-			len = (int)(pos2 - pos) - 1;
-			imgPath = (qspIsAnyString(++pos2) ? qspGetAbsFromRelPath(pos2) : 0);
+			imgPath = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
+			imgPath = (qspIsAnyString(imgPath) ? qspGetAbsFromRelPath(imgPath) : qspNullString);
 		}
 		else
 		{
 			pos = pos2;
-			len = -1;
-			imgPath = 0;
+			pos2 = str.End;
+			imgPath = qspNullString;
 		}
-		menuLocs[itemsCount++] = qspGetNewText(pos + 1, len);
-		*pos = 0;
-		qspCallAddMenuItem(str, imgPath);
-		*pos = QSP_MENUDELIM[0];
-		if (imgPath) free(imgPath);
+		menuLocs[itemsCount++] = qspGetNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
+		qspCallAddMenuItem(qspStringFromPair(str.Str, pos), imgPath);
+		qspFreeString(imgPath);
 		++ind;
 	}
 	if (itemsCount)
@@ -91,7 +91,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSP_CHAR **jumpTo, in
 			qspExecLocByNameWithArgs(menuLocs[ind], &arg, 1, 0);
 		}
 		while (--itemsCount >= 0)
-			free(menuLocs[itemsCount]);
+			qspFreeString(menuLocs[itemsCount]);
 	}
 	return QSP_FALSE;
 }

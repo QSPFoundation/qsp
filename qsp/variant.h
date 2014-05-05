@@ -29,7 +29,7 @@
 	{
 		union
 		{
-			QSP_CHAR *Str;
+			QSPString Str;
 			int Num;
 		} Val;
 		QSP_BOOL IsStr;

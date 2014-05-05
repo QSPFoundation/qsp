@@ -28,7 +28,7 @@ int qspCurSelAction = -1;
 QSP_BOOL qspIsActionsChanged = QSP_FALSE;
 QSP_BOOL qspCurIsShowActs = QSP_TRUE;
 
-static int qspActIndex(QSP_CHAR *);
+static int qspActIndex(QSPString name);
 
 void qspClearActions(QSP_BOOL isFirst)
 {
@@ -37,8 +37,8 @@ void qspClearActions(QSP_BOOL isFirst)
 	{
 		for (i = 0; i < qspCurActionsCount; ++i)
 		{
-			if (qspCurActions[i].Image) free(qspCurActions[i].Image);
-			free(qspCurActions[i].Desc);
+			qspFreeString(qspCurActions[i].Image);
+			qspFreeString(qspCurActions[i].Desc);
 			qspFreePrepLines(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount);
 		}
 		qspIsActionsChanged = QSP_TRUE;
@@ -47,12 +47,14 @@ void qspClearActions(QSP_BOOL isFirst)
 	qspCurSelAction = -1;
 }
 
-static int qspActIndex(QSP_CHAR *name)
+static int qspActIndex(QSPString name)
 {
+	QSPString uName, bufName;
 	int i, actNameLen, bufSize;
-	QSP_CHAR *uName, *buf;
+	QSP_CHAR *buf;
 	if (!qspCurActionsCount) return -1;
-	qspUpperStr(uName = qspGetNewText(name, -1));
+	uName = qspGetNewText(name);
+	qspUpperStr(&uName);
 	bufSize = 64;
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspCurActionsCount; ++i)
@@ -63,16 +65,17 @@ static int qspActIndex(QSP_CHAR *name)
 			bufSize = actNameLen + 16;
 			buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
 		}
-		qspStrCopy(buf, qspCurActions[i].Desc);
-		qspUpperStr(buf);
-		if (!qspStrsComp(buf, uName))
+		memcpy(buf, qspCurActions[i].Desc.Str, actNameLen * sizeof(QSP_CHAR));
+		bufName = qspStringFromLen(buf, actNameLen);
+		qspUpperStr(&bufName);
+		if (!qspStrsComp(bufName, uName))
 		{
-			free(uName);
+			qspFreeString(uName);
 			free(buf);
 			return i;
 		}
 	}
-	free(uName);
+	qspFreeString(uName);
 	free(buf);
 	return -1;
 }
@@ -80,7 +83,7 @@ static int qspActIndex(QSP_CHAR *name)
 void qspAddAction(QSPVariant *args, int count, QSPLineOfCode *code, int start, int end, QSP_BOOL isManageLines)
 {
 	QSPCurAct *act;
-	QSP_CHAR *imgPath;
+	QSPString imgPath;
 	if (qspActIndex(QSP_STR(args[0])) >= 0) return;
 	if (qspCurActionsCount == QSP_MAXACTIONS)
 	{
@@ -90,10 +93,10 @@ void qspAddAction(QSPVariant *args, int count, QSPLineOfCode *code, int start, i
 	if (count == 2 && qspIsAnyString(QSP_STR(args[1])))
 		imgPath = qspGetAbsFromRelPath(QSP_STR(args[1]));
 	else
-		imgPath = 0;
+		imgPath = qspNullString;
 	act = qspCurActions + qspCurActionsCount++;
 	act->Image = imgPath;
-	act->Desc = qspGetNewText(QSP_STR(args[0]), -1);
+	act->Desc = qspGetNewText(QSP_STR(args[0]));
 	qspCopyPrepLines(&act->OnPressLines, code, start, end);
 	act->OnPressLinesCount = end - start;
 	act->Location = qspRealCurLoc;
@@ -129,40 +132,42 @@ void qspExecAction(int ind)
 	qspRealCurLoc = oldLoc;
 }
 
-QSP_CHAR *qspGetAllActionsAsCode()
+QSPString qspGetAllActionsAsCode()
 {
-	int len = 0, count, i;
-	QSP_CHAR *res, *temp;
-	res = qspGetNewText(QSP_FMT(""), 0);
+	int count, i;
+	QSPString res, temp;
+	res = qspNewEmptyString();
 	for (i = 0; i < qspCurActionsCount; ++i)
 	{
-		len = qspAddText(&res, QSP_FMT("ACT '"), len, 5, QSP_FALSE);
-		temp = qspReplaceText(qspCurActions[i].Desc, QSP_FMT("'"), QSP_FMT("''"));
-		len = qspAddText(&res, temp, len, -1, QSP_FALSE);
-		free(temp);
-		if (qspCurActions[i].Image)
+		qspAddText(&res, QSP_STATIC_STR(QSP_FMT("ACT '")), QSP_FALSE);
+		temp = qspReplaceText(qspCurActions[i].Desc, QSP_STATIC_STR(QSP_FMT("'")), QSP_STATIC_STR(QSP_FMT("''")));
+		qspAddText(&res, temp, QSP_FALSE);
+		qspFreeString(temp);
+		if (qspCurActions[i].Image.Str)
 		{
-			len = qspAddText(&res, QSP_FMT("','"), len, 3, QSP_FALSE);
-			temp = qspReplaceText(qspCurActions[i].Image + qspQstPathLen, QSP_FMT("'"), QSP_FMT("''"));
-			len = qspAddText(&res, temp, len, -1, QSP_FALSE);
-			free(temp);
+			qspAddText(&res, QSP_STATIC_STR(QSP_FMT("','")), QSP_FALSE);
+			temp = qspReplaceText(
+				qspStringFromPair(qspCurActions[i].Image.Str + qspStrLen(qspQstPath), qspCurActions[i].Image.End),
+				QSP_STATIC_STR(QSP_FMT("'")), QSP_STATIC_STR(QSP_FMT("''")));
+			qspAddText(&res, temp, QSP_FALSE);
+			qspFreeString(temp);
 		}
-		len = qspAddText(&res, QSP_FMT("':"), len, 2, QSP_FALSE);
+		qspAddText(&res, QSP_STATIC_STR(QSP_FMT("':")), QSP_FALSE);
 		count = qspCurActions[i].OnPressLinesCount;
 		if (count == 1 && qspIsAnyString(qspCurActions[i].OnPressLines->Str))
-			len = qspAddText(&res, qspCurActions[i].OnPressLines->Str, len, -1, QSP_FALSE);
+			qspAddText(&res, qspCurActions[i].OnPressLines->Str, QSP_FALSE);
 		else
 		{
 			if (count >= 2)
 			{
-				len = qspAddText(&res, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
-				temp = qspJoinPrepLines(qspCurActions[i].OnPressLines, count, QSP_STRSDELIM);
-				len = qspAddText(&res, temp, len, -1, QSP_FALSE);
-				free(temp);
+				qspAddText(&res, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+				temp = qspJoinPrepLines(qspCurActions[i].OnPressLines, count, QSP_STATIC_STR(QSP_STRSDELIM));
+				qspAddText(&res, temp, QSP_FALSE);
+				qspFreeString(temp);
 			}
-			len = qspAddText(&res, QSP_STRSDELIM QSP_FMT("END"), len, QSP_LEN(QSP_STRSDELIM) + 3, QSP_FALSE);
+			qspAddText(&res, QSP_STATIC_STR(QSP_STRSDELIM QSP_FMT("END")), QSP_FALSE);
 		}
-		len = qspAddText(&res, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
+		qspAddText(&res, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
 	}
 	return res;
 }
@@ -172,8 +177,8 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
 	QSPVariant args[2];
 	QSPLineOfCode code;
 	int i, oldRefreshCount, count, offset;
-	QSP_CHAR ch, *pos = s->Str + s->Stats[statPos].EndPos;
-	if (*pos != QSP_COLONDELIM[0])
+	QSP_CHAR *lastPos, *firstPos = s->Str.Str + s->Stats[statPos].EndPos;
+	if (*firstPos != QSP_COLONDELIM[0])
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return;
@@ -184,22 +189,19 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
 		return;
 	}
 	oldRefreshCount = qspRefreshCount;
-	*pos = 0;
-	count = qspGetStatArgs(s->Str + s->Stats[statPos].ParamPos, qspStatAct, args);
-	*pos = QSP_COLONDELIM[0];
+	count = qspGetStatArgs(qspStringFromPair(s->Str.Str + s->Stats[statPos].ParamPos, firstPos), qspStatAct, args);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
 	++statPos;
-	code.Str = pos + 1;
+	firstPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+	lastPos = s->Str.Str + s->Stats[endPos - 1].EndPos;
+	if (lastPos != s->Str.End && *lastPos == QSP_COLONDELIM[0]) lastPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+	code.Str = qspStringFromPair(firstPos, lastPos);
 	code.Label = qspGetLineLabel(code.Str);
 	code.LineNum = 0;
 	code.IsMultiline = QSP_FALSE;
-	pos = s->Str + s->Stats[endPos - 1].EndPos;
-	if (*pos == QSP_COLONDELIM[0]) ++pos;
-	ch = *pos;
-	*pos = 0;
 	code.StatsCount = endPos - statPos;
 	code.Stats = (QSPCachedStat *)malloc(code.StatsCount * sizeof(QSPCachedStat));
-	offset = (int)(code.Str - s->Str);
+	offset = (int)(firstPos - s->Str.Str);
 	for (i = 0; i < code.StatsCount; ++i)
 	{
 		code.Stats[i].Stat = s->Stats[statPos].Stat;
@@ -208,35 +210,32 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
 		++statPos;
 	}
 	qspAddAction(args, count, &code, 0, 1, QSP_FALSE);
-	*pos = ch;
 	qspFreeVariants(args, count);
 	free(code.Stats);
-	if (code.Label) free(code.Label);
+	qspFreeString(code.Label);
 }
 
 void qspStatementMultilineAddAct(QSPLineOfCode *s, int endLine, int lineInd, QSP_BOOL isManageLines)
 {
 	QSPVariant args[2];
 	int count, oldRefreshCount;
-	QSP_CHAR *pos;
 	QSPLineOfCode *line = s + lineInd;
-	pos = line->Str + line->Stats->EndPos;
 	oldRefreshCount = qspRefreshCount;
-	*pos = 0;
-	count = qspGetStatArgs(line->Str + line->Stats->ParamPos, qspStatAct, args);
-	*pos = QSP_COLONDELIM[0];
+	count = qspGetStatArgs(
+		qspStringFromPair(line->Str.Str + line->Stats->ParamPos, line->Str.Str + line->Stats->EndPos),
+		qspStatAct, args);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
 	qspAddAction(args, count, s, lineInd + 1, endLine, isManageLines);
 	qspFreeVariants(args, count);
 }
 
-QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
+QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
 	int actInd = qspActIndex(QSP_STR(args[0]));
 	if (actInd < 0) return QSP_FALSE;
 	if (qspCurSelAction >= actInd) qspCurSelAction = -1;
-	if (qspCurActions[actInd].Image) free(qspCurActions[actInd].Image);
-	free(qspCurActions[actInd].Desc);
+	qspFreeString(qspCurActions[actInd].Image);
+	qspFreeString(qspCurActions[actInd].Desc);
 	qspFreePrepLines(qspCurActions[actInd].OnPressLines, qspCurActions[actInd].OnPressLinesCount);
 	--qspCurActionsCount;
 	while (actInd < qspCurActionsCount)

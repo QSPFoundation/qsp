@@ -19,15 +19,13 @@
 
 #ifdef _DEFAULT_BINDING
 
+#include <windows.h>
 #include "../../text.h"
 
-#ifdef _UNICODE
-	#define QSP_WCSTOMBSLEN(a) (int)wcstombs(0, a, 0)
-	#define QSP_WCSTOMBS wcstombs
-#else
-	#define QSP_WCSTOMBSLEN qspStrLen
-	#define QSP_WCSTOMBS qspStrNCopy
-#endif
+#define QSP_WCSTOMBSLEN(a) (int)wcstombs(0, a, 0)
+#define QSP_WCSTOMBS wcstombs
+
+DWORD qspLastTicks = 0;
 
 char *qspToSysString(QSP_CHAR *s)
 {
@@ -35,6 +33,33 @@ char *qspToSysString(QSP_CHAR *s)
 	char *ret = (char *)malloc(len);
 	QSP_WCSTOMBS(ret, s, len);
 	return ret;
+}
+
+int qspSysGetMsecsCount()
+{
+	DWORD curTicks = GetTickCount();
+	int result = (qspLastTicks != 0 ? (int)(curTicks - qspLastTicks) : 0);
+	qspLastTicks = curTicks;
+	return result;
+}
+
+char *qspSysLoadGameData(QSPString fileName, int *fileSize)
+{
+	FILE *file;
+	int size;
+	char *buf;
+	QSP_CHAR *systemName = qspStringToC(fileName);
+	file = _wfopen(systemName, QSP_FMT("rb"));
+	free(systemName);
+	if (!file) return 0;
+	fseek(file, 0, SEEK_END);
+	size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	buf = (char *)malloc(size);
+	fread(buf, 1, size, file);
+	fclose(file);
+	*fileSize = size;
+	return buf;
 }
 
 #endif

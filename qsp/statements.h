@@ -29,13 +29,12 @@
 	#define QSP_STATFORTO QSP_FMT("TO")
 	#define QSP_STATFORSTEP QSP_FMT("STEP")
 
-	typedef QSP_BOOL (*QSP_STATEMENT)(QSPVariant *, int, QSP_CHAR **, int);
+	typedef QSP_BOOL (*QSP_STATEMENT)(QSPVariant *, int, QSPString *, int);
 
 	typedef struct
 	{
 		int Code;
-		QSP_CHAR *Name;
-		int NameLen;
+		QSPString Name;
 	} QSPStatName;
 
 	typedef struct
@@ -117,10 +116,10 @@
 
 	/* External functions */
 	void qspInitStats();
-	int qspGetStatArgs(QSP_CHAR *, int, QSPVariant *);
+	int qspGetStatArgs(QSPString s, int statCode, QSPVariant *args);
 	QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *, int, int, QSP_BOOL);
-	void qspExecStringAsCodeWithArgs(QSP_CHAR *, QSPVariant *, int, QSPVariant *);
-	QSP_CHAR *qspGetLineLabel(QSP_CHAR *);
-	void qspInitLineOfCode(QSPLineOfCode *, QSP_CHAR *, int);
+	void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, int count, QSPVariant *res);
+	QSPString qspGetLineLabel(QSPString str);
+	void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum);
 
 #endif

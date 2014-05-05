@@ -171,16 +171,10 @@
     <ClCompile Include="..\..\..\qsp\bindings\default\default_callbacks.c">
       <Filter>Source Files\bindings\default</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\qsp\bindings\default\default_coding.c">
-      <Filter>Source Files\bindings\default</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\qsp\bindings\default\default_control.c">
       <Filter>Source Files\bindings\default</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\qsp\bindings\flash\flash_callbacks.c">
-      <Filter>Source Files\bindings\flash</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\qsp\bindings\flash\flash_coding.c">
       <Filter>Source Files\bindings\flash</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\qsp\bindings\flash\flash_control.c">
@@ -189,19 +183,25 @@
     <ClCompile Include="..\..\..\qsp\bindings\java\java_callbacks.c">
       <Filter>Source Files\bindings\java</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\qsp\bindings\java\java_coding.c">
-      <Filter>Source Files\bindings\java</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\qsp\bindings\java\java_control.c">
       <Filter>Source Files\bindings\java</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\qsp\bindings\android\android_callbacks.c">
       <Filter>Source Files\bindings\android</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\qsp\bindings\android\android_coding.c">
+    <ClCompile Include="..\..\..\qsp\bindings\android\android_control.c">
       <Filter>Source Files\bindings\android</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\qsp\bindings\android\android_control.c">
+    <ClCompile Include="..\..\..\qsp\bindings\default\default_platform.c">
+      <Filter>Source Files\bindings\default</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\flash\flash_platform.c">
+      <Filter>Source Files\bindings\flash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\java\java_platform.c">
+      <Filter>Source Files\bindings\java</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\qsp\bindings\android\android_platform.c">
       <Filter>Source Files\bindings\android</Filter>
     </ClCompile>
   </ItemGroup>

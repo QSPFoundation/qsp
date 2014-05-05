@@ -25,8 +25,8 @@
 
 	typedef struct
 	{
-		QSP_CHAR *Image;
-		QSP_CHAR *Desc;
+		QSPString Image;
+		QSPString Desc;
 	} QSPObj;
 
 	extern QSPObj qspCurObjects[QSP_MAXOBJECTS];
@@ -38,10 +38,10 @@
 	/* External functions */
 	void qspClearObjects(QSP_BOOL);
 	void qspClearObjectsWithNotify();
-	int qspObjIndex(QSP_CHAR *);
+	int qspObjIndex(QSPString name);
 	/* Statements */
-	QSP_BOOL qspStatementAddObject(QSPVariant *, int, QSP_CHAR **, int);
-	QSP_BOOL qspStatementDelObj(QSPVariant *, int, QSP_CHAR **, int);
-	QSP_BOOL qspStatementUnSelect(QSPVariant *, int, QSP_CHAR **, int);
+	QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+	QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+	QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
 #endif

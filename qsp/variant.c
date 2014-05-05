@@ -22,14 +22,14 @@
 void qspFreeVariants(QSPVariant *args, int count)
 {
 	while (--count >= 0)
-		if (args[count].IsStr) free(QSP_STR(args[count]));
+		if (args[count].IsStr) free(QSP_STR(args[count]).Str);
 }
 
 QSPVariant qspGetEmptyVariant(QSP_BOOL isStringType)
 {
 	QSPVariant ret;
 	if (ret.IsStr = isStringType)
-		QSP_STR(ret) = qspGetNewText(QSP_FMT(""), 0);
+		QSP_STR(ret) = qspNewEmptyString();
 	else
 		QSP_NUM(ret) = 0;
 	return ret;
@@ -46,14 +46,14 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
 		{
 			num = qspStrToNum(QSP_PSTR(val), &isValid);
 			if (!isValid) return QSP_TRUE;
-			free(QSP_PSTR(val));
+			free(QSP_PSTR(val).Str);
 			QSP_PNUM(val) = num;
 			val->IsStr = QSP_FALSE;
 		}
 	}
 	else if (isToString)
 	{
-		QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)), -1);
+		QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)));
 		val->IsStr = QSP_TRUE;
 	}
 	return QSP_FALSE;
@@ -62,7 +62,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
 void qspCopyVariant(QSPVariant *dest, QSPVariant *src)
 {
 	if (dest->IsStr = src->IsStr)
-		QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src), -1);
+		QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
 	else
 		QSP_PNUM(dest) = QSP_PNUM(src);
 }

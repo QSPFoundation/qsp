@@ -25,15 +25,15 @@
 
 	typedef struct
 	{
-		QSP_CHAR *Image;
-		QSP_CHAR *Desc;
+		QSPString Image;
+		QSPString Desc;
 		QSPLineOfCode *OnPressLines;
 		int OnPressLinesCount;
 	} QSPLocAct;
 	typedef struct
 	{
-		QSP_CHAR *Name;
-		QSP_CHAR *Desc;
+		QSPString Name;
+		QSPString Desc;
 		QSPLineOfCode *OnVisitLines;
 		int OnVisitLinesCount;
 		QSPLocAct Actions[QSP_MAXACTIONS];
@@ -41,7 +41,7 @@
 	typedef struct
 	{
 		int Index;
-		QSP_CHAR *Name;
+		QSPString Name;
 	} QSPLocName;
 
 	extern QSPLocation *qspLocs;
@@ -54,11 +54,11 @@
 	/* External functions */
 	void qspCreateWorld(int, int);
 	void qspPrepareLocs();
-	int qspLocIndex(QSP_CHAR *);
+	int qspLocIndex(QSPString name);
 	void qspExecLocByIndex(int, QSP_BOOL, QSP_BOOL);
-	void qspExecLocByName(QSP_CHAR *, QSP_BOOL);
-	void qspExecLocByNameWithArgs(QSP_CHAR *, QSPVariant *, int, QSPVariant *);
-	void qspExecLocByVarNameWithArgs(QSP_CHAR *, QSPVariant *, int);
+	void qspExecLocByName(QSPString name, QSP_BOOL isChangeDesc);
+	void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, int count, QSPVariant *res);
+	void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, int count);
 	void qspRefreshCurLoc(QSP_BOOL, QSPVariant *, int);
 
 #endif

@@ -20,10 +20,7 @@
 #ifndef QSP_JAVADEFINES
 	#define QSP_JAVADEFINES
 
-	#ifdef _UNICODE
-		typedef wchar_t QSP_CHAR;
-	#endif
-
+	typedef wchar_t QSP_CHAR;
 	typedef int QSP_CALLBACK;
 
 	void QSPIsInCallBack(QSP_BOOL *res);

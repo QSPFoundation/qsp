@@ -21,9 +21,7 @@
 #ifndef QSP_FLASHDEFINES
 	#define QSP_FLASHDEFINES
 
-	#ifdef _UNICODE
-		typedef unsigned short QSP_CHAR;
-	#endif
+	typedef unsigned short QSP_CHAR;
 
 	typedef struct
 	{

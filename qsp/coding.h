@@ -31,12 +31,12 @@
 
 	/* External functions */
 	int qspStrCmpSB(char *, char *, unsigned char *);
-	QSP_CHAR *qspCodeReCode(QSP_CHAR *, QSP_BOOL);
-	QSP_CHAR *qspGameToQSPString(char *, QSP_BOOL, QSP_BOOL);
-	int qspSplitGameStr(char *, QSP_BOOL, QSP_CHAR *, char ***);
-	int qspReCodeGetIntVal(QSP_CHAR *);
-	int qspCodeWriteIntVal(QSP_CHAR **, int, int, QSP_BOOL);
-	int qspCodeWriteVal(QSP_CHAR **, int, QSP_CHAR *, QSP_BOOL);
-	char *qspToSysString(QSP_CHAR *);
+	QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode);
+	QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded);
+	int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSPString delim, char ***res);
+	int qspReCodeGetIntVal(QSPString val);
+	void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL isCode);
+	void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL isCode);
+	char *qspToSysString(QSPString s);
 
 #endif

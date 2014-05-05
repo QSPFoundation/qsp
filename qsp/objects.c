@@ -37,8 +37,8 @@ void qspClearObjects(QSP_BOOL isFirst)
 	{
 		for (i = 0; i < qspCurObjectsCount; ++i)
 		{
-			if (qspCurObjects[i].Image) free(qspCurObjects[i].Image);
-			free(qspCurObjects[i].Desc);
+			qspFreeString(qspCurObjects[i].Image);
+			qspFreeString(qspCurObjects[i].Desc);
 		}
 		qspIsObjectsChanged = QSP_TRUE;
 	}
@@ -49,20 +49,20 @@ void qspClearObjects(QSP_BOOL isFirst)
 void qspClearObjectsWithNotify()
 {
 	QSPVariant v;
-	QSP_CHAR **objs;
+	QSPString *objs;
 	int i, oldRefreshCount, oldCount = qspCurObjectsCount;
 	if (oldCount)
 	{
-		objs = (QSP_CHAR **)malloc(oldCount * sizeof(QSP_CHAR *));
+		objs = (QSPString *)malloc(oldCount * sizeof(QSPString));
 		for (i = 0; i < oldCount; ++i)
-			qspAddText(objs + i, qspCurObjects[i].Desc, 0, -1, QSP_TRUE);
+			qspAddText(objs + i, qspCurObjects[i].Desc, QSP_TRUE);
 		qspClearObjects(QSP_FALSE);
 		v.IsStr = QSP_TRUE;
 		oldRefreshCount = qspRefreshCount;
 		for (i = 0; i < oldCount; ++i)
 		{
 			QSP_STR(v) = objs[i];
-			qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJDEL"), &v, 1);
+			qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &v, 1);
 			if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		}
 		qspFreeStrs(objs, oldCount);
@@ -76,7 +76,7 @@ static void qspRemoveObject(int index)
 	if (qspCurSelObject >= index) qspCurSelObject = -1;
 	name.IsStr = QSP_TRUE;
 	QSP_STR(name) = qspCurObjects[index].Desc;
-	if (qspCurObjects[index].Image) free(qspCurObjects[index].Image);
+	qspFreeString(qspCurObjects[index].Image);
 	--qspCurObjectsCount;
 	while (index < qspCurObjectsCount)
 	{
@@ -84,45 +84,48 @@ static void qspRemoveObject(int index)
 		++index;
 	}
 	qspIsObjectsChanged = QSP_TRUE;
-	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJDEL"), &name, 1);
-	free(QSP_STR(name));
+	qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &name, 1);
+	qspFreeString(QSP_STR(name));
 }
 
-int qspObjIndex(QSP_CHAR *name)
+int qspObjIndex(QSPString name)
 {
+	QSPString locName;
 	int i, objNameLen, bufSize;
-	QSP_CHAR *uName, *buf;
+	QSP_CHAR *buf;
 	if (!qspCurObjectsCount) return -1;
-	qspUpperStr(uName = qspGetNewText(name, -1));
+	name = qspGetNewText(name);
+	qspUpperStr(&name);
 	bufSize = 32;
 	buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	for (i = 0; i < qspCurObjectsCount; ++i)
 	{
 		objNameLen = qspStrLen(qspCurObjects[i].Desc);
-		if (objNameLen >= bufSize)
+		if (objNameLen > bufSize)
 		{
 			bufSize = objNameLen + 8;
 			buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
 		}
-		qspStrCopy(buf, qspCurObjects[i].Desc);
-		qspUpperStr(buf);
-		if (!qspStrsComp(buf, uName))
+		memcpy(buf, qspCurObjects[i].Desc.Str, objNameLen * sizeof(QSP_CHAR));
+		locName = qspStringFromLen(buf, objNameLen);
+		qspUpperStr(&locName);
+		if (!qspStrsComp(locName, name))
 		{
-			free(uName);
+			free(name.Str);
 			free(buf);
 			return i;
 		}
 	}
-	free(uName);
+	free(name.Str);
 	free(buf);
 	return -1;
 }
 
-QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
+QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
 	QSPObj *obj;
 	int i, objInd;
-	QSP_CHAR *imgPath;
+	QSPString imgPath;
 	if (count == 3)
 	{
 		objInd = QSP_NUM(args[2]) - 1;
@@ -139,20 +142,20 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSP_CHAR **jumpTo, i
 	if (count >= 2 && qspIsAnyString(QSP_STR(args[1])))
 		imgPath = qspGetAbsFromRelPath(QSP_STR(args[1]));
 	else
-		imgPath = 0;
+		imgPath = qspNullString;
 	for (i = qspCurObjectsCount; i > objInd; --i)
 		qspCurObjects[i] = qspCurObjects[i - 1];
 	++qspCurObjectsCount;
 	obj = qspCurObjects + objInd;
 	obj->Image = imgPath;
-	obj->Desc = qspGetNewText(QSP_STR(args[0]), -1);
+	obj->Desc = qspGetNewText(QSP_STR(args[0]));
 	qspIsObjectsChanged = QSP_TRUE;
 	if (count == 3) count = 2;
-	qspExecLocByVarNameWithArgs(QSP_FMT("ONOBJADD"), args, count);
+	qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJADD")), args, count);
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
+QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
 	switch (extArg)
 	{
@@ -169,7 +172,7 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSP_CHAR **jumpTo, int 
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSP_CHAR **jumpTo, int extArg)
+QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
 	qspCurSelObject = -1;
 	return QSP_FALSE;

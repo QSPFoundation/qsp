@@ -101,12 +101,6 @@
     <ClInclude Include="src\msgdlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\qsp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\qsp_default.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\textbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>

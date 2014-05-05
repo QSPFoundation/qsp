@@ -23,13 +23,10 @@
 	#define QSP_RANDMASK 0x7FFFFFFF
 
 	extern QSP_BOOL qspIsDebug;
-	extern QSP_CHAR *qspCurDesc;
-	extern int qspCurDescLen;
-	extern QSP_CHAR *qspCurVars;
-	extern int qspCurVarsLen;
-	extern QSP_CHAR *qspCurInput;
-	extern int qspCurInputLen;
-	extern QSP_CHAR *qspViewPath;
+	extern QSPString qspCurDesc;
+	extern QSPString qspCurVars;
+	extern QSPString qspCurInput;
+	extern QSPString qspViewPath;
 	extern int qspTimerInterval;
 	extern QSP_BOOL qspIsMainDescChanged;
 	extern QSP_BOOL qspIsVarsDescChanged;

@@ -29,18 +29,18 @@
 	typedef struct
 	{
 		int Num;
-		QSP_CHAR *Str;
+		QSPString Str;
 	} QSPVarValue;
 
 	typedef struct
 	{
 		int Index;
-		QSP_CHAR *Str;
+		QSPString Str;
 	} QSPVarIndex;
 
 	typedef struct
 	{
-		QSP_CHAR *Name;
+		QSPString Name;
 		QSPVarValue *Values;
 		int ValsCount;
 		QSPVarIndex *Indices;
@@ -61,30 +61,30 @@
 	/* External functions */
 	void qspClearVars(QSP_BOOL);
 	void qspEmptyVar(QSPVar *);
-	QSPVar *qspVarReference(QSP_CHAR *, QSP_BOOL);
-	QSPVar *qspVarReferenceWithType(QSP_CHAR *, QSP_BOOL, QSP_BOOL *);
+	QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate);
+	QSPVar *qspVarReferenceWithType(QSPString name, QSP_BOOL isCreate, QSP_BOOL *isString);
 	void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
 	QSPVariant qspGetVarValueByReference(QSPVar *, int, QSP_BOOL);
-	QSP_CHAR *qspGetVarStrValue(QSP_CHAR *);
-	int qspGetVarNumValue(QSP_CHAR *);
-	QSPVariant qspGetVar(QSP_CHAR *);
+	QSPString qspGetVarStrValue(QSPString name);
+	int qspGetVarNumValue(QSPString name);
+	QSPVariant qspGetVar(QSPString name);
 	void qspPrepareGlobalVars();
 	int qspPrepareLocalVars(QSPVar **);
 	void qspRestoreLocalVars(QSPVar *, int, QSPVarsGroup *, int);
 	void qspClearLocalVars(QSPVar *, int);
 	void qspRestoreVarsList(QSPVar *, int);
 	void qspClearVarsList(QSPVar *, int);
-	int qspArraySize(QSP_CHAR *);
-	int qspArrayPos(QSP_CHAR *, QSPVariant *, int, QSP_BOOL);
-	QSPVariant qspArrayMinMaxItem(QSP_CHAR *, QSP_BOOL);
+	int qspArraySize(QSPString name);
+	int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
+	QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin);
 	int qspGetVarsCount();
 	void qspSetArgs(QSPVar *, QSPVariant *, int);
 	void qspApplyResult(QSPVar *, QSPVariant *);
 	void qspMoveVar(QSPVar *, QSPVar *);
 	/* Statements */
-	void qspStatementSetVarValue(QSP_CHAR *);
-	void qspStatementLocal(QSP_CHAR *);
-	QSP_BOOL qspStatementCopyArr(QSPVariant *, int, QSP_CHAR **, int);
-	QSP_BOOL qspStatementKillVar(QSPVariant *, int, QSP_CHAR **, int);
+	void qspStatementSetVarValue(QSPString s);
+	void qspStatementLocal(QSPString s);
+	QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+	QSP_BOOL qspStatementKillVar(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
 #endif

@@ -25,7 +25,6 @@
 #include "../../common.h"
 #include "../../errors.h"
 #include "../../objects.h"
-#include "../../text.h"
 
 extern int _call_java(int a, int b, int c, int d);
 
@@ -233,7 +232,7 @@ void qspCallSleep(int msecs)
 	}
 }
 
-int qspCallGetMSCount()
+int qspSysGetMsecsCount()
 {
 	/* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
 	QSPCallState state;
@@ -272,7 +271,7 @@ void qspCallDeleteMenu()
 	}
 }
 
-QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
+QSPString qspCallInputBox(QSPString text)
 {
 	/* Здесь вводим текст */
 	QSPCallState state;
@@ -289,7 +288,7 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 		qspRestoreCallState(&state);
 	}
 	else
-		buffer = qspGetNewText(QSP_FMT(""), 0);
+		buffer = qspNewEmptyString();
 	return buffer;
 }
 

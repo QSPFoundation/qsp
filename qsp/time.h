@@ -23,6 +23,7 @@
 	extern int qspMSCount;
 
 	/* External functions */
+	int qspSysGetMsecsCount();
 	void qspResetTime(int);
 	int qspGetTime();
 

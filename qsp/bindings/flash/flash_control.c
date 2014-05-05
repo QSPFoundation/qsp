@@ -552,7 +552,7 @@ AS3_Val QSPLoadGameWorld(void *param, AS3_Val args)
 	qspResetError();
 	if (qspIsDisableCodeExec) return AS3_False();
 	fileNameWC = qspC2W(fileName);
-	qspOpenQuest(fileNameWC, QSP_FALSE);
+	qspOpenQuestFromFile(fileNameWC, QSP_TRUE);
 	free(fileNameWC);
 	if (qspErrorNum) return AS3_False();
 	return AS3_True();
@@ -574,7 +574,7 @@ AS3_Val QSPLoadGameWorldFromData(void *param, AS3_Val args)
 	AS3_ByteArray_readBytes(ptr, data, dataSize);
 	ptr[dataSize] = ptr[dataSize + 1] = ptr[dataSize + 2] = 0;
 	fileNameWC = qspC2W(fileName);
-	qspOpenQuestFromData(ptr, dataSize + 3, fileNameWC, QSP_FALSE);
+	qspOpenQuestFromData(ptr, dataSize + 3, fileNameWC, QSP_TRUE);
 	free(fileNameWC);
 	free(ptr);
 	if (qspErrorNum) return AS3_False();

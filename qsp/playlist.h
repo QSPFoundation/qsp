@@ -24,7 +24,7 @@
 	#define QSP_PLVOLUMEDELIM QSP_FMT("*")
 	#define QSP_MAXPLFILES 500
 
-	extern QSP_CHAR *qspPLFiles[QSP_MAXPLFILES];
+	extern QSPString qspPLFiles[QSP_MAXPLFILES];
 	extern int qspPLFilesCount;
 
 	/* External functions */
@@ -32,7 +32,7 @@
 	void qspPlayPLFiles();
 	void qspRefreshPlayList();
 	/* Statements */
-	QSP_BOOL qspStatementPlayFile(QSPVariant *, int, QSP_CHAR **, int);
-	QSP_BOOL qspStatementCloseFile(QSPVariant *, int, QSP_CHAR **, int);
+	QSP_BOOL qspStatementPlayFile(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+	QSP_BOOL qspStatementCloseFile(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
 #endif

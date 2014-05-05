@@ -26,8 +26,8 @@
 
 	typedef struct
 	{
-		QSP_CHAR *Image;
-		QSP_CHAR *Desc;
+		QSPString Image;
+		QSPString Desc;
 		QSPLineOfCode *OnPressLines;
 		int OnPressLinesCount;
 		int Location;
@@ -46,10 +46,10 @@
 	void qspClearActions(QSP_BOOL);
 	void qspAddAction(QSPVariant *, int, QSPLineOfCode *, int, int, QSP_BOOL);
 	void qspExecAction(int);
-	QSP_CHAR *qspGetAllActionsAsCode();
+	QSPString qspGetAllActionsAsCode();
 	/* Statements */
 	void qspStatementSinglelineAddAct(QSPLineOfCode *, int, int);
 	void qspStatementMultilineAddAct(QSPLineOfCode *, int, int, QSP_BOOL);
-	QSP_BOOL qspStatementDelAct(QSPVariant *, int, QSP_CHAR **, int);
+	QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
 #endif

@@ -69,35 +69,35 @@
 
 	enum
 	{
-		QSP_CALL_DEBUG, /* void func(const QSP_CHAR *str) */
-		QSP_CALL_ISPLAYINGFILE, /* QSP_BOOL func(const QSP_CHAR *file) */
-		QSP_CALL_PLAYFILE, /* void func(const QSP_CHAR *file, int volume) */
-		QSP_CALL_CLOSEFILE, /* void func(const QSP_CHAR *file) */
-		QSP_CALL_SHOWIMAGE, /* void func(const QSP_CHAR *file) */
+		QSP_CALL_DEBUG, /* void func(QSPString str) */
+		QSP_CALL_ISPLAYINGFILE, /* QSP_BOOL func(QSPString file) */
+		QSP_CALL_PLAYFILE, /* void func(QSPString file, int volume) */
+		QSP_CALL_CLOSEFILE, /* void func(QSPString file) */
+		QSP_CALL_SHOWIMAGE, /* void func(QSPString file) */
 		QSP_CALL_SHOWWINDOW, /* void func(int type, QSP_BOOL isShow) */
 		QSP_CALL_DELETEMENU, /* void func() */
-		QSP_CALL_ADDMENUITEM, /* void func(const QSP_CHAR *name, const QSP_CHAR *imgPath) */
+		QSP_CALL_ADDMENUITEM, /* void func(QSPString name, QSPString imgPath) */
 		QSP_CALL_SHOWMENU, /* int func() */
-		QSP_CALL_SHOWMSGSTR, /* void func(const QSP_CHAR *str) */
+		QSP_CALL_SHOWMSGSTR, /* void func(QSPString text) */
 		QSP_CALL_REFRESHINT, /* void func(QSP_BOOL isRedraw) */
 		QSP_CALL_SETTIMER, /* void func(int msecs) */
-		QSP_CALL_SETINPUTSTRTEXT, /* void func(const QSP_CHAR *text) */
-		QSP_CALL_SYSTEM, /* void func(const QSP_CHAR *str) */
-		QSP_CALL_OPENGAMESTATUS, /* void func(const QSP_CHAR *file) */
-		QSP_CALL_SAVEGAMESTATUS, /* void func(const QSP_CHAR *file) */
+		QSP_CALL_SETINPUTSTRTEXT, /* void func(QSPString text) */
+		QSP_CALL_SYSTEM, /* void func(QSPString cmd) */
+		QSP_CALL_OPENGAMESTATUS, /* void func(QSPString file) */
+		QSP_CALL_SAVEGAMESTATUS, /* void func(QSPString file) */
 		QSP_CALL_SLEEP, /* void func(int msecs) */
-		QSP_CALL_GETMSCOUNT, /* int func() */
-		QSP_CALL_INPUTBOX, /* void func(const QSP_CHAR *text, QSP_CHAR *buffer, int maxLen) */
+		QSP_CALL_INPUTBOX, /* void func(QSPString text, QSP_CHAR *buffer, int maxLen) */
 		QSP_CALL_DUMMY
 	};
 
-	#ifdef _UNICODE
-		#define QSP_FMT2(x) L##x
-		#define QSP_FMT(x) QSP_FMT2(x)
-	#else
-		typedef char QSP_CHAR;
-		#define QSP_FMT(x) x
-	#endif
+	#define QSP_FMT2(x) L##x
+	#define QSP_FMT(x) QSP_FMT2(x)
+
+	typedef struct
+	{
+		QSP_CHAR *Str;
+		QSP_CHAR *End;
+	} QSPString;
 
 	typedef int QSP_BOOL;
 

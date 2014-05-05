@@ -42,7 +42,7 @@ void qspSetCallBack(int type, QSP_CALLBACK func)
 	qspCallBacks[type] = func;
 }
 
-void qspCallDebug(QSP_CHAR *str)
+void qspCallDebug(QSPString str)
 {
 	/* Здесь передаем управление отладчику */
 	QSPCallState state;
@@ -78,7 +78,7 @@ void qspCallRefreshInt(QSP_BOOL isRedraw)
 	}
 }
 
-void qspCallSetInputStrText(QSP_CHAR *text)
+void qspCallSetInputStrText(QSPString text)
 {
 	/* Здесь устанавливаем текст строки ввода */
 	QSPCallState state;
@@ -90,7 +90,7 @@ void qspCallSetInputStrText(QSP_CHAR *text)
 	}
 }
 
-void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
+void qspCallAddMenuItem(QSPString name, QSPString imgPath)
 {
 	/* Здесь добавляем пункт меню */
 	QSPCallState state;
@@ -102,7 +102,7 @@ void qspCallAddMenuItem(QSP_CHAR *name, QSP_CHAR *imgPath)
 	}
 }
 
-void qspCallSystem(QSP_CHAR *cmd)
+void qspCallSystem(QSPString cmd)
 {
 	/* Здесь выполняем системный вызов */
 	QSPCallState state;
@@ -114,7 +114,7 @@ void qspCallSystem(QSP_CHAR *cmd)
 	}
 }
 
-void qspCallOpenGame(QSP_CHAR *file)
+void qspCallOpenGame(QSPString file)
 {
 	/* Здесь позволяем пользователю выбрать файл */
 	/* состояния игры для загрузки и загружаем его */
@@ -127,7 +127,7 @@ void qspCallOpenGame(QSP_CHAR *file)
 	}
 }
 
-void qspCallSaveGame(QSP_CHAR *file)
+void qspCallSaveGame(QSPString file)
 {
 	/* Здесь позволяем пользователю выбрать файл */
 	/* для сохранения состояния игры и сохраняем */
@@ -141,7 +141,7 @@ void qspCallSaveGame(QSP_CHAR *file)
 	}
 }
 
-void qspCallShowMessage(QSP_CHAR *text)
+void qspCallShowMessage(QSPString text)
 {
 	/* Здесь показываем сообщение */
 	QSPCallState state;
@@ -168,7 +168,7 @@ int qspCallShowMenu()
 	return -1;
 }
 
-void qspCallShowPicture(QSP_CHAR *file)
+void qspCallShowPicture(QSPString file)
 {
 	/* Здесь показываем изображение */
 	QSPCallState state;
@@ -192,7 +192,7 @@ void qspCallShowWindow(int type, QSP_BOOL isShow)
 	}
 }
 
-void qspCallPlayFile(QSP_CHAR *file, int volume)
+void qspCallPlayFile(QSPString file, int volume)
 {
 	/* Здесь начинаем воспроизведение файла с заданной громкостью */
 	QSPCallState state;
@@ -204,7 +204,7 @@ void qspCallPlayFile(QSP_CHAR *file, int volume)
 	}
 }
 
-QSP_BOOL qspCallIsPlayingFile(QSP_CHAR *file)
+QSP_BOOL qspCallIsPlayingFile(QSPString file)
 {
 	/* Здесь проверяем, проигрывается ли файл */
 	QSPCallState state;
@@ -231,22 +231,7 @@ void qspCallSleep(int msecs)
 	}
 }
 
-int qspCallGetMSCount()
-{
-	/* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
-	QSPCallState state;
-	int count;
-	if (qspCallBacks[QSP_CALL_GETMSCOUNT])
-	{
-		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		count = qspCallBacks[QSP_CALL_GETMSCOUNT]();
-		qspRestoreCallState(&state);
-		return count;
-	}
-	return 0;
-}
-
-void qspCallCloseFile(QSP_CHAR *file)
+void qspCallCloseFile(QSPString file)
 {
 	/* Здесь выполняем закрытие файла */
 	QSPCallState state;
@@ -270,7 +255,7 @@ void qspCallDeleteMenu()
 	}
 }
 
-QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
+QSPString qspCallInputBox(QSPString text)
 {
 	/* Здесь вводим текст */
 	QSPCallState state;
@@ -279,15 +264,17 @@ QSP_CHAR *qspCallInputBox(QSP_CHAR *text)
 	if (qspCallBacks[QSP_CALL_INPUTBOX])
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
+		/* Prepare input buffer */
 		buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
 		*buffer = 0;
+		/* Process input */
 		qspCallBacks[QSP_CALL_INPUTBOX](text, buffer, maxLen);
 		buffer[maxLen] = 0;
+		/* Clean up */
 		qspRestoreCallState(&state);
+		return qspStringFromC(buffer);
 	}
-	else
-		buffer = qspGetNewText(QSP_FMT(""), 0);
-	return buffer;
+	return qspNewEmptyString();
 }
 
 #endif

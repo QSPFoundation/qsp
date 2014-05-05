@@ -488,7 +488,7 @@ void QSPLoadGameWorld(QSP_BOOL *res, const QSP_CHAR *fileName)
 		*res = QSP_FALSE;
 		return;
 	}
-	qspOpenQuest((QSP_CHAR *)fileName, QSP_FALSE);
+	qspOpenQuestFromFile((QSP_CHAR *)fileName, QSP_TRUE);
 	if (qspErrorNum)
 	{
 		*res = QSP_FALSE;
@@ -514,7 +514,7 @@ void QSPLoadGameWorldFromData(QSP_BOOL *res, const void *data, int dataSize, con
 	ptr = (char *)malloc(dataSize + 3);
 	memcpy(ptr, data, dataSize);
 	ptr[dataSize] = ptr[dataSize + 1] = ptr[dataSize + 2] = 0;
-	qspOpenQuestFromData(ptr, dataSize + 3, (QSP_CHAR *)fileName, QSP_FALSE);
+	qspOpenQuestFromData(ptr, dataSize + 3, (QSP_CHAR *)fileName, QSP_TRUE);
 	free(ptr);
 	if (qspErrorNum)
 	{

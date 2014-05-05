@@ -26,7 +26,7 @@
 	#include <wx/colordlg.h>
 	#include <wx/aboutdlg.h>
 	#include <wx/aui/aui.h>
-	#include "qsp_default.h"
+	#include <qsp_default.h>
 	#include "transhelper.h"
 	#include "inputbox.h"
 	#include "textbox.h"

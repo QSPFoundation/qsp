@@ -23,54 +23,74 @@
 #include "variables.h"
 #include "variant.h"
 
-int qspAddText(QSP_CHAR **dest, QSP_CHAR *val, int destLen, int valLen, QSP_BOOL isCreate)
+QSPString qspNullString;
+QSPString qspEmptyString;
+
+QSP_CHAR *qspStringToC(QSPString s)
 {
-	int ret;
+	QSP_CHAR *string;
+	int stringLen = qspStrLen(s);
+	string = (QSP_CHAR *)malloc((stringLen + 1) * sizeof(QSP_CHAR));
+	memcpy(string, s.Str, stringLen * sizeof(QSP_CHAR));
+	string[stringLen] = 0;
+	return string;
+}
+
+void qspAddText(QSPString *dest, QSPString val, QSP_BOOL isCreate)
+{
+	int destLen, valLen;
 	QSP_CHAR *destPtr;
-	if (valLen < 0) valLen = qspStrLen(val);
-	if (!isCreate && *dest)
+	valLen = qspStrLen(val);
+	if (!isCreate && dest->Str)
 	{
-		if (destLen < 0) destLen = qspStrLen(*dest);
-		ret = destLen + valLen;
-		destPtr = (QSP_CHAR *)realloc(*dest, (ret + 1) * sizeof(QSP_CHAR));
-		*dest = destPtr;
+		destLen = qspStrLen(*dest);
+		destPtr = (QSP_CHAR *)realloc(dest->Str, (destLen + valLen) * sizeof(QSP_CHAR));
+		dest->Str = destPtr;
 		destPtr += destLen;
 	}
 	else
 	{
-		ret = valLen;
-		destPtr = (QSP_CHAR *)malloc((ret + 1) * sizeof(QSP_CHAR));
-		*dest = destPtr;
+		destPtr = (QSP_CHAR *)malloc(valLen * sizeof(QSP_CHAR));
+		dest->Str = destPtr;
 	}
-	qspStrNCopy(destPtr, val, valLen);
-	destPtr[valLen] = 0;
-	return ret;
+	dest->End = destPtr + valLen;
+	memcpy(destPtr, val.Str, valLen * sizeof(QSP_CHAR));
 }
 
-QSP_CHAR *qspGetNewText(QSP_CHAR *val, int valLen)
+void qspUpdateText(QSPString *dest, QSPString val)
 {
-	QSP_CHAR *buf;
-	qspAddText(&buf, val, 0, valLen, QSP_TRUE);
-	return buf;
+	dest->End = dest->Str;
+	qspAddText(dest, val, QSP_FALSE);
 }
 
-QSP_CHAR *qspGetAddText(QSP_CHAR *dest, QSP_CHAR *val, int destLen, int valLen)
+QSPString qspGetNewText(QSPString val)
 {
-	qspAddText(&dest, val, destLen, valLen, QSP_FALSE);
+	QSPString string;
+	qspAddText(&string, val, QSP_TRUE);
+	return string;
+}
+
+QSPString qspGetAddText(QSPString dest, QSPString val)
+{
+	qspAddText(&dest, val, QSP_FALSE);
 	return dest;
 }
 
-QSP_BOOL qspClearText(void **text, int *textLen)
+QSPString qspNewEmptyString()
 {
-	if (*text)
+	return qspGetNewText(qspEmptyString);
+}
+
+QSP_BOOL qspClearText(QSPString *s)
+{
+	int strLen;
+	if (s->Str)
 	{
-		free(*text);
-		*text = 0;
-		if (*textLen)
-		{
-			*textLen = 0;
-			return QSP_TRUE;
-		}
+		strLen = (int)(s->End - s->Str);
+		free(s->Str);
+		s->Str = 0;
+		s->End = 0;
+		if (strLen) return QSP_TRUE;
 	}
 	return QSP_FALSE;
 }
@@ -82,227 +102,182 @@ QSP_BOOL qspIsInList(QSP_CHAR *list, QSP_CHAR ch)
 	return QSP_FALSE;
 }
 
-QSP_BOOL qspIsInListEOL(QSP_CHAR *list, QSP_CHAR ch)
-{
-	while (*list && *list != ch) ++list;
-	return (*list == ch);
-}
-
 QSP_BOOL qspIsDigit(QSP_CHAR ch)
 {
 	return (ch >= QSP_FMT('0') && ch <= QSP_FMT('9'));
 }
 
-QSP_CHAR *qspSkipSpaces(QSP_CHAR *s)
+void qspSkipSpaces(QSPString *s)
 {
-	while (qspIsInList(QSP_SPACES, *s)) ++s;
-	return s;
+	QSP_CHAR *pos = s->Str;
+	while (pos < s->End && qspIsInList(QSP_SPACES, *pos)) ++pos;
+	s->Str = pos;
 }
 
-QSP_CHAR *qspStrEnd(QSP_CHAR *s)
+/* TODO: rewrite */
+QSPString qspDelSpc(QSPString s)
 {
-	while (*s) ++s;
-	return s;
-}
-
-QSP_CHAR *qspDelSpc(QSP_CHAR *s)
-{
-	int len;
-	QSP_CHAR *str, *begin = qspSkipSpaces(s), *end = qspStrEnd(begin);
+	QSP_CHAR *begin, *end = s.End;
+	qspSkipSpaces(&s);
+	begin = s.Str;
 	while (begin < end && qspIsInList(QSP_SPACES, *(end - 1))) --end;
-	len = (int)(end - begin);
-	str = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
-	qspStrNCopy(str, begin, len);
-	str[len] = 0;
-	return str;
+	return qspStringFromPair(begin, end);
 }
 
-QSP_CHAR *qspDelSpcCanRetSelf(QSP_CHAR *s)
+QSP_BOOL qspIsAnyString(QSPString s)
 {
-	int len;
-	QSP_CHAR *str, *origEnd, *begin = qspSkipSpaces(s), *end = qspStrEnd(begin);
-	origEnd = end;
-	while (begin < end && qspIsInList(QSP_SPACES, *(end - 1))) --end;
-	if (begin == s && end == origEnd) return s;
-	len = (int)(end - begin);
-	str = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
-	qspStrNCopy(str, begin, len);
-	str[len] = 0;
-	return str;
+	qspSkipSpaces(&s);
+	return (s.Str != s.End);
 }
 
-QSP_BOOL qspIsAnyString(QSP_CHAR *s)
+void qspLowerStr(QSPString *str)
 {
-	return (*qspSkipSpaces(s) != 0);
+	QSP_CHAR *pos = str->Str;
+	while (pos < str->End) *pos++ = QSP_CHRLWR(*pos);
 }
 
-void qspLowerStr(QSP_CHAR *str)
+void qspUpperStr(QSPString *str)
 {
-	while (*str) *str++ = QSP_CHRLWR(*str);
+	QSP_CHAR *pos = str->Str;
+	while (pos < str->End) *pos++ = QSP_CHRUPR(*pos);
 }
 
-void qspUpperStr(QSP_CHAR *str)
-{
-	while (*str) *str++ = QSP_CHRUPR(*str);
-}
-
-int qspStrsNComp(QSP_CHAR *str1, QSP_CHAR *str2, int maxLen)
+int qspStrsNComp(QSPString str1, QSPString str2, int maxLen)
 {
 	int delta = 0;
-	while (maxLen-- && !(delta = (int)*str1 - *str2) && *str2)
-		++str1, ++str2;
+	QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;
+	while (maxLen-- && pos2 < str2.End && pos1 < str1.End && !(delta = (int)*pos1 - *pos2))
+		++pos1, ++pos2;
 	return delta;
 }
 
-int qspStrsComp(QSP_CHAR *str1, QSP_CHAR *str2)
+int qspStrsComp(QSPString str1, QSPString str2)
 {
-	int ret = 0;
-	while (!(ret = (int)*str1 - *str2) && *str2)
-		++str1, ++str2;
-	if (ret < 0)
-		return -1;
-	else if (ret > 0)
-		return 1;
+	int delta = 0;
+	QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;
+	while (pos2 < str2.End && pos1 < str1.End && !(delta = (int)*pos1 - *pos2))
+		++pos1, ++pos2;
+	if (delta) return delta;
+	return (pos1 == str1.End) ? ((pos2 == str2.End) ? 0 : -1) : 1;
+}
+
+QSP_CHAR *qspStrChar(QSPString str, QSP_CHAR ch)
+{
+	QSP_CHAR *pos = str.Str;
+	while (pos < str.End && *pos != ch) ++pos;
+	if (*pos == ch) return pos;
 	return 0;
 }
 
-QSP_CHAR *qspStrCopy(QSP_CHAR *strDest, QSP_CHAR *strSource)
+QSP_CHAR *qspStrStr(QSPString str, QSPString strSearch)
 {
-	QSP_CHAR *ret = strDest;
-	while (*strDest++ = *strSource++);
-	return ret;
-}
-
-QSP_CHAR *qspStrChar(QSP_CHAR *str, QSP_CHAR ch)
-{
-	while (*str && *str != ch) ++str;
-	if (*str == ch) return str;
-	return 0;
-}
-
-QSP_CHAR *qspStrNCopy(QSP_CHAR *strDest, QSP_CHAR *strSource, int maxLen)
-{
-	QSP_CHAR *ret = strDest;
-	while (maxLen-- && (*strDest++ = *strSource++));
-	return ret;
-}
-
-int qspStrLen(QSP_CHAR *str)
-{
-	QSP_CHAR *bos = str;
-	while (*str) ++str;
-	return (int)(str - bos);
-}
-
-QSP_CHAR *qspStrStr(QSP_CHAR *str, QSP_CHAR *strSearch)
-{
-	QSP_CHAR *s1, *s2;
-	while (*str)
+	QSP_CHAR *s1, *s2, *pos = str.Str;
+	while (pos < str.End)
 	{
-		s1 = str;
-		s2 = strSearch;
-		while (*s1 && *s2 && !((int)*s1 - *s2))
+		s1 = pos;
+		s2 = strSearch.Str;
+		while (s1 < str.End && s2 < strSearch.End && !((int)*s1 - *s2))
 			++s1, ++s2;
-		if (!(*s2)) return str;
-		++str;
+		if (s2 == strSearch.End) return pos;
+		++pos;
 	}
 	return 0;
 }
 
-QSP_CHAR *qspStrPBrk(QSP_CHAR *str, QSP_CHAR *strCharSet)
+QSP_CHAR *qspStrPBrk(QSPString str, QSP_CHAR *strCharSet)
 {
-	QSP_CHAR *set;
-	while (*str)
+	QSP_CHAR *set, *pos = str.Str;
+	while (pos < str.End)
 	{
 		for (set = strCharSet; *set; ++set)
-			if (*set == *str) return str;
-		++str;
+			if (*set == *pos) return pos;
+		++pos;
 	}
 	return 0;
 }
 
-QSP_CHAR *qspInStrRChars(QSP_CHAR *str, QSP_CHAR *chars, QSP_CHAR *end)
+QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars)
 {
-	QSP_CHAR *pos = 0;
-	while (*str)
+	QSP_CHAR *lastPos = 0, *pos = str.Str;
+	while (pos < str.End)
 	{
-		if (end && str == end) break;
-		if (qspIsInList(chars, *str)) pos = str;
-		++str;
+		if (qspIsInList(chars, *pos)) lastPos = pos;
+		++pos;
 	}
-	return pos;
+	return lastPos;
 }
 
-QSP_CHAR *qspJoinStrs(QSP_CHAR **s, int count, QSP_CHAR *delim)
+QSPString qspJoinStrs(QSPString *s, int count, QSPString delim)
 {
-	int i, txtLen = 0, txtRealLen = 0, bufSize = 256, lastIndex = count - 1, delimLen = qspStrLen(delim);
+	int i, curLen, txtLen = 0, txtRealLen = 0, bufSize = 256, delimLen = qspStrLen(delim);
 	QSP_CHAR *txt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
-	*txt = 0;
 	for (i = 0; i < count; ++i)
 	{
-		if ((txtLen += qspStrLen(s[i])) >= bufSize)
+		curLen = qspStrLen(s[i]);
+		if ((txtLen += curLen) > bufSize)
 		{
 			bufSize = txtLen + 128;
 			txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
 		}
-		qspStrCopy(txt + txtRealLen, s[i]);
-		if (i == lastIndex) break;
+		memcpy(txt + txtRealLen, s[i].Str, curLen * sizeof(QSP_CHAR));
+		if (i == count - 1) break;
 		txtRealLen = txtLen;
-		if ((txtLen += delimLen) >= bufSize)
+		if ((txtLen += delimLen) > bufSize)
 		{
 			bufSize = txtLen + 128;
 			txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
 		}
-		qspStrCopy(txt + txtRealLen, delim);
+		memcpy(txt + txtRealLen, delim.Str, delimLen * sizeof(QSP_CHAR));
 		txtRealLen = txtLen;
 	}
-	return txt;
+	return qspStringFromLen(txt, txtLen);
 }
 
-int qspSplitStr(QSP_CHAR *str, QSP_CHAR *delim, QSP_CHAR ***res)
+int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
 {
+	QSPString *ret;
 	int allocChars, count = 0, bufSize = 8, delimLen = qspStrLen(delim);
-	QSP_CHAR *newStr, **ret, *curPos = str, *found = qspStrStr(str, delim);
-	ret = (QSP_CHAR **)malloc(bufSize * sizeof(QSP_CHAR *));
+	QSP_CHAR *newStr, *found = qspStrStr(str, delim);
+	ret = (QSPString *)malloc(bufSize * sizeof(QSPString));
 	while (found)
 	{
-		allocChars = (int)(found - curPos);
-		newStr = (QSP_CHAR *)malloc((allocChars + 1) * sizeof(QSP_CHAR));
-		qspStrNCopy(newStr, curPos, allocChars);
-		newStr[allocChars] = 0;
+		allocChars = (int)(found - str.Str);
+		newStr = (QSP_CHAR *)malloc(allocChars * sizeof(QSP_CHAR));
+		memcpy(newStr, str.Str, allocChars * sizeof(QSP_CHAR));
 		if (++count > bufSize)
 		{
 			bufSize += 16;
-			ret = (QSP_CHAR **)realloc(ret, bufSize * sizeof(QSP_CHAR *));
+			ret = (QSPString *)realloc(ret, bufSize * sizeof(QSPString));
 		}
-		ret[count - 1] = newStr;
-		curPos = found + delimLen;
-		found = qspStrStr(curPos, delim);
+		ret[count - 1] = qspStringFromLen(newStr, allocChars);
+		str.Str = found + delimLen;
+		found = qspStrStr(str, delim);
 	}
-	newStr = (QSP_CHAR *)malloc((qspStrLen(curPos) + 1) * sizeof(QSP_CHAR));
-	qspStrCopy(newStr, curPos);
+	allocChars = qspStrLen(str);
+	newStr = (QSP_CHAR *)malloc(allocChars * sizeof(QSP_CHAR));
+	memcpy(newStr, str.Str, allocChars * sizeof(QSP_CHAR));
 	if (++count > bufSize)
-		ret = (QSP_CHAR **)realloc(ret, count * sizeof(QSP_CHAR *));
-	ret[count - 1] = newStr;
+		ret = (QSPString *)realloc(ret, count * sizeof(QSPString));
+	ret[count - 1] = qspStringFromLen(newStr, allocChars);
 	*res = ret;
 	return count;
 }
 
-void qspCopyStrs(QSP_CHAR ***dest, QSP_CHAR **src, int start, int end)
+void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end)
 {
 	int i, count = end - start;
 	if (src && count)
 	{
-		*dest = (QSP_CHAR **)malloc(count * sizeof(QSP_CHAR *));
+		*dest = (QSPString *)malloc(count * sizeof(QSPString));
 		i = 0;
 		while (start < end)
-			qspAddText(*dest + i++, src[start++], 0, -1, QSP_TRUE);
+			qspAddText(*dest + i++, src[start++], QSP_TRUE);
 	}
 	else
 		*dest = 0;
 }
 
-void qspFreeStrs(void **strs, int count)
+void qspFreeGameStrs(char **strs, int count)
 {
 	if (strs)
 	{
@@ -311,59 +286,82 @@ void qspFreeStrs(void **strs, int count)
 	}
 }
 
-QSP_BOOL qspIsNumber(QSP_CHAR *s)
+void qspFreeStrs(QSPString *strs, int count)
 {
-	s = qspSkipSpaces(s);
-	if (*s == QSP_FMT('-'))
-		++s;
-	else if (*s == QSP_FMT('+'))
-		++s;
-	if (qspIsDigit(*s))
+	if (strs)
 	{
-		do
-		{
-			++s;
-		} while (qspIsDigit(*s));
+		while (--count >= 0) free(strs[count].Str);
+		free(strs);
+	}
+}
+
+QSP_BOOL qspIsNumber(QSPString s)
+{
+	QSP_CHAR *pos;
+	qspSkipSpaces(&s);
+	pos = s.Str;
+	if (pos < s.End)
+	{
+		if (*pos == QSP_FMT('-'))
+			++pos;
+		else if (*pos == QSP_FMT('+'))
+			++pos;
 	}
 	else
 		return QSP_FALSE;
-	s = qspSkipSpaces(s);
-	return !(*s);
+	if (pos < s.End && qspIsDigit(*pos))
+	{
+		do
+		{
+			++pos;
+		} while (pos < s.End && qspIsDigit(*pos));
+	}
+	else
+		return QSP_FALSE;
+	s.Str = pos;
+	qspSkipSpaces(&s);
+	return qspIsEmpty(s);
 }
 
-int qspStrToNum(QSP_CHAR *s, QSP_BOOL *isValid)
+int qspStrToNum(QSPString s, QSP_BOOL *isValid)
 {
 	int num;
+	QSP_CHAR *pos;
 	QSP_BOOL isNeg = QSP_FALSE;
-	s = qspSkipSpaces(s);
-	if (*s == QSP_FMT('-'))
+	qspSkipSpaces(&s);
+	pos = s.Str;
+	if (pos < s.End)
 	{
-		isNeg = QSP_TRUE;
-		++s;
+		if (*pos == QSP_FMT('-'))
+		{
+			isNeg = QSP_TRUE;
+			++pos;
+		}
+		else if (*pos == QSP_FMT('+'))
+			++pos;
 	}
-	else if (*s == QSP_FMT('+'))
-		++s;
-	else if (!(*s)) /* special case, i.e. empty string must be convertible to 0 */
+	else /* special case, i.e. empty string must be convertible to 0 */
 	{
 		if (isValid) *isValid = QSP_TRUE;
 		return 0;
 	}
-	if (qspIsDigit(*s))
+	if (pos < s.End && qspIsDigit(*pos))
 	{
 		num = 0;
 		do
 		{
-			num = num * 10 + (*s - QSP_FMT('0'));
-			++s;
-		} while (qspIsDigit(*s));
+			num = num * 10 + (*pos - QSP_FMT('0'));
+			++pos;
+		} while (pos < s.End && qspIsDigit(*pos));
 	}
 	else
 	{
 		if (isValid) *isValid = QSP_FALSE;
 		return 0;
 	}
-	s = qspSkipSpaces(s);
-	if (*s)
+	s.Str = pos;
+	qspSkipSpaces(&s);
+	if (!qspIsEmpty(s))
 	{
 		if (isValid) *isValid = QSP_FALSE;
 		return 0;
@@ -373,9 +371,9 @@ int qspStrToNum(QSP_CHAR *s, QSP_BOOL *isValid)
 	return num;
 }
 
-QSP_CHAR *qspNumToStr(QSP_CHAR *buf, int val)
+QSPString qspNumToStr(QSP_CHAR *buf, int val)
 {
-	QSP_CHAR temp, *str = buf, *first = str;
+	QSP_CHAR temp, *last, *str = buf, *first = str;
 	if (val < 0)
 	{
 		*str++ = QSP_FMT('-');
@@ -387,7 +385,7 @@ QSP_CHAR *qspNumToStr(QSP_CHAR *buf, int val)
 		*str++ = (QSP_CHAR)(val % 10 + QSP_FMT('0'));
 		val /= 10;
 	} while (val > 0);
-	*str-- = 0;
+	last = str--;
 	while (first < str)
 	{
 		temp = *str;
@@ -396,45 +394,46 @@ QSP_CHAR *qspNumToStr(QSP_CHAR *buf, int val)
 		--str;
 		++first;
 	}
-	return buf;
+	return qspStringFromPair(buf, last);
 }
 
-QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
+QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 {
 	QSP_BOOL isLastDelim;
 	int strLen, c1, c2, c3;
-	QSP_CHAR quot, *pos = qspStrStr(txt, str);
+	QSP_CHAR quot, *lastPos, *pos = qspStrStr(txt, str);
 	if (!pos) return 0;
 	if (!(isIsolated || qspStrPBrk(txt, QSP_QUOTS QSP_LQUOT QSP_LRBRACK QSP_LSBRACK))) return pos;
 	strLen = qspStrLen(str);
-	pos = qspStrEnd(txt) - strLen + 1;
+	lastPos = txt.End - strLen + 1;
 	c1 = c2 = c3 = 0;
 	isLastDelim = QSP_TRUE;
-	while (txt < pos)
+	pos = txt.Str;
+	while (pos < lastPos)
 	{
-		if (qspIsInList(QSP_QUOTS, *txt))
+		if (qspIsInList(QSP_QUOTS, *pos))
 		{
-			quot = *txt;
-			while (++txt < pos)
-				if (*txt == quot && *(++txt) != quot) break;
-			if (txt >= pos) return 0;
+			quot = *pos;
+			while (++pos < lastPos)
+				if (*pos == quot && (++pos >= lastPos || *pos != quot)) break;
+			if (pos >= lastPos) return 0;
 			isLastDelim = QSP_TRUE;
 		}
-		if (*txt == QSP_LRBRACK[0])
+		if (*pos == QSP_LRBRACK[0])
 			++c1;
-		else if (*txt == QSP_RRBRACK[0])
+		else if (*pos == QSP_RRBRACK[0])
 		{
 			if (c1) --c1;
 		}
-		else if (*txt == QSP_LSBRACK[0])
+		else if (*pos == QSP_LSBRACK[0])
 			++c2;
-		else if (*txt == QSP_RSBRACK[0])
+		else if (*pos == QSP_RSBRACK[0])
 		{
 			if (c2) --c2;
 		}
-		else if (*txt == QSP_LQUOT[0])
+		else if (*pos == QSP_LQUOT[0])
 			++c3;
-		else if (*txt == QSP_RQUOT[0])
+		else if (*pos == QSP_RQUOT[0])
 		{
 			if (c3) --c3;
 		}
@@ -442,41 +441,34 @@ QSP_CHAR *qspStrPos(QSP_CHAR *txt, QSP_CHAR *str, QSP_BOOL isIsolated)
 		{
 			if (isIsolated)
 			{
-				if (qspIsInList(QSP_DELIMS, *txt))
+				if (qspIsInList(QSP_DELIMS, *pos))
 					isLastDelim = QSP_TRUE;
 				else if (isLastDelim)
 				{
-					if (qspIsInListEOL(QSP_DELIMS, txt[strLen]) && !qspStrsNComp(txt, str, strLen)) return txt;
+					if (pos >= lastPos - 1 || qspIsInList(QSP_DELIMS, pos[strLen]))
+					{
+						txt.Str = pos;
+						if (!qspStrsNComp(txt, str, strLen)) return pos;
+					}
 					isLastDelim = QSP_FALSE;
 				}
 			}
-			else if (!qspStrsNComp(txt, str, strLen))
-				return txt;
+			else
+			{
+				txt.Str = pos;
+				if (!qspStrsNComp(txt, str, strLen)) return pos;
+			}
 		}
-		++txt;
+		++pos;
 	}
 	return 0;
 }
 
-QSP_CHAR *qspStrPosPartial(QSP_CHAR *txt, QSP_CHAR *pos, QSP_CHAR *str, QSP_BOOL isIsolated)
-{
-	QSP_CHAR ch, *res;
-	if (pos)
-	{
-		ch = *pos;
-		*pos = 0;
-		res = qspStrPos(txt, str, isIsolated);
-		*pos = ch;
-		return res;
-	}
-	return qspStrPos(txt, str, isIsolated);
-}
-
-QSP_CHAR *qspReplaceText(QSP_CHAR *txt, QSP_CHAR *searchTxt, QSP_CHAR *repTxt)
+QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt)
 {
 	int txtLen, oldTxtLen, bufSize, searchLen, repLen, len;
 	QSP_CHAR *newTxt, *pos = qspStrStr(txt, searchTxt);
-	if (!pos) return qspGetNewText(txt, -1);
+	if (!pos) return qspGetNewText(txt);
 	bufSize = 256;
 	txtLen = oldTxtLen = 0;
 	searchLen = qspStrLen(searchTxt);
@@ -484,78 +476,80 @@ QSP_CHAR *qspReplaceText(QSP_CHAR *txt, QSP_CHAR *searchTxt, QSP_CHAR *repTxt)
 	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	do
 	{
-		len = (int)(pos - txt);
-		if ((txtLen += len + repLen) >= bufSize)
+		len = (int)(pos - txt.Str);
+		if ((txtLen += len + repLen) > bufSize)
 		{
 			bufSize = txtLen + 128;
 			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
 		}
-		qspStrNCopy(newTxt + oldTxtLen, txt, len);
-		qspStrCopy(newTxt + oldTxtLen + len, repTxt);
+		memcpy(newTxt + oldTxtLen, txt.Str, len * sizeof(QSP_CHAR));
+		memcpy(newTxt + oldTxtLen + len, repTxt.Str, repLen * sizeof(QSP_CHAR));
 		oldTxtLen = txtLen;
-		txt = pos + searchLen;
+		txt.Str = pos + searchLen;
 		pos = qspStrStr(txt, searchTxt);
 	} while (pos);
-	return qspGetAddText(newTxt, txt, txtLen, -1);
+	return qspGetAddText(qspStringFromLen(newTxt, txtLen), txt);
 }
 
-QSP_CHAR *qspFormatText(QSP_CHAR *txt, QSP_BOOL canReturnSelf)
+QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
 {
 	QSPVariant val;
+	QSPString leftSubEx, rightSubEx;
 	QSP_CHAR *newTxt, *lPos, *rPos;
 	int oldRefreshCount, len, txtLen, oldTxtLen, bufSize;
-	if (qspGetVarNumValue(QSP_FMT("DISABLESUBEX")))
+	if (qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DISABLESUBEX"))))
 	{
 		if (canReturnSelf) return txt;
-		return qspGetNewText(txt, -1);
+		return qspGetNewText(txt);
 	}
-	lPos = qspStrStr(txt, QSP_LSUBEX);
+	leftSubEx = QSP_STATIC_STR(QSP_LSUBEX);
+	lPos = qspStrStr(txt, leftSubEx);
 	if (!lPos)
 	{
 		if (canReturnSelf) return txt;
-		return qspGetNewText(txt, -1);
+		return qspGetNewText(txt);
 	}
 	bufSize = 256;
 	newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
 	txtLen = oldTxtLen = 0;
 	oldRefreshCount = qspRefreshCount;
+	rightSubEx = QSP_STATIC_STR(QSP_RSUBEX);
 	do
 	{
-		len = (int)(lPos - txt);
-		if ((txtLen += len) >= bufSize)
+		len = (int)(lPos - txt.Str);
+		if ((txtLen += len) > bufSize)
 		{
 			bufSize = txtLen + 128;
 			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
 		}
-		qspStrNCopy(newTxt + oldTxtLen, txt, len);
+		memcpy(newTxt + oldTxtLen, txt.Str, len * sizeof(QSP_CHAR));
 		oldTxtLen = txtLen;
-		txt = lPos + QSP_LEN(QSP_LSUBEX);
-		rPos = qspStrPos(txt, QSP_RSUBEX, QSP_FALSE);
+		txt.Str = lPos + QSP_STATIC_LEN(QSP_LSUBEX);
+		rPos = qspStrPos(txt, rightSubEx, QSP_FALSE);
 		if (!rPos)
 		{
 			qspSetError(QSP_ERR_BRACKNOTFOUND);
 			free(newTxt);
-			return 0;
+			return qspNullString;
 		}
-		*rPos = 0;
-		val = qspExprValue(txt);
-		*rPos = QSP_RSUBEX[0];
+		val = qspExprValue(qspStringFromPair(txt.Str, rPos));
 		if (qspRefreshCount != oldRefreshCount || qspErrorNum)
 		{
 			free(newTxt);
-			return 0;
+			return qspNullString;
 		}
 		qspConvertVariantTo(&val, QSP_TRUE);
-		if ((txtLen += qspStrLen(QSP_STR(val))) >= bufSize)
+		len = qspStrLen(QSP_STR(val));
+		if ((txtLen += len) > bufSize)
 		{
 			bufSize = txtLen + 128;
 			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
 		}
-		qspStrCopy(newTxt + oldTxtLen, QSP_STR(val));
-		free(QSP_STR(val));
+		memcpy(newTxt + oldTxtLen, QSP_STR(val).Str, len * sizeof(QSP_CHAR));
+		free(QSP_STR(val).Str);
 		oldTxtLen = txtLen;
-		txt = rPos + QSP_LEN(QSP_RSUBEX);
-		lPos = qspStrStr(txt, QSP_LSUBEX);
+		txt.Str = rPos + QSP_STATIC_LEN(QSP_RSUBEX);
+		lPos = qspStrStr(txt, leftSubEx);
 	} while (lPos);
-	return qspGetAddText(newTxt, txt, txtLen, -1);
+	return qspGetAddText(qspStringFromLen(newTxt, txtLen), txt);
 }

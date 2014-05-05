@@ -32,10 +32,10 @@
 
 	typedef struct
 	{
-		QSP_CHAR *Str;
+		QSPString Str;
 		int LineNum;
 		QSP_BOOL IsMultiline;
-		QSP_CHAR *Label;
+		QSPString Label;
 		QSPCachedStat *Stats;
 		int StatsCount;
 	} QSPLineOfCode;
@@ -43,7 +43,7 @@
 	/* External functions */
 	void qspFreePrepLines(QSPLineOfCode *, int);
 	void qspCopyPrepLines(QSPLineOfCode **, QSPLineOfCode *, int, int);
-	QSP_CHAR *qspJoinPrepLines(QSPLineOfCode *, int, QSP_CHAR *);
-	int qspPreprocessData(QSP_CHAR *, QSPLineOfCode **);
+	QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim);
+	int qspPreprocessData(QSPString data, QSPLineOfCode **strs);
 
 #endif

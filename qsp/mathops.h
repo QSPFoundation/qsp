@@ -36,8 +36,7 @@
 	typedef struct
 	{
 		int Code;
-		QSP_CHAR *Name;
-		int NameLen;
+		QSPString Name;
 	} QSPMathOpName;
 
 	typedef struct
@@ -123,7 +122,6 @@
 
 	/* External functions */
 	void qspInitMath();
-	QSPVariant qspExprValue(QSP_CHAR *);
-	QSPVariant qspExprValuePartial(QSP_CHAR *, QSP_CHAR *);
+	QSPVariant qspExprValue(QSPString expr);
 
 #endif
