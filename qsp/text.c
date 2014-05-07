@@ -244,21 +244,21 @@ int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
 		allocChars = (int)(found - str.Str);
 		newStr = (QSP_CHAR *)malloc(allocChars * sizeof(QSP_CHAR));
 		memcpy(newStr, str.Str, allocChars * sizeof(QSP_CHAR));
-		if (++count > bufSize)
+		if (count >= bufSize)
 		{
-			bufSize += 16;
+			bufSize = count + 16;
 			ret = (QSPString *)realloc(ret, bufSize * sizeof(QSPString));
 		}
-		ret[count - 1] = qspStringFromLen(newStr, allocChars);
+		ret[count++] = qspStringFromLen(newStr, allocChars);
 		str.Str = found + delimLen;
 		found = qspStrStr(str, delim);
 	}
 	allocChars = qspStrLen(str);
 	newStr = (QSP_CHAR *)malloc(allocChars * sizeof(QSP_CHAR));
 	memcpy(newStr, str.Str, allocChars * sizeof(QSP_CHAR));
-	if (++count > bufSize)
-		ret = (QSPString *)realloc(ret, count * sizeof(QSPString));
-	ret[count - 1] = qspStringFromLen(newStr, allocChars);
+	if (count >= bufSize)
+		ret = (QSPString *)realloc(ret, (count + 1) * sizeof(QSPString));
+	ret[count++] = qspStringFromLen(newStr, allocChars);
 	*res = ret;
 	return count;
 }

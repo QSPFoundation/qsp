@@ -80,7 +80,7 @@ static int qspSearchPlayList(QSPString file)
 	for (i = 0; i < qspPLFilesCount; ++i)
 	{
 		itemLen = qspStrLen(qspPLFiles[i]);
-		if (itemLen >= bufSize)
+		if (itemLen > bufSize)
 		{
 			bufSize = itemLen + 8;
 			buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));

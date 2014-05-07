@@ -419,12 +419,12 @@ int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSPString delim, char ***res)
 			*((unsigned short *)(newStr + allocChars)) = 0;
 		else
 			newStr[allocChars] = 0;
-		if (++count > bufSize)
+		if (count >= bufSize)
 		{
-			bufSize += 16;
+			bufSize = count + 16;
 			ret = (char **)realloc(ret, bufSize * sizeof(char *));
 		}
-		ret[count - 1] = newStr;
+		ret[count++] = newStr;
 		curPos = found + delimSize;
 		found = (isUCS2 ? qspUCS2StrStr(curPos, delimStr) : strstr(curPos, delimStr));
 	}
@@ -432,9 +432,9 @@ int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSPString delim, char ***res)
 	allocChars = (isUCS2 ? (qspUCS2StrLen(curPos) + 1) * charSize : (int)strlen(curPos) + 1);
 	newStr = (char *)malloc(allocChars);
 	memcpy(newStr, curPos, allocChars);
-	if (++count > bufSize)
-		ret = (char **)realloc(ret, count * sizeof(char *));
-	ret[count - 1] = newStr;
+	if (count >= bufSize)
+		ret = (char **)realloc(ret, (count + 1) * sizeof(char *));
+	ret[count++] = newStr;
 	*res = ret;
 	return count;
 }

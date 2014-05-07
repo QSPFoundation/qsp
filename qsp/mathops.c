@@ -374,7 +374,7 @@ static QSPString qspGetString(QSPString *expr)
 		if (*pos == quot && (++pos >= expr->End || *pos != quot)) break;
 		if (strLen >= bufSize)
 		{
-			bufSize += 128;
+			bufSize = strLen + 128;
 			buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
 		}
 		buf[strLen++] = *pos;

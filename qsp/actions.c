@@ -60,7 +60,7 @@ static int qspActIndex(QSPString name)
 	for (i = 0; i < qspCurActionsCount; ++i)
 	{
 		actNameLen = qspStrLen(qspCurActions[i].Desc);
-		if (actNameLen >= bufSize)
+		if (actNameLen > bufSize)
 		{
 			bufSize = actNameLen + 16;
 			buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
