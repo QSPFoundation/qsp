@@ -1,0 +1,3 @@
+[submodule "players/classic/build_wx/wxWidgets"]
+	path = players/classic/build_wx/wxWidgets
+	url = https://github.com/wxWidgets/wxWidgets.git

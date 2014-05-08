@@ -180,7 +180,7 @@ void QSPListBox::OnMouseMove(wxMouseEvent& event)
 	event.Skip();
 	if (m_type == LB_EXTENDED)
 	{
-		item = HitTest(event.GetPosition());
+		item = VirtualHitTest(event.GetPosition().y);
 		if (item != wxNOT_FOUND) DoHandleItemClick(item, 0);
 	}
 }

@@ -62,10 +62,10 @@
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <CompileAs>Default</CompileAs>
-      <AdditionalIncludeDirectories>..\..\..\qsp\common;..\..\..\qsp\bindings\default;..\build_wx\wxWidgets\include;..\build_wx\wxWidgets\lib\vc_lib\mswu</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\qsp\common;..\..\..\qsp\bindings\default;..\build_wx\wxWidgets\include;..\build_wx\wxWidgets\lib\vc_lib\mswud</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>rpcrt4.lib;wxmsw29ud_core.lib;wxbase29ud.lib;wxmsw29ud_html.lib;wxmsw29ud_adv.lib;wxmsw29ud_aui.lib;wxzlibd.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;comctl32.lib;fmodex_vc.lib;qsp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>rpcrt4.lib;wxmsw31ud_core.lib;wxbase31ud.lib;wxmsw31ud_html.lib;wxmsw31ud_adv.lib;wxmsw31ud_aui.lib;wxzlibd.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;comctl32.lib;fmodex_vc.lib;qsp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>..\build_wx\wxWidgets\lib\vc_lib;$(OutDir);misc\win32\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -91,7 +91,7 @@
       <AdditionalIncludeDirectories>..\..\..\qsp\common;..\..\..\qsp\bindings\default;..\build_wx\wxWidgets\include;..\build_wx\wxWidgets\lib\vc_lib\mswu</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>rpcrt4.lib;wxmsw29u_core.lib;wxbase29u.lib;wxmsw29u_html.lib;wxmsw29u_adv.lib;wxmsw29u_aui.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;comctl32.lib;fmodex_vc.lib;qsp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>rpcrt4.lib;wxmsw31u_core.lib;wxbase31u.lib;wxmsw31u_html.lib;wxmsw31u_adv.lib;wxmsw31u_aui.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;comctl32.lib;fmodex_vc.lib;qsp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>..\build_wx\wxWidgets\lib\vc_lib;$(OutDir);misc\win32\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
