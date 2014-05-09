@@ -23,11 +23,11 @@ int qspMSCount = 0;
 void qspResetTime(int msecs)
 {
 	qspMSCount = msecs;
-	qspSysGetMsecsCount();
+	qspCallGetMSCount();
 }
 
 int qspGetTime()
 {
-	if ((qspMSCount += qspSysGetMsecsCount()) < 0) qspMSCount = 0;
+	if ((qspMSCount += qspCallGetMSCount()) < 0) qspMSCount = 0;
 	return qspMSCount;
 }

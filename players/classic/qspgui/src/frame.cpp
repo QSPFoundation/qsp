@@ -618,7 +618,7 @@ void QSPFrame::TogglePane(wxWindowID id)
 
 void QSPFrame::OpenGameFile(const wxString& path)
 {
-	if (QSPLoadGameWorld(qspStringFromLen(path.c_str(), path.Length())))
+	if (QSPLoadGameWorld(qspStringFromLen(path.c_str(), path.Length()), QSP_TRUE))
 	{
 		m_isGameOpened = true;
 		wxCommandEvent dummy;

@@ -139,7 +139,6 @@
     <ClCompile Include="..\..\..\qsp\onig\enc\utf32_be.c" />
     <ClCompile Include="..\..\..\qsp\onig\enc\utf32_le.c" />
     <ClCompile Include="..\..\..\qsp\bindings\default\default_callbacks.c" />
-    <ClCompile Include="..\..\..\qsp\bindings\default\default_platform.c" />
     <ClCompile Include="..\..\..\qsp\bindings\default\default_control.c" />
     <ClCompile Include="..\..\..\qsp\bindings\flash\flash_callbacks.c" />
     <ClCompile Include="..\..\..\qsp\bindings\flash\flash_platform.c" />
@@ -166,7 +165,6 @@
     <ClInclude Include="..\..\..\qsp\menu.h" />
     <ClInclude Include="..\..\..\qsp\objects.h" />
     <ClInclude Include="..\..\..\qsp\playlist.h" />
-    <ClInclude Include="..\..\..\qsp\qsp.h" />
     <ClInclude Include="..\..\..\qsp\regexp.h" />
     <ClInclude Include="..\..\..\qsp\statements.h" />
     <ClInclude Include="..\..\..\qsp\text.h" />

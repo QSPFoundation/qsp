@@ -75,12 +75,14 @@
 		static void PlayFile(QSPString file, int volume);
 		static void ShowPane(int type, QSP_BOOL isShow);
 		static void Sleep(int msecs);
+		static int GetMSCount();
 		static void Msg(QSPString str);
 		static void DeleteMenu();
 		static void AddMenuItem(QSPString name, QSPString imgPath);
 		static int ShowMenu();
 		static void Input(QSPString text, QSP_CHAR *buffer, int maxLen);
 		static void ShowImage(QSPString file);
+		static void OpenGame(QSPString file, QSP_BOOL isNewGame);
 		static void OpenGameStatus(QSPString file);
 		static void SaveGameStatus(QSPString file);
 	private:

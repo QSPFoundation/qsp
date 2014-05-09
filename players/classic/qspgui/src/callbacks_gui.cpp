@@ -49,12 +49,14 @@ void QSPCallBacks::Init(QSPFrame *frame)
 	QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
 	QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&Msg);
 	QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Sleep);
+	QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
 	QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
 	QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
 	QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
 	QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
 	QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowImage);
 	QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
+	QSPSetCallBack(QSP_CALL_OPENGAME, (QSP_CALLBACK)&OpenGame);
 	QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
 	QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
 }
@@ -264,6 +266,14 @@ void QSPCallBacks::Sleep(int msecs)
 	m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, isSave);
 }
 
+int QSPCallBacks::GetMSCount()
+{
+	static wxStopWatch stopWatch;
+	int ret = stopWatch.Time();
+	stopWatch.Start();
+	return ret;
+}
+
 void QSPCallBacks::Msg(QSPString str)
 {
 	if (m_frame->IsQuit()) return;
@@ -332,6 +342,12 @@ void QSPCallBacks::ShowImage(QSPString file)
 {
 	if (m_frame->IsQuit()) return;
 	m_frame->ShowPane(ID_VIEWPIC, m_frame->GetImgView()->OpenFile(wxString(file.Str, file.End)));
+}
+
+void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
+{
+	if (m_frame->IsQuit()) return;
+	QSPLoadGameWorld(file, isNewGame);
 }
 
 void QSPCallBacks::OpenGameStatus(QSPString file)

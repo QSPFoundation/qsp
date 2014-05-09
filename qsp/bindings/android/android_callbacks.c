@@ -113,7 +113,7 @@ void qspCallSystem(QSP_CHAR *cmd)
 	}
 }
 
-void qspCallOpenGame(QSP_CHAR *file)
+void qspCallOpenGameStatus(QSP_CHAR *file)
 {
 	/* Здесь позволяем пользователю выбрать файл */
 	/* состояния игры для загрузки и загружаем его */
@@ -126,7 +126,7 @@ void qspCallOpenGame(QSP_CHAR *file)
 	}
 }
 
-void qspCallSaveGame(QSP_CHAR *file)
+void qspCallSaveGameStatus(QSP_CHAR *file)
 {
 	/* Здесь позволяем пользователю выбрать файл */
 	/* для сохранения состояния игры и сохраняем */
@@ -230,7 +230,7 @@ void qspCallSleep(int msecs)
 	}
 }
 
-int qspSysGetMsecsCount()
+int qspCallGetMSCount()
 {
 	/* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
 	QSPCallState state;

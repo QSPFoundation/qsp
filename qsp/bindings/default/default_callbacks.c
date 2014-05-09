@@ -114,7 +114,18 @@ void qspCallSystem(QSPString cmd)
 	}
 }
 
-void qspCallOpenGame(QSPString file)
+void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
+{
+	QSPCallState state;
+	if (qspCallBacks[QSP_CALL_OPENGAME])
+	{
+		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
+		qspCallBacks[QSP_CALL_OPENGAME](file, isNewGame);
+		qspRestoreCallState(&state);
+	}
+}
+
+void qspCallOpenGameStatus(QSPString file)
 {
 	/* Здесь позволяем пользователю выбрать файл */
 	/* состояния игры для загрузки и загружаем его */
@@ -127,7 +138,7 @@ void qspCallOpenGame(QSPString file)
 	}
 }
 
-void qspCallSaveGame(QSPString file)
+void qspCallSaveGameStatus(QSPString file)
 {
 	/* Здесь позволяем пользователю выбрать файл */
 	/* для сохранения состояния игры и сохраняем */
@@ -229,6 +240,21 @@ void qspCallSleep(int msecs)
 		qspCallBacks[QSP_CALL_SLEEP](msecs);
 		qspRestoreCallState(&state);
 	}
+}
+
+int qspCallGetMSCount()
+{
+	/* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
+	QSPCallState state;
+	int count;
+	if (qspCallBacks[QSP_CALL_GETMSCOUNT])
+	{
+		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
+		count = qspCallBacks[QSP_CALL_GETMSCOUNT]();
+		qspRestoreCallState(&state);
+		return count;
+	}
+	return 0;
 }
 
 void qspCallCloseFile(QSPString file)

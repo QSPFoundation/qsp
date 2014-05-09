@@ -192,9 +192,6 @@
     <ClCompile Include="..\..\..\qsp\bindings\android\android_control.c">
       <Filter>Source Files\bindings\android</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\qsp\bindings\default\default_platform.c">
-      <Filter>Source Files\bindings\default</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\qsp\bindings\flash\flash_platform.c">
       <Filter>Source Files\bindings\flash</Filter>
     </ClCompile>
@@ -246,9 +243,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\qsp\playlist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\qsp\qsp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\qsp\regexp.h">

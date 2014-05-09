@@ -35,6 +35,39 @@
 #include "../../variables.h"
 #include "../../variant.h"
 
+static char *qspLoadFileData(QSPString fileName, int *fileSize);
+static void qspSaveFileData(QSPString fileName, char *data, int dataSize);
+
+static char *qspLoadFileData(QSPString fileName, int *fileSize)
+{
+	FILE *file;
+	int size;
+	char *buf;
+	QSP_CHAR *systemName = qspStringToC(fileName);
+	file = _wfopen(systemName, QSP_FMT("rb"));
+	free(systemName);
+	if (!file) return 0;
+	fseek(file, 0, SEEK_END);
+	size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	buf = (char *)malloc(size);
+	fread(buf, 1, size, file);
+	fclose(file);
+	*fileSize = size;
+	return buf;
+}
+
+static void qspSaveFileData(QSPString fileName, char *data, int dataSize)
+{
+	FILE *file;
+	QSP_CHAR *systemName = qspStringToC(fileName);
+	file = _wfopen(systemName, QSP_FMT("wb"));
+	free(systemName);
+	if (!file) return;
+	fwrite(data, 1, dataSize, file);
+	fclose(file);
+}
+
 /* ------------------------------------------------------------ */
 QSP_BOOL QSPIsInCallBack()
 {
@@ -371,22 +404,33 @@ QSPString QSPGetErrorDesc(int errorNum)
 /* Управление игрой */
 
 /* Загрузка новой игры из файла */
-QSP_BOOL QSPLoadGameWorld(QSPString fileName)
+QSP_BOOL QSPLoadGameWorld(QSPString fileName, QSP_BOOL isNewGame)
 {
+	char *buf;
+	int fileSize;
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspResetError();
 	if (qspIsDisableCodeExec) return QSP_FALSE;
-	qspOpenQuestFromFile(fileName, QSP_TRUE);
+	buf = qspLoadFileData(fileName, &fileSize);
+	if (buf)
+	{
+		qspOpenQuestFromData(buf, fileSize, fileName, isNewGame);
+		free(buf);
+	}
 	if (qspErrorNum) return QSP_FALSE;
 	return QSP_TRUE;
 }
 /* Сохранение состояния в файл */
 QSP_BOOL QSPSaveGame(QSPString fileName, QSP_BOOL isRefresh)
 {
+	QSPString data;
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspPrepareExecution();
 	if (qspIsDisableCodeExec) return QSP_FALSE;
-	//qspSaveGameStatus(fileName);
+	data = qspSaveGameStatusToString();
+	if (!data.Str) return QSP_FALSE;
+	qspSaveFileData(fileName, (char *)data.Str, qspStrLen(data) * sizeof(QSP_CHAR));
+	qspFreeString(data);
 	if (qspErrorNum) return QSP_FALSE;
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return QSP_TRUE;
@@ -394,21 +438,28 @@ QSP_BOOL QSPSaveGame(QSPString fileName, QSP_BOOL isRefresh)
 /* Загрузка состояния из файла */
 QSP_BOOL QSPOpenSavedGame(QSPString fileName, QSP_BOOL isRefresh)
 {
+	char *buf;
+	int fileSize;
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspPrepareExecution();
 	if (qspIsDisableCodeExec) return QSP_FALSE;
-	//qspOpenGameStatus(fileName);
+	buf = qspLoadFileData(fileName, &fileSize);
+	if (buf)
+	{
+		qspOpenGameStatusFromString(qspStringFromLen((QSP_CHAR *)buf, fileSize / sizeof(QSP_CHAR)));
+		free(buf);
+	}
 	if (qspErrorNum) return QSP_FALSE;
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return QSP_TRUE;
 }
 /* Загрузка новой игры из памяти */
-QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSPString fileName)
+QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSPString fileName, QSP_BOOL isNewGame)
 {
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspResetError();
 	if (qspIsDisableCodeExec) return QSP_FALSE;
-	qspOpenQuestFromData((char *)data, dataSize, fileName, QSP_TRUE);
+	qspOpenQuestFromData((char *)data, dataSize, fileName, isNewGame);
 	if (qspErrorNum) return QSP_FALSE;
 	return QSP_TRUE;
 }

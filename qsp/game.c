@@ -129,7 +129,7 @@ static void qspIncludeFile(QSPString s)
 	}
 	oldCurIncLocsCount = qspCurIncLocsCount;
 	file = qspGetAbsFromRelPath(s);
-	qspOpenQuestFromFile(file, QSP_FALSE);
+	qspCallOpenGame(file, QSP_FALSE);
 	qspFreeString(file);
 	if (qspErrorNum) return;
 	if (qspCurIncLocsCount != oldCurIncLocsCount)
@@ -143,7 +143,7 @@ static void qspOpenIncludes()
 	for (i = 0; i < qspCurIncFilesCount; ++i)
 	{
 		file = qspGetAbsFromRelPath(qspCurIncFiles[i]);
-		qspOpenQuestFromFile(file, QSP_FALSE);
+		qspCallOpenGame(file, QSP_FALSE);
 		qspFreeString(file);
 		if (qspErrorNum) return;
 	}
@@ -307,19 +307,6 @@ void qspOpenQuestFromData(char *data, int dataSize, QSPString fileName, QSP_BOOL
 	}
 	else
 		qspCurIncLocsCount += count;
-}
-
-void qspOpenQuestFromFile(QSPString fileName, QSP_BOOL isNewGame)
-{
-	int fileSize;
-	char *buf = qspSysLoadGameData(fileName, &fileSize);
-	if (buf)
-	{
-		qspOpenQuestFromData(buf, fileSize, fileName, isNewGame);
-		free(buf);
-	}
-	else
-		qspSetError(QSP_ERR_FILENOTFOUND);
 }
 
 QSPString qspSaveGameStatusToString()
@@ -651,7 +638,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSPString *jumpTo, int
 		if (qspIsAnyString(QSP_STR(args[0])))
 		{
 			file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-			qspOpenQuestFromFile(file, QSP_TRUE);
+			qspCallOpenGame(file, QSP_TRUE);
 			qspFreeString(file);
 			if (qspErrorNum) return QSP_FALSE;
 			qspNewGame(QSP_FALSE);
@@ -670,11 +657,11 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSPString *jumpTo, in
 	if (count && qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-		qspCallOpenGame(file);
+		qspCallOpenGameStatus(file);
 		qspFreeString(file);
 	}
 	else
-		qspCallOpenGame(qspNullString);
+		qspCallOpenGameStatus(qspNullString);
 	return QSP_FALSE;
 }
 
@@ -684,10 +671,10 @@ QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSPString *jumpTo, in
 	if (count && qspIsAnyString(QSP_STR(args[0])))
 	{
 		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
-		qspCallSaveGame(file);
+		qspCallSaveGameStatus(file);
 		qspFreeString(file);
 	}
 	else
-		qspCallSaveGame(qspNullString);
+		qspCallSaveGameStatus(qspNullString);
 	return QSP_FALSE;
 }

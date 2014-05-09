@@ -33,12 +33,10 @@
 	extern int qspCurIncLocsCount;
 
 	/* External functions */
-	char *qspSysLoadGameData(QSPString fileName, int *fileSize);
 	QSPString qspGetAbsFromRelPath(QSPString path);
 	void qspClearIncludes(QSP_BOOL);
 	void qspNewGame(QSP_BOOL);
 	void qspOpenQuestFromData(char *data, int dataSize, QSPString fileName, QSP_BOOL isNewGame);
-	void qspOpenQuestFromFile(QSPString fileName, QSP_BOOL isNewGame);
 	QSPString qspSaveGameStatusToString();
 	void qspOpenGameStatusFromString(QSPString str);
 	/* Statements */
