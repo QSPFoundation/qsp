@@ -492,16 +492,10 @@ QSP_BOOL QSPSaveGameAsData(void *buf, int bufSize, int *realSize, QSP_BOOL isRef
 /* Загрузка состояния из памяти */
 QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRefresh)
 {
-	int dataLen;
-	QSP_CHAR *ptr;
 	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
 	qspPrepareExecution();
 	if (qspIsDisableCodeExec) return QSP_FALSE;
-	dataLen = dataSize / sizeof(QSP_CHAR);
-	ptr = (QSP_CHAR *)malloc(dataLen * sizeof(QSP_CHAR));
-	memcpy(ptr, data, dataSize);
-	qspOpenGameStatusFromString(qspStringFromLen(ptr, dataLen));
-	free(ptr);
+	qspOpenGameStatusFromString(qspStringFromLen((QSP_CHAR *)data, dataSize / sizeof(QSP_CHAR)));
 	if (qspErrorNum) return QSP_FALSE;
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return QSP_TRUE;
