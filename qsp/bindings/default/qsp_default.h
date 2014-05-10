@@ -75,7 +75,6 @@
 	QSP_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSPString file, QSP_BOOL isNewGame);
 	QSP_EXTERN QSP_BOOL QSPSaveGameAsData(void *buf, int bufSize, int *realSize, QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRefresh);
-	/* ---------- */
 	QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
 	QSP_EXTERN void QSPSetCallBack(int type, QSP_CALLBACK func);
 	QSP_EXTERN void QSPInit();

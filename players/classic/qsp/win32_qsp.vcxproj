@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\qsp\actions.h" />
+    <ClInclude Include="..\..\..\qsp\bindings\qsp.h" />
     <ClInclude Include="..\..\..\qsp\callbacks.h" />
     <ClInclude Include="..\..\..\qsp\codetools.h" />
     <ClInclude Include="..\..\..\qsp\coding.h" />

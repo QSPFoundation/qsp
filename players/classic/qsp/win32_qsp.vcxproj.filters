@@ -296,5 +296,8 @@
     <ClInclude Include="..\..\..\qsp\bindings\android\android.h">
       <Filter>Header Files\bindings\android</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\qsp\bindings\qsp.h">
+      <Filter>Header Files\bindings</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

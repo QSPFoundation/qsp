@@ -318,7 +318,7 @@ QSPString qspSaveGameStatusToString()
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return qspNullString;
 	varsCount = qspPrepareLocalVars(&savedVars);
 	if (qspErrorNum) return qspNullString;
-	buf.Str = buf.End = 0;
+	buf = qspNullString;
 	qspRefreshPlayList();
 	locName = (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : qspNullString);
 	qspCodeWriteVal(&buf, QSP_STATIC_STR(QSP_SAVEDGAMEID), QSP_FALSE);
