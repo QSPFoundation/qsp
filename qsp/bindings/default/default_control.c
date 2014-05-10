@@ -108,18 +108,6 @@ int QSPGetFullRefreshCount()
 	return qspFullRefreshCount;
 }
 /* ------------------------------------------------------------ */
-/* Ïîëíûé ïóòü ê çàãğóæåííîìó ôàéëó èãğû */
-QSPString QSPGetQstFullPath()
-{
-	return qspQstFullPath;
-}
-/* ------------------------------------------------------------ */
-/* Íàçâàíèå òåêóùåé ëîêàöèè */
-QSPString QSPGetCurLoc()
-{
-	return (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : qspNullString);
-}
-/* ------------------------------------------------------------ */
 /* Îñíîâíîå îïèñàíèå ëîêàöèè */
 
 /* Òåêñò îñíîâíîãî îêíà îïèñàíèÿ ëîêàöèè */
@@ -146,31 +134,6 @@ QSP_BOOL QSPIsVarsDescChanged()
 	return qspIsVarsDescChanged;
 }
 /* ------------------------------------------------------------ */
-/* Ïîëó÷èòü çíà÷åíèå óêàçàííîãî âûğàæåíèÿ */
-QSP_BOOL QSPGetExprValue(QSPString expr, QSP_BOOL *isString, int *numVal, QSP_CHAR *strVal, int strValBufSize)
-{
-	int strRealLen;
-	QSPVariant v;
-	if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-	qspResetError();
-	if (qspIsDisableCodeExec) return QSP_FALSE;
-	v = qspExprValue(expr);
-	if (qspErrorNum) return QSP_FALSE;
-	*isString = v.IsStr;
-	if (v.IsStr)
-	{
-		strRealLen = qspStrLen(QSP_STR(v));
-		if (strRealLen >= strValBufSize)
-			strRealLen = strValBufSize - 1;
-		memcpy(strVal, QSP_STR(v).Str, strRealLen * sizeof(QSP_CHAR));
-		qspFreeString(QSP_STR(v));
-		strVal[strRealLen] = 0;
-	}
-	else
-		*numVal = QSP_NUM(v);
-	return QSP_TRUE;
-}
-/* ------------------------------------------------------------ */
 /* Òåêñò ñòğîêè ââîäà */
 void QSPSetInputStrText(QSPString val)
 {
@@ -179,21 +142,15 @@ void QSPSetInputStrText(QSPString val)
 /* ------------------------------------------------------------ */
 /* Ñïèñîê äåéñòâèé */
 
-/* Êîëè÷åñòâî äåéñòâèé */
-int QSPGetActionsCount()
+int QSPGetActions(QSPListItem *items, int itemsBufSize)
 {
-	return qspCurActionsCount;
-}
-/* Äàííûå äåéñòâèÿ ñ óêàçàííûì èíäåêñîì */
-void QSPGetActionData(int ind, QSPString *image, QSPString *desc)
-{
-	if (ind >= 0 && ind < qspCurActionsCount)
+	int i;
+	for (i = 0; i < qspCurActionsCount && i < itemsBufSize; ++i)
 	{
-		*image = qspCurActions[ind].Image;
-		*desc = qspCurActions[ind].Desc;
+		items[i].Name = qspCurActions[i].Desc;
+		items[i].Image = qspCurActions[i].Image;
 	}
-	else
-		*image = *desc = qspNullString;
+	return qspCurActionsCount;
 }
 /* Âûïîëíåíèå êîäà âûáğàííîãî äåéñòâèÿ */
 QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh)
@@ -237,21 +194,15 @@ QSP_BOOL QSPIsActionsChanged()
 /* ------------------------------------------------------------ */
 /* Ñïèñîê îáúåêòîâ */
 
-/* Êîëè÷åñòâî îáúåêòîâ */
-int QSPGetObjectsCount()
+int QSPGetObjects(QSPListItem *items, int itemsBufSize)
 {
-	return qspCurObjectsCount;
-}
-/* Äàííûå îáúåêòà ñ óêàçàííûì èíäåêñîì */
-void QSPGetObjectData(int ind, QSPString *image, QSPString *desc)
-{
-	if (ind >= 0 && ind < qspCurObjectsCount)
+	int i;
+	for (i = 0; i < qspCurObjectsCount && i < itemsBufSize; ++i)
 	{
-		*image = qspCurObjects[ind].Image;
-		*desc = qspCurObjects[ind].Desc;
+		items[i].Name = qspCurObjects[i].Desc;
+		items[i].Image = qspCurObjects[i].Image;
 	}
-	else
-		*image = *desc = qspNullString;
+	return qspCurObjectsCount;
 }
 /* Óñòàíîâèòü èíäåêñ âûáğàííîãî îáúåêòà */
 QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh)

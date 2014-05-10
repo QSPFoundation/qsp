@@ -33,42 +33,45 @@
 	{
 	#endif
 
+	QSP_EXTERN void QSPInit();
+	QSP_EXTERN void QSPDeInit();
+	QSP_EXTERN void QSPSetCallBack(int type, QSP_CALLBACK func);
 	QSP_EXTERN QSP_BOOL QSPIsInCallBack();
 	QSP_EXTERN void QSPEnableDebugMode(QSP_BOOL isDebug);
 	QSP_EXTERN void QSPGetCurStateData(QSPString *loc, int *actIndex, int *line);
 	QSP_EXTERN QSPString QSPGetVersion();
 	QSP_EXTERN QSPString QSPGetCompiledDateTime();
 	QSP_EXTERN int QSPGetFullRefreshCount();
-	QSP_EXTERN QSPString QSPGetQstFullPath();
-	QSP_EXTERN QSPString QSPGetCurLoc();
+	/* Main desc */
 	QSP_EXTERN QSPString QSPGetMainDesc();
 	QSP_EXTERN QSP_BOOL QSPIsMainDescChanged();
+	/* Vars desc */
 	QSP_EXTERN QSPString QSPGetVarsDesc();
 	QSP_EXTERN QSP_BOOL QSPIsVarsDescChanged();
-	QSP_EXTERN QSP_BOOL QSPGetExprValue(QSPString str, QSP_BOOL *isString, int *numVal, QSP_CHAR *strVal, int strValBufSize);
+	/* Input string */
 	QSP_EXTERN void QSPSetInputStrText(QSPString str);
-	QSP_EXTERN int QSPGetActionsCount();
-	QSP_EXTERN void QSPGetActionData(int ind, QSPString *imgPath, QSPString *desc);
-	QSP_EXTERN QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh);
+	/* Actions */
+	QSP_EXTERN int QSPGetActions(QSPListItem *items, int itemsBufSize);
 	QSP_EXTERN QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL isRefresh);
 	QSP_EXTERN int QSPGetSelActionIndex();
 	QSP_EXTERN QSP_BOOL QSPIsActionsChanged();
-	QSP_EXTERN int QSPGetObjectsCount();
-	QSP_EXTERN void QSPGetObjectData(int ind, QSPString *imgPath, QSPString *desc);
+	QSP_EXTERN QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh);
+	/* Objects */
+	QSP_EXTERN int QSPGetObjects(QSPListItem *items, int itemsBufSize);
 	QSP_EXTERN QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh);
 	QSP_EXTERN int QSPGetSelObjectIndex();
 	QSP_EXTERN QSP_BOOL QSPIsObjectsChanged();
+	/* Windows */
 	QSP_EXTERN void QSPShowWindow(int type, QSP_BOOL isShow);
-	QSP_EXTERN QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count);
-	QSP_EXTERN QSP_BOOL QSPGetVarValues(QSPString name, int ind, int *numVal, QSPString *strVal);
-	QSP_EXTERN int QSPGetMaxVarsCount();
-	QSP_EXTERN QSP_BOOL QSPGetVarNameByIndex(int ind, QSPString *name);
+	/* Code execution */
 	QSP_EXTERN QSP_BOOL QSPExecString(QSPString str, QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL isRefresh);
+	/* Errors */
 	QSP_EXTERN void QSPGetLastErrorData(int *errorNum, QSPString *errorLoc, int *errorActIndex, int *errorLine);
 	QSP_EXTERN QSPString QSPGetErrorDesc(int errorNum);
+	/* Game */
 	QSP_EXTERN QSP_BOOL QSPLoadGameWorld(QSPString file, QSP_BOOL isNewGame);
 	QSP_EXTERN QSP_BOOL QSPSaveGame(QSPString file, QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPOpenSavedGame(QSPString file, QSP_BOOL isRefresh);
@@ -76,9 +79,11 @@
 	QSP_EXTERN QSP_BOOL QSPSaveGameAsData(void *buf, int bufSize, int *realSize, QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
-	QSP_EXTERN void QSPSetCallBack(int type, QSP_CALLBACK func);
-	QSP_EXTERN void QSPInit();
-	QSP_EXTERN void QSPDeInit();
+	/* Variables */
+	QSP_EXTERN QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count);
+	QSP_EXTERN QSP_BOOL QSPGetVarValues(QSPString name, int ind, int *numVal, QSPString *strVal);
+	QSP_EXTERN int QSPGetMaxVarsCount();
+	QSP_EXTERN QSP_BOOL QSPGetVarNameByIndex(int ind, QSPString *name);
 
 	#ifdef __cplusplus
 	}

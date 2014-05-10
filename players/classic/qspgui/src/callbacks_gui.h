@@ -85,7 +85,6 @@
 		static void SaveGameStatus(QSPString file);
 	private:
 		// Internal methods
-		static void UpdateGamePath();
 		static bool SetVolume(QSPString file, int volume);
 		static void UpdateSounds();
 
@@ -96,6 +95,8 @@
 		static FMOD_SYSTEM *m_sys;
 		static QSPSounds m_sounds;
 		static float m_volumeCoeff;
+
+		static const int MAX_LIST_ITEMS = 1000;
 	};
 
 #endif

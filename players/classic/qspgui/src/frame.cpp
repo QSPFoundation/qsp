@@ -927,7 +927,6 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 
 void QSPFrame::OnLinkClicked(wxHtmlLinkEvent& event)
 {
-	long ind;
 	wxString href;
 	wxHtmlLinkInfo info(event.GetLinkInfo());
 	if (info.GetEvent()->LeftUp())
@@ -945,17 +944,6 @@ void QSPFrame::OnLinkClicked(wxHtmlLinkEvent& event)
 			wxString string = href.Mid(5);
 			if (m_isProcessEvents && !QSPExecString(qspStringFromLen(string.c_str(), string.Length()), QSP_TRUE))
 				ShowError();
-		}
-		else if (href.ToLong(&ind))
-		{
-			if (m_isProcessEvents && ind > 0 && ind <= QSPGetActionsCount())
-			{
-				wxCommandEvent e;
-				if (QSPSetSelActionIndex(ind - 1, QSP_TRUE))
-					OnActionDblClick(e);
-				else
-					ShowError();
-			}
 		}
 		else
 			wxLaunchDefaultBrowser(href);
@@ -1013,7 +1001,7 @@ void QSPFrame::OnKey(wxKeyEvent& event)
 	if (m_isProcessEvents && !event.HasModifiers() && wxWindow::FindFocus() != m_input)
 	{
 		int ind = -1;
-		int actsCount = QSPGetActionsCount();
+		int actsCount = QSPGetActions(NULL, 0);
 		switch (event.GetKeyCode())
 		{
 		case '1': case WXK_NUMPAD1: case WXK_NUMPAD_END: ind = 0; break;

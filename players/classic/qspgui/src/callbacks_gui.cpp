@@ -81,9 +81,8 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	int i, numVal;
 	bool isScroll, isCanSave;
 	QSPString strVal, imgPath;
+	QSPListItem items[MAX_LIST_ITEMS];
 	if (m_frame->IsQuit()) return;
-	// -------------------------------
-	UpdateGamePath();
 	// -------------------------------
 	QSPString mainDesc = QSPGetMainDesc();
 	QSPString varsDesc = QSPGetVarsDesc();
@@ -110,26 +109,20 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	m_frame->GetActions()->SetIsShowNums(m_frame->IsShowHotkeys());
 	if (QSPIsActionsChanged())
 	{
-		int actionsCount = QSPGetActionsCount();
+		int actionsCount = QSPGetActions(items, MAX_LIST_ITEMS);
 		m_frame->GetActions()->BeginItems();
 		for (i = 0; i < actionsCount; ++i)
-		{
-			QSPGetActionData(i, &imgPath, &strVal);
-			m_frame->GetActions()->AddItem(wxString(imgPath.Str, imgPath.End), wxString(strVal.Str, strVal.End));
-		}
+			m_frame->GetActions()->AddItem(wxString(items[i].Image.Str, items[i].Image.End), wxString(items[i].Name.Str, items[i].Name.End));
 		m_frame->GetActions()->EndItems();
 	}
 	m_frame->GetActions()->SetSelection(QSPGetSelActionIndex());
 	m_frame->GetObjects()->SetIsHtml(m_isHtml);
 	if (QSPIsObjectsChanged())
 	{
-		int objectsCount = QSPGetObjectsCount();
+		int objectsCount = QSPGetObjects(items, MAX_LIST_ITEMS);
 		m_frame->GetObjects()->BeginItems();
 		for (i = 0; i < objectsCount; ++i)
-		{
-			QSPGetObjectData(i, &imgPath, &strVal);
-			m_frame->GetObjects()->AddItem(wxString(imgPath.Str, imgPath.End), wxString(strVal.Str, strVal.End));
-		}
+			m_frame->GetObjects()->AddItem(wxString(items[i].Image.Str, items[i].Image.End), wxString(items[i].Name.Str, items[i].Name.End));
 		m_frame->GetObjects()->EndItems();
 	}
 	m_frame->GetObjects()->SetSelection(QSPGetSelObjectIndex());
@@ -336,7 +329,15 @@ void QSPCallBacks::ShowImage(QSPString file)
 void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
 {
 	if (m_frame->IsQuit()) return;
-	QSPLoadGameWorld(file, isNewGame);
+	if (QSPLoadGameWorld(file, isNewGame) && isNewGame)
+	{
+		wxFileName fileName(wxString(file.Str, file.End));
+		m_gamePath = fileName.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+		m_frame->GetDesc()->SetGamePath(m_gamePath);
+		m_frame->GetObjects()->SetGamePath(m_gamePath);
+		m_frame->GetActions()->SetGamePath(m_gamePath);
+		m_frame->GetVars()->SetGamePath(m_gamePath);
+	}
 }
 
 void QSPCallBacks::OpenGameStatus(QSPString file)
@@ -377,17 +378,6 @@ void QSPCallBacks::SaveGameStatus(QSPString file)
 			QSPSaveGame(qspStringFromLen(path.c_str(), path.Length()), QSP_FALSE);
 		}
 	}
-}
-
-void QSPCallBacks::UpdateGamePath()
-{
-	QSPString fullPath = QSPGetQstFullPath();
-	wxFileName file(wxString(fullPath.Str, fullPath.End));
-	m_gamePath = file.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
-	m_frame->GetDesc()->SetGamePath(m_gamePath);
-	m_frame->GetObjects()->SetGamePath(m_gamePath);
-	m_frame->GetActions()->SetGamePath(m_gamePath);
-	m_frame->GetVars()->SetGamePath(m_gamePath);
 }
 
 bool QSPCallBacks::SetVolume(QSPString file, int volume)
