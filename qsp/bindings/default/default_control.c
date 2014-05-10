@@ -69,11 +69,6 @@ static void qspSaveFileData(QSPString fileName, char *data, int dataSize)
 }
 
 /* ------------------------------------------------------------ */
-QSP_BOOL QSPIsInCallBack()
-{
-	return qspIsInCallBack;
-}
-/* ------------------------------------------------------------ */
 /* Отладка */
 
 /* Управление режимом отладки */

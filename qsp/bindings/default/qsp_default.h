@@ -36,7 +36,6 @@
 	QSP_EXTERN void QSPInit();
 	QSP_EXTERN void QSPDeInit();
 	QSP_EXTERN void QSPSetCallBack(int type, QSP_CALLBACK func);
-	QSP_EXTERN QSP_BOOL QSPIsInCallBack();
 	QSP_EXTERN void QSPEnableDebugMode(QSP_BOOL isDebug);
 	QSP_EXTERN void QSPGetCurStateData(QSPString *loc, int *actIndex, int *line);
 	QSP_EXTERN QSPString QSPGetVersion();

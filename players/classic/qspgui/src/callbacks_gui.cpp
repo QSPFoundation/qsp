@@ -80,7 +80,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	static int oldFullRefreshCount = 0;
 	int i, numVal;
 	bool isScroll, isCanSave;
-	QSPString strVal, imgPath;
+	QSPString strVal;
 	QSPListItem items[MAX_LIST_ITEMS];
 	if (m_frame->IsQuit()) return;
 	// -------------------------------
