@@ -50,8 +50,6 @@ void QSPCallBacks::Init(QSPFrame *frame)
 	QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&Msg);
 	QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Sleep);
 	QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
-	QSPSetCallBack(QSP_CALL_DELETEMENU, (QSP_CALLBACK)&DeleteMenu);
-	QSPSetCallBack(QSP_CALL_ADDMENUITEM, (QSP_CALLBACK)&AddMenuItem);
 	QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
 	QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
 	QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowImage);
@@ -293,22 +291,13 @@ void QSPCallBacks::Msg(QSPString str)
 	m_frame->EnableControls(true);
 }
 
-void QSPCallBacks::DeleteMenu()
-{
-	if (m_frame->IsQuit()) return;
-	m_frame->DeleteMenu();
-}
-
-void QSPCallBacks::AddMenuItem(QSPString name, QSPString imgPath)
-{
-	if (m_frame->IsQuit()) return;
-	m_frame->AddMenuItem(wxString(name.Str, name.End), wxString(imgPath.Str, imgPath.End));
-}
-
-int QSPCallBacks::ShowMenu()
+int QSPCallBacks::ShowMenu(QSPListItem *items, int count)
 {
 	if (m_frame->IsQuit()) return -1;
 	m_frame->EnableControls(false);
+	m_frame->DeleteMenu();
+	for (int i = 0; i < count; ++i)
+		m_frame->AddMenuItem(wxString(items[i].Name.Str, items[i].Name.End), wxString(items[i].Image.Str, items[i].Image.End));
 	int index = m_frame->ShowMenu();
 	m_frame->EnableControls(true);
 	return index;

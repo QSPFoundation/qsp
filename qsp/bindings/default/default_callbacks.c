@@ -90,18 +90,6 @@ void qspCallSetInputStrText(QSPString text)
 	}
 }
 
-void qspCallAddMenuItem(QSPString name, QSPString imgPath)
-{
-	/* Здесь добавляем пункт меню */
-	QSPCallState state;
-	if (qspCallBacks[QSP_CALL_ADDMENUITEM])
-	{
-		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_ADDMENUITEM](name, imgPath);
-		qspRestoreCallState(&state);
-	}
-}
-
 void qspCallSystem(QSPString cmd)
 {
 	/* Здесь выполняем системный вызов */
@@ -164,7 +152,7 @@ void qspCallShowMessage(QSPString text)
 	}
 }
 
-int qspCallShowMenu()
+int qspCallShowMenu(QSPListItem *items, int count)
 {
 	/* Здесь показываем меню */
 	QSPCallState state;
@@ -172,7 +160,7 @@ int qspCallShowMenu()
 	if (qspCallBacks[QSP_CALL_SHOWMENU])
 	{
 		qspSaveCallState(&state, QSP_FALSE, QSP_TRUE);
-		index = qspCallBacks[QSP_CALL_SHOWMENU]();
+		index = qspCallBacks[QSP_CALL_SHOWMENU](items, count);
 		qspRestoreCallState(&state);
 		return index;
 	}
@@ -265,18 +253,6 @@ void qspCallCloseFile(QSPString file)
 	{
 		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
 		qspCallBacks[QSP_CALL_CLOSEFILE](file);
-		qspRestoreCallState(&state);
-	}
-}
-
-void qspCallDeleteMenu()
-{
-	/* Здесь удаляем текущее меню */
-	QSPCallState state;
-	if (qspCallBacks[QSP_CALL_DELETEMENU])
-	{
-		qspSaveCallState(&state, QSP_TRUE, QSP_FALSE);
-		qspCallBacks[QSP_CALL_DELETEMENU]();
 		qspRestoreCallState(&state);
 	}
 }

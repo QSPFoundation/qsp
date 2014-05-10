@@ -77,9 +77,7 @@
 		static void Sleep(int msecs);
 		static int GetMSCount();
 		static void Msg(QSPString str);
-		static void DeleteMenu();
-		static void AddMenuItem(QSPString name, QSPString imgPath);
-		static int ShowMenu();
+		static int ShowMenu(QSPListItem *items, int count);
 		static void Input(QSPString text, QSP_CHAR *buffer, int maxLen);
 		static void ShowImage(QSPString file);
 		static void OpenGame(QSPString file, QSP_BOOL isNewGame);

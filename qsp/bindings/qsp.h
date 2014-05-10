@@ -75,9 +75,7 @@
 		QSP_CALL_CLOSEFILE, /* void func(QSPString file) */
 		QSP_CALL_SHOWIMAGE, /* void func(QSPString file) */
 		QSP_CALL_SHOWWINDOW, /* void func(int type, QSP_BOOL isShow) */
-		QSP_CALL_DELETEMENU, /* void func() */
-		QSP_CALL_ADDMENUITEM, /* void func(QSPString name, QSPString imgPath) */
-		QSP_CALL_SHOWMENU, /* int func() */
+		QSP_CALL_SHOWMENU, /* int func(QSPListItem *items, int count) */
 		QSP_CALL_SHOWMSGSTR, /* void func(QSPString text) */
 		QSP_CALL_REFRESHINT, /* void func(QSP_BOOL isRedraw) */
 		QSP_CALL_SETTIMER, /* void func(int msecs) */
@@ -100,6 +98,12 @@
 		QSP_CHAR *Str;
 		QSP_CHAR *End;
 	} QSPString;
+
+	typedef struct
+	{
+		QSPString Image;
+		QSPString Name;
+	} QSPListItem;
 
 	typedef int QSP_BOOL;
 

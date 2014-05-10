@@ -60,9 +60,6 @@
 	void qspCallOpenGameStatus(QSPString file);
 	void qspCallSaveGameStatus(QSPString file);
 	QSPString qspCallInputBox(QSPString text);
-
-	void qspCallAddMenuItem(QSPString name, QSPString imgPath);
-	void qspCallDeleteMenu();
-	int qspCallShowMenu();
+	int qspCallShowMenu(QSPListItem *items, int count);
 
 #endif
