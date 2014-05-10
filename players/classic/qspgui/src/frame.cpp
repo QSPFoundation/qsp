@@ -411,6 +411,14 @@ int QSPFrame::ShowMenu()
 	return m_menuIndex;
 }
 
+void QSPFrame::UpdateGamePath(const wxString &path)
+{
+	m_desc->SetGamePath(path);
+	m_vars->SetGamePath(path);
+	m_actions->SetGamePath(path);
+	m_objects->SetGamePath(path);
+}
+
 void QSPFrame::ShowError()
 {
 	bool oldIsProcessEvents;
@@ -623,7 +631,8 @@ void QSPFrame::OpenGameFile(const wxString& path)
 		m_isGameOpened = true;
 		wxCommandEvent dummy;
 		wxFileName file(path);
-		wxString configString(file.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + QSP_CONFIG);
+		wxString filePath(file.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));
+		wxString configString(filePath + QSP_CONFIG);
 		wxString newPath(wxFileExists(configString) ? configString : m_configDefPath);
 		if (newPath != m_configPath)
 		{
@@ -631,6 +640,7 @@ void QSPFrame::OpenGameFile(const wxString& path)
 			m_configPath = newPath;
 			LoadSettings();
 		}
+		UpdateGamePath(filePath);
 		OnNewGame(dummy);
 		if (m_isQuit) return;
 		UpdateTitle();

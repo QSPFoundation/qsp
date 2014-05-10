@@ -111,6 +111,7 @@
 		void DeleteMenu();
 		void AddMenuItem(const wxString &name, const wxString &imgPath);
 		int ShowMenu();
+		void UpdateGamePath(const wxString &path);
 
 		// Accessors
 		wxTimer *GetTimer() const { return m_timer; }

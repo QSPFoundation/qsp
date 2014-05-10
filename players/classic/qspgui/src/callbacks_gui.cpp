@@ -84,16 +84,16 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	QSPListItem items[MAX_LIST_ITEMS];
 	if (m_frame->IsQuit()) return;
 	// -------------------------------
-	QSPString mainDesc = QSPGetMainDesc();
-	QSPString varsDesc = QSPGetVarsDesc();
-	// -------------------------------
 	isScroll = !(QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("DISABLESCROLL")), 0, &numVal, &strVal) && numVal);
 	isCanSave = !(QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("NOSAVE")), 0, &numVal, &strVal) && numVal);
 	m_isHtml = QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("USEHTML")), 0, &numVal, &strVal) && numVal;
 	// -------------------------------
 	m_frame->GetVars()->SetIsHtml(m_isHtml);
 	if (QSPIsVarsDescChanged())
+	{
+		QSPString varsDesc = QSPGetVarsDesc();
 		m_frame->GetVars()->SetText(wxString(varsDesc.Str, varsDesc.End), isScroll);
+	}
 	// -------------------------------
 	int fullRefreshCount = QSPGetFullRefreshCount();
 	if (oldFullRefreshCount != fullRefreshCount)
@@ -103,7 +103,10 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
 	}
 	m_frame->GetDesc()->SetIsHtml(m_isHtml);
 	if (QSPIsMainDescChanged())
+	{
+		QSPString mainDesc = QSPGetMainDesc();
 		m_frame->GetDesc()->SetText(wxString(mainDesc.Str, mainDesc.End), isScroll);
+	}
 	// -------------------------------
 	m_frame->GetActions()->SetIsHtml(m_isHtml);
 	m_frame->GetActions()->SetIsShowNums(m_frame->IsShowHotkeys());
@@ -333,10 +336,7 @@ void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
 	{
 		wxFileName fileName(wxString(file.Str, file.End));
 		m_gamePath = fileName.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
-		m_frame->GetDesc()->SetGamePath(m_gamePath);
-		m_frame->GetObjects()->SetGamePath(m_gamePath);
-		m_frame->GetActions()->SetGamePath(m_gamePath);
-		m_frame->GetVars()->SetGamePath(m_gamePath);
+		m_frame->UpdateGamePath(m_gamePath);
 	}
 }
 
