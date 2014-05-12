@@ -84,7 +84,6 @@
 	void qspAddText(QSPString *dest, QSPString val, QSP_BOOL isCreate);
 	void qspUpdateText(QSPString *dest, QSPString val);
 	QSPString qspGetNewText(QSPString val);
-	QSPString qspGetAddText(QSPString dest, QSPString val);
 	QSPString qspNewEmptyString();
 	QSP_BOOL qspClearText(QSPString *s);
 	QSP_BOOL qspIsInList(QSP_CHAR *list, QSP_CHAR ch);

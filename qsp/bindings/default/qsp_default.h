@@ -74,9 +74,11 @@
 	QSP_EXTERN QSP_BOOL QSPLoadGameWorld(QSPString file, QSP_BOOL isNewGame);
 	QSP_EXTERN QSP_BOOL QSPSaveGame(QSPString file, QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPOpenSavedGame(QSPString file, QSP_BOOL isRefresh);
+
 	QSP_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSPString file, QSP_BOOL isNewGame);
 	QSP_EXTERN QSP_BOOL QSPSaveGameAsData(void *buf, int bufSize, int *realSize, QSP_BOOL isRefresh);
 	QSP_EXTERN QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRefresh);
+
 	QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
 	/* Variables */
 	QSP_EXTERN QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count);

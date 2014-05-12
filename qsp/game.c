@@ -96,7 +96,8 @@ QSPString qspGetAbsFromRelPath(QSPString path)
 {
 	QSPString absPath;
 	absPath = qspGetNewText(qspQstPath);
-	return qspGetAddText(absPath, path);
+	qspAddText(&absPath, path, QSP_FALSE);
+	return absPath;
 }
 
 void qspClearIncludes(QSP_BOOL isFirst)

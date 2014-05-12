@@ -460,7 +460,7 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 				{
 					tos.IsStr = QSP_TRUE;
 					qspAddText(&QSP_STR(tos), QSP_STR(args[0]), QSP_TRUE);
-					QSP_STR(tos) = qspGetAddText(QSP_STR(tos), QSP_STR(args[1]));
+					qspAddText(&QSP_STR(tos), QSP_STR(args[1]), QSP_FALSE);
 				}
 				else if (qspIsCanConvertToNum(args) && qspIsCanConvertToNum(args + 1))
 				{
@@ -475,7 +475,7 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 					qspConvertVariantTo(args + 1, QSP_TRUE);
 					tos.IsStr = QSP_TRUE;
 					qspAddText(&QSP_STR(tos), QSP_STR(args[0]), QSP_TRUE);
-					QSP_STR(tos) = qspGetAddText(QSP_STR(tos), QSP_STR(args[1]));
+					qspAddText(&QSP_STR(tos), QSP_STR(args[1]), QSP_FALSE);
 				}
 				break;
 			case qspOpSub:
@@ -491,12 +491,12 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 				break;
 			case qspOpAppend:
 				qspAddText(&QSP_STR(tos), QSP_STR(args[0]), QSP_TRUE);
-				QSP_STR(tos) = qspGetAddText(QSP_STR(tos), QSP_STR(args[1]));
+				qspAddText(&QSP_STR(tos), QSP_STR(args[1]), QSP_FALSE);
 				break;
 			case qspOpComma:
 				qspAddText(&QSP_STR(tos), QSP_STR(args[0]), QSP_TRUE);
 				qspAddText(&QSP_STR(tos), QSP_STATIC_STR(QSP_VALSDELIM), QSP_FALSE);
-				QSP_STR(tos) = qspGetAddText(QSP_STR(tos), QSP_STR(args[1]));
+				qspAddText(&QSP_STR(tos), QSP_STR(args[1]), QSP_FALSE);
 				break;
 			case qspOpEq:
 				QSP_NUM(tos) = QSP_TOBOOL(!qspAutoConvertCompare(args, args + 1));

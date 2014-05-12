@@ -70,12 +70,6 @@ QSPString qspGetNewText(QSPString val)
 	return string;
 }
 
-QSPString qspGetAddText(QSPString dest, QSPString val)
-{
-	qspAddText(&dest, val, QSP_FALSE);
-	return dest;
-}
-
 QSPString qspNewEmptyString()
 {
 	return qspGetNewText(qspEmptyString);
@@ -466,6 +460,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 
 QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt)
 {
+	QSPString res;
 	int txtLen, oldTxtLen, bufSize, searchLen, repLen, len;
 	QSP_CHAR *newTxt, *pos = qspStrStr(txt, searchTxt);
 	if (!pos) return qspGetNewText(txt);
@@ -488,13 +483,15 @@ QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt)
 		txt.Str = pos + searchLen;
 		pos = qspStrStr(txt, searchTxt);
 	} while (pos);
-	return qspGetAddText(qspStringFromLen(newTxt, txtLen), txt);
+	res = qspStringFromLen(newTxt, txtLen);
+	qspAddText(&res, txt, QSP_FALSE);
+	return res;
 }
 
 QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
 {
 	QSPVariant val;
-	QSPString leftSubEx, rightSubEx;
+	QSPString res, leftSubEx, rightSubEx;
 	QSP_CHAR *newTxt, *lPos, *rPos;
 	int oldRefreshCount, len, txtLen, oldTxtLen, bufSize;
 	if (qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DISABLESUBEX"))))
@@ -551,5 +548,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
 		txt.Str = rPos + QSP_STATIC_LEN(QSP_RSUBEX);
 		lPos = qspStrStr(txt, leftSubEx);
 	} while (lPos);
-	return qspGetAddText(qspStringFromLen(newTxt, txtLen), txt);
+	res = qspStringFromLen(newTxt, txtLen);
+	qspAddText(&res, txt, QSP_FALSE);
+	return res;
 }
