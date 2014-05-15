@@ -340,7 +340,7 @@ static int qspOperatorOpCode(QSPString *expr)
 	int i;
 	QSPString uStr;
 	QSPMathOpName *name;
-	if (expr->Str == expr->End) return qspOpEnd;
+	if (qspIsEmpty(*expr)) return qspOpEnd;
 	uStr = qspGetNewText(qspStringFromString(*expr, qspOpMaxLen));
 	qspUpperStr(&uStr);
 	for (i = 0; i < QSP_OPSLEVELS; ++i)
