@@ -684,7 +684,7 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
 		if (isString)
 		{
 			str = var->Values[count].Str;
-			if (str.Str && !qspIsEmpty(str))
+			if (!qspIsEmpty(str))
 			{
 				if (curInd >= 0)
 				{

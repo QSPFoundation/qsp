@@ -808,7 +808,7 @@ int main()
 		getErrorDesc, loadGameWorld, loadGameWorldFromData, saveGame, saveGameAsData, openSavedGame,
 		openSavedGameFromData, restartGame, setCallBack, init, deInit, returnValue);
 
-	// Release
+	/* Release */
 	AS3_Release(isInCallBack);
 	AS3_Release(enableDebugMode);
 	AS3_Release(getCurStateData);

@@ -1052,10 +1052,10 @@ static QSPString qspPrepareForLoop(QSPString params, QSPVar *local, QSPString *t
 	}
 	stepPos = qspStrPos(qspStringFromPair(toPos + QSP_STATIC_LEN(QSP_STATFORTO), uStr.End), QSP_STATIC_STR(QSP_STATFORSTEP), QSP_TRUE);
 	qspFreeString(uStr);
-	// Find real positions
+	/* Find real positions */
 	if (stepPos) stepPos = eqPos + (stepPos - uStr.Str);
 	toPos = eqPos + (toPos - uStr.Str);
-	// Calculate initial value of the counter
+	/* Calculate initial value of the counter */
 	oldRefreshCount = qspRefreshCount;
 	initValue = qspExprValue(qspStringFromPair(eqPos + QSP_STATIC_LEN(QSP_EQUAL), toPos));
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
@@ -1066,14 +1066,14 @@ static QSPString qspPrepareForLoop(QSPString params, QSPVar *local, QSPString *t
 		qspFreeString(QSP_STR(initValue));
 		return qspNullString;
 	}
-	// Set initial value
+	/* Set initial value */
 	if (!(var = qspVarReference(varName, QSP_TRUE)))
 		return qspNullString;
 	qspMoveVar(local, var);
 	qspConvertVariantTo(&initValue, (*varName.Str == QSP_STRCHAR[0]));
 	qspSetVarValueByReference(var, 0, &initValue);
 	if (initValue.IsStr) qspFreeString(QSP_STR(initValue));
-	// Set positions of the loop conditions
+	/* Set positions of the loop conditions */
 	if (stepPos)
 	{
 		*toValuePos = qspStringFromPair(toPos + QSP_STATIC_LEN(QSP_STATFORTO), stepPos);
@@ -1092,7 +1092,7 @@ static QSP_BOOL qspCheckForLoop(QSPString varName, QSPString toValuePos, QSPStri
 	QSPVar *var;
 	QSPVariant toValue, stepValue, curValue;
 	int oldRefreshCount = qspRefreshCount;
-	// Evaluate current step
+	/* Evaluate current step */
 	if (stepValuePos.Str)
 	{
 		stepValue = qspExprValue(stepValuePos);
@@ -1105,7 +1105,7 @@ static QSP_BOOL qspCheckForLoop(QSPString varName, QSPString toValuePos, QSPStri
 		}
 		*curStep = QSP_NUM(stepValue);
 	}
-	// Evaluate termination value
+	/* Evaluate termination value */
 	toValue = qspExprValue(toValuePos);
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
 	if (qspConvertVariantTo(&toValue, QSP_FALSE))
@@ -1114,7 +1114,7 @@ static QSP_BOOL qspCheckForLoop(QSPString varName, QSPString toValuePos, QSPStri
 		qspFreeString(QSP_STR(toValue));
 		return QSP_FALSE;
 	}
-	// Get value of the counter
+	/* Get value of the counter */
 	if (!(var = qspVarReference(varName, QSP_TRUE))) return QSP_FALSE;
 	curValue = qspGetVarValueByReference(var, 0, (*varName.Str == QSP_STRCHAR[0]));
 	if (qspConvertVariantTo(&curValue, QSP_FALSE))
@@ -1123,7 +1123,7 @@ static QSP_BOOL qspCheckForLoop(QSPString varName, QSPString toValuePos, QSPStri
 		qspFreeString(QSP_STR(curValue));
 		return QSP_FALSE;
 	}
-	// Get state of the loop
+	/* Get state of the loop */
 	if (*curStep >= 0)
 	{
 		if (QSP_NUM(curValue) > QSP_NUM(toValue)) return QSP_TRUE;
@@ -1139,7 +1139,7 @@ static void qspEndForLoop(QSPString varName, int curStep)
 {
 	QSPVar *var;
 	QSPVariant curValue;
-	// Get the counter
+	/* Get the counter */
 	if (!(var = qspVarReference(varName, QSP_TRUE))) return;
 	curValue = qspGetVarValueByReference(var, 0, (*varName.Str == QSP_STRCHAR[0]));
 	if (qspConvertVariantTo(&curValue, QSP_FALSE))
@@ -1148,9 +1148,9 @@ static void qspEndForLoop(QSPString varName, int curStep)
 		qspFreeString(QSP_STR(curValue));
 		return;
 	}
-	// Increment the counter
+	/* Increment the counter */
 	QSP_NUM(curValue) += curStep;
-	// Save new value
+	/* Save new value */
 	qspConvertVariantTo(&curValue, (*varName.Str == QSP_STRCHAR[0]));
 	qspSetVarValueByReference(var, 0, &curValue);
 	if (curValue.IsStr) qspFreeString(QSP_STR(curValue));

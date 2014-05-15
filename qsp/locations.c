@@ -141,7 +141,7 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc, QSP_BOOL isNewLoc)
 	for (i = 0; i < QSP_MAXACTIONS; ++i)
 	{
 		str = loc->Actions[i].Desc;
-		if (!str.Str || qspIsEmpty(str)) break; // use qspIsEmpty only
+		if (qspIsEmpty(str)) break;
 		str = qspFormatText(str, QSP_FALSE);
 		if (!str.Str)
 		{
@@ -154,7 +154,7 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc, QSP_BOOL isNewLoc)
 		args[0].IsStr = QSP_TRUE;
 		QSP_STR(args[0]) = str;
 		str = loc->Actions[i].Image;
-		if (str.Str && !qspIsEmpty(str)) // use qspIsEmpty only
+		if (!qspIsEmpty(str))
 		{
 			args[1].IsStr = QSP_TRUE;
 			QSP_STR(args[1]) = str;
