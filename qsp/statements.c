@@ -786,10 +786,10 @@ QSPString qspGetLineLabel(QSPString str)
 
 void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 {
-	QSPString uStr, nextPos, tempStr;
+	QSPString uStr, tempStr;
 	QSP_BOOL isInLoop, isSearchElse;
 	int statCode, count = 0;
-	QSP_CHAR *temp, *elsePos, *delimPos = 0, *paramPos = 0;
+	QSP_CHAR *temp, *nextPos, *elsePos, *delimPos = 0, *paramPos = 0;
 	line->Str = str;
 	line->LineNum = lineNum;
 	line->StatsCount = 0;
@@ -811,19 +811,25 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 			delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_COLONDELIM), QSP_FALSE);
 			if (delimPos)
 			{
-				nextPos = qspStringFromPair(delimPos + QSP_STATIC_LEN(QSP_COLONDELIM), str.End);
-				if (qspIsEmpty(nextPos)) isInLoop = QSP_FALSE;
+				nextPos = delimPos + QSP_STATIC_LEN(QSP_COLONDELIM);
+				if (nextPos == str.End) isInLoop = QSP_FALSE;
 			}
 			break;
 		case qspStatElse:
-			nextPos = qspStringFromPair(paramPos, str.End);
-			qspSkipSpaces(&nextPos);
-			if (!qspIsEmpty(nextPos) && *nextPos.Str == QSP_COLONDELIM[0]) ++nextPos.Str;
-			delimPos = (!qspIsEmpty(nextPos) ? nextPos.Str : 0);
+			str.Str = paramPos;
+			qspSkipSpaces(&str);
+			nextPos = str.Str;
+			if (nextPos != str.End)
+			{
+				if (*nextPos == QSP_COLONDELIM[0]) ++nextPos;
+				delimPos = nextPos;
+			}
+			else
+				delimPos = 0;
 			break;
 		default:
 			delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_STATDELIM), QSP_FALSE);
-			if (delimPos) nextPos = qspStringFromPair(delimPos + QSP_STATIC_LEN(QSP_STATDELIM), str.End);
+			if (delimPos) nextPos = delimPos + QSP_STATIC_LEN(QSP_STATDELIM);
 			tempStr = qspStringFromPair(uStr.Str + (int)(str.Str - line->Str.Str), uStr.End);
 			elsePos = qspStrPos(tempStr, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
 			if (elsePos)
@@ -831,8 +837,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 				elsePos = line->Str.Str + (elsePos - uStr.Str);
 				if (!delimPos || elsePos < delimPos)
 				{
-					delimPos = elsePos;
-					nextPos = qspStringFromPair(delimPos, str.End);
+					nextPos = delimPos = elsePos;
 					elsePos = 0;
 				}
 			}
@@ -856,14 +861,12 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 			line->Stats[count].EndPos = (int)(delimPos - line->Str.Str);
 			if (paramPos)
 			{
-				tempStr = qspStringFromPair(paramPos, str.End);
-				qspSkipSpaces(&tempStr);
-				line->Stats[count].ParamPos = (int)(tempStr.Str - line->Str.Str);
+				str.Str = paramPos;
+				qspSkipSpaces(&str);
 			}
-			else
-				line->Stats[count].ParamPos = (int)(str.Str - line->Str.Str);
+			line->Stats[count].ParamPos = (int)(str.Str - line->Str.Str);
 			++count;
-			str = nextPos;
+			str.Str = nextPos;
 			qspSkipSpaces(&str);
 			paramPos = 0;
 			statCode = qspGetStatCode(str, &paramPos);
@@ -878,19 +881,25 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 					delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_COLONDELIM), QSP_FALSE);
 					if (delimPos)
 					{
-						nextPos = qspStringFromPair(delimPos + QSP_STATIC_LEN(QSP_COLONDELIM), str.End);
-						if (qspIsEmpty(nextPos)) isInLoop = QSP_FALSE;
+						nextPos = delimPos + QSP_STATIC_LEN(QSP_COLONDELIM);
+						if (nextPos == str.End) isInLoop = QSP_FALSE;
 					}
 					break;
 				case qspStatElse:
-					nextPos = qspStringFromPair(paramPos, str.End);
-					qspSkipSpaces(&nextPos);
-					if (!qspIsEmpty(nextPos) && *nextPos.Str == QSP_COLONDELIM[0]) ++nextPos.Str;
-					delimPos = (!qspIsEmpty(nextPos) ? nextPos.Str : 0);
+					str.Str = paramPos;
+					qspSkipSpaces(&str);
+					nextPos = str.Str;
+					if (nextPos != str.End)
+					{
+						if (*nextPos == QSP_COLONDELIM[0]) ++nextPos;
+						delimPos = nextPos;
+					}
+					else
+						delimPos = 0;
 					break;
 				default:
 					delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_STATDELIM), QSP_FALSE);
-					if (delimPos) nextPos = qspStringFromPair(delimPos + QSP_STATIC_LEN(QSP_STATDELIM), str.End);
+					if (delimPos) nextPos = delimPos + QSP_STATIC_LEN(QSP_STATDELIM);
 					if (elsePos && str.Str >= elsePos) elsePos = 0;
 					if (!elsePos && isSearchElse)
 					{
@@ -903,8 +912,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 					}
 					if (elsePos && (!delimPos || elsePos < delimPos))
 					{
-						delimPos = elsePos;
-						nextPos = qspStringFromPair(delimPos, str.End);
+						nextPos = delimPos = elsePos;
 						elsePos = 0;
 					}
 					if (statCode == qspStatUnknown && str.Str != delimPos)
@@ -939,12 +947,10 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 		line->Stats[count].EndPos = (int)(str.End - line->Str.Str);
 	if (paramPos)
 	{
-		tempStr = qspStringFromPair(paramPos, str.End);
-		qspSkipSpaces(&tempStr);
-		line->Stats[count].ParamPos = (int)(tempStr.Str - line->Str.Str);
+		str.Str = paramPos;
+		qspSkipSpaces(&str);
 	}
-	else
-		line->Stats[count].ParamPos = (int)(str.Str - line->Str.Str);
+	line->Stats[count].ParamPos = (int)(str.Str - line->Str.Str);
 	switch (line->Stats->Stat)
 	{
 	case qspStatAct:
