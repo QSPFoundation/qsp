@@ -76,7 +76,7 @@ QSPString qspGetErrorDesc(int errorNum)
 	case QSP_ERR_TOOMANYVARS: str = QSP_STATIC_STR(QSP_FMT("Too many variables!")); break;
 	case QSP_ERR_INCORRECTREGEXP: str = QSP_STATIC_STR(QSP_FMT("Regular expression's error!")); break;
 	case QSP_ERR_CODENOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Code not found!")); break;
-	case QSP_ERR_TONOTFOUND: str = QSP_STATIC_STR(QSP_FMT("[to] not found!")); break;
+	case QSP_ERR_LOOPWHILENOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Loop condition not found!")); break;
 	default: str = QSP_STATIC_STR(QSP_FMT("Unknown error!")); break;
 	}
 	return str;

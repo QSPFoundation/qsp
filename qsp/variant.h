@@ -38,8 +38,8 @@
 	/* External functions */
 	void qspFreeVariants(QSPVariant *, int);
 	QSPVariant qspGetEmptyVariant(QSP_BOOL);
-	QSP_BOOL qspConvertVariantTo(QSPVariant *, QSP_BOOL);
-	void qspCopyVariant(QSPVariant *, QSPVariant *);
+	QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString);
+	void qspCopyVariant(QSPVariant *dest, QSPVariant *src);
 	QSP_BOOL qspIsCanConvertToNum(QSPVariant *);
 	int qspAutoConvertCompare(QSPVariant *, QSPVariant *);
 

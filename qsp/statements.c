@@ -49,11 +49,10 @@ static QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int co
 static QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
 static QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
 static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
-static QSPString qspPrepareForLoop(QSPString params, QSPString *toValuePos, QSPString *stepValuePos);
-static QSP_BOOL qspCheckForLoop(QSPString varName, QSPString toValuePos, QSPString stepValuePos, int *curStep);
-static void qspEndForLoop(QSPString varName, int curStep);
-static QSP_BOOL qspStatementSinglelineFor(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
-static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *s, int endLine, int lineInd, int codeOffset, QSPString *jumpTo);
+static QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo);
+static QSP_BOOL qspCheckCondition(QSPString expr);
+static QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
+static QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lineInd, int codeOffset, QSPString *jumpTo);
 static QSP_BOOL qspStatementAddText(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 static QSP_BOOL qspStatementClear(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 static QSP_BOOL qspStatementExit(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
@@ -136,7 +135,7 @@ void qspInitStats()
 	qspAddStatement(qspStatSet, 0, 0, 0, 0);
 	qspAddStatement(qspStatIf, 0, 0, 1, 1, 2);
 	qspAddStatement(qspStatAct, 0, 0, 1, 2, 1, 1);
-	qspAddStatement(qspStatFor, 0, 0, 0, 0);
+	qspAddStatement(qspStatLoop, 0, 0, 0, 0);
 	qspAddStatement(qspStatAddObj, 0, qspStatementAddObject, 1, 3, 1, 1, 2);
 	qspAddStatement(qspStatClA, 3, qspStatementClear, 0, 0);
 	qspAddStatement(qspStatCloseAll, 1, qspStatementCloseFile, 0, 0);
@@ -190,7 +189,7 @@ void qspInitStats()
 	qspAddStatName(qspStatSet, QSP_STATIC_STR(QSP_FMT("LET")), 2);
 	qspAddStatName(qspStatIf, QSP_STATIC_STR(QSP_FMT("IF")), 2);
 	qspAddStatName(qspStatAct, QSP_STATIC_STR(QSP_FMT("ACT")), 2);
-	qspAddStatName(qspStatFor, QSP_STATIC_STR(QSP_FMT("FOR")), 2);
+	qspAddStatName(qspStatLoop, QSP_STATIC_STR(QSP_FMT("LOOP")), 2);
 	qspAddStatName(qspStatAddObj, QSP_STATIC_STR(QSP_FMT("ADDOBJ")), 2);
 	qspAddStatName(qspStatAddObj, QSP_STATIC_STR(QSP_FMT("ADD OBJ")), 2);
 	qspAddStatName(qspStatClA, QSP_STATIC_STR(QSP_FMT("CLA")), 2);
@@ -287,7 +286,7 @@ static int qspSearchElse(QSPLineOfCode *s, int start, int end)
 		switch (s->Stats->Stat)
 		{
 		case qspStatAct:
-		case qspStatFor:
+		case qspStatLoop:
 		case qspStatIf:
 			if (s->IsMultiline) ++c;
 			break;
@@ -314,7 +313,7 @@ static int qspSearchEnd(QSPLineOfCode *s, int start, int end)
 		switch (s->Stats->Stat)
 		{
 		case qspStatAct:
-		case qspStatFor:
+		case qspStatLoop:
 		case qspStatIf:
 			if (s->IsMultiline) ++c;
 			break;
@@ -430,8 +429,8 @@ static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPS
 			return QSP_FALSE;
 		case qspStatIf:
 			return qspStatementIf(s, i, endStat, jumpTo);
-		case qspStatFor:
-			return qspStatementSinglelineFor(s, i, endStat, jumpTo);
+		case qspStatLoop:
+			return qspStatementSinglelineLoop(s, i, endStat, jumpTo);
 		case qspStatLocal:
 			if (i < s->StatsCount - 1)
 				qspStatementLocal(qspStringFromPair(s->Str.Str + s->Stats[i].ParamPos, s->Str.Str + s->Stats[i].EndPos));
@@ -464,7 +463,7 @@ static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPS
 static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset,
 	QSPString *jumpTo, int *lineInd, int *action)
 {
-	QSPVariant arg;
+	QSP_BOOL condition;
 	QSPLineOfCode *line;
 	int ind, statCode, elsePos, oldRefreshCount;
 	ind = *lineInd;
@@ -481,10 +480,10 @@ static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
 	case qspStatIf:
 	case qspStatElseIf:
 		oldRefreshCount = qspRefreshCount;
-		qspGetStatArgs(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, line->Str.Str + line->Stats->EndPos), statCode, &arg);
+		condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, line->Str.Str + line->Stats->EndPos));
 		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
 		elsePos = qspSearchElse(s, ind + 1, endLine);
-		if (QSP_NUM(arg))
+		if (condition)
 		{
 			*lineInd = endLine;
 			*action = qspFlowSkip;
@@ -503,10 +502,10 @@ static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
 		*action = qspFlowContinue;
 		qspStatementMultilineAddAct(s, endLine, ind, codeOffset > 0);
 		break;
-	case qspStatFor:
+	case qspStatLoop:
 		*lineInd = endLine;
 		*action = qspFlowSkip;
-		return qspStatementMultilineFor(s, endLine, ind, codeOffset, jumpTo);
+		return qspStatementMultilineLoop(s, endLine, ind, codeOffset, jumpTo);
 	}
 	return QSP_FALSE;
 }
@@ -514,7 +513,7 @@ static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
 static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset,
 	QSPString *jumpTo, int *lineInd, int *action)
 {
-	QSPVariant arg;
+	QSP_BOOL condition;
 	QSPLineOfCode *line;
 	QSP_CHAR *pos;
 	int ind, elsePos, oldRefreshCount;
@@ -536,9 +535,9 @@ static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
 			break;
 		}
 		oldRefreshCount = qspRefreshCount;
-		qspGetStatArgs(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, pos), qspStatElseIf, &arg);
+		condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, pos));
 		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-		if (QSP_NUM(arg))
+		if (condition)
 		{
 			*lineInd = endLine;
 			*action = qspFlowSkip;
@@ -777,7 +776,7 @@ QSPString qspGetLineLabel(QSPString str)
 			str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_STATDELIM), delimPos);
 		else
 			str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_STATDELIM), str.End);
-		str = qspDelSpc(str);
+		str = qspGetNewText(qspDelSpc(str));
 		qspUpperStr(&str);
 		return str;
 	}
@@ -805,7 +804,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 		switch (statCode)
 		{
 		case qspStatAct:
-		case qspStatFor:
+		case qspStatLoop:
 		case qspStatIf:
 		case qspStatElseIf:
 			delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_COLONDELIM), QSP_FALSE);
@@ -875,7 +874,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 				switch (statCode)
 				{
 				case qspStatAct:
-				case qspStatFor:
+				case qspStatLoop:
 				case qspStatIf:
 				case qspStatElseIf:
 					delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_COLONDELIM), QSP_FALSE);
@@ -954,7 +953,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 	switch (line->Stats->Stat)
 	{
 	case qspStatAct:
-	case qspStatFor:
+	case qspStatLoop:
 	case qspStatIf:
 	case qspStatElseIf:
 		line->IsMultiline = (line->StatsCount == 1 && *(line->Str.Str + line->Stats->EndPos) == QSP_COLONDELIM[0]);
@@ -968,7 +967,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 
 static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
 {
-	QSPVariant arg;
+	QSP_BOOL condition;
 	int i, c, elseStat, oldRefreshCount;
 	QSP_CHAR *pos = s->Str.Str + s->Stats[startStat].EndPos;
 	if (*pos != QSP_COLONDELIM[0])
@@ -1014,9 +1013,9 @@ static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSP
 		return QSP_FALSE;
 	}
 	oldRefreshCount = qspRefreshCount;
-	qspGetStatArgs(qspStringFromPair(s->Str.Str + s->Stats[startStat].ParamPos, pos), qspStatIf, &arg);
+	condition = qspCheckCondition(qspStringFromPair(s->Str.Str + s->Stats[startStat].ParamPos, pos));
 	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-	if (QSP_NUM(arg))
+	if (condition)
 	{
 		if (elseStat)
 			return qspExecStringWithLocals(s, startStat + 1, elseStat, jumpTo);
@@ -1028,210 +1027,157 @@ static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSP
 	return QSP_FALSE;
 }
 
-static QSPString qspPrepareForLoop(QSPString params, QSPString *toValuePos, QSPString *stepValuePos)
+static QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo)
 {
-	QSPVar *var;
 	int oldRefreshCount;
-	QSPVariant initValue;
-	QSPString uStr, varName;
-	QSP_CHAR *eqPos, *toPos, *stepPos;
-	eqPos = qspStrPos(params, QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
-	if (!eqPos)
-	{
-		qspSetError(QSP_ERR_EQNOTFOUND);
-		return qspNullString;
-	}
-	uStr = qspGetNewText(qspStringFromPair(eqPos, params.End));
+	QSPString uStr;
+	QSPLineOfCode initializatorLine;
+	QSP_BOOL isExit;
+	QSP_CHAR *whilePos, *stepPos;
+	uStr = qspGetNewText(params);
 	qspUpperStr(&uStr);
-	toPos = qspStrPos(qspStringFromPair(uStr.Str + QSP_STATIC_LEN(QSP_EQUAL), uStr.End), QSP_STATIC_STR(QSP_STATFORTO), QSP_TRUE);
-	if (!toPos)
+	whilePos = qspStrPos(uStr, QSP_STATIC_STR(QSP_STATLOOPWHILE), QSP_TRUE);
+	if (!whilePos)
 	{
-		qspSetError(QSP_ERR_TONOTFOUND);
+		qspSetError(QSP_ERR_LOOPWHILENOTFOUND);
 		qspFreeString(uStr);
-		return qspNullString;
+		return QSP_FALSE;
 	}
-	stepPos = qspStrPos(qspStringFromPair(toPos + QSP_STATIC_LEN(QSP_STATFORTO), uStr.End), QSP_STATIC_STR(QSP_STATFORSTEP), QSP_TRUE);
+	stepPos = qspStrPos(qspStringFromPair(whilePos + QSP_STATIC_LEN(QSP_STATLOOPWHILE), uStr.End), QSP_STATIC_STR(QSP_STATLOOPSTEP), QSP_TRUE);
 	qspFreeString(uStr);
 	/* Find real positions */
-	if (stepPos) stepPos = eqPos + (stepPos - uStr.Str);
-	toPos = eqPos + (toPos - uStr.Str);
-	/* Calculate initial value of the counter */
+	if (stepPos) stepPos = params.Str + (stepPos - uStr.Str);
+	whilePos = params.Str + (whilePos - uStr.Str);
+	/* Execute loop initialization */
+	qspInitLineOfCode(&initializatorLine, qspStringFromPair(params.Str, whilePos), 0);
 	oldRefreshCount = qspRefreshCount;
-	initValue = qspExprValue(qspStringFromPair(eqPos + QSP_STATIC_LEN(QSP_EQUAL), toPos));
-	if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-		return qspNullString;
-	varName = qspDelSpc(qspStringFromPair(params.Str, eqPos));
-	if (qspIsEmpty(varName))
-	{
-		qspSetError(QSP_ERR_NOTCORRECTNAME);
-		if (initValue.IsStr) qspFreeString(QSP_STR(initValue));
-		return qspNullString;
-	}
-	if (qspConvertVariantTo(&initValue, (*varName.Str == QSP_STRCHAR[0])))
-	{
-		qspSetError(QSP_ERR_TYPEMISMATCH);
-		qspFreeString(QSP_STR(initValue));
-		return qspNullString;
-	}
-	/* Set initial value */
-	if (!(var = qspVarReference(varName, QSP_TRUE)))
-	{
-		if (initValue.IsStr) qspFreeString(QSP_STR(initValue));
-		return qspNullString;
-	}
-	qspSetVarValueByReference(var, 0, &initValue);
-	if (initValue.IsStr) qspFreeString(QSP_STR(initValue));
+	isExit = qspExecString(&initializatorLine, 0, initializatorLine.StatsCount, jumpTo);
+	if (initializatorLine.Label.Str) free(initializatorLine.Label.Str);
+	if (initializatorLine.Stats) free(initializatorLine.Stats);
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
+	if (isExit || !qspIsEmpty(*jumpTo)) return isExit; /* TODO: jump returns TRUE */
 	/* Set positions of the loop conditions */
 	if (stepPos)
 	{
-		*toValuePos = qspStringFromPair(toPos + QSP_STATIC_LEN(QSP_STATFORTO), stepPos);
-		*stepValuePos = qspStringFromPair(stepPos + QSP_STATIC_LEN(QSP_STATFORSTEP), params.End);
+		*condition = qspStringFromPair(whilePos + QSP_STATIC_LEN(QSP_STATLOOPWHILE), stepPos);
+		*iterator = qspStringFromPair(stepPos + QSP_STATIC_LEN(QSP_STATLOOPSTEP), params.End);
 	}
 	else
 	{
-		*toValuePos = qspStringFromPair(toPos + QSP_STATIC_LEN(QSP_STATFORTO), params.End);
-		*stepValuePos = qspNullString;
-	}
-	return varName;
-}
-
-static QSP_BOOL qspCheckForLoop(QSPString varName, QSPString toValuePos, QSPString stepValuePos, int *curStep)
-{
-	QSPVar *var;
-	QSPVariant toValue, stepValue, curValue;
-	int oldRefreshCount = qspRefreshCount;
-	/* Evaluate current step */
-	if (stepValuePos.Str)
-	{
-		stepValue = qspExprValue(stepValuePos);
-		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-		if (qspConvertVariantTo(&stepValue, QSP_FALSE))
-		{
-			qspSetError(QSP_ERR_TYPEMISMATCH);
-			qspFreeString(QSP_STR(stepValue));
-			return QSP_FALSE;
-		}
-		*curStep = QSP_NUM(stepValue);
-	}
-	/* Evaluate termination value */
-	toValue = qspExprValue(toValuePos);
-	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-	if (qspConvertVariantTo(&toValue, QSP_FALSE))
-	{
-		qspSetError(QSP_ERR_TYPEMISMATCH);
-		qspFreeString(QSP_STR(toValue));
-		return QSP_FALSE;
-	}
-	/* Get value of the counter */
-	if (!(var = qspVarReference(varName, QSP_TRUE))) return QSP_FALSE;
-	curValue = qspGetVarValueByReference(var, 0, (*varName.Str == QSP_STRCHAR[0]));
-	if (qspConvertVariantTo(&curValue, QSP_FALSE))
-	{
-		qspSetError(QSP_ERR_TYPEMISMATCH);
-		qspFreeString(QSP_STR(curValue));
-		return QSP_FALSE;
-	}
-	/* Get state of the loop */
-	if (*curStep >= 0)
-	{
-		if (QSP_NUM(curValue) > QSP_NUM(toValue)) return QSP_TRUE;
-	}
-	else
-	{
-		if (QSP_NUM(curValue) < QSP_NUM(toValue)) return QSP_TRUE;
+		*condition = qspStringFromPair(whilePos + QSP_STATIC_LEN(QSP_STATLOOPWHILE), params.End);
+		*iterator = qspNullString;
 	}
 	return QSP_FALSE;
 }
 
-static void qspEndForLoop(QSPString varName, int curStep)
+static QSP_BOOL qspCheckCondition(QSPString expr)
 {
-	QSPVar *var;
-	QSPVariant curValue;
-	/* Get the counter */
-	if (!(var = qspVarReference(varName, QSP_TRUE))) return;
-	curValue = qspGetVarValueByReference(var, 0, (*varName.Str == QSP_STRCHAR[0]));
-	if (qspConvertVariantTo(&curValue, QSP_FALSE))
+	int oldRefreshCount = qspRefreshCount;
+	QSPVariant condValue = qspExprValue(expr);
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
+	if (qspConvertVariantTo(&condValue, QSP_FALSE))
 	{
 		qspSetError(QSP_ERR_TYPEMISMATCH);
-		qspFreeString(QSP_STR(curValue));
-		return;
+		qspFreeString(QSP_STR(condValue));
+		return QSP_FALSE;
 	}
-	/* Increment the counter */
-	QSP_NUM(curValue) += curStep;
-	/* Save new value */
-	qspConvertVariantTo(&curValue, (*varName.Str == QSP_STRCHAR[0]));
-	qspSetVarValueByReference(var, 0, &curValue);
-	if (curValue.IsStr) qspFreeString(QSP_STR(curValue));
+	return (QSP_NUM(condValue) != 0);
 }
 
-static QSP_BOOL qspStatementSinglelineFor(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
+static QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
 {
-	QSP_BOOL isExit;
-	int curStep, oldRefreshCount;
+	QSP_BOOL isExit, conditionValue;
+	int oldRefreshCount;
 	QSP_CHAR *endPos;
-	QSPString varName, toValuePos, stepValuePos;
+	QSPLineOfCode iteratorLine;
+	QSPString condition, iterator;
 	endPos = s->Str.Str + s->Stats[startStat].EndPos;
 	if (*endPos != QSP_COLONDELIM[0])
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return QSP_FALSE;
 	}
-	varName = qspPrepareForLoop(qspStringFromPair(s->Str.Str + s->Stats[startStat].ParamPos, endPos), &toValuePos, &stepValuePos);
-	if (!varName.Str) return QSP_FALSE;
-	curStep = 1;
 	oldRefreshCount = qspRefreshCount;
+	isExit = qspPrepareLoop(qspStringFromPair(s->Str.Str + s->Stats[startStat].ParamPos, endPos), &condition, &iterator, jumpTo);
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
+	if (isExit || !qspIsEmpty(*jumpTo)) return isExit;
+	qspInitLineOfCode(&iteratorLine, iterator, 0);
 	while (1)
 	{
-		if (qspCheckForLoop(varName, toValuePos, stepValuePos, &curStep)) break;
-		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
+		/* Check condition */
+		conditionValue = qspCheckCondition(condition);
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+		if (!conditionValue) break;
+		/* Execute body */
 		isExit = qspExecStringWithLocals(s, startStat + 1, endStat, jumpTo);
-		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 		if (isExit || !qspIsEmpty(*jumpTo)) break;
-		qspEndForLoop(varName, curStep);
-		if (qspErrorNum) return QSP_FALSE;
+		/* Execute iterator */
+		isExit = qspExecString(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+		if (isExit || !qspIsEmpty(*jumpTo)) break;
 	}
-	return QSP_FALSE;
+	if (iteratorLine.Label.Str) free(iteratorLine.Label.Str);
+	if (iteratorLine.Stats) free(iteratorLine.Stats);
+	return isExit;
 }
 
-static QSP_BOOL qspStatementMultilineFor(QSPLineOfCode *s, int endLine, int lineInd,
+static QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lineInd,
 	int codeOffset, QSPString *jumpTo)
 {
-	QSP_BOOL isExit;
-	int curStep, oldRefreshCount;
+	QSP_BOOL isExit, conditionValue;
+	int oldRefreshCount;
 	QSP_CHAR *endPos;
-	QSPString varName, toValuePos, stepValuePos;
-	QSPLineOfCode *line = s + lineInd;
+	QSPString condition, iterator;
+	QSPLineOfCode iteratorLine, *line = s + lineInd;
 	endPos = line->Str.Str + line->Stats->EndPos;
 	if (*endPos != QSP_COLONDELIM[0])
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return QSP_FALSE;
 	}
-	varName = qspPrepareForLoop(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, endPos), &toValuePos, &stepValuePos);
-	if (!varName.Str) return QSP_FALSE;
-	curStep = 1;
-	++lineInd;
 	oldRefreshCount = qspRefreshCount;
+	isExit = qspPrepareLoop(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, endPos), &condition, &iterator, jumpTo);
+	if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
+	if (isExit || !qspIsEmpty(*jumpTo)) return isExit;
+	qspInitLineOfCode(&iteratorLine, iterator, 0);
+	++lineInd;
 	while (1)
 	{
-		if (qspCheckForLoop(varName, toValuePos, stepValuePos, &curStep)) break;
-		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-		isExit = qspExecCodeBlockWithLocals(s, lineInd, endLine, codeOffset, jumpTo);
-		if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-		if (isExit || !qspIsEmpty(*jumpTo)) break;
+		/* Check condition */
 		if (codeOffset > 0)
 		{
 			qspRealLine = line->LineNum + codeOffset;
 			if (qspIsDebug)
 			{
 				qspCallDebug(line->Str);
-				if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+				if (qspRefreshCount != oldRefreshCount) break;
 			}
 		}
-		qspEndForLoop(varName, curStep);
-		if (qspErrorNum) return QSP_FALSE;
+		conditionValue = qspCheckCondition(condition);
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+		if (!conditionValue) break;
+		/* Execute body */
+		isExit = qspExecCodeBlockWithLocals(s, lineInd, endLine, codeOffset, jumpTo);
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+		if (isExit || !qspIsEmpty(*jumpTo)) break;
+		/* Execute iterator */
+		if (codeOffset > 0)
+		{
+			qspRealLine = line->LineNum + codeOffset;
+			if (qspIsDebug)
+			{
+				qspCallDebug(line->Str);
+				if (qspRefreshCount != oldRefreshCount) break;
+			}
+		}
+		isExit = qspExecString(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
+		if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+		if (isExit || !qspIsEmpty(*jumpTo)) break;
 	}
-	return QSP_FALSE;
+	if (iteratorLine.Label.Str) free(iteratorLine.Label.Str);
+	if (iteratorLine.Stats) free(iteratorLine.Stats);
+	return isExit;
 }
 
 static QSP_BOOL qspStatementAddText(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
