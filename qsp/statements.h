@@ -49,8 +49,7 @@
 	enum
 	{
 		qspFlowExecute,
-		qspFlowSkip,
-		qspFlowContinue
+		qspFlowJumpToSpecified
 	};
 
 	enum
