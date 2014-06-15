@@ -786,9 +786,9 @@ QSPString qspGetLineLabel(QSPString str)
 	{
 		delimPos = qspStrChar(str, QSP_STATDELIM[0]);
 		if (delimPos)
-			str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_STATDELIM), delimPos);
+			str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_LABEL), delimPos);
 		else
-			str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_STATDELIM), str.End);
+			str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_LABEL), str.End);
 		str = qspGetNewText(qspDelSpc(str));
 		qspUpperStr(&str);
 		return str;
