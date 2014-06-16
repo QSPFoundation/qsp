@@ -929,7 +929,10 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 					}
 					if (statCode == qspStatUnknown && str.Str != delimPos)
 					{
-						temp = qspStrPos(qspStringFromPair(str.Str, delimPos), QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
+						if (delimPos)
+							temp = qspStrPos(qspStringFromPair(str.Str, delimPos), QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
+						else
+							temp = qspStrPos(str, QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
 						statCode = (temp ? qspStatSet : qspStatMPL);
 					}
 					break;

@@ -624,7 +624,7 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 	while (index < itemsCount)
 	{
 		if (compOpCodes[index] == qspOpValue && compValues[index].IsStr)
-			free(QSP_STR(compValues[index]).Str);
+			qspFreeString(QSP_STR(compValues[index]));
 		++index;
 	}
 	return qspGetEmptyVariant(QSP_FALSE);
@@ -741,7 +741,7 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
 		}
 		else
 		{
-			if (s.Str >= s.End)
+			if (qspIsEmpty(s))
 			{
 				if (opStack[opSp] >= qspOpFirst_Function)
 					qspSetError(QSP_ERR_ARGSCOUNT);
@@ -749,7 +749,7 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
 					qspSetError(QSP_ERR_SYNTAX);
 				break;
 			}
-			if (qspIsDigit(*s.Str))
+			else if (qspIsDigit(*s.Str))
 			{
 				v.IsStr = QSP_FALSE;
 				QSP_NUM(v) = qspGetNumber(&s);
@@ -886,12 +886,17 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
 					waitForOperator = QSP_TRUE;
 				}
 			}
+			else
+			{
+				qspSetError(QSP_ERR_SYNTAX);
+				break;
+			}
 		}
 	}
 	while (--itemsCount >= 0)
 	{
 		if (compOpCodes[itemsCount] == qspOpValue && compValues[itemsCount].IsStr)
-			free(QSP_STR(compValues[itemsCount]).Str);
+			qspFreeString(QSP_STR(compValues[itemsCount]));
 	}
 	return 0;
 }
