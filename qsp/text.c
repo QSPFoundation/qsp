@@ -230,29 +230,29 @@ QSPString qspJoinStrs(QSPString *s, int count, QSPString delim)
 int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
 {
 	QSPString *ret;
-	int allocChars, count = 0, bufSize = 8, delimLen = qspStrLen(delim);
+	int newStrLen, count = 0, bufSize = 8, delimLen = qspStrLen(delim);
 	QSP_CHAR *newStr, *found = qspStrStr(str, delim);
 	ret = (QSPString *)malloc(bufSize * sizeof(QSPString));
 	while (found)
 	{
-		allocChars = (int)(found - str.Str);
-		newStr = (QSP_CHAR *)malloc(allocChars * sizeof(QSP_CHAR));
-		memcpy(newStr, str.Str, allocChars * sizeof(QSP_CHAR));
+		newStrLen = (int)(found - str.Str);
+		newStr = (QSP_CHAR *)malloc(newStrLen * sizeof(QSP_CHAR));
+		memcpy(newStr, str.Str, newStrLen * sizeof(QSP_CHAR));
 		if (count >= bufSize)
 		{
 			bufSize = count + 16;
 			ret = (QSPString *)realloc(ret, bufSize * sizeof(QSPString));
 		}
-		ret[count++] = qspStringFromLen(newStr, allocChars);
+		ret[count++] = qspStringFromLen(newStr, newStrLen);
 		str.Str = found + delimLen;
 		found = qspStrStr(str, delim);
 	}
-	allocChars = qspStrLen(str);
-	newStr = (QSP_CHAR *)malloc(allocChars * sizeof(QSP_CHAR));
-	memcpy(newStr, str.Str, allocChars * sizeof(QSP_CHAR));
+	newStrLen = qspStrLen(str);
+	newStr = (QSP_CHAR *)malloc(newStrLen * sizeof(QSP_CHAR));
+	memcpy(newStr, str.Str, newStrLen * sizeof(QSP_CHAR));
 	if (count >= bufSize)
 		ret = (QSPString *)realloc(ret, (count + 1) * sizeof(QSPString));
-	ret[count++] = qspStringFromLen(newStr, allocChars);
+	ret[count++] = qspStringFromLen(newStr, newStrLen);
 	*res = ret;
 	return count;
 }
