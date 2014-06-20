@@ -185,7 +185,7 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate)
 		}
 		if (!qspStrsComp(var->Name, uName))
 		{
-			free(uName.Str);
+			qspFreeString(uName);
 			return var;
 		}
 		++var;
@@ -213,7 +213,7 @@ static int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL isCreate)
 		ind = (QSPVarIndex *)bsearch(&uStr, var->Indices, n, sizeof(QSPVarIndex), qspIndStringCompare);
 		if (ind)
 		{
-			free(uStr.Str);
+			qspFreeString(uStr);
 			return ind->Index;
 		}
 	}
@@ -237,7 +237,7 @@ static int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL isCreate)
 		var->Indices[i].Index = n;
 		return n;
 	}
-	free(uStr.Str);
+	qspFreeString(uStr);
 	return -1;
 }
 
@@ -276,7 +276,7 @@ static QSPVar *qspGetVarData(QSPString s, QSP_BOOL isSet, int *index)
 			if (ind.IsStr)
 			{
 				*index = qspGetVarTextIndex(var, QSP_STR(ind), isSet);
-				free(QSP_STR(ind).Str);
+				qspFreeString(QSP_STR(ind));
 			}
 			else
 				*index = QSP_NUM(ind);

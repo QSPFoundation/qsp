@@ -284,7 +284,7 @@ void qspFreeStrs(QSPString *strs, int count)
 {
 	if (strs)
 	{
-		while (--count >= 0) free(strs[count].Str);
+		while (--count >= 0) qspFreeString(strs[count]);
 		free(strs);
 	}
 }
@@ -543,7 +543,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
 			newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
 		}
 		memcpy(newTxt + oldTxtLen, QSP_STR(val).Str, len * sizeof(QSP_CHAR));
-		free(QSP_STR(val).Str);
+		qspFreeString(QSP_STR(val));
 		oldTxtLen = txtLen;
 		txt.Str = rPos + QSP_STATIC_LEN(QSP_RSUBEX);
 		lPos = qspStrStr(txt, leftSubEx);

@@ -28,8 +28,8 @@ void qspFreePrepLines(QSPLineOfCode *strs, int count)
 	{
 		while (--count >= 0)
 		{
-			free(strs[count].Str.Str);
-			if (strs[count].Label.Str) free(strs[count].Label.Str);
+			qspFreeString(strs[count].Str);
+			qspFreeString(strs[count].Label);
 			if (strs[count].Stats) free(strs[count].Stats);
 		}
 		free(strs);

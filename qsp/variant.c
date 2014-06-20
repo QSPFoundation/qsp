@@ -22,7 +22,7 @@
 void qspFreeVariants(QSPVariant *args, int count)
 {
 	while (--count >= 0)
-		if (args[count].IsStr) free(QSP_STR(args[count]).Str);
+		if (args[count].IsStr) qspFreeString(QSP_STR(args[count]));
 }
 
 QSPVariant qspGetEmptyVariant(QSP_BOOL isStringType)
@@ -46,7 +46,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
 		{
 			num = qspStrToNum(QSP_PSTR(val), &isValid);
 			if (!isValid) return QSP_TRUE;
-			free(QSP_PSTR(val).Str);
+			qspFreeString(QSP_PSTR(val));
 			QSP_PNUM(val) = num;
 			val->IsStr = QSP_FALSE;
 		}

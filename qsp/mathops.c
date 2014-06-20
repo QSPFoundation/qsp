@@ -330,7 +330,7 @@ static int qspFunctionOpCode(QSPString funName)
 	funName = qspGetNewText(funName);
 	qspUpperStr(&funName);
 	name = (QSPMathOpName *)bsearch(&funName, qspOpsNames[QSP_OPSLEVELS - 1], qspOpsNamesCounts[QSP_OPSLEVELS - 1], sizeof(QSPMathOpName), qspMathOpStringFullCompare);
-	free(funName.Str);
+	qspFreeString(funName);
 	if (name) return name->Code;
 	return qspOpUnknown;
 }
@@ -349,11 +349,11 @@ static int qspOperatorOpCode(QSPString *expr)
 		if (name)
 		{
 			expr->Str += qspStrLen(name->Name);
-			free(uStr.Str);
+			qspFreeString(uStr);
 			return name->Code;
 		}
 	}
-	free(uStr.Str);
+	qspFreeString(uStr);
 	return qspOpUnknown;
 }
 
@@ -430,7 +430,7 @@ static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
 			if (sp == QSP_STACKSIZE - 1)
 			{
 				qspSetError(QSP_ERR_STACKOVERFLOW);
-				if (tos.IsStr) free(QSP_STR(tos).Str);
+				if (tos.IsStr) qspFreeString(QSP_STR(tos));
 				break;
 			}
 			stack[++sp] = tos;
@@ -772,7 +772,7 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
 				qspAppendToCompiled(qspOpValue, &itemsCount, compValues, compOpCodes, compArgsCounts, 0, v);
 				if (qspErrorNum)
 				{
-					free(QSP_STR(v).Str);
+					qspFreeString(QSP_STR(v));
 					break;
 				}
 				waitForOperator = QSP_TRUE;
@@ -786,7 +786,7 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
 				qspAppendToCompiled(qspOpValue, &itemsCount, compValues, compOpCodes, compArgsCounts, 0, v);
 				if (qspErrorNum)
 				{
-					free(QSP_STR(v).Str);
+					qspFreeString(QSP_STR(v));
 					break;
 				}
 				waitForOperator = QSP_TRUE;
@@ -880,7 +880,7 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
 					qspAppendToCompiled(qspOpValue, &itemsCount, compValues, compOpCodes, compArgsCounts, 0, v);
 					if (qspErrorNum)
 					{
-						if (v.IsStr) free(QSP_STR(v).Str);
+						if (v.IsStr) qspFreeString(QSP_STR(v));
 						break;
 					}
 					waitForOperator = QSP_TRUE;
@@ -1031,7 +1031,7 @@ static void qspFunctionIsPlay(QSPVariant *args, int count, QSPVariant *tos)
 	{
 		file = qspGetAbsFromRelPath(QSP_STR(args[0]));
 		QSP_PNUM(tos) = QSP_TOBOOL(qspCallIsPlayingFile(file) != 0);
-		free(file.Str);
+		qspFreeString(file);
 	}
 	else
 		QSP_PNUM(tos) = QSP_TOBOOL(QSP_FALSE);

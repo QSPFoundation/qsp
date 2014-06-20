@@ -268,12 +268,12 @@ static int qspGetStatCode(QSPString s, QSP_CHAR **pos)
 			if (nameLen == qspStrLen(s) || qspIsInList(QSP_DELIMS, s.Str[nameLen]))
 			{
 				*pos = s.Str + nameLen;
-				free(uStr.Str);
+				qspFreeString(uStr);
 				return name->Code;
 			}
 		}
 	}
-	free(uStr.Str);
+	qspFreeString(uStr);
 	return qspStatUnknown;
 }
 
@@ -1068,7 +1068,7 @@ static QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString
 	qspInitLineOfCode(&initializatorLine, qspStringFromPair(params.Str, whilePos), 0);
 	oldRefreshCount = qspRefreshCount;
 	isExit = qspExecString(&initializatorLine, 0, initializatorLine.StatsCount, jumpTo);
-	if (initializatorLine.Label.Str) free(initializatorLine.Label.Str);
+	qspFreeString(initializatorLine.Label);
 	if (initializatorLine.Stats) free(initializatorLine.Stats);
 	if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) return isExit;
 	/* Set positions of the loop conditions */
@@ -1129,7 +1129,7 @@ static QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int 
 		isExit = qspExecString(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
 		if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 	}
-	if (iteratorLine.Label.Str) free(iteratorLine.Label.Str);
+	qspFreeString(iteratorLine.Label);
 	if (iteratorLine.Stats) free(iteratorLine.Stats);
 	return isExit;
 }
@@ -1184,7 +1184,7 @@ static QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lin
 		isExit = qspExecString(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
 		if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) break;
 	}
-	if (iteratorLine.Label.Str) free(iteratorLine.Label.Str);
+	qspFreeString(iteratorLine.Label);
 	if (iteratorLine.Stats) free(iteratorLine.Stats);
 	return isExit;
 }

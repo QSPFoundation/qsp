@@ -111,12 +111,12 @@ int qspObjIndex(QSPString name)
 		qspUpperStr(&locName);
 		if (!qspStrsComp(locName, name))
 		{
-			free(name.Str);
+			qspFreeString(name);
 			free(buf);
 			return i;
 		}
 	}
-	free(name.Str);
+	qspFreeString(name);
 	free(buf);
 	return -1;
 }
