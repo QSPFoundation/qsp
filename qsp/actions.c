@@ -178,7 +178,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
 	QSPLineOfCode code;
 	int i, oldRefreshCount, count, offset;
 	QSP_CHAR *lastPos, *firstPos = s->Str.Str + s->Stats[statPos].EndPos;
-	if (*firstPos != QSP_COLONDELIM[0])
+	if (firstPos == s->Str.End || *firstPos != QSP_COLONDELIM[0])
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return;

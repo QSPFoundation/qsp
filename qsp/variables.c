@@ -883,7 +883,12 @@ void qspStatementLocal(QSPString s)
 	QSP_CHAR *commaPos, *eqPos;
 	int i, groupInd, count, bufSize, oldRefreshCount;
 	qspSkipSpaces(&s);
-	if (qspIsEmpty(s))
+	eqPos = qspStrPos(s, QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
+	if (eqPos)
+		curPos = qspStringFromPair(s.Str, eqPos);
+	else
+		curPos = s;
+	if (qspIsEmpty(curPos))
 	{
 		qspSetError(QSP_ERR_SYNTAX);
 		return;
@@ -891,11 +896,6 @@ void qspStatementLocal(QSPString s)
 	groupInd = qspSavedVarsGroupsCount - 1;
 	count = bufSize = qspSavedVarsGroups[groupInd].VarsCount;
 	isVarFound = QSP_FALSE;
-	eqPos = qspStrPos(s, QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
-	if (eqPos)
-		curPos = qspStringFromPair(s.Str, eqPos);
-	else
-		curPos = s;
 	while (1)
 	{
 		/* Skip type char */

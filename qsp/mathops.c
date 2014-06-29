@@ -844,7 +844,7 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
 				opCode = qspFunctionOpCode(name);
 				if (opCode >= qspOpFirst_Function)
 				{
-					if (*s.Str == QSP_LRBRACK[0])
+					if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK[0])
 					{
 						qspCompileExprPushOpCode(opStack, &opSp, argStack, &argSp, opCode);
 						if (qspErrorNum) break;

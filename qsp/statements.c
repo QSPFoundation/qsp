@@ -345,7 +345,7 @@ int qspGetStatArgs(QSPString s, int statCode, QSPVariant *args)
 	int oldRefreshCount, count = 0;
 	QSP_CHAR *pos, *brack;
 	qspSkipSpaces(&s);
-	if (*s.Str == QSP_LRBRACK[0])
+	if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK[0])
 	{
 		if (!(brack = qspStrPos(s, QSP_STATIC_STR(QSP_RRBRACK), QSP_FALSE)))
 		{
@@ -523,7 +523,7 @@ static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
 	{
 	case qspStatElseIf:
 		pos = line->Str.Str + line->Stats->EndPos;
-		if (*pos != QSP_COLONDELIM[0])
+		if (pos == line->Str.End || *pos != QSP_COLONDELIM[0])
 		{
 			qspSetError(QSP_ERR_COLONNOTFOUND);
 			break;
@@ -944,8 +944,8 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 		qspFreeString(uStr);
 	}
 	/* Check for ELSE IF */
-	if (count == 1 && delimPos && line->Stats->Stat == qspStatElse && statCode == qspStatIf &&
-		*(line->Str.Str + line->Stats->ParamPos) != QSP_COLONDELIM[0])
+	if (count == 1 && delimPos && line->Stats[0].Stat == qspStatElse && statCode == qspStatIf &&
+		*(line->Str.Str + line->Stats[0].ParamPos) != QSP_COLONDELIM[0])
 	{
 		count = 0;
 		statCode = qspStatElseIf;
@@ -966,13 +966,13 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 		qspSkipSpaces(&str);
 	}
 	line->Stats[count].ParamPos = (int)(str.Str - line->Str.Str);
-	switch (line->Stats->Stat)
+	switch (line->Stats[0].Stat)
 	{
 	case qspStatAct:
 	case qspStatLoop:
 	case qspStatIf:
 	case qspStatElseIf:
-		line->IsMultiline = (line->StatsCount == 1 && *(line->Str.Str + line->Stats->EndPos) == QSP_COLONDELIM[0]);
+		line->IsMultiline = (line->StatsCount == 1 && *(line->Str.Str + line->Stats[0].EndPos) == QSP_COLONDELIM[0]);
 		break;
 	default:
 		line->IsMultiline = QSP_FALSE;
@@ -986,7 +986,7 @@ static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSP
 	QSP_BOOL condition;
 	int i, c, elseStat, oldRefreshCount;
 	QSP_CHAR *pos = s->Str.Str + s->Stats[startStat].EndPos;
-	if (*pos != QSP_COLONDELIM[0])
+	if (pos == s->Str.End || *pos != QSP_COLONDELIM[0])
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return QSP_FALSE;
@@ -1107,7 +1107,7 @@ static QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int 
 	QSPLineOfCode iteratorLine;
 	QSPString condition, iterator;
 	endPos = s->Str.Str + s->Stats[startStat].EndPos;
-	if (*endPos != QSP_COLONDELIM[0])
+	if (endPos == s->Str.End || *endPos != QSP_COLONDELIM[0])
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return QSP_FALSE;
@@ -1143,7 +1143,7 @@ static QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lin
 	QSPString condition, iterator;
 	QSPLineOfCode iteratorLine, *line = s + lineInd;
 	endPos = line->Str.Str + line->Stats->EndPos;
-	if (*endPos != QSP_COLONDELIM[0])
+	if (endPos == line->Str.End || *endPos != QSP_COLONDELIM[0])
 	{
 		qspSetError(QSP_ERR_COLONNOTFOUND);
 		return QSP_FALSE;
