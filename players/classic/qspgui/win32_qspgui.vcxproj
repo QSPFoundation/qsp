@@ -65,7 +65,7 @@
       <AdditionalIncludeDirectories>..\..\..\qsp\bindings;..\..\..\qsp\bindings\default;..\build_wx\wxWidgets\include;..\build_wx\wxWidgets\lib\vc_lib\mswud</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>rpcrt4.lib;wxmsw31ud_core.lib;wxbase31ud.lib;wxmsw31ud_html.lib;wxmsw31ud_adv.lib;wxmsw31ud_aui.lib;wxzlibd.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;comctl32.lib;fmodex_vc.lib;qsp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>rpcrt4.lib;wxbase31ud.lib;wxmsw31ud_core.lib;wxmsw31ud_html.lib;wxmsw31ud_adv.lib;wxmsw31ud_aui.lib;wxzlibd.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;comctl32.lib;fmodex_vc.lib;qsp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>..\build_wx\wxWidgets\lib\vc_lib;$(OutDir);misc\win32\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
