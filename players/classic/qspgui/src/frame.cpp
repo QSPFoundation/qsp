@@ -913,7 +913,6 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
 	info.AddArtist(wxT("AI [gribanov_a@mail.ru]"));
 	info.AddArtist(wxT("Ajenta [ajenta.arrow@gmail.com]"));
 	info.AddArtist(wxT("Alex [dogmar88@mail.ru]"));
-	info.AddArtist(wxT("BalleR [vsevolod_kremyan@mail.ru]"));
 	info.AddArtist(wxT("BaxZzZz [bauer_v@mail.ru]"));
 	info.AddArtist(wxT("Belial [belgame@bk.ru]"));
 	info.AddArtist(wxT("DzafT [dzaft@mail.ru]"));
