@@ -22,15 +22,17 @@
 
 	#define QSP_CODREMOV 5
 
-	extern wchar_t qspCP1251ToUnicodeTable[];
+	extern wchar_t qspCP1251ToUCS2LETable[];
+	extern unsigned int qspCP1251ToUTF8Table[];
 
 	/* External functions */
-	wchar_t qspDirectConvertUC(char, wchar_t *);
-	char qspReverseConvertUC(wchar_t, wchar_t *);
+	wchar_t qspDirectConvertUC2LE(char, wchar_t *);
+	char qspReverseConvertUCS2LE(wchar_t, wchar_t *);
+	char qspReverseConvertUTF8(unsigned int, unsigned int *);
 	char *qspFromQSPString(QSP_CHAR *);
 	QSP_CHAR *qspToQSPString(char *);
 	char *qspQSPToGameString(QSP_CHAR *, QSP_BOOL, QSP_BOOL);
-	QSP_CHAR *qspGameToQSPString(char *, QSP_BOOL, QSP_BOOL);
+	QSP_CHAR *qspGameToQSPString(char *, encoding_t);
 	int qspSplitGameStr(char *, QSP_BOOL, QSP_CHAR *, char ***);
 	int qspGameCodeWriteIntVal(char **, int, int, QSP_BOOL, QSP_BOOL);
 	int qspGameCodeWriteVal(char **, int, QSP_CHAR *, QSP_BOOL, QSP_BOOL);

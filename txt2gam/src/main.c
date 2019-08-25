@@ -23,9 +23,9 @@
 static int qspAddCharToBuffer(QSP_CHAR **, QSP_CHAR, int *, int);
 static int qspGetLocsStrings(QSP_CHAR *, QSP_CHAR, QSP_CHAR, QSP_BOOL, QSP_CHAR **);
 static int qspGetLocs(QSP_CHAR *, QSP_CHAR, QSP_CHAR, QSP_BOOL);
-static QSP_BOOL qspLoadFileContents(char *, QSP_CHAR **);
+static QSP_BOOL qspLoadFileContents(char *, QSP_CHAR **, QSP_BOOL);
 static QSP_BOOL qspExportStrings(char *, char *, QSP_CHAR, QSP_CHAR, QSP_BOOL, QSP_BOOL);
-static QSP_BOOL qspOpenQuestFromText(char *, QSP_CHAR, QSP_CHAR);
+static QSP_BOOL qspOpenQuestFromText(char *, QSP_CHAR, QSP_CHAR, QSP_BOOL);
 static QSP_BOOL qspSaveQuest(char *, QSP_BOOL, QSP_BOOL, QSP_CHAR *);
 
 static int qspAddCharToBuffer(QSP_CHAR **curStr, QSP_CHAR ch, int *bufSize, int strLen)
@@ -260,11 +260,11 @@ static int qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BO
 	return curLoc;
 }
 
-static QSP_BOOL qspLoadFileContents(char *file, QSP_CHAR **data)
+static QSP_BOOL qspLoadFileContents(char *file, QSP_CHAR **data, QSP_BOOL isUnicode)
 {
 	int fileSize;
 	char *buf, *resBuf;
-	QSP_BOOL isUCS2;
+	encoding_t encoding;
 	FILE *f;
 	/* Loading file's contents */
 	if (!(f = fopen(file, "rb"))) return QSP_FALSE;
@@ -279,24 +279,24 @@ static QSP_BOOL qspLoadFileContents(char *file, QSP_CHAR **data)
 	if ((unsigned char)resBuf[0] == 0xFF && (unsigned char)resBuf[1] == 0xFE)
 	{
 		resBuf += 2;
-		isUCS2 = QSP_TRUE;
+		encoding = UCS2LE;
 	}
 	else if (resBuf[0] && !resBuf[1])
-		isUCS2 = QSP_TRUE;
+		encoding = UCS2LE;
 	else
-		isUCS2 = QSP_FALSE;
-	*data = qspGameToQSPString(resBuf, isUCS2, QSP_FALSE);
+		encoding = isUnicode ? UTF8 : CP1251;
+	*data = qspGameToQSPString(resBuf, encoding);
 	free(buf);
 	return QSP_TRUE;
 }
 
-static QSP_BOOL qspExportStrings(char *file, char *outFile, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isGetQStrings, QSP_BOOL isUCS2)
+static QSP_BOOL qspExportStrings(char *file, char *outFile, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isGetQStrings, QSP_BOOL isUnicode)
 {
 	int len;
 	char *buf;
 	QSP_CHAR *data, *strs;
 	FILE *f;
-	if (!qspLoadFileContents(file, &data)) return QSP_FALSE;
+	if (!qspLoadFileContents(file, &data, isUnicode)) return QSP_FALSE;
 	len = qspGetLocsStrings(data, locStart, locEnd, isGetQStrings, &strs);
 	free(data);
 	if (len)
@@ -306,20 +306,20 @@ static QSP_BOOL qspExportStrings(char *file, char *outFile, QSP_CHAR locStart, Q
 			free(strs);
 			return QSP_FALSE;
 		}
-		buf = qspQSPToGameString(strs, isUCS2, QSP_FALSE);
+		buf = qspQSPToGameString(strs, isUnicode, QSP_FALSE);
 		free(strs);
-		fwrite(buf, isUCS2 ? 2 : 1, len, f);
+		fwrite(buf, isUnicode ? 2 : 1, len, f);
 		free(buf);
 		fclose(f);
 	}
 	return QSP_TRUE;
 }
 
-static QSP_BOOL qspOpenQuestFromText(char *file, QSP_CHAR locStart, QSP_CHAR locEnd)
+static QSP_BOOL qspOpenQuestFromText(char *file, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isUnicode)
 {
 	int locsCount;
 	QSP_CHAR *data;
-	if (!qspLoadFileContents(file, &data)) return QSP_FALSE;
+	if (!qspLoadFileContents(file, &data, isUnicode)) return QSP_FALSE;
 	locsCount = qspGetLocs(data, locStart, locEnd, QSP_FALSE);
 	qspCreateWorld(locsCount);
 	qspGetLocs(data, locStart, locEnd, QSP_TRUE);
@@ -327,7 +327,7 @@ static QSP_BOOL qspOpenQuestFromText(char *file, QSP_CHAR locStart, QSP_CHAR loc
 	return QSP_TRUE;
 }
 
-static QSP_BOOL qspSaveQuest(char *file, QSP_BOOL isOldFormat, QSP_BOOL isUCS2, QSP_CHAR *passwd)
+static QSP_BOOL qspSaveQuest(char *file, QSP_BOOL isOldFormat, QSP_BOOL isUnicode, QSP_CHAR *passwd)
 {
 	int i, j, len;
 	char *buf;
@@ -336,29 +336,29 @@ static QSP_BOOL qspSaveQuest(char *file, QSP_BOOL isOldFormat, QSP_BOOL isUCS2, 
 	buf = 0;
 	if (isOldFormat)
 	{
-		len = qspGameCodeWriteIntVal(&buf, 0, qspLocsCount, isUCS2, QSP_FALSE);
-		len = qspGameCodeWriteVal(&buf, len, passwd, isUCS2, QSP_TRUE);
-		len = qspGameCodeWriteVal(&buf, len, QSP_VER, isUCS2, QSP_FALSE);
-		for (i = 0; i < 27; ++i) len = qspGameCodeWriteVal(&buf, len, 0, isUCS2, QSP_FALSE);
+		len = qspGameCodeWriteIntVal(&buf, 0, qspLocsCount, isUnicode, QSP_FALSE);
+		len = qspGameCodeWriteVal(&buf, len, passwd, isUnicode, QSP_TRUE);
+		len = qspGameCodeWriteVal(&buf, len, QSP_VER, isUnicode, QSP_FALSE);
+		for (i = 0; i < 27; ++i) len = qspGameCodeWriteVal(&buf, len, 0, isUnicode, QSP_FALSE);
 	}
 	else
 	{
-		len = qspGameCodeWriteVal(&buf, 0, QSP_GAMEID, isUCS2, QSP_FALSE);
-		len = qspGameCodeWriteVal(&buf, len, QSP_VER, isUCS2, QSP_FALSE);
-		len = qspGameCodeWriteVal(&buf, len, passwd, isUCS2, QSP_TRUE);
-		len = qspGameCodeWriteIntVal(&buf, len, qspLocsCount, isUCS2, QSP_TRUE);
+		len = qspGameCodeWriteVal(&buf, 0, QSP_GAMEID, isUnicode, QSP_FALSE);
+		len = qspGameCodeWriteVal(&buf, len, QSP_VER, isUnicode, QSP_FALSE);
+		len = qspGameCodeWriteVal(&buf, len, passwd, isUnicode, QSP_TRUE);
+		len = qspGameCodeWriteIntVal(&buf, len, qspLocsCount, isUnicode, QSP_TRUE);
 	}
 	for (i = 0; i < qspLocsCount; ++i)
 	{
-		len = qspGameCodeWriteVal(&buf, len, qspLocs[i].Name, isUCS2, QSP_TRUE);
-		len = qspGameCodeWriteVal(&buf, len, 0, isUCS2, QSP_FALSE);
-		len = qspGameCodeWriteVal(&buf, len, qspLocs[i].OnVisit, isUCS2, QSP_TRUE);
+		len = qspGameCodeWriteVal(&buf, len, qspLocs[i].Name, isUnicode, QSP_TRUE);
+		len = qspGameCodeWriteVal(&buf, len, 0, isUnicode, QSP_FALSE);
+		len = qspGameCodeWriteVal(&buf, len, qspLocs[i].OnVisit, isUnicode, QSP_TRUE);
 		if (isOldFormat)
-			for (j = 0; j < 40; ++j) len = qspGameCodeWriteVal(&buf, len, 0, isUCS2, QSP_FALSE);
+			for (j = 0; j < 40; ++j) len = qspGameCodeWriteVal(&buf, len, 0, isUnicode, QSP_FALSE);
 		else
-			len = qspGameCodeWriteIntVal(&buf, len, 0, isUCS2, QSP_TRUE);
+			len = qspGameCodeWriteIntVal(&buf, len, 0, isUnicode, QSP_TRUE);
 	}
-	fwrite(buf, isUCS2 ? 2 : 1, len, f);
+	fwrite(buf, isUnicode ? 2 : 1, len, f);
 	free(buf);
 	fclose(f);
 	return QSP_TRUE;
@@ -372,7 +372,7 @@ void ShowHelp()
 	printf("Using:\n");
 	printf("  txt2gam [txt file] [output file] [options]\n");
 	printf("Options:\n");
-	printf("  a, A - ANSI mode, default is Unicode (UCS-2 / UTF-16) mode\n");
+	printf("  a, A - ANSI mode, default is Unicode (UTF-8, UCS-2 / UTF-16) mode\n");
 	printf("  o, O - Save game in old format, default is new format\n");
 	printf("  s[char], S[char] - 'Begin of loc' character, default is '%c'\n", QSP_FROM_OS_CHAR(QSP_STARTLOC[0]));
 	printf("  e[char], E[char] - 'End of loc' character, default is '%c'\n", QSP_FROM_OS_CHAR(QSP_ENDLOC[0]));
@@ -399,7 +399,7 @@ void ShowHelp()
 int main(int argc, char **argv)
 {
 	int i;
-	QSP_BOOL isFreePass, isOldFormat, isUCS2, isErr, isExtractStrs, isGetQStrings;
+	QSP_BOOL isFreePass, isOldFormat, isUnicode, isErr, isExtractStrs, isGetQStrings;
 	QSP_CHAR *passwd, ch, locStart, locEnd;
 	setlocale(LC_ALL, QSP_LOCALE);
 	if (argc < 3)
@@ -410,7 +410,7 @@ int main(int argc, char **argv)
 	isExtractStrs = QSP_FALSE;
 	isGetQStrings = QSP_FALSE;
 	isOldFormat = QSP_FALSE;
-	isUCS2 = QSP_TRUE;
+	isUnicode = QSP_TRUE;
 	passwd = QSP_PASSWD;
 	isFreePass = QSP_FALSE;
 	locStart = QSP_STARTLOC[0];
@@ -423,7 +423,7 @@ int main(int argc, char **argv)
 			isOldFormat = QSP_TRUE;
 			break;
 		case 'a': case 'A':
-			isUCS2 = QSP_FALSE;
+			isUnicode = QSP_FALSE;
 			break;
 		case 's': case 'S':
 		case 'e': case 'E':
@@ -459,17 +459,17 @@ int main(int argc, char **argv)
 	}
 	if (isExtractStrs)
 	{
-		if (isErr = !qspExportStrings(argv[1], argv[2], locStart, locEnd, isGetQStrings, isUCS2))
+		if (isErr = !qspExportStrings(argv[1], argv[2], locStart, locEnd, isGetQStrings, isUnicode))
 			printf("Strings extracting failed!\n");
 	}
 	else
 	{
 		qspLocs = 0;
 		qspLocsCount = 0;
-		if (isErr = !qspOpenQuestFromText(argv[1], locStart, locEnd))
+		if (isErr = !qspOpenQuestFromText(argv[1], locStart, locEnd, isUnicode))
 			printf("Loading game failed!\n");
 		else
-			if (isErr = !qspSaveQuest(argv[2], isOldFormat, isUCS2, passwd))
+			if (isErr = !qspSaveQuest(argv[2], isOldFormat, isUnicode, passwd))
 				printf("Saving game failed!\n");
 		qspCreateWorld(0);
 	}

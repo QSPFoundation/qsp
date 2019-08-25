@@ -46,10 +46,10 @@
 		#define QSP_WCSTOMBS wcstombs
 		#define QSP_MBSTOWCSLEN(a) mbstowcs(0, a, 0)
 		#define QSP_MBSTOWCS mbstowcs
-		#define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
-		#define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
-		#define QSP_WCTOB
-		#define QSP_BTOWC
+		#define QSP_FROM_OS_CHAR(a) qspReverseConvertUCS2LE(a, qspCP1251ToUCS2LETable)
+		#define QSP_TO_OS_CHAR(a) qspDirectConvertUCS2LE(a, qspCP1251ToUCS2LETable)
+		#define QSP_UCS2TOB
+		#define QSP_BTOUCS2
 	#else
 		typedef char QSP_CHAR;
 		#define QSP_FMT(x) x
@@ -64,8 +64,8 @@
 		#define QSP_MBSTOWCS strncpy
 		#define QSP_FROM_OS_CHAR
 		#define QSP_TO_OS_CHAR
-		#define QSP_WCTOB(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
-		#define QSP_BTOWC(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
+		#define QSP_UCS2TOB(a) qspReverseConvertUCS2LE(a, qspCP1251ToUCS2LETable)
+		#define QSP_BTOUCS2(a) qspDirectConvertUCS2LE(a, qspCP1251ToUCS2LETable)
 	#endif
 
 	#define QSP_VER QSP_FMT("0.1.1")
@@ -74,7 +74,13 @@
 	#define QSP_TRUE 1
 	#define QSP_FALSE 0
 
+	#define QSP_BYTE(a) (a & 0xFF)
+	#define QSP_DWORD(a, b, c, d) (((a) & 0xFF) << 24) | (((b) & 0xFF) << 16) | (((c) & 0xFF) << 8) | ((d) & 0xFF)
+
+	#define QSP_UTF8TOB(a) qspReverseConvertUTF8(a, qspCP1251ToUTF8Table)
+
 	/* Types */
 	typedef int QSP_BOOL;
+	typedef enum _encoding { CP1251, UTF8, UCS2LE } encoding_t;
 
 #endif

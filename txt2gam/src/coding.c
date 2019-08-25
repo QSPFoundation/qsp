@@ -18,7 +18,7 @@
 #include "coding.h"
 #include "text.h"
 
-wchar_t qspCP1251ToUnicodeTable[] =
+wchar_t qspCP1251ToUCS2LETable[] =
 {
 	0x0402, 0x0403, 0x201A, 0x0453, 0x201E, 0x2026, 0x2020, 0x2021,
 	0x20AC, 0x2030, 0x0409, 0x2039, 0x040A, 0x040C, 0x040B, 0x040F,
@@ -36,6 +36,26 @@ wchar_t qspCP1251ToUnicodeTable[] =
 	0x0438, 0x0439, 0x043A, 0x043B, 0x043C, 0x043D, 0x043E, 0x043F,
 	0x0440, 0x0441, 0x0442, 0x0443, 0x0444, 0x0445, 0x0446, 0x0447,
 	0x0448, 0x0449, 0x044A, 0x044B, 0x044C, 0x044D, 0x044E, 0x044F
+};
+
+unsigned int qspCP1251ToUTF8Table[] =
+{
+	0x00D082, 0x00D083, 0xE2809A, 0x00D193, 0xE2809E, 0xE280A6, 0xE280A0, 0xE280A1,
+	0xE282AC, 0xE280B0, 0x00D089, 0xE280B9, 0x00D08A, 0x00D08C, 0x00D08B, 0x00D08F,
+	0x00D192, 0xE28098, 0xE28099, 0xE2809C, 0xE2809D, 0xE280A2, 0xE28093, 0xE28094,
+	0x000020, 0xE284A2, 0x00D199, 0xE280BA, 0x00D19A, 0x00D19C, 0x00D19B, 0x00D19F,
+	0x00C2A0, 0x00D08E, 0x00D19E, 0x00D088, 0x00C2A4, 0x00D290, 0x00C2A6, 0x00C2A7,
+	0x00D081, 0x00C2A9, 0x00D084, 0x00C2AB, 0x00C2AC, 0x00C2AD, 0x00C2AE, 0x00D087,
+	0x00C2B0, 0x00C2B1, 0x00D086, 0x00D196, 0x00D291, 0x00C2B5, 0x00C2B6, 0x00C2B7,
+	0x00D191, 0xE28496, 0x00D194, 0x00C2BB, 0x00D198, 0x00D085, 0x00D195, 0x00D197,
+	0x00D090, 0x00D091, 0x00D092, 0x00D093, 0x00D094, 0x00D095, 0x00D096, 0x00D097,
+	0x00D098, 0x00D099, 0x00D09A, 0x00D09B, 0x00D09C, 0x00D09D, 0x00D09E, 0x00D09F,
+	0x00D0A0, 0x00D0A1, 0x00D0A2, 0x00D0A3, 0x00D0A4, 0x00D0A5, 0x00D0A6, 0x00D0A7,
+	0x00D0A8, 0x00D0A9, 0x00D0AA, 0x00D0AB, 0x00D0AC, 0x00D0AD, 0x00D0AE, 0x00D0AF,
+	0x00D0B0, 0x00D0B1, 0x00D0B2, 0x00D0B3, 0x00D0B4, 0x00D0B5, 0x00D0B6, 0x00D0B7,
+	0x00D0B8, 0x00D0B9, 0x00D0BA, 0x00D0BB, 0x00D0BC, 0x00D0BD, 0x00D0BE, 0x00D0BF,
+	0x00D180, 0x00D181, 0x00D182, 0x00D183, 0x00D184, 0x00D185, 0x00D186, 0x00D187,
+	0x00D188, 0x00D189, 0x00D18A, 0x00D18B, 0x00D18C, 0x00D18D, 0x00D18E, 0x00D18F
 };
 
 static int qspUCS2StrLen(char *);
@@ -64,19 +84,28 @@ static char *qspUCS2StrStr(char *str, char *subStr)
 	return 0;
 }
 
-wchar_t qspDirectConvertUC(char ch, wchar_t *table)
+wchar_t qspDirectConvertUCS2LE(char ch, wchar_t *table)
 {
 	unsigned char ch2 = (unsigned char)ch;
 	return (ch2 >= 0x80 ? table[ch2 - 0x80] : ch);
 }
 
-char qspReverseConvertUC(wchar_t ch, wchar_t *table)
+char qspReverseConvertUCS2LE(wchar_t ch, wchar_t *table)
 {
 	int i;
 	if (ch < 0x80) return (char)ch;
 	for (i = 127; i >= 0; --i)
 		if (table[i] == ch) return (char)(i + 0x80);
 	return 0x20;
+}
+
+char qspReverseConvertUTF8(unsigned int codePoint, unsigned int *table)
+{
+    int i;
+    if (codePoint < 0x80) return (char)codePoint;
+    for (i = 127; i >= 0; --i)
+        if (table[i] == codePoint) return (char)(i + 0x80);
+    return 0x20;
 }
 
 char *qspFromQSPString(QSP_CHAR *s)
@@ -108,7 +137,7 @@ char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 		{
 			while (--len >= 0)
 			{
-				uCh = QSP_BTOWC(s[len]);
+				uCh = QSP_BTOUCS2(s[len]);
 				if (uCh == QSP_CODREMOV)
 					uCh = (unsigned short)-QSP_CODREMOV;
 				else
@@ -119,7 +148,7 @@ char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 		else
 		{
 			while (--len >= 0)
-				ptr[len] = QSP_BTOWC(s[len]);
+				ptr[len] = QSP_BTOUCS2(s[len]);
 		}
 	}
 	else
@@ -146,53 +175,49 @@ char *qspQSPToGameString(QSP_CHAR *s, QSP_BOOL isUCS2, QSP_BOOL isCode)
 	return ret;
 }
 
-QSP_CHAR *qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded)
+QSP_CHAR *qspGameToQSPString(char *s, encoding_t encoding)
 {
-	char ch;
-	unsigned short uCh, *ptr;
-	int len = (isUCS2 ? qspUCS2StrLen(s) : (int)strlen(s));
-	QSP_CHAR *ret = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
+	char ch, *si;
+	unsigned short *ptr;
+	unsigned int codePoint;
+	int len = encoding == UCS2LE ? qspUCS2StrLen(s) : (int)strlen(s);
+	QSP_CHAR *reti, *ret = (QSP_CHAR *)malloc((len + 1) * sizeof(QSP_CHAR));
 	ret[len] = 0;
-	if (isUCS2)
+	switch (encoding)
 	{
+	case UCS2LE:
 		ptr = (unsigned short *)s;
-		if (isCoded)
+		while (--len >= 0)
+			ret[len] = QSP_UCS2TOB(ptr[len]);
+		break;
+	case UTF8:
+		for (si = s, reti = ret; *si; ++si)
 		{
-			while (--len >= 0)
+			switch (QSP_BYTE(*si))
 			{
-				uCh = ptr[len];
-				if (uCh == (unsigned short)-QSP_CODREMOV)
-					uCh = QSP_CODREMOV;
-				else
-					uCh += QSP_CODREMOV;
-				ret[len] = QSP_WCTOB(uCh);
+			case 0xd0:
+			case 0xd1:
+			case 0xc2:
+				codePoint = QSP_DWORD(0, 0, si[0], si[1]);
+				*reti = QSP_TO_OS_CHAR(QSP_UTF8TOB(codePoint));
+				si++;
+				break;
+			case 0xe2:
+				codePoint = QSP_DWORD(0, si[0], si[1], si[2]);
+				*reti = QSP_TO_OS_CHAR(QSP_UTF8TOB(codePoint));
+				si += 2;
+				break;
+			default:
+				*reti = QSP_TO_OS_CHAR(*si);
+				break;
 			}
+			reti++;
 		}
-		else
-		{
-			while (--len >= 0)
-				ret[len] = QSP_WCTOB(ptr[len]);
-		}
-	}
-	else
-	{
-		if (isCoded)
-		{
-			while (--len >= 0)
-			{
-				ch = s[len];
-				if (ch == -QSP_CODREMOV)
-					ch = QSP_CODREMOV;
-				else
-					ch += QSP_CODREMOV;
-				ret[len] = QSP_TO_OS_CHAR(ch);
-			}
-		}
-		else
-		{
-			while (--len >= 0)
-				ret[len] = QSP_TO_OS_CHAR(s[len]);
-		}
+		break;
+	default:
+		while (--len >= 0)
+			ret[len] = QSP_TO_OS_CHAR(s[len]);
+		break;
 	}
 	return ret;
 }
