@@ -49,17 +49,17 @@ AeroQSPFrame::AeroQSPFrame( const wxString &currentPath, const wxString &filenam
 		wxMenuBar *menuBar = new wxMenuBar;
 		_fileMenu = new wxMenu;
 		_helpMenu = new wxMenu;
-		wxMenuItem *fileOpenItem = new wxMenuItem(_fileMenu, ID_OPENGAME, wxT("&Открыть...\tCtrl+O"));
-		wxMenuItem *exitItem = new wxMenuItem(_fileMenu, ID_EXIT, wxT("&Выход\tAlt+X"));
-		wxMenuItem *screenModeItem = new wxMenuItem(_fileMenu, ID_SCREEN_MODE, wxT("&Полноэкранный режим\tAlt+Enter"));
+		wxMenuItem *fileOpenItem = new wxMenuItem(_fileMenu, ID_OPENGAME, wxT("&РћС‚РєСЂС‹С‚СЊ...\tCtrl+O"));
+		wxMenuItem *exitItem = new wxMenuItem(_fileMenu, ID_EXIT, wxT("&Р’С‹С…РѕРґ\tAlt+X"));
+		wxMenuItem *screenModeItem = new wxMenuItem(_fileMenu, ID_SCREEN_MODE, wxT("&РџРѕР»РЅРѕСЌРєСЂР°РЅРЅС‹Р№ СЂРµР¶РёРј\tAlt+Enter"));
 		_fileMenu->Append(fileOpenItem);
 		_fileMenu->Append(screenModeItem);
 		_fileMenu->AppendSeparator();
 		_fileMenu->Append(exitItem);
-		wxMenuItem *about = new wxMenuItem(_helpMenu, ID_ABOUT, wxT("&О программе..."));
+		wxMenuItem *about = new wxMenuItem(_helpMenu, ID_ABOUT, wxT("&Рћ РїСЂРѕРіСЂР°РјРјРµ..."));
 		_helpMenu->Append(about);
-		menuBar->Append(_fileMenu, wxT("&Игра"));
-		menuBar->Append(_helpMenu, wxT("&Помощь"));
+		menuBar->Append(_fileMenu, wxT("&РРіСЂР°"));
+		menuBar->Append(_helpMenu, wxT("&РџРѕРјРѕС‰СЊ"));
 		SetMenuBar(menuBar);
 		SetClientSize(800, 600);
 		CenterOnParent();
@@ -122,8 +122,8 @@ void AeroQSPFrame::SetUserTitle( const wxString &title )
 
 void AeroQSPFrame::OnLoadFile( wxCommandEvent &event )
 {
-	wxFileDialog dialog(this, wxT("Открыть игру"), wxEmptyString, wxEmptyString,
-		wxT("Игры AeroQSP (*.aqsp)|*.aqsp"), wxFD_OPEN);
+	wxFileDialog dialog(this, wxT("РћС‚РєСЂС‹С‚СЊ РёРіСЂСѓ"), wxEmptyString, wxEmptyString,
+		wxT("РРіСЂС‹ AeroQSP (*.aqsp)|*.aqsp"), wxFD_OPEN);
 	dialog.CenterOnParent();
 	if (dialog.ShowModal() == wxID_OK)
 		LoadFile(dialog.GetPath());

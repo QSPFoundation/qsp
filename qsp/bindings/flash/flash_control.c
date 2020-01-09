@@ -44,7 +44,7 @@ AS3_Val QSPIsInCallBack(void *param, AS3_Val args)
 		return AS3_False();
 }
 /* ------------------------------------------------------------ */
-/* Управление режимом отладки */
+/* РЈРїСЂР°РІР»РµРЅРёРµ СЂРµР¶РёРјРѕРј РѕС‚Р»Р°РґРєРё */
 AS3_Val QSPEnableDebugMode(void *param, AS3_Val args)
 {
 	QSP_BOOL isDebug;
@@ -52,7 +52,7 @@ AS3_Val QSPEnableDebugMode(void *param, AS3_Val args)
 	qspIsDebug = isDebug;
 	return AS3_True();
 }
-/* Получение данных текущего состояния */
+/* РџРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ */
 AS3_Val QSPGetCurStateData(void *param, AS3_Val args)
 {
 	char *locUTF8;
@@ -68,9 +68,9 @@ AS3_Val QSPGetCurStateData(void *param, AS3_Val args)
 	return res;
 }
 /* ------------------------------------------------------------ */
-/* Информация о версии */
+/* РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РІРµСЂСЃРёРё */
 
-/* Версия */
+/* Р’РµСЂСЃРёСЏ */
 AS3_Val QSPGetVersion(void *param, AS3_Val args)
 {
 	AS3_Val res;
@@ -79,7 +79,7 @@ AS3_Val QSPGetVersion(void *param, AS3_Val args)
 	free(verUTF8);
 	return res;
 }
-/* Дата и время компиляции */
+/* Р”Р°С‚Р° Рё РІСЂРµРјСЏ РєРѕРјРїРёР»СЏС†РёРё */
 AS3_Val QSPGetCompiledDateTime(void *param, AS3_Val args)
 {
 	AS3_Val res;
@@ -89,13 +89,13 @@ AS3_Val QSPGetCompiledDateTime(void *param, AS3_Val args)
 	return res;
 }
 /* ------------------------------------------------------------ */
-/* Количество полных обновлений локаций */
+/* РљРѕР»РёС‡РµСЃС‚РІРѕ РїРѕР»РЅС‹С… РѕР±РЅРѕРІР»РµРЅРёР№ Р»РѕРєР°С†РёР№ */
 AS3_Val QSPGetFullRefreshCount(void *param, AS3_Val args)
 {
 	return AS3_Int(qspFullRefreshCount);
 }
 /* ------------------------------------------------------------ */
-/* Полный путь к загруженному файлу игры */
+/* РџРѕР»РЅС‹Р№ РїСѓС‚СЊ Рє Р·Р°РіСЂСѓР¶РµРЅРЅРѕРјСѓ С„Р°Р№Р»Сѓ РёРіСЂС‹ */
 AS3_Val QSPGetQstFullPath(void *param, AS3_Val args)
 {
 	AS3_Val res;
@@ -111,7 +111,7 @@ AS3_Val QSPGetQstFullPath(void *param, AS3_Val args)
 	return res;
 }
 /* ------------------------------------------------------------ */
-/* Название текущей локации */
+/* РќР°Р·РІР°РЅРёРµ С‚РµРєСѓС‰РµР№ Р»РѕРєР°С†РёРё */
 AS3_Val QSPGetCurLoc(void *param, AS3_Val args)
 {
 	AS3_Val res;
@@ -127,9 +127,9 @@ AS3_Val QSPGetCurLoc(void *param, AS3_Val args)
 	return res;
 }
 /* ------------------------------------------------------------ */
-/* Основное описание локации */
+/* РћСЃРЅРѕРІРЅРѕРµ РѕРїРёСЃР°РЅРёРµ Р»РѕРєР°С†РёРё */
 
-/* Текст основного окна описания локации */
+/* РўРµРєСЃС‚ РѕСЃРЅРѕРІРЅРѕРіРѕ РѕРєРЅР° РѕРїРёСЃР°РЅРёСЏ Р»РѕРєР°С†РёРё */
 AS3_Val QSPGetMainDesc(void *param, AS3_Val args)
 {
 	AS3_Val res;
@@ -144,7 +144,7 @@ AS3_Val QSPGetMainDesc(void *param, AS3_Val args)
 		res = AS3_String(0);
 	return res;
 }
-/* Возможность изменения текста основного описания */
+/* Р’РѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ С‚РµРєСЃС‚Р° РѕСЃРЅРѕРІРЅРѕРіРѕ РѕРїРёСЃР°РЅРёСЏ */
 AS3_Val QSPIsMainDescChanged(void *param, AS3_Val args)
 {
 	if (qspIsMainDescChanged)
@@ -153,9 +153,9 @@ AS3_Val QSPIsMainDescChanged(void *param, AS3_Val args)
 		return AS3_False();
 }
 /* ------------------------------------------------------------ */
-/* Дополнительное описание локации */
+/* Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРµ РѕРїРёСЃР°РЅРёРµ Р»РѕРєР°С†РёРё */
 
-/* Текст дополнительного окна описания локации */
+/* РўРµРєСЃС‚ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РѕРєРЅР° РѕРїРёСЃР°РЅРёСЏ Р»РѕРєР°С†РёРё */
 AS3_Val QSPGetVarsDesc(void *param, AS3_Val args)
 {
 	AS3_Val res;
@@ -170,7 +170,7 @@ AS3_Val QSPGetVarsDesc(void *param, AS3_Val args)
 		res = AS3_String(0);
 	return res;
 }
-/* Возможность изменения текста дополнительного описания */
+/* Р’РѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ С‚РµРєСЃС‚Р° РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕРіРѕ РѕРїРёСЃР°РЅРёСЏ */
 AS3_Val QSPIsVarsDescChanged(void *param, AS3_Val args)
 {
 	if (qspIsVarsDescChanged)
@@ -179,7 +179,7 @@ AS3_Val QSPIsVarsDescChanged(void *param, AS3_Val args)
 		return AS3_False();
 }
 /* ------------------------------------------------------------ */
-/* Получить значение указанного выражения */
+/* РџРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёРµ СѓРєР°Р·Р°РЅРЅРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ */
 AS3_Val QSPGetExprValue(void *param, AS3_Val args)
 {
 	char *expr;
@@ -207,7 +207,7 @@ AS3_Val QSPGetExprValue(void *param, AS3_Val args)
 	return res;
 }
 /* ------------------------------------------------------------ */
-/* Текст строки ввода */
+/* РўРµРєСЃС‚ СЃС‚СЂРѕРєРё РІРІРѕРґР° */
 AS3_Val QSPSetInputStrText(void *param, AS3_Val args)
 {
 	QSP_CHAR *valWC;
@@ -219,14 +219,14 @@ AS3_Val QSPSetInputStrText(void *param, AS3_Val args)
 	return AS3_True();
 }
 /* ------------------------------------------------------------ */
-/* Список действий */
+/* РЎРїРёСЃРѕРє РґРµР№СЃС‚РІРёР№ */
 
-/* Количество действий */
+/* РљРѕР»РёС‡РµСЃС‚РІРѕ РґРµР№СЃС‚РІРёР№ */
 AS3_Val QSPGetActionsCount(void *param, AS3_Val args)
 {
 	return AS3_Int(qspCurActionsCount);
 }
-/* Данные действия с указанным индексом */
+/* Р”Р°РЅРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј */
 AS3_Val QSPGetActionData(void *param, AS3_Val args)
 {
 	int ind;
@@ -246,7 +246,7 @@ AS3_Val QSPGetActionData(void *param, AS3_Val args)
 		res = AS3_Object("image:StrType, desc:StrType", 0, 0);
 	return res;
 }
-/* Выполнение кода выбранного действия */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґРµР№СЃС‚РІРёСЏ */
 AS3_Val QSPExecuteSelActionCode(void *param, AS3_Val args)
 {
 	QSP_BOOL isRefresh;
@@ -262,7 +262,7 @@ AS3_Val QSPExecuteSelActionCode(void *param, AS3_Val args)
 	}
 	return AS3_True();
 }
-/* Установить индекс выбранного действия */
+/* РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РёРЅРґРµРєСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґРµР№СЃС‚РІРёСЏ */
 AS3_Val QSPSetSelActionIndex(void *param, AS3_Val args)
 {
 	int ind;
@@ -280,12 +280,12 @@ AS3_Val QSPSetSelActionIndex(void *param, AS3_Val args)
 	}
 	return AS3_True();
 }
-/* Получить индекс выбранного действия */
+/* РџРѕР»СѓС‡РёС‚СЊ РёРЅРґРµРєСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РґРµР№СЃС‚РІРёСЏ */
 AS3_Val QSPGetSelActionIndex(void *param, AS3_Val args)
 {
 	return AS3_Int(qspCurSelAction);
 }
-/* Возможность изменения списка действий */
+/* Р’РѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ СЃРїРёСЃРєР° РґРµР№СЃС‚РІРёР№ */
 AS3_Val QSPIsActionsChanged(void *param, AS3_Val args)
 {
 	if (qspIsActionsChanged)
@@ -294,14 +294,14 @@ AS3_Val QSPIsActionsChanged(void *param, AS3_Val args)
 		return AS3_False();
 }
 /* ------------------------------------------------------------ */
-/* Список объектов */
+/* РЎРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ */
 
-/* Количество объектов */
+/* РљРѕР»РёС‡РµСЃС‚РІРѕ РѕР±СЉРµРєС‚РѕРІ */
 AS3_Val QSPGetObjectsCount(void *param, AS3_Val args)
 {
 	return AS3_Int(qspCurObjectsCount);
 }
-/* Данные объекта с указанным индексом */
+/* Р”Р°РЅРЅС‹Рµ РѕР±СЉРµРєС‚Р° СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј */
 AS3_Val QSPGetObjectData(void *param, AS3_Val args)
 {
 	int ind;
@@ -321,7 +321,7 @@ AS3_Val QSPGetObjectData(void *param, AS3_Val args)
 		res = AS3_Object("image:StrType, desc:StrType", 0, 0);
 	return res;
 }
-/* Установить индекс выбранного объекта */
+/* РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РёРЅРґРµРєСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° */
 AS3_Val QSPSetSelObjectIndex(void *param, AS3_Val args)
 {
 	int ind;
@@ -339,12 +339,12 @@ AS3_Val QSPSetSelObjectIndex(void *param, AS3_Val args)
 	}
 	return AS3_True();
 }
-/* Получить индекс выбранного объекта */
+/* РџРѕР»СѓС‡РёС‚СЊ РёРЅРґРµРєСЃ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р° */
 AS3_Val QSPGetSelObjectIndex(void *param, AS3_Val args)
 {
 	return AS3_Int(qspCurSelObject);
 }
-/* Возможность изменения списка объектов */
+/* Р’РѕР·РјРѕР¶РЅРѕСЃС‚СЊ РёР·РјРµРЅРµРЅРёСЏ СЃРїРёСЃРєР° РѕР±СЉРµРєС‚РѕРІ */
 AS3_Val QSPIsObjectsChanged(void *param, AS3_Val args)
 {
 	if (qspIsObjectsChanged)
@@ -353,7 +353,7 @@ AS3_Val QSPIsObjectsChanged(void *param, AS3_Val args)
 		return AS3_False();
 }
 /* ------------------------------------------------------------ */
-/* Показ / скрытие окон */
+/* РџРѕРєР°Р· / СЃРєСЂС‹С‚РёРµ РѕРєРѕРЅ */
 AS3_Val QSPShowWindow(void *param, AS3_Val args)
 {
 	int type;
@@ -377,9 +377,9 @@ AS3_Val QSPShowWindow(void *param, AS3_Val args)
 	return AS3_True();
 }
 /* ------------------------------------------------------------ */
-/* Переменные */
+/* РџРµСЂРµРјРµРЅРЅС‹Рµ */
 
-/* Получить количество элементов массива */
+/* РџРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РјР°СЃСЃРёРІР° */
 AS3_Val QSPGetVarValuesCount(void *param, AS3_Val args)
 {
 	char *name;
@@ -394,7 +394,7 @@ AS3_Val QSPGetVarValuesCount(void *param, AS3_Val args)
 	if (qspErrorNum) return AS3_Null();
 	return AS3_Int(var->ValsCount);
 }
-/* Получить значения указанного элемента массива */
+/* РџРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёСЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР° */
 AS3_Val QSPGetVarValues(void *param, AS3_Val args)
 {
 	char *name;
@@ -420,12 +420,12 @@ AS3_Val QSPGetVarValues(void *param, AS3_Val args)
 		res = AS3_Object("numVal:IntType, strVal:StrType", var->Values[ind].Num, 0);
 	return res;
 }
-/* Получить максимальное количество переменных */
+/* РџРѕР»СѓС‡РёС‚СЊ РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ РїРµСЂРµРјРµРЅРЅС‹С… */
 AS3_Val QSPGetMaxVarsCount(void *param, AS3_Val args)
 {
 	return AS3_Int(QSP_VARSCOUNT);
 }
-/* Получить имя переменной с указанным индексом */
+/* РџРѕР»СѓС‡РёС‚СЊ РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј РёРЅРґРµРєСЃРѕРј */
 AS3_Val QSPGetVarNameByIndex(void *param, AS3_Val args)
 {
 	int index;
@@ -440,9 +440,9 @@ AS3_Val QSPGetVarNameByIndex(void *param, AS3_Val args)
 	return res;
 }
 /* ------------------------------------------------------------ */
-/* Выполнение кода */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° */
 
-/* Выполнение строки кода */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ СЃС‚СЂРѕРєРё РєРѕРґР° */
 AS3_Val QSPExecString(void *param, AS3_Val args)
 {
 	char *s;
@@ -459,7 +459,7 @@ AS3_Val QSPExecString(void *param, AS3_Val args)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return AS3_True();
 }
-/* Выполнение кода указанной локации */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° СѓРєР°Р·Р°РЅРЅРѕР№ Р»РѕРєР°С†РёРё */
 AS3_Val QSPExecLocationCode(void *param, AS3_Val args)
 {
 	char *name;
@@ -476,7 +476,7 @@ AS3_Val QSPExecLocationCode(void *param, AS3_Val args)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return AS3_True();
 }
-/* Выполнение кода локации-счетчика */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° Р»РѕРєР°С†РёРё-СЃС‡РµС‚С‡РёРєР° */
 AS3_Val QSPExecCounter(void *param, AS3_Val args)
 {
 	QSP_BOOL isRefresh;
@@ -490,7 +490,7 @@ AS3_Val QSPExecCounter(void *param, AS3_Val args)
 	}
 	return AS3_True();
 }
-/* Выполнение кода локации-обработчика строки ввода */
+/* Р’С‹РїРѕР»РЅРµРЅРёРµ РєРѕРґР° Р»РѕРєР°С†РёРё-РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃС‚СЂРѕРєРё РІРІРѕРґР° */
 AS3_Val QSPExecUserInput(void *param, AS3_Val args)
 {
 	QSP_BOOL isRefresh;
@@ -504,9 +504,9 @@ AS3_Val QSPExecUserInput(void *param, AS3_Val args)
 	return AS3_True();
 }
 /* ------------------------------------------------------------ */
-/* Ошибки */
+/* РћС€РёР±РєРё */
 
-/* Получить информацию о последней ошибке */
+/* РџРѕР»СѓС‡РёС‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РїРѕСЃР»РµРґРЅРµР№ РѕС€РёР±РєРµ */
 AS3_Val QSPGetLastErrorData(void *param, AS3_Val args)
 {
 	AS3_Val res;
@@ -525,7 +525,7 @@ AS3_Val QSPGetLastErrorData(void *param, AS3_Val args)
 	}
 	return res;
 }
-/* Получить описание ошибки по ее номеру */
+/* РџРѕР»СѓС‡РёС‚СЊ РѕРїРёСЃР°РЅРёРµ РѕС€РёР±РєРё РїРѕ РµРµ РЅРѕРјРµСЂСѓ */
 AS3_Val QSPGetErrorDesc(void *param, AS3_Val args)
 {
 	int errorNum;
@@ -540,9 +540,9 @@ AS3_Val QSPGetErrorDesc(void *param, AS3_Val args)
 	return res;
 }
 /* ------------------------------------------------------------ */
-/* Управление игрой */
+/* РЈРїСЂР°РІР»РµРЅРёРµ РёРіСЂРѕР№ */
 
-/* Загрузка новой игры из файла */
+/* Р—Р°РіСЂСѓР·РєР° РЅРѕРІРѕР№ РёРіСЂС‹ РёР· С„Р°Р№Р»Р° */
 AS3_Val QSPLoadGameWorld(void *param, AS3_Val args)
 {
 	char *fileName;
@@ -557,7 +557,7 @@ AS3_Val QSPLoadGameWorld(void *param, AS3_Val args)
 	if (qspErrorNum) return AS3_False();
 	return AS3_True();
 }
-/* Загрузка новой игры из памяти */
+/* Р—Р°РіСЂСѓР·РєР° РЅРѕРІРѕР№ РёРіСЂС‹ РёР· РїР°РјСЏС‚Рё */
 AS3_Val QSPLoadGameWorldFromData(void *param, AS3_Val args)
 {
 	char *ptr;
@@ -580,7 +580,7 @@ AS3_Val QSPLoadGameWorldFromData(void *param, AS3_Val args)
 	if (qspErrorNum) return AS3_False();
 	return AS3_True();
 }
-/* Сохранение состояния в файл */
+/* РЎРѕС…СЂР°РЅРµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ С„Р°Р№Р» */
 AS3_Val QSPSaveGame(void *param, AS3_Val args)
 {
 	char *fileName;
@@ -597,7 +597,7 @@ AS3_Val QSPSaveGame(void *param, AS3_Val args)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return AS3_True();
 }
-/* Сохранение состояния в память */
+/* РЎРѕС…СЂР°РЅРµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РїР°РјСЏС‚СЊ */
 AS3_Val QSPSaveGameAsData(void *param, AS3_Val args)
 {
 	int len;
@@ -615,7 +615,7 @@ AS3_Val QSPSaveGameAsData(void *param, AS3_Val args)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return AS3_True();
 }
-/* Загрузка состояния из файла */
+/* Р—Р°РіСЂСѓР·РєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РёР· С„Р°Р№Р»Р° */
 AS3_Val QSPOpenSavedGame(void *param, AS3_Val args)
 {
 	char *fileName;
@@ -632,7 +632,7 @@ AS3_Val QSPOpenSavedGame(void *param, AS3_Val args)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return AS3_True();
 }
-/* Загрузка состояния из памяти */
+/* Р—Р°РіСЂСѓР·РєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РёР· РїР°РјСЏС‚Рё */
 AS3_Val QSPOpenSavedGameFromData(void *param, AS3_Val args)
 {
 	AS3_Val data;
@@ -654,7 +654,7 @@ AS3_Val QSPOpenSavedGameFromData(void *param, AS3_Val args)
 	if (isRefresh) qspCallRefreshInt(QSP_FALSE);
 	return AS3_True();
 }
-/* Перезапуск игры */
+/* РџРµСЂРµР·Р°РїСѓСЃРє РёРіСЂС‹ */
 AS3_Val QSPRestartGame(void *param, AS3_Val args)
 {
 	QSP_BOOL isRefresh;
@@ -668,7 +668,7 @@ AS3_Val QSPRestartGame(void *param, AS3_Val args)
 	return AS3_True();
 }
 /* ------------------------------------------------------------ */
-/* Установка CALLBACK'ов */
+/* РЈСЃС‚Р°РЅРѕРІРєР° CALLBACK'РѕРІ */
 AS3_Val QSPSetCallBack(void *param, AS3_Val args)
 {
 	int type;
@@ -682,7 +682,7 @@ AS3_Val QSPSetCallBack(void *param, AS3_Val args)
 	return AS3_True();
 }
 /* ------------------------------------------------------------ */
-/* Инициализация */
+/* РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ */
 AS3_Val QSPInit(void *param, AS3_Val args)
 {
 #ifdef _DEBUG
@@ -712,7 +712,7 @@ AS3_Val QSPInit(void *param, AS3_Val args)
 	qspInitMath();
 	return AS3_True();
 }
-/* Деинициализация */
+/* Р”РµРёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ */
 AS3_Val QSPDeInit(void *param, AS3_Val args)
 {
 	qspMemClear(QSP_FALSE);
