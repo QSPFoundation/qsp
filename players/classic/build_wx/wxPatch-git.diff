@@ -16,7 +16,7 @@
  15 files changed, 190 insertions(+), 16 deletions(-)
 
 diff --git a/include/wx/animate.h b/include/wx/animate.h
-index 6243fb4..b88257a 100644
+index 6243fb4568..b88257abf9 100644
 --- a/include/wx/animate.h
 +++ b/include/wx/animate.h
 @@ -114,11 +114,15 @@ private:
@@ -36,7 +36,7 @@ index 6243fb4..b88257a 100644
  #endif // wxUSE_ANIMATIONCTRL
  
 diff --git a/include/wx/animdecod.h b/include/wx/animdecod.h
-index 58177e6..42451ab 100644
+index 58177e68fd..42451abf5f 100644
 --- a/include/wx/animdecod.h
 +++ b/include/wx/animdecod.h
 @@ -144,6 +144,9 @@ public:
@@ -50,7 +50,7 @@ index 58177e6..42451ab 100644
      wxSize GetAnimationSize() const { return m_szAnimation; }
      wxColour GetBackgroundColour() const { return m_background; }
 diff --git a/include/wx/aui/floatpane.h b/include/wx/aui/floatpane.h
-index bf15893..f773185 100644
+index bf158933b8..f77318576b 100644
 --- a/include/wx/aui/floatpane.h
 +++ b/include/wx/aui/floatpane.h
 @@ -31,6 +31,8 @@
@@ -79,7 +79,7 @@ index bf15893..f773185 100644
      void SetPaneWindow(const wxAuiPaneInfo& pane);
      wxAuiManager* GetOwnerManager() const;
 diff --git a/include/wx/generic/animate.h b/include/wx/generic/animate.h
-index 818daf8..2b97aaa 100644
+index 818daf890c..2b97aaa521 100644
 --- a/include/wx/generic/animate.h
 +++ b/include/wx/generic/animate.h
 @@ -26,8 +26,13 @@ public:
@@ -110,11 +110,11 @@ index 818daf8..2b97aaa 100644
      typedef wxAnimationCtrlBase base_type;
      DECLARE_DYNAMIC_CLASS(wxAnimationCtrl)
 diff --git a/include/wx/gifdecod.h b/include/wx/gifdecod.h
-index b0de466..273e029 100644
+index f0b84fc4bf..87286b2a09 100644
 --- a/include/wx/gifdecod.h
 +++ b/include/wx/gifdecod.h
 @@ -65,8 +65,11 @@ public:
-     virtual long GetDelay(unsigned int frame) const wxOVERRIDE;
+     virtual long GetDelay(unsigned int frame) const;
  
      // GIFs can contain both static images and animations
 +    // HzD_Byte's hack
@@ -126,7 +126,7 @@ index b0de466..273e029 100644
      // load function which returns more info than just Load():
      wxGIFErrorCode LoadGIF( wxInputStream& stream );
 diff --git a/include/wx/htmllbox.h b/include/wx/htmllbox.h
-index c7e27ee..dad79f3 100644
+index 27c3a36c30..2473d6700d 100644
 --- a/include/wx/htmllbox.h
 +++ b/include/wx/htmllbox.h
 @@ -129,7 +129,8 @@ protected:
@@ -137,8 +137,8 @@ index c7e27ee..dad79f3 100644
 +    // HzD_Byte's hack
 +// private:
      // wxHtmlWindowInterface methods:
-     virtual void SetHTMLWindowTitle(const wxString& title) wxOVERRIDE;
-     virtual void OnHTMLLinkClicked(const wxHtmlLinkInfo& link) wxOVERRIDE;
+     virtual void SetHTMLWindowTitle(const wxString& title);
+     virtual void OnHTMLLinkClicked(const wxHtmlLinkInfo& link);
 @@ -162,7 +163,8 @@ private:
      // given cell to physical coordinates in the window
      wxPoint CellCoordsToPhysical(const wxPoint& pos, wxHtmlCell *cell) const;
@@ -159,7 +159,7 @@ index c7e27ee..dad79f3 100644
      // it calls our GetSelectedTextColour() and GetSelectedTextBgColour()
      friend class wxHtmlListBoxStyle;
 diff --git a/src/aui/floatpane.cpp b/src/aui/floatpane.cpp
-index 837c0a0..176a0f9 100644
+index 837c0a0aa5..176a0f9316 100644
 --- a/src/aui/floatpane.cpp
 +++ b/src/aui/floatpane.cpp
 @@ -132,10 +132,13 @@ void wxAuiFloatingFrame::SetPaneWindow(const wxAuiPaneInfo& pane)
@@ -177,7 +177,7 @@ index 837c0a0..176a0f9 100644
      if ( hasFloatingSize )
      {
 diff --git a/src/aui/framemanager.cpp b/src/aui/framemanager.cpp
-index 8f92365..15dfb9d 100644
+index f0c506220d..4a8cd4ebf5 100644
 --- a/src/aui/framemanager.cpp
 +++ b/src/aui/framemanager.cpp
 @@ -2670,6 +2670,8 @@ void wxAuiManager::Update()
@@ -190,7 +190,7 @@ index 8f92365..15dfb9d 100644
      }
  
 diff --git a/src/common/filesys.cpp b/src/common/filesys.cpp
-index fadcec6..8dc1d61 100644
+index 06edca28a2..14663e4857 100644
 --- a/src/common/filesys.cpp
 +++ b/src/common/filesys.cpp
 @@ -632,7 +632,8 @@ wxFileName wxFileSystem::URLToFileName(const wxString& url)
@@ -204,7 +204,7 @@ index fadcec6..8dc1d61 100644
  #ifdef __WINDOWS__
      // file urls either start with a forward slash (local harddisk),
 diff --git a/src/generic/animateg.cpp b/src/generic/animateg.cpp
-index d238c82..66173e5 100644
+index dd2adecffc..85391aabb7 100644
 --- a/src/generic/animateg.cpp
 +++ b/src/generic/animateg.cpp
 @@ -276,6 +276,8 @@ void wxAnimationCtrl::Init()
@@ -304,10 +304,10 @@ index d238c82..66173e5 100644
  }
  
 diff --git a/src/generic/scrlwing.cpp b/src/generic/scrlwing.cpp
-index ff248ce..7cdaad6 100644
+index 4fcb6a17bf..c34de2b419 100644
 --- a/src/generic/scrlwing.cpp
 +++ b/src/generic/scrlwing.cpp
-@@ -558,6 +558,8 @@ void wxScrollHelperBase::HandleOnScroll(wxScrollWinEvent& event)
+@@ -608,6 +608,8 @@ void wxScrollHelperBase::HandleOnScroll(wxScrollWinEvent& event)
          m_win->SetScrollPos(wxVERTICAL, m_yScrollPosition);
      }
  
@@ -316,7 +316,7 @@ index ff248ce..7cdaad6 100644
      if ( needsRefresh )
      {
          m_targetWindow->Refresh(true, GetScrollRect());
-@@ -566,6 +568,10 @@ void wxScrollHelperBase::HandleOnScroll(wxScrollWinEvent& event)
+@@ -616,6 +618,10 @@ void wxScrollHelperBase::HandleOnScroll(wxScrollWinEvent& event)
      {
          m_targetWindow->ScrollWindow(dx, dy, GetScrollRect());
      }
@@ -328,21 +328,21 @@ index ff248ce..7cdaad6 100644
  
  int wxScrollHelperBase::CalcScrollInc(wxScrollWinEvent& event)
 diff --git a/src/html/htmlwin.cpp b/src/html/htmlwin.cpp
-index 21fdad2..afd7a2f 100644
+index 01621ddf5d..7b6292548e 100644
 --- a/src/html/htmlwin.cpp
 +++ b/src/html/htmlwin.cpp
-@@ -482,7 +482,8 @@ bool wxHtmlWindow::DoSetPage(const wxString& source)
+@@ -472,7 +472,8 @@ bool wxHtmlWindow::DoSetPage(const wxString& source)
      // ...and run the parser on it:
-     wxClientDC *dc = new wxClientDC(this);
-     dc->SetMapMode(wxMM_TEXT);
+     wxClientDC dc(this);
+     dc.SetMapMode(wxMM_TEXT);
 -    SetBackgroundColour(wxColour(0xFF, 0xFF, 0xFF));
 +    // HzD_Byte's hack
 +    // SetBackgroundColour(wxColour(0xFF, 0xFF, 0xFF));
      SetBackgroundImage(wxNullBitmap);
  
-     m_Parser->SetDC(dc);
+     m_Parser->SetDC(&dc);
 diff --git a/src/html/m_image.cpp b/src/html/m_image.cpp
-index d16040f..f8e41c4 100644
+index 482692b649..b90ba0fdbc 100644
 --- a/src/html/m_image.cpp
 +++ b/src/html/m_image.cpp
 @@ -311,6 +311,9 @@ private:
@@ -546,7 +546,7 @@ index d16040f..f8e41c4 100644
  
  wxHtmlLinkInfo *wxHtmlImageCell::GetLink( int x, int y ) const
 diff --git a/src/html/m_links.cpp b/src/html/m_links.cpp
-index b5a6553..ba2696a 100644
+index 4dfebdc2e6..9f595b85c5 100644
 --- a/src/html/m_links.cpp
 +++ b/src/html/m_links.cpp
 @@ -84,7 +84,10 @@ TAG_HANDLER_BEGIN(A, "A")
@@ -562,7 +562,7 @@ index b5a6553..ba2696a 100644
              m_WParser->SetLink(wxHtmlLinkInfo(href, target));
  
 diff --git a/src/html/winpars.cpp b/src/html/winpars.cpp
-index 9973cf1..c3f8d6a 100644
+index 1218467ba3..95df9bbb42 100644
 --- a/src/html/winpars.cpp
 +++ b/src/html/winpars.cpp
 @@ -55,6 +55,8 @@ wxHtmlWinParser::wxHtmlWinParser(wxHtmlWindowInterface *wndIface)
@@ -584,7 +584,7 @@ index 9973cf1..c3f8d6a 100644
      m_ActualColor.Set(0, 0, 0);
      const wxColour windowColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW) ;
      m_ActualBackgroundColor = m_windowInterface
-@@ -291,6 +294,8 @@ wxFSFile *wxHtmlWinParser::OpenURL(wxHtmlURLType type,
+@@ -300,6 +303,8 @@ wxFSFile *wxHtmlWinParser::OpenURL(wxHtmlURLType type,
      {
          wxString myfullurl(myurl);
  
@@ -593,7 +593,7 @@ index 9973cf1..c3f8d6a 100644
          // consider url as absolute path first
          wxURI current(myurl);
          myfullurl = current.BuildUnescapedURI();
-@@ -319,6 +324,7 @@ wxFSFile *wxHtmlWinParser::OpenURL(wxHtmlURLType type,
+@@ -328,6 +333,7 @@ wxFSFile *wxHtmlWinParser::OpenURL(wxHtmlURLType type,
                  }
              }
          }
