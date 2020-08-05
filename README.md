@@ -11,4 +11,6 @@ QSP Library
 * Move global state into context parameter
 * Split QSP library and QSP player/editor into multiple repositories
 * Make sure qspgui works with the latest wxWidgets fw
+* Build web player
+* Build web editor
 * ???
