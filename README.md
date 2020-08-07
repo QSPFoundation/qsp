@@ -13,4 +13,7 @@ QSP Library
 * Make sure qspgui works with the latest wxWidgets fw
 * Build web player
 * Build web editor
+* Build new QGen
+* Document new features
+* Improve TXT2GAM to support UTF-8
 * ???
