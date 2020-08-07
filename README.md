@@ -8,6 +8,7 @@ QSP Library
 * Test locals implementation
 * Test loop implementation
 * Update bindings
+* Implement new way to communicate with GUI (more specific callbacks)
 * Move global state into context parameter
 * Split QSP library and QSP player/editor into multiple repositories
 * Make sure qspgui works with the latest wxWidgets fw
