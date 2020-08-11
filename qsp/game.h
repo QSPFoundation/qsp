@@ -19,29 +19,26 @@
 #include "variant.h"
 
 #ifndef QSP_GAMEDEFINES
-	#define QSP_GAMEDEFINES
+    #define QSP_GAMEDEFINES
 
-	#define QSP_GAMEID QSP_FMT("QSPGAME")
-	#define QSP_SAVEDGAMEID QSP_FMT("QSPSAVEDGAME")
-	#define QSP_GAMEMINVER QSP_FMT("5.7.0")
-	#define QSP_MAXINCFILES 100
-	#define QSP_DEFTIMERINTERVAL 500
+    #define QSP_GAMEID QSP_FMT("QSPGAME")
+    #define QSP_SAVEDGAMEID QSP_FMT("QSPSAVEDGAME")
+    #define QSP_GAMEMINVER QSP_FMT("5.7.0")
+    #define QSP_MAXINCFILES 100
+    #define QSP_DEFTIMERINTERVAL 500
 
-	extern QSPString qspQstPath;
-	extern QSPString qspQstFullPath;
-	extern int qspQstCRC;
-	extern int qspCurIncLocsCount;
+    extern int qspQstCRC;
+    extern int qspCurIncLocsCount;
 
-	/* External functions */
-	QSPString qspGetAbsFromRelPath(QSPString path);
-	void qspClearIncludes(QSP_BOOL);
-	void qspNewGame(QSP_BOOL);
-	void qspOpenQuestFromData(char *data, int dataSize, QSPString fileName, QSP_BOOL isNewGame);
-	QSPString qspSaveGameStatusToString();
-	void qspOpenGameStatusFromString(QSPString str);
-	/* Statements */
-	QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-	QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-	QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    /* External functions */
+    void qspClearIncludes(QSP_BOOL);
+    void qspNewGame(QSP_BOOL);
+    void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isNewGame);
+    QSPString qspSaveGameStatusToString();
+    void qspOpenGameStatusFromString(QSPString str);
+    /* Statements */
+    QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
 #endif

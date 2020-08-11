@@ -18,12 +18,12 @@
 #include "declarations.h"
 
 #ifndef QSP_TIMEDEFINES
-	#define QSP_TIMEDEFINES
+    #define QSP_TIMEDEFINES
 
-	extern int qspMSCount;
+    extern int qspMSCount;
 
-	/* External functions */
-	void qspResetTime(int);
-	int qspGetTime();
+    /* External functions */
+    void qspResetTime(int);
+    int qspGetTime();
 
 #endif

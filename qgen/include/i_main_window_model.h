@@ -7,7 +7,7 @@ namespace QGen
 class IMainWindowModel
 {
 public:
-	virtual ~IMainWindowModel() { }
+    virtual ~IMainWindowModel() { }
 
 };
 

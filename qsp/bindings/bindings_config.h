@@ -16,32 +16,22 @@
 */
 
 #ifndef QSP_BINDINGSCONFIG
-	#define QSP_BINDINGSCONFIG
+    #define QSP_BINDINGSCONFIG
 
-	/* Flash binding */
-	#ifdef _FLASH
-		#define QSP_BINDING
-		#include "flash/flash.h"
-	#endif
+    /* Android binding */
+    /*
+    #ifdef _ANDROID
+        #define QSP_BINDING
+        #include "android/android.h"
+    #endif
+    */
 
-	/* Java binding */
-	#ifdef _JAVA
-		#define QSP_BINDING
-		#include "java/java.h"
-	#endif
+    /* Place your bindings here */
 
-	/* Android binding */
-	#ifdef _ANDROID
-		#define QSP_BINDING
-		#include "android/android.h"
-	#endif
-
-	/* Place your bindings here */
-
-	#ifndef QSP_BINDING
-		#define QSP_BINDING
-		#define _DEFAULT_BINDING
-		#include "default/qsp_default.h"
-	#endif
+    #ifndef QSP_BINDING
+        #define QSP_BINDING
+        #define _DEFAULT_BINDING
+        #include "default/qsp_default.h"
+    #endif
 
 #endif

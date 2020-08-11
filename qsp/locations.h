@@ -21,44 +21,44 @@
 #include "variant.h"
 
 #ifndef QSP_LOCSDEFINES
-	#define QSP_LOCSDEFINES
+    #define QSP_LOCSDEFINES
 
-	typedef struct
-	{
-		QSPString Image;
-		QSPString Desc;
-		QSPLineOfCode *OnPressLines;
-		int OnPressLinesCount;
-	} QSPLocAct;
-	typedef struct
-	{
-		QSPString Name;
-		QSPString Desc;
-		QSPLineOfCode *OnVisitLines;
-		int OnVisitLinesCount;
-		QSPLocAct Actions[QSP_MAXACTIONS];
-	} QSPLocation;
-	typedef struct
-	{
-		int Index;
-		QSPString Name;
-	} QSPLocName;
+    typedef struct
+    {
+        QSPString Image;
+        QSPString Desc;
+        QSPLineOfCode *OnPressLines;
+        int OnPressLinesCount;
+    } QSPLocAct;
+    typedef struct
+    {
+        QSPString Name;
+        QSPString Desc;
+        QSPLineOfCode *OnVisitLines;
+        int OnVisitLinesCount;
+        QSPLocAct Actions[QSP_MAXACTIONS];
+    } QSPLocation;
+    typedef struct
+    {
+        int Index;
+        QSPString Name;
+    } QSPLocName;
 
-	extern QSPLocation *qspLocs;
-	extern QSPLocName *qspLocsNames;
-	extern int qspLocsCount;
-	extern int qspCurLoc;
-	extern int qspRefreshCount;
-	extern int qspFullRefreshCount;
+    extern QSPLocation *qspLocs;
+    extern QSPLocName *qspLocsNames;
+    extern int qspLocsCount;
+    extern int qspCurLoc;
+    extern int qspRefreshCount;
+    extern int qspFullRefreshCount;
 
-	/* External functions */
-	void qspCreateWorld(int, int);
-	void qspPrepareLocs();
-	int qspLocIndex(QSPString name);
-	void qspExecLocByIndex(int, QSP_BOOL, QSP_BOOL);
-	void qspExecLocByName(QSPString name, QSP_BOOL isChangeDesc);
-	void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, int count, QSPVariant *res);
-	void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, int count);
-	void qspRefreshCurLoc(QSP_BOOL, QSPVariant *, int);
+    /* External functions */
+    void qspCreateWorld(int, int);
+    void qspPrepareLocs();
+    int qspLocIndex(QSPString name);
+    void qspExecLocByIndex(int, QSP_BOOL, QSP_BOOL);
+    void qspExecLocByName(QSPString name, QSP_BOOL isChangeDesc);
+    void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, int count, QSPVariant *res);
+    void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, int count);
+    void qspRefreshCurLoc(QSP_BOOL, QSPVariant *, int);
 
 #endif

@@ -18,25 +18,25 @@
 #include "declarations.h"
 
 #ifndef QSP_CODINGDEFINES
-	#define QSP_CODINGDEFINES
+    #define QSP_CODINGDEFINES
 
-	#define QSP_CODREMOV 5
+    #define QSP_CODREMOV 5
 
-	extern unsigned char qspCP1251ToUpperTable[];
-	extern unsigned char qspCP1251ToLowerTable[];
-	extern unsigned char qspKOI8RToUpperTable[];
-	extern unsigned char qspKOI8RToLowerTable[];
-	extern unsigned char qspCP1251OrderTable[];
-	extern unsigned char qspKOI8ROrderTable[];
+    extern unsigned char qspCP1251ToUpperTable[];
+    extern unsigned char qspCP1251ToLowerTable[];
+    extern unsigned char qspKOI8RToUpperTable[];
+    extern unsigned char qspKOI8RToLowerTable[];
+    extern unsigned char qspCP1251OrderTable[];
+    extern unsigned char qspKOI8ROrderTable[];
 
-	/* External functions */
-	int qspStrCmpSB(char *, char *, unsigned char *);
-	QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode);
-	QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded);
-	int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSPString delim, char ***res);
-	int qspReCodeGetIntVal(QSPString val);
-	void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL isCode);
-	void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL isCode);
-	char *qspToSysString(QSPString s);
+    /* External functions */
+    int qspStrCmpSB(char *, char *, unsigned char *);
+    QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode);
+    QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded);
+    int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSPString delim, char ***res);
+    int qspReCodeGetIntVal(QSPString val);
+    void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL isCode);
+    void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL isCode);
+    char *qspToSysString(QSPString s);
 
 #endif

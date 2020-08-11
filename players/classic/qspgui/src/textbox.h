@@ -16,58 +16,58 @@
 */
 
 #ifndef TEXTBOX_H
-	#define TEXTBOX_H
+    #define TEXTBOX_H
 
-	#include <wx/wx.h>
-	#include <wx/fontmap.h>
-	#include <wx/html/htmlwin.h>
-	#include "comtools.h"
+    #include <wx/wx.h>
+    #include <wx/fontmap.h>
+    #include <wx/html/htmlwin.h>
+    #include "comtools.h"
 
-	class QSPTextBox : public wxHtmlWindow
-	{
-		DECLARE_CLASS(QSPTextBox)
-		DECLARE_EVENT_TABLE()
-	public:
-		// C-tors / D-tor
-		QSPTextBox(wxWindow *parent, wxWindowID id);
+    class QSPTextBox : public wxHtmlWindow
+    {
+        DECLARE_CLASS(QSPTextBox)
+        DECLARE_EVENT_TABLE()
+    public:
+        // C-tors / D-tor
+        QSPTextBox(wxWindow *parent, wxWindowID id);
 
-		// Methods
-		void RefreshUI(bool isScroll = false);
-		void LoadBackImage(const wxString& fileName);
+        // Methods
+        void RefreshUI(bool isScroll = false);
+        void LoadBackImage(const wxString& fileName);
 
-		// Accessors
-		void SetIsHtml(bool isHtml);
-		void SetText(const wxString& text, bool isScroll = false);
-		void SetTextFont(const wxFont& font);
-		wxFont GetTextFont() const { return m_font; }
-		wxString GetText() const { return m_text; }
-		void SetLinkColor(const wxColour& clr);
-		const wxColour& GetLinkColor() const { return m_Parser->GetLinkColor(); }
-		void SetGamePath(const wxString& path) { m_path = path; }
-		void SetBackgroundImage(const wxBitmap& bmpBg);
-	protected:
-		// Internal methods
-		void CalcImageSize();
-		virtual wxHtmlOpeningStatus OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const;
+        // Accessors
+        void SetIsHtml(bool isHtml);
+        void SetText(const wxString& text, bool isScroll = false);
+        void SetTextFont(const wxFont& font);
+        wxFont GetTextFont() const { return m_font; }
+        wxString GetText() const { return m_text; }
+        void SetLinkColor(const wxColour& clr);
+        const wxColour& GetLinkColor() const { return m_Parser->GetLinkColor(); }
+        void SetGamePath(const wxString& path) { m_path = path; }
+        void SetBackgroundImage(const wxBitmap& bmpBg);
+    protected:
+        // Internal methods
+        void CalcImageSize();
+        virtual wxHtmlOpeningStatus OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const;
 
-		// Events
-		void OnSize(wxSizeEvent& event);
-		void OnEraseBackground(wxEraseEvent& event);
-		void OnKeyUp(wxKeyEvent& event);
-		void OnMouseWheel(wxMouseEvent& event);
-		void OnMouseClick(wxMouseEvent& event);
+        // Events
+        void OnSize(wxSizeEvent& event);
+        void OnEraseBackground(wxEraseEvent& event);
+        void OnKeyUp(wxKeyEvent& event);
+        void OnMouseWheel(wxMouseEvent& event);
+        void OnMouseClick(wxMouseEvent& event);
 
-		// Fields
-		bool m_isUseHtml;
-		wxString m_outFormat;
-		wxString m_path;
-		wxString m_imagePath;
-		wxFont m_font;
-		wxString m_text;
-		wxBitmap m_bmpBg;
-		wxBitmap m_bmpRealBg;
-		int m_posX;
-		int m_posY;
-	};
+        // Fields
+        bool m_isUseHtml;
+        wxString m_outFormat;
+        wxString m_path;
+        wxString m_imagePath;
+        wxFont m_font;
+        wxString m_text;
+        wxBitmap m_bmpBg;
+        wxBitmap m_bmpRealBg;
+        int m_posX;
+        int m_posY;
+    };
 
 #endif

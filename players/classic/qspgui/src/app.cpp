@@ -21,62 +21,62 @@ IMPLEMENT_APP(QSPApp)
 
 bool QSPApp::OnInit()
 {
-	wxLog::EnableLogging(false);
-	wxInitAllImageHandlers();
-	QSPInit();
-	InitUI();
-	return true;
+    wxLog::EnableLogging(false);
+    wxInitAllImageHandlers();
+    QSPInit();
+    InitUI();
+    return true;
 }
 
 int QSPApp::OnExit()
 {
-	QSPDeInit();
-	QSPCallBacks::DeInit();
-	delete m_transhelper;
-	wxTheClipboard->Flush();
-	return wxApp::OnExit();
+    QSPDeInit();
+    QSPCallBacks::DeInit();
+    delete m_transhelper;
+    wxTheClipboard->Flush();
+    return wxApp::OnExit();
 }
 
 void QSPApp::InitUI()
 {
-	wxString appPathString = QSPTools::GetAppPath();
-	m_transhelper = new QSPTranslationHelper(QSP_APPNAME, appPathString + wxT("langs"));
-	wxString configPath = appPathString + QSP_CONFIG;
-	if (!(wxFileExists(configPath) || wxFileName::IsDirWritable(appPathString)))
-		configPath = wxFileName(wxStandardPaths::Get().GetUserConfigDir(), QSP_CONFIG).GetFullPath();
-	// ----------------------
-	QSPFrame * frame = new QSPFrame(configPath, m_transhelper);
-	frame->LoadSettings();
-	frame->EnableControls(false);
-	QSPCallBacks::Init(frame);
-	// ----------------------
-	wxInitEvent initEvent;
-	if (GetAutoRunEvent(initEvent))
-		wxPostEvent(frame, initEvent);
+    wxString appPathString = QSPTools::GetAppPath();
+    m_transhelper = new QSPTranslationHelper(QSP_APPNAME, appPathString + wxT("langs"));
+    wxString configPath = appPathString + QSP_CONFIG;
+    if (!(wxFileExists(configPath) || wxFileName::IsDirWritable(appPathString)))
+        configPath = wxFileName(wxStandardPaths::Get().GetUserConfigDir(), QSP_CONFIG).GetFullPath();
+    // ----------------------
+    QSPFrame * frame = new QSPFrame(configPath, m_transhelper);
+    frame->LoadSettings();
+    frame->EnableControls(false);
+    QSPCallBacks::Init(frame);
+    // ----------------------
+    wxInitEvent initEvent;
+    if (GetAutoRunEvent(initEvent))
+        wxPostEvent(frame, initEvent);
 }
 
 bool QSPApp::GetAutoRunEvent(wxInitEvent& initEvent)
 {
-	wxCmdLineParser cmdParser(argc, argv);
-	if (argc > 1)
-	{
-		cmdParser.AddParam();
-		cmdParser.Parse(false);
-		wxFileName path(cmdParser.GetParam());
-		path.MakeAbsolute();
-		initEvent.SetInitString(path.GetFullPath());
-		return true;
-	}
-	else
-	{
-		wxFileName autoPath(wxT("auto.qsp"));
-		autoPath.MakeAbsolute();
-		wxString autoPathString(autoPath.GetFullPath());
-		if (wxFileExists(autoPathString))
-		{
-			initEvent.SetInitString(autoPathString);
-			return true;
-		}
-	}
-	return false;
+    wxCmdLineParser cmdParser(argc, argv);
+    if (argc > 1)
+    {
+        cmdParser.AddParam();
+        cmdParser.Parse(false);
+        wxFileName path(cmdParser.GetParam());
+        path.MakeAbsolute();
+        initEvent.SetInitString(path.GetFullPath());
+        return true;
+    }
+    else
+    {
+        wxFileName autoPath(wxT("auto.qsp"));
+        autoPath.MakeAbsolute();
+        wxString autoPathString(autoPath.GetFullPath());
+        if (wxFileExists(autoPathString))
+        {
+            initEvent.SetInitString(autoPathString);
+            return true;
+        }
+    }
+    return false;
 }

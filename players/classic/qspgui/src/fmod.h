@@ -68,9 +68,9 @@ typedef struct FMOD_SOUNDGROUP    FMOD_SOUNDGROUP;
 typedef struct FMOD_REVERB        FMOD_REVERB;
 typedef struct FMOD_DSP           FMOD_DSP;
 typedef struct FMOD_DSPCONNECTION FMOD_DSPCONNECTION;
-typedef struct FMOD_POLYGON		  FMOD_POLYGON;
-typedef struct FMOD_GEOMETRY	  FMOD_GEOMETRY;
-typedef struct FMOD_SYNCPOINT	  FMOD_SYNCPOINT;
+typedef struct FMOD_POLYGON          FMOD_POLYGON;
+typedef struct FMOD_GEOMETRY      FMOD_GEOMETRY;
+typedef struct FMOD_SYNCPOINT      FMOD_SYNCPOINT;
 typedef unsigned int              FMOD_MODE;
 typedef unsigned int              FMOD_TIMEUNIT;
 typedef unsigned int              FMOD_INITFLAGS;
@@ -235,7 +235,7 @@ typedef enum
 */
 typedef struct
 {
-	float x;        /* X co-ordinate in 3D space. */
+    float x;        /* X co-ordinate in 3D space. */
     float y;        /* Y co-ordinate in 3D space. */
     float z;        /* Z co-ordinate in 3D space. */
 } FMOD_VECTOR;
@@ -367,7 +367,7 @@ typedef enum
     FMOD_OUTPUTTYPE_PS3,             /* PS3                   - Native hardware output. (Default on PS3) */
     FMOD_OUTPUTTYPE_XBOX360,         /* Xbox 360              - Native hardware output. (Default on Xbox 360) */
     FMOD_OUTPUTTYPE_PSP,             /* PSP                   - Native hardware output. (Default on PSP) */
-	FMOD_OUTPUTTYPE_WII,			 /* Wii			          - Native hardware output. (Default on Wii) */
+    FMOD_OUTPUTTYPE_WII,             /* Wii                      - Native hardware output. (Default on Wii) */
     FMOD_OUTPUTTYPE_ANDROID,         /* Android               - Native android output. */
 
     FMOD_OUTPUTTYPE_MAX,             /* Maximum number of output types supported. */
@@ -407,7 +407,7 @@ typedef enum
 #define FMOD_CAPS_REVERB_EAX2            0x00000100  /* Device supports EAX2 reverb. */
 #define FMOD_CAPS_REVERB_EAX3            0x00000200  /* Device supports EAX3 reverb. */
 #define FMOD_CAPS_REVERB_EAX4            0x00000400  /* Device supports EAX4 reverb  */
-#define FMOD_CAPS_REVERB_EAX5			 0x00000800  /* Device supports EAX5 reverb  */
+#define FMOD_CAPS_REVERB_EAX5             0x00000800  /* Device supports EAX5 reverb  */
 #define FMOD_CAPS_REVERB_I3DL2           0x00001000  /* Device supports I3DL2 reverb. */
 #define FMOD_CAPS_REVERB_LIMITED         0x00002000  /* Device supports some form of limited hardware reverb, maybe parameterless and only selectable by environment. */
 /* [DEFINE_END] */

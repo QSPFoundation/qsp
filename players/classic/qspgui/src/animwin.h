@@ -16,26 +16,26 @@
 */
 
 #ifndef ANIMWIN_H
-	#define ANIMWIN_H
+    #define ANIMWIN_H
 
-	#include <wx/wx.h>
-	#include <wx/animate.h>
+    #include <wx/wx.h>
+    #include <wx/animate.h>
 
-	class QSPAnimWin : public wxAnimationCtrl
-	{
-		DECLARE_CLASS(QSPAnimWin)
-		DECLARE_EVENT_TABLE()
-	public:
-		// C-tors / D-tor
-		QSPAnimWin(wxWindow *parent);
+    class QSPAnimWin : public wxAnimationCtrl
+    {
+        DECLARE_CLASS(QSPAnimWin)
+        DECLARE_EVENT_TABLE()
+    public:
+        // C-tors / D-tor
+        QSPAnimWin(wxWindow *parent);
 
-		// Methods
-		void RefreshUI();
-	protected:
-		// Events
-		void OnKeyUp(wxKeyEvent& event);
-		void OnMouseWheel(wxMouseEvent& event);
-		void OnMouseClick(wxMouseEvent& event);
-	};
+        // Methods
+        void RefreshUI();
+    protected:
+        // Events
+        void OnKeyUp(wxKeyEvent& event);
+        void OnMouseWheel(wxMouseEvent& event);
+        void OnMouseClick(wxMouseEvent& event);
+    };
 
 #endif

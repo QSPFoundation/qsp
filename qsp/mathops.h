@@ -19,109 +19,109 @@
 #include "variant.h"
 
 #ifndef QSP_MATHDEFINES
-	#define QSP_MATHDEFINES
+    #define QSP_MATHDEFINES
 
-	#define QSP_OPSLEVELS 2
-	#define QSP_MAXOPSNAMES 100
-	#define QSP_OPMAXARGS 10
-	#define QSP_STACKSIZE 30
-	#define QSP_MAXITEMS 100
-	#define QSP_VALSDELIM QSP_FMT("|")
+    #define QSP_OPSLEVELS 2
+    #define QSP_MAXOPSNAMES 100
+    #define QSP_OPMAXARGS 10
+    #define QSP_STACKSIZE 30
+    #define QSP_MAXITEMS 100
+    #define QSP_VALSDELIM QSP_FMT("|")
 
-	/* Helpers */
-	#define QSP_TOBOOL(x) (-((x) != 0))
+    /* Helpers */
+    #define QSP_TOBOOL(x) (-((x) != 0))
 
-	typedef void (*QSP_FUNCTION)(QSPVariant *, int, QSPVariant *);
+    typedef void (*QSP_FUNCTION)(QSPVariant *, int, QSPVariant *);
 
-	typedef struct
-	{
-		int Code;
-		QSPString Name;
-	} QSPMathOpName;
+    typedef struct
+    {
+        int Code;
+        QSPString Name;
+    } QSPMathOpName;
 
-	typedef struct
-	{
-		int Priority;
-		int ResType;
-		int MinArgsCount;
-		int MaxArgsCount;
-		int ArgsTypes[QSP_OPMAXARGS];
-		QSP_FUNCTION Func;
-	} QSPMathOperation;
+    typedef struct
+    {
+        int Priority;
+        int ResType;
+        int MinArgsCount;
+        int MaxArgsCount;
+        int ArgsTypes[QSP_OPMAXARGS];
+        QSP_FUNCTION Func;
+    } QSPMathOperation;
 
-	enum
-	{
-		qspOpUnknown,
-		qspOpStart,
-		qspOpEnd,
-		qspOpValue,
-		qspOpOpenBracket,
-		qspOpMinus,
-		qspOpComma,
-		qspOpCloseBracket,
-		qspOpMul,
-		qspOpDiv,
-		qspOpAdd,
-		qspOpSub,
-		qspOpMod,
-		qspOpNe,
-		qspOpLeq,
-		qspOpGeq,
-		qspOpEq,
-		qspOpLt,
-		qspOpGt,
-		qspOpAnd,
-		qspOpOr,
-		qspOpAppend,
+    enum
+    {
+        qspOpUnknown,
+        qspOpStart,
+        qspOpEnd,
+        qspOpValue,
+        qspOpOpenBracket,
+        qspOpMinus,
+        qspOpComma,
+        qspOpCloseBracket,
+        qspOpMul,
+        qspOpDiv,
+        qspOpAdd,
+        qspOpSub,
+        qspOpMod,
+        qspOpNe,
+        qspOpLeq,
+        qspOpGeq,
+        qspOpEq,
+        qspOpLt,
+        qspOpGt,
+        qspOpAnd,
+        qspOpOr,
+        qspOpAppend,
 
-		qspOpFirst_Function,
-		qspOpNot = qspOpFirst_Function,
-		qspOpLoc,
-		qspOpObj,
-		qspOpMin,
-		qspOpMax,
-		qspOpRand,
-		qspOpIIf,
-		qspOpRGB,
-		qspOpLen,
-		qspOpIsNum,
-		qspOpLCase,
-		qspOpUCase,
-		qspOpInput,
-		qspOpStr,
-		qspOpVal,
-		qspOpArrSize,
-		qspOpIsPlay,
-		qspOpDesc,
-		qspOpTrim,
-		qspOpGetObj,
-		qspOpStrComp,
-		qspOpStrFind,
-		qspOpStrPos,
-		qspOpMid,
-		qspOpArrPos,
-		qspOpArrComp,
-		qspOpInstr,
-		qspOpReplace,
-		qspOpFunc,
-		qspOpDynEval,
-		qspOpRnd,
-		qspOpCountObj,
-		qspOpMsecsCount,
-		qspOpQSPVer,
-		qspOpUserText,
-		qspOpCurLoc,
-		qspOpSelObj,
-		qspOpSelAct,
-		qspOpMainText,
-		qspOpStatText,
-		qspOpCurActs,
+        qspOpFirst_Function,
+        qspOpNot = qspOpFirst_Function,
+        qspOpLoc,
+        qspOpObj,
+        qspOpMin,
+        qspOpMax,
+        qspOpRand,
+        qspOpIIf,
+        qspOpRGB,
+        qspOpLen,
+        qspOpIsNum,
+        qspOpLCase,
+        qspOpUCase,
+        qspOpInput,
+        qspOpStr,
+        qspOpVal,
+        qspOpArrSize,
+        qspOpIsPlay,
+        qspOpDesc,
+        qspOpTrim,
+        qspOpGetObj,
+        qspOpStrComp,
+        qspOpStrFind,
+        qspOpStrPos,
+        qspOpMid,
+        qspOpArrPos,
+        qspOpArrComp,
+        qspOpInstr,
+        qspOpReplace,
+        qspOpFunc,
+        qspOpDynEval,
+        qspOpRnd,
+        qspOpCountObj,
+        qspOpMsecsCount,
+        qspOpQSPVer,
+        qspOpUserText,
+        qspOpCurLoc,
+        qspOpSelObj,
+        qspOpSelAct,
+        qspOpMainText,
+        qspOpStatText,
+        qspOpCurActs,
 
-		qspOpLast_Operation
-	};
+        qspOpLast_Operation
+    };
 
-	/* External functions */
-	void qspInitMath();
-	QSPVariant qspExprValue(QSPString expr);
+    /* External functions */
+    void qspInitMath();
+    QSPVariant qspExprValue(QSPString expr);
 
 #endif

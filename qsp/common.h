@@ -18,25 +18,25 @@
 #include "declarations.h"
 
 #ifndef QSP_COMMONDEFINES
-	#define QSP_COMMONDEFINES
+    #define QSP_COMMONDEFINES
 
-	#define QSP_RANDMASK 0x7FFFFFFF
+    #define QSP_RANDMASK 0x7FFFFFFF
 
-	extern QSP_BOOL qspIsDebug;
-	extern QSPString qspCurDesc;
-	extern QSPString qspCurVars;
-	extern QSPString qspCurInput;
-	extern QSPString qspViewPath;
-	extern int qspTimerInterval;
-	extern QSP_BOOL qspIsMainDescChanged;
-	extern QSP_BOOL qspIsVarsDescChanged;
-	extern QSP_BOOL qspCurIsShowVars;
-	extern QSP_BOOL qspCurIsShowInput;
+    extern QSP_BOOL qspIsDebug;
+    extern QSPString qspCurDesc;
+    extern QSPString qspCurVars;
+    extern QSPString qspCurInput;
+    extern QSPString qspViewPath;
+    extern int qspTimerInterval;
+    extern QSP_BOOL qspIsMainDescChanged;
+    extern QSP_BOOL qspIsVarsDescChanged;
+    extern QSP_BOOL qspCurIsShowVars;
+    extern QSP_BOOL qspCurIsShowInput;
 
-	/* External functions */
-	void qspPrepareExecution();
-	void qspMemClear(QSP_BOOL);
-	void qspSetSeed(unsigned int);
-	int qspRand();
+    /* External functions */
+    void qspPrepareExecution();
+    void qspMemClear(QSP_BOOL);
+    void qspSetSeed(unsigned int);
+    int qspRand();
 
 #endif

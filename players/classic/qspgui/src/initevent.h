@@ -16,41 +16,41 @@
 */
 
 #ifndef INITEVENT_H
-	#define INITEVENT_H
+    #define INITEVENT_H
 
-	#include <wx/wx.h>
+    #include <wx/wx.h>
 
-	class wxInitEvent : public wxEvent
-	{
-	public:
-		// C-tors / D-tor
-		wxInitEvent();
-		wxInitEvent(const wxInitEvent& event);
+    class wxInitEvent : public wxEvent
+    {
+    public:
+        // C-tors / D-tor
+        wxInitEvent();
+        wxInitEvent(const wxInitEvent& event);
 
-		// Accessors
-		wxString GetInitString() const { return m_initString; }
-		void SetInitString(const wxString& str) { m_initString = str; }
+        // Accessors
+        wxString GetInitString() const { return m_initString; }
+        void SetInitString(const wxString& str) { m_initString = str; }
 
-		// Overloaded methods
-		virtual wxEvent *Clone() const
-		{
-			return new wxInitEvent(*this);
-		}
-	protected:
-		// Fields
-		wxString m_initString;
-	private:
-		DECLARE_DYNAMIC_CLASS(wxInitEvent)
-	};
+        // Overloaded methods
+        virtual wxEvent *Clone() const
+        {
+            return new wxInitEvent(*this);
+        }
+    protected:
+        // Fields
+        wxString m_initString;
+    private:
+        DECLARE_DYNAMIC_CLASS(wxInitEvent)
+    };
 
-	wxDECLARE_EVENT(wxEVT_INIT, wxInitEvent);
+    wxDECLARE_EVENT(wxEVT_INIT, wxInitEvent);
 
-	typedef void (wxEvtHandler::*wxInitEventFunction)(wxInitEvent&);
+    typedef void (wxEvtHandler::*wxInitEventFunction)(wxInitEvent&);
 
-	#define wxInitEventHandler(func) \
-		wxEVENT_HANDLER_CAST(wxInitEventFunction, func)
+    #define wxInitEventHandler(func) \
+        wxEVENT_HANDLER_CAST(wxInitEventFunction, func)
 
-	#define EVT_INIT(func) \
-		wx__DECLARE_EVT0(wxEVT_INIT, wxInitEventHandler(func))
+    #define EVT_INIT(func) \
+        wx__DECLARE_EVT0(wxEVT_INIT, wxInitEventHandler(func))
 
 #endif

@@ -63,9 +63,9 @@ utf16be_is_mbc_newline(const UChar* p, const UChar* end)
 #ifdef USE_UNICODE_ALL_LINE_TERMINATORS
     if ((
 #ifndef USE_CRNL_AS_LINE_TERMINATOR
-	 *(p+1) == 0x0d ||
+     *(p+1) == 0x0d ||
 #endif
-	 *(p+1) == 0x85) && *p == 0x00)
+     *(p+1) == 0x85) && *p == 0x00)
       return 1;
     if (*p == 0x20 && (*(p+1) == 0x29 || *(p+1) == 0x28))
       return 1;
@@ -121,7 +121,7 @@ utf16be_code_to_mbc(OnigCodePoint code, UChar *buf)
 
 static int
 utf16be_mbc_case_fold(OnigCaseFoldType flag,
-		      const UChar** pp, const UChar* end, UChar* fold)
+              const UChar** pp, const UChar* end, UChar* fold)
 {
   const UChar* p = *pp;
 
@@ -130,10 +130,10 @@ utf16be_mbc_case_fold(OnigCaseFoldType flag,
 #ifdef USE_UNICODE_CASE_FOLD_TURKISH_AZERI
     if ((flag & ONIGENC_CASE_FOLD_TURKISH_AZERI) != 0) {
       if (*p == 0x49) {
-	*fold++ = 0x01;
-	*fold   = 0x31;
-	(*pp) += 2;
-	return 2;
+    *fold++ = 0x01;
+    *fold   = 0x31;
+    (*pp) += 2;
+    return 2;
       }
     }
 #endif
@@ -145,7 +145,7 @@ utf16be_mbc_case_fold(OnigCaseFoldType flag,
   }
   else
     return onigenc_unicode_mbc_case_fold(ONIG_ENCODING_UTF16_BE, flag,
-					 pp, end, fold);
+                     pp, end, fold);
 }
 
 #if 0
@@ -166,14 +166,14 @@ utf16be_is_mbc_ambiguous(OnigCaseFoldType flag, const UChar** pp, const UChar* e
 
     c = *p;
     v = ONIGENC_IS_UNICODE_ISO_8859_1_BIT_CTYPE(c,
-		(BIT_CTYPE_UPPER | BIT_CTYPE_LOWER));
+        (BIT_CTYPE_UPPER | BIT_CTYPE_LOWER));
 
     if ((v | BIT_CTYPE_LOWER) != 0) {
       /* 0xaa, 0xb5, 0xba are lower case letter, but can't convert. */
       if (c >= 0xaa && c <= 0xba)
-	return FALSE;
+    return FALSE;
       else
-	return TRUE;
+    return TRUE;
     }
     return (v != 0 ? TRUE : FALSE);
   }
@@ -202,7 +202,7 @@ utf16be_get_case_fold_codes_by_str(OnigCaseFoldType flag,
     const OnigUChar* p, const OnigUChar* end, OnigCaseFoldCodeItem items[])
 {
   return onigenc_unicode_get_case_fold_codes_by_str(ONIG_ENCODING_UTF16_BE,
-						    flag, p, end, items);
+                            flag, p, end, items);
 }
 
 OnigEncodingType OnigEncodingUTF16_BE = {

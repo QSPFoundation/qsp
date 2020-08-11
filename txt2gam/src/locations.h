@@ -18,18 +18,18 @@
 #include "declarations.h"
 
 #ifndef QSP_LOCSDEFINES
-	#define QSP_LOCSDEFINES
+    #define QSP_LOCSDEFINES
 
-	typedef struct
-	{
-		QSP_CHAR *Name;
-		QSP_CHAR *OnVisit;
-	} QSPLocation;
+    typedef struct
+    {
+        QSP_CHAR *Name;
+        QSP_CHAR *OnVisit;
+    } QSPLocation;
 
-	extern QSPLocation *qspLocs;
-	extern int qspLocsCount;
+    extern QSPLocation *qspLocs;
+    extern int qspLocsCount;
 
-	/* External functions */
-	void qspCreateWorld(int);
+    /* External functions */
+    void qspCreateWorld(int);
 
 #endif

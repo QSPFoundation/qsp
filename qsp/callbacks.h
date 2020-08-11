@@ -18,48 +18,48 @@
 #include "declarations.h"
 
 #ifndef QSP_CALLSDEFINES
-	#define QSP_CALLSDEFINES
+    #define QSP_CALLSDEFINES
 
-	typedef struct
-	{
-		QSP_BOOL IsInCallBack;
-		QSP_BOOL IsDisableCodeExec;
-		QSP_BOOL IsExitOnError;
-		QSP_BOOL IsMainDescChanged;
-		QSP_BOOL IsVarsDescChanged;
-		QSP_BOOL IsObjectsChanged;
-		QSP_BOOL IsActionsChanged;
-	} QSPCallState;
+    typedef struct
+    {
+        QSP_BOOL IsInCallBack;
+        QSP_BOOL IsDisableCodeExec;
+        QSP_BOOL IsExitOnError;
+        QSP_BOOL IsMainDescChanged;
+        QSP_BOOL IsVarsDescChanged;
+        QSP_BOOL IsObjectsChanged;
+        QSP_BOOL IsActionsChanged;
+    } QSPCallState;
 
-	extern QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
-	extern QSP_BOOL qspIsInCallBack;
-	extern QSP_BOOL qspIsDisableCodeExec;
-	extern QSP_BOOL qspIsExitOnError;
+    extern QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
+    extern QSP_BOOL qspIsInCallBack;
+    extern QSP_BOOL qspIsDisableCodeExec;
+    extern QSP_BOOL qspIsExitOnError;
 
-	/* External functions */
-	void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec, QSP_BOOL isExitOnError);
-	void qspRestoreCallState(QSPCallState *state);
+    /* External functions */
+    void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec, QSP_BOOL isExitOnError);
+    void qspRestoreCallState(QSPCallState *state);
 
-	void qspInitCallBacks();
-	void qspSetCallBack(int, QSP_CALLBACK);
+    void qspInitCallBacks();
+    void qspSetCallBack(int, QSP_CALLBACK);
 
-	void qspCallDebug(QSPString str);
-	void qspCallSetTimer(int);
-	void qspCallRefreshInt(QSP_BOOL);
-	void qspCallSetInputStrText(QSPString text);
-	void qspCallShowMessage(QSPString text);
-	void qspCallShowPicture(QSPString file);
-	void qspCallShowWindow(int, QSP_BOOL);
-	void qspCallPlayFile(QSPString file, int volume);
-	QSP_BOOL qspCallIsPlayingFile(QSPString file);
-	void qspCallCloseFile(QSPString file);
-	void qspCallSystem(QSPString cmd);
-	void qspCallSleep(int);
-	int qspCallGetMSCount();
-	void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame);
-	void qspCallOpenGameStatus(QSPString file);
-	void qspCallSaveGameStatus(QSPString file);
-	QSPString qspCallInputBox(QSPString text);
-	int qspCallShowMenu(QSPListItem *items, int count);
+    void qspCallDebug(QSPString str);
+    void qspCallSetTimer(int);
+    void qspCallRefreshInt(QSP_BOOL);
+    void qspCallSetInputStrText(QSPString text);
+    void qspCallShowMessage(QSPString text);
+    void qspCallShowPicture(QSPString file);
+    void qspCallShowWindow(int, QSP_BOOL);
+    void qspCallPlayFile(QSPString file, int volume);
+    QSP_BOOL qspCallIsPlayingFile(QSPString file);
+    void qspCallCloseFile(QSPString file);
+    void qspCallSystem(QSPString cmd);
+    void qspCallSleep(int);
+    int qspCallGetMSCount();
+    void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame);
+    void qspCallOpenGameStatus(QSPString file);
+    void qspCallSaveGameStatus(QSPString file);
+    QSPString qspCallInputBox(QSPString text);
+    int qspCallShowMenu(QSPListItem *items, int count);
 
 #endif

@@ -16,38 +16,38 @@
 */
 
 #ifndef MSGDLG_H
-	#define MSGDLG_H
+    #define MSGDLG_H
 
-	#include <wx/wx.h>
-	#include <wx/statline.h>
-	#include "textbox.h"
+    #include <wx/wx.h>
+    #include <wx/statline.h>
+    #include "textbox.h"
 
-	enum
-	{
-		ID_MSG_DESC
-	};
+    enum
+    {
+        ID_MSG_DESC
+    };
 
-	class QSPMsgDlg : public wxDialog
-	{
-		DECLARE_CLASS(QSPMsgDlg)
-		DECLARE_EVENT_TABLE()
-	public:
-		// C-tors / D-tor
-		QSPMsgDlg(wxWindow* parent,
-				wxWindowID id,
-				const wxColour& backColor,
-				const wxColour& fontColor,
-				const wxFont& font,
-				const wxString& caption,
-				const wxString& text,
-				bool isHtml,
-				const wxString& gamePath);
-	protected:
-		// Events
-		void OnLinkClicked(wxHtmlLinkEvent& event);
+    class QSPMsgDlg : public wxDialog
+    {
+        DECLARE_CLASS(QSPMsgDlg)
+        DECLARE_EVENT_TABLE()
+    public:
+        // C-tors / D-tor
+        QSPMsgDlg(wxWindow* parent,
+                wxWindowID id,
+                const wxColour& backColor,
+                const wxColour& fontColor,
+                const wxFont& font,
+                const wxString& caption,
+                const wxString& text,
+                bool isHtml,
+                const wxString& gamePath);
+    protected:
+        // Events
+        void OnLinkClicked(wxHtmlLinkEvent& event);
 
-		// Fields
-		QSPTextBox *m_desc;
-	};
+        // Fields
+        QSPTextBox *m_desc;
+    };
 
 #endif

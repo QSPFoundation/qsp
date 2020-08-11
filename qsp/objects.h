@@ -19,29 +19,29 @@
 #include "variant.h"
 
 #ifndef QSP_OBJSDEFINES
-	#define QSP_OBJSDEFINES
+    #define QSP_OBJSDEFINES
 
-	#define QSP_MAXOBJECTS 1000
+    #define QSP_MAXOBJECTS 1000
 
-	typedef struct
-	{
-		QSPString Image;
-		QSPString Desc;
-	} QSPObj;
+    typedef struct
+    {
+        QSPString Image;
+        QSPString Desc;
+    } QSPObj;
 
-	extern QSPObj qspCurObjects[QSP_MAXOBJECTS];
-	extern int qspCurObjectsCount;
-	extern int qspCurSelObject;
-	extern QSP_BOOL qspIsObjectsChanged;
-	extern QSP_BOOL qspCurIsShowObjs;
+    extern QSPObj qspCurObjects[QSP_MAXOBJECTS];
+    extern int qspCurObjectsCount;
+    extern int qspCurSelObject;
+    extern QSP_BOOL qspIsObjectsChanged;
+    extern QSP_BOOL qspCurIsShowObjs;
 
-	/* External functions */
-	void qspClearObjects(QSP_BOOL);
-	void qspClearObjectsWithNotify();
-	int qspObjIndex(QSPString name);
-	/* Statements */
-	QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-	QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-	QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    /* External functions */
+    void qspClearObjects(QSP_BOOL);
+    void qspClearObjectsWithNotify();
+    int qspObjIndex(QSPString name);
+    /* Statements */
+    QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
 #endif

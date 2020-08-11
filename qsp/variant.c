@@ -21,86 +21,86 @@
 
 void qspFreeVariants(QSPVariant *args, int count)
 {
-	while (--count >= 0)
-		if (args[count].IsStr) qspFreeString(QSP_STR(args[count]));
+    while (--count >= 0)
+        if (args[count].IsStr) qspFreeString(QSP_STR(args[count]));
 }
 
 QSPVariant qspGetEmptyVariant(QSP_BOOL isStringType)
 {
-	QSPVariant ret;
-	if (ret.IsStr = isStringType)
-		QSP_STR(ret) = qspNewEmptyString();
-	else
-		QSP_NUM(ret) = 0;
-	return ret;
+    QSPVariant ret;
+    if (ret.IsStr = isStringType)
+        QSP_STR(ret) = qspNewEmptyString();
+    else
+        QSP_NUM(ret) = 0;
+    return ret;
 }
 
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
 {
-	int num;
-	QSP_CHAR buf[12];
-	QSP_BOOL isValid;
-	if (val->IsStr)
-	{
-		if (!isToString)
-		{
-			num = qspStrToNum(QSP_PSTR(val), &isValid);
-			if (!isValid) return QSP_TRUE;
-			qspFreeString(QSP_PSTR(val));
-			QSP_PNUM(val) = num;
-			val->IsStr = QSP_FALSE;
-		}
-	}
-	else if (isToString)
-	{
-		QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)));
-		val->IsStr = QSP_TRUE;
-	}
-	return QSP_FALSE;
+    int num;
+    QSP_CHAR buf[12];
+    QSP_BOOL isValid;
+    if (val->IsStr)
+    {
+        if (!isToString)
+        {
+            num = qspStrToNum(QSP_PSTR(val), &isValid);
+            if (!isValid) return QSP_TRUE;
+            qspFreeString(QSP_PSTR(val));
+            QSP_PNUM(val) = num;
+            val->IsStr = QSP_FALSE;
+        }
+    }
+    else if (isToString)
+    {
+        QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)));
+        val->IsStr = QSP_TRUE;
+    }
+    return QSP_FALSE;
 }
 
 void qspCopyVariant(QSPVariant *dest, QSPVariant *src)
 {
-	if (dest->IsStr = src->IsStr)
-		QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
-	else
-		QSP_PNUM(dest) = QSP_PNUM(src);
+    if (dest->IsStr = src->IsStr)
+        QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
+    else
+        QSP_PNUM(dest) = QSP_PNUM(src);
 }
 
 QSP_BOOL qspIsCanConvertToNum(QSPVariant *val)
 {
-	QSP_BOOL isValid;
-	if (val->IsStr)
-	{
-		qspStrToNum(QSP_PSTR(val), &isValid);
-		if (!isValid) return QSP_FALSE;
-	}
-	return QSP_TRUE;
+    QSP_BOOL isValid;
+    if (val->IsStr)
+    {
+        qspStrToNum(QSP_PSTR(val), &isValid);
+        if (!isValid) return QSP_FALSE;
+    }
+    return QSP_TRUE;
 }
 
 int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
 {
-	int res;
-	if (v1->IsStr != v2->IsStr)
-	{
-		if (v2->IsStr)
-		{
-			if (qspIsCanConvertToNum(v2))
-				qspConvertVariantTo(v2, QSP_FALSE);
-			else
-				qspConvertVariantTo(v1, QSP_TRUE);
-		}
-		else
-		{
-			if (qspIsCanConvertToNum(v1))
-				qspConvertVariantTo(v1, QSP_FALSE);
-			else
-				qspConvertVariantTo(v2, QSP_TRUE);
-		}
-	}
-	if (v1->IsStr)
-		res = QSP_STRCOLL(QSP_PSTR(v1), QSP_PSTR(v2));
-	else
-		res = (QSP_PNUM(v1) > QSP_PNUM(v2) ? 1 : (QSP_PNUM(v1) < QSP_PNUM(v2) ? -1 : 0));
-	return res;
+    int res;
+    if (v1->IsStr != v2->IsStr)
+    {
+        if (v2->IsStr)
+        {
+            if (qspIsCanConvertToNum(v2))
+                qspConvertVariantTo(v2, QSP_FALSE);
+            else
+                qspConvertVariantTo(v1, QSP_TRUE);
+        }
+        else
+        {
+            if (qspIsCanConvertToNum(v1))
+                qspConvertVariantTo(v1, QSP_FALSE);
+            else
+                qspConvertVariantTo(v2, QSP_TRUE);
+        }
+    }
+    if (v1->IsStr)
+        res = QSP_STRCOLL(QSP_PSTR(v1), QSP_PSTR(v2));
+    else
+        res = (QSP_PNUM(v1) > QSP_PNUM(v2) ? 1 : (QSP_PNUM(v1) < QSP_PNUM(v2) ? -1 : 0));
+    return res;
 }

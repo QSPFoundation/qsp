@@ -24,7 +24,7 @@
 **
 ************************************************************************
 
-	This file is part of MEMWATCH.
+    This file is part of MEMWATCH.
 
     MEMWATCH is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -91,29 +91,29 @@
 ** 970813 JLI   [2.47 stabilized marker handling]
 ** 980317 JLI   [2.48 ripped out C++ support; wasn't working good anyway]
 ** 980318 JLI   [2.50 improved self-repair facilities & SIGSEGV support]
-** 980417 JLI	[2.51 more checks for invalid addresses]
-** 980512 JLI	[2.52 moved MW_ARI_NULLREAD to occur before aborting]
-** 990112 JLI	[2.53 added check for empty heap to mwIsOwned]
-** 990217 JLI	[2.55 improved the emergency repairs diagnostics and NML]
-** 990224 JLI	[2.56 changed ordering of members in structures]
-** 990303 JLI	[2.57 first maybe-fixit-for-hpux test]
-** 990516 JLI	[2.58 added 'static' to the definition of mwAutoInit]
-** 990517 JLI	[2.59 fixed some high-sensitivity warnings]
-** 990610 JLI	[2.60 fixed some more high-sensitivity warnings]
-** 990715 JLI	[2.61 changed TRACE/ASSERT/VERIFY macro names]
-** 991001 JLI	[2.62 added CHECK_BUFFER() and mwTestBuffer()]
-** 991007 JLI	[2.63 first shot at a 64-bit compatible version]
-** 991009 JLI	[2.64 undef's strdup() if defined, mwStrdup made const]
-** 000704 JLI	[2.65 added some more detection for 64-bits]
+** 980417 JLI    [2.51 more checks for invalid addresses]
+** 980512 JLI    [2.52 moved MW_ARI_NULLREAD to occur before aborting]
+** 990112 JLI    [2.53 added check for empty heap to mwIsOwned]
+** 990217 JLI    [2.55 improved the emergency repairs diagnostics and NML]
+** 990224 JLI    [2.56 changed ordering of members in structures]
+** 990303 JLI    [2.57 first maybe-fixit-for-hpux test]
+** 990516 JLI    [2.58 added 'static' to the definition of mwAutoInit]
+** 990517 JLI    [2.59 fixed some high-sensitivity warnings]
+** 990610 JLI    [2.60 fixed some more high-sensitivity warnings]
+** 990715 JLI    [2.61 changed TRACE/ASSERT/VERIFY macro names]
+** 991001 JLI    [2.62 added CHECK_BUFFER() and mwTestBuffer()]
+** 991007 JLI    [2.63 first shot at a 64-bit compatible version]
+** 991009 JLI    [2.64 undef's strdup() if defined, mwStrdup made const]
+** 000704 JLI    [2.65 added some more detection for 64-bits]
 ** 010502 JLI   [2.66 incorporated some user fixes]
 **              [mwRelink() could print out garbage pointer (thanks mac@phobos.ca)]
-**				[added array destructor for C++ (thanks rdasilva@connecttel.com)]
-**				[added mutex support (thanks rdasilva@connecttel.com)]
-** 010531 JLI	[2.67 fix: mwMutexXXX() was declared even if MW_HAVE_MUTEX was not defined]
-** 010619 JLI	[2.68 fix: mwRealloc() could leave the mutex locked]
-** 020918 JLI	[2.69 changed to GPL, added C++ array allocation by Howard Cohen]
-** 030212 JLI	[2.70 mwMalloc() bug for very large allocations (4GB on 32bits)]
-** 030520 JLI	[2.71 added ULONG_LONG_MAX as a 64-bit detector (thanks Sami Salonen)]
+**                [added array destructor for C++ (thanks rdasilva@connecttel.com)]
+**                [added mutex support (thanks rdasilva@connecttel.com)]
+** 010531 JLI    [2.67 fix: mwMutexXXX() was declared even if MW_HAVE_MUTEX was not defined]
+** 010619 JLI    [2.68 fix: mwRealloc() could leave the mutex locked]
+** 020918 JLI    [2.69 changed to GPL, added C++ array allocation by Howard Cohen]
+** 030212 JLI    [2.70 mwMalloc() bug for very large allocations (4GB on 32bits)]
+** 030520 JLI    [2.71 added ULONG_LONG_MAX as a 64-bit detector (thanks Sami Salonen)]
 **
 ** To use, simply include 'MEMWATCH.H' as a header file,
 ** and add MEMWATCH.C to your list of files, and define the macro
@@ -691,7 +691,7 @@ public:
     };
 void * operator new(size_t);
 void * operator new(size_t,const char *,int);
-void * operator new[] (size_t,const char *,int);	// hjc 07/16/02
+void * operator new[] (size_t,const char *,int);    // hjc 07/16/02
 void operator delete(void *);
 #define mwNew new(__FILE__,__LINE__)
 #define mwDelete (mwNCur=1,mwNFile=__FILE__,mwNLine=__LINE__),delete

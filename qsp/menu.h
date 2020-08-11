@@ -19,12 +19,12 @@
 #include "variant.h"
 
 #ifndef QSP_MENUDEFINES
-	#define QSP_MENUDEFINES
+    #define QSP_MENUDEFINES
 
-	#define QSP_MAXMENUITEMS 100
-	#define QSP_MENUDELIM QSP_FMT(":")
+    #define QSP_MAXMENUITEMS 100
+    #define QSP_MENUDELIM QSP_FMT(":")
 
-	/* Statements */
-	QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    /* Statements */
+    QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
 #endif

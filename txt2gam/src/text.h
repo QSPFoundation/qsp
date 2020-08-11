@@ -18,24 +18,24 @@
 #include "declarations.h"
 
 #ifndef QSP_TEXTDEFINES
-	#define QSP_TEXTDEFINES
+    #define QSP_TEXTDEFINES
 
-	#define QSP_STRSDELIM QSP_FMT("\r\n")
-	#define QSP_SPACES QSP_FMT(" \t")
-	#define QSP_QUOTS QSP_FMT("'\"")
-	#define QSP_LQUOT QSP_FMT("{")
-	#define QSP_RQUOT QSP_FMT("}")
+    #define QSP_STRSDELIM QSP_FMT("\r\n")
+    #define QSP_SPACES QSP_FMT(" \t")
+    #define QSP_QUOTS QSP_FMT("'\"")
+    #define QSP_LQUOT QSP_FMT("{")
+    #define QSP_RQUOT QSP_FMT("}")
 
-	/* Helpers */
-	#define QSP_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
+    /* Helpers */
+    #define QSP_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
 
-	/* External functions */
-	int qspAddText(QSP_CHAR **, QSP_CHAR *, int, int, QSP_BOOL);
-	QSP_BOOL qspIsInList(QSP_CHAR *, QSP_CHAR);
-	QSP_CHAR *qspSkipSpaces(QSP_CHAR *);
-	QSP_CHAR *qspDelSpc(QSP_CHAR *);
-	QSP_BOOL qspIsEqual(QSP_CHAR *, QSP_CHAR *, int);
-	void qspFreeStrs(void **, int, QSP_BOOL);
-	QSP_CHAR *qspNumToStr(QSP_CHAR *, int);
+    /* External functions */
+    int qspAddText(QSP_CHAR **, QSP_CHAR *, int, int, QSP_BOOL);
+    QSP_BOOL qspIsInList(QSP_CHAR *, QSP_CHAR);
+    QSP_CHAR *qspSkipSpaces(QSP_CHAR *);
+    QSP_CHAR *qspDelSpc(QSP_CHAR *);
+    QSP_BOOL qspIsEqual(QSP_CHAR *, QSP_CHAR *, int);
+    void qspFreeStrs(void **, int, QSP_BOOL);
+    QSP_CHAR *qspNumToStr(QSP_CHAR *, int);
 
 #endif

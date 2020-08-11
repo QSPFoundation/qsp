@@ -16,36 +16,36 @@
 */
 
 #ifndef INPUTBOX_H
-	#define INPUTBOX_H
+    #define INPUTBOX_H
 
-	#include <wx/wx.h>
+    #include <wx/wx.h>
 
-	wxDECLARE_EVENT(wxEVT_ENTER, wxCommandEvent);
+    wxDECLARE_EVENT(wxEVT_ENTER, wxCommandEvent);
 
-	#define EVT_ENTER(winid, func) \
-		wx__DECLARE_EVT1(wxEVT_ENTER, winid, wxCommandEventHandler(func))
+    #define EVT_ENTER(winid, func) \
+        wx__DECLARE_EVT1(wxEVT_ENTER, winid, wxCommandEventHandler(func))
 
-	class QSPInputBox : public wxTextCtrl
-	{
-		DECLARE_CLASS(QSPInputBox)
-		DECLARE_EVENT_TABLE()
-	public:
-		// C-tors / D-tor
-		QSPInputBox(wxWindow *parent, wxWindowID id);
+    class QSPInputBox : public wxTextCtrl
+    {
+        DECLARE_CLASS(QSPInputBox)
+        DECLARE_EVENT_TABLE()
+    public:
+        // C-tors / D-tor
+        QSPInputBox(wxWindow *parent, wxWindowID id);
 
-		// Accessors
-		void SetText(const wxString& text, bool isChangeValue = true);
-		wxString GetText() const { return m_text; }
-	protected:
-		// Events
-		void OnChar(wxKeyEvent& event);
-		void OnKeyDown(wxKeyEvent& event);
-		void OnMouseWheel(wxMouseEvent& event);
+        // Accessors
+        void SetText(const wxString& text, bool isChangeValue = true);
+        wxString GetText() const { return m_text; }
+    protected:
+        // Events
+        void OnChar(wxKeyEvent& event);
+        void OnKeyDown(wxKeyEvent& event);
+        void OnMouseWheel(wxMouseEvent& event);
 
-		// Fields
-		wxString m_text;
-		wxArrayString m_strings;
-		int m_selIndex;
-	};
+        // Fields
+        wxString m_text;
+        wxArrayString m_strings;
+        int m_selIndex;
+    };
 
 #endif

@@ -16,26 +16,26 @@
 */
 
 #ifndef APP_H
-	#define APP_H
+    #define APP_H
 
-	#include <wx/wx.h>
-	#include <wx/stdpaths.h>
-	#include <wx/clipbrd.h>
-	#include "frame.h"
-	#include "callbacks_gui.h"
-	#include "transhelper.h"
+    #include <wx/wx.h>
+    #include <wx/stdpaths.h>
+    #include <wx/clipbrd.h>
+    #include "frame.h"
+    #include "callbacks_gui.h"
+    #include "transhelper.h"
 
-	class QSPApp : public wxApp
-	{
-	public:
-		// Overloaded methods
-		virtual bool OnInit();
-		virtual int OnExit();
-	protected:
-		void InitUI();
-		bool GetAutoRunEvent(wxInitEvent& initEvent);
-		// Fields
-		QSPTranslationHelper *m_transhelper;
-	};
+    class QSPApp : public wxApp
+    {
+    public:
+        // Overloaded methods
+        virtual bool OnInit();
+        virtual int OnExit();
+    protected:
+        void InitUI();
+        bool GetAutoRunEvent(wxInitEvent& initEvent);
+        // Fields
+        QSPTranslationHelper *m_transhelper;
+    };
 
 #endif

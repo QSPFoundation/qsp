@@ -7,7 +7,7 @@ namespace QGen
 class IMainWindowPresenter
 {
 public:
-	virtual ~IMainWindowPresenter() { }
+    virtual ~IMainWindowPresenter() { }
 
 };
 

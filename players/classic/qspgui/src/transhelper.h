@@ -16,30 +16,30 @@
 */
 
 #ifndef TRANSHELPER_H
-	#define TRANSHELPER_H
+    #define TRANSHELPER_H
 
-	#include <wx/wx.h>
-	#include <wx/dir.h>
-	#include <wx/filename.h>
-	#include <wx/confbase.h>
+    #include <wx/wx.h>
+    #include <wx/dir.h>
+    #include <wx/filename.h>
+    #include <wx/confbase.h>
 
-	class QSPTranslationHelper
-	{
-	public:
-		// C-tors / D-tor
-		QSPTranslationHelper(const wxString &appName, const wxString &path);
-		~QSPTranslationHelper();
+    class QSPTranslationHelper
+    {
+    public:
+        // C-tors / D-tor
+        QSPTranslationHelper(const wxString &appName, const wxString &path);
+        ~QSPTranslationHelper();
 
-		// Methods
-		void Load(wxConfigBase &config, const wxString &key);
-		void Save(wxConfigBase &config, const wxString &key) const;
-		bool AskUserForLanguage();
-		void UpdateLocale(int lang);
-	private:
-		// Fields
-		wxString m_appName;
-		wxString m_path;
-		wxLocale *m_locale;
-	};
+        // Methods
+        void Load(wxConfigBase &config, const wxString &key);
+        void Save(wxConfigBase &config, const wxString &key) const;
+        bool AskUserForLanguage();
+        void UpdateLocale(int lang);
+    private:
+        // Fields
+        wxString m_appName;
+        wxString m_path;
+        wxLocale *m_locale;
+    };
 
 #endif

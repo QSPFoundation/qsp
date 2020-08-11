@@ -5,8 +5,8 @@ namespace QGen
 {
 
 LocationsListBox::LocationsListBox( QWidget* parent, Settings* settings )
-	:	QListWidget(parent),
-		_settings(settings)
+    :    QListWidget(parent),
+        _settings(settings)
 {
 
 }

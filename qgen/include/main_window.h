@@ -11,22 +11,22 @@ namespace QGen
 
 class MainWindow : public QMainWindow, public IMainWindowView
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	MainWindow(Settings* settings, QWidget *parent = 0, Qt::WFlags flags = 0);
-	~MainWindow();
+    MainWindow(Settings* settings, QWidget *parent = 0, Qt::WFlags flags = 0);
+    ~MainWindow();
 
 private slots:
-	
-private:
-	void createDockWindows();
 
 private:
-	Settings*			_settings;
-	MenuBar*			_menuBar;
-	ToolBar*			_toolBar;
-	QStatusBar*			_statusBar;
-	LocationsListBox*	_locsListBox;
+    void createDockWindows();
+
+private:
+    Settings*            _settings;
+    MenuBar*            _menuBar;
+    ToolBar*            _toolBar;
+    QStatusBar*            _statusBar;
+    LocationsListBox*    _locsListBox;
 };
 
 } // namespace QGen

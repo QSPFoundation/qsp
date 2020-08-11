@@ -19,142 +19,142 @@
 
 wxString QSPTools::GetHexColor(const wxColour& color)
 {
-	return wxString::Format(wxT("%.2X%.2X%.2X"), (int)color.Red(), (int)color.Green(), (int)color.Blue());
+    return wxString::Format(wxT("%.2X%.2X%.2X"), (int)color.Red(), (int)color.Green(), (int)color.Blue());
 }
 
 wxString QSPTools::HtmlizeWhitespaces(const wxString& str)
 {
-	wxString::const_iterator i;
-	wxChar ch, quote;
-	wxString out;
-	size_t j, linepos = 0;
-	bool isLastSpace = true;
-	for (i = str.begin(); i != str.end(); ++i)
-	{
-		switch (ch = *i)
-		{
-		case wxT('<'):
-			quote = 0;
-			while (i != str.end())
-			{
-				ch = *i;
-				if (quote)
-				{
-					if (ch == wxT('\\'))
-					{
-						if (++i == str.end()) break;
-						ch = *i;
-						if (ch == quote)
-						{
-							switch (ch)
-							{
-							case wxT('"'):
-								out << wxT("&quot;");
-								break;
-							case wxT('\''):
-								out << wxT("&apos;");
-								break;
-							}
-							++i;
-							continue;
-						}
-						out << wxT('\\');
-					}
-					switch (ch)
-					{
-					case wxT('&'):
-						out << wxT("&amp;");
-						break;
-					case wxT('<'):
-						out << wxT("&lt;");
-						break;
-					case wxT('>'):
-						out << wxT("&gt;");
-						break;
-					default:
-						if (ch == quote)
-							quote = 0;
-						out << ch;
-						break;
-					}
-				}
-				else
-				{
-					out << ch;
-					if (ch == wxT('>'))
-						break;
-					else if (ch == wxT('"') || ch == wxT('\''))
-						quote = ch;
-				}
-				++i;
-			}
-			if (i == str.end()) return out;
-			isLastSpace = true;
-			break;
-		case wxT(' '):
-			if (isLastSpace)
-				out << wxT("&nbsp;");
-			else
-				out << wxT(' ');
-			isLastSpace = !isLastSpace;
-			++linepos;
-			break;
-		case wxT('\r'):
-			break;
-		case wxT('\n'):
-			out << wxT("<br />");
-			isLastSpace = true;
-			linepos = 0;
-			break;
-		case wxT('\t'):
-			for (j = 4 - linepos % 4; j > 0; --j)
-			{
-				if (isLastSpace)
-					out << wxT("&nbsp;");
-				else
-					out << wxT(' ');
-				isLastSpace = !isLastSpace;
-			}
-			linepos += 4 - linepos % 4;
-			break;
-		default:
-			out << ch;
-			isLastSpace = false;
-			++linepos;
-			break;
-		}
-	}
-	return out;
+    wxString::const_iterator i;
+    wxChar ch, quote;
+    wxString out;
+    size_t j, linepos = 0;
+    bool isLastSpace = true;
+    for (i = str.begin(); i != str.end(); ++i)
+    {
+        switch (ch = *i)
+        {
+        case wxT('<'):
+            quote = 0;
+            while (i != str.end())
+            {
+                ch = *i;
+                if (quote)
+                {
+                    if (ch == wxT('\\'))
+                    {
+                        if (++i == str.end()) break;
+                        ch = *i;
+                        if (ch == quote)
+                        {
+                            switch (ch)
+                            {
+                            case wxT('"'):
+                                out << wxT("&quot;");
+                                break;
+                            case wxT('\''):
+                                out << wxT("&apos;");
+                                break;
+                            }
+                            ++i;
+                            continue;
+                        }
+                        out << wxT('\\');
+                    }
+                    switch (ch)
+                    {
+                    case wxT('&'):
+                        out << wxT("&amp;");
+                        break;
+                    case wxT('<'):
+                        out << wxT("&lt;");
+                        break;
+                    case wxT('>'):
+                        out << wxT("&gt;");
+                        break;
+                    default:
+                        if (ch == quote)
+                            quote = 0;
+                        out << ch;
+                        break;
+                    }
+                }
+                else
+                {
+                    out << ch;
+                    if (ch == wxT('>'))
+                        break;
+                    else if (ch == wxT('"') || ch == wxT('\''))
+                        quote = ch;
+                }
+                ++i;
+            }
+            if (i == str.end()) return out;
+            isLastSpace = true;
+            break;
+        case wxT(' '):
+            if (isLastSpace)
+                out << wxT("&nbsp;");
+            else
+                out << wxT(' ');
+            isLastSpace = !isLastSpace;
+            ++linepos;
+            break;
+        case wxT('\r'):
+            break;
+        case wxT('\n'):
+            out << wxT("<br />");
+            isLastSpace = true;
+            linepos = 0;
+            break;
+        case wxT('\t'):
+            for (j = 4 - linepos % 4; j > 0; --j)
+            {
+                if (isLastSpace)
+                    out << wxT("&nbsp;");
+                else
+                    out << wxT(' ');
+                isLastSpace = !isLastSpace;
+            }
+            linepos += 4 - linepos % 4;
+            break;
+        default:
+            out << ch;
+            isLastSpace = false;
+            ++linepos;
+            break;
+        }
+    }
+    return out;
 }
 
 wxString QSPTools::ProceedAsPlain(const wxString& str)
 {
-	wxString::const_iterator i;
-	wxChar ch;
-	wxString out;
-	for (i = str.begin(); i != str.end(); ++i)
-	{
-		switch (ch = *i)
-		{
-		case wxT('<'):
-			out << wxT("&lt;");
-			break;
-		case wxT('>'):
-			out << wxT("&gt;");
-			break;
-		case wxT('&'):
-			out << wxT("&amp;");
-			break;
-		default:
-			out << ch;
-			break;
-		}
-	}
-	return out;
+    wxString::const_iterator i;
+    wxChar ch;
+    wxString out;
+    for (i = str.begin(); i != str.end(); ++i)
+    {
+        switch (ch = *i)
+        {
+        case wxT('<'):
+            out << wxT("&lt;");
+            break;
+        case wxT('>'):
+            out << wxT("&gt;");
+            break;
+        case wxT('&'):
+            out << wxT("&amp;");
+            break;
+        default:
+            out << ch;
+            break;
+        }
+    }
+    return out;
 }
 
 wxString QSPTools::GetAppPath()
 {
-	wxFileName appPath(wxStandardPaths::Get().GetExecutablePath());
-	return appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+    wxFileName appPath(wxStandardPaths::Get().GetExecutablePath());
+    return appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
 }

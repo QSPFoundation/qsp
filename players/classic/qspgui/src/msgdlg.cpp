@@ -20,77 +20,77 @@
 IMPLEMENT_CLASS(QSPMsgDlg, wxDialog)
 
 BEGIN_EVENT_TABLE(QSPMsgDlg, wxDialog)
-	EVT_HTML_LINK_CLICKED(ID_MSG_DESC, QSPMsgDlg::OnLinkClicked)
+    EVT_HTML_LINK_CLICKED(ID_MSG_DESC, QSPMsgDlg::OnLinkClicked)
 END_EVENT_TABLE()
 
 QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
-					 wxWindowID id,
-					 const wxColour& backColor,
-					 const wxColour& fontColor,
-					 const wxFont& font,
-					 const wxString& caption,
-					 const wxString& text,
-					 bool isHtml,
-					 const wxString& gamePath)
+                     wxWindowID id,
+                     const wxColour& backColor,
+                     const wxColour& fontColor,
+                     const wxFont& font,
+                     const wxString& caption,
+                     const wxString& text,
+                     bool isHtml,
+                     const wxString& gamePath)
 {
-	if (!Create(parent, id, caption, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)) return;
-	// ----------
-	SetBackgroundColour(backColor);
-	wxSizer *sizerUp = new wxBoxSizer(wxVERTICAL);
-	m_desc = new QSPTextBox(this, ID_MSG_DESC);
-	m_desc->SetGamePath(gamePath);
-	m_desc->SetIsHtml(isHtml);
-	m_desc->SetBackgroundColour(backColor);
-	m_desc->SetForegroundColour(fontColor);
-	m_desc->SetTextFont(font);
-	m_desc->SetText(text);
-	wxStaticLine* line = new wxStaticLine(this, wxID_STATIC, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-	sizerUp->Add(m_desc, 1, wxALL | wxGROW, 2);
-	sizerUp->Add(line, 0, wxALL | wxGROW, 2);
-	// ----------
-	wxSizer *sizerBottom = new wxBoxSizer(wxHORIZONTAL);
-	wxButton *btnOk = new wxButton(this, wxID_OK, _("OK"));
-	btnOk->SetDefault();
-	btnOk->SetFont(font);
-	#ifdef __WXMSW__
-		btnOk->SetBackgroundColour(backColor);
-		btnOk->SetForegroundColour(fontColor);
-	#endif
-	sizerBottom->Add(btnOk, 0, wxALL, 2);
-	// ----------
-	wxSizer *sizerMain = new wxBoxSizer(wxVERTICAL);
-	sizerMain->Add(sizerUp, 1, wxGROW, 0);
-	sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
-	// ----------
-	static const int minWidth = 450;
-	static const int maxWidth = 550;
-	static const int minHeight = 100;
-	static const int maxHeight = 350;
-	sizerMain->SetMinSize(minWidth, minHeight);
-	SetSizerAndFit(sizerMain);
-	int deltaH = GetClientSize().GetHeight() - m_desc->GetSize().GetHeight();
-	int deltaW = GetClientSize().GetWidth() - m_desc->GetSize().GetWidth();
-	int height = m_desc->GetInternalRepresentation()->GetHeight() + m_desc->GetCharHeight() + deltaH;
-	int width = m_desc->GetInternalRepresentation()->GetWidth() + deltaW;
-	height = wxMin(wxMax(height, minHeight), maxHeight);
-	width = wxMin(wxMax(width, minWidth), maxWidth);
-	SetClientSize(width, height);
-	Center();
-	btnOk->SetFocus();
+    if (!Create(parent, id, caption, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)) return;
+    // ----------
+    SetBackgroundColour(backColor);
+    wxSizer *sizerUp = new wxBoxSizer(wxVERTICAL);
+    m_desc = new QSPTextBox(this, ID_MSG_DESC);
+    m_desc->SetGamePath(gamePath);
+    m_desc->SetIsHtml(isHtml);
+    m_desc->SetBackgroundColour(backColor);
+    m_desc->SetForegroundColour(fontColor);
+    m_desc->SetTextFont(font);
+    m_desc->SetText(text);
+    wxStaticLine* line = new wxStaticLine(this, wxID_STATIC, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
+    sizerUp->Add(m_desc, 1, wxALL | wxGROW, 2);
+    sizerUp->Add(line, 0, wxALL | wxGROW, 2);
+    // ----------
+    wxSizer *sizerBottom = new wxBoxSizer(wxHORIZONTAL);
+    wxButton *btnOk = new wxButton(this, wxID_OK, _("OK"));
+    btnOk->SetDefault();
+    btnOk->SetFont(font);
+    #ifdef __WXMSW__
+        btnOk->SetBackgroundColour(backColor);
+        btnOk->SetForegroundColour(fontColor);
+    #endif
+    sizerBottom->Add(btnOk, 0, wxALL, 2);
+    // ----------
+    wxSizer *sizerMain = new wxBoxSizer(wxVERTICAL);
+    sizerMain->Add(sizerUp, 1, wxGROW, 0);
+    sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
+    // ----------
+    static const int minWidth = 450;
+    static const int maxWidth = 550;
+    static const int minHeight = 100;
+    static const int maxHeight = 350;
+    sizerMain->SetMinSize(minWidth, minHeight);
+    SetSizerAndFit(sizerMain);
+    int deltaH = GetClientSize().GetHeight() - m_desc->GetSize().GetHeight();
+    int deltaW = GetClientSize().GetWidth() - m_desc->GetSize().GetWidth();
+    int height = m_desc->GetInternalRepresentation()->GetHeight() + m_desc->GetCharHeight() + deltaH;
+    int width = m_desc->GetInternalRepresentation()->GetWidth() + deltaW;
+    height = wxMin(wxMax(height, minHeight), maxHeight);
+    width = wxMin(wxMax(width, minWidth), maxWidth);
+    SetClientSize(width, height);
+    Center();
+    btnOk->SetFocus();
 }
 
 void QSPMsgDlg::OnLinkClicked(wxHtmlLinkEvent& event)
 {
-	wxString href;
-	wxHtmlLinkInfo info(event.GetLinkInfo());
-	if (info.GetEvent()->LeftUp())
-	{
-		href = info.GetHref();
-		if (href[0] == wxT('#'))
-			m_desc->LoadPage(href);
-		else
-			wxLaunchDefaultBrowser(href);
-	}
-	else
-		event.Skip();
+    wxString href;
+    wxHtmlLinkInfo info(event.GetLinkInfo());
+    if (info.GetEvent()->LeftUp())
+    {
+        href = info.GetHref();
+        if (href[0] == wxT('#'))
+            m_desc->LoadPage(href);
+        else
+            wxLaunchDefaultBrowser(href);
+    }
+    else
+        event.Skip();
 }

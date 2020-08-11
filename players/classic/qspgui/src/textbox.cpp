@@ -20,171 +20,171 @@
 IMPLEMENT_CLASS(QSPTextBox, wxHtmlWindow)
 
 BEGIN_EVENT_TABLE(QSPTextBox, wxHtmlWindow)
-	EVT_SIZE(QSPTextBox::OnSize)
-	EVT_ERASE_BACKGROUND(QSPTextBox::OnEraseBackground)
-	EVT_KEY_UP(QSPTextBox::OnKeyUp)
-	EVT_MOUSEWHEEL(QSPTextBox::OnMouseWheel)
-	EVT_LEFT_DOWN(QSPTextBox::OnMouseClick)
+    EVT_SIZE(QSPTextBox::OnSize)
+    EVT_ERASE_BACKGROUND(QSPTextBox::OnEraseBackground)
+    EVT_KEY_UP(QSPTextBox::OnKeyUp)
+    EVT_MOUSEWHEEL(QSPTextBox::OnMouseWheel)
+    EVT_LEFT_DOWN(QSPTextBox::OnMouseClick)
 END_EVENT_TABLE()
 
 wxHtmlOpeningStatus QSPTextBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
 {
-	if (wxFileName(url).IsAbsolute()) return wxHTML_OPEN;
-	*redirect = wxFileName(m_path + url, wxPATH_DOS).GetFullPath();
-	return wxHTML_REDIRECT;
+    if (wxFileName(url).IsAbsolute()) return wxHTML_OPEN;
+    *redirect = wxFileName(m_path + url, wxPATH_DOS).GetFullPath();
+    return wxHTML_REDIRECT;
 }
 
 QSPTextBox::QSPTextBox(wxWindow *parent, wxWindowID id) : wxHtmlWindow(parent, id)
 {
-	SetBorders(5);
-	m_isUseHtml = false;
-	m_font = *wxNORMAL_FONT;
-	m_outFormat = wxString::Format(
-		wxT("<HTML><META HTTP-EQUIV = \"Content-Type\" CONTENT = \"text/html; charset=%s\">")
-		wxT("<BODY><FONT COLOR = #%%s>%%s</FONT></BODY></HTML>"),
-		wxFontMapper::GetEncodingName(wxLocale::GetSystemEncoding()).wx_str()
-	);
-	wxString fontName(m_font.GetFaceName());
-	SetStandardFonts(m_font.GetPointSize(), fontName, fontName);
+    SetBorders(5);
+    m_isUseHtml = false;
+    m_font = *wxNORMAL_FONT;
+    m_outFormat = wxString::Format(
+        wxT("<HTML><META HTTP-EQUIV = \"Content-Type\" CONTENT = \"text/html; charset=%s\">")
+        wxT("<BODY><FONT COLOR = #%%s>%%s</FONT></BODY></HTML>"),
+        wxFontMapper::GetEncodingName(wxLocale::GetSystemEncoding()).wx_str()
+    );
+    wxString fontName(m_font.GetFaceName());
+    SetStandardFonts(m_font.GetPointSize(), fontName, fontName);
 }
 
 void QSPTextBox::SetIsHtml(bool isHtml)
 {
-	if (m_isUseHtml != isHtml)
-	{
-		m_isUseHtml = isHtml;
-		RefreshUI();
-	}
+    if (m_isUseHtml != isHtml)
+    {
+        m_isUseHtml = isHtml;
+        RefreshUI();
+    }
 }
 
 void QSPTextBox::RefreshUI(bool isScroll)
 {
-	wxString color(QSPTools::GetHexColor(GetForegroundColour()));
-	wxString text(QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_text : QSPTools::ProceedAsPlain(m_text)));
-	wxON_BLOCK_EXIT_THIS0(QSPTextBox::Thaw);
-	Freeze();
-	SetPage(wxString::Format(m_outFormat, color.wx_str(), text.wx_str()));
-	if (isScroll) Scroll(0, 0x7FFFFFFF);
+    wxString color(QSPTools::GetHexColor(GetForegroundColour()));
+    wxString text(QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_text : QSPTools::ProceedAsPlain(m_text)));
+    wxON_BLOCK_EXIT_THIS0(QSPTextBox::Thaw);
+    Freeze();
+    SetPage(wxString::Format(m_outFormat, color.wx_str(), text.wx_str()));
+    if (isScroll) Scroll(0, 0x7FFFFFFF);
 }
 
 void QSPTextBox::LoadBackImage(const wxString& fileName)
 {
-	wxString path(wxFileName(fileName, wxPATH_DOS).GetFullPath());
-	if (m_imagePath != path)
-	{
-		m_imagePath = path;
-		if (wxFileExists(path))
-		{
-			wxImage image;
-			if (image.LoadFile(path))
-			{
-				SetBackgroundImage(wxBitmap(image));
-				Refresh();
-				return;
-			}
-		}
-		SetBackgroundImage(wxNullBitmap);
-		Refresh();
-	}
+    wxString path(wxFileName(fileName, wxPATH_DOS).GetFullPath());
+    if (m_imagePath != path)
+    {
+        m_imagePath = path;
+        if (wxFileExists(path))
+        {
+            wxImage image;
+            if (image.LoadFile(path))
+            {
+                SetBackgroundImage(wxBitmap(image));
+                Refresh();
+                return;
+            }
+        }
+        SetBackgroundImage(wxNullBitmap);
+        Refresh();
+    }
 }
 
 void QSPTextBox::SetText(const wxString& text, bool isScroll)
 {
-	if (m_text != text)
-	{
-		if (isScroll)
-		{
-			if (m_text.IsEmpty() || !text.StartsWith(m_text))
-				isScroll = false;
-		}
-		m_text = text;
-		RefreshUI(isScroll);
-	}
+    if (m_text != text)
+    {
+        if (isScroll)
+        {
+            if (m_text.IsEmpty() || !text.StartsWith(m_text))
+                isScroll = false;
+        }
+        m_text = text;
+        RefreshUI(isScroll);
+    }
 }
 
 void QSPTextBox::SetTextFont(const wxFont& font)
 {
-	int fontSize = font.GetPointSize();
-	wxString fontName(font.GetFaceName());
-	if (!m_font.GetFaceName().IsSameAs(fontName, false) || m_font.GetPointSize() != fontSize)
-	{
-		m_font = font;
-		wxON_BLOCK_EXIT_THIS0(QSPTextBox::Thaw);
-		Freeze();
-		SetStandardFonts(fontSize, fontName, fontName);
-	}
+    int fontSize = font.GetPointSize();
+    wxString fontName(font.GetFaceName());
+    if (!m_font.GetFaceName().IsSameAs(fontName, false) || m_font.GetPointSize() != fontSize)
+    {
+        m_font = font;
+        wxON_BLOCK_EXIT_THIS0(QSPTextBox::Thaw);
+        Freeze();
+        SetStandardFonts(fontSize, fontName, fontName);
+    }
 }
 
 void QSPTextBox::SetLinkColor(const wxColour& clr)
 {
-	m_Parser->SetLinkColor(clr);
-	RefreshUI();
+    m_Parser->SetLinkColor(clr);
+    RefreshUI();
 }
 
 void QSPTextBox::OnKeyUp(wxKeyEvent& event)
 {
-	event.Skip();
-	wxKeyEvent keyEvent(event);
-	keyEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
-	TryAfter(keyEvent);
+    event.Skip();
+    wxKeyEvent keyEvent(event);
+    keyEvent.ResumePropagation(wxEVENT_PROPAGATE_MAX);
+    TryAfter(keyEvent);
 }
 
 void QSPTextBox::OnMouseWheel(wxMouseEvent& event)
 {
-	event.Skip();
-	if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
-		event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
+    event.Skip();
+    if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
+        event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }
 
 void QSPTextBox::OnMouseClick(wxMouseEvent& event)
 {
-	event.Skip();
-	event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
+    event.Skip();
+    event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }
 
 void QSPTextBox::OnSize(wxSizeEvent& event)
 {
-	CalcImageSize();
-	wxHtmlWindow::OnSize(event);
+    CalcImageSize();
+    wxHtmlWindow::OnSize(event);
 }
 
 void QSPTextBox::OnEraseBackground(wxEraseEvent& event)
 {
-	wxDC *dc = event.GetDC();
-	dc->SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
-	dc->Clear();
-	if (m_bmpBg.Ok() && m_bmpRealBg.Ok())
-	{
-		wxPoint pt = dc->GetDeviceOrigin();
-		dc->DrawBitmap(m_bmpRealBg, m_posX - pt.x, m_posY - pt.y, true);
-	}
+    wxDC *dc = event.GetDC();
+    dc->SetBackground(wxBrush(GetBackgroundColour(), wxBRUSHSTYLE_SOLID));
+    dc->Clear();
+    if (m_bmpBg.Ok() && m_bmpRealBg.Ok())
+    {
+        wxPoint pt = dc->GetDeviceOrigin();
+        dc->DrawBitmap(m_bmpRealBg, m_posX - pt.x, m_posY - pt.y, true);
+    }
 }
 
 void QSPTextBox::SetBackgroundImage(const wxBitmap& bmpBg)
 {
-	m_bmpBg = bmpBg;
-	CalcImageSize();
+    m_bmpBg = bmpBg;
+    CalcImageSize();
 }
 
 void QSPTextBox::CalcImageSize()
 {
-	if (m_bmpBg.Ok())
-	{
-		int w, h;
-		GetClientSize(&w, &h);
-		if (w < 1) w = 1;
-		if (h < 1) h = 1;
-		int srcW = m_bmpBg.GetWidth(), srcH = m_bmpBg.GetHeight();
-		int destW = srcW * h / srcH, destH = srcH * w / srcW;
-		if (destW > w)
-			destW = w;
-		else
-			destH = h;
-		m_posX = (w - destW) / 2;
-		m_posY = (h - destH) / 2;
-		if (destW > 0 && destH > 0)
-			m_bmpRealBg = wxBitmap(m_bmpBg.ConvertToImage().Scale(destW, destH));
-		else
-			m_bmpRealBg = wxNullBitmap;
-	}
+    if (m_bmpBg.Ok())
+    {
+        int w, h;
+        GetClientSize(&w, &h);
+        if (w < 1) w = 1;
+        if (h < 1) h = 1;
+        int srcW = m_bmpBg.GetWidth(), srcH = m_bmpBg.GetHeight();
+        int destW = srcW * h / srcH, destH = srcH * w / srcW;
+        if (destW > w)
+            destW = w;
+        else
+            destH = h;
+        m_posX = (w - destW) / 2;
+        m_posY = (h - destH) / 2;
+        if (destW > 0 && destH > 0)
+            m_bmpRealBg = wxBitmap(m_bmpBg.ConvertToImage().Scale(destW, destH));
+        else
+            m_bmpRealBg = wxNullBitmap;
+    }
 }

@@ -16,43 +16,43 @@
 */
 
 #ifndef IMGCANVAS_H
-	#define IMGCANVAS_H
+    #define IMGCANVAS_H
 
-	#include <wx/wx.h>
-	#include <wx/filename.h>
-	#include "animwin.h"
+    #include <wx/wx.h>
+    #include <wx/filename.h>
+    #include "animwin.h"
 
-	class QSPImgCanvas : public wxWindow
-	{
-		DECLARE_CLASS(QSPImgCanvas)
-		DECLARE_EVENT_TABLE()
-	public:
-		// C-tors / D-tor
-		QSPImgCanvas(wxWindow *parent, wxWindowID id);
-		virtual ~QSPImgCanvas();
+    class QSPImgCanvas : public wxWindow
+    {
+        DECLARE_CLASS(QSPImgCanvas)
+        DECLARE_EVENT_TABLE()
+    public:
+        // C-tors / D-tor
+        QSPImgCanvas(wxWindow *parent, wxWindowID id);
+        virtual ~QSPImgCanvas();
 
-		// Methods
-		bool OpenFile(const wxString& fileName);
-		void RefreshUI();
+        // Methods
+        bool OpenFile(const wxString& fileName);
+        void RefreshUI();
 
-		// Overloaded methods
-		virtual bool SetBackgroundColour(const wxColour& color);
-	protected:
-		// Events
-		void OnSize(wxSizeEvent& event);
-		void OnPaint(wxPaintEvent &event);
-		void OnKeyUp(wxKeyEvent& event);
-		void OnMouseWheel(wxMouseEvent& event);
-		void OnMouseClick(wxMouseEvent& event);
+        // Overloaded methods
+        virtual bool SetBackgroundColour(const wxColour& color);
+    protected:
+        // Events
+        void OnSize(wxSizeEvent& event);
+        void OnPaint(wxPaintEvent &event);
+        void OnKeyUp(wxKeyEvent& event);
+        void OnMouseWheel(wxMouseEvent& event);
+        void OnMouseClick(wxMouseEvent& event);
 
-		// Fields
-		bool m_isAnim;
-		wxImage m_image;
-		wxBitmap m_cachedBitmap;
-		QSPAnimWin *m_animation;
-		wxString m_path;
-		int m_posX;
-		int m_posY;
-	};
+        // Fields
+        bool m_isAnim;
+        wxImage m_image;
+        wxBitmap m_cachedBitmap;
+        QSPAnimWin *m_animation;
+        wxString m_path;
+        int m_posX;
+        int m_posY;
+    };
 
 #endif

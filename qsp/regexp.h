@@ -18,21 +18,21 @@
 #include "declarations.h"
 
 #ifndef QSP_REGEXPDEFINES
-	#define QSP_REGEXPDEFINES
+    #define QSP_REGEXPDEFINES
 
-	#define QSP_MAXCACHEDREGEXPS 10
+    #define QSP_MAXCACHEDREGEXPS 10
 
-	typedef struct
-	{
-		QSPString Text;
-		regex_t *CompiledExp;
-	} QSPRegExp;
+    typedef struct
+    {
+        QSPString Text;
+        regex_t *CompiledExp;
+    } QSPRegExp;
 
-	/* External functions */
-	void qspClearRegExps(QSP_BOOL);
-	regex_t *qspRegExpGetCompiled(QSPString exp);
-	QSP_BOOL qspRegExpStrMatch(regex_t *exp, QSPString str);
-	QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind);
-	int qspRegExpStrPos(regex_t *exp, QSPString str, int ind);
+    /* External functions */
+    void qspClearRegExps(QSP_BOOL);
+    regex_t *qspRegExpGetCompiled(QSPString exp);
+    QSP_BOOL qspRegExpStrMatch(regex_t *exp, QSPString str);
+    QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind);
+    int qspRegExpStrPos(regex_t *exp, QSPString str, int ind);
 
 #endif

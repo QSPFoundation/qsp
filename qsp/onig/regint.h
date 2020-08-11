@@ -265,7 +265,7 @@ typedef unsigned int  BitStatusType;
   ((n) < (int )BIT_STATUS_BITS_NUM  ?  ((stats) & (1 << n)) : ((stats) & 1))
 
 #define BIT_STATUS_ON_AT(stats,n) do {\
-    if ((n) < (int )BIT_STATUS_BITS_NUM)	\
+    if ((n) < (int )BIT_STATUS_BITS_NUM)    \
     (stats) |= (1 << (n));\
   else\
     (stats) |= 1;\
@@ -328,7 +328,7 @@ typedef Bits*          BitSetRef;
 
 #define BITSET_CLEAR(bs) do {\
   int i;\
-  for (i = 0; i < (int )BITSET_SIZE; i++) { (bs)[i] = 0; }	\
+  for (i = 0; i < (int )BITSET_SIZE; i++) { (bs)[i] = 0; }    \
 } while (0)
 
 #define BS_ROOM(bs,pos)            (bs)[pos / BITS_IN_ROOM]
@@ -789,8 +789,8 @@ extern int onig_st_insert_strend P_((hash_table_type* table, const UChar* str_ke
 /* encoding property management */
 #define PROPERTY_LIST_ADD_PROP(Name, CR) \
   r = onigenc_property_list_add_property((UChar* )Name, CR,\
-	      &PropertyNameTable, &PropertyList, &PropertyListNum,\
-	      &PropertyListSize);\
+          &PropertyNameTable, &PropertyList, &PropertyListNum,\
+          &PropertyListSize);\
   if (r != 0) goto end
 
 #define PROPERTY_LIST_INIT_CHECK \

@@ -8,7 +8,7 @@ class IMainWindowView
 {
 
 public:
-	virtual ~IMainWindowView() { }
+    virtual ~IMainWindowView() { }
 
 };
 

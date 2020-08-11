@@ -22,15 +22,15 @@ int qspLocsCount = 0;
 
 void qspCreateWorld(int locsCount)
 {
-	int i;
-	for (i = 0; i < qspLocsCount; ++i)
-	{
-		free(qspLocs[i].Name);
-		free(qspLocs[i].OnVisit);
-	}
-	if (qspLocsCount != locsCount)
-	{
-		qspLocsCount = locsCount;
-		qspLocs = (QSPLocation *)realloc(qspLocs, qspLocsCount * sizeof(QSPLocation));
-	}
+    int i;
+    for (i = 0; i < qspLocsCount; ++i)
+    {
+        free(qspLocs[i].Name);
+        free(qspLocs[i].OnVisit);
+    }
+    if (qspLocsCount != locsCount)
+    {
+        qspLocsCount = locsCount;
+        qspLocs = (QSPLocation *)realloc(qspLocs, qspLocsCount * sizeof(QSPLocation));
+    }
 }

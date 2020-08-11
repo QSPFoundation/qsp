@@ -24,57 +24,57 @@
 /* MEMWATCH */
 
 #ifdef _DEBUG
-	#define MEMWATCH
-	#define MEMWATCH_STDIO
+    #define MEMWATCH
+    #define MEMWATCH_STDIO
 
-	#include "memwatch.h"
+    #include "memwatch.h"
 #endif
 
 #ifndef QSP_DEFINES
-	#define QSP_DEFINES
+    #define QSP_DEFINES
 
-	#ifdef _UNICODE
-		typedef wchar_t QSP_CHAR;
-		#define QSP_FMT2(x) L##x
-		#define QSP_FMT(x) QSP_FMT2(x)
-		#define QSP_STRCPY wcscpy
-		#define QSP_STRNCPY wcsncpy
-		#define QSP_STRLEN wcslen
-		#define QSP_STRSTR wcsstr
-		#define QSP_STRCHR wcschr
-		#define QSP_WCSTOMBSLEN(a) wcstombs(0, a, 0)
-		#define QSP_WCSTOMBS wcstombs
-		#define QSP_MBSTOWCSLEN(a) mbstowcs(0, a, 0)
-		#define QSP_MBSTOWCS mbstowcs
-		#define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
-		#define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
-		#define QSP_WCTOB
-		#define QSP_BTOWC
-	#else
-		typedef char QSP_CHAR;
-		#define QSP_FMT(x) x
-		#define QSP_STRCPY strcpy
-		#define QSP_STRNCPY strncpy
-		#define QSP_STRLEN strlen
-		#define QSP_STRSTR strstr
-		#define QSP_STRCHR strchr
-		#define QSP_WCSTOMBSLEN strlen
-		#define QSP_WCSTOMBS strncpy
-		#define QSP_MBSTOWCSLEN strlen
-		#define QSP_MBSTOWCS strncpy
-		#define QSP_FROM_OS_CHAR
-		#define QSP_TO_OS_CHAR
-		#define QSP_WCTOB(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
-		#define QSP_BTOWC(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
-	#endif
+    #ifdef _UNICODE
+        typedef wchar_t QSP_CHAR;
+        #define QSP_FMT2(x) L##x
+        #define QSP_FMT(x) QSP_FMT2(x)
+        #define QSP_STRCPY wcscpy
+        #define QSP_STRNCPY wcsncpy
+        #define QSP_STRLEN wcslen
+        #define QSP_STRSTR wcsstr
+        #define QSP_STRCHR wcschr
+        #define QSP_WCSTOMBSLEN(a) wcstombs(0, a, 0)
+        #define QSP_WCSTOMBS wcstombs
+        #define QSP_MBSTOWCSLEN(a) mbstowcs(0, a, 0)
+        #define QSP_MBSTOWCS mbstowcs
+        #define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
+        #define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
+        #define QSP_WCTOB
+        #define QSP_BTOWC
+    #else
+        typedef char QSP_CHAR;
+        #define QSP_FMT(x) x
+        #define QSP_STRCPY strcpy
+        #define QSP_STRNCPY strncpy
+        #define QSP_STRLEN strlen
+        #define QSP_STRSTR strstr
+        #define QSP_STRCHR strchr
+        #define QSP_WCSTOMBSLEN strlen
+        #define QSP_WCSTOMBS strncpy
+        #define QSP_MBSTOWCSLEN strlen
+        #define QSP_MBSTOWCS strncpy
+        #define QSP_FROM_OS_CHAR
+        #define QSP_TO_OS_CHAR
+        #define QSP_WCTOB(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
+        #define QSP_BTOWC(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
+    #endif
 
-	#define QSP_VER QSP_FMT("0.1.1")
-	#define QSP_LOCALE "russian"
+    #define QSP_VER QSP_FMT("0.1.1")
+    #define QSP_LOCALE "russian"
 
-	#define QSP_TRUE 1
-	#define QSP_FALSE 0
+    #define QSP_TRUE 1
+    #define QSP_FALSE 0
 
-	/* Types */
-	typedef int QSP_BOOL;
+    /* Types */
+    typedef int QSP_BOOL;
 
 #endif

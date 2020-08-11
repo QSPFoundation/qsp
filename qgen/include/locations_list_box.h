@@ -8,12 +8,12 @@ namespace QGen
 
 class LocationsListBox : public QListWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	LocationsListBox(QWidget* parent, Settings* settings);
+    LocationsListBox(QWidget* parent, Settings* settings);
 
 private:
-	Settings*	_settings;
+    Settings*    _settings;
 };
 
 } // namespace QGen

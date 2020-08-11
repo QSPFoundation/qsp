@@ -18,29 +18,29 @@
 #include "declarations.h"
 
 #ifndef QSP_VARIANTDEFINES
-	#define QSP_VARIANTDEFINES
+    #define QSP_VARIANTDEFINES
 
-	#define QSP_STR(a) (a).Val.Str
-	#define QSP_NUM(a) (a).Val.Num
-	#define QSP_PSTR(a) (a)->Val.Str
-	#define QSP_PNUM(a) (a)->Val.Num
+    #define QSP_STR(a) (a).Val.Str
+    #define QSP_NUM(a) (a).Val.Num
+    #define QSP_PSTR(a) (a)->Val.Str
+    #define QSP_PNUM(a) (a)->Val.Num
 
-	typedef struct
-	{
-		union
-		{
-			QSPString Str;
-			int Num;
-		} Val;
-		QSP_BOOL IsStr;
-	} QSPVariant;
+    typedef struct
+    {
+        union
+        {
+            QSPString Str;
+            int Num;
+        } Val;
+        QSP_BOOL IsStr;
+    } QSPVariant;
 
-	/* External functions */
-	void qspFreeVariants(QSPVariant *, int);
-	QSPVariant qspGetEmptyVariant(QSP_BOOL);
-	QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString);
-	void qspCopyVariant(QSPVariant *dest, QSPVariant *src);
-	QSP_BOOL qspIsCanConvertToNum(QSPVariant *);
-	int qspAutoConvertCompare(QSPVariant *, QSPVariant *);
+    /* External functions */
+    void qspFreeVariants(QSPVariant *, int);
+    QSPVariant qspGetEmptyVariant(QSP_BOOL);
+    QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString);
+    void qspCopyVariant(QSPVariant *dest, QSPVariant *src);
+    QSP_BOOL qspIsCanConvertToNum(QSPVariant *);
+    int qspAutoConvertCompare(QSPVariant *, QSPVariant *);
 
 #endif

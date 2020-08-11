@@ -22,84 +22,84 @@ IMPLEMENT_CLASS(QSPInputBox, wxTextCtrl)
 wxDEFINE_EVENT(wxEVT_ENTER, wxCommandEvent);
 
 BEGIN_EVENT_TABLE(QSPInputBox, wxTextCtrl)
-	EVT_CHAR(QSPInputBox::OnChar)
-	EVT_KEY_DOWN(QSPInputBox::OnKeyDown)
-	EVT_MOUSEWHEEL(QSPInputBox::OnMouseWheel)
+    EVT_CHAR(QSPInputBox::OnChar)
+    EVT_KEY_DOWN(QSPInputBox::OnKeyDown)
+    EVT_MOUSEWHEEL(QSPInputBox::OnMouseWheel)
 END_EVENT_TABLE()
 
 QSPInputBox::QSPInputBox(wxWindow *parent, wxWindowID id) : wxTextCtrl(parent, id, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxNO_BORDER)
 {
-	m_selIndex = -1;
+    m_selIndex = -1;
 }
 
 void QSPInputBox::SetText(const wxString& text, bool isChangeValue)
 {
-	if (m_text != text)
-	{
-		m_text = text;
-		if (isChangeValue) ChangeValue(m_text);
-	}
+    if (m_text != text)
+    {
+        m_text = text;
+        if (isChangeValue) ChangeValue(m_text);
+    }
 }
 
 void QSPInputBox::OnChar(wxKeyEvent& event)
 {
-	if (!IsEditable() || event.GetKeyCode() != WXK_RETURN)
-	{
-		event.Skip();
-		return;
-	}
-	int count = (int)m_strings.GetCount();
-	wxString curText(GetValue());
-	m_selIndex = count;
-	if (!count || curText != m_strings.Last())
-	{
-		m_strings.Add(curText);
-		++m_selIndex;
-	}
-	wxCommandEvent enterEvent(wxEVT_ENTER, GetId());
-	enterEvent.SetEventObject(this);
-	ProcessEvent(enterEvent);
+    if (!IsEditable() || event.GetKeyCode() != WXK_RETURN)
+    {
+        event.Skip();
+        return;
+    }
+    int count = (int)m_strings.GetCount();
+    wxString curText(GetValue());
+    m_selIndex = count;
+    if (!count || curText != m_strings.Last())
+    {
+        m_strings.Add(curText);
+        ++m_selIndex;
+    }
+    wxCommandEvent enterEvent(wxEVT_ENTER, GetId());
+    enterEvent.SetEventObject(this);
+    ProcessEvent(enterEvent);
 }
 
 void QSPInputBox::OnKeyDown(wxKeyEvent& event)
 {
-	if (!IsEditable())
-	{
-		event.Skip();
-		return;
-	}
-	int count = (int)m_strings.GetCount();
-	wxString curText(GetValue());
-	switch (event.GetKeyCode())
-	{
-	case WXK_UP:
-		if (m_selIndex > 0)
-		{
-			--m_selIndex;
-			if (curText == m_strings[m_selIndex]) --m_selIndex;
-		}
-		break;
-	case WXK_DOWN:
-		if (m_selIndex < count - 1)
-		{
-			++m_selIndex;
-			if (curText == m_strings[m_selIndex]) ++m_selIndex;
-		}
-		break;
-	default:
-		event.Skip();
-		return;
-	}
-	if (m_selIndex >= 0 && m_selIndex < count)
-	{
-		SetValue(m_strings[m_selIndex]);
-		SetSelection(GetLastPosition(), -1);
-	}
+    if (!IsEditable())
+    {
+        event.Skip();
+        return;
+    }
+    int count = (int)m_strings.GetCount();
+    wxString curText(GetValue());
+    switch (event.GetKeyCode())
+    {
+    case WXK_UP:
+        if (m_selIndex > 0)
+        {
+            --m_selIndex;
+            if (curText == m_strings[m_selIndex]) --m_selIndex;
+        }
+        break;
+    case WXK_DOWN:
+        if (m_selIndex < count - 1)
+        {
+            ++m_selIndex;
+            if (curText == m_strings[m_selIndex]) ++m_selIndex;
+        }
+        break;
+    default:
+        event.Skip();
+        return;
+    }
+    if (m_selIndex >= 0 && m_selIndex < count)
+    {
+        SetValue(m_strings[m_selIndex]);
+        SetSelection(GetLastPosition(), -1);
+    }
 }
 
 void QSPInputBox::OnMouseWheel(wxMouseEvent& event)
 {
-	event.Skip();
-	if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
-		event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
+    event.Skip();
+    if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
+        event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }

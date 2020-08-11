@@ -22,12 +22,12 @@ int qspMSCount = 0;
 
 void qspResetTime(int msecs)
 {
-	qspMSCount = msecs;
-	qspCallGetMSCount();
+    qspMSCount = msecs;
+    qspCallGetMSCount();
 }
 
 int qspGetTime()
 {
-	if ((qspMSCount += qspCallGetMSCount()) < 0) qspMSCount = 0;
-	return qspMSCount;
+    if ((qspMSCount += qspCallGetMSCount()) < 0) qspMSCount = 0;
+    return qspMSCount;
 }
