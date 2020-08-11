@@ -84,13 +84,6 @@ if(BUILD_QSPGUI)
 		add_subdirectory("${CMAKE_BINARY_DIR}/wxWidgets-src"
 						 "${CMAKE_BINARY_DIR}/wxWidgets-build"
 		)
-
-		# The wxWidgets targets carry header search path dependencies
-		# automatically when using CMake 2.8.11 or later. Otherwise we
-		# have to add them here ourselves.
-		if(CMAKE_VERSION VERSION_LESS 2.8.11)
-			include_directories("${wxWidgets_SOURCE_DIR}/include")
-		endif()
 	endif()
 
 	add_library(fmod SHARED IMPORTED)
