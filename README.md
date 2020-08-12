@@ -10,6 +10,14 @@ cmake -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
 make
 ```
 
+**Windows build:**
+```
+mkdir build
+cd build
+cmake.exe -G "Visual Studio 15 2017" -A Win32 -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
+MSBuild.exe ALL_BUILD.vcxproj
+```
+
 **TODO:**
 * Check build on Windows
 * Test locals implementation
