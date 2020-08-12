@@ -198,7 +198,6 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isNewGame)
 {
     QSP_BOOL isOldFormat, isUCS2, isAddLoc;
     int i, j, ind, crc, count, locsCount, actsCount, start, end;
-    QSP_CHAR *delimPos;
     QSPString buf;
     char *gameData, **strs;
     gameData = (char *)malloc(dataSize + 3);
@@ -479,7 +478,7 @@ static QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
 
 void qspOpenGameStatusFromString(QSPString str)
 {
-    QSPString *strs, file, locName;
+    QSPString *strs, locName;
     int i, j, ind, count, varInd, varsCount, valsCount;
     count = qspSplitStr(str, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     if (!qspCheckGameStatus(strs, count))
