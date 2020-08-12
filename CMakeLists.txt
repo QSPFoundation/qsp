@@ -126,6 +126,7 @@ if(BUILD_QSPGUI)
 	endif()
 	target_compile_definitions(qspgui PRIVATE _UNICODE)
 	target_include_directories(qspgui PRIVATE qsp/bindings qsp/bindings/default)
+	target_link_directories(qspgui PRIVATE "${CMAKE_BINARY_DIR}")
 	target_link_libraries(qspgui qsp fmod wxbase wxcore wxadv wxaui wxhtml)
 endif()
 
