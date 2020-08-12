@@ -4,9 +4,11 @@ QSP
 QSP Library
 
 **Linux build:**
+```
 mkdir build & cd build
 cmake -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
 make
+```
 
 **TODO:**
 * Check build on Windows
