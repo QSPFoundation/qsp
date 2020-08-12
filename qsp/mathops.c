@@ -674,13 +674,12 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                 qspSetError(QSP_ERR_UNKNOWNACTION);
                 break;
             }
-            /*
+            /* We want to separate keywords */
             if ((opCode == qspOpAnd || opCode == qspOpOr || opCode == qspOpMod) && (qspIsEmpty(s) || !qspIsInList(QSP_SPACES QSP_QUOTS QSP_LQUOT QSP_LRBRACK, *s.Str)))
             {
                 qspSetError(QSP_ERR_SYNTAX);
                 break;
             }
-            */
             while (qspOps[opCode].Priority <= qspOps[opStack[opSp]].Priority && qspOps[opStack[opSp]].Priority != 127)
             {
                 if (opStack[opSp] >= qspOpFirst_Function) ++argStack[argSp];
