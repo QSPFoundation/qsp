@@ -19,7 +19,7 @@ MSBuild.exe ALL_BUILD.vcxproj
 ```
 
 **TODO:**
-* Check build on Windows
+* Put all the related files (DLLs/localization) into the output directory
 * Test locals implementation
 * Test loop implementation
 * Update bindings
