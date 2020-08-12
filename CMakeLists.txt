@@ -76,6 +76,9 @@ if(BUILD_QSPGUI)
 				WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/wxWidgets-src"
 		)
 
+		# Disable wxWidgets features we don't need
+		set(wxUSE_LIBTIFF OFF)
+
 		# Prevent wxWidgets from overriding our compiler/linker options
 		# when building with Visual Studio
 		set(wxWidgets_force_shared_crt ON CACHE BOOL "" FORCE)
