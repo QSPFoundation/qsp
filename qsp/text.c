@@ -394,23 +394,24 @@ QSPString qspNumToStr(QSP_CHAR *buf, int val)
 QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 {
     QSP_BOOL isLastDelim;
-    int strLen, c1, c2, c3;
-    QSP_CHAR quot, *lastPos, *pos = qspStrStr(txt, str);
+    QSP_CHAR quot, *lastPos, *pos;
+    int c1, c2, c3, strLen = qspStrLen(str);
+    if (!strLen) return txt.Str;
+    pos = qspStrStr(txt, str);
     if (!pos) return 0;
     if (!(isIsolated || qspStrPBrk(txt, QSP_QUOTS QSP_LQUOT QSP_LRBRACK QSP_LSBRACK))) return pos;
-    strLen = qspStrLen(str);
-    lastPos = txt.End - strLen + 1;
     c1 = c2 = c3 = 0;
     isLastDelim = QSP_TRUE;
     pos = txt.Str;
-    while (pos < lastPos)
+    lastPos = txt.End - strLen;
+    while (pos <= lastPos)
     {
         if (qspIsInList(QSP_QUOTS, *pos))
         {
             quot = *pos;
-            while (++pos < lastPos)
-                if (*pos == quot && (++pos >= lastPos || *pos != quot)) break;
-            if (pos >= lastPos) return 0;
+            while (++pos <= lastPos)
+                if (*pos == quot && (++pos > lastPos || *pos != quot)) break;
+            if (pos > lastPos) return 0;
             isLastDelim = QSP_TRUE;
         }
         if (*pos == QSP_LRBRACK[0])
@@ -439,7 +440,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
                     isLastDelim = QSP_TRUE;
                 else if (isLastDelim)
                 {
-                    if (pos >= lastPos - 1 || qspIsInList(QSP_DELIMS, pos[strLen]))
+                    if (pos >= lastPos || qspIsInList(QSP_DELIMS, pos[strLen]))
                     {
                         txt.Str = pos;
                         if (!qspStrsNComp(txt, str, strLen)) return pos;
