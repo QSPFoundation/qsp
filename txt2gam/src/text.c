@@ -74,6 +74,86 @@ QSP_CHAR *qspDelSpc(QSP_CHAR *s)
     return str;
 }
 
+int qspStrLen(QSP_CHAR *str)
+{
+    QSP_CHAR *bos = str;
+    while (*str) ++str;
+    return (int)(str - bos);
+}
+
+QSP_CHAR *qspStrStr(QSP_CHAR *str, QSP_CHAR *strSearch)
+{
+    QSP_CHAR *s1, *s2;
+    while (*str)
+    {
+        s1 = str;
+        s2 = strSearch;
+        while (*s1 && *s2 && !((int)*s1 - *s2))
+            ++s1, ++s2;
+        if (!(*s2)) return str;
+        ++str;
+    }
+    return 0;
+}
+
+QSP_CHAR *qspStrCopy(QSP_CHAR *strDest, QSP_CHAR *strSource)
+{
+    QSP_CHAR *ret = strDest;
+    while (*strDest++ = *strSource++);
+    return ret;
+}
+
+QSP_CHAR *qspStrNCopy(QSP_CHAR *strDest, QSP_CHAR *strSource, int maxLen)
+{
+    QSP_CHAR *ret = strDest;
+    while (maxLen-- && (*strDest++ = *strSource++));
+    return ret;
+}
+
+QSP_CHAR *qspReplaceText(QSP_CHAR *txt, QSP_CHAR *searchTxt, QSP_CHAR *repTxt)
+{
+    int txtLen, oldTxtLen, bufSize, searchLen, repLen, len;
+    QSP_CHAR *newTxt, *pos = qspStrStr(txt, searchTxt);
+    if (!pos)
+    {
+        qspAddText(&newTxt, txt, 0, -1, QSP_TRUE);
+        return newTxt;
+    }
+    bufSize = 256;
+    txtLen = oldTxtLen = 0;
+    searchLen = qspStrLen(searchTxt);
+    repLen = qspStrLen(repTxt);
+    newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+    do
+    {
+        len = (int)(pos - txt);
+        if ((txtLen += len + repLen) >= bufSize)
+        {
+            bufSize = txtLen + 128;
+            newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
+        }
+        qspStrNCopy(newTxt + oldTxtLen, txt, len);
+        qspStrCopy(newTxt + oldTxtLen + len, repTxt);
+        oldTxtLen = txtLen;
+        txt = pos + searchLen;
+        pos = qspStrStr(txt, searchTxt);
+    } while (pos);
+    qspAddText(&newTxt, txt, txtLen, -1, QSP_FALSE);
+    return newTxt;
+}
+
+int qspStrsComp(QSP_CHAR *str1, QSP_CHAR *str2)
+{
+    int ret = 0;
+    while (!(ret = (int)*str1 - *str2) && *str2)
+        ++str1, ++str2;
+    if (ret < 0)
+        return -1;
+    else if (ret > 0)
+        return 1;
+    return 0;
+}
+
 QSP_BOOL qspIsEqual(QSP_CHAR *str1, QSP_CHAR *str2, int maxLen)
 {
     int delta = 0;
@@ -82,19 +162,90 @@ QSP_BOOL qspIsEqual(QSP_CHAR *str1, QSP_CHAR *str2, int maxLen)
     return (delta == 0);
 }
 
-void qspFreeStrs(void **strs, int count, QSP_BOOL isVerify)
+int qspSplitStr(QSP_CHAR *str, QSP_CHAR *delim, QSP_CHAR ***res)
+{
+    int allocChars, count = 0, bufSize = 8, delimLen = qspStrLen(delim);
+    QSP_CHAR *newStr, **ret, *curPos = str, *found = qspStrStr(str, delim);
+    ret = (QSP_CHAR **)malloc(bufSize * sizeof(QSP_CHAR *));
+    while (found)
+    {
+        allocChars = (int)(found - curPos);
+        newStr = (QSP_CHAR *)malloc((allocChars + 1) * sizeof(QSP_CHAR));
+        qspStrNCopy(newStr, curPos, allocChars);
+        newStr[allocChars] = 0;
+        if (++count > bufSize)
+        {
+            bufSize += 16;
+            ret = (QSP_CHAR **)realloc(ret, bufSize * sizeof(QSP_CHAR *));
+        }
+        ret[count - 1] = newStr;
+        curPos = found + delimLen;
+        found = qspStrStr(curPos, delim);
+    }
+    newStr = (QSP_CHAR *)malloc((qspStrLen(curPos) + 1) * sizeof(QSP_CHAR));
+    qspStrCopy(newStr, curPos);
+    if (++count > bufSize)
+        ret = (QSP_CHAR **)realloc(ret, count * sizeof(QSP_CHAR *));
+    ret[count - 1] = newStr;
+    *res = ret;
+    return count;
+}
+
+void qspFreeStrs(void **strs, int count)
 {
     if (strs)
     {
-        if (isVerify)
-        {
-            while (--count >= 0)
-                if (strs[count]) free(strs[count]);
-        }
-        else
-            while (--count >= 0) free(strs[count]);
+        while (--count >= 0)
+            if (strs[count]) free(strs[count]);
         free(strs);
     }
+}
+
+QSP_BOOL qspIsDigit(QSP_CHAR ch)
+{
+    return (ch >= QSP_FMT('0') && ch <= QSP_FMT('9'));
+}
+
+int qspStrToNum(QSP_CHAR *s, QSP_BOOL *isValid)
+{
+    int num;
+    QSP_BOOL isNeg = QSP_FALSE;
+    s = qspSkipSpaces(s);
+    if (*s == QSP_FMT('-'))
+    {
+        isNeg = QSP_TRUE;
+        ++s;
+    }
+    else if (*s == QSP_FMT('+'))
+        ++s;
+    else if (!(*s)) /* special case, i.e. empty string must be convertible to 0 */
+    {
+        if (isValid) *isValid = QSP_TRUE;
+        return 0;
+    }
+    if (qspIsDigit(*s))
+    {
+        num = 0;
+        do
+        {
+            num = num * 10 + (*s - QSP_FMT('0'));
+            ++s;
+        } while (qspIsDigit(*s));
+    }
+    else
+    {
+        if (isValid) *isValid = QSP_FALSE;
+        return 0;
+    }
+    s = qspSkipSpaces(s);
+    if (*s)
+    {
+        if (isValid) *isValid = QSP_FALSE;
+        return 0;
+    }
+    if (isValid) *isValid = QSP_TRUE;
+    if (isNeg) return -num;
+    return num;
 }
 
 QSP_CHAR *qspNumToStr(QSP_CHAR *buf, int val)

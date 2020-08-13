@@ -20,10 +20,22 @@
 #ifndef QSP_LOCSDEFINES
     #define QSP_LOCSDEFINES
 
+    #define QSP_GAMEID QSP_FMT("QSPGAME")
+    #define QSP_PASSWD QSP_FMT("No")
+    #define QSP_MAXACTIONS 50
+
+    typedef struct
+    {
+        QSP_CHAR *Image;
+        QSP_CHAR *Desc;
+        QSP_CHAR *Code;
+    } QSPLocAct;
     typedef struct
     {
         QSP_CHAR *Name;
+        QSP_CHAR *Desc;
         QSP_CHAR *OnVisit;
+        QSPLocAct Actions[QSP_MAXACTIONS];
     } QSPLocation;
 
     extern QSPLocation *qspLocs;
@@ -31,5 +43,10 @@
 
     /* External functions */
     void qspCreateWorld(int);
+    int qspGetLocsStrings(QSP_CHAR *, QSP_CHAR, QSP_CHAR, QSP_BOOL, QSP_CHAR **);
+    int qspOpenTextData(QSP_CHAR *, QSP_CHAR, QSP_CHAR, QSP_BOOL);
+    char *qspSaveQuestToText(QSP_CHAR, QSP_CHAR, QSP_BOOL, int *);
+    QSP_BOOL qspOpenQuest(char *, int, QSP_CHAR *);
+    char *qspSaveQuest(QSP_BOOL, QSP_BOOL, QSP_CHAR *, int *);
 
 #endif

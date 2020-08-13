@@ -34,8 +34,17 @@
     QSP_BOOL qspIsInList(QSP_CHAR *, QSP_CHAR);
     QSP_CHAR *qspSkipSpaces(QSP_CHAR *);
     QSP_CHAR *qspDelSpc(QSP_CHAR *);
+    int qspStrLen(QSP_CHAR *);
+    QSP_CHAR *qspStrStr(QSP_CHAR *, QSP_CHAR *);
+    QSP_CHAR *qspStrCopy(QSP_CHAR *, QSP_CHAR *);
+    QSP_CHAR *qspStrNCopy(QSP_CHAR *, QSP_CHAR *, int);
+    QSP_CHAR *qspReplaceText(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *);
+    int qspStrsComp(QSP_CHAR *, QSP_CHAR *);
     QSP_BOOL qspIsEqual(QSP_CHAR *, QSP_CHAR *, int);
-    void qspFreeStrs(void **, int, QSP_BOOL);
+    int qspSplitStr(QSP_CHAR *, QSP_CHAR *, QSP_CHAR ***);
+    void qspFreeStrs(void **, int);
+    QSP_BOOL qspIsDigit(QSP_CHAR);
+    int qspStrToNum(QSP_CHAR *, QSP_BOOL *);
     QSP_CHAR *qspNumToStr(QSP_CHAR *, int);
 
 #endif

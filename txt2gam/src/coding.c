@@ -270,7 +270,7 @@ static int qspAddGameText(char **dest, char *val, QSP_BOOL isUCS2, int destLen, 
     return ret;
 }
 
-int qspGameCodeWriteIntVal(char **s, int len, int val, QSP_BOOL isUCS2, QSP_BOOL isCode)
+int qspGameCodeWriteIntValLine(char **s, int len, int val, QSP_BOOL isUCS2, QSP_BOOL isCode)
 {
     char *temp;
     QSP_CHAR buf[12];
@@ -286,12 +286,18 @@ int qspGameCodeWriteIntVal(char **s, int len, int val, QSP_BOOL isUCS2, QSP_BOOL
 
 int qspGameCodeWriteVal(char **s, int len, QSP_CHAR *val, QSP_BOOL isUCS2, QSP_BOOL isCode)
 {
+    char *temp = qspQSPToGameString(val, isUCS2, isCode);
+    len = qspAddGameText(s, temp, isUCS2, len, -1, QSP_FALSE);
+    free(temp);
+    return len;
+}
+
+int qspGameCodeWriteValLine(char **s, int len, QSP_CHAR *val, QSP_BOOL isUCS2, QSP_BOOL isCode)
+{
     char *temp;
     if (val)
     {
-        temp = qspQSPToGameString(val, isUCS2, isCode);
-        len = qspAddGameText(s, temp, isUCS2, len, -1, QSP_FALSE);
-        free(temp);
+        len = qspGameCodeWriteVal(s, len, val, isUCS2, isCode);
     }
     temp = qspQSPToGameString(QSP_STRSDELIM, isUCS2, QSP_FALSE);
     len = qspAddGameText(s, temp, isUCS2, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);

@@ -18,249 +18,15 @@
 #include "main.h"
 #include "coding.h"
 #include "locations.h"
-#include "text.h"
 
-static int qspAddCharToBuffer(QSP_CHAR **, QSP_CHAR, int *, int);
-static int qspGetLocsStrings(QSP_CHAR *, QSP_CHAR, QSP_CHAR, QSP_BOOL, QSP_CHAR **);
-static int qspGetLocs(QSP_CHAR *, QSP_CHAR, QSP_CHAR, QSP_BOOL);
-static QSP_BOOL qspLoadFileContents(char *, QSP_CHAR **);
+static QSP_BOOL qspLoadTextFileContents(char *, QSP_CHAR **);
 static QSP_BOOL qspExportStrings(char *, char *, QSP_CHAR, QSP_CHAR, QSP_BOOL, QSP_BOOL);
-static QSP_BOOL qspOpenQuestFromText(char *, QSP_CHAR, QSP_CHAR);
-static QSP_BOOL qspSaveQuest(char *, QSP_BOOL, QSP_BOOL, QSP_CHAR *);
+static QSP_BOOL qspOpenQuestFromTextFile(char *, QSP_CHAR, QSP_CHAR);
+static QSP_BOOL qspSaveGameFile(char *, QSP_BOOL, QSP_BOOL, QSP_CHAR *);
+static QSP_BOOL qspOpenGameFile(char *, QSP_CHAR *);
+static QSP_BOOL qspSaveQuestToTextFile(char *, QSP_CHAR, QSP_CHAR, QSP_BOOL);
 
-static int qspAddCharToBuffer(QSP_CHAR **curStr, QSP_CHAR ch, int *bufSize, int strLen)
-{
-    if (++strLen >= *bufSize)
-    {
-        *bufSize <<= 1;
-        *curStr = (QSP_CHAR *)realloc(*curStr, *bufSize * sizeof(QSP_CHAR));
-    }
-    (*curStr)[strLen - 1] = ch;
-    return strLen;
-}
-
-static int qspGetLocsStrings(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isGetQStrings, QSP_CHAR **buf)
-{
-    QSP_CHAR *name, *curStr, *line, *pos, quot = 0;
-    int bufSize = 512, strLen = 0, len = 0, quotsCount = 0;
-    QSP_BOOL isAddToString, isInLoc = QSP_FALSE;
-    *buf = 0;
-    curStr = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
-    while (*data)
-    {
-        if (isInLoc)
-        {
-            if (!quot && !quotsCount && qspIsEqual(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM)) &&
-                *(line = qspSkipSpaces(data + QSP_LEN(QSP_STRSDELIM))) == locEnd)
-            {
-                isInLoc = QSP_FALSE;
-                pos = QSP_STRSTR(line + 1, QSP_STRSDELIM);
-                if (pos)
-                    data = pos + QSP_LEN(QSP_STRSDELIM);
-                else
-                    break;
-            }
-            else
-            {
-                if (quot)
-                {
-                    if (*data == quot)
-                    {
-                        if (*(data + 1) == quot)
-                        {
-                            if (isGetQStrings && quotsCount)
-                                strLen = qspAddCharToBuffer(&curStr, *data, &bufSize, strLen);
-                            ++data;
-                        }
-                        else
-                            quot = 0;
-                    }
-                    if (quot || (isGetQStrings && quotsCount))
-                        strLen = qspAddCharToBuffer(&curStr, *data, &bufSize, strLen);
-                    else
-                    {
-                        if (strLen)
-                        {
-                            curStr[strLen] = 0;
-                            len = qspAddText(buf, curStr, len, strLen, QSP_FALSE);
-                            len = qspAddText(buf, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
-                            strLen = 0;
-                        }
-                    }
-                }
-                else
-                {
-                    isAddToString = (quotsCount > 0);
-                    if (*data == QSP_LQUOT[0])
-                        ++quotsCount;
-                    else if (*data == QSP_RQUOT[0])
-                    {
-                        if (quotsCount)
-                        {
-                            --quotsCount;
-                            if (isGetQStrings && !quotsCount)
-                            {
-                                isAddToString = QSP_FALSE;
-                                if (strLen)
-                                {
-                                    curStr[strLen] = 0;
-                                    len = qspAddText(buf, curStr, len, strLen, QSP_FALSE);
-                                    len = qspAddText(buf, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
-                                    strLen = 0;
-                                }
-                            }
-                        }
-                    }
-                    else if (qspIsInList(QSP_QUOTS, *data))
-                        quot = *data;
-                    if (isGetQStrings && isAddToString)
-                        strLen = qspAddCharToBuffer(&curStr, *data, &bufSize, strLen);
-                }
-                ++data;
-            }
-        }
-        else
-        {
-            line = qspSkipSpaces(data);
-            pos = QSP_STRSTR(line, QSP_STRSDELIM);
-            if (*line == locStart)
-            {
-                isInLoc = QSP_TRUE;
-                ++line;
-                if (pos)
-                {
-                    *pos = 0;
-                    name = qspDelSpc(line);
-                    *pos = QSP_STRSDELIM[0];
-                }
-                else
-                    name = qspDelSpc(line);
-                len = qspAddText(buf, QSP_FMT("Location: "), len, -1, QSP_FALSE);
-                len = qspAddText(buf, name, len, -1, QSP_FALSE);
-                free(name);
-                len = qspAddText(buf, QSP_STRSDELIM, len, QSP_LEN(QSP_STRSDELIM), QSP_FALSE);
-                if (pos && *qspSkipSpaces(pos + QSP_LEN(QSP_STRSDELIM)) == locEnd)
-                {
-                    data = pos;
-                    continue;
-                }
-            }
-            if (pos)
-                data = pos + QSP_LEN(QSP_STRSDELIM);
-            else
-                break;
-        }
-    }
-    free(curStr);
-    return len;
-}
-
-static int qspGetLocs(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isFill)
-{
-    char *name;
-    QSP_CHAR *locCode, *line, *pos, quot = 0;
-    int bufSize, codeLen, quotsCount = 0, curLoc = 0;
-    QSP_BOOL isInLoc = QSP_FALSE;
-    while (*data)
-    {
-        if (isInLoc)
-        {
-            if (!quot && !quotsCount && qspIsEqual(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM)) &&
-                *(line = qspSkipSpaces(data + QSP_LEN(QSP_STRSDELIM))) == locEnd)
-            {
-                isInLoc = QSP_FALSE;
-                if (isFill)
-                {
-                    locCode[codeLen] = 0;
-                    qspLocs[curLoc].OnVisit = locCode;
-                }
-                ++curLoc;
-                pos = QSP_STRSTR(line + 1, QSP_STRSDELIM);
-                if (pos)
-                    data = pos + QSP_LEN(QSP_STRSDELIM);
-                else
-                    break;
-            }
-            else
-            {
-                if (isFill) codeLen = qspAddCharToBuffer(&locCode, *data, &bufSize, codeLen);
-                if (quot)
-                {
-                    if (*data == quot)
-                    {
-                        if (*(data + 1) == quot)
-                        {
-                            if (isFill) codeLen = qspAddCharToBuffer(&locCode, *data, &bufSize, codeLen);
-                            ++data;
-                        }
-                        else
-                            quot = 0;
-                    }
-                }
-                else
-                {
-                    if (*data == QSP_LQUOT[0])
-                        ++quotsCount;
-                    else if (*data == QSP_RQUOT[0])
-                    {
-                        if (quotsCount) --quotsCount;
-                    }
-                    else if (qspIsInList(QSP_QUOTS, *data))
-                        quot = *data;
-                }
-                ++data;
-            }
-        }
-        else
-        {
-            line = qspSkipSpaces(data);
-            pos = QSP_STRSTR(line, QSP_STRSDELIM);
-            if (*line == locStart)
-            {
-                isInLoc = QSP_TRUE;
-                if (isFill)
-                {
-                    ++line;
-                    if (pos)
-                    {
-                        *pos = 0;
-                        qspLocs[curLoc].Name = qspDelSpc(line);
-                        *pos = QSP_STRSDELIM[0];
-                    }
-                    else
-                        qspLocs[curLoc].Name = qspDelSpc(line);
-                    name = qspFromQSPString(qspLocs[curLoc].Name);
-                    printf("Location: %s\n", name);
-                    free(name);
-                    codeLen = 0;
-                    bufSize = 512;
-                    locCode = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
-                }
-                if (pos && *qspSkipSpaces(pos + QSP_LEN(QSP_STRSDELIM)) == locEnd)
-                {
-                    data = pos;
-                    continue;
-                }
-            }
-            if (pos)
-                data = pos + QSP_LEN(QSP_STRSDELIM);
-            else
-                break;
-        }
-    }
-    if (isInLoc)
-    {
-        if (isFill)
-        {
-            locCode[codeLen] = 0;
-            qspLocs[curLoc].OnVisit = locCode;
-        }
-        ++curLoc;
-    }
-    return curLoc;
-}
-
-static QSP_BOOL qspLoadFileContents(char *file, QSP_CHAR **data)
+static QSP_BOOL qspLoadTextFileContents(char *file, QSP_CHAR **data)
 {
     int fileSize;
     char *buf, *resBuf;
@@ -276,7 +42,7 @@ static QSP_BOOL qspLoadFileContents(char *file, QSP_CHAR **data)
     fclose(f);
     buf[fileSize] = buf[fileSize + 1] = buf[fileSize + 2] = 0;
     resBuf = buf;
-    if ((unsigned char)resBuf[0] == 0xFF && (unsigned char)resBuf[1] == 0xFE)
+    if ((unsigned char)resBuf[0] == (unsigned char)TXT2GAM_BOM[0] && (unsigned char)resBuf[1] == (unsigned char)TXT2GAM_BOM[1])
     {
         resBuf += 2;
         isUCS2 = QSP_TRUE;
@@ -296,7 +62,7 @@ static QSP_BOOL qspExportStrings(char *file, char *outFile, QSP_CHAR locStart, Q
     char *buf;
     QSP_CHAR *data, *strs;
     FILE *f;
-    if (!qspLoadFileContents(file, &data)) return QSP_FALSE;
+    if (!qspLoadTextFileContents(file, &data)) return QSP_FALSE;
     len = qspGetLocsStrings(data, locStart, locEnd, isGetQStrings, &strs);
     free(data);
     if (len)
@@ -315,50 +81,66 @@ static QSP_BOOL qspExportStrings(char *file, char *outFile, QSP_CHAR locStart, Q
     return QSP_TRUE;
 }
 
-static QSP_BOOL qspOpenQuestFromText(char *file, QSP_CHAR locStart, QSP_CHAR locEnd)
+static QSP_BOOL qspOpenQuestFromTextFile(char *file, QSP_CHAR locStart, QSP_CHAR locEnd)
 {
     int locsCount;
     QSP_CHAR *data;
-    if (!qspLoadFileContents(file, &data)) return QSP_FALSE;
-    locsCount = qspGetLocs(data, locStart, locEnd, QSP_FALSE);
+    if (!qspLoadTextFileContents(file, &data)) return QSP_FALSE;
+    locsCount = qspOpenTextData(data, locStart, locEnd, QSP_FALSE);
     qspCreateWorld(locsCount);
-    qspGetLocs(data, locStart, locEnd, QSP_TRUE);
+    qspOpenTextData(data, locStart, locEnd, QSP_TRUE);
     free(data);
     return QSP_TRUE;
 }
 
-static QSP_BOOL qspSaveQuest(char *file, QSP_BOOL isOldFormat, QSP_BOOL isUCS2, QSP_CHAR *passwd)
+static QSP_BOOL qspSaveGameFile(char *file, QSP_BOOL isOldFormat, QSP_BOOL isUCS2, QSP_CHAR *passwd)
 {
-    int i, j, len;
+    int len;
     char *buf;
     FILE *f;
+    buf = qspSaveQuest(isOldFormat, isUCS2, passwd, &len);
+    if (!buf) return QSP_FALSE;
     if (!(f = fopen(file, "wb"))) return QSP_FALSE;
-    buf = 0;
-    if (isOldFormat)
+    fwrite(buf, 1, len, f);
+    free(buf);
+    fclose(f);
+    return QSP_TRUE;
+}
+
+static QSP_BOOL qspOpenGameFile(char *file, QSP_CHAR *password)
+{
+    int fileSize;
+    char *data;
+    FILE *f;
+    if (!(f = fopen(file, "rb"))) return QSP_FALSE;
+    fseek(f, 0, SEEK_END);
+    fileSize = ftell(f);
+    data = (char *)malloc(fileSize);
+    fseek(f, 0, SEEK_SET);
+    fread(data, 1, fileSize, f);
+    fclose(f);
+    if (!qspOpenQuest(data, fileSize, password))
     {
-        len = qspGameCodeWriteIntVal(&buf, 0, qspLocsCount, isUCS2, QSP_FALSE);
-        len = qspGameCodeWriteVal(&buf, len, passwd, isUCS2, QSP_TRUE);
-        len = qspGameCodeWriteVal(&buf, len, QSP_VER, isUCS2, QSP_FALSE);
-        for (i = 0; i < 27; ++i) len = qspGameCodeWriteVal(&buf, len, 0, isUCS2, QSP_FALSE);
+        free(data);
+        return QSP_FALSE;
     }
-    else
+    free(data);
+    return QSP_TRUE;
+}
+
+static QSP_BOOL qspSaveQuestToTextFile(char *file, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isUCS2)
+{
+    int len;
+    char *buf;
+    FILE *f;
+    buf = qspSaveQuestToText(locStart, locEnd, isUCS2, &len);
+    if (!buf) return QSP_FALSE;
+    if (!(f = fopen(file, "wb"))) return QSP_FALSE;
+    if (isUCS2)
     {
-        len = qspGameCodeWriteVal(&buf, 0, QSP_GAMEID, isUCS2, QSP_FALSE);
-        len = qspGameCodeWriteVal(&buf, len, QSP_VER, isUCS2, QSP_FALSE);
-        len = qspGameCodeWriteVal(&buf, len, passwd, isUCS2, QSP_TRUE);
-        len = qspGameCodeWriteIntVal(&buf, len, qspLocsCount, isUCS2, QSP_TRUE);
+        fwrite(TXT2GAM_BOM, 1, sizeof(TXT2GAM_BOM) - 1, f);
     }
-    for (i = 0; i < qspLocsCount; ++i)
-    {
-        len = qspGameCodeWriteVal(&buf, len, qspLocs[i].Name, isUCS2, QSP_TRUE);
-        len = qspGameCodeWriteVal(&buf, len, 0, isUCS2, QSP_FALSE);
-        len = qspGameCodeWriteVal(&buf, len, qspLocs[i].OnVisit, isUCS2, QSP_TRUE);
-        if (isOldFormat)
-            for (j = 0; j < 40; ++j) len = qspGameCodeWriteVal(&buf, len, 0, isUCS2, QSP_FALSE);
-        else
-            len = qspGameCodeWriteIntVal(&buf, len, 0, isUCS2, QSP_TRUE);
-    }
-    fwrite(buf, isUCS2 ? 2 : 1, len, f);
+    fwrite(buf, 1, len, f);
     free(buf);
     fclose(f);
     return QSP_TRUE;
@@ -370,7 +152,7 @@ void ShowHelp()
     printf("TXT2GAM utility, ver. %s\n", temp);
     free(temp);
     printf("Using:\n");
-    printf("  txt2gam [txt file] [output file] [options]\n");
+    printf("  txt2gam [input file] [output file] [options]\n");
     printf("Options:\n");
     printf("  a, A - ANSI mode, default is Unicode (UCS-2 / UTF-16) mode\n");
     printf("  o, O - Save game in old format, default is new format\n");
@@ -379,6 +161,8 @@ void ShowHelp()
     temp = qspFromQSPString(QSP_PASSWD);
     printf("  p[pass], P[pass] - Password, default is '%s'\n", temp);
     free(temp);
+    printf("  c, C - Encode text file into game file (default mode)\n");
+    printf("  d, D - Decode game file into text file\n");
     printf("  t, T - Extract strings from text\n");
     printf("  q, Q - Extract q-strings from text\n");
     printf("Examples:\n");
@@ -398,8 +182,8 @@ void ShowHelp()
 
 int main(int argc, char **argv)
 {
-    int i;
-    QSP_BOOL isFreePass, isOldFormat, isUCS2, isErr, isExtractStrs, isGetQStrings;
+    int i, workMode;
+    QSP_BOOL isFreePass, isOldFormat, isUCS2, isErr;
     QSP_CHAR *passwd, ch, locStart, locEnd;
     setlocale(LC_ALL, QSP_LOCALE);
     if (argc < 3)
@@ -407,8 +191,7 @@ int main(int argc, char **argv)
         ShowHelp();
         return 0;
     }
-    isExtractStrs = QSP_FALSE;
-    isGetQStrings = QSP_FALSE;
+    workMode = QSP_ENCODE_INTO_GAME;
     isOldFormat = QSP_FALSE;
     isUCS2 = QSP_TRUE;
     passwd = QSP_PASSWD;
@@ -448,31 +231,55 @@ int main(int argc, char **argv)
                 }
             }
             break;
+        case 'c': case 'C':
+            workMode = QSP_ENCODE_INTO_GAME;
+            break;
+        case 'd': case 'D':
+            workMode = QSP_DECODE_INTO_TEXT;
+            break;
         case 't': case 'T':
-            isExtractStrs = QSP_TRUE;
+            workMode = QSP_EXTRACT_STRINGS;
             break;
         case 'q': case 'Q':
-            isExtractStrs = QSP_TRUE;
-            isGetQStrings = QSP_TRUE;
+            workMode = QSP_EXTRACT_QSTRINGS;
             break;
         }
     }
-    if (isExtractStrs)
+    qspLocs = 0;
+    qspLocsCount = 0;
+    switch (workMode)
     {
-        if (isErr = !qspExportStrings(argv[1], argv[2], locStart, locEnd, isGetQStrings, isUCS2))
-            printf("Strings extracting failed!\n");
+        case QSP_EXTRACT_STRINGS:
+        case QSP_EXTRACT_QSTRINGS:
+            if (isErr = !qspExportStrings(argv[1], argv[2], locStart, locEnd, workMode == QSP_EXTRACT_QSTRINGS, isUCS2))
+                printf("Strings extracting failed!\n");
+            break;
+        case QSP_ENCODE_INTO_GAME:
+            do
+            {
+                if (isErr = !qspOpenQuestFromTextFile(argv[1], locStart, locEnd))
+                {
+                    printf("Loading text file failed!\n");
+                    break;
+                }
+                if (isErr = !qspSaveGameFile(argv[2], isOldFormat, isUCS2, passwd))
+                    printf("Saving game failed!\n");
+            } while (1);
+            break;
+        case QSP_DECODE_INTO_TEXT:
+            do
+            {
+                if (isErr = !qspOpenGameFile(argv[1], passwd))
+                {
+                    printf("Can't open game!\n");
+                    break;
+                }
+                if (isErr = !qspSaveQuestToTextFile(argv[2], locStart, locEnd, isUCS2))
+                    printf("Saving text file failed!\n");
+            } while (1);
+            break;
     }
-    else
-    {
-        qspLocs = 0;
-        qspLocsCount = 0;
-        if (isErr = !qspOpenQuestFromText(argv[1], locStart, locEnd))
-            printf("Loading game failed!\n");
-        else
-            if (isErr = !qspSaveQuest(argv[2], isOldFormat, isUCS2, passwd))
-                printf("Saving game failed!\n");
-        qspCreateWorld(0);
-    }
+    qspCreateWorld(0);
     if (isFreePass) free(passwd);
     return (isErr == QSP_TRUE);
 }

@@ -20,9 +20,16 @@
 #ifndef QSP_MAINDEFINES
     #define QSP_MAINDEFINES
 
-    #define QSP_GAMEID QSP_FMT("QSPGAME")
-    #define QSP_PASSWD QSP_FMT("No")
     #define QSP_STARTLOC QSP_FMT("#")
     #define QSP_ENDLOC QSP_FMT("-")
+    #define TXT2GAM_BOM "\xFF\xFE"
+
+    enum Mode
+    {
+        QSP_ENCODE_INTO_GAME,
+        QSP_DECODE_INTO_TEXT,
+        QSP_EXTRACT_STRINGS,
+        QSP_EXTRACT_QSTRINGS
+    };
 
 #endif
