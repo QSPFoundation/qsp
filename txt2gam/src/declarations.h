@@ -69,7 +69,7 @@
     #endif
 
     #define QSP_VER QSP_FMT("0.2.0")
-    #define QSP_LOCALE "russian"
+    #define QSP_LOCALE "" /* system locale */
 
     #define QSP_TRUE 1
     #define QSP_FALSE 0
