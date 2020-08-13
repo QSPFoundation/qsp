@@ -264,7 +264,7 @@ int main(int argc, char **argv)
                 }
                 if (isErr = !qspSaveGameFile(argv[2], isOldFormat, isUCS2, passwd))
                     printf("Saving game failed!\n");
-            } while (1);
+            } while (0);
             break;
         case QSP_DECODE_INTO_TEXT:
             do
@@ -276,7 +276,7 @@ int main(int argc, char **argv)
                 }
                 if (isErr = !qspSaveQuestToTextFile(argv[2], locStart, locEnd, isUCS2))
                     printf("Saving text file failed!\n");
-            } while (1);
+            } while (0);
             break;
     }
     qspCreateWorld(0);
