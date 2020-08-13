@@ -332,9 +332,8 @@ int qspOpenTextData(QSP_CHAR *data, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL
 
 char *qspSaveQuest(QSP_BOOL isOldFormat, QSP_BOOL isUCS2, QSP_CHAR *passwd, int *dataLen)
 {
-    int i, j, len;
-    char *buf;
-    buf = 0;
+    int i, j, len = 0;
+    char *buf = 0;
     if (isOldFormat)
     {
         len = qspGameCodeWriteIntValLine(&buf, 0, qspLocsCount, isUCS2, QSP_FALSE);
@@ -417,14 +416,13 @@ QSP_BOOL qspOpenQuest(char *data, int dataSize, QSP_CHAR *password)
 
 char *qspSaveQuestToText(QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isUCS2, int *dataLen)
 {
-    int i, j, k, len, linesCount;
-    char *buf;
     QSP_CHAR *temp, **tempStrs;
+    int i, j, k, linesCount, len = 0;
+    char *buf = 0;
     QSP_CHAR headerPrefix[] = QSP_FMT("#");
     QSP_CHAR footerPrefix[] = QSP_FMT("-");
     headerPrefix[0] = locStart;
     footerPrefix[0] = locEnd;
-    buf = 0;
     for (i = 0; i < qspLocsCount; ++i)
     {
         /* Write location header */
