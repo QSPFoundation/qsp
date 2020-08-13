@@ -9,6 +9,13 @@ elseif(APPLE OR NOT UNIX)
 	message(FATAL_ERROR "Only Windows and Linux targets are supported")
 endif()
 
+if (CMAKE_COMPILER_IS_GNUCC)
+	set(PROJECT_COMPILER_FLAGS "-Wall")
+endif()
+if (MSVC)
+	set(PROJECT_COMPILER_FLAGS "/W4")
+endif()
+
 set(QSP_SOURCES
 	qsp/bindings/default/default_callbacks.c
 	qsp/bindings/default/default_control.c
@@ -56,6 +63,7 @@ target_compile_definitions(qsp PRIVATE _UNICODE EXPORT)
 if(WIN32)
 	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS _WIN)
 endif()
+target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
 
 option(BUILD_QSPGUI "Build qspgui application")
 if(BUILD_QSPGUI)
@@ -129,6 +137,7 @@ if(BUILD_QSPGUI)
 	endif()
 	target_compile_definitions(qspgui PRIVATE _UNICODE)
 	target_include_directories(qspgui PRIVATE qsp/bindings qsp/bindings/default)
+	target_compile_options(qspgui PRIVATE ${PROJECT_COMPILER_FLAGS})
 	target_link_libraries(qspgui qsp fmod wxbase wxcore wxadv wxaui wxhtml)
 endif()
 
@@ -152,4 +161,5 @@ if(BUILD_TXT2GAM)
 	if(WIN32)
 		target_compile_definitions(txt2gam PRIVATE _CRT_SECURE_NO_WARNINGS)
 	endif()
+	target_compile_options(txt2gam PRIVATE ${PROJECT_COMPILER_FLAGS})
 endif()
