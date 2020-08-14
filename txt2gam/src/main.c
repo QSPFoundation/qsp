@@ -18,13 +18,14 @@
 #include "main.h"
 #include "coding.h"
 #include "locations.h"
+#include "text.h"
 
 static QSP_BOOL qspLoadTextFileContents(char *, QSP_CHAR **);
-static QSP_BOOL qspExportStrings(char *, char *, QSP_CHAR, QSP_CHAR, QSP_BOOL, QSP_BOOL);
-static QSP_BOOL qspOpenQuestFromTextFile(char *, QSP_CHAR, QSP_CHAR);
+static QSP_BOOL qspExportStrings(char *, char *, QSP_CHAR *, QSP_CHAR *, QSP_BOOL, QSP_BOOL);
+static QSP_BOOL qspOpenQuestFromTextFile(char *, QSP_CHAR *, QSP_CHAR *);
 static QSP_BOOL qspSaveGameFile(char *, QSP_BOOL, QSP_BOOL, QSP_CHAR *);
 static QSP_BOOL qspOpenGameFile(char *, QSP_CHAR *);
-static QSP_BOOL qspSaveQuestToTextFile(char *, QSP_CHAR, QSP_CHAR, QSP_BOOL);
+static QSP_BOOL qspSaveQuestToTextFile(char *, QSP_CHAR *, QSP_CHAR *, QSP_BOOL);
 
 static QSP_BOOL qspLoadTextFileContents(char *file, QSP_CHAR **data)
 {
@@ -56,7 +57,7 @@ static QSP_BOOL qspLoadTextFileContents(char *file, QSP_CHAR **data)
     return QSP_TRUE;
 }
 
-static QSP_BOOL qspExportStrings(char *file, char *outFile, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isGetQStrings, QSP_BOOL isUCS2)
+static QSP_BOOL qspExportStrings(char *file, char *outFile, QSP_CHAR *locStart, QSP_CHAR *locEnd, QSP_BOOL isGetQStrings, QSP_BOOL isUCS2)
 {
     int len;
     char *buf;
@@ -81,7 +82,7 @@ static QSP_BOOL qspExportStrings(char *file, char *outFile, QSP_CHAR locStart, Q
     return QSP_TRUE;
 }
 
-static QSP_BOOL qspOpenQuestFromTextFile(char *file, QSP_CHAR locStart, QSP_CHAR locEnd)
+static QSP_BOOL qspOpenQuestFromTextFile(char *file, QSP_CHAR *locStart, QSP_CHAR *locEnd)
 {
     int locsCount;
     QSP_CHAR *data;
@@ -128,7 +129,7 @@ static QSP_BOOL qspOpenGameFile(char *file, QSP_CHAR *password)
     return QSP_TRUE;
 }
 
-static QSP_BOOL qspSaveQuestToTextFile(char *file, QSP_CHAR locStart, QSP_CHAR locEnd, QSP_BOOL isUCS2)
+static QSP_BOOL qspSaveQuestToTextFile(char *file, QSP_CHAR *locStart, QSP_CHAR *locEnd, QSP_BOOL isUCS2)
 {
     int len;
     char *buf;
@@ -156,8 +157,12 @@ void ShowHelp()
     printf("Options:\n");
     printf("  a, A - ANSI mode, default is Unicode (UCS-2 / UTF-16) mode\n");
     printf("  o, O - Save game in old format, default is new format\n");
-    printf("  s[char], S[char] - 'Begin of loc' character, default is '%c'\n", QSP_FROM_OS_CHAR(QSP_STARTLOC[0]));
-    printf("  e[char], E[char] - 'End of loc' character, default is '%c'\n", QSP_FROM_OS_CHAR(QSP_ENDLOC[0]));
+    temp = qspFromQSPString(QSP_STARTLOC);
+    printf("  s[string], S[string] - 'Begin of loc' prefix, default is '%s'\n", temp);
+    free(temp);
+    temp = qspFromQSPString(QSP_ENDLOC);
+    printf("  e[string], E[string] - 'End of loc' prefix, default is '%s'\n", temp);
+    free(temp);
     temp = qspFromQSPString(QSP_PASSWD);
     printf("  p[pass], P[pass] - Password, default is '%s'\n", temp);
     free(temp);
@@ -183,8 +188,8 @@ void ShowHelp()
 int main(int argc, char **argv)
 {
     int i, workMode;
-    QSP_BOOL isFreePass, isOldFormat, isUCS2, isErr;
-    QSP_CHAR *passwd, ch, locStart, locEnd;
+    QSP_BOOL isOldFormat, isUCS2, isErr;
+    QSP_CHAR *passwd, *locStart, *locEnd, ch;
     setlocale(LC_ALL, QSP_LOCALE);
     if (argc < 3)
     {
@@ -194,10 +199,9 @@ int main(int argc, char **argv)
     workMode = QSP_ENCODE_INTO_GAME;
     isOldFormat = QSP_FALSE;
     isUCS2 = QSP_TRUE;
-    passwd = QSP_PASSWD;
-    isFreePass = QSP_FALSE;
-    locStart = QSP_STARTLOC[0];
-    locEnd = QSP_ENDLOC[0];
+    qspAddText(&locStart, QSP_STARTLOC, 0, -1, QSP_TRUE);
+    qspAddText(&locEnd, QSP_ENDLOC, 0, -1, QSP_TRUE);
+    qspAddText(&passwd, QSP_PASSWD, 0, -1, QSP_TRUE);
     for (i = 3; i < argc; ++i)
     {
         switch (*argv[i])
@@ -216,17 +220,16 @@ int main(int argc, char **argv)
                 switch (*argv[i])
                 {
                 case 's': case 'S':
-                    ch = QSP_TO_OS_CHAR(argv[i][1]);
-                    if (ch != locEnd) locStart = ch;
+                    free(locStart);
+                    locStart = qspToQSPString(argv[i] + 1);
                     break;
                 case 'e': case 'E':
-                    ch = QSP_TO_OS_CHAR(argv[i][1]);
-                    if (ch != locStart) locEnd = ch;
+                    free(locEnd);
+                    locEnd = qspToQSPString(argv[i] + 1);
                     break;
                 case 'p': case 'P':
-                    if (isFreePass) free(passwd);
+                    free(passwd);
                     passwd = qspToQSPString(argv[i] + 1);
-                    isFreePass = QSP_TRUE;
                     break;
                 }
             }
@@ -280,6 +283,8 @@ int main(int argc, char **argv)
             break;
     }
     qspCreateWorld(0);
-    if (isFreePass) free(passwd);
+    free(locStart);
+    free(locEnd);
+    free(passwd);
     return (isErr == QSP_TRUE);
 }

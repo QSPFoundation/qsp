@@ -43,9 +43,9 @@
 
     /* External functions */
     void qspCreateWorld(int);
-    int qspGetLocsStrings(QSP_CHAR *, QSP_CHAR, QSP_CHAR, QSP_BOOL, QSP_CHAR **);
-    int qspOpenTextData(QSP_CHAR *, QSP_CHAR, QSP_CHAR, QSP_BOOL);
-    char *qspSaveQuestToText(QSP_CHAR, QSP_CHAR, QSP_BOOL, int *);
+    int qspGetLocsStrings(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, QSP_BOOL, QSP_CHAR **);
+    int qspOpenTextData(QSP_CHAR *, QSP_CHAR *, QSP_CHAR *, QSP_BOOL);
+    char *qspSaveQuestToText(QSP_CHAR *, QSP_CHAR *, QSP_BOOL, int *);
     QSP_BOOL qspOpenQuest(char *, int, QSP_CHAR *);
     char *qspSaveQuest(QSP_BOOL, QSP_BOOL, QSP_CHAR *, int *);
 
