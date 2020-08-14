@@ -49,6 +49,9 @@ static QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2, QSP_CHAR 
            qspGameToQSPString(strs[1], isUCS2, QSP_TRUE) : qspGameToQSPString(strs[2], isUCS2, QSP_TRUE));
     hasInvalidPassword = qspStrsComp(buf, password);
     free(buf);
+#ifdef SPEC_PASS
+    hasInvalidPassword = hasInvalidPassword && qspStrsComp(QSP_FMT(SPEC_PASS), password);
+#endif
     if (hasInvalidPassword) return QSP_FALSE;
     buf = (isOldFormat ?
            qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE));
