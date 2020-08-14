@@ -495,11 +495,6 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
     QSPString res, leftSubEx, rightSubEx;
     QSP_CHAR *newTxt, *lPos, *rPos;
     int oldRefreshCount, len, txtLen, oldTxtLen, bufSize;
-    if (qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DISABLESUBEX"))))
-    {
-        if (canReturnSelf) return txt;
-        return qspGetNewText(txt);
-    }
     leftSubEx = QSP_STATIC_STR(QSP_LSUBEX);
     lPos = qspStrStr(txt, leftSubEx);
     if (!lPos)
