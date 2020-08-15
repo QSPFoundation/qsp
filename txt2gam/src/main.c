@@ -189,7 +189,7 @@ int main(int argc, char **argv)
 {
     int i, workMode;
     QSP_BOOL isOldFormat, isUCS2, isErr;
-    QSP_CHAR *passwd, *locStart, *locEnd, ch;
+    QSP_CHAR *passwd, *locStart, *locEnd;
     setlocale(LC_ALL, QSP_LOCALE);
     if (argc < 3)
     {
