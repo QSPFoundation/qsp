@@ -112,6 +112,7 @@
         void AddMenuItem(const wxString &name, const wxString &imgPath);
         int ShowMenu();
         void UpdateGamePath(const wxString &fullPath);
+        wxString ComposeGamePath(const wxString &relativePath) const;
         wxString GetGamePath() const { return m_worldPath; }
 
         // Accessors

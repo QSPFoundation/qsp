@@ -331,8 +331,7 @@ void QSPCallBacks::ShowImage(QSPString file)
 void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
 {
     if (m_frame->IsQuit()) return;
-    wxFileName fileName(m_frame->GetGamePath() + wxString(file.Str, file.End));
-    wxString filePath(fileName.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));
+    wxString filePath(m_frame->GetGamePath() + wxString(file.Str, file.End));
     if (wxFileExists(filePath))
     {
         wxFile fileToLoad(filePath);
@@ -353,8 +352,7 @@ void QSPCallBacks::OpenGameStatus(QSPString file)
     wxString filePath;
     if (file.Str)
     {
-        wxFileName fileName(m_frame->GetGamePath() + wxString(file.Str, file.End));
-        filePath = fileName.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+        filePath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
     }
     else
     {
@@ -383,8 +381,7 @@ void QSPCallBacks::SaveGameStatus(QSPString file)
     wxString filePath;
     if (file.Str)
     {
-        wxFileName fileName(m_frame->GetGamePath() + wxString(file.Str, file.End));
-        filePath = fileName.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+        filePath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
     }
     else
     {

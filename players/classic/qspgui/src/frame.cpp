@@ -424,6 +424,16 @@ void QSPFrame::UpdateGamePath(const wxString &fullPath)
     m_objects->SetGamePath(directoryPath);
 }
 
+wxString QSPFrame::ComposeGamePath(const wxString &relativePath) const
+{
+    wxFileName fullPath(m_worldPath + relativePath);
+    fullPath.Normalize(wxPATH_NORM_ALL, m_worldPath);
+    wxString normalizedPath(fullPath.GetFullPath());
+    if (normalizedPath.StartsWith(m_worldPath))
+        return normalizedPath;
+    return wxEmptyString;
+}
+
 void QSPFrame::ShowError()
 {
     bool oldIsProcessEvents;
