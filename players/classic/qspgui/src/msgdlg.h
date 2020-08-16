@@ -29,21 +29,27 @@
 
     class QSPMsgDlg : public wxDialog
     {
+        const int MinWidth = 450;
+        const int MaxWidth = 550;
+        const int MinHeight = 100;
+        const int MaxHeight = 350;
+
         DECLARE_CLASS(QSPMsgDlg)
         DECLARE_EVENT_TABLE()
     public:
         // C-tors / D-tor
         QSPMsgDlg(wxWindow* parent,
-                wxWindowID id,
-                const wxColour& backColor,
-                const wxColour& fontColor,
-                const wxFont& font,
-                const wxString& caption,
-                const wxString& text,
-                bool isHtml,
-                const wxString& gamePath);
+                  wxWindowID id,
+                  const wxColour& backColor,
+                  const wxColour& fontColor,
+                  const wxFont& font,
+                  const wxString& caption,
+                  const wxString& text,
+                  bool isHtml,
+                  const wxString& gamePath);
     protected:
         // Events
+        void OnInitDialog(wxInitDialogEvent& event);
         void OnLinkClicked(wxHtmlLinkEvent& event);
 
         // Fields

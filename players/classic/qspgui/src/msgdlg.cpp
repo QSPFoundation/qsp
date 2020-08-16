@@ -21,6 +21,7 @@ wxIMPLEMENT_CLASS(QSPMsgDlg, wxDialog);
 
 BEGIN_EVENT_TABLE(QSPMsgDlg, wxDialog)
     EVT_HTML_LINK_CLICKED(ID_MSG_DESC, QSPMsgDlg::OnLinkClicked)
+    EVT_INIT_DIALOG(QSPMsgDlg::OnInitDialog)
 END_EVENT_TABLE()
 
 QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
@@ -52,31 +53,29 @@ QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
     wxButton *btnOk = new wxButton(this, wxID_OK, _("OK"));
     btnOk->SetDefault();
     btnOk->SetFont(font);
-    #ifdef __WXMSW__
-        btnOk->SetBackgroundColour(backColor);
-        btnOk->SetForegroundColour(fontColor);
-    #endif
+    btnOk->SetBackgroundColour(backColor);
+    btnOk->SetForegroundColour(fontColor);
     sizerBottom->Add(btnOk, 0, wxALL, 2);
     // ----------
     wxSizer *sizerMain = new wxBoxSizer(wxVERTICAL);
     sizerMain->Add(sizerUp, 1, wxGROW, 0);
     sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
     // ----------
-    static const int minWidth = 450;
-    static const int maxWidth = 550;
-    static const int minHeight = 100;
-    static const int maxHeight = 350;
-    sizerMain->SetMinSize(minWidth, minHeight);
+    sizerMain->SetMinSize(MinWidth, MinHeight);
     SetSizerAndFit(sizerMain);
+    btnOk->SetFocus();
+}
+
+void QSPMsgDlg::OnInitDialog(wxInitDialogEvent& event)
+{
     int deltaH = GetClientSize().GetHeight() - m_desc->GetSize().GetHeight();
     int deltaW = GetClientSize().GetWidth() - m_desc->GetSize().GetWidth();
     int height = m_desc->GetInternalRepresentation()->GetHeight() + m_desc->GetCharHeight() + deltaH;
     int width = m_desc->GetInternalRepresentation()->GetWidth() + deltaW;
-    height = wxMin(wxMax(height, minHeight), maxHeight);
-    width = wxMin(wxMax(width, minWidth), maxWidth);
+    height = wxMin(wxMax(height, MinHeight), MaxHeight);
+    width = wxMin(wxMax(width, MinWidth), MaxWidth);
     SetClientSize(width, height);
     Center();
-    btnOk->SetFocus();
 }
 
 void QSPMsgDlg::OnLinkClicked(wxHtmlLinkEvent& event)

@@ -21,6 +21,7 @@ wxIMPLEMENT_CLASS(QSPInputDlg, wxDialog);
 
 BEGIN_EVENT_TABLE(QSPInputDlg, wxDialog)
     EVT_HTML_LINK_CLICKED(ID_INPUT_DESC, QSPInputDlg::OnLinkClicked)
+    EVT_INIT_DIALOG(QSPInputDlg::OnInitDialog)
 END_EVENT_TABLE()
 
 QSPInputDlg::QSPInputDlg(wxWindow* parent,
@@ -58,13 +59,11 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
     wxButton *btnCancel = new wxButton(this, wxID_CANCEL, _("Cancel"));
     btnOk->SetDefault();
     btnOk->SetFont(font);
+    btnOk->SetBackgroundColour(backColor);
+    btnOk->SetForegroundColour(fontColor);
     btnCancel->SetFont(font);
-    #ifdef __WXMSW__
-        btnOk->SetBackgroundColour(backColor);
-        btnOk->SetForegroundColour(fontColor);
-        btnCancel->SetBackgroundColour(backColor);
-        btnCancel->SetForegroundColour(fontColor);
-    #endif
+    btnCancel->SetBackgroundColour(backColor);
+    btnCancel->SetForegroundColour(fontColor);
     sizerBottom->Add(btnOk, 0, wxALL, 2);
     sizerBottom->Add(btnCancel, 0, wxALL, 2);
     // ----------
@@ -73,21 +72,21 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
     sizerMain->Add(sizerBottom, 0, wxALIGN_RIGHT, 0);
     // ----------
     inputStr->SetValidator(wxGenericValidator(&m_text));
-    static const int minWidth = 420;
-    static const int maxWidth = 550;
-    static const int minHeight = 150;
-    static const int maxHeight = 350;
-    sizerMain->SetMinSize(minWidth, minHeight);
+    sizerMain->SetMinSize(MinWidth, MinHeight);
     SetSizerAndFit(sizerMain);
+    inputStr->SetFocus();
+}
+
+void QSPInputDlg::OnInitDialog(wxInitDialogEvent& event)
+{
     int deltaH = GetClientSize().GetHeight() - m_desc->GetSize().GetHeight();
     int deltaW = GetClientSize().GetWidth() - m_desc->GetSize().GetWidth();
     int height = m_desc->GetInternalRepresentation()->GetHeight() + m_desc->GetCharHeight() + deltaH;
     int width = m_desc->GetInternalRepresentation()->GetWidth() + deltaW;
-    height = wxMin(wxMax(height, minHeight), maxHeight);
-    width = wxMin(wxMax(width, minWidth), maxWidth);
+    height = wxMin(wxMax(height, MinHeight), MaxHeight);
+    width = wxMin(wxMax(width, MinWidth), MaxWidth);
     SetClientSize(width, height);
     Center();
-    inputStr->SetFocus();
 }
 
 void QSPInputDlg::OnLinkClicked(wxHtmlLinkEvent& event)

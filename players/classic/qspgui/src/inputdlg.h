@@ -30,6 +30,11 @@
 
     class QSPInputDlg : public wxDialog
     {
+        const int MinWidth = 420;
+        const int MaxWidth = 550;
+        const int MinHeight = 150;
+        const int MaxHeight = 350;
+
         DECLARE_CLASS(QSPInputDlg)
         DECLARE_EVENT_TABLE()
     public:
@@ -48,6 +53,7 @@
         wxString GetText() const { return m_text; }
     protected:
         // Events
+        void OnInitDialog(wxInitDialogEvent& event);
         void OnLinkClicked(wxHtmlLinkEvent& event);
 
         // Fields

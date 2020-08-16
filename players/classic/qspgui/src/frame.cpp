@@ -458,7 +458,16 @@ void QSPFrame::ShowError()
             (size_t)code,
             wxGetTranslation(wxString(desc.Str, desc.End)).wx_str()
         );
-    wxMessageDialog dialog(this, wxMessage, _("Error"), wxOK | wxICON_ERROR);
+    QSPMsgDlg dialog(this,
+                     wxID_ANY,
+                     m_desc->GetBackgroundColour(),
+                     m_desc->GetForegroundColour(),
+                     m_desc->GetTextFont(),
+                     _("Error"),
+                     wxMessage,
+                     false,
+                     m_worldPath
+    );
     oldIsProcessEvents = m_isProcessEvents;
     m_isProcessEvents = false;
     dialog.ShowModal();
