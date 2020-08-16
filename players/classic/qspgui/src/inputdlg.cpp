@@ -17,7 +17,7 @@
 
 #include "inputdlg.h"
 
-IMPLEMENT_CLASS(QSPInputDlg, wxDialog)
+wxIMPLEMENT_CLASS(QSPInputDlg, wxDialog);
 
 BEGIN_EVENT_TABLE(QSPInputDlg, wxDialog)
     EVT_HTML_LINK_CLICKED(ID_INPUT_DESC, QSPInputDlg::OnLinkClicked)

@@ -17,7 +17,7 @@
 
 #include "animwin.h"
 
-IMPLEMENT_CLASS(QSPAnimWin, wxAnimationCtrl)
+wxIMPLEMENT_CLASS(QSPAnimWin, wxAnimationCtrl);
 
 BEGIN_EVENT_TABLE(QSPAnimWin, wxAnimationCtrl)
     EVT_KEY_UP(QSPAnimWin::OnKeyUp)

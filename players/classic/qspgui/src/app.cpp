@@ -17,10 +17,13 @@
 
 #include "app.h"
 
-IMPLEMENT_APP(QSPApp)
+wxIMPLEMENT_APP(QSPApp);
 
 bool QSPApp::OnInit()
 {
+    if (!wxApp::OnInit())
+        return false;
+
     wxLog::EnableLogging(false);
     wxInitAllImageHandlers();
     QSPInit();

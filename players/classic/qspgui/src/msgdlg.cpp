@@ -17,7 +17,7 @@
 
 #include "msgdlg.h"
 
-IMPLEMENT_CLASS(QSPMsgDlg, wxDialog)
+wxIMPLEMENT_CLASS(QSPMsgDlg, wxDialog);
 
 BEGIN_EVENT_TABLE(QSPMsgDlg, wxDialog)
     EVT_HTML_LINK_CLICKED(ID_MSG_DESC, QSPMsgDlg::OnLinkClicked)

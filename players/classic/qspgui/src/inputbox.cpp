@@ -17,7 +17,7 @@
 
 #include "inputbox.h"
 
-IMPLEMENT_CLASS(QSPInputBox, wxTextCtrl)
+wxIMPLEMENT_CLASS(QSPInputBox, wxTextCtrl);
 
 wxDEFINE_EVENT(wxEVT_ENTER, wxCommandEvent);
 

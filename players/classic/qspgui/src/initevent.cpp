@@ -19,7 +19,7 @@
 
 wxDEFINE_EVENT(wxEVT_INIT, wxInitEvent);
 
-IMPLEMENT_DYNAMIC_CLASS(wxInitEvent, wxEvent)
+wxIMPLEMENT_DYNAMIC_CLASS(wxInitEvent, wxEvent);
 
 wxInitEvent::wxInitEvent()
 {

@@ -17,7 +17,7 @@
 
 #include "listbox.h"
 
-IMPLEMENT_CLASS(QSPListBox, wxHtmlListBox)
+wxIMPLEMENT_CLASS(QSPListBox, wxHtmlListBox);
 
 BEGIN_EVENT_TABLE(QSPListBox, wxHtmlListBox)
     EVT_MOTION(QSPListBox::OnMouseMove)

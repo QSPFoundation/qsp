@@ -17,7 +17,7 @@
 
 #include "imgcanvas.h"
 
-IMPLEMENT_CLASS(QSPImgCanvas, wxWindow)
+wxIMPLEMENT_CLASS(QSPImgCanvas, wxWindow);
 
 BEGIN_EVENT_TABLE(QSPImgCanvas, wxWindow)
     EVT_SIZE(QSPImgCanvas::OnSize)

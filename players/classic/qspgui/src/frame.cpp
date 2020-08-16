@@ -63,10 +63,10 @@ BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
     EVT_DROP_FILES(QSPFrame::OnDropFiles)
 END_EVENT_TABLE()
 
-IMPLEMENT_CLASS(QSPFrame, wxFrame)
+wxIMPLEMENT_CLASS(QSPFrame, wxFrame);
 
 QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper) :
-    wxFrame(0, wxID_ANY, wxEmptyString),
+    wxFrame(NULL, wxID_ANY, wxEmptyString),
     m_configDefPath(configPath),
     m_configPath(configPath),
     m_transhelper(transhelper)

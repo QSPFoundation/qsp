@@ -17,7 +17,7 @@
 
 #include "textbox.h"
 
-IMPLEMENT_CLASS(QSPTextBox, wxHtmlWindow)
+wxIMPLEMENT_CLASS(QSPTextBox, wxHtmlWindow);
 
 BEGIN_EVENT_TABLE(QSPTextBox, wxHtmlWindow)
     EVT_SIZE(QSPTextBox::OnSize)
