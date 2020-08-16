@@ -394,10 +394,10 @@ void QSPFrame::AddMenuItem(const wxString &name, const wxString &imgPath)
     else
     {
         wxMenuItem *item = new wxMenuItem(m_menu, m_menuItemId, name);
-        wxString itemPath(wxFileName(imgPath, wxPATH_DOS).GetFullPath());
-        if (wxFileExists(itemPath))
+        wxString imageFullPath(wxFileName(m_worldPath + imgPath, wxPATH_DOS).GetFullPath());
+        if (wxFileExists(imageFullPath))
         {
-            wxBitmap itemBmp(itemPath, wxBITMAP_TYPE_ANY);
+            wxBitmap itemBmp(imageFullPath, wxBITMAP_TYPE_ANY);
             if (itemBmp.Ok()) item->SetBitmap(itemBmp);
         }
         m_menu->Append(item);
@@ -426,7 +426,7 @@ void QSPFrame::UpdateGamePath(const wxString &fullPath)
 
 wxString QSPFrame::ComposeGamePath(const wxString &relativePath) const
 {
-    wxFileName fullPath(m_worldPath + relativePath);
+    wxFileName fullPath(m_worldPath + relativePath, wxPATH_DOS);
     fullPath.Normalize(wxPATH_NORM_ALL, m_worldPath);
     wxString normalizedPath(fullPath.GetFullPath());
     if (normalizedPath.StartsWith(m_worldPath))
@@ -704,7 +704,7 @@ void QSPFrame::OpenGameState(const wxString& fullPath)
 
 void QSPFrame::SaveGameState(const wxString &fullPath)
 {
-    int fileSize = 128 * 1024;
+    int fileSize = 64 * 1024;
     void *fileData = (void *)malloc(fileSize);
     if (!QSPSaveGameAsData(fileData, fileSize, &fileSize, QSP_TRUE))
     {

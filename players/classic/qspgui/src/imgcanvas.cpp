@@ -41,15 +41,14 @@ QSPImgCanvas::~QSPImgCanvas()
     delete m_animation;
 }
 
-bool QSPImgCanvas::OpenFile(const wxString& fileName)
+bool QSPImgCanvas::OpenFile(const wxString& fullPath)
 {
     bool ret;
-    wxString path(wxFileName(fileName, wxPATH_DOS).GetFullPath());
-    if (m_path != path || path.IsEmpty())
+    if (m_path != fullPath)
     {
-        if (wxFileExists(path))
+        if (wxFileExists(fullPath))
         {
-            if (m_isAnim = m_animation->LoadFile(path))
+            if (m_isAnim = m_animation->LoadFile(fullPath))
             {
                 m_animation->Show();
                 ret = true;
@@ -57,7 +56,7 @@ bool QSPImgCanvas::OpenFile(const wxString& fileName)
             else
             {
                 m_animation->Hide();
-                ret = m_image.LoadFile(path);
+                ret = m_image.LoadFile(fullPath);
             }
             if (ret)
             {
@@ -67,7 +66,7 @@ bool QSPImgCanvas::OpenFile(const wxString& fileName)
                     m_animation->Play();
                 else
                     Refresh();
-                m_path = path;
+                m_path = fullPath;
             }
             return ret;
         }

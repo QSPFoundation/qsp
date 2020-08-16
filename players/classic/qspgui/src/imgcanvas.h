@@ -32,7 +32,7 @@
         virtual ~QSPImgCanvas();
 
         // Methods
-        bool OpenFile(const wxString& fileName);
+        bool OpenFile(const wxString& fullPath);
         void RefreshUI();
 
         // Overloaded methods

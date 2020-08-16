@@ -155,20 +155,20 @@ void QSPListBox::CreateHTMLParser() const
 
 wxString QSPListBox::OnGetItem(size_t n) const
 {
-    wxString image(wxFileName(m_images[n], wxPATH_DOS).GetFullPath());
+    wxString imageFullPath(wxFileName(m_path + m_images[n], wxPATH_DOS).GetFullPath());
     wxString color(QSPTools::GetHexColor(GetForegroundColour()));
     wxString text(QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_descs[n] : QSPTools::ProceedAsPlain(m_descs[n])));
     if (m_isShowNums && n < 9)
     {
-        if (wxFileExists(image))
-            return wxString::Format(m_outFormatImageNums, color.wx_str(), n + 1, image.wx_str(), text.wx_str());
+        if (wxFileExists(imageFullPath))
+            return wxString::Format(m_outFormatImageNums, color.wx_str(), n + 1, imageFullPath.wx_str(), text.wx_str());
         else
             return wxString::Format(m_outFormatNums, color.wx_str(), n + 1, text.wx_str());
     }
     else
     {
-        if (wxFileExists(image))
-            return wxString::Format(m_outFormatImage, color.wx_str(), image.wx_str(), text.wx_str());
+        if (wxFileExists(imageFullPath))
+            return wxString::Format(m_outFormatImage, color.wx_str(), imageFullPath.wx_str(), text.wx_str());
         else
             return wxString::Format(m_outFormat, color.wx_str(), text.wx_str());
     }

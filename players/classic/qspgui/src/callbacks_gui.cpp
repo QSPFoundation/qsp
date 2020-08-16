@@ -325,22 +325,30 @@ void QSPCallBacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
 void QSPCallBacks::ShowImage(QSPString file)
 {
     if (m_frame->IsQuit()) return;
-    m_frame->ShowPane(ID_VIEWPIC, m_frame->GetImgView()->OpenFile(wxString(file.Str, file.End)));
+    if (file.Str)
+    {
+        wxString imgFullPath(wxFileName(m_frame->GetGamePath() + wxString(file.Str, file.End), wxPATH_DOS).GetFullPath());
+        m_frame->ShowPane(ID_VIEWPIC, m_frame->GetImgView()->OpenFile(imgFullPath));
+    }
+    else
+    {
+        m_frame->ShowPane(ID_VIEWPIC, false);
+    }
 }
 
 void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
 {
     if (m_frame->IsQuit()) return;
-    wxString filePath(m_frame->GetGamePath() + wxString(file.Str, file.End));
-    if (wxFileExists(filePath))
+    wxString fullPath(wxFileName(m_frame->GetGamePath() + wxString(file.Str, file.End), wxPATH_DOS).GetFullPath());
+    if (wxFileExists(fullPath))
     {
-        wxFile fileToLoad(filePath);
+        wxFile fileToLoad(fullPath);
         int fileSize = fileToLoad.Length();
         void *fileData = (void *)malloc(fileSize);
         if (fileToLoad.Read(fileData, fileSize) == fileSize)
         {
             if (QSPLoadGameWorldFromData(fileData, fileSize, isNewGame) && isNewGame)
-                m_frame->UpdateGamePath(filePath);
+                m_frame->UpdateGamePath(fullPath);
         }
         free(fileData);
     }
@@ -349,10 +357,10 @@ void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
 void QSPCallBacks::OpenGameStatus(QSPString file)
 {
     if (m_frame->IsQuit()) return;
-    wxString filePath;
+    wxString fullPath;
     if (file.Str)
     {
-        filePath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
+        fullPath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
     }
     else
     {
@@ -362,11 +370,11 @@ void QSPCallBacks::OpenGameStatus(QSPString file)
         m_frame->EnableControls(true);
         if (res != wxID_OK)
             return;
-        filePath = dialog.GetPath();
+        fullPath = dialog.GetPath();
     }
-    if (wxFileExists(filePath))
+    if (wxFileExists(fullPath))
     {
-        wxFile fileToLoad(filePath);
+        wxFile fileToLoad(fullPath);
         int fileSize = fileToLoad.Length();
         void *fileData = (void *)malloc(fileSize);
         if (fileToLoad.Read(fileData, fileSize) == fileSize)
@@ -378,10 +386,10 @@ void QSPCallBacks::OpenGameStatus(QSPString file)
 void QSPCallBacks::SaveGameStatus(QSPString file)
 {
     if (m_frame->IsQuit()) return;
-    wxString filePath;
+    wxString fullPath;
     if (file.Str)
     {
-        filePath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
+        fullPath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
     }
     else
     {
@@ -391,9 +399,9 @@ void QSPCallBacks::SaveGameStatus(QSPString file)
         m_frame->EnableControls(true);
         if (res != wxID_OK)
             return;
-        filePath = dialog.GetPath();
+        fullPath = dialog.GetPath();
     }
-    int fileSize = 128 * 1024;
+    int fileSize = 64 * 1024;
     void *fileData = (void *)malloc(fileSize);
     if (!QSPSaveGameAsData(fileData, fileSize, &fileSize, QSP_FALSE))
     {
@@ -407,7 +415,7 @@ void QSPCallBacks::SaveGameStatus(QSPString file)
             }
         }
     }
-    wxFile fileToSave(filePath, wxFile::write);
+    wxFile fileToSave(fullPath, wxFile::write);
     fileToSave.Write(fileData, fileSize);
     free(fileData);
 }
