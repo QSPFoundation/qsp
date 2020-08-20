@@ -1,5 +1,0 @@
-#define HAVE_SYS_TYPES_H 1
-#define HAVE_STDLIB_H 1
-#define HAVE_STRING_H 1
-#define HAVE_STDARG_PROTOTYPES 1
-#define HAVE_ALLOCA 1
