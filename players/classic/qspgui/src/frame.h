@@ -52,8 +52,8 @@
 
     enum
     {
-        ID_BEGOFDYNMENU = 1,
-        ID_ENDOFDYNMENU = 150,
+        ID_BEGOFDYNMENU = 1000,
+        ID_ENDOFDYNMENU = 1500,
         ID_OPENGAME,
         ID_NEWGAME,
         ID_OPENGAMESTAT,

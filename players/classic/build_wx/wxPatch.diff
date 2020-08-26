@@ -1,8 +1,23 @@
+diff --git a/include/wx/generic/animate.h b/include/wx/generic/animate.h
+index 46413e01dd..cc607a1bc0 100644
+--- a/include/wx/generic/animate.h
++++ b/include/wx/generic/animate.h
+@@ -130,6 +130,10 @@ protected:
+     wxBitmap      m_backingStore;     // The frames are drawn here and then blitted
+                                       // on the screen
+ 
++    int m_scalePosX;
++    int m_scalePosY;
++    int m_scaleWidth;
++    int m_scaleHeight;
+ private:
+     typedef wxAnimationCtrlBase base_type;
+     wxDECLARE_DYNAMIC_CLASS(wxGenericAnimationCtrl);
 diff --git a/include/wx/htmllbox.h b/include/wx/htmllbox.h
-index e936699bbe..3d42e83a3d 100644
+index a65fa566e5..06f827c899 100644
 --- a/include/wx/htmllbox.h
 +++ b/include/wx/htmllbox.h
-@@ -129,6 +129,15 @@ protected:
+@@ -133,6 +133,15 @@ protected:
      // ensure that the given item is cached
      void CacheItem(size_t n) const;
  
@@ -18,7 +33,7 @@ index e936699bbe..3d42e83a3d 100644
  private:
      // wxHtmlWindowInterface methods:
      virtual void SetHTMLWindowTitle(const wxString& title) wxOVERRIDE;
-@@ -169,14 +178,6 @@ private:
+@@ -173,14 +182,6 @@ private:
      // this class caches the pre-parsed HTML to speed up display
      wxHtmlListBoxCache *m_cache;
  
@@ -33,8 +48,147 @@ index e936699bbe..3d42e83a3d 100644
      // rendering style for the parser which allows us to customize our colours
      wxHtmlListBoxStyle *m_htmlRendStyle;
  
+diff --git a/src/aui/floatpane.cpp b/src/aui/floatpane.cpp
+index 80dee278c7..9a142d2c66 100644
+--- a/src/aui/floatpane.cpp
++++ b/src/aui/floatpane.cpp
+@@ -132,10 +132,6 @@ void wxAuiFloatingFrame::SetPaneWindow(const wxAuiPaneInfo& pane)
+     // pane.floating_size from inside it so we must also record its original
+     // value before doing it.
+     const bool hasFloatingSize = pane.floating_size != wxDefaultSize;
+-    if (pane.IsFixed())
+-    {
+-        SetWindowStyleFlag(GetWindowStyleFlag() & ~wxRESIZE_BORDER);
+-    }
+ 
+     if ( hasFloatingSize )
+     {
+diff --git a/src/aui/framemanager.cpp b/src/aui/framemanager.cpp
+index e9aed4e5f0..b4a8421e4c 100644
+--- a/src/aui/framemanager.cpp
++++ b/src/aui/framemanager.cpp
+@@ -2685,6 +2685,7 @@ void wxAuiManager::Update()
+                 p.window->Refresh();
+                 p.window->Update();
+             }
++            p.BestSize(p.rect.GetSize());
+         }
+     }
+ 
+diff --git a/src/generic/animateg.cpp b/src/generic/animateg.cpp
+index 578827b52b..82712ac939 100644
+--- a/src/generic/animateg.cpp
++++ b/src/generic/animateg.cpp
+@@ -178,6 +178,7 @@ void wxGenericAnimationCtrl::Init()
+     m_currentFrame = 0;
+     m_looped = false;
+     m_isPlaying = false;
++    m_scalePosX = m_scalePosY = m_scaleWidth = m_scaleHeight = 0;
+ 
+     // use the window background colour by default to be consistent
+     // with the GTK+ native version
+@@ -250,6 +251,9 @@ void wxGenericAnimationCtrl::SetAnimation(const wxAnimation& animation)
+ 
+     // set new animation even if it's wxNullAnimation
+     m_animation = animation;
++    wxSizeEvent e;
++    OnSize(e);
++
+     if (!m_animation.IsOk())
+     {
+         DisplayStaticImage();
+@@ -354,18 +358,14 @@ bool wxGenericAnimationCtrl::RebuildBackingStoreUpToFrame(unsigned int frame)
+ {
+     // if we've not created the backing store yet or it's too
+     // small, then recreate it
+-    wxSize sz = m_animation.GetSize(),
+-           winsz = GetClientSize();
+-    int w = wxMin(sz.GetWidth(), winsz.GetWidth());
+-    int h = wxMin(sz.GetHeight(), winsz.GetHeight());
+-
+-    if ( !m_backingStore.IsOk() ||
+-            m_backingStore.GetWidth() < w || m_backingStore.GetHeight() < h )
++    wxSize sz = m_animation.GetSize();
++    int w = sz.GetWidth(), h = sz.GetHeight();
++    if (!m_backingStore.IsOk() ||
++        m_backingStore.GetWidth() != w || m_backingStore.GetHeight() != h)
+     {
+         if (!m_backingStore.Create(w, h))
+             return false;
+     }
+-
+     wxMemoryDC dc;
+     dc.SelectObject(m_backingStore);
+ 
+@@ -498,7 +498,11 @@ void wxGenericAnimationCtrl::DrawCurrentFrame(wxDC& dc)
+     wxASSERT( m_backingStore.IsOk() );
+ 
+     // m_backingStore always contains the current frame
+-    dc.DrawBitmap(m_backingStore, 0, 0, true /* use mask in case it's present */);
++    if (m_scaleWidth > 0 && m_scaleHeight > 0)
++    {
++        wxBitmap bitmap(m_backingStore.ConvertToImage().Scale(m_scaleWidth, m_scaleHeight));
++        dc.DrawBitmap(bitmap, m_scalePosX, m_scalePosY, true);
++    }
+ }
+ 
+ void wxGenericAnimationCtrl::DisposeToBackground()
+@@ -546,7 +550,11 @@ void wxGenericAnimationCtrl::OnPaint(wxPaintEvent& WXUNUSED(event))
+         // NOTE: we draw the bitmap explicitly ignoring the mask (if any);
+         //       i.e. we don't want to combine the backing store with the
+         //       possibly wrong preexisting contents of the window!
+-        dc.DrawBitmap(m_backingStore, 0, 0, false /* no mask */);
++        if (m_scaleWidth > 0 && m_scaleHeight > 0)
++        {
++            wxBitmap bitmap(m_backingStore.ConvertToImage().Scale(m_scaleWidth, m_scaleHeight));
++            dc.DrawBitmap(bitmap, m_scalePosX, m_scalePosY, false);
++        }
+     }
+     else
+     {
+@@ -606,6 +614,19 @@ void wxGenericAnimationCtrl::OnSize(wxSizeEvent &WXUNUSED(event))
+             if (!RebuildBackingStoreUpToFrame(m_currentFrame))
+                 Stop();     // in case we are playing
+         }
++        int w, h, srcW, srcH;
++        wxSize srcSize = m_animation.GetSize();
++        GetClientSize(&w, &h);
++        srcW = srcSize.GetWidth();
++        srcH = srcSize.GetHeight();
++        m_scaleWidth = srcW * h / srcH;
++        m_scaleHeight = srcH * w / srcW;
++        if (m_scaleWidth > w)
++            m_scaleWidth = w;
++        else
++            m_scaleHeight = h;
++        m_scalePosX = (w - m_scaleWidth) / 2;
++        m_scalePosY = (h - m_scaleHeight) / 2;
+     }
+ }
+ 
+diff --git a/src/generic/scrlwing.cpp b/src/generic/scrlwing.cpp
+index 53a556af22..35e69d346a 100644
+--- a/src/generic/scrlwing.cpp
++++ b/src/generic/scrlwing.cpp
+@@ -556,14 +556,9 @@ void wxScrollHelperBase::HandleOnScroll(wxScrollWinEvent& event)
+         m_win->SetScrollPos(wxVERTICAL, m_yScrollPosition);
+     }
+ 
+-    if ( needsRefresh )
+-    {
+-        m_targetWindow->Refresh(true, GetScrollRect());
+-    }
+-    else
+-    {
++    m_targetWindow->Refresh(true, GetScrollRect());
++    if (!needsRefresh)
+         m_targetWindow->ScrollWindow(dx, dy, GetScrollRect());
+-    }
+ }
+ 
+ int wxScrollHelperBase::CalcScrollInc(wxScrollWinEvent& event)
 diff --git a/src/html/htmlwin.cpp b/src/html/htmlwin.cpp
-index 8fdbe56cf6..31d3041936 100644
+index 6662d1cd77..8ba82eee39 100644
 --- a/src/html/htmlwin.cpp
 +++ b/src/html/htmlwin.cpp
 @@ -488,7 +488,6 @@ bool wxHtmlWindow::DoSetPage(const wxString& source)
@@ -45,3 +199,280 @@ index 8fdbe56cf6..31d3041936 100644
      SetBackgroundImage(wxNullBitmap);
  
      double pixelScale = 1.0;
+diff --git a/src/html/m_image.cpp b/src/html/m_image.cpp
+index edef506fd1..1d557d8383 100644
+--- a/src/html/m_image.cpp
++++ b/src/html/m_image.cpp
+@@ -320,6 +320,8 @@ private:
+     wxBitmap           *m_bitmap;
+     int                 m_align;
+     int                 m_bmpW, m_bmpH;
++    wxBitmap            m_cachedBmp;
++    int                 m_bmpMaxW, m_bmpMaxH;
+     bool                m_bmpWpercent:1;
+     bool                m_bmpHpresent:1;
+     bool                m_showFrame:1;
+@@ -373,6 +375,7 @@ wxHtmlImageCell::wxHtmlImageCell(wxHtmlWindowInterface *windowIface,
+     m_bitmap = NULL;
+     m_bmpW   = w;
+     m_bmpH   = h;
++    m_bmpMaxW = m_bmpMaxH = wxDefaultCoord;
+     m_align  = align;
+     m_bmpWpercent = wpercent;
+     m_bmpHpresent = hpresent;
+@@ -403,20 +406,21 @@ wxHtmlImageCell::wxHtmlImageCell(wxHtmlWindowInterface *windowIface,
+                     if ( m_gifDecoder->LoadGIF(*s) == wxGIF_OK )
+                     {
+                         wxImage img;
+-                        if ( m_gifDecoder->ConvertToImage(0, &img) )
+-                            SetImage(img);
+-
+                         readImg = false;
+ 
+                         if ( m_gifDecoder->IsAnimation() )
+                         {
+                             m_gifTimer = new wxGIFTimer(this);
++                            wxSize sz(m_gifDecoder->GetAnimationSize());
++                            m_bmpMaxW = sz.GetWidth() / scaleHDPI;
++                            m_bmpMaxH = sz.GetHeight() / scaleHDPI;
+                             long delay = m_gifDecoder->GetDelay(0);
+                             if ( delay == 0 )
+                                 delay = 1;
+                             m_gifTimer->Start(delay, true);
+                         }
+-                        else
++                        if (m_gifDecoder->ConvertToImage(0, &img)) SetImage(img, scaleHDPI);
++                        if (!m_gifDecoder->IsAnimation())
+                         {
+                             wxDELETE(m_gifDecoder);
+                         }
+@@ -438,19 +442,8 @@ wxHtmlImageCell::wxHtmlImageCell(wxHtmlWindowInterface *windowIface,
+         }
+         else // input==NULL, use "broken image" bitmap
+         {
+-            if ( m_bmpW == wxDefaultCoord && m_bmpH == wxDefaultCoord )
+-            {
+-                m_bmpW = 29;
+-                m_bmpH = 31;
+-            }
+-            else
+-            {
+-                m_showFrame = true;
+-                if ( m_bmpW == wxDefaultCoord ) m_bmpW = 31;
+-                if ( m_bmpH == wxDefaultCoord ) m_bmpH = 33;
+-            }
+-            m_bitmap =
+-                new wxBitmap(wxArtProvider::GetBitmap(wxART_MISSING_IMAGE));
++            wxBitmap missBmp(wxArtProvider::GetBitmap(wxART_MISSING_IMAGE));
++            SetImage(missBmp.ConvertToImage());
+         }
+     }
+     //else: ignore the 0-sized images used sometimes on the Web pages
+@@ -468,14 +461,26 @@ void wxHtmlImageCell::SetImage(const wxImage& img, double scaleHDPI)
+         ww = img.GetWidth();
+         hh = img.GetHeight();
+ 
+-        if ( m_bmpW == wxDefaultCoord)
+-            m_bmpW = ww / scaleHDPI;
+-        if ( m_bmpH == wxDefaultCoord)
+-            m_bmpH = hh / scaleHDPI;
++        if (m_bmpMaxW == wxDefaultCoord)
++            m_bmpMaxW = ww / scaleHDPI;
++        if (m_bmpMaxH == wxDefaultCoord)
++            m_bmpMaxH = hh / scaleHDPI;
++        if (m_bmpW == wxDefaultCoord && m_bmpH == wxDefaultCoord)
++        {
++            m_bmpW = m_bmpMaxW;
++            m_bmpH = m_bmpMaxH;
++        }
++        else if (m_bmpW == wxDefaultCoord)
++            m_bmpW = m_bmpMaxW * m_bmpH / m_bmpMaxH;
++        else if (m_bmpH == wxDefaultCoord)
++            m_bmpH = m_bmpMaxH * m_bmpW / m_bmpMaxW;
+ 
+         // On a Mac retina screen, we might have found a @2x version of the image,
+         // so specify this scale factor.
+-        m_bitmap = new wxBitmap(img, -1, scaleHDPI);
++        if (ww == m_bmpMaxW && hh == m_bmpMaxH)
++            m_bitmap = new wxBitmap(img, -1, scaleHDPI);
++        else
++            m_bitmap = new wxBitmap(img.Size(wxSize(m_bmpMaxW, m_bmpMaxH), wxPoint(0, 0)), -1, scaleHDPI);
+     }
+ #endif
+ }
+@@ -500,7 +505,6 @@ void wxHtmlImageCell::AdvanceAnimation(wxTimer *timer)
+     if (m_nCurrFrame == m_gifDecoder->GetFrameCount())
+         m_nCurrFrame = 0;
+ 
+-    if ( m_physX == wxDefaultCoord )
+     {
+         m_physX = m_physY = 0;
+         for (wxHtmlCell *cell = this; cell; cell = cell->GetParent())
+@@ -519,18 +523,24 @@ void wxHtmlImageCell::AdvanceAnimation(wxTimer *timer)
+          m_gifDecoder->ConvertToImage(m_nCurrFrame, &img) )
+     {
+ #if !defined(__WXMSW__) || wxUSE_WXDIB
+-        if ( m_gifDecoder->GetFrameSize(m_nCurrFrame) != wxSize(m_Width, m_Height) ||
+-             m_gifDecoder->GetFramePosition(m_nCurrFrame) != wxPoint(0, 0) )
++        if (m_gifDecoder->GetFramePosition(m_nCurrFrame) != wxPoint(0, 0))
+         {
+-            wxBitmap bmp(img);
++            wxBitmap bmp(img.Size(wxSize(m_bmpMaxW, m_bmpMaxH), m_gifDecoder->GetFramePosition(m_nCurrFrame)));
+             wxMemoryDC dc;
+             dc.SelectObject(*m_bitmap);
+-            dc.DrawBitmap(bmp, m_gifDecoder->GetFramePosition(m_nCurrFrame),
+-                          true /* use mask */);
++            dc.DrawBitmap(bmp, 0, 0, true);
+         }
+         else
+ #endif
+             SetImage(img);
++
++        if (m_Width > 0 && m_Height > 0)
++        {
++            if (m_bitmap->GetWidth() == m_Width && m_bitmap->GetHeight() == m_Height)
++                m_cachedBmp = *m_bitmap;
++            else
++                m_cachedBmp = wxBitmap(m_bitmap->ConvertToImage().Scale(m_Width, m_Height));
++        }
+         win->Refresh(img.HasMask(), &rect);
+     }
+ 
+@@ -557,6 +567,15 @@ void wxHtmlImageCell::Layout(int w)
+         m_Width  = static_cast<int>(m_scale*m_bmpW);
+         m_Height = static_cast<int>(m_scale*m_bmpH);
+     }
++    if (m_Width < 0) m_Width = 0;
++    if (m_Height < 0) m_Height = 0;
++    if (m_bitmap && m_Width > 0 && m_Height > 0)
++    {
++        if (m_bitmap->GetWidth() == m_Width && m_bitmap->GetHeight() == m_Height)
++            m_cachedBmp = *m_bitmap;
++        else
++            m_cachedBmp = wxBitmap(m_bitmap->ConvertToImage().Scale(m_Width, m_Height));
++    }
+ 
+     switch (m_align)
+     {
+@@ -597,48 +616,9 @@ void wxHtmlImageCell::Draw(wxDC& dc, int x, int y,
+         dc.SetBrush(*wxTRANSPARENT_BRUSH);
+         dc.SetPen(*wxBLACK_PEN);
+         dc.DrawRectangle(x + m_PosX, y + m_PosY, m_Width, m_Height);
+-        x++, y++;
+-    }
+-    if ( m_bitmap )
+-    {
+-        // We add in the scaling from the desired bitmap width
+-        // and height, so we only do the scaling once.
+-        double imageScaleX = 1.0;
+-        double imageScaleY = 1.0;
+-
+-        // Optimisation for Windows: WIN32 scaling for window DCs is very poor,
+-        // so unless we're using a printer DC, do the scaling ourselves.
+-#if defined(__WXMSW__) && wxUSE_IMAGE
+-        if (m_Width >= 0 && m_Width != m_bitmap->GetWidth()
+-    #if wxUSE_PRINTING_ARCHITECTURE
+-            && !dc.IsKindOf(CLASSINFO(wxPrinterDC))
+-    #endif
+-           )
+-        {
+-            wxImage image(m_bitmap->ConvertToImage());
+-            if (image.HasMask())
+-            {
+-                // Convert the mask to an alpha channel or scaling won't work correctly
+-                image.InitAlpha();
+-            }
+-            image.Rescale(m_Width, m_Height, wxIMAGE_QUALITY_HIGH);
+-            (*m_bitmap) = wxBitmap(image);
+-        }
+-#endif 
+-
+-        if (m_Width != m_bitmap->GetScaledWidth())
+-            imageScaleX = (double) m_Width / (double) m_bitmap->GetScaledWidth();
+-        if (m_Height != m_bitmap->GetScaledHeight())
+-            imageScaleY = (double) m_Height / (double) m_bitmap->GetScaledHeight();
+-
+-        double us_x, us_y;
+-        dc.GetUserScale(&us_x, &us_y);
+-        dc.SetUserScale(us_x * imageScaleX, us_y * imageScaleY);
+-
+-        dc.DrawBitmap(*m_bitmap, (int) ((x + m_PosX) / (imageScaleX)),
+-                                 (int) ((y + m_PosY) / (imageScaleY)), true);
+-        dc.SetUserScale(us_x, us_y);
+     }
++    if (m_cachedBmp.IsOk())
++        dc.DrawBitmap(m_cachedBmp, x + m_PosX, y + m_PosY, true);
+ }
+ 
+ wxHtmlLinkInfo *wxHtmlImageCell::GetLink( int x, int y ) const
+diff --git a/src/html/m_links.cpp b/src/html/m_links.cpp
+index 5acfea0973..fc1a07363d 100644
+--- a/src/html/m_links.cpp
++++ b/src/html/m_links.cpp
+@@ -84,7 +84,8 @@ TAG_HANDLER_BEGIN(A, "A")
+             // set default styles, might get overridden by ApplyStyle
+             m_WParser->SetActualColor(m_WParser->GetLinkColor());
+             m_WParser->GetContainer()->InsertCell(new wxHtmlColourCell(m_WParser->GetLinkColor()));
+-            m_WParser->SetFontUnderlined(true);
++            if (!(tag.HasParam(wxT("CLASS")) && tag.GetParam(wxT("CLASS")).IsSameAs(wxT("PLAIN"), false)))
++                m_WParser->SetFontUnderlined(true);
+             m_WParser->GetContainer()->InsertCell(new wxHtmlFontCell(m_WParser->CreateCurrentFont()));
+             m_WParser->SetLink(wxHtmlLinkInfo(href, target));
+ 
+diff --git a/src/html/winpars.cpp b/src/html/winpars.cpp
+index 96650b2b37..c1b577f2e8 100644
+--- a/src/html/winpars.cpp
++++ b/src/html/winpars.cpp
+@@ -55,6 +55,7 @@ wxHtmlWinParser::wxHtmlWinParser(wxHtmlWindowInterface *wndIface)
+     m_whitespaceMode = Whitespace_Normal;
+     m_lastWordCell = NULL;
+     m_posColumn = 0;
++    m_LinkColor.Set(0, 0, 0xFF);
+ 
+     {
+         int i, j, k, l, m;
+@@ -211,7 +212,6 @@ void wxHtmlWinParser::InitParser(const wxString& source)
+ 
+     m_UseLink = false;
+     m_Link = wxHtmlLinkInfo( wxEmptyString );
+-    m_LinkColor.Set(0, 0, 0xFF);
+     m_ActualColor.Set(0, 0, 0);
+     const wxColour windowColour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW) ;
+     m_ActualBackgroundColor = m_windowInterface
+@@ -289,36 +289,6 @@ wxFSFile *wxHtmlWinParser::OpenURL(wxHtmlURLType type,
+     for (;;)
+     {
+         wxString myfullurl(myurl);
+-
+-        // consider url as absolute path first
+-        wxURI current(myurl);
+-        myfullurl = current.BuildUnescapedURI();
+-
+-        // if not absolute then ...
+-        if( current.IsRelative() )
+-        {
+-            wxString basepath = GetFS()->GetPath();
+-            wxURI base(basepath);
+-
+-            // ... try to apply base path if valid ...
+-            if( !base.IsReference() )
+-            {
+-                wxURI path(myfullurl);
+-                path.Resolve( base );
+-                myfullurl = path.BuildUnescapedURI();
+-            }
+-            else
+-            {
+-                // ... or force such addition if not included already
+-                if( !current.GetPath().Contains(base.GetPath()) )
+-                {
+-                    basepath += myurl;
+-                    wxURI connected( basepath );
+-                    myfullurl = connected.BuildUnescapedURI();
+-                }
+-            }
+-        }
+-
+         wxString redirect;
+         status = m_windowInterface->OnHTMLOpeningURL(type, myfullurl, &redirect);
+         if ( status != wxHTML_REDIRECT )

@@ -20,8 +20,9 @@
 
     #include <wx/wx.h>
     #include <wx/animate.h>
+    #include <wx/generic/animate.h>
 
-    class QSPAnimWin : public wxAnimationCtrl
+    class QSPAnimWin : public wxGenericAnimationCtrl
     {
         DECLARE_CLASS(QSPAnimWin)
         DECLARE_EVENT_TABLE()

@@ -17,22 +17,22 @@
 
 #include "animwin.h"
 
-wxIMPLEMENT_CLASS(QSPAnimWin, wxAnimationCtrl);
+wxIMPLEMENT_CLASS(QSPAnimWin, wxGenericAnimationCtrl);
 
-BEGIN_EVENT_TABLE(QSPAnimWin, wxAnimationCtrl)
+BEGIN_EVENT_TABLE(QSPAnimWin, wxGenericAnimationCtrl)
     EVT_KEY_UP(QSPAnimWin::OnKeyUp)
     EVT_MOUSEWHEEL(QSPAnimWin::OnMouseWheel)
     EVT_LEFT_DOWN(QSPAnimWin::OnMouseClick)
 END_EVENT_TABLE()
 
 QSPAnimWin::QSPAnimWin(wxWindow *parent) :
-    wxAnimationCtrl(parent, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxAC_NO_AUTORESIZE)
+    wxGenericAnimationCtrl(parent, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxAC_NO_AUTORESIZE)
 {
 }
 
 void QSPAnimWin::RefreshUI()
 {
-    // IncrementalUpdateBackingStore();
+    IncrementalUpdateBackingStore();
     Refresh();
 }
 

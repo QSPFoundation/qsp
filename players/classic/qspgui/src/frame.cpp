@@ -301,30 +301,41 @@ void QSPFrame::EnableControls(bool status, bool isExtended)
 void QSPFrame::ShowPane(wxWindowID id, bool isShow)
 {
     int i;
-    wxAuiPaneInfo &pane = m_manager->GetPane(FindWindow(id));
     wxAuiPaneInfoArray& allPanes = m_manager->GetAllPanes();
     wxON_BLOCK_EXIT_THIS0(QSPFrame::Thaw);
     Freeze();
+    wxAuiPaneInfo *maximizedPane = NULL;
+    wxAuiPaneInfo *pane = NULL;
     for (i = (int)allPanes.GetCount() - 1; i >= 0; --i)
-        if (allPanes.Item(i).IsMaximized())
+    {
+        wxAuiPaneInfo &currentPane = allPanes.Item(i);
+        wxWindow *paneWindow = currentPane.window;
+        if (paneWindow && paneWindow->GetId() == id)
+            pane = &currentPane;
+        if (currentPane.IsMaximized())
+            maximizedPane = &currentPane;
+    }
+    if (pane)
+    {
+        if (maximizedPane)
         {
-            if (&allPanes.Item(i) == &pane)
+            if (maximizedPane == pane)
             {
                 if (!isShow)
                 {
-                    m_manager->RestorePane(pane);
-                    pane.Hide();
+                    m_manager->RestorePane(*pane);
+                    pane->Hide();
                     m_manager->Update();
                 }
             }
-            else if (pane.HasFlag(wxAuiPaneInfo::savedHiddenState) == isShow)
-                pane.SetFlag(wxAuiPaneInfo::savedHiddenState, !isShow);
-            return;
+            else if (pane->HasFlag(wxAuiPaneInfo::savedHiddenState) == isShow)
+                pane->SetFlag(wxAuiPaneInfo::savedHiddenState, !isShow);
         }
-    if (pane.IsShown() != isShow)
-    {
-        pane.Show(isShow);
-        m_manager->Update();
+        else if (pane->IsShown() != isShow)
+        {
+            pane->Show(isShow);
+            m_manager->Update();
+        }
     }
 }
 
