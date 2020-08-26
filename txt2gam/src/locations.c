@@ -340,13 +340,19 @@ int qspOpenTextData(QSP_CHAR *data, QSP_CHAR *locStart, QSP_CHAR *locEnd, QSP_BO
         }
         ++curLoc;
     }
+
+    if (isFill)
+    {
+        printf("%d locations were loaded\n", curLoc);
+    }
+
     return curLoc;
 }
 
 char *qspSaveQuest(QSP_BOOL isOldFormat, QSP_BOOL isUCS2, QSP_CHAR *passwd, int *dataLen)
 {
-    int i, j, len = 0;
-    char *buf = 0;
+    int i, j, len;
+    char *name, *buf = 0;
     if (isOldFormat)
     {
         len = qspGameCodeWriteIntValLine(&buf, 0, qspLocsCount, isUCS2, QSP_FALSE);
@@ -363,6 +369,10 @@ char *qspSaveQuest(QSP_BOOL isOldFormat, QSP_BOOL isUCS2, QSP_CHAR *passwd, int 
     }
     for (i = 0; i < qspLocsCount; ++i)
     {
+        name = qspFromQSPString(qspLocs[i].Name);
+        printf("Saving location: %s\n", name);
+        free(name);
+
         len = qspGameCodeWriteValLine(&buf, len, qspLocs[i].Name, isUCS2, QSP_TRUE);
         len = qspGameCodeWriteValLine(&buf, len, 0, isUCS2, QSP_FALSE);
         len = qspGameCodeWriteValLine(&buf, len, qspLocs[i].OnVisit, isUCS2, QSP_TRUE);
@@ -371,6 +381,9 @@ char *qspSaveQuest(QSP_BOOL isOldFormat, QSP_BOOL isUCS2, QSP_CHAR *passwd, int 
         else
             len = qspGameCodeWriteIntValLine(&buf, len, 0, isUCS2, QSP_TRUE);
     }
+
+    printf("%d locations were saved\n", qspLocsCount);
+
     *dataLen = isUCS2 ? len * 2 : len;
     return buf;
 }
@@ -423,6 +436,9 @@ QSP_BOOL qspOpenQuest(char *data, int dataSize, QSP_CHAR *password)
             qspLocs[i].Actions[j].Code = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
         }
     }
+
+    printf("%d locations were loaded\n", locsCount);
+
     qspFreeStrs((void **)strs, count);
     return QSP_TRUE;
 }
@@ -431,9 +447,13 @@ char *qspSaveQuestToText(QSP_CHAR *locStart, QSP_CHAR *locEnd, QSP_BOOL isUCS2, 
 {
     QSP_CHAR *temp, **tempStrs;
     int i, j, k, linesCount, len = 0;
-    char *buf = 0;
+    char *name, *buf = 0;
     for (i = 0; i < qspLocsCount; ++i)
     {
+        name = qspFromQSPString(qspLocs[i].Name);
+        printf("Saving location: %s\n", name);
+        free(name);
+
         /* Write location header */
         len = qspGameCodeWriteVal(&buf, len, locStart, isUCS2, QSP_FALSE);
         len = qspGameCodeWriteVal(&buf, len, QSP_FMT(" "), isUCS2, QSP_FALSE);
@@ -518,6 +538,9 @@ char *qspSaveQuestToText(QSP_CHAR *locStart, QSP_CHAR *locEnd, QSP_BOOL isUCS2, 
         len = qspGameCodeWriteVal(&buf, len, qspLocs[i].Name, isUCS2, QSP_FALSE);
         len = qspGameCodeWriteValLine(&buf, len, QSP_FMT(" ---------------------------------") QSP_STRSDELIM, isUCS2, QSP_FALSE);
     }
+
+    printf("%d locations were saved\n", qspLocsCount);
+
     *dataLen = isUCS2 ? len * 2 : len;
     return buf;
 }
