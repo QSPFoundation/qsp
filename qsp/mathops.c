@@ -156,8 +156,8 @@ void qspInitMath()
     qspAddOperation(qspOpComma, 0, 0, 1, 2, 2, 1, 1);
     qspAddOperation(qspOpAnd, 7, 0, 2, 2, 2, 2, 2);
     qspAddOperation(qspOpOr, 6, 0, 2, 2, 2, 2, 2);
-    qspAddOperation(qspOpLoc, 8, 0, 2, 1, 1, 1);
-    qspAddOperation(qspOpObj, 8, 0, 2, 1, 1, 1);
+    qspAddOperation(qspOpLoc, 11, 0, 2, 1, 1, 1);
+    qspAddOperation(qspOpObj, 11, 0, 2, 1, 1, 1);
     qspAddOperation(qspOpNot, 8, 0, 2, 1, 1, 2);
     qspAddOperation(qspOpMin, 30, qspFunctionMin, 0, 1, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     qspAddOperation(qspOpMax, 30, qspFunctionMax, 0, 1, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
