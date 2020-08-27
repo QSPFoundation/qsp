@@ -159,8 +159,8 @@ void qspInitMath()
     qspAddOperation(qspOpLoc, 8, 0, 2, 1, 1, 1);
     qspAddOperation(qspOpObj, 8, 0, 2, 1, 1, 1);
     qspAddOperation(qspOpNot, 8, 0, 2, 1, 1, 2);
-    qspAddOperation(qspOpMin, 30, qspFunctionMin, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    qspAddOperation(qspOpMax, 30, qspFunctionMax, 0, 1, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    qspAddOperation(qspOpMin, 30, qspFunctionMin, 0, 1, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    qspAddOperation(qspOpMax, 30, qspFunctionMax, 0, 1, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     qspAddOperation(qspOpRand, 30, qspFunctionRand, 2, 1, 2, 2, 2);
     qspAddOperation(qspOpIIf, 30, 0, 0, 3, 3, 2, 0, 0);
     qspAddOperation(qspOpRGB, 30, qspFunctionRGB, 2, 3, 4, 2, 2, 2, 2);
@@ -184,8 +184,8 @@ void qspInitMath()
     qspAddOperation(qspOpArrComp, 30, qspFunctionArrComp, 2, 2, 3, 1, 0, 2);
     qspAddOperation(qspOpInstr, 30, qspFunctionInstr, 2, 2, 3, 1, 1, 2);
     qspAddOperation(qspOpReplace, 30, qspFunctionReplace, 1, 2, 3, 1, 1, 1);
-    qspAddOperation(qspOpFunc, 30, qspFunctionFunc, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, 0, 1, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    qspAddOperation(qspOpFunc, 30, qspFunctionFunc, 0, 1, 20, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, 0, 1, 20, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     qspAddOperation(qspOpRnd, 30, 0, 2, 0, 0);
     qspAddOperation(qspOpCountObj, 30, 0, 2, 0, 0);
     qspAddOperation(qspOpMsecsCount, 30, 0, 2, 0, 0);

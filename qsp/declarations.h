@@ -63,7 +63,7 @@
         #define QSP_TIME time
     #endif
 
-    #define QSP_VER QSP_FMT("5.7.0")
+    #define QSP_VER QSP_FMT("5.8.0")
     #define QSP_LOCALE "russian"
     #define QSP_STRCHAR QSP_FMT("$")
     #define QSP_LABEL QSP_FMT(":")
