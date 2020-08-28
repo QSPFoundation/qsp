@@ -29,6 +29,8 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /DNDEBUG")
 endif()
 
+find_package(oniguruma CONFIG REQUIRED)
+
 set(QSP_SOURCES
 	qsp/bindings/default/default_callbacks.c
 	qsp/bindings/default/default_control.c
@@ -53,25 +55,9 @@ set(QSP_SOURCES
 	qsp/towupper.c
 	qsp/variables.c
 	qsp/variant.c
-	qsp/onig/regcomp.c
-	qsp/onig/regenc.c
-	qsp/onig/regerror.c
-	qsp/onig/regexec.c
-	qsp/onig/regparse.c
-	qsp/onig/regsyntax.c
-	qsp/onig/regtrav.c
-	qsp/onig/regversion.c
-	qsp/onig/st.c
-	qsp/onig/enc/ascii.c
-	qsp/onig/enc/cp1251.c
-	qsp/onig/enc/koi8_r.c
-	qsp/onig/enc/unicode.c
-	qsp/onig/enc/utf16_le.c
-	qsp/onig/enc/utf16_be.c
-	qsp/onig/enc/utf32_le.c
-	qsp/onig/enc/utf32_be.c
 )
 add_library(qsp SHARED ${QSP_SOURCES})
+target_link_libraries(qsp PRIVATE oniguruma::onig)
 target_compile_definitions(qsp PRIVATE _UNICODE EXPORT)
 if(WIN32)
 	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS _WIN)
