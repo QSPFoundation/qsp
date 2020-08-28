@@ -1,29 +1,26 @@
 
 # QSP
 
-## QSP Library
+## Prerequisites (libqsp)
 
-## Prerequisites
-
-```bash
+```
+bash
 vcpkg install oniguruma
 ```
-
 Multiple specific versions can be installed at once
-
-```bash
+```
+bash
 vcpkg install oniguruma:x86-windows oniguruma:x64-windows
 ```
 
-If vcpkg is not installed system wide or you want to use a separate vcpkg install,
-it's path can be specified in the cmake argument like so
+If vcpkg is not installed system-wide or you want to use a separate vcpkg install, it's path can be specified in the cmake argument like so
 `-DCMAKE_TOOLCHAIN_FILE=D:\src\vcpkg\scripts\buildsystems\vcpkg.cmake`
 
 ## Linux build
 
 ```bash
 mkdir build && cd build
-cmake -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
+cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
 make
 ```
 
@@ -33,7 +30,7 @@ make
 mkdir build
 cd build
 cmake.exe -G "Visual Studio 15 2017" -A Win32 -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
-MSBuild.exe ALL_BUILD.vcxproj
+MSBuild.exe ALL_BUILD.vcxproj /p:Configuration=Release
 ```
 
 ## TODO
