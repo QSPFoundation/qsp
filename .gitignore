@@ -37,3 +37,8 @@ _deps
 *.exe
 *.out
 *.app
+
+# Visual Studio files
+/.vs/
+/out/
+/CMakeSettings.json
