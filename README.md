@@ -41,7 +41,6 @@ MSBuild.exe ALL_BUILD.vcxproj /p:Configuration=Release
 * Update bindings
 * Implement new way to communicate with GUI (more specific callbacks)
 * Move global state into context parameter
-* Make sure qspgui works with the latest wxWidgets fw
 * Split QSP library and QSP player/editor into multiple repositories
 * Build web player
 * Build web editor
