@@ -29,7 +29,29 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /DNDEBUG")
 endif()
 
-find_package(oniguruma CONFIG REQUIRED)
+if(USE_INSTALLED_ONIGURUMA)
+	find_package(oniguruma CONFIG REQUIRED)
+else()
+	# Download and unpack oniguruma at configure time
+	configure_file(CMakeLists-oniguruma.txt.in oniguruma-download/CMakeLists.txt)
+	execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+			WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
+	)
+	execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+			WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
+	)
+	# Prevent oniguruma from overriding our compiler/linker options
+	# when building with Visual Studio
+	set(oniguruma_force_shared_crt ON CACHE BOOL "" FORCE)
+
+	# Configure the CRNL handling
+	add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR)
+
+	# Add oniguruma directly to our build
+	add_subdirectory("${CMAKE_BINARY_DIR}/oniguruma-src"
+					 "${CMAKE_BINARY_DIR}/oniguruma-build"
+	)
+endif()
 
 set(QSP_SOURCES
 	qsp/bindings/default/default_callbacks.c
@@ -57,21 +79,21 @@ set(QSP_SOURCES
 	qsp/variant.c
 )
 add_library(qsp SHARED ${QSP_SOURCES})
-target_link_libraries(qsp PRIVATE oniguruma::onig)
 target_compile_definitions(qsp PRIVATE _UNICODE EXPORT)
 if(WIN32)
 	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS _WIN)
 endif()
 target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
+target_link_libraries(qsp PRIVATE onig)
 
 option(BUILD_QSPGUI "Build qspgui application")
 if(BUILD_QSPGUI)
-	if(DEFAULT_WX)
+	if(USE_INSTALLED_WX)
 		find_package(wxWidgets REQUIRED base core adv aui html)
 		include(${wxWidgets_USE_FILE})
 	else()
 		# Download and unpack wxWidgets at configure time
-		configure_file(CMakeLists.txt.in wxWidgets-download/CMakeLists.txt)
+		configure_file(CMakeLists-wxWidgets.txt.in wxWidgets-download/CMakeLists.txt)
 		execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
 				WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/wxWidgets-download"
 		)
@@ -85,6 +107,11 @@ if(BUILD_QSPGUI)
 
 		# Disable wxWidgets features we don't need
 		set(wxUSE_LIBTIFF OFF)
+		set(wxUSE_REGEX OFF)
+		set(wxUSE_SECRETSTORE OFF)
+		set(wxUSE_LIBSDL OFF)
+		set(wxUSE_LIBMSPACK OFF)
+		set(wxUSE_GSTREAMER OFF)
 
 		# Prevent wxWidgets from overriding our compiler/linker options
 		# when building with Visual Studio
@@ -137,7 +164,7 @@ if(BUILD_QSPGUI)
 	target_compile_definitions(qspgui PRIVATE _UNICODE)
 	target_include_directories(qspgui PRIVATE qsp/bindings qsp/bindings/default)
 	target_compile_options(qspgui PRIVATE ${PROJECT_COMPILER_FLAGS})
-	target_link_libraries(qspgui qsp fmod wxbase wxcore wxadv wxaui wxhtml)
+	target_link_libraries(qspgui PRIVATE qsp fmod wxbase wxcore wxadv wxaui wxhtml)
 endif()
 
 option(BUILD_TXT2GAM "Build txt2gam tool")
