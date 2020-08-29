@@ -56,7 +56,7 @@
     {
         int len = (int)(s.End - s.Str);
         if (maxLen < len)
-            s.End -= (len - maxLen);
+            s.End = s.Str + maxLen;
         return s;
     }
 

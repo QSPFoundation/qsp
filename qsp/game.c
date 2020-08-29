@@ -601,7 +601,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSPString *jumpTo, int
     int oldRefreshCount;
     switch (extArg)
     {
-    case 0:
+    case qspStatOpenQst:
         if (qspIsAnyString(QSP_STR(args[0])))
         {
             oldRefreshCount = qspRefreshCount;
@@ -610,7 +610,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSPString *jumpTo, int
             qspNewGame(QSP_FALSE);
         }
         break;
-    case 1:
+    case qspStatIncLib:
         qspIncludeFile(QSP_STR(args[0]));
         break;
     }

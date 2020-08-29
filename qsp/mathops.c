@@ -316,7 +316,7 @@ static QSPString qspGetName(QSPString *expr)
                 qspSetError(QSP_ERR_BRACKNOTFOUND);
                 return qspNullString;
             }
-            ++pos;
+            pos += QSP_STATIC_LEN(QSP_RSBRACK);
             break;
         }
     } while (!qspIsInList(QSP_DELIMS, *pos));
@@ -394,8 +394,8 @@ static QSPString qspGetQString(QSPString *expr)
         qspSetError(QSP_ERR_QUOTNOTFOUND);
         return qspNullString;
     }
-    expr->Str = pos + 1;
-    return qspGetNewText(qspStringFromPair(buf + 1, pos));
+    expr->Str = pos + QSP_STATIC_LEN(QSP_RQUOT);
+    return qspGetNewText(qspStringFromPair(buf + QSP_STATIC_LEN(QSP_LQUOT), pos));
 }
 
 static QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCodes, int *compArgsCounts)
@@ -794,19 +794,19 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
             }
             else if (*s.Str == QSP_UPLUS[0])
             {
-                ++s.Str;
+                s.Str += QSP_STATIC_LEN(QSP_UPLUS);
             }
             else if (*s.Str == QSP_UMINUS[0])
             {
                 qspCompileExprPushOpCode(opStack, &opSp, argStack, &argSp, qspOpMinus);
                 if (qspErrorNum) break;
-                ++s.Str;
+                s.Str += QSP_STATIC_LEN(QSP_UMINUS);
             }
             else if (*s.Str == QSP_LRBRACK[0])
             {
                 qspCompileExprPushOpCode(opStack, &opSp, argStack, &argSp, qspOpOpenBracket);
                 if (qspErrorNum) break;
-                ++s.Str;
+                s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
             }
             else if (*s.Str == QSP_RRBRACK[0])
             {
@@ -830,7 +830,7 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                     qspSetError(QSP_ERR_ARGSCOUNT);
                     break;
                 }
-                ++s.Str;
+                s.Str += QSP_STATIC_LEN(QSP_RRBRACK);
                 qspAppendToCompiled(opCode, &itemsCount, compValues, compOpCodes, compArgsCounts, 0, v);
                 if (qspErrorNum) break;
                 --opSp;
@@ -851,7 +851,7 @@ static int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                         if (qspErrorNum) break;
                         qspCompileExprPushOpCode(opStack, &opSp, argStack, &argSp, qspOpOpenBracket);
                         if (qspErrorNum) break;
-                        ++s.Str;
+                        s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
                         --argSp;
                     }
                     else if (qspOps[opCode].MinArgsCount < 2)

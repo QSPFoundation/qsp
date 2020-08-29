@@ -434,7 +434,8 @@ QSPVariant qspGetVar(QSPString name)
 {
     QSPVar *var;
     int index;
-    if (!(var = qspGetVarData(name, QSP_FALSE, &index))) return qspGetEmptyVariant(QSP_FALSE);
+    if (!(var = qspGetVarData(name, QSP_FALSE, &index)))
+        return qspGetEmptyVariant(QSP_FALSE);
     return qspGetVarValueByReference(var, index, *name.Str == QSP_STRCHAR[0]);
 }
 
@@ -847,23 +848,28 @@ static void qspSetVarValue(QSPString name, QSPVariant *v, QSP_CHAR op)
     if (notFirstValue && v2.IsStr) qspFreeString(QSP_STR(v2));
 }
 
-void qspStatementSetVarValue(QSPString s)
+void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat)
 {
     QSPVariant v;
+    QSPString names;
     int oldRefreshCount;
-    QSPString name;
-    QSP_CHAR *pos = qspStrPos(s, QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
-    if (!pos)
+    QSP_CHAR op;
+    if (stat->ErrorCode)
+    {
+        qspSetError(stat->ErrorCode);
+        return;
+    }
+    if (stat->ArgsCount < 3)
     {
         qspSetError(QSP_ERR_EQNOTFOUND);
         return;
     }
     oldRefreshCount = qspRefreshCount;
-    v = qspExprValue(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_EQUAL), s.End));
+    v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-    if (pos != s.Str && qspIsInList(QSP_ADD QSP_SUB QSP_DIV QSP_MUL, *(pos - 1))) --pos;
-    name = qspDelSpc(qspStringFromPair(s.Str, pos));
-    qspSetVarValue(name, &v, *pos);
+    names = qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos);
+    op = *(s.Str + stat->Args[1].StartPos);
+    qspSetVarValue(names, &v, op);
     if (v.IsStr) qspFreeString(QSP_STR(v));
 }
 
@@ -874,30 +880,37 @@ static QSPString qspGetVarNameOnly(QSPString s)
     return qspDelSpc(s);
 }
 
-void qspStatementLocal(QSPString s)
+void qspStatementLocal(QSPString s, QSPCachedStat *stat)
 {
     QSPVariant v;
     QSPVar *var;
     QSP_BOOL isVarFound;
-    QSPString curPos, varName;
-    QSP_CHAR *commaPos, *eqPos;
+    QSPString names, curPos, varName;
+    QSP_CHAR *commaPos;
     int i, groupInd, count, bufSize, oldRefreshCount;
-    qspSkipSpaces(&s);
-    eqPos = qspStrPos(s, QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
-    if (eqPos)
-        curPos = qspStringFromPair(s.Str, eqPos);
-    else
-        curPos = s;
-    if (qspIsEmpty(curPos))
+    if (stat->ErrorCode)
+    {
+        qspSetError(stat->ErrorCode);
+        return;
+    }
+    if (stat->ArgsCount > 1 && *(s.Str + stat->Args[1].StartPos) != QSP_EQUAL[0])
     {
         qspSetError(QSP_ERR_SYNTAX);
         return;
     }
+    names = qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos);
+    curPos = names;
     groupInd = qspSavedVarsGroupsCount - 1;
     count = bufSize = qspSavedVarsGroups[groupInd].VarsCount;
     isVarFound = QSP_FALSE;
     while (1)
     {
+        qspSkipSpaces(&curPos);
+        if (qspIsEmpty(curPos))
+        {
+            qspSetError(QSP_ERR_SYNTAX);
+            return;
+        }
         /* Skip type char */
         if (*curPos.Str == QSP_STRCHAR[0]) ++curPos.Str;
         /* Get variable's name */
@@ -943,21 +956,14 @@ void qspStatementLocal(QSPString s)
         }
         if (!commaPos) break;
         curPos.Str = commaPos + QSP_STATIC_LEN(QSP_COMMA);
-        qspSkipSpaces(&curPos);
-        if (qspIsEmpty(curPos))
-        {
-            qspSetError(QSP_ERR_SYNTAX);
-            return;
-        }
     }
-    if (eqPos)
+    if (stat->ArgsCount > 1)
     {
         oldRefreshCount = qspRefreshCount;
-        v = qspExprValue(qspStringFromPair(eqPos + QSP_STATIC_LEN(QSP_EQUAL), s.End));
+        v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
         if (qspRefreshCount != oldRefreshCount || qspErrorNum)
             return;
-        varName = qspDelSpc(qspStringFromPair(s.Str, eqPos));
-        qspSetVarValue(varName, &v, QSP_EQUAL[0]);
+        qspSetVarValue(names, &v, QSP_EQUAL[0]);
         if (v.IsStr) qspFreeString(QSP_STR(v));
     }
 }

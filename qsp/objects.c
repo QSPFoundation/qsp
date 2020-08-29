@@ -19,6 +19,7 @@
 #include "errors.h"
 #include "game.h"
 #include "locations.h"
+#include "statements.h"
 #include "text.h"
 #include "variables.h"
 
@@ -159,10 +160,10 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSPString *jumpTo, int 
 {
     switch (extArg)
     {
-    case 0:
+    case qspStatDelObj:
         qspRemoveObject(qspObjIndex(QSP_STR(args[0])));
         break;
-    case 1:
+    case qspStatKillObj:
         if (count)
             qspRemoveObject(QSP_NUM(args[0]) - 1);
         else

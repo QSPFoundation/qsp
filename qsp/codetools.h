@@ -25,9 +25,18 @@
 
     typedef struct
     {
-        int Stat;
+        int StartPos;
         int EndPos;
+    } QSPCachedArg;
+
+    typedef struct
+    {
+        int Stat;
         int ParamPos;
+        int EndPos;
+        QSPCachedArg *Args;
+        int ArgsCount;
+        int ErrorCode;
     } QSPCachedStat;
 
     typedef struct
@@ -41,6 +50,9 @@
     } QSPLineOfCode;
 
     /* External functions */
+    QSPString qspGetLineLabel(QSPString str);
+    void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum);
+    void qspFreeLineOfCode(QSPLineOfCode *line);
     void qspFreePrepLines(QSPLineOfCode *, int);
     void qspCopyPrepLines(QSPLineOfCode **, QSPLineOfCode *, int, int);
     QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim);

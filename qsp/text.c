@@ -108,12 +108,10 @@ void qspSkipSpaces(QSPString *s)
     s->Str = pos;
 }
 
-/* TODO: rewrite */
 QSPString qspDelSpc(QSPString s)
 {
-    QSP_CHAR *begin, *end = s.End;
-    qspSkipSpaces(&s);
-    begin = s.Str;
+    QSP_CHAR *begin = s.Str, *end = s.End;
+    while (begin < end && qspIsInList(QSP_SPACES, *begin)) ++begin;
     while (begin < end && qspIsInList(QSP_SPACES, *(end - 1))) --end;
     return qspStringFromPair(begin, end);
 }

@@ -113,12 +113,15 @@
         qspStatLast_Statement
     };
 
+    extern QSPStatement qspStats[qspStatLast_Statement];
+    extern QSPStatName qspStatsNames[QSP_STATSLEVELS][QSP_MAXSTATSNAMES];
+    extern int qspStatsNamesCounts[QSP_STATSLEVELS];
+    extern int qspStatMaxLen;
+
     /* External functions */
     void qspInitStats();
-    int qspGetStatArgs(QSPString s, int statCode, QSPVariant *args);
+    int qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args);
     QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *, int, int, QSP_BOOL);
     void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, int count, QSPVariant *res);
-    QSPString qspGetLineLabel(QSPString str);
-    void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum);
 
 #endif

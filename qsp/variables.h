@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "codetools.h"
 #include "variant.h"
 
 #ifndef QSP_VARSDEFINES
@@ -82,8 +83,8 @@
     void qspApplyResult(QSPVar *, QSPVariant *);
     void qspMoveVar(QSPVar *, QSPVar *);
     /* Statements */
-    void qspStatementSetVarValue(QSPString s);
-    void qspStatementLocal(QSPString s);
+    void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat);
+    void qspStatementLocal(QSPString s, QSPCachedStat *stat);
     QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
     QSP_BOOL qspStatementKillVar(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
