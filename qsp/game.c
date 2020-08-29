@@ -110,19 +110,22 @@ void qspClearIncludes(QSP_BOOL isFirst)
 
 static void qspIncludeFile(QSPString s)
 {
-    int oldCurIncLocsCount, oldRefreshCount;
+    int i, oldRefreshCount;
     if (!qspIsAnyString(s)) return;
     if (qspCurIncFilesCount == QSP_MAXINCFILES)
     {
         qspSetError(QSP_ERR_CANTINCFILE);
         return;
     }
-    oldCurIncLocsCount = qspCurIncLocsCount;
+    for (i = 0; i < qspCurIncFilesCount; ++i)
+    {
+        if (!qspStrsComp(qspCurIncFiles[i], s))
+            return;
+    }
     oldRefreshCount = qspRefreshCount;
     qspCallOpenGame(s, QSP_FALSE);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-    if (qspCurIncLocsCount != oldCurIncLocsCount)
-        qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(s);
+    qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(s);
 }
 
 static void qspOpenIncludes()
