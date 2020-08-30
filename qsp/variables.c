@@ -55,7 +55,8 @@ static int qspGetVarTextIndex(QSPVar *, QSPString, QSP_BOOL);
 static QSPVar *qspGetVarData(QSPString s, QSP_BOOL isSet, int *index);
 static void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op);
 static void qspCopyVar(QSPVar *, QSPVar *, int, int);
-static void qspSetVarValue(QSPString name, QSPVariant *v, QSP_CHAR op);
+static int qspGetVarsNames(QSPString names, QSPString **varNames);
+static void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, QSP_CHAR op);
 static QSPString qspGetVarNameOnly(QSPString s);
 
 static int qspIndStringCompare(const void *name, const void *compareTo)
@@ -770,89 +771,100 @@ void qspMoveVar(QSPVar *dest, QSPVar *src)
     qspInitVarData(src);
 }
 
-static void qspSetVarValue(QSPString name, QSPVariant *v, QSP_CHAR op)
+static int qspGetVarsNames(QSPString names, QSPString **varNames)
 {
+    QSP_CHAR *pos;
+    int count = 0, bufSize = 1;
+    QSPString *foundNames = (QSPString *)malloc(bufSize * sizeof(QSPString));
+    while (1)
+    {
+        qspSkipSpaces(&names);
+        if (qspIsEmpty(names))
+        {
+            qspSetError(QSP_ERR_SYNTAX);
+            free(foundNames);
+            return 0;
+        }
+        if (count >= bufSize)
+        {
+            bufSize = count + 2;
+            foundNames = (QSPString *)realloc(foundNames, bufSize * sizeof(QSPString));
+        }
+        pos = qspStrPos(names, QSP_STATIC_STR(QSP_COMMA), QSP_FALSE);
+        if (pos)
+        {
+            foundNames[count] = qspDelSpc(qspStringFromPair(names.Str, pos));
+            ++count;
+        }
+        else
+        {
+            foundNames[count] = qspDelSpc(names);
+            ++count;
+            break;
+        }
+        names.Str = pos + QSP_STATIC_LEN(QSP_COMMA);
+    }
+    *varNames = foundNames;
+    return count;
+}
+
+static void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, QSP_CHAR op)
+{
+    int i, lastVarIndex;
     QSPVariant v2;
     QSPString strVal;
-    QSP_BOOL isSingleValue, notFirstValue = QSP_FALSE;
-    QSP_CHAR *newValPos, *newCommaPos;
-    int oldRefreshCount = qspRefreshCount;
+    QSP_CHAR *newValPos;
+    int oldRefreshCount;
+    if (varsCount == 1)
+    {
+        qspSetVar(varNames[0], v, op);
+        return;
+    }
+    oldRefreshCount = qspRefreshCount;
     if (v->IsStr)
     {
         strVal = QSP_PSTR(v);
-        isSingleValue = QSP_FALSE; /* Multiple values by default */
+        newValPos = qspStrStr(strVal, QSP_STATIC_STR(QSP_VALSDELIM));
+        lastVarIndex = varsCount - 1;
+        for (i = 0; i < lastVarIndex && newValPos; ++i)
+        {
+            v2.IsStr = QSP_TRUE;
+            QSP_STR(v2) = qspGetNewText(qspStringFromPair(strVal.Str, newValPos));
+            qspSetVar(varNames[i], &v2, op);
+            if (v2.IsStr) qspFreeString(QSP_STR(v2));
+            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                return;
+            strVal.Str = newValPos + QSP_STATIC_LEN(QSP_VALSDELIM);
+            newValPos = qspStrStr(strVal, QSP_STATIC_STR(QSP_VALSDELIM));
+        }
+        /* fill the rest with the last value */
+        v2.IsStr = QSP_TRUE;
+        QSP_STR(v2) = qspGetNewText(strVal);
+        while (i < varsCount)
+        {
+            qspSetVar(varNames[i], &v2, op);
+            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                break;
+            ++i;
+        }
+        if (v2.IsStr) qspFreeString(QSP_STR(v2));
     }
     else
-        isSingleValue = QSP_TRUE;
-    while (1)
     {
-        newCommaPos = qspStrPos(name, QSP_STATIC_STR(QSP_COMMA), QSP_FALSE);
-        if (newCommaPos)
+        for (i = 0; i < varsCount; ++i)
         {
-            if (isSingleValue)
-            {
-                if (notFirstValue)
-                    qspSetVar(qspStringFromPair(name.Str, newCommaPos), &v2, op);
-                else
-                    qspSetVar(qspStringFromPair(name.Str, newCommaPos), v, op);
-                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                    break;
-            }
-            else
-            {
-                newValPos = qspStrStr(strVal, QSP_STATIC_STR(QSP_VALSDELIM));
-                if (newValPos)
-                {
-                    notFirstValue = QSP_TRUE;
-                    v2.IsStr = QSP_TRUE;
-                    QSP_STR(v2) = qspGetNewText(qspStringFromPair(strVal.Str, newValPos));
-                    qspSetVar(qspStringFromPair(name.Str, newCommaPos), &v2, op);
-                    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                        break;
-                    if (v2.IsStr) qspFreeString(QSP_STR(v2));
-                    strVal.Str = newValPos + QSP_STATIC_LEN(QSP_VALSDELIM);
-                }
-                else /* The last value */
-                {
-                    isSingleValue = QSP_TRUE;
-                    if (notFirstValue)
-                    {
-                        v2.IsStr = QSP_TRUE;
-                        QSP_STR(v2) = qspGetNewText(strVal);
-                        qspSetVar(qspStringFromPair(name.Str, newCommaPos), &v2, op);
-                    }
-                    else
-                        qspSetVar(qspStringFromPair(name.Str, newCommaPos), v, op);
-                    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                        break;
-                }
-            }
-            name.Str = newCommaPos + QSP_STATIC_LEN(QSP_COMMA);
-        }
-        else /* The last variable */
-        {
-            if (notFirstValue) /* Not a first value */
-            {
-                if (!isSingleValue)
-                {
-                    v2.IsStr = QSP_TRUE;
-                    QSP_STR(v2) = qspGetNewText(strVal);
-                }
-                qspSetVar(name, &v2, op);
-            }
-            else
-                qspSetVar(name, v, op);
-            break;
+            qspSetVar(varNames[i], v, op);
+            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                break;
         }
     }
-    if (notFirstValue && v2.IsStr) qspFreeString(QSP_STR(v2));
 }
 
 void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat)
 {
     QSPVariant v;
-    QSPString names;
-    int oldRefreshCount;
+    QSPString *names;
+    int namesCount, oldRefreshCount;
     QSP_CHAR op;
     if (stat->ErrorCode)
     {
@@ -867,17 +879,19 @@ void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat)
     oldRefreshCount = qspRefreshCount;
     v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-    names = qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos);
+    namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
+    if (qspErrorNum) return;
     op = *(s.Str + stat->Args[1].StartPos);
-    qspSetVarValue(names, &v, op);
+    qspSetVarsValues(names, namesCount, &v, op);
     if (v.IsStr) qspFreeString(QSP_STR(v));
+    free(names);
 }
 
 static QSPString qspGetVarNameOnly(QSPString s)
 {
     QSP_CHAR *brackPos = qspStrChar(s, QSP_LSBRACK[0]);
     if (brackPos) s.End = brackPos;
-    return qspDelSpc(s);
+    return s;
 }
 
 void qspStatementLocal(QSPString s, QSPCachedStat *stat)
@@ -885,9 +899,8 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     QSPVariant v;
     QSPVar *var;
     QSP_BOOL isVarFound;
-    QSPString names, curPos, varName;
-    QSP_CHAR *commaPos;
-    int i, groupInd, count, bufSize, oldRefreshCount;
+    QSPString *names, varName;
+    int i, namesCount, groupInd, varsCount, bufSize, oldRefreshCount;
     if (stat->ErrorCode)
     {
         qspSetError(stat->ErrorCode);
@@ -898,31 +911,26 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
         qspSetError(QSP_ERR_SYNTAX);
         return;
     }
-    names = qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos);
-    curPos = names;
+    namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
+    if (qspErrorNum) return;
     groupInd = qspSavedVarsGroupsCount - 1;
-    count = bufSize = qspSavedVarsGroups[groupInd].VarsCount;
+    varsCount = bufSize = qspSavedVarsGroups[groupInd].VarsCount;
     isVarFound = QSP_FALSE;
-    while (1)
+    for (i = 0; i < namesCount; ++i)
     {
-        qspSkipSpaces(&curPos);
-        if (qspIsEmpty(curPos))
+        varName = names[i];
+        if (qspIsEmpty(varName))
         {
             qspSetError(QSP_ERR_SYNTAX);
+            free(names);
             return;
         }
         /* Skip type char */
-        if (*curPos.Str == QSP_STRCHAR[0]) ++curPos.Str;
-        /* Get variable's name */
-        commaPos = qspStrPos(curPos, QSP_STATIC_STR(QSP_COMMA), QSP_FALSE);
-        if (commaPos)
-            varName = qspStringFromPair(curPos.Str, commaPos);
-        else
-            varName = curPos;
+        if (*varName.Str == QSP_STRCHAR[0]) ++varName.Str;
         varName = qspGetNewText(qspGetVarNameOnly(varName));
         qspUpperStr(&varName);
         /* Check for the existence */
-        for (i = 0; i < count; ++i)
+        for (i = 0; i < varsCount; ++i)
         {
             if (!qspStrsComp(varName, qspSavedVarsGroups[groupInd].Vars[i].Name))
             {
@@ -943,29 +951,32 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             if (!(var = qspVarReference(varName, QSP_FALSE)))
             {
                 qspFreeString(varName);
+                free(names);
                 return;
             }
-            if (count >= bufSize)
+            if (varsCount >= bufSize)
             {
-                bufSize = count + 4;
+                bufSize = varsCount + 4;
                 qspSavedVarsGroups[groupInd].Vars = (QSPVar *)realloc(qspSavedVarsGroups[groupInd].Vars, bufSize * sizeof(QSPVar));
             }
-            qspMoveVar(qspSavedVarsGroups[groupInd].Vars + count, var);
-            qspSavedVarsGroups[groupInd].Vars[count].Name = varName;
-            qspSavedVarsGroups[groupInd].VarsCount = ++count;
+            qspMoveVar(qspSavedVarsGroups[groupInd].Vars + varsCount, var);
+            qspSavedVarsGroups[groupInd].Vars[varsCount].Name = varName;
+            qspSavedVarsGroups[groupInd].VarsCount = ++varsCount;
         }
-        if (!commaPos) break;
-        curPos.Str = commaPos + QSP_STATIC_LEN(QSP_COMMA);
     }
     if (stat->ArgsCount > 1)
     {
         oldRefreshCount = qspRefreshCount;
         v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
         if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+        {
+            free(names);
             return;
-        qspSetVarValue(names, &v, QSP_EQUAL[0]);
+        }
+        qspSetVarsValues(names, namesCount, &v, QSP_EQUAL[0]);
         if (v.IsStr) qspFreeString(QSP_STR(v));
     }
+    free(names);
 }
 
 QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
