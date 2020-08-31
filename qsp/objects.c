@@ -91,7 +91,7 @@ static void qspRemoveObject(int index)
 
 int qspObjIndex(QSPString name)
 {
-    QSPString locName;
+    QSPString bufName;
     int i, objNameLen, bufSize;
     QSP_CHAR *buf;
     if (!qspCurObjectsCount) return -1;
@@ -108,9 +108,9 @@ int qspObjIndex(QSPString name)
             buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
         }
         memcpy(buf, qspCurObjects[i].Desc.Str, objNameLen * sizeof(QSP_CHAR));
-        locName = qspStringFromLen(buf, objNameLen);
-        qspUpperStr(&locName);
-        if (!qspStrsComp(locName, name))
+        bufName = qspStringFromLen(buf, objNameLen);
+        qspUpperStr(&bufName);
+        if (!qspStrsComp(bufName, name))
         {
             qspFreeString(name);
             free(buf);

@@ -490,11 +490,10 @@ QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt)
 QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
 {
     QSPVariant val;
-    QSPString res, leftSubEx, rightSubEx;
+    QSPString expr, res;
     QSP_CHAR *newTxt, *lPos, *rPos;
     int oldRefreshCount, len, txtLen, oldTxtLen, bufSize;
-    leftSubEx = QSP_STATIC_STR(QSP_LSUBEX);
-    lPos = qspStrStr(txt, leftSubEx);
+    lPos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
     if (!lPos)
     {
         if (canReturnSelf) return txt;
@@ -504,11 +503,11 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
     newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
     txtLen = oldTxtLen = 0;
     oldRefreshCount = qspRefreshCount;
-    rightSubEx = QSP_STATIC_STR(QSP_RSUBEX);
     do
     {
         len = (int)(lPos - txt.Str);
-        if ((txtLen += len) > bufSize)
+        txtLen += len;
+        if (txtLen > bufSize)
         {
             bufSize = txtLen + 128;
             newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
@@ -516,14 +515,17 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         memcpy(newTxt + oldTxtLen, txt.Str, len * sizeof(QSP_CHAR));
         oldTxtLen = txtLen;
         txt.Str = lPos + QSP_STATIC_LEN(QSP_LSUBEX);
-        rPos = qspStrPos(txt, rightSubEx, QSP_FALSE);
+        rPos = qspStrPos(txt, QSP_STATIC_STR(QSP_RSUBEX), QSP_FALSE);
         if (!rPos)
         {
             qspSetError(QSP_ERR_BRACKNOTFOUND);
             free(newTxt);
             return qspNullString;
         }
-        val = qspExprValue(qspStringFromPair(txt.Str, rPos));
+        expr = qspStringFromPair(txt.Str, rPos);
+        /* looks like it's ok to modify the original string here */
+        qspPrepareStringToExecution(&expr);
+        val = qspExprValue(expr);
         if (qspRefreshCount != oldRefreshCount || qspErrorNum)
         {
             free(newTxt);
@@ -531,7 +533,8 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         }
         qspConvertVariantTo(&val, QSP_TRUE);
         len = qspStrLen(QSP_STR(val));
-        if ((txtLen += len) > bufSize)
+        txtLen += len;
+        if (txtLen > bufSize)
         {
             bufSize = txtLen + 128;
             newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
@@ -540,7 +543,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         qspFreeString(QSP_STR(val));
         oldTxtLen = txtLen;
         txt.Str = rPos + QSP_STATIC_LEN(QSP_RSUBEX);
-        lPos = qspStrStr(txt, leftSubEx);
+        lPos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
     } while (lPos);
     res = qspStringFromLen(newTxt, txtLen);
     qspAddText(&res, txt, QSP_FALSE);

@@ -56,6 +56,7 @@
     void qspFreePrepLines(QSPLineOfCode *, int);
     void qspCopyPrepLines(QSPLineOfCode **, QSPLineOfCode *, int, int);
     QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim);
+    void qspPrepareStringToExecution(QSPString *str);
     int qspPreprocessData(QSPString data, QSPLineOfCode **strs);
 
 #endif

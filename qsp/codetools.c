@@ -36,30 +36,25 @@ static int qspStatStringCompare(const void *name, const void *compareTo)
 static int qspGetStatCode(QSPString s, QSP_CHAR **pos)
 {
     int i, strLen, nameLen;
-    QSPString uStr;
     QSPStatName *name;
     if (qspIsEmpty(s)) return qspStatUnknown;
     if (*s.Str == QSP_LABEL[0]) return qspStatLabel;
     if (*s.Str == QSP_COMMENT[0]) return qspStatComment;
     /* ------------------------------------------------------------------ */
-    uStr = qspGetNewText(qspStringFromString(s, qspStatMaxLen));
-    qspUpperStr(&uStr);
     strLen = qspStrLen(s);
     for (i = 0; i < QSP_STATSLEVELS; ++i)
     {
-        name = (QSPStatName *)bsearch(&uStr, qspStatsNames[i], qspStatsNamesCounts[i], sizeof(QSPStatName), qspStatStringCompare);
+        name = (QSPStatName *)bsearch(&s, qspStatsNames[i], qspStatsNamesCounts[i], sizeof(QSPStatName), qspStatStringCompare);
         if (name)
         {
             nameLen = qspStrLen(name->Name);
             if (nameLen == strLen || (nameLen < strLen && qspIsInList(QSP_DELIMS, s.Str[nameLen])))
             {
                 *pos = s.Str + nameLen;
-                qspFreeString(uStr);
                 return name->Code;
             }
         }
     }
-    qspFreeString(uStr);
     return qspStatUnknown;
 }
 
@@ -210,7 +205,6 @@ QSPString qspGetLineLabel(QSPString str)
 
 void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 {
-    QSPString uStr, tempStr;
     QSP_BOOL isInLoop, isSearchElse;
     int statCode, count = 0;
     QSP_CHAR *temp, *nextPos, *elsePos, *delimPos = 0, *paramPos = 0;
@@ -224,8 +218,6 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     {
         isInLoop = isSearchElse = QSP_TRUE;
         elsePos = 0;
-        uStr = qspGetNewText(line->Str);
-        qspUpperStr(&uStr);
         switch (statCode)
         {
             case qspStatAct:
@@ -254,11 +246,9 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
             default:
                 delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_STATDELIM), QSP_FALSE);
                 if (delimPos) nextPos = delimPos + QSP_STATIC_LEN(QSP_STATDELIM);
-                tempStr = qspStringFromPair(uStr.Str + (int)(str.Str - line->Str.Str), uStr.End);
-                elsePos = qspStrPos(tempStr, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
+                elsePos = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
                 if (elsePos)
                 {
-                    elsePos = line->Str.Str + (elsePos - uStr.Str);
                     if (!delimPos || elsePos < delimPos)
                     {
                         nextPos = delimPos = elsePos;
@@ -328,12 +318,8 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                         if (elsePos && str.Str >= elsePos) elsePos = 0;
                         if (!elsePos && isSearchElse)
                         {
-                            tempStr = qspStringFromPair(uStr.Str + (int)(str.Str - line->Str.Str), uStr.End);
-                            elsePos = qspStrPos(tempStr, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
-                            if (elsePos)
-                                elsePos = line->Str.Str + (elsePos - uStr.Str);
-                            else
-                                isSearchElse = QSP_FALSE;
+                            elsePos = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
+                            if (!elsePos) isSearchElse = QSP_FALSE;
                         }
                         if (elsePos && (!delimPos || elsePos < delimPos))
                         {
@@ -354,7 +340,6 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
             else
                 delimPos = 0;
         }
-        qspFreeString(uStr);
     }
     /* Check for ELSE IF */
     if (count == 1 && line->Stats[0].Stat == qspStatElse && statCode == qspStatIf &&
@@ -502,20 +487,54 @@ QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim)
     return qspStringFromLen(txt, txtLen);
 }
 
+void qspPrepareStringToExecution(QSPString *str)
+{
+    QSP_CHAR *pos, quot = 0, quotsCount = 0;
+    pos = str->Str;
+    while (pos < str->End)
+    {
+        if (quot)
+        {
+            if (*pos == quot)
+            {
+                ++pos;
+                if (pos >= str->End) break;
+                if (*pos != quot)
+                {
+                    quot = 0;
+                    continue;
+                }
+            }
+        }
+        else
+        {
+            if (*pos == QSP_LQUOT[0])
+                ++quotsCount;
+            else if (*pos == QSP_RQUOT[0])
+            {
+                if (quotsCount) --quotsCount;
+            }
+            else if (qspIsInList(QSP_QUOTS, *pos))
+                quot = *pos;
+            else if (!quotsCount) /* we have to keep q-strings untouched */
+                *pos = QSP_CHRUPR(*pos);
+        }
+        ++pos;
+    }
+}
+
 static int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
 {
     QSPLineOfCode *ret, *line;
     QSP_BOOL isNewLine;
     QSP_CHAR *str, *pos, quot = 0;
-    QSPString strsDelim;
     int lineNum = 0, lastLineNum = 0, count = 0, quotsCount = 0, strLen = 0, bufSize = 8, strBufSize = 256;
     str = (QSP_CHAR *)malloc(strBufSize * sizeof(QSP_CHAR));
     ret = (QSPLineOfCode *)malloc(bufSize * sizeof(QSPLineOfCode));
-    strsDelim = QSP_STATIC_STR(QSP_STRSDELIM);
     pos = data.Str;
     while (pos < data.End)
     {
-        isNewLine = (qspStrsNComp(data, strsDelim, QSP_STATIC_LEN(QSP_STRSDELIM)) == 0);
+        isNewLine = (qspStrsNComp(data, QSP_STATIC_STR(QSP_STRSDELIM), QSP_STATIC_LEN(QSP_STRSDELIM)) == 0);
         if (isNewLine) ++lineNum;
         if (quotsCount || quot || !isNewLine)
         {
@@ -531,6 +550,7 @@ static int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
                 {
                     if (++pos < data.End && *pos == quot)
                     {
+                        /* escape code */
                         if (strLen >= strBufSize)
                         {
                             strBufSize = strLen + 256;
@@ -539,7 +559,10 @@ static int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
                         str[strLen++] = *pos++;
                     }
                     else
+                    {
+                        /* termination of the string */
                         quot = 0;
+                    }
                 }
                 else
                     ++pos;
@@ -590,25 +613,24 @@ static int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
 static int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **strs)
 {
     QSPLineOfCode *ret;
-    QSPString str, eol, eolExt;
+    QSPString strBuf, eol;
     int len, lastNum = 0, i = 0, bufSize = 8, newCount = 0;
     ret = (QSPLineOfCode *)malloc(bufSize * sizeof(QSPLineOfCode));
-    eolExt = QSP_STATIC_STR(QSP_PREEOLEXT QSP_EOLEXT);
     while (i < count)
     {
-        qspAddText(&str, s[i].Str, QSP_TRUE);
-        len = qspStrLen(str);
+        qspAddText(&strBuf, s[i].Str, QSP_TRUE);
+        len = qspStrLen(strBuf);
         if (len >= QSP_STATIC_LEN(QSP_PREEOLEXT QSP_EOLEXT))
         {
-            eol = str;
+            eol = strBuf;
             eol.Str += len - QSP_STATIC_LEN(QSP_PREEOLEXT QSP_EOLEXT);
-            while (!qspStrsComp(eol, eolExt))
+            while (!qspStrsComp(eol, QSP_STATIC_STR(QSP_PREEOLEXT QSP_EOLEXT)))
             {
-                if (++i == count) break;
-                str.End -= QSP_STATIC_LEN(QSP_EOLEXT);
-                qspAddText(&str, s[i].Str, QSP_FALSE);
-                len = qspStrLen(str);
-                eol = str;
+                if (++i >= count) break;
+                strBuf.End -= QSP_STATIC_LEN(QSP_EOLEXT);
+                qspAddText(&strBuf, s[i].Str, QSP_FALSE);
+                len = qspStrLen(strBuf);
+                eol = strBuf;
                 eol.Str += len - QSP_STATIC_LEN(QSP_PREEOLEXT QSP_EOLEXT);
             }
         }
@@ -617,7 +639,10 @@ static int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **
             bufSize = newCount + 16;
             ret = (QSPLineOfCode *)realloc(ret, bufSize * sizeof(QSPLineOfCode));
         }
-        qspInitLineOfCode(ret + newCount, qspDelSpc(str), lastNum);
+        /* prepare the buffer to execution */
+        qspPrepareStringToExecution(&strBuf);
+        /* transfer ownership of the buffer to QSPLineOfCode */
+        qspInitLineOfCode(ret + newCount, strBuf, lastNum);
         ++newCount;
         ++i;
         lastNum = s[i].LineNum;

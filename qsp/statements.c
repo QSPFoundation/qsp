@@ -762,24 +762,16 @@ static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSP
 static QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo)
 {
     int oldRefreshCount;
-    QSPString uStr;
     QSPLineOfCode initializatorLine;
     QSP_BOOL isExit;
     QSP_CHAR *whilePos, *stepPos;
-    uStr = qspGetNewText(params);
-    qspUpperStr(&uStr);
-    whilePos = qspStrPos(uStr, QSP_STATIC_STR(QSP_STATLOOPWHILE), QSP_TRUE);
+    whilePos = qspStrPos(params, QSP_STATIC_STR(QSP_STATLOOPWHILE), QSP_TRUE);
     if (!whilePos)
     {
         qspSetError(QSP_ERR_LOOPWHILENOTFOUND);
-        qspFreeString(uStr);
         return QSP_FALSE;
     }
-    stepPos = qspStrPos(qspStringFromPair(whilePos + QSP_STATIC_LEN(QSP_STATLOOPWHILE), uStr.End), QSP_STATIC_STR(QSP_STATLOOPSTEP), QSP_TRUE);
-    qspFreeString(uStr);
-    /* Find real positions */
-    if (stepPos) stepPos = params.Str + (stepPos - uStr.Str);
-    whilePos = params.Str + (whilePos - uStr.Str);
+    stepPos = qspStrPos(qspStringFromPair(whilePos + QSP_STATIC_LEN(QSP_STATLOOPWHILE), params.End), QSP_STATIC_STR(QSP_STATLOOPSTEP), QSP_TRUE);
     /* Execute loop initialization */
     qspInitLineOfCode(&initializatorLine, qspStringFromPair(params.Str, whilePos), 0);
     oldRefreshCount = qspRefreshCount;
