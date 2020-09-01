@@ -43,6 +43,12 @@
 #ifndef QSP_DEFINES
     #define QSP_DEFINES
 
+    #if defined(__GNUC__)
+        #define INLINE static inline
+    #else
+        #define INLINE static
+    #endif
+
     static int qspEndiannessTestValue = 1;
 
     #define QSP_ONIG_ENC ((*(char *)&(qspEndiannessTestValue) == 1) ? \
@@ -54,14 +60,14 @@
     #define QSP_FIXBYTESORDER(a) ((*(char *)&(qspEndiannessTestValue) == 1) ? \
         (a) : \
         ((unsigned short)(((a) << 8) | ((a) >> 8))))
-    #ifdef _MSC_VER
+    #if defined(_MSC_VER)
         #define QSP_TIME _time64
     #else
         #define QSP_TIME time
     #endif
 
     #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
-    #ifdef __GNUC__ || _MSC_VER >= 1800
+    #if defined(__GNUC__) || _MSC_VER >= 1800
         #define QSP_STATIC_STR(x) ((QSPString) { (x), (x) + QSP_STATIC_LEN(x) })
     #else
         #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))

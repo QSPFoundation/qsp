@@ -19,21 +19,21 @@
 #include "statements.h"
 #include "text.h"
 
-static int qspStatStringCompare(const void *, const void *);
-static int qspGetStatCode(QSPString s, QSP_CHAR **pos);
-static int qspInitStatArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-static int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-static int qspInitRegularArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-static int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs);
-static int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **strs);
+INLINE int qspStatStringCompare(const void *, const void *);
+INLINE int qspGetStatCode(QSPString s, QSP_CHAR **pos);
+INLINE int qspInitStatArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE int qspInitRegularArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs);
+INLINE int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **strs);
 
-static int qspStatStringCompare(const void *name, const void *compareTo)
+INLINE int qspStatStringCompare(const void *name, const void *compareTo)
 {
     QSPStatName *statName = (QSPStatName *)compareTo;
     return qspStrsNComp(*(QSPString *)name, statName->Name, qspStrLen(statName->Name));
 }
 
-static int qspGetStatCode(QSPString s, QSP_CHAR **pos)
+INLINE int qspGetStatCode(QSPString s, QSP_CHAR **pos)
 {
     int i, strLen, nameLen;
     QSPStatName *name;
@@ -58,7 +58,7 @@ static int qspGetStatCode(QSPString s, QSP_CHAR **pos)
     return qspStatUnknown;
 }
 
-static int qspInitStatArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE int qspInitStatArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
     *args = 0;
     *errorCode = 0;
@@ -79,7 +79,7 @@ static int qspInitStatArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_C
     }
 }
 
-static int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
     int argsCount;
     QSPString names, values, op;
@@ -120,7 +120,7 @@ static int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CH
     return argsCount;
 }
 
-static int qspInitRegularArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE int qspInitRegularArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
     QSPCachedArg *foundArgs;
     QSP_CHAR *pos, *brack;
@@ -523,7 +523,7 @@ void qspPrepareStringToExecution(QSPString *str)
     }
 }
 
-static int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
+INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
 {
     QSPLineOfCode *ret, *line;
     QSP_BOOL isNewLine;
@@ -610,7 +610,7 @@ static int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
     return count;
 }
 
-static int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **strs)
+INLINE int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **strs)
 {
     QSPLineOfCode *ret;
     QSPString strBuf, eol;

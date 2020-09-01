@@ -28,7 +28,7 @@ int qspCurSelAction = -1;
 QSP_BOOL qspIsActionsChanged = QSP_FALSE;
 QSP_BOOL qspCurIsShowActs = QSP_TRUE;
 
-static int qspActIndex(QSPString name);
+INLINE int qspActIndex(QSPString name);
 
 void qspClearActions(QSP_BOOL isFirst)
 {
@@ -47,7 +47,7 @@ void qspClearActions(QSP_BOOL isFirst)
     qspCurSelAction = -1;
 }
 
-static int qspActIndex(QSPString name)
+INLINE int qspActIndex(QSPString name)
 {
     QSPString bufName;
     int i, actNameLen, bufSize;

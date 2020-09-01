@@ -29,7 +29,7 @@ int qspCurSelObject = -1;
 QSP_BOOL qspIsObjectsChanged = QSP_FALSE;
 QSP_BOOL qspCurIsShowObjs = QSP_TRUE;
 
-static void qspRemoveObject(int);
+INLINE void qspRemoveObject(int);
 
 void qspClearObjects(QSP_BOOL isFirst)
 {
@@ -70,7 +70,7 @@ void qspClearObjectsWithNotify()
     }
 }
 
-static void qspRemoveObject(int index)
+INLINE void qspRemoveObject(int index)
 {
     QSPVariant name;
     if (index < 0 || index >= qspCurObjectsCount) return;

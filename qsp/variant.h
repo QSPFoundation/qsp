@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "text.h"
 
 #ifndef QSP_VARIANTDEFINES
     #define QSP_VARIANTDEFINES
@@ -36,11 +37,42 @@
     } QSPVariant;
 
     /* External functions */
-    void qspFreeVariants(QSPVariant *, int);
-    QSPVariant qspGetEmptyVariant(QSP_BOOL);
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString);
-    void qspCopyVariant(QSPVariant *dest, QSPVariant *src);
-    QSP_BOOL qspIsCanConvertToNum(QSPVariant *);
     int qspAutoConvertCompare(QSPVariant *, QSPVariant *);
+
+    INLINE void qspFreeVariants(QSPVariant *args, int count)
+    {
+        while (--count >= 0)
+            if (args[count].IsStr) qspFreeString(QSP_STR(args[count]));
+    }
+
+    INLINE QSPVariant qspGetEmptyVariant(QSP_BOOL isStringType)
+    {
+        QSPVariant ret;
+        if (ret.IsStr = isStringType)
+            QSP_STR(ret) = qspNewEmptyString();
+        else
+            QSP_NUM(ret) = 0;
+        return ret;
+    }
+
+    INLINE void qspCopyVariant(QSPVariant *dest, QSPVariant *src)
+    {
+        if (dest->IsStr = src->IsStr)
+            QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
+        else
+            QSP_PNUM(dest) = QSP_PNUM(src);
+    }
+
+    INLINE QSP_BOOL qspIsCanConvertToNum(QSPVariant *val)
+    {
+        QSP_BOOL isValid;
+        if (val->IsStr)
+        {
+            qspStrToNum(QSP_PSTR(val), &isValid);
+            if (!isValid) return QSP_FALSE;
+        }
+        return QSP_TRUE;
+    }
 
 #endif

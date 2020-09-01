@@ -34,39 +34,39 @@ QSPStatName qspStatsNames[QSP_STATSLEVELS][QSP_MAXSTATSNAMES];
 int qspStatsNamesCounts[QSP_STATSLEVELS];
 int qspStatMaxLen = 0;
 
-static void qspAddStatement(int, int, QSP_STATEMENT, int, int, ...);
-static void qspAddStatName(int statCode, QSPString statName, int level);
-static int qspStatsCompare(const void *, const void *);
-static int qspSearchElse(QSPLineOfCode *, int, int);
-static int qspSearchEnd(QSPLineOfCode *, int, int);
-static int qspSearchLabel(QSPLineOfCode *s, int start, int end, QSPString str);
-static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
-static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
-static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
-static QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
-static QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
-static QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
-static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
-static QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo);
-static QSP_BOOL qspCheckCondition(QSPString expr);
-static QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
-static QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lineInd, int codeOffset, QSPString *jumpTo);
-static QSP_BOOL qspStatementAddText(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementClear(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementExit(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementGoSub(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementGoTo(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementJump(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementWait(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementSetTimer(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementShowWin(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementRefInt(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementView(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementMsg(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementExec(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-static QSP_BOOL qspStatementDynamic(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE void qspAddStatement(int, int, QSP_STATEMENT, int, int, ...);
+INLINE void qspAddStatName(int statCode, QSPString statName, int level);
+INLINE int qspStatsCompare(const void *, const void *);
+INLINE int qspSearchElse(QSPLineOfCode *, int, int);
+INLINE int qspSearchEnd(QSPLineOfCode *, int, int);
+INLINE int qspSearchLabel(QSPLineOfCode *s, int start, int end, QSPString str);
+INLINE QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
+INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
+INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
+INLINE QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
+INLINE QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
+INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
+INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
+INLINE QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo);
+INLINE QSP_BOOL qspCheckCondition(QSPString expr);
+INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
+INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lineInd, int codeOffset, QSPString *jumpTo);
+INLINE QSP_BOOL qspStatementAddText(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementClear(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementExit(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementGoSub(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementGoTo(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementJump(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementWait(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementSetTimer(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementShowWin(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementRefInt(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementView(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementMsg(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementExec(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+INLINE QSP_BOOL qspStatementDynamic(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
-static void qspAddStatement(int statCode, int extArg, QSP_STATEMENT func, int minArgs, int maxArgs, ...)
+INLINE void qspAddStatement(int statCode, int extArg, QSP_STATEMENT func, int minArgs, int maxArgs, ...)
 {
     int i;
     va_list marker;
@@ -83,7 +83,7 @@ static void qspAddStatement(int statCode, int extArg, QSP_STATEMENT func, int mi
     }
 }
 
-static void qspAddStatName(int statCode, QSPString statName, int level)
+INLINE void qspAddStatName(int statCode, QSPString statName, int level)
 {
     int count, len = qspStrLen(statName);
     count = qspStatsNamesCounts[level];
@@ -94,7 +94,7 @@ static void qspAddStatName(int statCode, QSPString statName, int level)
     if (len > qspStatMaxLen) qspStatMaxLen = len;
 }
 
-static int qspStatsCompare(const void *statName1, const void *statName2)
+INLINE int qspStatsCompare(const void *statName1, const void *statName2)
 {
     return qspStrsComp(((QSPStatName *)statName1)->Name, ((QSPStatName *)statName2)->Name);
 }
@@ -240,7 +240,7 @@ void qspInitStats()
         qsort(qspStatsNames[i], qspStatsNamesCounts[i], sizeof(QSPStatName), qspStatsCompare);
 }
 
-static int qspSearchElse(QSPLineOfCode *s, int start, int end)
+INLINE int qspSearchElse(QSPLineOfCode *s, int start, int end)
 {
     int c = 1;
     s += start;
@@ -267,7 +267,7 @@ static int qspSearchElse(QSPLineOfCode *s, int start, int end)
     return -1;
 }
 
-static int qspSearchEnd(QSPLineOfCode *s, int start, int end)
+INLINE int qspSearchEnd(QSPLineOfCode *s, int start, int end)
 {
     int c = 1;
     s += start;
@@ -290,7 +290,7 @@ static int qspSearchEnd(QSPLineOfCode *s, int start, int end)
     return -1;
 }
 
-static int qspSearchLabel(QSPLineOfCode *s, int start, int end, QSPString str)
+INLINE int qspSearchLabel(QSPLineOfCode *s, int start, int end, QSPString str)
 {
     s += start;
     while (start < end)
@@ -334,7 +334,7 @@ int qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
     return stat->ArgsCount;
 }
 
-static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
+INLINE QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
 {
     QSPVariant args[QSP_STATMAXARGS];
     QSP_BOOL isExit;
@@ -379,7 +379,7 @@ static QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPS
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset,
+INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset,
     QSPString *jumpTo, int *lineInd, int *action)
 {
     QSP_BOOL condition;
@@ -429,7 +429,7 @@ static QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset,
+INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset,
     QSPString *jumpTo, int *lineInd, int *action)
 {
     QSP_BOOL condition;
@@ -492,7 +492,7 @@ static QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
+INLINE QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
 {
     QSPLineOfCode *line;
     QSPString jumpToFake;
@@ -565,7 +565,7 @@ static QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int co
     return isExit;
 }
 
-static QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
+INLINE QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
 {
     QSP_BOOL isExit;
     int oldRefreshCount, ind = qspSavedVarsGroupsCount;
@@ -589,7 +589,7 @@ static QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int 
     return isExit;
 }
 
-static QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
+INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_BOOL isExit;
     int oldRefreshCount, ind = qspSavedVarsGroupsCount;
@@ -697,7 +697,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, int count, QSPVa
     qspMoveVar(varRes, &result);
 }
 
-static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
+INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_BOOL condition;
     int i, c, elseStat, oldRefreshCount;
@@ -759,7 +759,7 @@ static QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSP
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo)
+INLINE QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo)
 {
     int oldRefreshCount;
     QSPLineOfCode initializatorLine;
@@ -792,7 +792,7 @@ static QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspCheckCondition(QSPString expr)
+INLINE QSP_BOOL qspCheckCondition(QSPString expr)
 {
     int oldRefreshCount = qspRefreshCount;
     QSPVariant condValue = qspExprValue(expr);
@@ -806,7 +806,7 @@ static QSP_BOOL qspCheckCondition(QSPString expr)
     return (QSP_NUM(condValue) != 0);
 }
 
-static QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
+INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_BOOL isExit, conditionValue;
     int oldRefreshCount;
@@ -840,7 +840,7 @@ static QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int 
     return isExit;
 }
 
-static QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lineInd,
+INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lineInd,
     int codeOffset, QSPString *jumpTo)
 {
     QSP_BOOL isExit, conditionValue;
@@ -894,7 +894,7 @@ static QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lin
     return isExit;
 }
 
-static QSP_BOOL qspStatementAddText(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementAddText(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     switch (extArg)
     {
@@ -936,7 +936,7 @@ static QSP_BOOL qspStatementAddText(QSPVariant *args, int count, QSPString *jump
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementClear(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementClear(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     switch (extArg)
     {
@@ -976,18 +976,18 @@ static QSP_BOOL qspStatementClear(QSPVariant *args, int count, QSPString *jumpTo
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementExit(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementExit(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     return QSP_TRUE;
 }
 
-static QSP_BOOL qspStatementGoSub(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementGoSub(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0);
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementGoTo(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementGoTo(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     int locInd = qspLocIndex(QSP_STR(args[0]));
     if (locInd < 0)
@@ -1000,7 +1000,7 @@ static QSP_BOOL qspStatementGoTo(QSPVariant *args, int count, QSPString *jumpTo,
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementJump(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementJump(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     qspFreeString(*jumpTo);
     *jumpTo = qspGetNewText(qspDelSpc(QSP_STR(args[0])));
@@ -1008,7 +1008,7 @@ static QSP_BOOL qspStatementJump(QSPVariant *args, int count, QSPString *jumpTo,
     return QSP_TRUE;
 }
 
-static QSP_BOOL qspStatementWait(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementWait(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     int num = QSP_NUM(args[0]);
     qspCallRefreshInt(QSP_TRUE);
@@ -1017,7 +1017,7 @@ static QSP_BOOL qspStatementWait(QSPVariant *args, int count, QSPString *jumpTo,
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementSetTimer(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementSetTimer(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     int num = QSP_NUM(args[0]);
     if (num < 0) num = 0;
@@ -1026,7 +1026,7 @@ static QSP_BOOL qspStatementSetTimer(QSPVariant *args, int count, QSPString *jum
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementShowWin(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementShowWin(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     QSP_BOOL val = QSP_NUM(args[0]) != 0;
     switch (extArg)
@@ -1047,13 +1047,13 @@ static QSP_BOOL qspStatementShowWin(QSPVariant *args, int count, QSPString *jump
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementRefInt(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementRefInt(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     qspCallRefreshInt(QSP_TRUE);
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementView(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementView(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     if (count && qspIsAnyString(QSP_STR(args[0])))
     {
@@ -1068,19 +1068,19 @@ static QSP_BOOL qspStatementView(QSPVariant *args, int count, QSPString *jumpTo,
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementMsg(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementMsg(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     qspCallShowMessage(QSP_STR(args[0]));
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementExec(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementExec(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     qspCallSystem(QSP_STR(args[0]));
     return QSP_FALSE;
 }
 
-static QSP_BOOL qspStatementDynamic(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+INLINE QSP_BOOL qspStatementDynamic(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0);
     return QSP_FALSE;

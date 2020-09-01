@@ -16,24 +16,7 @@
 */
 
 #include "variant.h"
-#include "coding.h"
 #include "text.h"
-
-void qspFreeVariants(QSPVariant *args, int count)
-{
-    while (--count >= 0)
-        if (args[count].IsStr) qspFreeString(QSP_STR(args[count]));
-}
-
-QSPVariant qspGetEmptyVariant(QSP_BOOL isStringType)
-{
-    QSPVariant ret;
-    if (ret.IsStr = isStringType)
-        QSP_STR(ret) = qspNewEmptyString();
-    else
-        QSP_NUM(ret) = 0;
-    return ret;
-}
 
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
 {
@@ -57,25 +40,6 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
         val->IsStr = QSP_TRUE;
     }
     return QSP_FALSE;
-}
-
-void qspCopyVariant(QSPVariant *dest, QSPVariant *src)
-{
-    if (dest->IsStr = src->IsStr)
-        QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
-    else
-        QSP_PNUM(dest) = QSP_PNUM(src);
-}
-
-QSP_BOOL qspIsCanConvertToNum(QSPVariant *val)
-{
-    QSP_BOOL isValid;
-    if (val->IsStr)
-    {
-        qspStrToNum(QSP_PSTR(val), &isValid);
-        if (!isValid) return QSP_FALSE;
-    }
-    return QSP_TRUE;
 }
 
 int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)

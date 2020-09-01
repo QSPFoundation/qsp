@@ -30,15 +30,15 @@ int qspCurLoc = -1;
 int qspRefreshCount = 0;
 int qspFullRefreshCount = 0;
 
-static int qspLocsCompare(const void *, const void *);
-static int qspLocStringCompare(const void *, const void *);
+INLINE int qspLocsCompare(const void *, const void *);
+INLINE int qspLocStringCompare(const void *, const void *);
 
-static int qspLocsCompare(const void *locName1, const void *locName2)
+INLINE int qspLocsCompare(const void *locName1, const void *locName2)
 {
     return qspStrsComp(((QSPLocName *)locName1)->Name, ((QSPLocName *)locName2)->Name);
 }
 
-static int qspLocStringCompare(const void *name, const void *compareTo)
+INLINE int qspLocStringCompare(const void *name, const void *compareTo)
 {
     return qspStrsComp(*(QSPString *)name, ((QSPLocName *)compareTo)->Name);
 }

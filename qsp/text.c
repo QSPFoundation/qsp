@@ -16,12 +16,9 @@
 */
 
 #include "text.h"
-#include "coding.h"
 #include "errors.h"
 #include "locations.h"
 #include "mathops.h"
-#include "variables.h"
-#include "variant.h"
 
 QSPString qspNullString;
 QSPString qspEmptyString;
@@ -57,24 +54,6 @@ void qspAddText(QSPString *dest, QSPString val, QSP_BOOL isCreate)
     memcpy(destPtr, val.Str, valLen * sizeof(QSP_CHAR));
 }
 
-void qspUpdateText(QSPString *dest, QSPString val)
-{
-    dest->End = dest->Str;
-    qspAddText(dest, val, QSP_FALSE);
-}
-
-QSPString qspGetNewText(QSPString val)
-{
-    QSPString string;
-    qspAddText(&string, val, QSP_TRUE);
-    return string;
-}
-
-QSPString qspNewEmptyString()
-{
-    return qspGetNewText(qspEmptyString);
-}
-
 QSP_BOOL qspClearText(QSPString *s)
 {
     int strLen;
@@ -87,105 +66,6 @@ QSP_BOOL qspClearText(QSPString *s)
         if (strLen) return QSP_TRUE;
     }
     return QSP_FALSE;
-}
-
-QSP_BOOL qspIsInList(QSP_CHAR *list, QSP_CHAR ch)
-{
-    while (*list)
-        if (*list++ == ch) return QSP_TRUE;
-    return QSP_FALSE;
-}
-
-QSP_BOOL qspIsDigit(QSP_CHAR ch)
-{
-    return (ch >= QSP_FMT('0') && ch <= QSP_FMT('9'));
-}
-
-void qspSkipSpaces(QSPString *s)
-{
-    QSP_CHAR *pos = s->Str;
-    while (pos < s->End && qspIsInList(QSP_SPACES, *pos)) ++pos;
-    s->Str = pos;
-}
-
-QSPString qspDelSpc(QSPString s)
-{
-    QSP_CHAR *begin = s.Str, *end = s.End;
-    while (begin < end && qspIsInList(QSP_SPACES, *begin)) ++begin;
-    while (begin < end && qspIsInList(QSP_SPACES, *(end - 1))) --end;
-    return qspStringFromPair(begin, end);
-}
-
-QSP_BOOL qspIsAnyString(QSPString s)
-{
-    qspSkipSpaces(&s);
-    return (s.Str != s.End);
-}
-
-void qspLowerStr(QSPString *str)
-{
-    QSP_CHAR *pos = str->Str;
-    while (pos < str->End) *pos++ = qspToWLower(*pos);
-}
-
-void qspUpperStr(QSPString *str)
-{
-    QSP_CHAR *pos = str->Str;
-    while (pos < str->End) *pos++ = qspToWUpper(*pos);
-}
-
-int qspStrsNComp(QSPString str1, QSPString str2, int maxLen)
-{
-    int delta = 0;
-    QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;
-    while (maxLen-- && pos2 < str2.End && pos1 < str1.End && !(delta = (int)*pos1 - *pos2))
-        ++pos1, ++pos2;
-    return delta;
-}
-
-int qspStrsComp(QSPString str1, QSPString str2)
-{
-    int delta = 0;
-    QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;
-    while (pos2 < str2.End && pos1 < str1.End && !(delta = (int)*pos1 - *pos2))
-        ++pos1, ++pos2;
-    if (delta) return delta;
-    return (pos1 == str1.End) ? ((pos2 == str2.End) ? 0 : -1) : 1;
-}
-
-QSP_CHAR *qspStrChar(QSPString str, QSP_CHAR ch)
-{
-    QSP_CHAR *pos = str.Str;
-    while (pos < str.End && *pos != ch) ++pos;
-    if (*pos == ch) return pos;
-    return 0;
-}
-
-QSP_CHAR *qspStrStr(QSPString str, QSPString strSearch)
-{
-    QSP_CHAR *s1, *s2, *pos = str.Str;
-    while (pos < str.End)
-    {
-        s1 = pos;
-        s2 = strSearch.Str;
-        while (s1 < str.End && s2 < strSearch.End && !((int)*s1 - *s2))
-            ++s1, ++s2;
-        if (s2 == strSearch.End) return pos;
-        ++pos;
-    }
-    return 0;
-}
-
-QSP_CHAR *qspStrPBrk(QSPString str, QSP_CHAR *strCharSet)
-{
-    QSP_CHAR *set, *pos = str.Str;
-    while (pos < str.End)
-    {
-        for (set = strCharSet; *set; ++set)
-            if (*set == *pos) return pos;
-        ++pos;
-    }
-    return 0;
 }
 
 QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars)

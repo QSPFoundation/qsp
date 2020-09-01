@@ -72,15 +72,15 @@ int qspCRCTable[256] =
     0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
 };
 
-static int qspCRC(void *, int);
-static void qspIncludeFile(QSPString s);
-static void qspOpenIncludes();
-static QSP_BOOL qspCheckQuest(char **, int, QSP_BOOL);
-static QSP_BOOL qspSkipLines(int *, int, int);
-static QSP_BOOL qspGetIntValueAndSkipLine(int *value, int *index, QSPString *strs, int totalLinesCount);
-static QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount);
+INLINE int qspCRC(void *, int);
+INLINE void qspIncludeFile(QSPString s);
+INLINE void qspOpenIncludes();
+INLINE QSP_BOOL qspCheckQuest(char **, int, QSP_BOOL);
+INLINE QSP_BOOL qspSkipLines(int *, int, int);
+INLINE QSP_BOOL qspGetIntValueAndSkipLine(int *value, int *index, QSPString *strs, int totalLinesCount);
+INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount);
 
-static int qspCRC(void *data, int len)
+INLINE int qspCRC(void *data, int len)
 {
     unsigned char *ptr;
     int crc = 0;
@@ -108,7 +108,7 @@ void qspClearIncludes(QSP_BOOL isFirst)
     qspCurIncLocsCount = 0;
 }
 
-static void qspIncludeFile(QSPString s)
+INLINE void qspIncludeFile(QSPString s)
 {
     int i, oldRefreshCount;
     if (!qspIsAnyString(s)) return;
@@ -128,7 +128,7 @@ static void qspIncludeFile(QSPString s)
     qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(s);
 }
 
-static void qspOpenIncludes()
+INLINE void qspOpenIncludes()
 {
     int i, oldRefreshCount = qspRefreshCount;
     for (i = 0; i < qspCurIncFilesCount; ++i)
@@ -165,7 +165,7 @@ void qspNewGame(QSP_BOOL isReset)
     qspRefreshCurLoc(QSP_TRUE, 0, 0);
 }
 
-static QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
+INLINE QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
 {
     int i, ind, locsCount, actsCount;
     QSP_BOOL isOldFormat;
@@ -241,7 +241,7 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isNewGame)
     for (i = start; i < end; ++i)
     {
         buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-        if (isAddLoc = isNewGame || qspLocIndex(buf) < 0)
+        if (isAddLoc = (isNewGame || qspLocIndex(buf) < 0))
             qspLocs[locsCount].Name = buf;
         else
             qspFreeString(buf);
@@ -381,19 +381,19 @@ QSPString qspSaveGameStatusToString()
     return buf;
 }
 
-static QSP_BOOL qspSkipLines(int *index, int totalLinesCount, int linesToSkip)
+INLINE QSP_BOOL qspSkipLines(int *index, int totalLinesCount, int linesToSkip)
 {
     if ((*index += linesToSkip) >= totalLinesCount) return QSP_FALSE;
     return QSP_TRUE;
 }
 
-static QSP_BOOL qspGetIntValueAndSkipLine(int *value, int *index, QSPString *strs, int totalLinesCount)
+INLINE QSP_BOOL qspGetIntValueAndSkipLine(int *value, int *index, QSPString *strs, int totalLinesCount)
 {
     *value = qspReCodeGetIntVal(strs[*index]);
     return qspSkipLines(index, totalLinesCount, 1);
 }
 
-static QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
+INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
 {
     int i, j, ind, count, linesCount, lastInd, temp, selAction, selObject;
     ind = 16;
