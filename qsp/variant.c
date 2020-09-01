@@ -99,7 +99,7 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
         }
     }
     if (v1->IsStr)
-        res = QSP_STRCOLL(QSP_PSTR(v1), QSP_PSTR(v2));
+        res = qspStrsComp(QSP_PSTR(v1), QSP_PSTR(v2));
     else
         res = (QSP_PNUM(v1) > QSP_PNUM(v2) ? 1 : (QSP_PNUM(v1) < QSP_PNUM(v2) ? -1 : 0));
     return res;

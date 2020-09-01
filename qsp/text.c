@@ -125,13 +125,13 @@ QSP_BOOL qspIsAnyString(QSPString s)
 void qspLowerStr(QSPString *str)
 {
     QSP_CHAR *pos = str->Str;
-    while (pos < str->End) *pos++ = QSP_CHRLWR(*pos);
+    while (pos < str->End) *pos++ = qspToWLower(*pos);
 }
 
 void qspUpperStr(QSPString *str)
 {
     QSP_CHAR *pos = str->Str;
-    while (pos < str->End) *pos++ = QSP_CHRUPR(*pos);
+    while (pos < str->End) *pos++ = qspToWUpper(*pos);
 }
 
 int qspStrsNComp(QSPString str1, QSPString str2, int maxLen)

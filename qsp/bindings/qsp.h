@@ -19,8 +19,10 @@
     #define QSP_H
 
     #ifdef EXPORT
-        #ifdef _WIN
+        #ifdef _MSC_VER
             #define QSP_EXTERN __declspec(dllexport)
+        #elif __GNUC__
+            #define QSP_EXTERN __attribute__ ((dllexport))
         #else
             #define QSP_EXTERN extern
         #endif

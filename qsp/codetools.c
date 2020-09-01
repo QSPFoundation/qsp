@@ -517,7 +517,7 @@ void qspPrepareStringToExecution(QSPString *str)
             else if (qspIsInList(QSP_QUOTS, *pos))
                 quot = *pos;
             else if (!quotsCount) /* we have to keep q-strings untouched */
-                *pos = QSP_CHRUPR(*pos);
+                *pos = qspToWUpper(*pos);
         }
         ++pos;
     }

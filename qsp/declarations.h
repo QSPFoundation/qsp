@@ -45,9 +45,6 @@
 
     static int qspEndiannessTestValue = 1;
 
-    #define QSP_STRCOLL qspStrsComp
-    #define QSP_CHRLWR qspToWLower
-    #define QSP_CHRUPR qspToWUpper
     #define QSP_ONIG_ENC ((*(char *)&(qspEndiannessTestValue) == 1) ? \
         (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE) : \
         (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_BE : ONIG_ENCODING_UTF32_BE))
@@ -61,6 +58,13 @@
         #define QSP_TIME _time64
     #else
         #define QSP_TIME time
+    #endif
+
+    #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
+    #ifdef __GNUC__ || _MSC_VER >= 1800
+        #define QSP_STATIC_STR(x) ((QSPString) { (x), (x) + QSP_STATIC_LEN(x) })
+    #else
+        #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
     #endif
 
     #define QSP_VER QSP_FMT("5.8.0")

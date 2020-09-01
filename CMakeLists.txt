@@ -81,7 +81,7 @@ set(QSP_SOURCES
 add_library(qsp SHARED ${QSP_SOURCES})
 target_compile_definitions(qsp PRIVATE _UNICODE EXPORT)
 if(WIN32)
-	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS _WIN)
+	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
 target_link_libraries(qsp PRIVATE onig)

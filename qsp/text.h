@@ -75,11 +75,6 @@
         if (s.Str) free(s.Str);
     }
 
-    /* Helpers */
-    #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
-    //#define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
-    #define QSP_STATIC_STR(x) ((QSPString) { (x), (x) + QSP_STATIC_LEN(x) })
-
     /* External functions */
     QSP_CHAR *qspStringToC(QSPString s);
     void qspAddText(QSPString *dest, QSPString val, QSP_BOOL isCreate);

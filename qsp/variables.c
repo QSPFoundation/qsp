@@ -685,10 +685,10 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
                 {
                     if (isMin)
                     {
-                        if (QSP_STRCOLL(str, var->Values[curInd].Str) < 0)
+                        if (qspStrsComp(str, var->Values[curInd].Str) < 0)
                             curInd = count;
                     }
-                    else if (QSP_STRCOLL(str, var->Values[curInd].Str) > 0)
+                    else if (qspStrsComp(str, var->Values[curInd].Str) > 0)
                         curInd = count;
                 }
                 else
