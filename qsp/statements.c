@@ -568,91 +568,51 @@ INLINE QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int co
 INLINE QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
 {
     QSP_BOOL isExit;
-    int oldRefreshCount, ind = qspSavedVarsGroupsCount;
-    qspSavedVarsGroups = (QSPVarsGroup *)realloc(qspSavedVarsGroups, (ind + 1) * sizeof(QSPVarsGroup));
-    qspSavedVarsGroups[ind].Vars = 0;
-    qspSavedVarsGroups[ind].VarsCount = 0;
-    ++qspSavedVarsGroupsCount;
-    oldRefreshCount = qspRefreshCount;
+    int oldRefreshCount = qspRefreshCount;
+    qspAllocateSavedVarsGroup();
     isExit = qspExecCode(s, startLine, endLine, codeOffset, jumpTo);
     if (oldRefreshCount != qspRefreshCount || qspErrorNum)
     {
-        if (qspSavedVarsGroupsCount)
-        {
-            --qspSavedVarsGroupsCount;
-            qspClearVarsList(qspSavedVarsGroups[ind].Vars, qspSavedVarsGroups[ind].VarsCount);
-        }
+        qspReleaseSavedVarsGroup(QSP_TRUE);
         return QSP_FALSE;
     }
-    --qspSavedVarsGroupsCount;
-    qspRestoreVarsList(qspSavedVarsGroups[ind].Vars, qspSavedVarsGroups[ind].VarsCount);
+    qspReleaseSavedVarsGroup(QSP_FALSE);
     return isExit;
 }
 
 INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_BOOL isExit;
-    int oldRefreshCount, ind = qspSavedVarsGroupsCount;
-    qspSavedVarsGroups = (QSPVarsGroup *)realloc(qspSavedVarsGroups, (ind + 1) * sizeof(QSPVarsGroup));
-    qspSavedVarsGroups[ind].Vars = 0;
-    qspSavedVarsGroups[ind].VarsCount = 0;
-    ++qspSavedVarsGroupsCount;
-    oldRefreshCount = qspRefreshCount;
+    int oldRefreshCount = qspRefreshCount;
+    qspAllocateSavedVarsGroup();
     isExit = qspExecString(s, startStat, endStat, jumpTo);
     if (oldRefreshCount != qspRefreshCount || qspErrorNum)
     {
-        if (qspSavedVarsGroupsCount)
-        {
-            --qspSavedVarsGroupsCount;
-            qspClearVarsList(qspSavedVarsGroups[ind].Vars, qspSavedVarsGroups[ind].VarsCount);
-        }
+        qspReleaseSavedVarsGroup(QSP_TRUE);
         return QSP_FALSE;
     }
-    --qspSavedVarsGroupsCount;
-    qspRestoreVarsList(qspSavedVarsGroups[ind].Vars, qspSavedVarsGroups[ind].VarsCount);
+    qspReleaseSavedVarsGroup(QSP_FALSE);
     return isExit;
 }
 
 QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *s, int endLine, int codeOffset, QSP_BOOL isNewLoc)
 {
     QSP_BOOL isExit;
-    QSPVar *savedVars;
-    QSPVarsGroup *savedGroups;
-    int oldRefreshCount, varsCount, groupsCount;
+    int oldRefreshCount;
     if (isNewLoc)
-        qspPrepareGlobalVars();
-    else
-        varsCount = qspPrepareLocalVars(&savedVars);
-    if (qspErrorNum) return QSP_FALSE;
-    groupsCount = qspSavedVarsGroupsCount;
-    savedGroups = qspSavedVarsGroups;
-    qspSavedVarsGroupsCount = 1;
-    qspSavedVarsGroups = (QSPVarsGroup *)malloc(sizeof(QSPVarsGroup));
-    qspSavedVarsGroups[0].Vars = 0;
-    qspSavedVarsGroups[0].VarsCount = 0;
+    {
+        qspRestoreGlobalVars();
+        if (qspErrorNum) return QSP_FALSE;
+    }
+    qspAllocateSavedVarsGroup();
     oldRefreshCount = qspRefreshCount;
     isExit = qspExecCode(s, 0, endLine, codeOffset, 0);
     if (oldRefreshCount != qspRefreshCount || qspErrorNum)
     {
-        if (qspSavedVarsGroupsCount)
-            qspClearVarsList(qspSavedVarsGroups[0].Vars, qspSavedVarsGroups[0].VarsCount);
-        if (!isNewLoc)
-            qspClearLocalVars(savedVars, varsCount);
+        qspReleaseSavedVarsGroup(QSP_TRUE);
+        return QSP_FALSE;
     }
-    else
-    {
-        qspRestoreVarsList(qspSavedVarsGroups[0].Vars, qspSavedVarsGroups[0].VarsCount);
-        if (!isNewLoc)
-        {
-            if (qspErrorNum)
-                qspClearLocalVars(savedVars, varsCount);
-            else
-                qspRestoreLocalVars(savedVars, varsCount, savedGroups, groupsCount);
-        }
-    }
-    if (qspSavedVarsGroups) free(qspSavedVarsGroups);
-    qspSavedVarsGroups = savedGroups;
-    qspSavedVarsGroupsCount = groupsCount;
+    qspReleaseSavedVarsGroup(QSP_FALSE);
     return isExit;
 }
 

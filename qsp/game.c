@@ -298,7 +298,7 @@ QSPString qspSaveGameStatusToString()
     int i, j, varsCount, oldRefreshCount = qspRefreshCount;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return qspNullString;
-    varsCount = qspPrepareLocalVars(&savedVars);
+    varsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVars);
     if (qspErrorNum) return qspNullString;
     buf = qspNullString;
     qspRefreshPlayList();
@@ -372,7 +372,7 @@ QSPString qspSaveGameStatusToString()
                 qspCodeWriteVal(&buf, qspVars[i].Indices[j].Str, QSP_TRUE);
             }
         }
-    qspRestoreLocalVars(savedVars, varsCount, qspSavedVarsGroups, qspSavedVarsGroupsCount);
+    qspRestoreLocalVars(savedVars, varsCount, qspSavedVarGroups, qspSavedVarGroupsCount);
     if (qspErrorNum)
     {
         qspFreeString(buf);

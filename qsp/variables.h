@@ -22,6 +22,7 @@
 #ifndef QSP_VARSDEFINES
     #define QSP_VARSDEFINES
 
+    #define QSP_VARGROUPSBATCHSIZE 256
     #define QSP_VARSSEEK 50
     #define QSP_VARSCOUNT 256 * QSP_VARSSEEK
     #define QSP_VARARGS QSP_FMT("ARGS")
@@ -56,21 +57,21 @@
     } QSPVarsGroup;
 
     extern QSPVar qspVars[QSP_VARSCOUNT];
-    extern QSPVarsGroup *qspSavedVarsGroups;
-    extern int qspSavedVarsGroupsCount;
+    extern QSPVarsGroup *qspSavedVarGroups;
+    extern int qspSavedVarGroupsCount;
+    extern int qspSavedVarGroupsBufSize;
 
     /* External functions */
-    void qspClearVars(QSP_BOOL);
-    void qspEmptyVar(QSPVar *);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate);
+    void qspClearVars(QSP_BOOL isFirst);
     QSPVar *qspVarReferenceWithType(QSPString name, QSP_BOOL isCreate, QSP_BOOL *isString);
     void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
     QSPVariant qspGetVarValueByReference(QSPVar *, int, QSP_BOOL);
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
     QSPVariant qspGetVar(QSPString name);
-    void qspPrepareGlobalVars();
-    int qspPrepareLocalVars(QSPVar **);
+    void qspRestoreGlobalVars();
+    int qspSaveLocalVarsAndRestoreGlobals(QSPVar **);
     void qspRestoreLocalVars(QSPVar *, int, QSPVarsGroup *, int);
     void qspClearLocalVars(QSPVar *, int);
     void qspRestoreVarsList(QSPVar *, int);
@@ -81,11 +82,74 @@
     int qspGetVarsCount();
     void qspSetArgs(QSPVar *, QSPVariant *, int);
     void qspApplyResult(QSPVar *, QSPVariant *);
-    void qspMoveVar(QSPVar *, QSPVar *);
     /* Statements */
     void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat);
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);
     QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
     QSP_BOOL qspStatementKillVar(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+
+    INLINE void qspAllocateSavedVarsGroup()
+    {
+        int ind = qspSavedVarGroupsCount++;
+        if (ind >= qspSavedVarGroupsBufSize)
+        {
+            qspSavedVarGroupsBufSize += QSP_VARGROUPSBATCHSIZE;
+            qspSavedVarGroups = (QSPVarsGroup *)realloc(qspSavedVarGroups, qspSavedVarGroupsBufSize * sizeof(QSPVarsGroup));
+        }
+        qspSavedVarGroups[ind].Vars = 0;
+        qspSavedVarGroups[ind].VarsCount = 0;
+    }
+
+    INLINE void qspReleaseSavedVarsGroup(QSP_BOOL isKeepLocals)
+    {
+        int ind;
+        if (qspSavedVarGroupsCount)
+        {
+            ind = --qspSavedVarGroupsCount;
+            if (isKeepLocals)
+                qspClearVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
+            else
+                qspRestoreVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
+        }
+    }
+
+    INLINE void qspInitVarData(QSPVar *var)
+    {
+        var->Values = 0;
+        var->ValsCount = 0;
+        var->Indices = 0;
+        var->IndsCount = 0;
+        var->IndsBufSize = 0;
+    }
+
+    INLINE void qspMoveVar(QSPVar *dest, QSPVar *src)
+    {
+        dest->Values = src->Values;
+        dest->ValsCount = src->ValsCount;
+        dest->Indices = src->Indices;
+        dest->IndsCount = src->IndsCount;
+        dest->IndsBufSize = src->IndsBufSize;
+        qspInitVarData(src);
+    }
+
+    INLINE void qspEmptyVar(QSPVar *var)
+    {
+        int count;
+        if (var->Values)
+        {
+            count = var->ValsCount;
+            while (--count >= 0)
+                qspFreeString(var->Values[count].Str);
+            free(var->Values);
+        }
+        if (var->Indices)
+        {
+            count = var->IndsCount;
+            while (--count >= 0)
+                qspFreeString(var->Indices[count].Str);
+            free(var->Indices);
+        }
+        qspInitVarData(var);
+    }
 
 #endif

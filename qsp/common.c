@@ -65,16 +65,17 @@ void qspMemClear(QSP_BOOL isFirst)
         qspFreeString(qspCurInput);
         qspFreeString(qspViewPath);
 
-        for (i = qspSavedVarsGroupsCount - 1; i >= 0; --i)
-            qspClearVarsList(qspSavedVarsGroups[i].Vars, qspSavedVarsGroups[i].VarsCount);
-        if (qspSavedVarsGroups) free(qspSavedVarsGroups);
+        for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
+            qspClearVarsList(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
+        if (qspSavedVarGroups) free(qspSavedVarGroups);
     }
     qspCurDesc = qspNullString;
     qspCurVars = qspNullString;
     qspCurInput = qspNullString;
     qspViewPath = qspNullString;
-    qspSavedVarsGroups = 0;
-    qspSavedVarsGroupsCount = 0;
+    qspSavedVarGroups = 0;
+    qspSavedVarGroupsCount = 0;
+    qspSavedVarGroupsBufSize = 0;
 }
 
 void qspSetSeed(unsigned int seed)
