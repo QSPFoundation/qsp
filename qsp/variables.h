@@ -88,31 +88,6 @@
     QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
     QSP_BOOL qspStatementKillVar(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
-    INLINE void qspAllocateSavedVarsGroup()
-    {
-        int ind = qspSavedVarGroupsCount++;
-        if (ind >= qspSavedVarGroupsBufSize)
-        {
-            qspSavedVarGroupsBufSize += QSP_VARGROUPSBATCHSIZE;
-            qspSavedVarGroups = (QSPVarsGroup *)realloc(qspSavedVarGroups, qspSavedVarGroupsBufSize * sizeof(QSPVarsGroup));
-        }
-        qspSavedVarGroups[ind].Vars = 0;
-        qspSavedVarGroups[ind].VarsCount = 0;
-    }
-
-    INLINE void qspReleaseSavedVarsGroup(QSP_BOOL isKeepLocals)
-    {
-        int ind;
-        if (qspSavedVarGroupsCount)
-        {
-            ind = --qspSavedVarGroupsCount;
-            if (isKeepLocals)
-                qspClearVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
-            else
-                qspRestoreVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
-        }
-    }
-
     INLINE void qspInitVarData(QSPVar *var)
     {
         var->Values = 0;
@@ -150,6 +125,46 @@
             free(var->Indices);
         }
         qspInitVarData(var);
+    }
+
+    INLINE int qspAllocateSavedVarsGroup()
+    {
+        int ind = qspSavedVarGroupsCount++;
+        if (ind >= qspSavedVarGroupsBufSize)
+        {
+            qspSavedVarGroupsBufSize += QSP_VARGROUPSBATCHSIZE;
+            qspSavedVarGroups = (QSPVarsGroup *)realloc(qspSavedVarGroups, qspSavedVarGroupsBufSize * sizeof(QSPVarsGroup));
+        }
+        qspSavedVarGroups[ind].Vars = 0;
+        qspSavedVarGroups[ind].VarsCount = 0;
+        return ind;
+    }
+
+    INLINE int qspAllocateSavedVarsGroupWithArgs(QSPVar *varArgs, QSPVar *varRes)
+    {
+        QSPVar *varsList;
+        int groupInd = qspAllocateSavedVarsGroup();
+        varsList = (QSPVar *)malloc(2 * sizeof(QSPVar));
+        varsList[0].Name = qspGetNewText(varArgs->Name);
+        qspMoveVar(&varsList[0], varArgs);
+        varsList[1].Name = qspGetNewText(varRes->Name);
+        qspMoveVar(&varsList[1], varRes);
+        qspSavedVarGroups[groupInd].Vars = varsList;
+        qspSavedVarGroups[groupInd].VarsCount = 2;
+        return groupInd;
+    }
+
+    INLINE void qspReleaseSavedVarsGroup(QSP_BOOL isKeepLocals)
+    {
+        int ind;
+        if (qspSavedVarGroupsCount)
+        {
+            ind = --qspSavedVarGroupsCount;
+            if (isKeepLocals)
+                qspClearVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
+            else
+                qspRestoreVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
+        }
     }
 
 #endif

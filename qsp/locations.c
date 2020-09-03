@@ -212,39 +212,28 @@ void qspExecLocByName(QSPString name, QSP_BOOL isChangeDesc)
 void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, int count, QSPVariant *res)
 {
     int oldRefreshCount;
-    QSPVar local, result, *varArgs, *varRes;
-    QSPString resultName, argsName;
-    resultName = QSP_STATIC_STR(QSP_VARRES);
-    if (!(varRes = qspVarReference(resultName, QSP_TRUE))) return;
-    argsName = QSP_STATIC_STR(QSP_VARARGS);
-    if (!(varArgs = qspVarReference(argsName, QSP_TRUE))) return;
-    qspMoveVar(&result, varRes);
-    qspMoveVar(&local, varArgs);
+    QSPVar *varArgs, *varRes;
+    if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return;
+    if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE))) return;
+    qspAllocateSavedVarsGroupWithArgs(varArgs, varRes);
     qspSetArgs(varArgs, args, count);
     oldRefreshCount = qspRefreshCount;
     qspExecLocByName(name, QSP_FALSE);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum)
     {
-        qspEmptyVar(&local);
-        qspEmptyVar(&result);
+        qspReleaseSavedVarsGroup(QSP_TRUE);
         return;
     }
-    if (!(varArgs = qspVarReference(argsName, QSP_TRUE)))
+    if (res)
     {
-        qspEmptyVar(&local);
-        qspEmptyVar(&result);
-        return;
+        if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE)))
+        {
+            qspReleaseSavedVarsGroup(QSP_TRUE);
+            return;
+        }
+        qspApplyResult(varRes, res);
     }
-    qspEmptyVar(varArgs);
-    qspMoveVar(varArgs, &local);
-    if (!(varRes = qspVarReference(resultName, QSP_TRUE)))
-    {
-        qspEmptyVar(&result);
-        return;
-    }
-    if (res) qspApplyResult(varRes, res);
-    qspEmptyVar(varRes);
-    qspMoveVar(varRes, &result);
+    qspReleaseSavedVarsGroup(QSP_FALSE);
 }
 
 void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, int count)
