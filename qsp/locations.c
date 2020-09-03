@@ -173,13 +173,24 @@ void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc, QSP_BOOL isNewLoc)
         }
     }
     qspRealActIndex = -1;
+    if (isNewLoc)
+    {
+        qspRestoreGlobalVars();
+        if (qspErrorNum)
+        {
+            qspRealLine = oldLine;
+            qspRealActIndex = oldActIndex;
+            qspRealCurLoc = oldLoc;
+            return;
+        }
+    }
     if (locInd < qspLocsCount - qspCurIncLocsCount)
-        qspExecTopCodeWithLocals(loc->OnVisitLines, loc->OnVisitLinesCount, 1, isNewLoc);
+        qspExecCodeBlockWithLocals(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0);
     else
     {
         count = loc->OnVisitLinesCount;
         qspCopyPrepLines(&code, loc->OnVisitLines, 0, count);
-        qspExecTopCodeWithLocals(code, count, 1, isNewLoc);
+        qspExecCodeBlockWithLocals(code, 0, count, 1, 0);
         qspFreePrepLines(code, count);
     }
     qspRealLine = oldLine;

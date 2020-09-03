@@ -194,11 +194,11 @@
 
     INLINE QSP_CHAR *qspStrPBrk(QSPString str, QSP_CHAR *strCharSet)
     {
-        QSP_CHAR *set, *pos = str.Str;
+        QSP_CHAR *pos = str.Str;
         while (pos < str.End)
         {
-            for (set = strCharSet; *set; ++set)
-                if (*set == *pos) return pos;
+            if (qspIsInList(strCharSet, *pos))
+                return pos;
             ++pos;
         }
         return 0;

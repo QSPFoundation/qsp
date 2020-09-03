@@ -44,7 +44,6 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPS
 INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
 INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
 INLINE QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
-INLINE QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
 INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo);
@@ -565,7 +564,7 @@ INLINE QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int co
     return isExit;
 }
 
-INLINE QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
+QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
 {
     QSP_BOOL isExit;
     int oldRefreshCount = qspRefreshCount;
@@ -586,27 +585,6 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int end
     int oldRefreshCount = qspRefreshCount;
     qspAllocateSavedVarsGroup();
     isExit = qspExecString(s, startStat, endStat, jumpTo);
-    if (oldRefreshCount != qspRefreshCount || qspErrorNum)
-    {
-        qspReleaseSavedVarsGroup(QSP_TRUE);
-        return QSP_FALSE;
-    }
-    qspReleaseSavedVarsGroup(QSP_FALSE);
-    return isExit;
-}
-
-QSP_BOOL qspExecTopCodeWithLocals(QSPLineOfCode *s, int endLine, int codeOffset, QSP_BOOL isNewLoc)
-{
-    QSP_BOOL isExit;
-    int oldRefreshCount;
-    if (isNewLoc)
-    {
-        qspRestoreGlobalVars();
-        if (qspErrorNum) return QSP_FALSE;
-    }
-    qspAllocateSavedVarsGroup();
-    oldRefreshCount = qspRefreshCount;
-    isExit = qspExecCode(s, 0, endLine, codeOffset, 0);
     if (oldRefreshCount != qspRefreshCount || qspErrorNum)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
