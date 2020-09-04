@@ -48,7 +48,7 @@ INLINE int qspGetStatCode(QSPString s, QSP_CHAR **pos)
         if (name)
         {
             nameLen = qspStrLen(name->Name);
-            if (nameLen == strLen || (nameLen < strLen && qspIsInList(QSP_DELIMS, s.Str[nameLen])))
+            if (nameLen == strLen || (nameLen < strLen && qspIsInClass(s.Str[nameLen], QSP_CHAR_DELIM)))
             {
                 *pos = s.Str + nameLen;
                 return name->Code;
@@ -91,7 +91,7 @@ INLINE int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CH
     {
         op = qspStringFromPair(pos, pos + QSP_STATIC_LEN(QSP_EQUAL));
         values = qspDelSpc(qspStringFromPair(op.End, s.End));
-        if (op.Str != s.Str && qspIsInList(QSP_ADD QSP_SUB QSP_DIV QSP_MUL, *(op.Str - 1))) --op.Str;
+        if (op.Str != s.Str && qspIsInClass(*(op.Str - 1), QSP_CHAR_SIMPLEOP)) --op.Str;
         names = qspDelSpc(qspStringFromPair(s.Str, op.Str));
         if (qspIsEmpty(names) || qspIsEmpty(values))
             *errorCode = QSP_ERR_SYNTAX;
@@ -514,7 +514,7 @@ void qspPrepareStringToExecution(QSPString *str)
             {
                 if (quotsCount) --quotsCount;
             }
-            else if (qspIsInList(QSP_QUOTS, *pos))
+            else if (qspIsInClass(*pos, QSP_CHAR_QUOT))
                 quot = *pos;
             else if (!quotsCount) /* we have to keep q-strings untouched */
                 *pos = qspToWUpper(*pos);
@@ -575,7 +575,7 @@ INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
                 {
                     if (quotsCount) --quotsCount;
                 }
-                else if (qspIsInList(QSP_QUOTS, *pos))
+                else if (qspIsInClass(*pos, QSP_CHAR_QUOT))
                     quot = *pos;
                 ++pos;
             }

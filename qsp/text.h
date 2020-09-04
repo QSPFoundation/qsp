@@ -24,6 +24,36 @@
     #define QSP_LSUBEX QSP_FMT("<<")
     #define QSP_RSUBEX QSP_FMT(">>")
 
+    /* Frequently used classes of characters */
+    enum
+    {
+        QSP_CHAR_SPACE = 1 << 0,
+        QSP_CHAR_QUOT = 1 << 1,
+        QSP_CHAR_DELIM = 1 << 2,
+        QSP_CHAR_SIMPLEOP = 1 << 3,
+        QSP_CHAR_EXPSTART = 1 << 4
+    };
+
+    static const unsigned char qspAsciiClasses[] =
+    {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x05, 0x04, 0x06, 0x00, 0x00, 0x00, 0x04, 0x06,
+        0x14, 0x04, 0x0c, 0x0c, 0x04, 0x0c, 0x00, 0x0c,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x04, 0x00, 0x04, 0x04, 0x04, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x14, 0x00, 0x04, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x14, 0x00, 0x04, 0x00, 0x00,
+    };
+
     extern QSPString qspNullString;
     extern QSPString qspEmptyString;
 
@@ -119,6 +149,26 @@
         return QSP_FALSE;
     }
 
+    INLINE QSP_BOOL qspIsInClass(QSP_CHAR ch, int charClass)
+    {
+        if (ch >= 128)
+            return QSP_FALSE;
+
+        return (qspAsciiClasses[ch] & charClass) != 0;
+    }
+
+    INLINE QSP_BOOL qspIsAnyInClass(QSPString str, int charClass)
+    {
+        QSP_CHAR *pos = str.Str;
+        while (pos < str.End)
+        {
+            if (qspIsInClass(*pos, charClass))
+                return QSP_TRUE;
+            ++pos;
+        }
+        return QSP_FALSE;
+    }
+
     INLINE QSP_BOOL qspIsDigit(QSP_CHAR ch)
     {
         return (ch >= QSP_FMT('0') && ch <= QSP_FMT('9'));
@@ -127,15 +177,15 @@
     INLINE void qspSkipSpaces(QSPString *s)
     {
         QSP_CHAR *pos = s->Str;
-        while (pos < s->End && qspIsInList(QSP_SPACES, *pos)) ++pos;
+        while (pos < s->End && qspIsInClass(*pos, QSP_CHAR_SPACE)) ++pos;
         s->Str = pos;
     }
 
     INLINE QSPString qspDelSpc(QSPString s)
     {
         QSP_CHAR *begin = s.Str, *end = s.End;
-        while (begin < end && qspIsInList(QSP_SPACES, *begin)) ++begin;
-        while (begin < end && qspIsInList(QSP_SPACES, *(end - 1))) --end;
+        while (begin < end && qspIsInClass(*begin, QSP_CHAR_SPACE)) ++begin;
+        while (begin < end && qspIsInClass(*(end - 1), QSP_CHAR_SPACE)) --end;
         return qspStringFromPair(begin, end);
     }
 

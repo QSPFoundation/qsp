@@ -319,7 +319,7 @@ INLINE QSPString qspGetFullName(QSPString *expr)
             pos += QSP_STATIC_LEN(QSP_RSBRACK);
             break;
         }
-    } while (!qspIsInList(QSP_DELIMS, *pos));
+    } while (!qspIsInClass(*pos, QSP_CHAR_DELIM));
     expr->Str = pos;
     return qspStringFromPair(startPos, pos);
 }
@@ -672,7 +672,7 @@ INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                 break;
             }
             /* We want to separate keywords */
-            if ((opCode == qspOpAnd || opCode == qspOpOr || opCode == qspOpMod) && (qspIsEmpty(s) || !qspIsInList(QSP_SPACES QSP_QUOTS QSP_LQUOT QSP_LRBRACK, *s.Str)))
+            if ((opCode == qspOpAnd || opCode == qspOpOr || opCode == qspOpMod) && (qspIsEmpty(s) || !qspIsInClass(*s.Str, QSP_CHAR_SPACE | QSP_CHAR_QUOT | QSP_CHAR_EXPSTART)))
             {
                 qspSetError(QSP_ERR_SYNTAX);
                 break;
@@ -761,7 +761,7 @@ INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                 if (qspErrorNum) break;
                 waitForOperator = QSP_TRUE;
             }
-            else if (qspIsInList(QSP_QUOTS, *s.Str))
+            else if (qspIsInClass(*s.Str, QSP_CHAR_QUOT))
             {
                 name = qspGetString(&s);
                 if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
@@ -834,7 +834,7 @@ INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                 --argSp;
                 waitForOperator = QSP_TRUE;
             }
-            else if (!qspIsInList(QSP_DELIMS, *s.Str))
+            else if (!qspIsInClass(*s.Str, QSP_CHAR_DELIM))
             {
                 name = qspGetFullName(&s);
                 if (qspErrorNum) break;

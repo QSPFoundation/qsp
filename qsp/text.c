@@ -277,14 +277,14 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
     if (!strLen) return txt.Str;
     pos = qspStrStr(txt, str);
     if (!pos) return 0;
-    if (!(isIsolated || qspStrPBrk(txt, QSP_QUOTS QSP_LQUOT QSP_LRBRACK QSP_LSBRACK))) return pos;
+    if (!(isIsolated || qspIsAnyInClass(txt, QSP_CHAR_QUOT | QSP_CHAR_EXPSTART))) return pos;
     c1 = c2 = c3 = 0;
     isLastDelim = QSP_TRUE;
     pos = txt.Str;
     lastPos = txt.End - strLen;
     while (pos <= lastPos)
     {
-        if (qspIsInList(QSP_QUOTS, *pos))
+        if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
             quot = *pos;
             while (++pos <= lastPos)
@@ -314,11 +314,11 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
         {
             if (isIsolated)
             {
-                if (qspIsInList(QSP_DELIMS, *pos))
+                if (qspIsInClass(*pos, QSP_CHAR_DELIM))
                     isLastDelim = QSP_TRUE;
                 else if (isLastDelim)
                 {
-                    if (pos >= lastPos || qspIsInList(QSP_DELIMS, pos[strLen]))
+                    if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
                     {
                         txt.Str = pos;
                         if (!qspStrsNComp(txt, str, strLen)) return pos;

@@ -56,7 +56,7 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate)
         return 0;
     }
     if (*name.Str == QSP_STRCHAR[0]) ++name.Str;
-    if (qspIsEmpty(name) || qspIsDigit(*name.Str) || qspStrPBrk(name, QSP_DELIMS))
+    if (qspIsEmpty(name) || qspIsDigit(*name.Str) || qspIsAnyInClass(name, QSP_CHAR_DELIM))
     {
         qspSetError(QSP_ERR_NOTCORRECTNAME);
         return 0;
@@ -295,7 +295,7 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
         qspSetVarValueByReference(var, index, &oldVal);
         if (oldVal.IsStr) qspFreeString(QSP_STR(oldVal));
     }
-    else if (qspIsInList(QSP_SUB QSP_DIV QSP_MUL, op))
+    else if (qspIsInClass(op, QSP_CHAR_SIMPLEOP))
     {
         if (qspConvertVariantTo(val, QSP_FALSE))
         {
