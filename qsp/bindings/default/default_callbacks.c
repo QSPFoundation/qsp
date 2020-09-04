@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2010 Valeriy Argunov (nporep AT mail DOT ru) */
+/* Copyright (C) 2001-2020 Valeriy Argunov (val AT time DOT guru) */
 /*
 * This library is free software; you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as published by
@@ -44,7 +44,7 @@ void qspSetCallBack(int type, QSP_CALLBACK func)
 
 void qspCallDebug(QSPString str)
 {
-    /* Здесь передаем управление отладчику */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_DEBUG])
     {
@@ -56,7 +56,7 @@ void qspCallDebug(QSPString str)
 
 void qspCallSetTimer(int msecs)
 {
-    /* Здесь устанавливаем интервал таймера */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_SETTIMER])
     {
@@ -68,7 +68,7 @@ void qspCallSetTimer(int msecs)
 
 void qspCallRefreshInt(QSP_BOOL isRedraw)
 {
-    /* Здесь выполняем обновление интерфейса */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_REFRESHINT])
     {
@@ -80,7 +80,7 @@ void qspCallRefreshInt(QSP_BOOL isRedraw)
 
 void qspCallSetInputStrText(QSPString text)
 {
-    /* Здесь устанавливаем текст строки ввода */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_SETINPUTSTRTEXT])
     {
@@ -92,7 +92,7 @@ void qspCallSetInputStrText(QSPString text)
 
 void qspCallSystem(QSPString cmd)
 {
-    /* Здесь выполняем системный вызов */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_SYSTEM])
     {
@@ -115,8 +115,8 @@ void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
 
 void qspCallOpenGameStatus(QSPString file)
 {
-    /* Здесь позволяем пользователю выбрать файл */
-    /* состояния игры для загрузки и загружаем его */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ */
+    /* пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_OPENGAMESTATUS])
     {
@@ -128,9 +128,9 @@ void qspCallOpenGameStatus(QSPString file)
 
 void qspCallSaveGameStatus(QSPString file)
 {
-    /* Здесь позволяем пользователю выбрать файл */
-    /* для сохранения состояния игры и сохраняем */
-    /* в нем текущее состояние */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ */
+    /* пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
+    /* пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS])
     {
@@ -142,7 +142,7 @@ void qspCallSaveGameStatus(QSPString file)
 
 void qspCallShowMessage(QSPString text)
 {
-    /* Здесь показываем сообщение */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_SHOWMSGSTR])
     {
@@ -154,7 +154,7 @@ void qspCallShowMessage(QSPString text)
 
 int qspCallShowMenu(QSPListItem *items, int count)
 {
-    /* Здесь показываем меню */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ */
     QSPCallState state;
     int index;
     if (qspCallBacks[QSP_CALL_SHOWMENU])
@@ -169,7 +169,7 @@ int qspCallShowMenu(QSPListItem *items, int count)
 
 void qspCallShowPicture(QSPString file)
 {
-    /* Здесь показываем изображение */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_SHOWIMAGE])
     {
@@ -181,7 +181,7 @@ void qspCallShowPicture(QSPString file)
 
 void qspCallShowWindow(int type, QSP_BOOL isShow)
 {
-    /* Здесь показываем или скрываем окно */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_SHOWWINDOW])
     {
@@ -193,7 +193,7 @@ void qspCallShowWindow(int type, QSP_BOOL isShow)
 
 void qspCallPlayFile(QSPString file, int volume)
 {
-    /* Здесь начинаем воспроизведение файла с заданной громкостью */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_PLAYFILE])
     {
@@ -205,7 +205,7 @@ void qspCallPlayFile(QSPString file, int volume)
 
 QSP_BOOL qspCallIsPlayingFile(QSPString file)
 {
-    /* Здесь проверяем, проигрывается ли файл */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ */
     QSPCallState state;
     QSP_BOOL isPlaying;
     if (qspCallBacks[QSP_CALL_ISPLAYINGFILE])
@@ -220,7 +220,7 @@ QSP_BOOL qspCallIsPlayingFile(QSPString file)
 
 void qspCallSleep(int msecs)
 {
-    /* Здесь ожидаем заданное количество миллисекунд */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_SLEEP])
     {
@@ -232,7 +232,7 @@ void qspCallSleep(int msecs)
 
 int qspCallGetMSCount()
 {
-    /* Здесь получаем количество миллисекунд, прошедших с момента последнего вызова функции */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     int count;
     if (qspCallBacks[QSP_CALL_GETMSCOUNT])
@@ -247,7 +247,7 @@ int qspCallGetMSCount()
 
 void qspCallCloseFile(QSPString file)
 {
-    /* Здесь выполняем закрытие файла */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_CLOSEFILE])
     {
@@ -259,7 +259,7 @@ void qspCallCloseFile(QSPString file)
 
 QSPString qspCallInputBox(QSPString text)
 {
-    /* Здесь вводим текст */
+    /* пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ */
     QSPCallState state;
     QSP_CHAR *buffer;
     int maxLen = 511;

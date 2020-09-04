@@ -1,4 +1,4 @@
-// Copyright (C) 2005-2010 Valeriy Argunov (nporep AT mail DOT ru)
+// Copyright (C) 2001-2020 Valeriy Argunov (val AT time DOT guru)
 /*
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
