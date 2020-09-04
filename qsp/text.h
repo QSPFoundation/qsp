@@ -27,11 +27,11 @@
     /* Frequently used classes of characters */
     enum
     {
-        QSP_CHAR_SPACE = 1 << 0,
-        QSP_CHAR_QUOT = 1 << 1,
-        QSP_CHAR_DELIM = 1 << 2,
-        QSP_CHAR_SIMPLEOP = 1 << 3,
-        QSP_CHAR_EXPSTART = 1 << 4
+        QSP_CHAR_SPACE = 1 << 0, /* QSP_SPACES */
+        QSP_CHAR_QUOT = 1 << 1, /* QSP_QUOTS */
+        QSP_CHAR_DELIM = 1 << 2, /* QSP_DELIMS */
+        QSP_CHAR_SIMPLEOP = 1 << 3, /* QSP_ADD QSP_SUB QSP_DIV QSP_MUL */
+        QSP_CHAR_EXPSTART = 1 << 4 /* QSP_LQUOT QSP_LRBRACK QSP_LSBRACK */
     };
 
     static const unsigned char qspAsciiClasses[] =
