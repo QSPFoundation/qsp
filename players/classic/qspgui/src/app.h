@@ -31,11 +31,14 @@
         // Overloaded methods
         virtual bool OnInit();
         virtual int OnExit();
+        virtual void OnInitCmdLine(wxCmdLineParser &parser);
+        virtual bool OnCmdLineParsed(wxCmdLineParser &parser);
     protected:
         void InitUI();
         bool GetAutoRunEvent(wxInitEvent& initEvent);
         // Fields
-        QSPTranslationHelper *m_transhelper;
+        QSPTranslationHelper *m_transHelper;
+        wxString m_gameFile;
     };
 
 #endif

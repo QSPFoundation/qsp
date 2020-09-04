@@ -35,9 +35,9 @@ void QSPTranslationHelper::Load(wxConfigBase &config, const wxString &key)
         UpdateLocale(wxLANGUAGE_DEFAULT);
     else
     {
-        const wxLanguageInfo *langinfo = wxLocale::FindLanguageInfo(langName);
-        if (langinfo)
-            UpdateLocale(langinfo->Language);
+        const wxLanguageInfo *langInfo = wxLocale::FindLanguageInfo(langName);
+        if (langInfo)
+            UpdateLocale(langInfo->Language);
         else
             UpdateLocale(wxLANGUAGE_DEFAULT);
     }

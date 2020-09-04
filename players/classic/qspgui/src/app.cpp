@@ -35,20 +35,39 @@ int QSPApp::OnExit()
 {
     QSPDeInit();
     QSPCallBacks::DeInit();
-    delete m_transhelper;
+    delete m_transHelper;
     wxTheClipboard->Flush();
     return wxApp::OnExit();
+}
+
+void QSPApp::OnInitCmdLine(wxCmdLineParser &parser)
+{
+    wxApp::OnInitCmdLine(parser);
+
+    parser.AddParam("game file",
+                    wxCMD_LINE_VAL_STRING,
+                    wxCMD_LINE_PARAM_OPTIONAL);
+}
+
+bool QSPApp::OnCmdLineParsed(wxCmdLineParser &parser)
+{
+    if (!wxApp::OnCmdLineParsed(parser))
+        return false;
+
+    if (parser.GetParamCount() > 0)
+        m_gameFile = parser.GetParam();
+    return true;
 }
 
 void QSPApp::InitUI()
 {
     wxString appPathString = QSPTools::GetAppPath();
-    m_transhelper = new QSPTranslationHelper(QSP_APPNAME, appPathString + wxT("langs"));
+    m_transHelper = new QSPTranslationHelper(QSP_APPNAME, appPathString + wxT("langs"));
     wxString configPath = appPathString + QSP_CONFIG;
     if (!(wxFileExists(configPath) || wxFileName::IsDirWritable(appPathString)))
         configPath = wxFileName(wxStandardPaths::Get().GetUserConfigDir(), QSP_CONFIG).GetFullPath();
     // ----------------------
-    QSPFrame * frame = new QSPFrame(configPath, m_transhelper);
+    QSPFrame * frame = new QSPFrame(configPath, m_transHelper);
     frame->LoadSettings();
     frame->EnableControls(false);
     QSPCallBacks::Init(frame);
@@ -60,12 +79,9 @@ void QSPApp::InitUI()
 
 bool QSPApp::GetAutoRunEvent(wxInitEvent& initEvent)
 {
-    wxCmdLineParser cmdParser(argc, argv);
-    if (argc > 1)
+    if (!m_gameFile.IsEmpty())
     {
-        cmdParser.AddParam();
-        cmdParser.Parse(false);
-        wxFileName path(cmdParser.GetParam());
+        wxFileName path(m_gameFile);
         path.MakeAbsolute();
         initEvent.SetInitString(path.GetFullPath());
         return true;
