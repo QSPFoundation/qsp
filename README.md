@@ -33,3 +33,7 @@ MSBuild.exe ALL_BUILD.vcxproj /p:Configuration=Release
 * Improve TXT2GAM to support UTF-8
 * Improve TXT2GAM to join multiple text files (you can specify a file that contains a list of files to be joined)
 * ???
+
+## Chat group
+
+https://discord.gg/vyyyTrd
