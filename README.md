@@ -5,7 +5,7 @@
 ```bash
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
-make
+cmake --build . --config Release
 ```
 
 ## Windows build
@@ -14,7 +14,7 @@ make
 mkdir build
 cd build
 cmake.exe -G "Visual Studio 15 2017" -A Win32 -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
-MSBuild.exe ALL_BUILD.vcxproj /p:Configuration=Release
+cmake --build . --config Release
 ```
 
 ## TODO
