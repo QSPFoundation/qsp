@@ -181,6 +181,9 @@ if(BUILD_QSPGUI)
 	install(DIRECTORY "${CMAKE_SOURCE_DIR}/players/classic/misc/common/langs"
 			DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
 	)
+	install(DIRECTORY "${CMAKE_SOURCE_DIR}/players/classic/misc/common/sound"
+			DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+	)
 endif()
 
 option(BUILD_TXT2GAM "Build txt2gam tool")
