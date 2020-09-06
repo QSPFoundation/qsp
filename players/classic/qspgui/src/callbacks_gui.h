@@ -24,7 +24,7 @@
     #include "inputdlg.h"
     #include "fmod.h"
 
-    typedef struct
+    typedef struct QSPSound_
     {
         FMOD_CHANNEL *Channel;
         FMOD_SOUND *Sound;
