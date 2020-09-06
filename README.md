@@ -4,7 +4,7 @@
 
 ```bash
 mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
+cmake -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
 cmake --build . --config Release
 ```
 
@@ -19,7 +19,6 @@ cmake --build . --target install --config Release
 
 ## TODO
 
-* Put all the related files (DLLs/localization) into the output directory automatically
 * Test locals implementation
 * Test loop implementation
 * Update bindings
