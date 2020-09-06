@@ -4,7 +4,7 @@
 
 ```bash
 mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
+cmake -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
 cmake --build . --config Release
 ```
 
