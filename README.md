@@ -19,7 +19,6 @@ cmake --build . --target install --config Release
 
 ## TODO
 
-* Put all the related files (DLLs/localization) into the output directory automatically
 * Test locals implementation
 * Test loop implementation
 * Update bindings
