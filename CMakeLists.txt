@@ -210,4 +210,9 @@ if(BUILD_TXT2GAM)
 		target_compile_definitions(txt2gam PRIVATE SPEC_PASS=${SPEC_PASS})
 	endif()
 	target_compile_options(txt2gam PRIVATE ${PROJECT_COMPILER_FLAGS})
+	install(TARGETS txt2gam
+			RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+			LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
+			ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
+	)
 endif()
