@@ -13,7 +13,7 @@ cmake --build . --config Release
 ```bash
 mkdir build
 cd build
-cmake.exe -G "Visual Studio 15 2017" -A Win32 -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
+cmake -G "Visual Studio 15 2017" -A Win32 -DBUILD_QSPGUI=ON -DBUILD_TXT2GAM=ON ..
 cmake --build . --config Release
 ```
 
