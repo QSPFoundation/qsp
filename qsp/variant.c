@@ -18,26 +18,28 @@
 #include "variant.h"
 #include "text.h"
 
-QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
+QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type)
 {
     int num;
     QSP_CHAR buf[12];
     QSP_BOOL isValid;
-    if (val->IsStr)
+    if (val->Type != type)
     {
-        if (!isToString)
+        if (QSP_ISSTR(val->Type))
         {
-            num = qspStrToNum(QSP_PSTR(val), &isValid);
-            if (!isValid) return QSP_TRUE;
-            qspFreeString(QSP_PSTR(val));
-            QSP_PNUM(val) = num;
-            val->IsStr = QSP_FALSE;
+            if (QSP_ISNUM(type))
+            {
+                num = qspStrToNum(QSP_PSTR(val), &isValid);
+                if (!isValid) return QSP_TRUE;
+                qspFreeString(QSP_PSTR(val));
+                QSP_PNUM(val) = num;
+            }
         }
-    }
-    else if (isToString)
-    {
-        QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)));
-        val->IsStr = QSP_TRUE;
+        else if (QSP_ISSTR(type))
+        {
+            QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)));
+        }
+        val->Type = type;
     }
     return QSP_FALSE;
 }
@@ -45,24 +47,24 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString)
 int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
 {
     int res;
-    if (v1->IsStr != v2->IsStr)
+    if (QSP_ISSTR(v1->Type) != QSP_ISSTR(v2->Type))
     {
-        if (v2->IsStr)
+        if (QSP_ISSTR(v2->Type))
         {
             if (qspIsCanConvertToNum(v2))
-                qspConvertVariantTo(v2, QSP_FALSE);
+                qspConvertVariantTo(v2, v1->Type);
             else
-                qspConvertVariantTo(v1, QSP_TRUE);
+                qspConvertVariantTo(v1, v2->Type);
         }
         else
         {
             if (qspIsCanConvertToNum(v1))
-                qspConvertVariantTo(v1, QSP_FALSE);
+                qspConvertVariantTo(v1, v2->Type);
             else
-                qspConvertVariantTo(v2, QSP_TRUE);
+                qspConvertVariantTo(v2, v1->Type);
         }
     }
-    if (v1->IsStr)
+    if (QSP_ISSTR(v1->Type))
         res = qspStrsComp(QSP_PSTR(v1), QSP_PSTR(v2));
     else
         res = (QSP_PNUM(v1) > QSP_PNUM(v2) ? 1 : (QSP_PNUM(v1) < QSP_PNUM(v2) ? -1 : 0));

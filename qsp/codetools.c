@@ -86,7 +86,7 @@ INLINE int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CH
     QSPCachedArg *foundArgs;
     QSP_CHAR *pos;
     qspSkipSpaces(&s);
-    pos = qspStrPos(s, QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
+    pos = qspDelimPos(s, QSP_EQUAL[0]);
     if (pos)
     {
         op = qspStringFromPair(pos, pos + QSP_STATIC_LEN(QSP_EQUAL));
@@ -128,7 +128,7 @@ INLINE int qspInitRegularArgs(QSPCachedArg **args, int statCode, QSPString s, QS
     qspSkipSpaces(&s);
     if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK[0])
     {
-        if (!(brack = qspStrPos(s, QSP_STATIC_STR(QSP_RRBRACK), QSP_FALSE)))
+        if (!(brack = qspDelimPos(s, QSP_RRBRACK[0])))
         {
             *errorCode = QSP_ERR_BRACKNOTFOUND;
             return 0;
@@ -156,7 +156,7 @@ INLINE int qspInitRegularArgs(QSPCachedArg **args, int statCode, QSPString s, QS
                 bufSize = count + 4;
                 foundArgs = (QSPCachedArg *)realloc(foundArgs, bufSize * sizeof(QSPCachedArg));
             }
-            pos = qspStrPos(s, QSP_STATIC_STR(QSP_COMMA), QSP_FALSE);
+            pos = qspDelimPos(s, QSP_COMMA[0]);
             if (pos)
             {
                 foundArgs[count].StartPos = (int)(s.Str - origStart);
@@ -224,7 +224,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
             case qspStatLoop:
             case qspStatIf:
             case qspStatElseIf:
-                delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_COLONDELIM), QSP_FALSE);
+                delimPos = qspDelimPos(str, QSP_COLONDELIM[0]);
                 if (delimPos)
                 {
                     nextPos = delimPos + QSP_STATIC_LEN(QSP_COLONDELIM);
@@ -244,7 +244,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                     delimPos = 0;
                 break;
             default:
-                delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_STATDELIM), QSP_FALSE);
+                delimPos = qspDelimPos(str, QSP_STATDELIM[0]);
                 if (delimPos) nextPos = delimPos + QSP_STATIC_LEN(QSP_STATDELIM);
                 elsePos = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
                 if (elsePos)
@@ -260,9 +260,9 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                 if (statCode == qspStatUnknown && str.Str != delimPos)
                 {
                     if (delimPos)
-                        temp = qspStrPos(qspStringFromPair(str.Str, delimPos), QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
+                        temp = qspDelimPos(qspStringFromPair(str.Str, delimPos), QSP_EQUAL[0]);
                     else
-                        temp = qspStrPos(str, QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
+                        temp = qspDelimPos(str, QSP_EQUAL[0]);
                     statCode = (temp ? qspStatSet : qspStatMPL);
                 }
                 break;
@@ -293,7 +293,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                     case qspStatLoop:
                     case qspStatIf:
                     case qspStatElseIf:
-                        delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_COLONDELIM), QSP_FALSE);
+                        delimPos = qspDelimPos(str, QSP_COLONDELIM[0]);
                         if (delimPos)
                         {
                             nextPos = delimPos + QSP_STATIC_LEN(QSP_COLONDELIM);
@@ -313,7 +313,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                             delimPos = 0;
                         break;
                     default:
-                        delimPos = qspStrPos(str, QSP_STATIC_STR(QSP_STATDELIM), QSP_FALSE);
+                        delimPos = qspDelimPos(str, QSP_STATDELIM[0]);
                         if (delimPos) nextPos = delimPos + QSP_STATIC_LEN(QSP_STATDELIM);
                         if (elsePos && str.Str >= elsePos) elsePos = 0;
                         if (!elsePos && isSearchElse)
@@ -329,9 +329,9 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                         if (statCode == qspStatUnknown && str.Str != delimPos)
                         {
                             if (delimPos)
-                                temp = qspStrPos(qspStringFromPair(str.Str, delimPos), QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
+                                temp = qspDelimPos(qspStringFromPair(str.Str, delimPos), QSP_EQUAL[0]);
                             else
-                                temp = qspStrPos(str, QSP_STATIC_STR(QSP_EQUAL), QSP_FALSE);
+                                temp = qspDelimPos(str, QSP_EQUAL[0]);
                             statCode = (temp ? qspStatSet : qspStatMPL);
                         }
                         break;
@@ -468,21 +468,27 @@ QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim)
     for (i = 0; i < count; ++i)
     {
         itemLen = qspStrLen(s[i].Str);
-        if ((txtLen += itemLen) > bufSize)
+        if (itemLen)
         {
-            bufSize = txtLen + 128;
-            txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
+            if ((txtLen += itemLen) > bufSize)
+            {
+                bufSize = txtLen + 128;
+                txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
+            }
+            memcpy(txt + txtRealLen, s[i].Str.Str, itemLen * sizeof(QSP_CHAR));
+            txtRealLen = txtLen;
         }
-        memcpy(txt + txtRealLen, s[i].Str.Str, itemLen * sizeof(QSP_CHAR));
-        if (i == count - 1) break;
-        txtRealLen = txtLen;
-        if ((txtLen += delimLen) > bufSize)
+        if (i == count - 1) break; /* don't add the delim */
+        if (delimLen)
         {
-            bufSize = txtLen + 128;
-            txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
+            if ((txtLen += delimLen) > bufSize)
+            {
+                bufSize = txtLen + 128;
+                txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
+            }
+            memcpy(txt + txtRealLen, delim.Str, delimLen * sizeof(QSP_CHAR));
+            txtRealLen = txtLen;
         }
-        memcpy(txt + txtRealLen, delim.Str, delimLen * sizeof(QSP_CHAR));
-        txtRealLen = txtLen;
     }
     return qspStringFromLen(txt, txtLen);
 }

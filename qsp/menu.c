@@ -53,41 +53,44 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSPString *jumpTo, in
     while (ind < var->ValsCount)
     {
         if (itemsCount == maxItems) break;
-        str = var->Values[ind].Str;
-        if (!(str.Str && qspIsAnyString(str))) break;
-        if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM)))
+        if (QSP_ISSTR(var->Values[ind].Type))
         {
-            qspSetError(QSP_ERR_COLONNOTFOUND);
-            return QSP_FALSE;
+            str = QSP_STR(var->Values[ind]);
+            if (!(str.Str && qspIsAnyString(str))) break;
+            if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM)))
+            {
+                qspSetError(QSP_ERR_COLONNOTFOUND);
+                return QSP_FALSE;
+            }
+            if (itemsCount == QSP_MAXMENUITEMS)
+            {
+                qspSetError(QSP_ERR_CANTADDMENUITEM);
+                return QSP_FALSE;
+            }
+            if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
+            {
+                imgPath = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
+                imgPath = (qspIsAnyString(imgPath) ? qspGetNewText(imgPath) : qspNullString);
+            }
+            else
+            {
+                pos = pos2;
+                pos2 = str.End;
+                imgPath = qspNullString;
+            }
+            menuLocs[itemsCount] = qspGetNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
+            menuItems[itemsCount].Name = qspGetNewText(qspStringFromPair(str.Str, pos));
+            menuItems[itemsCount].Image = imgPath;
+            ++itemsCount;
+            ++ind;
         }
-        if (itemsCount == QSP_MAXMENUITEMS)
-        {
-            qspSetError(QSP_ERR_CANTADDMENUITEM);
-            return QSP_FALSE;
-        }
-        if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
-        {
-            imgPath = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
-            imgPath = (qspIsAnyString(imgPath) ? qspGetNewText(imgPath) : qspNullString);
-        }
-        else
-        {
-            pos = pos2;
-            pos2 = str.End;
-            imgPath = qspNullString;
-        }
-        menuLocs[itemsCount] = qspGetNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
-        menuItems[itemsCount].Name = qspGetNewText(qspStringFromPair(str.Str, pos));
-        menuItems[itemsCount].Image = imgPath;
-        ++itemsCount;
-        ++ind;
     }
     if (itemsCount)
     {
         ind = qspCallShowMenu(menuItems, itemsCount);
         if (ind >= 0 && ind < itemsCount)
         {
-            arg.IsStr = QSP_FALSE;
+            arg.Type = QSP_TYPE_NUMBER;
             QSP_NUM(arg) = ind + 1;
             qspExecLocByNameWithArgs(menuLocs[ind], &arg, 1, 0);
         }

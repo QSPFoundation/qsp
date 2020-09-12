@@ -97,10 +97,10 @@ QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind)
             res = qspGetNewText(qspStringFromLen((QSP_CHAR *)(tempBeg + onigReg->beg[pos]), len));
         }
         else
-            res = qspNewEmptyString();
+            res = qspNullString;
     }
     else
-        res = qspNewEmptyString();
+        res = qspNullString;
     onig_region_free(onigReg, 1);
     return res;
 }

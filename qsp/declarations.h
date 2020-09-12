@@ -31,7 +31,7 @@
     #define MEMWATCH
     #define MEMWATCH_STDIO
 
-    #include "memwatch.h"
+//    #include "memwatch.h"
 #endif
 
 /* -------- */

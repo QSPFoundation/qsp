@@ -55,7 +55,6 @@
     };
 
     extern QSPString qspNullString;
-    extern QSPString qspEmptyString;
 
     /* External functions */
     QSP_CHAR *qspStringToC(QSPString s);
@@ -70,6 +69,7 @@
     QSP_BOOL qspIsNumber(QSPString s);
     int qspStrToNum(QSPString s, QSP_BOOL *isValid);
     QSPString qspNumToStr(QSP_CHAR *buf, int val);
+    QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch);
     QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated);
     QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt);
     QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf);
@@ -135,11 +135,6 @@
         QSPString string;
         qspAddText(&string, val, QSP_TRUE);
         return string;
-    }
-
-    INLINE QSPString qspNewEmptyString()
-    {
-        return qspGetNewText(qspEmptyString);
     }
 
     INLINE QSP_BOOL qspIsInList(QSP_CHAR *list, QSP_CHAR ch)

@@ -296,7 +296,7 @@ QSPString qspSaveGameStatusToString()
     QSPString buf, locName;
     QSPVar *savedVars;
     int i, j, varsCount, oldRefreshCount = qspRefreshCount;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONGSAVE")), 0, 0);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return qspNullString;
     varsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVars);
     if (qspErrorNum) return qspNullString;
@@ -362,8 +362,11 @@ QSPString qspSaveGameStatusToString()
             qspCodeWriteIntVal(&buf, qspVars[i].ValsCount, QSP_TRUE);
             for (j = 0; j < qspVars[i].ValsCount; ++j)
             {
-                qspCodeWriteIntVal(&buf, qspVars[i].Values[j].Num, QSP_TRUE);
-                qspCodeWriteVal(&buf, qspVars[i].Values[j].Str, QSP_TRUE);
+                qspCodeWriteIntVal(&buf, qspVars[i].Values[j].Type, QSP_TRUE);
+                if (QSP_ISSTR(qspVars[i].Values[j].Type))
+                    qspCodeWriteVal(&buf, QSP_STR(qspVars[i].Values[j]), QSP_TRUE);
+                else
+                    qspCodeWriteIntVal(&buf, QSP_NUM(qspVars[i].Values[j]), QSP_TRUE);
             }
             qspCodeWriteIntVal(&buf, qspVars[i].IndsCount, QSP_TRUE);
             for (j = 0; j < qspVars[i].IndsCount; ++j)
@@ -482,7 +485,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
 void qspOpenGameStatusFromString(QSPString str)
 {
     QSPString *strs, locName;
-    int i, j, ind, count, varInd, varsCount, valsCount;
+    int i, j, ind, type, count, varInd, varsCount, valsCount;
     count = qspSplitStr(str, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     if (!qspCheckGameStatus(strs, count))
     {
@@ -558,11 +561,14 @@ void qspOpenGameStatusFromString(QSPString str)
         if (valsCount)
         {
             qspVars[varInd].ValsCount = valsCount;
-            qspVars[varInd].Values = (QSPVarValue *)malloc(valsCount * sizeof(QSPVarValue));
+            qspVars[varInd].Values = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
             for (j = 0; j < valsCount; ++j)
             {
-                qspVars[varInd].Values[j].Num = qspReCodeGetIntVal(strs[ind++]);
-                qspVars[varInd].Values[j].Str = (qspIsEmpty(strs[ind]) ? qspNullString : qspCodeReCode(strs[ind], QSP_FALSE));
+                type = qspReCodeGetIntVal(strs[ind++]);
+                if (QSP_ISSTR(type))
+                    QSP_STR(qspVars[varInd].Values[j]) = (qspIsEmpty(strs[ind]) ? qspNullString : qspCodeReCode(strs[ind], QSP_FALSE));
+                else
+                    QSP_NUM(qspVars[varInd].Values[j]) = qspReCodeGetIntVal(strs[ind]);
                 ++ind;
             }
         }
@@ -596,7 +602,7 @@ void qspOpenGameStatusFromString(QSPString str)
     qspCallCloseFile(qspNullString);
     qspPlayPLFiles();
     qspCallSetTimer(qspTimerInterval);
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGLOAD")), 0, 0);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONGLOAD")), 0, 0);
 }
 
 QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSPString *jumpTo, int extArg)

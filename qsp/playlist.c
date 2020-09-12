@@ -78,12 +78,15 @@ INLINE int qspSearchPlayList(QSPString file)
     for (i = 0; i < qspPLFilesCount; ++i)
     {
         itemLen = qspStrLen(qspPLFiles[i]);
-        if (itemLen > bufSize)
+        if (itemLen)
         {
-            bufSize = itemLen + 8;
-            buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
+            if (itemLen > bufSize)
+            {
+                bufSize = itemLen + 8;
+                buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
+            }
+            memcpy(buf, qspPLFiles[i].Str, itemLen * sizeof(QSP_CHAR));
         }
-        memcpy(buf, qspPLFiles[i].Str, itemLen * sizeof(QSP_CHAR));
         bufName = qspStringFromLen(buf, itemLen);
         qspUpperStr(&bufName);
         if (!qspStrsNComp(bufName, uName, fileLen))

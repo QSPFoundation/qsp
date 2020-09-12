@@ -23,16 +23,12 @@
     #define QSP_VARSDEFINES
 
     #define QSP_VARGROUPSBATCHSIZE 256
-    #define QSP_VARSSEEK 50
+    #define QSP_VARSSEEK 64
     #define QSP_VARSCOUNT 256 * QSP_VARSSEEK
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
 
-    typedef struct
-    {
-        int Num;
-        QSPString Str;
-    } QSPVarValue;
+    #define QSP_VARTYPE(a) ((a) == QSP_STRCHAR[0]) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */
 
     typedef struct
     {
@@ -43,7 +39,7 @@
     typedef struct
     {
         QSPString Name;
-        QSPVarValue *Values;
+        QSPVariant *Values;
         int ValsCount;
         QSPVarIndex *Indices;
         int IndsCount;
@@ -66,10 +62,10 @@
     void qspClearVars(QSP_BOOL isFirst);
     QSPVar *qspVarReferenceWithType(QSPString name, QSP_BOOL isCreate, QSP_BOOL *isString);
     void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
-    QSPVariant qspGetVarValueByReference(QSPVar *, int, QSP_BOOL);
+    QSPVariant qspGetVarValueByReference(QSPVar *var, int ind, int type);
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
-    QSPVariant qspGetVar(QSPString name);
+    int qspGetVarTextIndex(QSPVar *, QSPString, QSP_BOOL);
     void qspRestoreGlobalVars();
     int qspSaveLocalVarsAndRestoreGlobals(QSPVar **);
     void qspRestoreLocalVars(QSPVar *, int, QSPVarsGroup *, int);
@@ -114,7 +110,7 @@
         {
             count = var->ValsCount;
             while (--count >= 0)
-                qspFreeString(var->Values[count].Str);
+                if (QSP_ISSTR(var->Values[count].Type)) qspFreeString(QSP_STR(var->Values[count]));
             free(var->Values);
         }
         if (var->Indices)

@@ -60,12 +60,15 @@ INLINE int qspActIndex(QSPString name)
     for (i = 0; i < qspCurActionsCount; ++i)
     {
         actNameLen = qspStrLen(qspCurActions[i].Desc);
-        if (actNameLen > bufSize)
+        if (actNameLen)
         {
-            bufSize = actNameLen + 16;
-            buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
+            if (actNameLen > bufSize)
+            {
+                bufSize = actNameLen + 16;
+                buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
+            }
+            memcpy(buf, qspCurActions[i].Desc.Str, actNameLen * sizeof(QSP_CHAR));
         }
-        memcpy(buf, qspCurActions[i].Desc.Str, actNameLen * sizeof(QSP_CHAR));
         bufName = qspStringFromLen(buf, actNameLen);
         qspUpperStr(&bufName);
         if (!qspStrsComp(bufName, name))
@@ -135,8 +138,8 @@ void qspExecAction(int ind)
 QSPString qspGetAllActionsAsCode()
 {
     int count, i;
-    QSPString res, temp;
-    res = qspNewEmptyString();
+    QSPString temp, res;
+    res = qspNullString;
     for (i = 0; i < qspCurActionsCount; ++i)
     {
         qspAddText(&res, QSP_STATIC_STR(QSP_FMT("ACT '")), QSP_FALSE);

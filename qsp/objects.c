@@ -58,12 +58,12 @@ void qspClearObjectsWithNotify()
         for (i = 0; i < oldCount; ++i)
             qspAddText(objs + i, qspCurObjects[i].Desc, QSP_TRUE);
         qspClearObjects(QSP_FALSE);
-        v.IsStr = QSP_TRUE;
+        v.Type = QSP_TYPE_STRING;
         oldRefreshCount = qspRefreshCount;
         for (i = 0; i < oldCount; ++i)
         {
             QSP_STR(v) = objs[i];
-            qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &v, 1);
+            qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONOBJDEL")), &v, 1);
             if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
         }
         qspFreeStrs(objs, oldCount);
@@ -75,7 +75,7 @@ INLINE void qspRemoveObject(int index)
     QSPVariant name;
     if (index < 0 || index >= qspCurObjectsCount) return;
     if (qspCurSelObject >= index) qspCurSelObject = -1;
-    name.IsStr = QSP_TRUE;
+    name.Type = QSP_TYPE_STRING;
     QSP_STR(name) = qspCurObjects[index].Desc;
     qspFreeString(qspCurObjects[index].Image);
     --qspCurObjectsCount;
@@ -85,7 +85,7 @@ INLINE void qspRemoveObject(int index)
         ++index;
     }
     qspIsObjectsChanged = QSP_TRUE;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &name, 1);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONOBJDEL")), &name, 1);
     qspFreeString(QSP_STR(name));
 }
 
@@ -102,12 +102,15 @@ int qspObjIndex(QSPString name)
     for (i = 0; i < qspCurObjectsCount; ++i)
     {
         objNameLen = qspStrLen(qspCurObjects[i].Desc);
-        if (objNameLen > bufSize)
+        if (objNameLen)
         {
-            bufSize = objNameLen + 8;
-            buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
+            if (objNameLen > bufSize)
+            {
+                bufSize = objNameLen + 8;
+                buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
+            }
+            memcpy(buf, qspCurObjects[i].Desc.Str, objNameLen * sizeof(QSP_CHAR));
         }
-        memcpy(buf, qspCurObjects[i].Desc.Str, objNameLen * sizeof(QSP_CHAR));
         bufName = qspStringFromLen(buf, objNameLen);
         qspUpperStr(&bufName);
         if (!qspStrsComp(bufName, name))
@@ -152,7 +155,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSPString *jumpTo, i
     obj->Desc = qspGetNewText(QSP_STR(args[0]));
     qspIsObjectsChanged = QSP_TRUE;
     if (count == 3) count = 2;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJADD")), args, count);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONOBJADD")), args, count);
     return QSP_FALSE;
 }
 

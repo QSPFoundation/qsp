@@ -124,7 +124,7 @@ QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL isRefresh)
         qspPrepareExecution();
         if (qspIsDisableCodeExec) return QSP_FALSE;
         qspCurSelAction = ind;
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONACTSEL")), 0, 0);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONACTSEL")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
         if (isRefresh) qspCallRefreshInt(QSP_FALSE);
     }
@@ -177,7 +177,7 @@ QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh)
         qspPrepareExecution();
         if (qspIsDisableCodeExec) return QSP_FALSE;
         qspCurSelObject = ind;
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJSEL")), 0, 0);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONOBJSEL")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
         if (isRefresh) qspCallRefreshInt(QSP_FALSE);
     }
@@ -235,8 +235,10 @@ QSP_BOOL QSPGetVarValues(QSPString name, int ind, int *numVal, QSPString *strVal
     qspResetError();
     var = qspVarReference(name, QSP_FALSE);
     if (qspErrorNum || ind < 0 || ind >= var->ValsCount) return QSP_FALSE;
-    *numVal = var->Values[ind].Num;
-    *strVal = var->Values[ind].Str;
+    if (QSP_ISSTR(var->Values[ind].Type))
+        *strVal = QSP_STR(var->Values[ind]);
+    else
+        *numVal = QSP_NUM(var->Values[ind]);
     return QSP_TRUE;
 }
 /* Get max number of variables */
@@ -282,7 +284,7 @@ QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh)
     if (!qspIsInCallBack)
     {
         qspPrepareExecution();
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("COUNTER")), 0, 0);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("COUNTER")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
         if (isRefresh) qspCallRefreshInt(QSP_FALSE);
     }
@@ -294,7 +296,7 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh)
     if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
     qspPrepareExecution();
     if (qspIsDisableCodeExec) return QSP_FALSE;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("USERCOM")), 0, 0);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("USERCOM")), 0, 0);
     if (qspErrorNum) return QSP_FALSE;
     if (isRefresh) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
@@ -337,7 +339,7 @@ QSP_BOOL QSPSaveGameAsData(void *buf, int bufSize, int *realSize, QSP_BOOL isRef
     qspPrepareExecution();
     if (qspIsDisableCodeExec) return QSP_FALSE;
     data = qspSaveGameStatusToString();
-    if (!data.Str)
+    if (qspIsEmpty(data))
     {
         *realSize = 0;
         return QSP_FALSE;
@@ -390,7 +392,6 @@ void QSPInit()
         mwInit();
     #endif
     qspNullString = qspStringFromPair(0, 0);
-    qspEmptyString = QSP_STATIC_STR(QSP_FMT(""));
     qspIsDebug = QSP_FALSE;
     qspRefreshCount = qspFullRefreshCount = 0;
     qspQstCRC = 0;

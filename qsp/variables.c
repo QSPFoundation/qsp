@@ -31,8 +31,7 @@ int qspSavedVarGroupsBufSize = 0;
 INLINE int qspIndStringCompare(const void *, const void *);
 INLINE void qspRemoveArray(QSPString name);
 INLINE void qspRemoveArrayItem(QSPString name, int index);
-INLINE int qspGetVarTextIndex(QSPVar *, QSPString, QSP_BOOL);
-INLINE QSPVar *qspGetVarData(QSPString s, QSP_BOOL isSet, int *index);
+INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSet);
 INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op);
 INLINE void qspCopyVar(QSPVar *, QSPVar *, int, int);
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames);
@@ -50,12 +49,6 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate)
     QSPVar *var;
     QSP_CHAR *pos;
     unsigned char bCode;
-    if (qspIsEmpty(name))
-    {
-        qspSetError(QSP_ERR_NOTCORRECTNAME);
-        return 0;
-    }
-    if (*name.Str == QSP_STRCHAR[0]) ++name.Str;
     if (qspIsEmpty(name) || qspIsDigit(*name.Str) || qspIsAnyInClass(name, QSP_CHAR_DELIM))
     {
         qspSetError(QSP_ERR_NOTCORRECTNAME);
@@ -113,7 +106,8 @@ INLINE void qspRemoveArrayItem(QSPString name, int index)
     if (!(var = qspVarReferenceWithType(name, QSP_FALSE, 0))) return;
     if (index < 0 || index >= var->ValsCount) return;
     curIndex = index;
-    qspFreeString(var->Values[curIndex].Str);
+    if (QSP_ISSTR(var->Values[curIndex].Type))
+        qspFreeString(QSP_STR(var->Values[curIndex]));
     var->ValsCount--;
     while (curIndex < var->ValsCount)
     {
@@ -147,7 +141,7 @@ QSPVar *qspVarReferenceWithType(QSPString name, QSP_BOOL isCreate, QSP_BOOL *isS
     return var;
 }
 
-INLINE int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL isCreate)
+int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL isCreate)
 {
     QSPVarIndex *ind;
     int i, n = var->IndsCount;
@@ -186,7 +180,7 @@ INLINE int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL isCreate)
     return -1;
 }
 
-INLINE QSPVar *qspGetVarData(QSPString s, QSP_BOOL isSet, int *index)
+INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSet)
 {
     QSPVar *var;
     QSPVariant ind;
@@ -196,7 +190,7 @@ INLINE QSPVar *qspGetVarData(QSPString s, QSP_BOOL isSet, int *index)
     {
         startPos = s.Str;
         s.Str = lPos;
-        rPos = qspStrPos(s, QSP_STATIC_STR(QSP_RSBRACK), QSP_FALSE);
+        rPos = qspDelimPos(s, QSP_RSBRACK[0]);
         if (!rPos)
         {
             qspSetError(QSP_ERR_BRACKNOTFOUND);
@@ -218,7 +212,7 @@ INLINE QSPVar *qspGetVarData(QSPString s, QSP_BOOL isSet, int *index)
             oldRefreshCount = qspRefreshCount;
             ind = qspExprValue(qspStringFromPair(s.Str, rPos));
             if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
-            if (ind.IsStr)
+            if (QSP_ISSTR(ind.Type))
             {
                 *index = qspGetVarTextIndex(var, QSP_STR(ind), isSet);
                 qspFreeString(QSP_STR(ind));
@@ -234,25 +228,21 @@ INLINE QSPVar *qspGetVarData(QSPString s, QSP_BOOL isSet, int *index)
 
 void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
 {
+    QSPVariant *curValue;
     int count, oldCount = var->ValsCount;
     if (ind >= oldCount)
     {
         count = var->ValsCount = ind + 1;
-        var->Values = (QSPVarValue *)realloc(var->Values, count * sizeof(QSPVarValue));
+        var->Values = (QSPVariant *)realloc(var->Values, count * sizeof(QSPVariant));
+        curValue = var->Values + oldCount;
         while (oldCount < count)
         {
-            var->Values[oldCount].Num = 0;
-            var->Values[oldCount].Str = qspNullString;
+            qspInitVariant(curValue, QSP_BASETYPE(val->Type));
             ++oldCount;
+            ++curValue;
         }
     }
-    if (ind >= 0)
-    {
-        if (val->IsStr)
-            qspUpdateText(&var->Values[ind].Str, QSP_PSTR(val));
-        else
-            var->Values[ind].Num = QSP_PNUM(val);
-    }
+    if (ind >= 0) qspCopyVariant(var->Values + ind, val);
 }
 
 INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
@@ -260,50 +250,57 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
     QSPVariant oldVal;
     QSPVar *var;
     int index;
-    if (!(var = qspGetVarData(name, QSP_TRUE, &index))) return;
+    if (!(var = qspGetVarData(name, &index, QSP_TRUE))) return;
     if (op == QSP_EQUAL[0])
     {
-        if (qspConvertVariantTo(val, *name.Str == QSP_STRCHAR[0]))
+        if (QSP_BASETYPE(QSP_VARTYPE(*name.Str)) != QSP_BASETYPE(val->Type))
         {
-            qspSetError(QSP_ERR_TYPEMISMATCH);
-            return;
+            if (qspConvertVariantTo(val, QSP_VARTYPE(*name.Str)))
+            {
+                qspSetError(QSP_ERR_TYPEMISMATCH);
+                return;
+            }
         }
         qspSetVarValueByReference(var, index, val);
     }
     else if (op == QSP_ADD[0])
     {
-        oldVal = qspGetVarValueByReference(var, index, *name.Str == QSP_STRCHAR[0]);
-        if (oldVal.IsStr && val->IsStr)
+        oldVal = qspGetVarValueByReference(var, index, QSP_VARTYPE(*name.Str));
+        if (QSP_ISSTR(oldVal.Type) && QSP_ISSTR(val->Type))
+        {
             qspAddText(&QSP_STR(oldVal), QSP_PSTR(val), QSP_FALSE);
+            oldVal.Type = QSP_TYPE_STRING;
+        }
         else if (qspIsCanConvertToNum(&oldVal) && qspIsCanConvertToNum(val))
         {
-            qspConvertVariantTo(&oldVal, QSP_FALSE);
-            qspConvertVariantTo(val, QSP_FALSE);
+            qspConvertVariantTo(&oldVal, QSP_TYPE_NUMBER);
+            qspConvertVariantTo(val, QSP_TYPE_NUMBER);
             QSP_NUM(oldVal) += QSP_PNUM(val);
-            qspConvertVariantTo(&oldVal, *name.Str == QSP_STRCHAR[0]);
+            qspConvertVariantTo(&oldVal, QSP_VARTYPE(*name.Str));
         }
         else
         {
-            if (!oldVal.IsStr)
+            if (QSP_ISNUM(oldVal.Type))
             {
                 qspSetError(QSP_ERR_TYPEMISMATCH);
                 return;
             }
-            qspConvertVariantTo(val, QSP_TRUE);
+            qspConvertVariantTo(val, QSP_TYPE_STRING);
             qspAddText(&QSP_STR(oldVal), QSP_PSTR(val), QSP_FALSE);
+            oldVal.Type = QSP_TYPE_STRING;
         }
         qspSetVarValueByReference(var, index, &oldVal);
-        if (oldVal.IsStr) qspFreeString(QSP_STR(oldVal));
+        if (QSP_ISSTR(oldVal.Type)) qspFreeString(QSP_STR(oldVal));
     }
     else if (qspIsInClass(op, QSP_CHAR_SIMPLEOP))
     {
-        if (qspConvertVariantTo(val, QSP_FALSE))
+        if (qspConvertVariantTo(val, QSP_TYPE_NUMBER))
         {
             qspSetError(QSP_ERR_TYPEMISMATCH);
             return;
         }
-        oldVal = qspGetVarValueByReference(var, index, *name.Str == QSP_STRCHAR[0]);
-        if (qspConvertVariantTo(&oldVal, QSP_FALSE))
+        oldVal = qspGetVarValueByReference(var, index, QSP_VARTYPE(*name.Str));
+        if (qspConvertVariantTo(&oldVal, QSP_TYPE_NUMBER))
         {
             qspSetError(QSP_ERR_TYPEMISMATCH);
             qspFreeString(QSP_STR(oldVal));
@@ -322,45 +319,37 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
         }
         else
             QSP_NUM(oldVal) *= QSP_PNUM(val);
-        qspConvertVariantTo(&oldVal, *name.Str == QSP_STRCHAR[0]);
+        qspConvertVariantTo(&oldVal, QSP_VARTYPE(*name.Str));
         qspSetVarValueByReference(var, index, &oldVal);
-        if (oldVal.IsStr) qspFreeString(QSP_STR(oldVal));
+        if (QSP_ISSTR(oldVal.Type)) qspFreeString(QSP_STR(oldVal));
     }
 }
 
-QSPVariant qspGetVarValueByReference(QSPVar *var, int ind, QSP_BOOL isStringType)
+QSPVariant qspGetVarValueByReference(QSPVar *var, int ind, int type)
 {
     QSPVariant ret;
-    QSPString text;
     if (ind >= 0 && ind < var->ValsCount)
     {
-        if (ret.IsStr = isStringType)
-        {
-            text = var->Values[ind].Str;
-            QSP_STR(ret) = (text.Str ? qspGetNewText(text) : qspNewEmptyString());
-        }
-        else
-            QSP_NUM(ret) = var->Values[ind].Num;
+        qspCopyVariant(&ret, var->Values + ind);
         return ret;
     }
-    return qspGetEmptyVariant(isStringType);
+    return qspGetEmptyVariant(type);
 }
 
 QSPString qspGetVarStrValue(QSPString name)
 {
-    QSPString text;
     QSPVar *var;
     if (var = qspVarReference(name, QSP_FALSE))
     {
         if (var->ValsCount)
         {
-            text = var->Values->Str;
-            if (text.Str) return text;
+            if (QSP_ISSTR(var->Values->Type))
+                return QSP_STR(var->Values[0]);
         }
     }
     else
         qspResetError();
-    return qspEmptyString;
+    return qspNullString;
 }
 
 int qspGetVarNumValue(QSPString name)
@@ -368,20 +357,15 @@ int qspGetVarNumValue(QSPString name)
     QSPVar *var;
     if (var = qspVarReference(name, QSP_FALSE))
     {
-        if (var->ValsCount) return var->Values->Num;
+        if (var->ValsCount)
+        {
+            if (QSP_ISNUM(var->Values->Type))
+                return QSP_NUM(var->Values[0]);
+        }
     }
     else
         qspResetError();
     return 0;
-}
-
-QSPVariant qspGetVar(QSPString name)
-{
-    QSPVar *var;
-    int index;
-    if (!(var = qspGetVarData(name, QSP_FALSE, &index)))
-        return qspGetEmptyVariant(QSP_FALSE);
-    return qspGetVarValueByReference(var, index, *name.Str == QSP_STRCHAR[0]);
 }
 
 void qspRestoreGlobalVars()
@@ -520,7 +504,6 @@ void qspClearVarsList(QSPVar *vars, int varsCount)
 
 INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 {
-    QSPString str;
     int i, maxCount, newInd;
     if (start < 0) start = 0;
     maxCount = src->ValsCount - start;
@@ -531,13 +514,9 @@ INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
     }
     if (count < maxCount) maxCount = count;
     dest->ValsCount = maxCount;
-    dest->Values = (QSPVarValue *)malloc(maxCount * sizeof(QSPVarValue));
+    dest->Values = (QSPVariant *)malloc(maxCount * sizeof(QSPVariant));
     for (i = 0; i < maxCount; ++i)
-    {
-        dest->Values[i].Num = src->Values[i + start].Num;
-        str = src->Values[i + start].Str;
-        dest->Values[i].Str = (str.Str ? qspGetNewText(str) : qspNullString);
-    }
+        qspCopyVariant(dest->Values + i, src->Values + i + start);
     dest->IndsBufSize = 0;
     dest->Indices = 0;
     count = 0;
@@ -570,11 +549,11 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 {
     int num, count;
     QSPVar *var;
-    QSPString str, emptyStr;
+    QSPString str;
     regex_t *regExp;
     QSP_BOOL isString;
     if (!(var = qspVarReferenceWithType(varName, QSP_FALSE, &isString))) return -1;
-    if (qspConvertVariantTo(val, isRegExp || isString))
+    if (qspConvertVariantTo(val, (isRegExp || isString ? QSP_TYPE_STRING : QSP_TYPE_NUMBER)))
     {
         qspSetError(QSP_ERR_TYPEMISMATCH);
         return -1;
@@ -589,29 +568,30 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
         ind = 0;
     else if (ind > count)
         ind = count;
-    emptyStr = qspEmptyString;
     while (ind <= count)
     {
-        if (val->IsStr)
+        if (QSP_BASETYPE(var->Values[ind].Type) == QSP_BASETYPE(val->Type))
         {
-            if (ind >= count)
-                str = emptyStr;
+            if (QSP_ISSTR(val->Type))
+            {
+                if (ind < count)
+                {
+                    str = QSP_STR(var->Values[ind]);
+                }
+                else
+                    str = qspNullString;
+                if (isRegExp)
+                {
+                    if (qspRegExpStrMatch(regExp, str)) return ind;
+                }
+                else if (!qspStrsComp(str, QSP_PSTR(val)))
+                    return ind;
+            }
             else
             {
-                str = var->Values[ind].Str;
-                if (!str.Str) str = emptyStr;
+                num = (ind < count ? QSP_NUM(var->Values[ind]) : 0);
+                if (num == QSP_PNUM(val)) return ind;
             }
-            if (isRegExp)
-            {
-                if (qspRegExpStrMatch(regExp, str)) return ind;
-            }
-            else if (!qspStrsComp(str, QSP_PSTR(val)))
-                return ind;
-        }
-        else
-        {
-            num = (ind < count ? var->Values[ind].Num : 0);
-            if (num == QSP_PNUM(val)) return ind;
         }
         ++ind;
     }
@@ -626,48 +606,51 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
     int curInd, count;
     QSPVariant res;
     if (!(var = qspVarReferenceWithType(name, QSP_FALSE, &isString)))
-        return qspGetEmptyVariant(QSP_FALSE);
+        return qspGetEmptyVariant(QSP_TYPE_NUMBER);
     curInd = -1;
     count = var->ValsCount;
     while (--count >= 0)
     {
-        if (isString)
+        if (QSP_ISSTR(var->Values[count].Type) == isString)
         {
-            str = var->Values[count].Str;
-            if (!qspIsEmpty(str))
+            if (isString)
+            {
+                str = QSP_STR(var->Values[count]);
+                if (!qspIsEmpty(str))
+                {
+                    if (curInd >= 0)
+                    {
+                        if (isMin)
+                        {
+                            if (qspStrsComp(str, QSP_STR(var->Values[curInd])) < 0)
+                                curInd = count;
+                        }
+                        else if (qspStrsComp(str, QSP_STR(var->Values[curInd])) > 0)
+                            curInd = count;
+                    }
+                    else
+                        curInd = count;
+                }
+            }
+            else
             {
                 if (curInd >= 0)
                 {
                     if (isMin)
                     {
-                        if (qspStrsComp(str, var->Values[curInd].Str) < 0)
+                        if (QSP_NUM(var->Values[count]) < QSP_NUM(var->Values[curInd]))
                             curInd = count;
                     }
-                    else if (qspStrsComp(str, var->Values[curInd].Str) > 0)
+                    else if (QSP_NUM(var->Values[count]) > QSP_NUM(var->Values[curInd]))
                         curInd = count;
                 }
                 else
                     curInd = count;
             }
         }
-        else if (curInd >= 0)
-        {
-            if (isMin)
-            {
-                if (var->Values[count].Num < var->Values[curInd].Num)
-                    curInd = count;
-            }
-            else if (var->Values[count].Num > var->Values[curInd].Num)
-                curInd = count;
-        }
-        else
-            curInd = count;
     }
     if (curInd < 0) return qspGetEmptyVariant(isString);
-    if (res.IsStr = isString)
-        QSP_STR(res) = qspGetNewText(var->Values[curInd].Str);
-    else
-        QSP_NUM(res) = var->Values[curInd].Num;
+    qspCopyVariant(&res, var->Values + curInd);
     return res;
 }
 
@@ -687,26 +670,10 @@ void qspSetArgs(QSPVar *var, QSPVariant *args, int count)
 
 void qspApplyResult(QSPVar *varRes, QSPVariant *res)
 {
-    QSPString text;
     if (varRes->ValsCount)
-    {
-        text = varRes->Values[0].Str;
-        if (text.Str)
-        {
-            res->IsStr = QSP_TRUE;
-            QSP_PSTR(res) = qspGetNewText(text);
-        }
-        else
-        {
-            res->IsStr = QSP_FALSE;
-            QSP_PNUM(res) = varRes->Values[0].Num;
-        }
-    }
+        qspCopyVariant(res, varRes->Values);
     else
-    {
-        res->IsStr = QSP_TRUE;
-        QSP_PSTR(res) = qspNewEmptyString();
-    }
+        qspInitVariant(res, QSP_TYPE_STRING);
 }
 
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames)
@@ -728,7 +695,7 @@ INLINE int qspGetVarsNames(QSPString names, QSPString **varNames)
             bufSize = count + 2;
             foundNames = (QSPString *)realloc(foundNames, bufSize * sizeof(QSPString));
         }
-        pos = qspStrPos(names, QSP_STATIC_STR(QSP_COMMA), QSP_FALSE);
+        pos = qspDelimPos(names, QSP_COMMA[0]);
         if (pos)
         {
             foundNames[count] = qspDelSpc(qspStringFromPair(names.Str, pos));
@@ -759,24 +726,24 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
         return;
     }
     oldRefreshCount = qspRefreshCount;
-    if (v->IsStr)
+    if (QSP_ISSTR(v->Type))
     {
         strVal = QSP_PSTR(v);
         newValPos = qspStrStr(strVal, QSP_STATIC_STR(QSP_VALSDELIM));
         lastVarIndex = varsCount - 1;
         for (i = 0; i < lastVarIndex && newValPos; ++i)
         {
-            v2.IsStr = QSP_TRUE;
+            v2.Type = QSP_TYPE_STRING;
             QSP_STR(v2) = qspGetNewText(qspStringFromPair(strVal.Str, newValPos));
             qspSetVar(varNames[i], &v2, op);
-            if (v2.IsStr) qspFreeString(QSP_STR(v2));
+            if (QSP_ISSTR(v2.Type)) qspFreeString(QSP_STR(v2));
             if (qspRefreshCount != oldRefreshCount || qspErrorNum)
                 return;
             strVal.Str = newValPos + QSP_STATIC_LEN(QSP_VALSDELIM);
             newValPos = qspStrStr(strVal, QSP_STATIC_STR(QSP_VALSDELIM));
         }
         /* fill the rest with the last value */
-        v2.IsStr = QSP_TRUE;
+        v2.Type = QSP_TYPE_STRING;
         QSP_STR(v2) = qspGetNewText(strVal);
         while (i < varsCount)
         {
@@ -785,7 +752,7 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
                 break;
             ++i;
         }
-        if (v2.IsStr) qspFreeString(QSP_STR(v2));
+        if (QSP_ISSTR(v2.Type)) qspFreeString(QSP_STR(v2));
     }
     else
     {
@@ -821,7 +788,7 @@ void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat)
     if (qspErrorNum) return;
     op = *(s.Str + stat->Args[1].StartPos);
     qspSetVarsValues(names, namesCount, &v, op);
-    if (v.IsStr) qspFreeString(QSP_STR(v));
+    if (QSP_ISSTR(v.Type)) qspFreeString(QSP_STR(v));
     free(names);
 }
 
@@ -863,8 +830,6 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             free(names);
             return;
         }
-        /* Skip type char */
-        if (*varName.Str == QSP_STRCHAR[0]) ++varName.Str;
         varName = qspGetVarNameOnly(varName);
         /* Check for the existence */
         for (i = 0; i < varsCount; ++i)
@@ -908,7 +873,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             return;
         }
         qspSetVarsValues(names, namesCount, &v, QSP_EQUAL[0]);
-        if (v.IsStr) qspFreeString(QSP_STR(v));
+        if (QSP_ISSTR(v.Type)) qspFreeString(QSP_STR(v));
     }
     free(names);
 }

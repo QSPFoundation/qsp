@@ -274,7 +274,7 @@ QSPString qspCallInputBox(QSPString text)
         qspRestoreCallState(&state);
         return qspStringFromC(buffer);
     }
-    return qspNewEmptyString();
+    return qspNullString;
 }
 
 #endif

@@ -322,7 +322,7 @@ int qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
                 return 0;
             }
             type = qspStats[stat->Stat].ArgsTypes[argIndex];
-            if (type && qspConvertVariantTo(args + argIndex, type == 1))
+            if (QSP_ISDEF(type) && qspConvertVariantTo(args + argIndex, type))
             {
                 qspSetError(QSP_ERR_TYPEMISMATCH);
                 qspFreeVariants(args, argIndex);
@@ -501,7 +501,7 @@ INLINE QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int co
     /* Prepare temporary data */
     if (uLevel = !jumpTo)
     {
-        jumpToFake = qspNewEmptyString();
+        jumpToFake = qspNullString;
         jumpTo = &jumpToFake;
     }
     /* Code execution */
@@ -724,7 +724,7 @@ INLINE QSP_BOOL qspCheckCondition(QSPString expr)
     int oldRefreshCount = qspRefreshCount;
     QSPVariant condValue = qspExprValue(expr);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-    if (qspConvertVariantTo(&condValue, QSP_FALSE))
+    if (qspConvertVariantTo(&condValue, QSP_TYPE_NUMBER))
     {
         qspSetError(QSP_ERR_TYPEMISMATCH);
         qspFreeString(QSP_STR(condValue));

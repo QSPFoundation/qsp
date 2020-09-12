@@ -9,10 +9,6 @@ elseif(APPLE OR NOT UNIX)
 	message(FATAL_ERROR "Only Windows and Linux targets are supported")
 endif()
 
-if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
-endif()
-
 if(CMAKE_COMPILER_IS_GNUCC)
 	set(PROJECT_COMPILER_FLAGS "-Wall")
 	set(CMAKE_CXX_FLAGS "-Wall -Wextra")

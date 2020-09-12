@@ -26,6 +26,21 @@
     #define QSP_PSTR(a) (a)->Val.Str
     #define QSP_PNUM(a) (a)->Val.Num
 
+    enum
+    {
+        QSP_TYPE_UNDEFINED = -1, /* not used for values */
+        QSP_TYPE_NUMBER = 0,
+        QSP_TYPE_STRING = 1,
+        QSP_TYPE_CODE = 2,
+        QSP_TYPE_TUPLE = 3
+    };
+
+    #define QSP_ISDEF(a) ((a) >= QSP_TYPE_NUMBER)
+    #define QSP_ISNUM(a) ((a) == QSP_TYPE_NUMBER)
+    #define QSP_ISSTR(a) ((a) != QSP_TYPE_NUMBER)
+
+    #define QSP_BASETYPE(a) ((a) != QSP_TYPE_NUMBER) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */
+
     typedef struct
     {
         union
@@ -33,32 +48,37 @@
             QSPString Str;
             int Num;
         } Val;
-        QSP_BOOL IsStr;
+        int Type;
     } QSPVariant;
 
     /* External functions */
-    QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_BOOL isToString);
+    QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type);
     int qspAutoConvertCompare(QSPVariant *, QSPVariant *);
 
     INLINE void qspFreeVariants(QSPVariant *args, int count)
     {
         while (--count >= 0)
-            if (args[count].IsStr) qspFreeString(QSP_STR(args[count]));
+            if (QSP_ISSTR(args[count].Type)) qspFreeString(QSP_STR(args[count]));
     }
 
-    INLINE QSPVariant qspGetEmptyVariant(QSP_BOOL isStringType)
+    INLINE void qspInitVariant(QSPVariant *value, int type)
+    {
+        if (QSP_ISSTR(value->Type = type))
+            QSP_PSTR(value) = qspNullString;
+        else
+            QSP_PNUM(value) = 0;
+    }
+
+    INLINE QSPVariant qspGetEmptyVariant(int type)
     {
         QSPVariant ret;
-        if (ret.IsStr = isStringType)
-            QSP_STR(ret) = qspNewEmptyString();
-        else
-            QSP_NUM(ret) = 0;
+        qspInitVariant(&ret, type);
         return ret;
     }
 
     INLINE void qspCopyVariant(QSPVariant *dest, QSPVariant *src)
     {
-        if (dest->IsStr = src->IsStr)
+        if (QSP_ISSTR(dest->Type = src->Type))
             QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
         else
             QSP_PNUM(dest) = QSP_PNUM(src);
@@ -67,7 +87,7 @@
     INLINE QSP_BOOL qspIsCanConvertToNum(QSPVariant *val)
     {
         QSP_BOOL isValid;
-        if (val->IsStr)
+        if (QSP_ISSTR(val->Type))
         {
             qspStrToNum(QSP_PSTR(val), &isValid);
             if (!isValid) return QSP_FALSE;
