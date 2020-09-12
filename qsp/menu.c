@@ -26,12 +26,18 @@
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     QSPVar *var;
+    QSP_BOOL isStringArray;
     QSPVariant arg;
     int ind, itemsCount, maxItems;
     QSPListItem menuItems[QSP_MAXMENUITEMS];
     QSPString menuLocs[QSP_MAXMENUITEMS], imgPath, str;
     QSP_CHAR *pos, *pos2;
-    if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0))) return QSP_FALSE;
+    if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, &isStringArray))) return QSP_FALSE;
+    if (!isStringArray)
+    {
+        qspSetError(QSP_ERR_TYPEMISMATCH);
+        return QSP_FALSE;
+    }
     if (count == 1)
     {
         ind = 0;

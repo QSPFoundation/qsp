@@ -881,9 +881,15 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
 QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     int start, num;
+    QSP_BOOL isDestString, isSrcString;
     QSPVar *dest, *src;
-    if (!(dest = qspVarReferenceWithType(QSP_STR(args[0]), QSP_TRUE, 0))) return QSP_FALSE;
-    if (!(src = qspVarReferenceWithType(QSP_STR(args[1]), QSP_FALSE, 0))) return QSP_FALSE;
+    if (!(dest = qspVarReferenceWithType(QSP_STR(args[0]), QSP_TRUE, &isDestString))) return QSP_FALSE;
+    if (!(src = qspVarReferenceWithType(QSP_STR(args[1]), QSP_FALSE, &isSrcString))) return QSP_FALSE;
+    if (isDestString != isSrcString)
+    {
+        qspSetError(QSP_ERR_TYPEMISMATCH);
+        return QSP_FALSE;
+    }
     if (dest != src)
     {
         start = (count >= 3 ? QSP_NUM(args[2]) : 0);
