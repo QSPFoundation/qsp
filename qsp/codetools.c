@@ -208,6 +208,8 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     QSP_BOOL isInLoop, isSearchElse;
     int statCode, count = 0;
     QSP_CHAR *temp, *nextPos, *elsePos, *delimPos = 0, *paramPos = 0;
+    /* 'nextPos' points to the next position to search for a statement */
+    /* 'delimPos' points to the statement separator (':' or '&') */
     line->Str = str;
     line->LineNum = lineNum;
     line->StatsCount = 0;
@@ -237,8 +239,12 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                 nextPos = str.Str;
                 if (nextPos != str.End)
                 {
-                    if (*nextPos == QSP_COLONDELIM[0]) ++nextPos;
                     delimPos = nextPos;
+                    if (*nextPos == QSP_COLONDELIM[0])
+                    {
+                        nextPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+                        if (nextPos == str.End) isInLoop = QSP_FALSE;
+                    }
                 }
                 else
                     delimPos = 0;
@@ -306,8 +312,12 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                         nextPos = str.Str;
                         if (nextPos != str.End)
                         {
-                            if (*nextPos == QSP_COLONDELIM[0]) ++nextPos;
                             delimPos = nextPos;
+                            if (*nextPos == QSP_COLONDELIM[0])
+                            {
+                                nextPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+                                if (nextPos == str.End) isInLoop = QSP_FALSE;
+                            }
                         }
                         else
                             delimPos = 0;
