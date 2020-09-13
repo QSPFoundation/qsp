@@ -24,7 +24,6 @@
     {
         QSP_BOOL IsInCallBack;
         QSP_BOOL IsDisableCodeExec;
-        QSP_BOOL IsExitOnError;
         QSP_BOOL IsMainDescChanged;
         QSP_BOOL IsVarsDescChanged;
         QSP_BOOL IsObjectsChanged;
@@ -34,10 +33,9 @@
     extern QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
     extern QSP_BOOL qspIsInCallBack;
     extern QSP_BOOL qspIsDisableCodeExec;
-    extern QSP_BOOL qspIsExitOnError;
 
     /* External functions */
-    void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec, QSP_BOOL isExitOnError);
+    void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec);
     void qspRestoreCallState(QSPCallState *state);
 
     void qspInitCallBacks();

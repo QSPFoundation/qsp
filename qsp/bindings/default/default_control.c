@@ -120,9 +120,8 @@ QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL isRefresh)
 {
     if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
     {
-        if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-        qspPrepareExecution();
         if (qspIsDisableCodeExec) return QSP_FALSE;
+        qspPrepareExecution();
         qspCurSelAction = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONACTSEL")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
@@ -135,9 +134,8 @@ QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh)
 {
     if (qspCurSelAction >= 0)
     {
-        if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-        qspPrepareExecution();
         if (qspIsDisableCodeExec) return QSP_FALSE;
+        qspPrepareExecution();
         qspExecAction(qspCurSelAction);
         if (qspErrorNum) return QSP_FALSE;
         if (isRefresh) qspCallRefreshInt(QSP_FALSE);
@@ -173,9 +171,8 @@ QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh)
 {
     if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
     {
-        if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-        qspPrepareExecution();
         if (qspIsDisableCodeExec) return QSP_FALSE;
+        qspPrepareExecution();
         qspCurSelObject = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONOBJSEL")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
@@ -220,10 +217,8 @@ void QSPShowWindow(int type, QSP_BOOL isShow)
 QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 {
     QSPVar *var;
-    if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-    qspResetError();
     var = qspVarReference(name, QSP_FALSE);
-    if (qspErrorNum) return QSP_FALSE;
+    if (!var) return QSP_FALSE;
     *count = var->ValsCount;
     return QSP_TRUE;
 }
@@ -231,10 +226,8 @@ QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 QSP_BOOL QSPGetVarValues(QSPString name, int ind, int *numVal, QSPString *strVal)
 {
     QSPVar *var;
-    if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-    qspResetError();
     var = qspVarReference(name, QSP_FALSE);
-    if (qspErrorNum || ind < 0 || ind >= var->ValsCount) return QSP_FALSE;
+    if (!var || ind < 0 || ind >= var->ValsCount) return QSP_FALSE;
     if (QSP_ISSTR(var->Values[ind].Type))
         *strVal = QSP_STR(var->Values[ind]);
     else
@@ -249,7 +242,7 @@ int QSPGetMaxVarsCount()
 /* Get name of a variable by index */
 QSP_BOOL QSPGetVarNameByIndex(int index, QSPString *name)
 {
-    if (index < 0 || index >= QSP_VARSCOUNT || !qspVars[index].Name.Str) return QSP_FALSE;
+    if (index < 0 || index >= QSP_VARSCOUNT || qspIsEmpty(qspVars[index].Name)) return QSP_FALSE;
     *name = qspVars[index].Name;
     return QSP_TRUE;
 }
@@ -259,9 +252,8 @@ QSP_BOOL QSPGetVarNameByIndex(int index, QSPString *name)
 /* Execute a line of code */
 QSP_BOOL QSPExecString(QSPString s, QSP_BOOL isRefresh)
 {
-    if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-    qspPrepareExecution();
     if (qspIsDisableCodeExec) return QSP_FALSE;
+    qspPrepareExecution();
     qspExecStringAsCodeWithArgs(s, 0, 0, 0);
     if (qspErrorNum) return QSP_FALSE;
     if (isRefresh) qspCallRefreshInt(QSP_FALSE);
@@ -270,9 +262,8 @@ QSP_BOOL QSPExecString(QSPString s, QSP_BOOL isRefresh)
 /* Execute code of the specified location */
 QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL isRefresh)
 {
-    if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-    qspPrepareExecution();
     if (qspIsDisableCodeExec) return QSP_FALSE;
+    qspPrepareExecution();
     qspExecLocByName(name, QSP_FALSE);
     if (qspErrorNum) return QSP_FALSE;
     if (isRefresh) qspCallRefreshInt(QSP_FALSE);
@@ -293,9 +284,8 @@ QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh)
 /* Execute code of the special "USERCOM" location */
 QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh)
 {
-    if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-    qspPrepareExecution();
     if (qspIsDisableCodeExec) return QSP_FALSE;
+    qspPrepareExecution();
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("USERCOM")), 0, 0);
     if (qspErrorNum) return QSP_FALSE;
     if (isRefresh) qspCallRefreshInt(QSP_FALSE);
@@ -323,9 +313,8 @@ QSPString QSPGetErrorDesc(int errorNum)
 /* Load game from data */
 QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame)
 {
-    if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-    qspResetError();
     if (qspIsDisableCodeExec) return QSP_FALSE;
+    qspPrepareExecution();
     qspOpenQuestFromData((char *)data, dataSize, isNewGame);
     if (qspErrorNum) return QSP_FALSE;
     return QSP_TRUE;
@@ -335,9 +324,8 @@ QSP_BOOL QSPSaveGameAsData(void *buf, int bufSize, int *realSize, QSP_BOOL isRef
 {
     int size;
     QSPString data;
-    if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-    qspPrepareExecution();
     if (qspIsDisableCodeExec) return QSP_FALSE;
+    qspPrepareExecution();
     data = qspSaveGameStatusToString();
     if (qspIsEmpty(data))
     {
@@ -359,9 +347,8 @@ QSP_BOOL QSPSaveGameAsData(void *buf, int bufSize, int *realSize, QSP_BOOL isRef
 /* Load game state from data */
 QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRefresh)
 {
-    if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-    qspPrepareExecution();
     if (qspIsDisableCodeExec) return QSP_FALSE;
+    qspPrepareExecution();
     qspOpenGameStatusFromString(qspStringFromLen((QSP_CHAR *)data, dataSize / sizeof(QSP_CHAR)));
     if (qspErrorNum) return QSP_FALSE;
     if (isRefresh) qspCallRefreshInt(QSP_FALSE);
@@ -370,9 +357,8 @@ QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRef
 /* Restart current game */
 QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh)
 {
-    if (qspIsExitOnError && qspErrorNum) return QSP_FALSE;
-    qspPrepareExecution();
     if (qspIsDisableCodeExec) return QSP_FALSE;
+    qspPrepareExecution();
     qspNewGame(QSP_TRUE);
     if (qspErrorNum) return QSP_FALSE;
     if (isRefresh) qspCallRefreshInt(QSP_FALSE);
