@@ -29,7 +29,7 @@ if(USE_INSTALLED_ONIGURUMA)
 	find_package(oniguruma CONFIG REQUIRED)
 else()
 	# Download and unpack oniguruma at configure time
-	configure_file(CMakeLists-oniguruma.txt.in oniguruma-download/CMakeLists.txt)
+	configure_file(CMakeLists-oniguruma.txt.in "${CMAKE_BINARY_DIR}/oniguruma-download/CMakeLists.txt")
 	execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
 			WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
 	)
@@ -94,7 +94,7 @@ if(BUILD_QSPGUI)
 		include(${wxWidgets_USE_FILE})
 	else()
 		# Download and unpack wxWidgets at configure time
-		configure_file(CMakeLists-wxWidgets.txt.in wxWidgets-download/CMakeLists.txt)
+		configure_file(CMakeLists-wxWidgets.txt.in "${CMAKE_BINARY_DIR}/wxWidgets-download/CMakeLists.txt")
 		execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
 				WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/wxWidgets-download"
 		)
