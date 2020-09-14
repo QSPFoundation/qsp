@@ -63,7 +63,7 @@ QSPString qspGetErrorDesc(int errorNum)
     case QSP_ERR_LOCNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Location not found!")); break;
     case QSP_ERR_ENDNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("[end] not found!")); break;
     case QSP_ERR_LABELNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Label not found!")); break;
-    case QSP_ERR_NOTCORRECTNAME: str = QSP_STATIC_STR(QSP_FMT("Incorrect variable's name!")); break;
+    case QSP_ERR_INCORRECTNAME: str = QSP_STATIC_STR(QSP_FMT("Incorrect variable's name!")); break;
     case QSP_ERR_QUOTNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Quote not found!")); break;
     case QSP_ERR_BRACKNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Bracket not found!")); break;
     case QSP_ERR_BRACKSNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Brackets not found!")); break;

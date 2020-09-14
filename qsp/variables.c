@@ -51,13 +51,13 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate)
     unsigned char bCode;
     if (qspIsEmpty(name))
     {
-        qspSetError(QSP_ERR_NOTCORRECTNAME);
+        qspSetError(QSP_ERR_INCORRECTNAME);
         return 0;
     }
     if (*name.Str == QSP_STRCHAR[0]) ++name.Str; /* ignore type specification */
     if (qspIsEmpty(name) || qspIsDigit(*name.Str) || qspIsAnyInClass(name, QSP_CHAR_DELIM))
     {
-        qspSetError(QSP_ERR_NOTCORRECTNAME);
+        qspSetError(QSP_ERR_INCORRECTNAME);
         return 0;
     }
     bCode = 7;
