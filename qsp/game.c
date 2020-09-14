@@ -296,7 +296,7 @@ QSPString qspSaveGameStatusToString()
     QSPString buf, locName;
     QSPVar *savedVars;
     int i, j, varsCount, oldRefreshCount = qspRefreshCount;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONGSAVE")), 0, 0);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return qspNullString;
     varsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVars);
     if (qspErrorNum) return qspNullString;
@@ -602,7 +602,7 @@ void qspOpenGameStatusFromString(QSPString str)
     qspCallCloseFile(qspNullString);
     qspPlayPLFiles();
     qspCallSetTimer(qspTimerInterval);
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONGLOAD")), 0, 0);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGLOAD")), 0, 0);
 }
 
 QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSPString *jumpTo, int extArg)

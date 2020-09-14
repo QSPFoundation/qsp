@@ -63,7 +63,7 @@ void qspClearObjectsWithNotify()
         for (i = 0; i < oldCount; ++i)
         {
             QSP_STR(v) = objs[i];
-            qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONOBJDEL")), &v, 1);
+            qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &v, 1);
             if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
         }
         qspFreeStrs(objs, oldCount);
@@ -85,7 +85,7 @@ INLINE void qspRemoveObject(int index)
         ++index;
     }
     qspIsObjectsChanged = QSP_TRUE;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONOBJDEL")), &name, 1);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &name, 1);
     qspFreeString(QSP_STR(name));
 }
 
@@ -155,7 +155,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSPString *jumpTo, i
     obj->Desc = qspGetNewText(QSP_STR(args[0]));
     qspIsObjectsChanged = QSP_TRUE;
     if (count == 3) count = 2;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONOBJADD")), args, count);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJADD")), args, count);
     return QSP_FALSE;
 }
 

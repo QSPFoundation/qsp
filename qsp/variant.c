@@ -47,7 +47,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type)
 int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
 {
     int res;
-    if (QSP_ISSTR(v1->Type) != QSP_ISSTR(v2->Type))
+    if (QSP_BASETYPE(v1->Type) != QSP_BASETYPE(v2->Type))
     {
         if (QSP_ISSTR(v2->Type))
         {
@@ -69,4 +69,25 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
     else
         res = (QSP_PNUM(v1) > QSP_PNUM(v2) ? 1 : (QSP_PNUM(v1) < QSP_PNUM(v2) ? -1 : 0));
     return res;
+}
+
+void qspUpdateVariantValue(QSPVariant *dest, QSPVariant *src)
+{
+    if (QSP_BASETYPE(src->Type) != QSP_BASETYPE(dest->Type))
+    {
+        if (QSP_ISSTR(dest->Type = src->Type))
+            QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
+        else
+        {
+            qspFreeString(QSP_PSTR(dest));
+            QSP_PNUM(dest) = QSP_PNUM(src);
+        }
+    }
+    else
+    {
+        if (QSP_ISSTR(dest->Type = src->Type))
+            qspUpdateText(&QSP_PSTR(dest), QSP_PSTR(src));
+        else
+            QSP_PNUM(dest) = QSP_PNUM(src);
+    }
 }

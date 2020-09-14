@@ -246,13 +246,11 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, int count)
     {
         if (!(var = qspVarReference(name, QSP_FALSE))) break;
         if (ind >= var->ValsCount) break;
-        if (QSP_ISSTR(var->Values[ind].Type))
-        {
-            locName = QSP_STR(var->Values[ind]);
-            if (!(locName.Str && qspIsAnyString(locName))) break;
-            qspExecLocByNameWithArgs(locName, args, count, 0);
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-        }
+        if (!QSP_ISSTR(var->Values[ind].Type)) break;
+        locName = QSP_STR(var->Values[ind]);
+        if (!(locName.Str && qspIsAnyString(locName))) break;
+        qspExecLocByNameWithArgs(locName, args, count, 0);
+        if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
         ++ind;
     }
 }
@@ -271,5 +269,5 @@ void qspRefreshCurLoc(QSP_BOOL isChangeDesc, QSPVariant *args, int count)
     qspExecLocByIndex(qspCurLoc, isChangeDesc, QSP_TRUE);
     if (qspErrorNum) return;
     if (qspRefreshCount == oldRefreshCount)
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_STRCHAR QSP_FMT("ONNEWLOC")), args, count);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONNEWLOC")), args, count);
 }

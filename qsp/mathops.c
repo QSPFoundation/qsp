@@ -454,7 +454,7 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
                     arrIndex = QSP_ISSTR(args[1].Type) ? qspGetVarTextIndex(var, QSP_STR(args[1]), QSP_FALSE) : QSP_NUM(args[1]);
                 else
                     arrIndex = 0;
-                tos = qspGetVarValueByReference(var, arrIndex, QSP_VARTYPE(*name.Str));
+                tos = qspGetVarValueByReference(var, arrIndex, QSP_VARBASETYPE(name));
                 break;
             case qspOpMul:
                 QSP_NUM(tos) = QSP_NUM(args[0]) * QSP_NUM(args[1]);
@@ -548,7 +548,7 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
                 QSP_NUM(tos) = QSP_TOBOOL(qspObjIndex(QSP_STR(args[0])) >= 0);
                 break;
             case qspOpIIf:
-                qspCopyVariant(&tos, QSP_NUM(args[0]) ? args + 1 : args + 2);
+                qspCopyToNewVariant(&tos, QSP_NUM(args[0]) ? args + 1 : args + 2);
                 break;
             case qspOpLen:
                 QSP_NUM(tos) = qspStrLen(QSP_STR(args[0]));
@@ -1176,7 +1176,7 @@ INLINE void qspFunctionMin(QSPVariant *args, int count, QSPVariant *tos)
             if (qspAutoConvertCompare(args + i, args + minInd) < 0)
                 minInd = i;
         }
-        qspCopyVariant(tos, args + minInd);
+        qspCopyToNewVariant(tos, args + minInd);
     }
 }
 
@@ -1196,6 +1196,6 @@ INLINE void qspFunctionMax(QSPVariant *args, int count, QSPVariant *tos)
             if (qspAutoConvertCompare(args + i, args + maxInd) > 0)
                 maxInd = i;
         }
-        qspCopyVariant(tos, args + maxInd);
+        qspCopyToNewVariant(tos, args + maxInd);
     }
 }

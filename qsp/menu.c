@@ -26,18 +26,12 @@
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
     QSPVar *var;
-    QSP_BOOL isStringArray;
     QSPVariant arg;
     int ind, itemsCount, maxItems;
     QSPListItem menuItems[QSP_MAXMENUITEMS];
     QSPString menuLocs[QSP_MAXMENUITEMS], imgPath, str;
     QSP_CHAR *pos, *pos2;
-    if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, &isStringArray))) return QSP_FALSE;
-    if (!isStringArray)
-    {
-        qspSetError(QSP_ERR_TYPEMISMATCH);
-        return QSP_FALSE;
-    }
+    if (!(var = qspVarReferenceWithType(QSP_STR(args[0]), QSP_FALSE, 0))) return QSP_FALSE;
     if (count == 1)
     {
         ind = 0;
@@ -59,37 +53,35 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSPString *jumpTo, in
     while (ind < var->ValsCount)
     {
         if (itemsCount == maxItems) break;
-        if (QSP_ISSTR(var->Values[ind].Type))
+        if (!QSP_ISSTR(var->Values[ind].Type)) break;
+        str = QSP_STR(var->Values[ind]);
+        if (!(str.Str && qspIsAnyString(str))) break;
+        if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM)))
         {
-            str = QSP_STR(var->Values[ind]);
-            if (!(str.Str && qspIsAnyString(str))) break;
-            if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM)))
-            {
-                qspSetError(QSP_ERR_COLONNOTFOUND);
-                return QSP_FALSE;
-            }
-            if (itemsCount == QSP_MAXMENUITEMS)
-            {
-                qspSetError(QSP_ERR_CANTADDMENUITEM);
-                return QSP_FALSE;
-            }
-            if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
-            {
-                imgPath = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
-                imgPath = (qspIsAnyString(imgPath) ? qspGetNewText(imgPath) : qspNullString);
-            }
-            else
-            {
-                pos = pos2;
-                pos2 = str.End;
-                imgPath = qspNullString;
-            }
-            menuLocs[itemsCount] = qspGetNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
-            menuItems[itemsCount].Name = qspGetNewText(qspStringFromPair(str.Str, pos));
-            menuItems[itemsCount].Image = imgPath;
-            ++itemsCount;
-            ++ind;
+            qspSetError(QSP_ERR_COLONNOTFOUND);
+            return QSP_FALSE;
         }
+        if (itemsCount == QSP_MAXMENUITEMS)
+        {
+            qspSetError(QSP_ERR_CANTADDMENUITEM);
+            return QSP_FALSE;
+        }
+        if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
+        {
+            imgPath = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
+            imgPath = (qspIsAnyString(imgPath) ? qspGetNewText(imgPath) : qspNullString);
+        }
+        else
+        {
+            pos = pos2;
+            pos2 = str.End;
+            imgPath = qspNullString;
+        }
+        menuLocs[itemsCount] = qspGetNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
+        menuItems[itemsCount].Name = qspGetNewText(qspStringFromPair(str.Str, pos));
+        menuItems[itemsCount].Image = imgPath;
+        ++itemsCount;
+        ++ind;
     }
     if (itemsCount)
     {

@@ -38,7 +38,6 @@
     #define QSP_ISDEF(a) ((a) >= QSP_TYPE_NUMBER)
     #define QSP_ISNUM(a) ((a) == QSP_TYPE_NUMBER)
     #define QSP_ISSTR(a) ((a) != QSP_TYPE_NUMBER)
-
     #define QSP_BASETYPE(a) ((a) != QSP_TYPE_NUMBER) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */
 
     typedef struct
@@ -53,7 +52,8 @@
 
     /* External functions */
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type);
-    int qspAutoConvertCompare(QSPVariant *, QSPVariant *);
+    int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2);
+    void qspUpdateVariantValue(QSPVariant *dest, QSPVariant *src);
 
     INLINE void qspFreeVariants(QSPVariant *args, int count)
     {
@@ -76,7 +76,7 @@
         return ret;
     }
 
-    INLINE void qspCopyVariant(QSPVariant *dest, QSPVariant *src)
+    INLINE void qspCopyToNewVariant(QSPVariant *dest, QSPVariant *src)
     {
         if (QSP_ISSTR(dest->Type = src->Type))
             QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));

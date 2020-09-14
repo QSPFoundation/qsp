@@ -28,7 +28,7 @@
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
 
-    #define QSP_VARTYPE(a) ((a) == QSP_STRCHAR[0]) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */
+    #define QSP_VARBASETYPE(name) (*(name).Str == QSP_STRCHAR[0]) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */
 
     typedef struct
     {
@@ -60,7 +60,7 @@
     /* External functions */
     QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate);
     void qspClearVars(QSP_BOOL isFirst);
-    QSPVar *qspVarReferenceWithType(QSPString name, QSP_BOOL isCreate, QSP_BOOL *isString);
+    QSPVar *qspVarReferenceWithType(QSPString name, QSP_BOOL isCreate, int *baseType);
     void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
     QSPVariant qspGetVarValueByReference(QSPVar *var, int ind, int type);
     QSPString qspGetVarStrValue(QSPString name);
