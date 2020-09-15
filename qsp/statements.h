@@ -57,6 +57,7 @@
         qspStatUnknown,
         qspStatLabel,
         qspStatComment,
+        qspStatImplicitStatement,
         qspStatAct,
         qspStatLoop,
         qspStatLocal,
