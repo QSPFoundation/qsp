@@ -267,6 +267,12 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
     else if (op == QSP_ADD[0])
     {
         oldVal = qspGetVarValueByReference(var, index, QSP_VARBASETYPE(name));
+        if (qspConvertVariantTo(&oldVal, QSP_VARBASETYPE(name)))
+        {
+            qspSetError(QSP_ERR_TYPEMISMATCH);
+            qspFreeString(QSP_STR(oldVal));
+            return;
+        }
         if (QSP_ISSTR(oldVal.Type) && QSP_ISSTR(val->Type))
         {
             qspAddText(&QSP_STR(oldVal), QSP_PSTR(val), QSP_FALSE);
@@ -281,7 +287,8 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
         }
         else
         {
-            if (QSP_ISNUM(oldVal.Type))
+            /* Result is a string that can't be converted to a number */
+            if (QSP_ISNUM(oldVal.Type)) /* dest variable is numeric */
             {
                 qspSetError(QSP_ERR_TYPEMISMATCH);
                 return;
@@ -295,16 +302,16 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
     }
     else if (qspIsInClass(op, QSP_CHAR_SIMPLEOP))
     {
-        if (qspConvertVariantTo(val, QSP_TYPE_NUMBER))
-        {
-            qspSetError(QSP_ERR_TYPEMISMATCH);
-            return;
-        }
-        oldVal = qspGetVarValueByReference(var, index, QSP_VARBASETYPE(name));
+        oldVal = qspGetVarValueByReference(var, index, QSP_TYPE_NUMBER);
         if (qspConvertVariantTo(&oldVal, QSP_TYPE_NUMBER))
         {
             qspSetError(QSP_ERR_TYPEMISMATCH);
             qspFreeString(QSP_STR(oldVal));
+            return;
+        }
+        if (qspConvertVariantTo(val, QSP_TYPE_NUMBER))
+        {
+            qspSetError(QSP_ERR_TYPEMISMATCH);
             return;
         }
         if (op == QSP_SUB[0])

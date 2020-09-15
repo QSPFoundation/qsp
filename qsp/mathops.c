@@ -483,6 +483,7 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
                 }
                 else
                 {
+                    /* Result is a string that can't be converted to a number */
                     qspConvertVariantTo(args, QSP_TYPE_STRING);
                     qspConvertVariantTo(args + 1, QSP_TYPE_STRING);
                     qspAddText(&QSP_STR(tos), QSP_STR(args[0]), QSP_TRUE);
