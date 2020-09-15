@@ -62,7 +62,7 @@
     void qspClearVars(QSP_BOOL isFirst);
     QSPVar *qspVarReferenceWithType(QSPString name, QSP_BOOL isCreate, int *baseType);
     void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
-    QSPVariant qspGetVarValueByReference(QSPVar *var, int ind, int type);
+    QSP_BOOL qspGetVarValueByReference(QSPVar *var, int ind, int type, QSPVariant *res);
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
     int qspGetVarTextIndex(QSPVar *, QSPString, QSP_BOOL);

@@ -30,7 +30,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type)
             if (QSP_ISNUM(type))
             {
                 num = qspStrToNum(QSP_PSTR(val), &isValid);
-                if (!isValid) return QSP_TRUE;
+                if (!isValid) return QSP_FALSE;
                 qspFreeString(QSP_PSTR(val));
                 QSP_PNUM(val) = num;
             }
@@ -41,7 +41,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type)
         }
         val->Type = type;
     }
-    return QSP_FALSE;
+    return QSP_TRUE;
 }
 
 int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)

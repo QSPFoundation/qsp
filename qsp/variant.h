@@ -37,8 +37,8 @@
 
     #define QSP_ISDEF(a) ((a) >= QSP_TYPE_NUMBER)
     #define QSP_ISNUM(a) ((a) == QSP_TYPE_NUMBER)
-    #define QSP_ISSTR(a) ((a) != QSP_TYPE_NUMBER)
-    #define QSP_BASETYPE(a) ((a) != QSP_TYPE_NUMBER) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */
+    #define QSP_ISSTR(a) ((a) > QSP_TYPE_NUMBER)
+    #define QSP_BASETYPE(a) ((a) > QSP_TYPE_NUMBER) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */
 
     typedef struct
     {

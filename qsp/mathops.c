@@ -408,7 +408,7 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
             for (i = 0; i < argsCount; ++i)
             {
                 type = qspOps[opCode].ArgsTypes[i];
-                if (QSP_ISDEF(type) && qspConvertVariantTo(args + i, type))
+                if (QSP_ISDEF(type) && !qspConvertVariantTo(args + i, type))
                 {
                     qspSetError(QSP_ERR_TYPEMISMATCH);
                     break;
@@ -454,7 +454,12 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
                     arrIndex = QSP_ISSTR(args[1].Type) ? qspGetVarTextIndex(var, QSP_STR(args[1]), QSP_FALSE) : QSP_NUM(args[1]);
                 else
                     arrIndex = 0;
-                tos = qspGetVarValueByReference(var, arrIndex, QSP_VARBASETYPE(name));
+                if (!qspGetVarValueByReference(var, arrIndex, QSP_VARBASETYPE(name), &tos))
+                {
+                    qspSetError(QSP_ERR_TYPEMISMATCH);
+                    qspFreeString(QSP_STR(tos));
+                    break;
+                }
                 break;
             case qspOpMul:
                 QSP_NUM(tos) = QSP_NUM(args[0]) * QSP_NUM(args[1]);
@@ -468,7 +473,12 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
                 QSP_NUM(tos) = QSP_NUM(args[0]) / QSP_NUM(args[1]);
                 break;
             case qspOpAdd:
-                if (QSP_ISSTR(args[0].Type) && QSP_ISSTR(args[1].Type))
+                if (QSP_ISNUM(args[0].Type) && QSP_ISNUM(args[1].Type)) /* tiny optimization for numbers */
+                {
+                    QSP_NUM(tos) = QSP_NUM(args[0]) + QSP_NUM(args[1]);
+                    tos.Type = QSP_TYPE_NUMBER;
+                }
+                else if (QSP_ISSTR(args[0].Type) && QSP_ISSTR(args[1].Type))
                 {
                     qspAddText(&QSP_STR(tos), QSP_STR(args[0]), QSP_TRUE);
                     qspAddText(&QSP_STR(tos), QSP_STR(args[1]), QSP_FALSE);
@@ -573,9 +583,9 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
                 break;
             case qspOpVal:
                 if (qspConvertVariantTo(args, QSP_TYPE_NUMBER))
-                    QSP_NUM(tos) = 0;
-                else
                     QSP_NUM(tos) = QSP_NUM(args[0]);
+                else
+                    QSP_NUM(tos) = 0;
                 break;
             case qspOpArrSize:
                 QSP_NUM(tos) = qspArraySize(QSP_STR(args[0]));
@@ -645,7 +655,7 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
         }
         ++index;
     }
-    return qspGetEmptyVariant(QSP_TYPE_NUMBER);
+    return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
 }
 
 INLINE void qspCompileExprPushOpCode(int *opStack, int *opSp, int *argStack, int *argSp, int opCode)
@@ -974,7 +984,7 @@ QSPVariant qspExprValue(QSPString expr)
     QSPVariant compValues[QSP_MAXITEMS];
     int compOpCodes[QSP_MAXITEMS], compArgsCounts[QSP_MAXITEMS], itemsCount;
     if (!(itemsCount = qspCompileExpression(expr, compValues, compOpCodes, compArgsCounts)))
-        return qspGetEmptyVariant(QSP_TYPE_NUMBER);
+        return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
     return qspValue(itemsCount, compValues, compOpCodes, compArgsCounts);
 }
 
