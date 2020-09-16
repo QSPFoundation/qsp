@@ -43,7 +43,6 @@ INLINE int qspSearchLabel(QSPLineOfCode *s, int start, int end, QSPString str);
 INLINE QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
 INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
-INLINE QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
 INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo);
@@ -493,7 +492,7 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
     return QSP_FALSE;
 }
 
-INLINE QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
+QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
 {
     QSPLineOfCode *line;
     QSPString jumpToFake;
@@ -607,7 +606,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, int count, QSPVa
     qspSetArgs(varArgs, args, count);
     count = qspPreprocessData(s, &strs);
     oldRefreshCount = qspRefreshCount;
-    qspExecCodeBlockWithLocals(strs, 0, count, 0, 0);
+    qspExecCode(strs, 0, count, 0, 0);
     qspFreePrepLines(strs, count);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum)
     {
@@ -616,7 +615,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, int count, QSPVa
     }
     if (res)
     {
-        if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE)))
+        if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_FALSE)))
         {
             qspReleaseSavedVarsGroup(QSP_TRUE);
             return;

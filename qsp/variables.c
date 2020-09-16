@@ -672,7 +672,7 @@ void qspApplyResult(QSPVar *varRes, QSPVariant *res)
     if (varRes->ValsCount)
         qspCopyToNewVariant(res, varRes->Values);
     else
-        qspInitVariant(res, QSP_TYPE_STRING);
+        qspInitVariant(res, QSP_TYPE_UNDEFINED);
 }
 
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames)

@@ -122,6 +122,7 @@
     /* External functions */
     void qspInitStats();
     int qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args);
+    QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
     QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
     void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, int count, QSPVariant *res);
 
