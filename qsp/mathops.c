@@ -143,7 +143,7 @@ void qspInitMath()
     qspAddOperation(qspOpCloseBracket, 0, 0, -1, 0, 0);
     qspAddOperation(qspOpOpenArrBracket, 127, 0, -1, 0, 0);
     qspAddOperation(qspOpCloseArrBracket, 0, 0, -1, 0, 0);
-    qspAddOperation(qspOpMinus, 18, 0, 0, 1, 1, 0);
+    qspAddOperation(qspOpNegation, 18, 0, 0, 1, 1, 0);
     qspAddOperation(qspOpAdd, 14, 0, -1, 2, 2, -1, -1);
     qspAddOperation(qspOpSub, 14, 0, 0, 2, 2, 0, 0);
     qspAddOperation(qspOpMul, 17, 0, 0, 2, 2, 0, 0);
@@ -539,7 +539,7 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
             case qspOpNe:
                 QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) != 0);
                 break;
-            case qspOpMinus:
+            case qspOpNegation:
                 QSP_NUM(tos) = -QSP_NUM(args[0]);
                 break;
             case qspOpNot:
@@ -800,7 +800,7 @@ INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
             {
                 v.Type = QSP_TYPE_NUMBER;
                 QSP_NUM(v) = qspGetNumber(&s);
-                if (opStack[opSp] == qspOpMinus)
+                if (opStack[opSp] == qspOpNegation)
                 {
                     QSP_NUM(v) = -QSP_NUM(v);
                     --opSp;
@@ -838,15 +838,11 @@ INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                 }
                 waitForOperator = QSP_TRUE;
             }
-            else if (*s.Str == QSP_UPLUS[0])
+            else if (*s.Str == QSP_NEGATION[0])
             {
-                s.Str += QSP_STATIC_LEN(QSP_UPLUS);
-            }
-            else if (*s.Str == QSP_UMINUS[0])
-            {
-                qspCompileExprPushOpCode(opStack, &opSp, argStack, &argSp, qspOpMinus);
+                qspCompileExprPushOpCode(opStack, &opSp, argStack, &argSp, qspOpNegation);
                 if (qspErrorNum) break;
-                s.Str += QSP_STATIC_LEN(QSP_UMINUS);
+                s.Str += QSP_STATIC_LEN(QSP_NEGATION);
             }
             else if (*s.Str == QSP_LRBRACK[0])
             {

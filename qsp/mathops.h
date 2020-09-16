@@ -62,7 +62,7 @@
         qspOpCloseArrBracket,
         qspOpOpenBracket,
         qspOpCloseBracket,
-        qspOpMinus,
+        qspOpNegation,
         qspOpComma,
         qspOpMul,
         qspOpDiv,
