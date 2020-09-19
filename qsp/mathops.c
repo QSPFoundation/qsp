@@ -875,6 +875,9 @@ INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                 qspSkipSpaces(&s);
                 if (*name.Str == QSP_USERFUNC[0])
                 {
+                    /* Ignore a @ symbol */
+                    name.Str += QSP_STATIC_LEN(QSP_USERFUNC);
+                    /* Add the loc name */
                     v.Type = QSP_TYPE_STRING;
                     QSP_STR(v) = qspGetNewText(name);
                     if (!qspAppendToCompiled(qspOpValue, &itemsCount, compValues, compOpCodes, compArgsCounts, 0, v))
@@ -882,6 +885,7 @@ INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                         qspFreeString(QSP_STR(v));
                         break;
                     }
+                    /* Add a function call */
                     if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpFunc)) break;
                     ++argStack[opSp];
                     if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK[0])
