@@ -764,7 +764,7 @@ INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                 ++argStack[opSp];
                 break;
             case qspOpComma:
-                if (opSp && opStack[opSp - 1] >= qspOpFirst_Function)
+                if (opStack[opSp] == qspOpOpenBracket && opStack[opSp - 1] >= qspOpFirst_Function)
                 {
                     if (++argStack[opSp - 1] > qspOps[opStack[opSp - 1]].MaxArgsCount)
                     {
@@ -912,7 +912,16 @@ INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, int *compOp
                         else if (qspOps[opCode].MinArgsCount < 2)
                         {
                             if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, opCode)) break;
-                            if (!qspOps[opCode].MinArgsCount) waitForOperator = QSP_TRUE;
+                            if (qspOps[opCode].MinArgsCount)
+                            {
+                                /* The function has a single argument */
+                                ++argStack[opSp];
+                            }
+                            else
+                            {
+                                /* The function has no arguments */
+                                waitForOperator = QSP_TRUE;
+                            }
                         }
                         else
                         {
