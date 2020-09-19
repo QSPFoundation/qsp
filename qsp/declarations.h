@@ -104,6 +104,7 @@
     #define QSP_SUB QSP_FMT("-")
     #define QSP_DIV QSP_FMT("/")
     #define QSP_MUL QSP_FMT("*")
+    #define QSP_USERFUNC QSP_FMT("@")
     #define QSP_DELIMS QSP_FMT(" \t&'\"()[]=!<>+-/*:,{}")
 
 #endif

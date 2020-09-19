@@ -829,6 +829,8 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             free(names);
             return;
         }
+        /* Skip type char */
+        if (*varName.Str == QSP_STRCHAR[0]) ++varName.Str;
         varName = qspGetVarNameOnly(varName);
         /* Check for the existence */
         for (i = 0; i < varsCount; ++i)
