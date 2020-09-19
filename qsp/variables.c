@@ -54,7 +54,7 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate)
         qspSetError(QSP_ERR_INCORRECTNAME);
         return 0;
     }
-    if (*name.Str == QSP_STRCHAR[0]) ++name.Str; /* ignore type specification */
+    if (*name.Str == QSP_STRCHAR[0]) name.Str += QSP_STATIC_LEN(QSP_STRCHAR); /* ignore type specification */
     if (qspIsEmpty(name) || qspIsDigit(*name.Str) || qspIsAnyInClass(name, QSP_CHAR_DELIM))
     {
         qspSetError(QSP_ERR_INCORRECTNAME);
@@ -829,8 +829,8 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             free(names);
             return;
         }
-        /* Skip type char */
-        if (*varName.Str == QSP_STRCHAR[0]) ++varName.Str;
+        /* Ignore a type char */
+        if (*varName.Str == QSP_STRCHAR[0]) varName.Str += QSP_STATIC_LEN(QSP_STRCHAR);
         varName = qspGetVarNameOnly(varName);
         /* Check for the existence */
         for (i = 0; i < varsCount; ++i)
