@@ -218,7 +218,11 @@ QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 {
     QSPVar *var;
     var = qspVarReference(name, QSP_FALSE);
-    if (!var) return QSP_FALSE;
+    if (!var)
+    {
+        *count = 0;
+        return QSP_FALSE;
+    }
     *count = var->ValsCount;
     return QSP_TRUE;
 }
@@ -227,11 +231,22 @@ QSP_BOOL QSPGetVarValues(QSPString name, int ind, int *numVal, QSPString *strVal
 {
     QSPVar *var;
     var = qspVarReference(name, QSP_FALSE);
-    if (!var || ind < 0 || ind >= var->ValsCount) return QSP_FALSE;
+    if (!var || ind < 0 || ind >= var->ValsCount)
+    {
+        *strVal = qspNullString;
+        *numVal = 0;
+        return QSP_FALSE;
+    }
     if (QSP_ISSTR(var->Values[ind].Type))
+    {
         *strVal = QSP_STR(var->Values[ind]);
+        *numVal = 0;
+    }
     else
+    {
+        *strVal = qspNullString;
         *numVal = QSP_NUM(var->Values[ind]);
+    }
     return QSP_TRUE;
 }
 /* Get max number of variables */
@@ -242,7 +257,11 @@ int QSPGetMaxVarsCount()
 /* Get name of a variable by index */
 QSP_BOOL QSPGetVarNameByIndex(int index, QSPString *name)
 {
-    if (index < 0 || index >= QSP_VARSCOUNT || qspIsEmpty(qspVars[index].Name)) return QSP_FALSE;
+    if (index < 0 || index >= QSP_VARSCOUNT || qspIsEmpty(qspVars[index].Name))
+    {
+        *name = qspNullString;
+        return QSP_FALSE;
+    }
     *name = qspVars[index].Name;
     return QSP_TRUE;
 }
