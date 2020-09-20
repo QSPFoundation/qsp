@@ -571,7 +571,7 @@ QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine
     int oldRefreshCount = qspRefreshCount;
     qspAllocateSavedVarsGroup();
     isExit = qspExecCode(s, startLine, endLine, codeOffset, jumpTo);
-    if (oldRefreshCount != qspRefreshCount || qspErrorNum)
+    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return QSP_FALSE;
@@ -586,7 +586,7 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int end
     int oldRefreshCount = qspRefreshCount;
     qspAllocateSavedVarsGroup();
     isExit = qspExecString(s, startStat, endStat, jumpTo);
-    if (oldRefreshCount != qspRefreshCount || qspErrorNum)
+    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return QSP_FALSE;
