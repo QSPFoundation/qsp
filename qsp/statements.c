@@ -34,7 +34,7 @@ QSPStatName qspStatsNames[QSP_STATSLEVELS][QSP_MAXSTATSNAMES];
 int qspStatsNamesCounts[QSP_STATSLEVELS];
 int qspStatMaxLen = 0;
 
-INLINE void qspAddStatement(int, int, QSP_STATEMENT, int, int, ...);
+INLINE void qspAddStatement(int, QSP_STATEMENT, int, int, ...);
 INLINE void qspAddStatName(int statCode, QSPString statName, int level);
 INLINE int qspStatsCompare(const void *, const void *);
 INLINE int qspSearchElse(QSPLineOfCode *, int, int);
@@ -65,11 +65,10 @@ INLINE QSP_BOOL qspStatementMsg(QSPVariant *args, int count, QSPString *jumpTo, 
 INLINE QSP_BOOL qspStatementExec(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 INLINE QSP_BOOL qspStatementDynamic(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
-INLINE void qspAddStatement(int statCode, int extArg, QSP_STATEMENT func, int minArgs, int maxArgs, ...)
+INLINE void qspAddStatement(int statCode, QSP_STATEMENT func, int minArgs, int maxArgs, ...)
 {
     int i;
     va_list marker;
-    qspStats[statCode].ExtArg = extArg;
     qspStats[statCode].Func = func;
     qspStats[statCode].MinArgsCount = minArgs;
     qspStats[statCode].MaxArgsCount = maxArgs;
@@ -119,59 +118,59 @@ void qspInitStats()
     int i;
     for (i = 0; i < QSP_STATSLEVELS; ++i) qspStatsNamesCounts[i] = 0;
     qspStatMaxLen = 0;
-    qspAddStatement(qspStatImplicitStatement, 0, qspStatementImplicitStatement, 1, 1, -1);
-    qspAddStatement(qspStatElse, 0, 0, 0, 0);
-    qspAddStatement(qspStatElseIf, 0, 0, 1, 1, 0);
-    qspAddStatement(qspStatEnd, 0, 0, 0, 0);
-    qspAddStatement(qspStatLocal, 0, 0, 0, 0);
-    qspAddStatement(qspStatSet, 0, 0, 0, 0);
-    qspAddStatement(qspStatIf, 0, 0, 1, 1, 0);
-    qspAddStatement(qspStatAct, 0, 0, 1, 2, 1, 1);
-    qspAddStatement(qspStatLoop, 0, 0, 0, 0);
-    qspAddStatement(qspStatAddObj, 0, qspStatementAddObject, 1, 3, 1, 1, 0);
-    qspAddStatement(qspStatClA, qspStatClA, qspStatementClear, 0, 0);
-    qspAddStatement(qspStatCloseAll, qspStatCloseAll, qspStatementCloseFile, 0, 0);
-    qspAddStatement(qspStatClose, qspStatClose, qspStatementCloseFile, 0, 1, 1);
-    qspAddStatement(qspStatClS, qspStatClS, qspStatementClear, 0, 0);
-    qspAddStatement(qspStatCmdClear, qspStatCmdClear, qspStatementClear, 0, 0);
-    qspAddStatement(qspStatCopyArr, 0, qspStatementCopyArr, 2, 4, 1, 1, 0, 0);
-    qspAddStatement(qspStatDelAct, 0, qspStatementDelAct, 1, 1, 1);
-    qspAddStatement(qspStatDelObj, qspStatDelObj, qspStatementDelObj, 1, 1, 1);
-    qspAddStatement(qspStatDynamic, 0, qspStatementDynamic, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
-    qspAddStatement(qspStatExec, 0, qspStatementExec, 1, 1, 1);
-    qspAddStatement(qspStatExit, 0, qspStatementExit, 0, 0);
-    qspAddStatement(qspStatFreeLib, qspStatFreeLib, qspStatementClear, 0, 0);
-    qspAddStatement(qspStatGoSub, 0, qspStatementGoSub, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
-    qspAddStatement(qspStatGoTo, qspStatGoTo, qspStatementGoTo, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
-    qspAddStatement(qspStatIncLib, qspStatIncLib, qspStatementOpenQst, 1, 1, 1);
-    qspAddStatement(qspStatJump, 0, qspStatementJump, 1, 1, 1);
-    qspAddStatement(qspStatKillAll, qspStatKillAll, qspStatementClear, 0, 0);
-    qspAddStatement(qspStatKillObj, qspStatKillObj, qspStatementDelObj, 0, 1, 0);
-    qspAddStatement(qspStatKillVar, 0, qspStatementKillVar, 0, 2, 1, 0);
-    qspAddStatement(qspStatMenu, 0, qspStatementShowMenu, 1, 3, 1, 0, 0);
-    qspAddStatement(qspStatMClear, qspStatMClear, qspStatementClear, 0, 0);
-    qspAddStatement(qspStatMNL, qspStatMNL, qspStatementAddText, 0, 1, 1);
-    qspAddStatement(qspStatMPL, qspStatMPL, qspStatementAddText, 0, 1, 1);
-    qspAddStatement(qspStatMP, qspStatMP, qspStatementAddText, 1, 1, 1);
-    qspAddStatement(qspStatClear, qspStatClear, qspStatementClear, 0, 0);
-    qspAddStatement(qspStatNL, qspStatNL, qspStatementAddText, 0, 1, 1);
-    qspAddStatement(qspStatPL, qspStatPL, qspStatementAddText, 0, 1, 1);
-    qspAddStatement(qspStatP, qspStatP, qspStatementAddText, 1, 1, 1);
-    qspAddStatement(qspStatMsg, 0, qspStatementMsg, 1, 1, 1);
-    qspAddStatement(qspStatOpenGame, 0, qspStatementOpenGame, 0, 1, 1);
-    qspAddStatement(qspStatOpenQst, qspStatOpenQst, qspStatementOpenQst, 1, 1, 1);
-    qspAddStatement(qspStatPlay, 0, qspStatementPlayFile, 1, 2, 1, 0);
-    qspAddStatement(qspStatRefInt, 0, qspStatementRefInt, 0, 0);
-    qspAddStatement(qspStatSaveGame, 0, qspStatementSaveGame, 0, 1, 1);
-    qspAddStatement(qspStatSetTimer, 0, qspStatementSetTimer, 1, 1, 0);
-    qspAddStatement(qspStatShowActs, qspStatShowActs, qspStatementShowWin, 1, 1, 0);
-    qspAddStatement(qspStatShowInput, qspStatShowInput, qspStatementShowWin, 1, 1, 0);
-    qspAddStatement(qspStatShowObjs, qspStatShowObjs, qspStatementShowWin, 1, 1, 0);
-    qspAddStatement(qspStatShowVars, qspStatShowVars, qspStatementShowWin, 1, 1, 0);
-    qspAddStatement(qspStatUnSelect, 0, qspStatementUnSelect, 0, 0);
-    qspAddStatement(qspStatView, 0, qspStatementView, 0, 1, 1);
-    qspAddStatement(qspStatWait, 0, qspStatementWait, 1, 1, 0);
-    qspAddStatement(qspStatXGoTo, qspStatXGoTo, qspStatementGoTo, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+    qspAddStatement(qspStatImplicitStatement, qspStatementImplicitStatement, 1, 1, -1);
+    qspAddStatement(qspStatElse, 0, 0, 0);
+    qspAddStatement(qspStatElseIf, 0, 1, 1, 0);
+    qspAddStatement(qspStatEnd, 0, 0, 0);
+    qspAddStatement(qspStatLocal, 0, 0, 0);
+    qspAddStatement(qspStatSet, 0, 0, 0);
+    qspAddStatement(qspStatIf, 0, 1, 1, 0);
+    qspAddStatement(qspStatAct, 0, 1, 2, 1, 1);
+    qspAddStatement(qspStatLoop, 0, 0, 0);
+    qspAddStatement(qspStatAddObj, qspStatementAddObject, 1, 3, 1, 1, 0);
+    qspAddStatement(qspStatClA, qspStatementClear, 0, 0);
+    qspAddStatement(qspStatCloseAll, qspStatementCloseFile, 0, 0);
+    qspAddStatement(qspStatClose, qspStatementCloseFile, 0, 1, 1);
+    qspAddStatement(qspStatClS, qspStatementClear, 0, 0);
+    qspAddStatement(qspStatCmdClear, qspStatementClear, 0, 0);
+    qspAddStatement(qspStatCopyArr, qspStatementCopyArr, 2, 4, 1, 1, 0, 0);
+    qspAddStatement(qspStatDelAct, qspStatementDelAct, 1, 1, 1);
+    qspAddStatement(qspStatDelObj, qspStatementDelObj, 1, 1, 1);
+    qspAddStatement(qspStatDynamic, qspStatementDynamic, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+    qspAddStatement(qspStatExec, qspStatementExec, 1, 1, 1);
+    qspAddStatement(qspStatExit, qspStatementExit, 0, 0);
+    qspAddStatement(qspStatFreeLib, qspStatementClear, 0, 0);
+    qspAddStatement(qspStatGoSub, qspStatementGoSub, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+    qspAddStatement(qspStatGoTo, qspStatementGoTo, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+    qspAddStatement(qspStatIncLib, qspStatementOpenQst, 1, 1, 1);
+    qspAddStatement(qspStatJump, qspStatementJump, 1, 1, 1);
+    qspAddStatement(qspStatKillAll, qspStatementClear, 0, 0);
+    qspAddStatement(qspStatKillObj, qspStatementDelObj, 0, 1, 0);
+    qspAddStatement(qspStatKillVar, qspStatementKillVar, 0, 2, 1, 0);
+    qspAddStatement(qspStatMenu, qspStatementShowMenu, 1, 3, 1, 0, 0);
+    qspAddStatement(qspStatMClear, qspStatementClear, 0, 0);
+    qspAddStatement(qspStatMNL, qspStatementAddText, 0, 1, 1);
+    qspAddStatement(qspStatMPL, qspStatementAddText, 0, 1, 1);
+    qspAddStatement(qspStatMP, qspStatementAddText, 1, 1, 1);
+    qspAddStatement(qspStatClear, qspStatementClear, 0, 0);
+    qspAddStatement(qspStatNL, qspStatementAddText, 0, 1, 1);
+    qspAddStatement(qspStatPL, qspStatementAddText, 0, 1, 1);
+    qspAddStatement(qspStatP, qspStatementAddText, 1, 1, 1);
+    qspAddStatement(qspStatMsg, qspStatementMsg, 1, 1, 1);
+    qspAddStatement(qspStatOpenGame, qspStatementOpenGame, 0, 1, 1);
+    qspAddStatement(qspStatOpenQst, qspStatementOpenQst, 1, 1, 1);
+    qspAddStatement(qspStatPlay, qspStatementPlayFile, 1, 2, 1, 0);
+    qspAddStatement(qspStatRefInt, qspStatementRefInt, 0, 0);
+    qspAddStatement(qspStatSaveGame, qspStatementSaveGame, 0, 1, 1);
+    qspAddStatement(qspStatSetTimer, qspStatementSetTimer, 1, 1, 0);
+    qspAddStatement(qspStatShowActs, qspStatementShowWin, 1, 1, 0);
+    qspAddStatement(qspStatShowInput, qspStatementShowWin, 1, 1, 0);
+    qspAddStatement(qspStatShowObjs, qspStatementShowWin, 1, 1, 0);
+    qspAddStatement(qspStatShowVars, qspStatementShowWin, 1, 1, 0);
+    qspAddStatement(qspStatUnSelect, qspStatementUnSelect, 0, 0);
+    qspAddStatement(qspStatView, qspStatementView, 0, 1, 1);
+    qspAddStatement(qspStatWait, qspStatementWait, 1, 1, 0);
+    qspAddStatement(qspStatXGoTo, qspStatementGoTo, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
     /* Names */
     qspAddStatName(qspStatElse, QSP_STATIC_STR(QSP_STATELSE), 2);
     qspAddStatName(qspStatElseIf, QSP_STATIC_STR(QSP_FMT("ELSEIF")), 1);
@@ -304,8 +303,7 @@ INLINE int qspSearchLabel(QSPLineOfCode *s, int start, int end, QSPString str)
 
 int qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
 {
-    int type;
-    int argIndex, oldRefreshCount;
+    int type, argIndex, oldRefreshCount;
     if (stat->ErrorCode)
     {
         qspSetError(stat->ErrorCode);
@@ -370,7 +368,7 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPS
         default:
             count = qspGetStatArgs(s->Str, s->Stats + i, args);
             if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-            isExit = qspStats[statCode].Func(args, count, jumpTo, qspStats[statCode].ExtArg);
+            isExit = qspStats[statCode].Func(args, count, jumpTo, statCode);
             qspFreeVariants(args, count);
             if (isExit || qspRefreshCount != oldRefreshCount || qspErrorNum) return isExit;
             break;
@@ -419,12 +417,12 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
     case qspStatAct:
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
-        qspStatementMultilineAddAct(s, endLine, ind, codeOffset > 0);
+        qspStatementMultilineAddAct(s, ind, endLine, codeOffset > 0);
         break;
     case qspStatLoop:
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
-        return qspStatementMultilineLoop(s, endLine, ind, codeOffset, jumpTo);
+        return qspStatementMultilineLoop(s, ind, endLine, codeOffset, jumpTo);
     }
     return QSP_FALSE;
 }
@@ -794,7 +792,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int 
     return isExit;
 }
 
-INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int endLine, int lineInd,
+INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int lineInd, int endLine,
     int codeOffset, QSPString *jumpTo)
 {
     QSP_BOOL isExit, conditionValue;

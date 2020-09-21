@@ -42,7 +42,6 @@
         int MinArgsCount;
         int MaxArgsCount;
         int ArgsTypes[QSP_STATMAXARGS];
-        int ExtArg;
         QSP_STATEMENT Func;
     } QSPStatement;
 

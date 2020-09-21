@@ -106,7 +106,7 @@
         QSPString Name;
     } QSPListItem;
 
-    typedef int QSP_BOOL;
+    typedef char QSP_BOOL;
 
     #define QSP_TRUE 1
     #define QSP_FALSE 0

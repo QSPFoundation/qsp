@@ -224,7 +224,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
     qspFreeLineOfCode(&code);
 }
 
-void qspStatementMultilineAddAct(QSPLineOfCode *s, int endLine, int lineInd, QSP_BOOL isManageLines)
+void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine, QSP_BOOL isManageLines)
 {
     QSPVariant args[2];
     int count, oldRefreshCount;

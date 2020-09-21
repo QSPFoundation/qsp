@@ -33,7 +33,7 @@ QSPMathOpName qspOpsNames[QSP_OPSLEVELS][QSP_MAXOPSNAMES];
 int qspOpsNamesCounts[QSP_OPSLEVELS];
 int qspOpMaxLen = 0;
 
-INLINE void qspAddOperation(int, int, QSP_FUNCTION, int, int, int, ...);
+INLINE void qspAddOperation(int opCode, int priority, QSP_FUNCTION func, int resType, int minArgs, int maxArgs, ...);
 INLINE void qspAddOpName(int, QSP_CHAR *, int);
 INLINE int qspMathOpsCompare(const void *, const void *);
 INLINE int qspMathOpStringFullCompare(const void *, const void *);
@@ -388,11 +388,10 @@ INLINE QSPString qspGetQString(QSPString *expr)
 
 INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCodes, int *compArgsCounts)
 {
-    int type;
     QSPVar *var;
     QSPVariant stack[QSP_STACKSIZE], args[QSP_OPMAXARGS], tos;
     QSPString name;
-    int i, j, oldRefreshCount, opCode, argsCount, arrIndex, sp = -1, index = 0;
+    int type, i, j, oldRefreshCount, opCode, argsCount, arrIndex, sp = -1, index = 0;
     tos.Type = QSP_TYPE_NUMBER;
     QSP_NUM(tos) = 0;
     oldRefreshCount = qspRefreshCount;

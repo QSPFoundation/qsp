@@ -602,8 +602,8 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
 {
     QSPVar *var;
     QSPString str;
-    int baseVarType, curInd, count;
     QSPVariant res;
+    int baseVarType, curInd, count;
     if (!(var = qspVarReferenceWithType(name, QSP_FALSE, &baseVarType)))
         return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
     curInd = -1;

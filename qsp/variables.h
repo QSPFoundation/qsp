@@ -76,8 +76,8 @@
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
     QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin);
     int qspGetVarsCount();
-    void qspSetArgs(QSPVar *, QSPVariant *, int);
-    void qspApplyResult(QSPVar *, QSPVariant *);
+    void qspSetArgs(QSPVar *var, QSPVariant *args, int count);
+    void qspApplyResult(QSPVar *varRes, QSPVariant *res);
     /* Statements */
     void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat);
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);
