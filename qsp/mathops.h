@@ -25,7 +25,7 @@
     #define QSP_MAXOPSNAMES 100
     #define QSP_OPMAXARGS 20
     #define QSP_STACKSIZE 30
-    #define QSP_MAXITEMS 100
+    #define QSP_MAXITEMS 200
     #define QSP_VALSDELIM QSP_FMT("|")
 
     /* Helpers */
