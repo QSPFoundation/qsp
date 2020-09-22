@@ -688,7 +688,7 @@ INLINE int qspGetVarsNames(QSPString names, QSPString **varNames)
         }
         if (count >= bufSize)
         {
-            bufSize = count + 2;
+            bufSize = count + 4;
             foundNames = (QSPString *)realloc(foundNames, bufSize * sizeof(QSPString));
         }
         pos = qspDelimPos(names, QSP_COMMA[0]);
