@@ -453,12 +453,7 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
                     arrIndex = QSP_ISSTR(args[1].Type) ? qspGetVarTextIndex(var, QSP_STR(args[1]), QSP_FALSE) : QSP_NUM(args[1]);
                 else
                     arrIndex = 0;
-                if (!qspGetVarValueByReference(var, arrIndex, QSP_VARBASETYPE(name), &tos))
-                {
-                    qspSetError(QSP_ERR_TYPEMISMATCH);
-                    qspFreeString(QSP_STR(tos));
-                    break;
-                }
+                qspGetVarValueByReference(var, arrIndex, QSP_VARBASETYPE(name), &tos);
                 break;
             case qspOpMul:
                 QSP_NUM(tos) = QSP_NUM(args[0]) * QSP_NUM(args[1]);

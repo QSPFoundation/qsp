@@ -266,12 +266,7 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
     }
     else if (op == QSP_ADD[0])
     {
-        if (!qspGetVarValueByReference(var, index, QSP_VARBASETYPE(name), &oldVal))
-        {
-            qspSetError(QSP_ERR_TYPEMISMATCH);
-            qspFreeString(QSP_STR(oldVal));
-            return;
-        }
+        qspGetVarValueByReference(var, index, QSP_VARBASETYPE(name), &oldVal);
         if (QSP_ISNUM(oldVal.Type) && QSP_ISNUM(val->Type)) /* tiny optimization for numbers */
         {
             QSP_NUM(oldVal) += QSP_PNUM(val);
@@ -305,20 +300,17 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
     }
     else if (qspIsInClass(op, QSP_CHAR_SIMPLEOP))
     {
-        if (!qspGetVarValueByReference(var, index, QSP_TYPE_NUMBER, &oldVal))
-        {
-            qspSetError(QSP_ERR_TYPEMISMATCH);
-            qspFreeString(QSP_STR(oldVal));
-            return;
-        }
         if (!qspConvertVariantTo(val, QSP_TYPE_NUMBER))
         {
             qspSetError(QSP_ERR_TYPEMISMATCH);
             return;
         }
+        qspGetVarValueByReference(var, index, QSP_TYPE_NUMBER, &oldVal);
         if (op == QSP_SUB[0])
             QSP_NUM(oldVal) -= QSP_PNUM(val);
-        else if (op == QSP_DIV[0])
+        else if (op == QSP_MUL[0])
+            QSP_NUM(oldVal) *= QSP_PNUM(val);
+        else /* QSP_DIV */
         {
             if (!QSP_PNUM(val))
             {
@@ -327,23 +319,28 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
             }
             QSP_NUM(oldVal) /= QSP_PNUM(val);
         }
-        else
-            QSP_NUM(oldVal) *= QSP_PNUM(val);
         qspConvertVariantTo(&oldVal, QSP_VARBASETYPE(name));
         qspSetVarValueByReference(var, index, &oldVal);
         if (QSP_ISSTR(oldVal.Type)) qspFreeString(QSP_STR(oldVal));
     }
+    else
+    {
+        qspSetError(QSP_ERR_UNKNOWNACTION);
+        return;
+    }
 }
 
-QSP_BOOL qspGetVarValueByReference(QSPVar *var, int ind, int type, QSPVariant *res)
+void qspGetVarValueByReference(QSPVar *var, int ind, int baseType, QSPVariant *res)
 {
     if (ind >= 0 && ind < var->ValsCount)
     {
-        qspCopyToNewVariant(res, var->Values + ind);
-        return qspConvertVariantTo(res, type);
+        if (QSP_BASETYPE(var->Values[ind].Type) == baseType)
+        {
+            qspCopyToNewVariant(res, var->Values + ind);
+            return;
+        }
     }
-    qspInitVariant(res, type);
-    return QSP_TRUE;
+    qspInitVariant(res, baseType);
 }
 
 QSPString qspGetVarStrValue(QSPString name)
