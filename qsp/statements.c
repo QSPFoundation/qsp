@@ -768,7 +768,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int 
             }
             if (!conditionValue) break;
             /* Execute body */
-            isExit = qspExecString(s, startStat + 1, endStat, jumpTo);
+            isExit = qspExecStringWithLocals(s, startStat + 1, endStat, jumpTo);
             if (qspRefreshCount != oldRefreshCount || qspErrorNum)
             {
                 qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -777,7 +777,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int 
             }
             if (isExit) break;
             /* Execute iterator */
-            isExit = qspExecString(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
+            isExit = qspExecStringWithLocals(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
             if (qspRefreshCount != oldRefreshCount || qspErrorNum)
             {
                 qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -844,7 +844,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int lineInd, int end
             }
             if (!conditionValue) break;
             /* Execute body */
-            isExit = qspExecCode(s, lineInd, endLine, codeOffset, jumpTo);
+            isExit = qspExecCodeBlockWithLocals(s, lineInd, endLine, codeOffset, jumpTo);
             if (qspRefreshCount != oldRefreshCount || qspErrorNum)
             {
                 qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -867,7 +867,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int lineInd, int end
                     }
                 }
             }
-            isExit = qspExecString(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
+            isExit = qspExecStringWithLocals(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
             if (qspRefreshCount != oldRefreshCount || qspErrorNum)
             {
                 qspReleaseSavedVarsGroup(QSP_TRUE);
