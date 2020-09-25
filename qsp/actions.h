@@ -32,8 +32,6 @@
         int OnPressLinesCount;
         int Location;
         int ActIndex;
-        int StartLine;
-        QSP_BOOL IsManageLines;
     } QSPCurAct;
 
     extern QSPCurAct qspCurActions[QSP_MAXACTIONS];
@@ -44,12 +42,12 @@
 
     /* External functions */
     void qspClearActions(QSP_BOOL);
-    void qspAddAction(QSPVariant *, int, QSPLineOfCode *, int, int, QSP_BOOL);
+    void qspAddAction(QSPVariant *args, int count, QSPLineOfCode *code, int start, int end);
     void qspExecAction(int);
     QSPString qspGetAllActionsAsCode();
     /* Statements */
     void qspStatementSinglelineAddAct(QSPLineOfCode *, int, int);
-    void qspStatementMultilineAddAct(QSPLineOfCode *, int, int, QSP_BOOL);
+    void qspStatementMultilineAddAct(QSPLineOfCode *, int, int);
     QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
 
 #endif

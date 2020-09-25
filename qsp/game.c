@@ -341,8 +341,6 @@ QSPString qspSaveGameStatusToString()
         }
         qspCodeWriteIntVal(&buf, qspCurActions[i].Location, QSP_TRUE);
         qspCodeWriteIntVal(&buf, qspCurActions[i].ActIndex, QSP_TRUE);
-        qspCodeWriteIntVal(&buf, qspCurActions[i].StartLine, QSP_TRUE);
-        qspCodeWriteIntVal(&buf, (int)qspCurActions[i].IsManageLines, QSP_TRUE);
     }
     qspCodeWriteIntVal(&buf, qspCurObjectsCount, QSP_TRUE);
     for (i = 0; i < qspCurObjectsCount; ++i)
@@ -539,8 +537,6 @@ void qspOpenGameStatusFromString(QSPString str)
             qspCurActions[i].OnPressLines = 0;
         qspCurActions[i].Location = qspReCodeGetIntVal(strs[ind++]);
         qspCurActions[i].ActIndex = qspReCodeGetIntVal(strs[ind++]);
-        qspCurActions[i].StartLine = qspReCodeGetIntVal(strs[ind++]);
-        qspCurActions[i].IsManageLines = qspReCodeGetIntVal(strs[ind++]) != 0;
     }
     qspCurObjectsCount = qspReCodeGetIntVal(strs[ind++]);
     for (i = 0; i < qspCurObjectsCount; ++i)

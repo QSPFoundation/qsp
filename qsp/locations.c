@@ -164,7 +164,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
         }
         else
             count = 1;
-        qspAddAction(actionArgs, count, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount, QSP_TRUE);
+        qspAddAction(actionArgs, count, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount);
         qspFreeString(QSP_STR(actionArgs[0]));
         if (qspErrorNum)
         {

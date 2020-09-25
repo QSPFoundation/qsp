@@ -83,7 +83,7 @@ INLINE int qspActIndex(QSPString name)
     return -1;
 }
 
-void qspAddAction(QSPVariant *args, int count, QSPLineOfCode *code, int start, int end, QSP_BOOL isManageLines)
+void qspAddAction(QSPVariant *args, int count, QSPLineOfCode *code, int start, int end)
 {
     QSPCurAct *act;
     QSPString imgPath;
@@ -104,8 +104,6 @@ void qspAddAction(QSPVariant *args, int count, QSPLineOfCode *code, int start, i
     act->OnPressLinesCount = end - start;
     act->Location = qspRealCurLoc;
     act->ActIndex = qspRealActIndex;
-    act->StartLine = qspRealLine;
-    act->IsManageLines = isManageLines;
     qspIsActionsChanged = QSP_TRUE;
 }
 
@@ -113,26 +111,21 @@ void qspExecAction(int ind)
 {
     QSPCurAct *act;
     QSPLineOfCode *code;
-    int count, oldLoc, oldActIndex, oldLine;
-    oldLoc = qspRealCurLoc;
-    oldActIndex = qspRealActIndex;
-    oldLine = qspRealLine;
-    act = qspCurActions + ind;
-    qspRealCurLoc = act->Location;
-    qspRealActIndex = act->ActIndex;
-    count = act->OnPressLinesCount;
-    qspCopyPrepLines(&code, act->OnPressLines, 0, count);
-    if (act->IsManageLines)
-        qspExecCodeBlockWithLocals(code, 0, count, 1, 0);
-    else
+    int count, oldLoc, oldActIndex;
+    if (ind >= 0 && ind < qspCurActionsCount)
     {
-        qspRealLine = act->StartLine;
-        qspExecCodeBlockWithLocals(code, 0, count, 0, 0);
+        oldLoc = qspRealCurLoc;
+        oldActIndex = qspRealActIndex;
+        act = qspCurActions + ind;
+        qspRealCurLoc = act->Location;
+        qspRealActIndex = act->ActIndex;
+        count = act->OnPressLinesCount;
+        qspCopyPrepLines(&code, act->OnPressLines, 0, count);
+        qspExecCodeBlockWithLocals(code, 0, count, 1, 0);
+        qspFreePrepLines(code, count);
+        qspRealActIndex = oldActIndex;
+        qspRealCurLoc = oldLoc;
     }
-    qspFreePrepLines(code, count);
-    qspRealLine = oldLine;
-    qspRealActIndex = oldActIndex;
-    qspRealCurLoc = oldLoc;
 }
 
 QSPString qspGetAllActionsAsCode()
@@ -199,7 +192,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
     if (lastPos != s->Str.End && *lastPos == QSP_COLONDELIM[0]) lastPos += QSP_STATIC_LEN(QSP_COLONDELIM);
     code.Str = qspStringFromPair(firstPos, lastPos);
     code.Label = qspGetLineLabel(code.Str);
-    code.LineNum = 0;
+    code.LineNum = s->LineNum;
     code.IsMultiline = QSP_FALSE;
     code.StatsCount = endPos - statPos;
     code.Stats = (QSPCachedStat *)malloc(code.StatsCount * sizeof(QSPCachedStat));
@@ -219,12 +212,12 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
         }
         ++statPos;
     }
-    qspAddAction(args, count, &code, 0, 1, QSP_FALSE);
+    qspAddAction(args, count, &code, 0, 1);
     qspFreeVariants(args, count);
     qspFreeLineOfCode(&code);
 }
 
-void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine, QSP_BOOL isManageLines)
+void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine)
 {
     QSPVariant args[2];
     int count, oldRefreshCount;
@@ -232,7 +225,7 @@ void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine, QSP
     oldRefreshCount = qspRefreshCount;
     count = qspGetStatArgs(line->Str, line->Stats, args);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-    qspAddAction(args, count, s, lineInd + 1, endLine, isManageLines);
+    qspAddAction(args, count, s, lineInd + 1, endLine);
     qspFreeVariants(args, count);
 }
 

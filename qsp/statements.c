@@ -417,7 +417,7 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
     case qspStatAct:
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
-        qspStatementMultilineAddAct(s, ind, endLine, codeOffset > 0);
+        qspStatementMultilineAddAct(s, ind, endLine);
         break;
     case qspStatLoop:
         *lineInd = endLine;
