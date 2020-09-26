@@ -442,11 +442,6 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
         if (temp < 0) return QSP_FALSE;
         /* action's source index */
         if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
-        /* action's start line */
-        if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
-        if (temp < 0) return QSP_FALSE;
-        /* action's manage lines flag */
-        if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
     }
     /* qspCurObjectsCount */
     if (!qspGetIntValueAndSkipLine(&count, &ind, strs, strsCount)) return QSP_FALSE;
@@ -477,7 +472,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
         /* indices */
         if (!qspSkipLines(&ind, strsCount, 2 * temp)) return QSP_FALSE;
     }
-    return QSP_TRUE;
+    return (ind == strsCount - 1); /* the last line is always empty */
 }
 
 void qspOpenGameStatusFromString(QSPString str)
