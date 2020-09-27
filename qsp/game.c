@@ -198,7 +198,7 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isNewGame)
     memcpy(gameData, data, dataSize);
     gameData[dataSize] = gameData[dataSize + 1] = gameData[dataSize + 2] = 0;
     if (isNewGame) crc = qspCRC(gameData, dataSize);
-    gameString = qspGameToQSPString(gameData, !gameData[1], QSP_FALSE);
+    gameString = qspGameToQSPString(gameData, !gameData[1]);
     free(gameData);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     qspFreeString(gameString);

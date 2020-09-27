@@ -32,7 +32,8 @@
     /* External functions */
     int qspStrCmpSB(char *, char *, unsigned char *);
     QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode);
-    QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded);
+    char *qspQSPToGameString(QSPString s, QSP_BOOL isUCS2);
+    QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2);
     int qspReCodeGetIntVal(QSPString val);
     void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL isCode);
     void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL isCode);
