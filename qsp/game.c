@@ -353,6 +353,7 @@ QSPString qspSaveGameStatusToString()
     }
     qspCodeWriteIntVal(&buf, qspGetVarsCount(), QSP_TRUE);
     for (i = 0; i < QSP_VARSCOUNT; ++i)
+    {
         if (qspVars[i].Name.Str)
         {
             qspCodeWriteIntVal(&buf, i, QSP_TRUE);
@@ -373,6 +374,7 @@ QSPString qspSaveGameStatusToString()
                 qspCodeWriteVal(&buf, qspVars[i].Indices[j].Str, QSP_TRUE);
             }
         }
+    }
     qspRestoreLocalVars(savedVars, varsCount, qspSavedVarGroups, qspSavedVarGroupsCount);
     if (qspErrorNum)
     {
@@ -492,10 +494,10 @@ void qspOpenGameStatusFromString(QSPString str)
     qspResetTime(qspReCodeGetIntVal(strs[3]));
     qspCurSelAction = qspReCodeGetIntVal(strs[4]);
     qspCurSelObject = qspReCodeGetIntVal(strs[5]);
-    if (!qspIsEmpty(strs[6])) qspViewPath = qspCodeReCode(strs[6], QSP_FALSE);
-    if (!qspIsEmpty(strs[7])) qspCurInput = qspCodeReCode(strs[7], QSP_FALSE);
-    if (!qspIsEmpty(strs[8])) qspCurDesc = qspCodeReCode(strs[8], QSP_FALSE);
-    if (!qspIsEmpty(strs[9])) qspCurVars = qspCodeReCode(strs[9], QSP_FALSE);
+    qspViewPath = qspCodeReCode(strs[6], QSP_FALSE);
+    qspCurInput = qspCodeReCode(strs[7], QSP_FALSE);
+    qspCurDesc = qspCodeReCode(strs[8], QSP_FALSE);
+    qspCurVars = qspCodeReCode(strs[9], QSP_FALSE);
     locName = qspCodeReCode(strs[10], QSP_FALSE);
     qspCurIsShowActs = qspReCodeGetIntVal(strs[11]) != 0;
     qspCurIsShowObjs = qspReCodeGetIntVal(strs[12]) != 0;
@@ -512,11 +514,7 @@ void qspOpenGameStatusFromString(QSPString str)
     qspCurActionsCount = qspReCodeGetIntVal(strs[ind++]);
     for (i = 0; i < qspCurActionsCount; ++i)
     {
-        if (qspIsEmpty(strs[ind]))
-            qspCurActions[i].Image = qspNullString;
-        else
-            qspCurActions[i].Image = qspCodeReCode(strs[ind], QSP_FALSE);
-        ++ind;
+        qspCurActions[i].Image = qspCodeReCode(strs[ind++], QSP_FALSE);
         qspCurActions[i].Desc = qspCodeReCode(strs[ind++], QSP_FALSE);
         valsCount = qspCurActions[i].OnPressLinesCount = qspReCodeGetIntVal(strs[ind++]);
         if (valsCount)
@@ -536,11 +534,7 @@ void qspOpenGameStatusFromString(QSPString str)
     qspCurObjectsCount = qspReCodeGetIntVal(strs[ind++]);
     for (i = 0; i < qspCurObjectsCount; ++i)
     {
-        if (qspIsEmpty(strs[ind]))
-            qspCurObjects[i].Image = qspNullString;
-        else
-            qspCurObjects[i].Image = qspCodeReCode(strs[ind], QSP_FALSE);
-        ++ind;
+        qspCurObjects[i].Image = qspCodeReCode(strs[ind++], QSP_FALSE);
         qspCurObjects[i].Desc = qspCodeReCode(strs[ind++], QSP_FALSE);
     }
     varsCount = qspReCodeGetIntVal(strs[ind++]);
@@ -556,8 +550,8 @@ void qspOpenGameStatusFromString(QSPString str)
             for (j = 0; j < valsCount; ++j)
             {
                 type = qspReCodeGetIntVal(strs[ind++]);
-                if (QSP_ISSTR(type))
-                    QSP_STR(qspVars[varInd].Values[j]) = (qspIsEmpty(strs[ind]) ? qspNullString : qspCodeReCode(strs[ind], QSP_FALSE));
+                if (QSP_ISSTR(qspVars[varInd].Values[j].Type = type))
+                    QSP_STR(qspVars[varInd].Values[j]) = qspCodeReCode(strs[ind], QSP_FALSE);
                 else
                     QSP_NUM(qspVars[varInd].Values[j]) = qspReCodeGetIntVal(strs[ind]);
                 ++ind;
@@ -586,10 +580,7 @@ void qspOpenGameStatusFromString(QSPString str)
     qspCallShowWindow(QSP_WIN_VARS, qspCurIsShowVars);
     qspCallShowWindow(QSP_WIN_INPUT, qspCurIsShowInput);
     qspCallSetInputStrText(qspCurInput);
-    if (qspViewPath.Str)
-        qspCallShowPicture(qspViewPath);
-    else
-        qspCallShowPicture(qspNullString);
+    qspCallShowPicture(qspViewPath);
     qspCallCloseFile(qspNullString);
     qspPlayPLFiles();
     qspCallSetTimer(qspTimerInterval);

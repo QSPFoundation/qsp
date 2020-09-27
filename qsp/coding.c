@@ -261,8 +261,10 @@ INLINE char qspReverseConvertUC(int ch, int *table)
 
 QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode)
 {
+    QSP_CHAR ch, *origBuf, *buf;
     int curLen, len = qspStrLen(str);
-    QSP_CHAR ch, *origBuf, *buf = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
+    if (!len) return qspNullString;
+    buf = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
     origBuf = str.Str;
     curLen = len;
     if (isCode)
@@ -351,8 +353,10 @@ QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded)
 {
     char ch;
     unsigned short uCh, *ptr;
+    QSP_CHAR *ret;
     int curLen, len = (isUCS2 ? qspUCS2StrLen(s) : (int)strlen(s));
-    QSP_CHAR *ret = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
+    if (!len) return qspNullString;
+    ret = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
     curLen = len;
     if (isUCS2)
     {
