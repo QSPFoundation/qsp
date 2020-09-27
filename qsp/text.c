@@ -167,15 +167,6 @@ void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end)
         *dest = 0;
 }
 
-void qspFreeGameStrs(char **strs, int count)
-{
-    if (strs)
-    {
-        while (--count >= 0) free(strs[count]);
-        free(strs);
-    }
-}
-
 void qspFreeStrs(QSPString *strs, int count)
 {
     if (strs)

@@ -64,7 +64,6 @@
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);
     void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end);
-    void qspFreeGameStrs(char **strs, int count);
     void qspFreeStrs(QSPString *strs, int count);
     QSP_BOOL qspIsNumber(QSPString s);
     int qspStrToNum(QSPString s, QSP_BOOL *isValid);

@@ -75,8 +75,8 @@ int qspCRCTable[256] =
 INLINE int qspCRC(void *, int);
 INLINE void qspIncludeFile(QSPString s);
 INLINE void qspOpenIncludes();
-INLINE QSP_BOOL qspCheckQuest(char **, int, QSP_BOOL);
-INLINE QSP_BOOL qspSkipLines(int *, int, int);
+INLINE QSP_BOOL qspCheckQuest(QSPString *strs, int count);
+INLINE QSP_BOOL qspSkipLines(int *index, int totalLinesCount, int linesToSkip);
 INLINE QSP_BOOL qspGetIntValueAndSkipLine(int *value, int *index, QSPString *strs, int totalLinesCount);
 INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount);
 
@@ -165,63 +165,51 @@ void qspNewGame(QSP_BOOL isReset)
     qspRefreshCurLoc(QSP_TRUE, 0, 0);
 }
 
-INLINE QSP_BOOL qspCheckQuest(char **strs, int count, QSP_BOOL isUCS2)
+INLINE QSP_BOOL qspCheckQuest(QSPString *strs, int count)
 {
     int i, ind, locsCount, actsCount;
-    QSP_BOOL isOldFormat;
-    QSPString buf = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
-    isOldFormat = qspStrsComp(buf, QSP_STATIC_STR(QSP_GAMEID)) != 0;
-    qspFreeString(buf);
+    QSP_BOOL isOldFormat = qspStrsComp(strs[0], QSP_STATIC_STR(QSP_GAMEID)) != 0;
     ind = (isOldFormat ? 30 : 4);
-    if (ind > count) return QSP_FALSE;
-    buf = (isOldFormat ?
-        qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE));
-    locsCount = qspStrToNum(buf, 0);
-    qspFreeString(buf);
+    if (ind >= count) return QSP_FALSE;
+    locsCount = (isOldFormat ? qspStrToNum(strs[0], 0) : qspReCodeGetIntVal(strs[3]));
     if (locsCount <= 0) return QSP_FALSE;
     for (i = 0; i < locsCount; ++i)
     {
-        if ((ind += 3) > count) return QSP_FALSE;
+        if ((ind += 3) >= count) return QSP_FALSE;
         if (isOldFormat)
             actsCount = 20;
         else
         {
-            if (ind + 1 > count) return QSP_FALSE;
-            buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-            actsCount = qspStrToNum(buf, 0);
-            qspFreeString(buf);
+            if (ind >= count) return QSP_FALSE;
+            actsCount = qspReCodeGetIntVal(strs[ind++]);
             if (actsCount < 0 || actsCount > QSP_MAXACTIONS) return QSP_FALSE;
         }
-        if ((ind += (actsCount * (isOldFormat ? 2 : 3))) > count) return QSP_FALSE;
+        if ((ind += (actsCount * (isOldFormat ? 2 : 3))) >= count) return QSP_FALSE;
     }
     return QSP_TRUE;
 }
 
 void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isNewGame)
 {
-    QSP_BOOL isOldFormat, isUCS2, isAddLoc;
+    QSP_BOOL isOldFormat, isAddLoc;
     int i, j, ind, crc, count, locsCount, actsCount, start, end;
-    QSPString buf;
-    char *gameData, **strs;
-    gameData = (char *)malloc(dataSize + 3);
+    QSPString buf, gameString, *strs;
+    char *gameData = (char *)malloc(dataSize + 3);
     memcpy(gameData, data, dataSize);
     gameData[dataSize] = gameData[dataSize + 1] = gameData[dataSize + 2] = 0;
     if (isNewGame) crc = qspCRC(gameData, dataSize);
-    count = qspSplitGameStr(gameData, isUCS2 = !gameData[1], QSP_STATIC_STR(QSP_STRSDELIM), &strs);
+    gameString = qspGameToQSPString(gameData, !gameData[1], QSP_FALSE);
     free(gameData);
-    if (!qspCheckQuest(strs, count, isUCS2))
+    count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
+    qspFreeString(gameString);
+    if (!qspCheckQuest(strs, count))
     {
         qspSetError(QSP_ERR_CANTLOADFILE);
-        qspFreeGameStrs(strs, count);
+        qspFreeStrs(strs, count);
         return;
     }
-    buf = qspGameToQSPString(strs[0], isUCS2, QSP_FALSE);
-    isOldFormat = qspStrsComp(buf, QSP_STATIC_STR(QSP_GAMEID)) != 0;
-    qspFreeString(buf);
-    buf = (isOldFormat ?
-        qspGameToQSPString(strs[0], isUCS2, QSP_FALSE) : qspGameToQSPString(strs[3], isUCS2, QSP_TRUE));
-    locsCount = qspStrToNum(buf, 0);
-    qspFreeString(buf);
+    isOldFormat = qspStrsComp(strs[0], QSP_STATIC_STR(QSP_GAMEID)) != 0;
+    locsCount = (isOldFormat ? qspStrToNum(strs[0], 0) : qspReCodeGetIntVal(strs[3]));
     if (isNewGame)
     {
         qspClearIncludes(QSP_FALSE);
@@ -240,35 +228,28 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isNewGame)
     ind = (isOldFormat ? 30 : 4);
     for (i = start; i < end; ++i)
     {
-        buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
+        buf = qspCodeReCode(strs[ind++], QSP_FALSE);
         if (isAddLoc = (isNewGame || qspLocIndex(buf) < 0))
             qspLocs[locsCount].Name = buf;
         else
             qspFreeString(buf);
         if (isAddLoc)
         {
-            qspLocs[locsCount].Desc = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-            buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
+            qspLocs[locsCount].Desc = qspCodeReCode(strs[ind++], QSP_FALSE);
+            buf = qspCodeReCode(strs[ind++], QSP_FALSE);
             qspLocs[locsCount].OnVisitLinesCount = qspPreprocessData(buf, &qspLocs[locsCount].OnVisitLines);
             qspFreeString(buf);
         }
         else
             ind += 2;
-        if (isOldFormat)
-            actsCount = 20;
-        else
-        {
-            buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-            actsCount = qspStrToNum(buf, 0);
-            qspFreeString(buf);
-        }
+        actsCount = (isOldFormat ? 20 : qspReCodeGetIntVal(strs[ind++]));
         if (isAddLoc)
         {
             for (j = 0; j < actsCount; ++j)
             {
-                qspLocs[locsCount].Actions[j].Image = (isOldFormat ? qspNullString : qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE));
-                qspLocs[locsCount].Actions[j].Desc = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
-                buf = qspGameToQSPString(strs[ind++], isUCS2, QSP_TRUE);
+                qspLocs[locsCount].Actions[j].Image = (isOldFormat ? qspNullString : qspCodeReCode(strs[ind++], QSP_FALSE));
+                qspLocs[locsCount].Actions[j].Desc = qspCodeReCode(strs[ind++], QSP_FALSE);
+                buf = qspCodeReCode(strs[ind++], QSP_FALSE);
                 qspLocs[locsCount].Actions[j].OnPressLinesCount = qspPreprocessData(buf, &qspLocs[locsCount].Actions[j].OnPressLines);
                 qspFreeString(buf);
             }
@@ -277,7 +258,7 @@ void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isNewGame)
         else
             ind += actsCount * (isOldFormat ? 2 : 3);
     }
-    qspFreeGameStrs(strs, count);
+    qspFreeStrs(strs, count);
     qspLocsCount = end;
     qspCreateWorld(end, locsCount);
     count = locsCount - start;

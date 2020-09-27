@@ -405,44 +405,6 @@ QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2, QSP_BOOL isCoded)
     return qspStringFromLen(ret, len);
 }
 
-int qspSplitGameStr(char *str, QSP_BOOL isUCS2, QSPString delim, char ***res)
-{
-    char *delimStr, *newStr, **ret, *found, *curPos = str;
-    int charSize, delimSize, allocChars, count = 0, bufSize = 8;
-    charSize = (isUCS2 ? 2 : 1);
-    delimSize = qspStrLen(delim) * charSize;
-    delimStr = qspQSPToGameString(delim, isUCS2, QSP_FALSE);
-    found = (isUCS2 ? qspUCS2StrStr(str, delimStr) : strstr(str, delimStr));
-    ret = (char **)malloc(bufSize * sizeof(char *));
-    while (found)
-    {
-        allocChars = (int)(found - curPos);
-        newStr = (char *)malloc(allocChars + charSize);
-        memcpy(newStr, curPos, allocChars);
-        if (isUCS2)
-            *((unsigned short *)(newStr + allocChars)) = 0;
-        else
-            newStr[allocChars] = 0;
-        if (count >= bufSize)
-        {
-            bufSize = count + 16;
-            ret = (char **)realloc(ret, bufSize * sizeof(char *));
-        }
-        ret[count++] = newStr;
-        curPos = found + delimSize;
-        found = (isUCS2 ? qspUCS2StrStr(curPos, delimStr) : strstr(curPos, delimStr));
-    }
-    free(delimStr);
-    allocChars = (isUCS2 ? (qspUCS2StrLen(curPos) + 1) * charSize : (int)strlen(curPos) + 1);
-    newStr = (char *)malloc(allocChars);
-    memcpy(newStr, curPos, allocChars);
-    if (count >= bufSize)
-        ret = (char **)realloc(ret, (count + 1) * sizeof(char *));
-    ret[count++] = newStr;
-    *res = ret;
-    return count;
-}
-
 int qspReCodeGetIntVal(QSPString val)
 {
     int num;
