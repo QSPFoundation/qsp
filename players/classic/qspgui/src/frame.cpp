@@ -65,11 +65,11 @@ END_EVENT_TABLE()
 
 wxIMPLEMENT_CLASS(QSPFrame, wxFrame);
 
-QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper) :
+QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transHelper) :
     wxFrame(NULL, wxID_ANY, wxEmptyString),
     m_configDefPath(configPath),
     m_configPath(configPath),
-    m_transhelper(transhelper)
+    m_transHelper(transHelper)
 {
     wxRegisterId(ID_DUMMY);
     SetIcon(wxICON(logo));
@@ -197,7 +197,7 @@ void QSPFrame::SaveSettings()
     cfg.Write(wxT("General/Volume"), m_volume);
     cfg.Write(wxT("General/ShowHotkeys"), m_isShowHotkeys);
     cfg.Write(wxT("General/Panels"), m_manager->SavePerspective());
-    m_transhelper->Save(cfg, wxT("General/Language"));
+    m_transHelper->Save(cfg, wxT("General/Language"));
     GetPosition(&x, &y);
     GetClientSize(&w, &h);
     cfg.Write(wxT("Pos/Left"), x);
@@ -240,7 +240,7 @@ void QSPFrame::LoadSettings()
         wxT("name=input;state=2099196;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=832;besth=22;minw=50;minh=20;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
         wxT("dock_size(5,0,0)=22|dock_size(2,0,0)=215|dock_size(3,0,0)=204|dock_size(3,1,0)=41|"));
     cfg.Read(wxT("General/Panels"), &panels);
-    m_transhelper->Load(cfg, wxT("General/Language"));
+    m_transHelper->Load(cfg, wxT("General/Language"));
     // -------------------------------------------------
     SetOverallVolume(m_volume);
     ApplyBackColor(m_backColor);
@@ -717,12 +717,12 @@ void QSPFrame::SaveGameState(const wxString &fullPath)
 {
     int fileSize = 64 * 1024;
     void *fileData = (void *)malloc(fileSize);
-    if (!QSPSaveGameAsData(fileData, fileSize, &fileSize, QSP_TRUE))
+    if (!QSPSaveGameAsData(fileData, &fileSize, QSP_TRUE))
     {
         if (!fileSize)
         {
             fileData = (void *)realloc(fileData, fileSize);
-            if (!QSPSaveGameAsData(fileData, fileSize, &fileSize, QSP_TRUE))
+            if (!QSPSaveGameAsData(fileData, &fileSize, QSP_TRUE))
             {
                 free(fileData);
                 ShowError();
@@ -904,7 +904,7 @@ void QSPFrame::OnSelectLinkColor(wxCommandEvent& event)
 
 void QSPFrame::OnSelectLang(wxCommandEvent& event)
 {
-    if (m_transhelper->AskUserForLanguage()) ReCreateGUI();
+    if (m_transHelper->AskUserForLanguage()) ReCreateGUI();
 }
 
 void QSPFrame::OnVolume(wxCommandEvent& event)

@@ -334,32 +334,14 @@ QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNew
 {
     if (qspIsDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
-    qspOpenQuestFromData((char *)data, dataSize, isNewGame);
-    if (qspErrorNum) return QSP_FALSE;
-    return QSP_TRUE;
+    return qspOpenGame((void *)data, dataSize, isNewGame);
 }
 /* Save game state to a buffer */
-QSP_BOOL QSPSaveGameAsData(void *buf, int bufSize, int *realSize, QSP_BOOL isRefresh)
+QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL isRefresh)
 {
-    int size;
-    QSPString data;
     if (qspIsDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
-    data = qspSaveGameStatusToString();
-    if (qspIsEmpty(data))
-    {
-        *realSize = 0;
-        return QSP_FALSE;
-    }
-    size = qspStrLen(data) * sizeof(QSP_CHAR);
-    *realSize = size;
-    if (size > bufSize)
-    {
-        qspFreeString(data);
-        return QSP_FALSE;
-    }
-    memcpy(buf, data.Str, size);
-    qspFreeString(data);
+    if (!qspSaveGameStatus(buf, bufSize)) return QSP_FALSE;
     if (isRefresh) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
@@ -368,8 +350,7 @@ QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRef
 {
     if (qspIsDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
-    qspOpenGameStatusFromString(qspStringFromLen((QSP_CHAR *)data, dataSize / sizeof(QSP_CHAR)));
-    if (qspErrorNum) return QSP_FALSE;
+    if (!qspOpenGameStatus((void *)data, dataSize)) return QSP_FALSE;
     if (isRefresh) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }

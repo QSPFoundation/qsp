@@ -33,9 +33,9 @@
     /* External functions */
     void qspClearIncludes(QSP_BOOL);
     void qspNewGame(QSP_BOOL);
-    void qspOpenQuestFromData(char *data, int dataSize, QSP_BOOL isNewGame);
-    QSPString qspSaveGameStatusToString();
-    void qspOpenGameStatusFromString(QSPString str);
+    QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame);
+    QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize);
+    QSP_BOOL qspOpenGameStatus(void *data, int dataSize);
     /* Statements */
     QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
     QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSPString *jumpTo, int extArg);

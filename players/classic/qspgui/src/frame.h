@@ -99,7 +99,7 @@
         DECLARE_EVENT_TABLE()
     public:
         // C-tors / D-tor
-        QSPFrame(const wxString &configPath, QSPTranslationHelper *transhelper);
+        QSPFrame(const wxString &configPath, QSPTranslationHelper *transHelper);
         virtual ~QSPFrame();
 
         // Methods
@@ -191,7 +191,7 @@
         wxString m_savedGamePath;
         wxString m_configPath;
         wxString m_configDefPath;
-        QSPTranslationHelper *m_transhelper;
+        QSPTranslationHelper *m_transHelper;
         wxTimer *m_timer;
         QSPTextBox *m_desc;
         QSPTextBox *m_vars;

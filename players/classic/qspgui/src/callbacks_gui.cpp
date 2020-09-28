@@ -403,12 +403,12 @@ void QSPCallBacks::SaveGameStatus(QSPString file)
     }
     int fileSize = 64 * 1024;
     void *fileData = (void *)malloc(fileSize);
-    if (!QSPSaveGameAsData(fileData, fileSize, &fileSize, QSP_FALSE))
+    if (!QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
     {
         if (!fileSize)
         {
             fileData = (void *)realloc(fileData, fileSize);
-            if (!QSPSaveGameAsData(fileData, fileSize, &fileSize, QSP_FALSE))
+            if (!QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
             {
                 free(fileData);
                 return;

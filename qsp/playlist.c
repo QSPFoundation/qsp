@@ -106,16 +106,16 @@ INLINE int qspSearchPlayList(QSPString file)
 
 void qspPlayPLFiles()
 {
-    int i;
+    int i, volume;
     QSP_CHAR *pos;
+    qspCallCloseFile(qspNullString);
     for (i = 0; i < qspPLFilesCount; ++i)
     {
         pos = qspStrChar(qspPLFiles[i], QSP_PLVOLUMEDELIM[0]);
         if (pos)
         {
-            qspPlayFile(qspStringFromPair(qspPLFiles[i].Str, pos),
-                qspStrToNum(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_PLVOLUMEDELIM), qspPLFiles[i].End), 0),
-                QSP_FALSE);
+            volume = qspStrToNum(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_PLVOLUMEDELIM), qspPLFiles[i].End), 0);
+            qspPlayFile(qspStringFromPair(qspPLFiles[i].Str, pos), volume, QSP_FALSE);
         }
         else
             qspPlayFile(qspPLFiles[i], 100, QSP_FALSE);
