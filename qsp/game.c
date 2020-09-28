@@ -191,15 +191,12 @@ INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count)
 
 QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
 {
-    QSP_BOOL isOldFormat, isAddLoc;
+    QSP_BOOL isOldFormat, isAddLoc, isUCS;
     int i, j, ind, crc, count, locsCount, actsCount, start, end;
     QSPString buf, gameString, *strs;
-    char *gameData = (char *)malloc(dataSize + 3);
-    memcpy(gameData, data, dataSize);
-    gameData[dataSize] = gameData[dataSize + 1] = gameData[dataSize + 2] = 0;
-    if (isNewGame) crc = qspCRC(gameData, dataSize);
-    gameString = qspGameToQSPString(gameData, !gameData[1]);
-    free(gameData);
+    if (isNewGame) crc = qspCRC(data, dataSize);
+    isUCS = (dataSize >= 2 && *((char *)data + 1) == 0);
+    gameString = qspStringFromFileData(data, dataSize, isUCS);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     qspFreeString(gameString);
     if (!qspCheckGame(strs, count))
@@ -275,7 +272,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
 
 QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
 {
-    char *gameData;
+    void *gameData;
     QSPString bufString, locName;
     QSPVar *savedVars;
     int i, j, dataSize, varsCount, oldRefreshCount = qspRefreshCount;
@@ -367,17 +364,16 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
         *bufSize = 0;
         return QSP_FALSE;
     }
-    dataSize = qspStrLen(bufString) * 2;
+    gameData = qspStringToFileData(bufString, QSP_TRUE, &dataSize);
+    qspFreeString(bufString);
     if (dataSize > *bufSize)
     {
         *bufSize = dataSize;
-        qspFreeString(bufString);
+        free(gameData);
         return QSP_FALSE;
     }
-    gameData = qspQSPToGameString(bufString, QSP_TRUE);
-    qspFreeString(bufString);
-    *bufSize = dataSize;
     memcpy(buf, gameData, dataSize);
+    *bufSize = dataSize;
     free(gameData);
     return QSP_TRUE;
 }
@@ -479,11 +475,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
 {
     QSPString *strs, locName, gameString;
     int i, j, ind, type, count, varInd, varsCount, valsCount;
-    char *gameData = (char *)malloc(dataSize + 3);
-    memcpy(gameData, data, dataSize);
-    gameData[dataSize] = gameData[dataSize + 1] = gameData[dataSize + 2] = 0;
-    gameString = qspGameToQSPString(gameData, QSP_TRUE);
-    free(gameData);
+    gameString = qspStringFromFileData(data, dataSize, QSP_TRUE);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     qspFreeString(gameString);
     if (!qspCheckGameStatus(strs, count))

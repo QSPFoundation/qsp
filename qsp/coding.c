@@ -190,42 +190,10 @@ unsigned char qspKOI8ROrderTable[] =
     0x96, 0xA6, 0x97, 0x98, 0x99, 0x9A, 0x8D, 0x89, 0xA3, 0xA2, 0x8E, 0x9F, 0xA4, 0xA0, 0x9E, 0xA1
 };
 
-INLINE int qspUCS2StrLen(char *);
-INLINE char *qspUCS2StrStr(char *, char *);
 INLINE char qspDirectConvertSB(char, unsigned char *);
 INLINE char qspReverseConvertSB(char, unsigned char *);
 INLINE int qspDirectConvertUC(char, int *);
 INLINE char qspReverseConvertUC(int, int *);
-
-INLINE int qspUCS2StrLen(char *str)
-{
-    unsigned short *ptr = (unsigned short *)str;
-    while (*ptr) ++ptr;
-    return (int)(ptr - (unsigned short *)str);
-}
-
-INLINE char *qspUCS2StrStr(char *str, char *subStr)
-{
-    unsigned short *s1, *s2, *cp = (unsigned short *)str;
-    while (*cp)
-    {
-        s1 = cp;
-        s2 = (unsigned short *)subStr;
-        while (*s1 && *s2 && !((int)*s1 - *s2))
-            ++s1, ++s2;
-        if (!(*s2)) return (char *)cp;
-        ++cp;
-    }
-    return 0;
-}
-
-int qspStrCmpSB(char *s1, char *s2, unsigned char *table)
-{
-    int ret = 0;
-    while (!(ret = (int)table[*(unsigned char *)s1] - table[*(unsigned char *)s2]) && *s2)
-        ++s1, ++s2;
-    return ret;
-}
 
 INLINE char qspDirectConvertSB(char ch, unsigned char *table)
 {
@@ -256,6 +224,59 @@ INLINE char qspReverseConvertUC(int ch, int *table)
     for (i = 127; i >= 0; --i)
         if (table[i] == ch) return (char)(i + 0x80);
     return 0x20;
+}
+
+void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize)
+{
+    char *buf;
+    unsigned short uCh, *uPtr;
+    QSP_CHAR *origBuf = s.Str;
+    int bufSize, len = qspStrLen(s);
+    bufSize = len * (isUCS2 ? 2 : 1);
+    buf = (char *)malloc(bufSize);
+    if (isUCS2)
+    {
+        uPtr = (unsigned short *)buf;
+        while (--len >= 0)
+        {
+            uCh = (unsigned short)QSP_BTOWC(origBuf[len]);
+            uPtr[len] = QSP_FIXBYTESORDER(uCh);
+        }
+    }
+    else
+    {
+        while (--len >= 0)
+            buf[len] = QSP_FROM_OS_CHAR(origBuf[len]);
+    }
+    *dataSize = bufSize;
+    return buf;
+}
+
+QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2)
+{
+    char *ptr;
+    unsigned short uCh, *uPtr;
+    QSP_CHAR *ret;
+    int curLen, len = (isUCS2 ? dataSize / 2 : dataSize);
+    if (!len) return qspNullString;
+    ret = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
+    curLen = len;
+    if (isUCS2)
+    {
+        uPtr = (unsigned short *)data;
+        while (--curLen >= 0)
+        {
+            uCh = QSP_FIXBYTESORDER(uPtr[curLen]);
+            ret[curLen] = QSP_WCTOB(uCh);
+        }
+    }
+    else
+    {
+        ptr = (char *)data;
+        while (--curLen >= 0)
+            ret[curLen] = (QSP_CHAR)QSP_TO_OS_CHAR(ptr[curLen]);
+    }
+    return qspStringFromLen(ret, len);
 }
 
 QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode)
@@ -291,56 +312,6 @@ QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode)
         }
     }
     return qspStringFromLen(buf, len);
-}
-
-char *qspQSPToGameString(QSPString s, QSP_BOOL isUCS2)
-{
-    unsigned short uCh, *ptr;
-    QSP_CHAR *origBuf = s.Str;
-    int len = qspStrLen(s);
-    char *ret = (char *)malloc((len + 1) * (isUCS2 ? 2 : 1));
-    if (isUCS2)
-    {
-        ptr = (unsigned short *)ret;
-        ptr[len] = 0;
-        while (--len >= 0)
-        {
-            uCh = (unsigned short)QSP_BTOWC(origBuf[len]);
-            ptr[len] = QSP_FIXBYTESORDER(uCh);
-        }
-    }
-    else
-    {
-        ret[len] = 0;
-        while (--len >= 0)
-            ret[len] = QSP_FROM_OS_CHAR(origBuf[len]);
-    }
-    return ret;
-}
-
-QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2)
-{
-    unsigned short uCh, *ptr;
-    QSP_CHAR *ret;
-    int curLen, len = (isUCS2 ? qspUCS2StrLen(s) : (int)strlen(s));
-    if (!len) return qspNullString;
-    ret = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
-    curLen = len;
-    if (isUCS2)
-    {
-        ptr = (unsigned short *)s;
-        while (--curLen >= 0)
-        {
-            uCh = QSP_FIXBYTESORDER(ptr[curLen]);
-            ret[curLen] = QSP_WCTOB(uCh);
-        }
-    }
-    else
-    {
-        while (--curLen >= 0)
-            ret[curLen] = (QSP_CHAR)QSP_TO_OS_CHAR(s[curLen]);
-    }
-    return qspStringFromLen(ret, len);
 }
 
 int qspReCodeGetIntVal(QSPString val)

@@ -30,13 +30,11 @@
     extern unsigned char qspKOI8ROrderTable[];
 
     /* External functions */
-    int qspStrCmpSB(char *, char *, unsigned char *);
+    void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize);
+    QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2);
     QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode);
-    char *qspQSPToGameString(QSPString s, QSP_BOOL isUCS2);
-    QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2);
     int qspReCodeGetIntVal(QSPString val);
     void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL isCode);
     void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL isCode);
-    char *qspToSysString(QSPString s);
 
 #endif
