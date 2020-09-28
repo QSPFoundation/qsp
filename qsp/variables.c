@@ -371,19 +371,11 @@ int qspGetVarNumValue(QSPString name)
 
 void qspRestoreGlobalVars()
 {
-    int i, j;
-    QSPVar *var;
+    int i;
     if (qspSavedVarGroupsCount)
     {
         for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
-        {
-            for (j = qspSavedVarGroups[i].VarsCount - 1; j >= 0; --j)
-            {
-                if (!(var = qspVarReference(qspSavedVarGroups[i].Vars[j].Name, QSP_TRUE))) return;
-                qspEmptyVar(var);
-                qspMoveVar(var, &qspSavedVarGroups[i].Vars[j]);
-            }
-        }
+            qspRestoreVarsList(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
         qspSavedVarGroupsCount = 0;
     }
 }
@@ -412,6 +404,7 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVar **vars)
                 free(savedVars);
                 return 0;
             }
+            /* We keep var names in qspSavedVarGroups, savedVars have empty names */
             qspMoveVar(savedVars + ind, var);
             qspMoveVar(var, &qspSavedVarGroups[i].Vars[j]);
             ++ind;
@@ -436,28 +429,19 @@ void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGr
                 {
                     while (ind < varsCount)
                     {
+                        /* savedVars don't have names here */
                         qspEmptyVar(savedVars + ind);
                         ++ind;
                     }
                     free(savedVars);
                     return;
                 }
+                /* savedVars don't have names here */
                 qspMoveVar(&savedGroups[i].Vars[j], var);
                 qspMoveVar(var, savedVars + ind);
                 ++ind;
             }
         }
-        free(savedVars);
-    }
-}
-
-void qspClearLocalVars(QSPVar *savedVars, int varsCount)
-{
-    int i;
-    if (savedVars)
-    {
-        for (i = 0; i < varsCount; ++i)
-            qspEmptyVar(savedVars + i);
         free(savedVars);
     }
 }

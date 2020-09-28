@@ -69,7 +69,6 @@
     void qspRestoreGlobalVars();
     int qspSaveLocalVarsAndRestoreGlobals(QSPVar **);
     void qspRestoreLocalVars(QSPVar *, int, QSPVarsGroup *, int);
-    void qspClearLocalVars(QSPVar *, int);
     void qspRestoreVarsList(QSPVar *, int);
     void qspClearVarsList(QSPVar *, int);
     int qspArraySize(QSPString name);
