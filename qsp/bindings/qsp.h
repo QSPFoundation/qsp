@@ -91,9 +91,6 @@
         QSP_CALL_DUMMY
     };
 
-    #define QSP_FMT2(x) L##x
-    #define QSP_FMT(x) QSP_FMT2(x)
-
     typedef struct
     {
         QSP_CHAR *Str;

@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "coding.h"
 
 #ifndef QSP_TEXTDEFINES
     #define QSP_TEXTDEFINES
@@ -194,7 +195,7 @@
         QSP_CHAR *pos = str->Str;
         while (pos < str->End)
         {
-            *pos = qspToWLower(*pos);
+            *pos = QSP_CHRLWR(*pos);
             ++pos;
         }
     }
@@ -204,7 +205,7 @@
         QSP_CHAR *pos = str->Str;
         while (pos < str->End)
         {
-            *pos = qspToWUpper(*pos);
+            *pos = QSP_CHRUPR(*pos);
             ++pos;
         }
     }

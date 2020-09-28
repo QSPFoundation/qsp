@@ -305,7 +305,7 @@ char *qspQSPToGameString(QSPString s, QSP_BOOL isUCS2)
         ptr[len] = 0;
         while (--len >= 0)
         {
-            uCh = (unsigned short)origBuf[len];
+            uCh = (unsigned short)QSP_BTOWC(origBuf[len]);
             ptr[len] = QSP_FIXBYTESORDER(uCh);
         }
     }
@@ -332,7 +332,7 @@ QSPString qspGameToQSPString(char *s, QSP_BOOL isUCS2)
         while (--curLen >= 0)
         {
             uCh = QSP_FIXBYTESORDER(ptr[curLen]);
-            ret[curLen] = uCh;
+            ret[curLen] = QSP_WCTOB(uCh);
         }
     }
     else

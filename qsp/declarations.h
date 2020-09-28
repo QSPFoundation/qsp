@@ -49,23 +49,6 @@
         #define INLINE static
     #endif
 
-    static int qspEndiannessTestValue = 1;
-
-    #define QSP_ONIG_ENC ((*(char *)&(qspEndiannessTestValue) == 1) ? \
-        (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE) : \
-        (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_BE : ONIG_ENCODING_UTF32_BE))
-    #define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
-    #define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
-
-    #define QSP_FIXBYTESORDER(a) ((*(char *)&(qspEndiannessTestValue) == 1) ? \
-        (a) : \
-        ((unsigned short)(((a) << 8) | ((a) >> 8))))
-    #if defined(_MSC_VER)
-        #define QSP_TIME _time64
-    #else
-        #define QSP_TIME time
-    #endif
-
     #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
     #if defined(__GNUC__) || _MSC_VER >= 1800
         #define QSP_STATIC_STR(x) ((QSPString) { (x), (x) + QSP_STATIC_LEN(x) })

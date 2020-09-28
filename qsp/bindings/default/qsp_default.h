@@ -18,7 +18,53 @@
 #ifndef QSP_DEFAULTDEFINES
     #define QSP_DEFAULTDEFINES
 
-    typedef wchar_t QSP_CHAR;
+    static int qspEndiannessTestValue = 1;
+
+    #ifdef _UNICODE
+        typedef wchar_t QSP_CHAR;
+        #define QSP_FMT2(x) L##x
+        #define QSP_FMT(x) QSP_FMT2(x)
+
+        #define QSP_ONIG_ENC ((*(char *)&(qspEndiannessTestValue) == 1) ? \
+                    (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE) : \
+                    (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_BE : ONIG_ENCODING_UTF32_BE))
+        #define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
+        #define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
+        #define QSP_CHRLWR qspToWLower
+        #define QSP_CHRUPR qspToWUpper
+        #define QSP_WCTOB
+        #define QSP_BTOWC
+    #else
+        typedef char QSP_CHAR;
+        #define QSP_FMT(x) x
+
+        #if defined(WIN32)
+            #define QSP_ONIG_ENC ONIG_ENCODING_CP1251
+            #define QSP_FROM_OS_CHAR
+            #define QSP_TO_OS_CHAR
+            #define QSP_CHRLWR(a) qspCP1251ToLowerTable[(unsigned char)(a)]
+            #define QSP_CHRUPR(a) qspCP1251ToUpperTable[(unsigned char)(a)]
+            #define QSP_WCTOB(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
+            #define QSP_BTOWC(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
+        #else
+            #define QSP_ONIG_ENC ONIG_ENCODING_KOI8_R
+            #define QSP_FROM_OS_CHAR(a) qspReverseConvertSB(a, qspCP1251ToKOI8RTable)
+            #define QSP_TO_OS_CHAR(a) qspDirectConvertSB(a, qspCP1251ToKOI8RTable)
+            #define QSP_CHRLWR(a) qspKOI8RToLowerTable[(unsigned char)(a)]
+            #define QSP_CHRUPR(a) qspKOI8RToUpperTable[(unsigned char)(a)]
+            #define QSP_WCTOB(a) qspReverseConvertUC(a, qspKOI8RToUnicodeTable)
+            #define QSP_BTOWC(a) qspDirectConvertUC(a, qspKOI8RToUnicodeTable)
+        #endif
+    #endif
+
+    #define QSP_FIXBYTESORDER(a) ((*(char *)&(qspEndiannessTestValue) == 1) ? \
+            (a) : \
+            ((unsigned short)(((a) << 8) | ((a) >> 8))))
+    #if defined(_MSC_VER)
+        #define QSP_TIME _time64
+    #else
+        #define QSP_TIME time
+    #endif
 
     #ifdef __cplusplus
         typedef int (*QSP_CALLBACK)(...);
