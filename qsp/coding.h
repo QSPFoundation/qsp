@@ -32,8 +32,8 @@
     /* External functions */
     void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize);
     QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2);
-    QSPString qspCodeReCode(QSPString str, QSP_BOOL isCode);
-    int qspReCodeGetIntVal(QSPString val);
+    QSPString qspCodeDeCode(QSPString str, QSP_BOOL isCode);
+    int qspDeCodeGetIntVal(QSPString val);
     void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL isCode);
     void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL isCode);
 
