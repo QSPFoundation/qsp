@@ -32,7 +32,8 @@
         QSP_TYPE_NUMBER = 0,
         QSP_TYPE_STRING = 1,
         QSP_TYPE_CODE = 2,
-        QSP_TYPE_TUPLE = 3
+        QSP_TYPE_TUPLE = 3,
+        QSP_TYPE_VARREF = 4
     };
 
     #define QSP_ISDEF(a) ((a) >= QSP_TYPE_NUMBER)

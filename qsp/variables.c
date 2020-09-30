@@ -99,7 +99,7 @@ void qspClearVars(QSP_BOOL isFirst)
 INLINE void qspRemoveArray(QSPString name)
 {
     QSPVar *var;
-    if (!(var = qspVarReferenceWithType(name, QSP_FALSE, 0))) return;
+    if (!(var = qspVarReference(name, QSP_FALSE))) return;
     qspEmptyVar(var);
 }
 
@@ -109,7 +109,7 @@ INLINE void qspRemoveArrayItem(QSPString name, int index)
     QSP_BOOL isRemoving;
     QSPVarIndex *ind;
     int curIndex;
-    if (!(var = qspVarReferenceWithType(name, QSP_FALSE, 0))) return;
+    if (!(var = qspVarReference(name, QSP_FALSE))) return;
     if (index < 0 || index >= var->ValsCount) return;
     curIndex = index;
     if (QSP_ISSTR(var->Values[curIndex].Type))
@@ -134,17 +134,6 @@ INLINE void qspRemoveArrayItem(QSPString name, int index)
         if (isRemoving) *ind = var->Indices[curIndex + 1];
         if (ind->Index > index) ind->Index--;
     }
-}
-
-QSPVar *qspVarReferenceWithType(QSPString name, QSP_BOOL isCreate, int *baseType)
-{
-    QSPVar *var;
-    QSPString uName = qspGetNewText(qspDelSpc(name));
-    qspUpperStr(&uName);
-    var = qspVarReference(uName, isCreate);
-    if (baseType && var) *baseType = QSP_VARBASETYPE(uName);
-    qspFreeString(uName);
-    return var;
 }
 
 int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL isCreate)
@@ -526,7 +515,7 @@ INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 int qspArraySize(QSPString name)
 {
     QSPVar *var;
-    if (!(var = qspVarReferenceWithType(name, QSP_FALSE, 0))) return 0;
+    if (!(var = qspVarReference(name, QSP_FALSE))) return 0;
     return var->ValsCount;
 }
 
@@ -536,7 +525,8 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
     QSPVar *var;
     QSPString str;
     regex_t *regExp;
-    if (!(var = qspVarReferenceWithType(varName, QSP_FALSE, &baseVarType))) return -1;
+    if (!(var = qspVarReference(varName, QSP_FALSE))) return -1;
+    baseVarType = QSP_VARBASETYPE(varName);
     if (!qspConvertVariantTo(val, (isRegExp || QSP_ISSTR(baseVarType) ? QSP_TYPE_STRING : QSP_TYPE_NUMBER)))
     {
         qspSetError(QSP_ERR_TYPEMISMATCH);
@@ -585,8 +575,9 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
     QSPString str;
     QSPVariant res;
     int baseVarType, curInd, count;
-    if (!(var = qspVarReferenceWithType(name, QSP_FALSE, &baseVarType)))
+    if (!(var = qspVarReference(name, QSP_FALSE)))
         return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
+    baseVarType = QSP_VARBASETYPE(name);
     curInd = -1;
     count = var->ValsCount;
     while (--count >= 0)
@@ -864,8 +855,8 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int
 {
     int start, num;
     QSPVar *dest, *src;
-    if (!(dest = qspVarReferenceWithType(QSP_STR(args[0]), QSP_TRUE, 0))) return QSP_FALSE;
-    if (!(src = qspVarReferenceWithType(QSP_STR(args[1]), QSP_FALSE, 0))) return QSP_FALSE;
+    if (!(dest = qspVarReference(QSP_STR(args[0]), QSP_TRUE))) return QSP_FALSE;
+    if (!(src = qspVarReference(QSP_STR(args[1]), QSP_FALSE))) return QSP_FALSE;
     if (dest != src)
     {
         start = (count >= 3 ? QSP_NUM(args[2]) : 0);

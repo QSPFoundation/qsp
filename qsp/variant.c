@@ -18,6 +18,22 @@
 #include "variant.h"
 #include "text.h"
 
+INLINE void qspFormatVariant(QSPVariant *val);
+
+INLINE void qspFormatVariant(QSPVariant *val)
+{
+    QSPString temp;
+    switch (val->Type)
+    {
+        case QSP_TYPE_VARREF:
+            temp = qspGetNewText(qspDelSpc(QSP_PSTR(val)));
+            qspUpperStr(&temp);
+            qspFreeString(QSP_PSTR(val));
+            QSP_PSTR(val) = temp;
+            break;
+    }
+}
+
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type)
 {
     int num;
@@ -25,9 +41,9 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type)
     QSP_BOOL isValid;
     if (val->Type != type)
     {
-        if (QSP_ISSTR(val->Type))
+        if (QSP_ISNUM(type))
         {
-            if (QSP_ISNUM(type))
+            if (QSP_ISSTR(val->Type))
             {
                 num = qspStrToNum(QSP_PSTR(val), &isValid);
                 if (!isValid) return QSP_FALSE;
@@ -35,11 +51,15 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type)
                 QSP_PNUM(val) = num;
             }
         }
-        else if (QSP_ISSTR(type))
+        else
         {
-            QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)));
+            if (QSP_ISNUM(val->Type))
+            {
+                QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)));
+            }
         }
         val->Type = type;
+        qspFormatVariant(val);
     }
     return QSP_TRUE;
 }

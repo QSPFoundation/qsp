@@ -126,8 +126,8 @@
 
     INLINE void qspUpdateText(QSPString *dest, QSPString val)
     {
-        dest->End = dest->Str;
-        qspAddText(dest, val, QSP_FALSE);
+        qspFreeString(*dest);
+        qspAddText(dest, val, QSP_TRUE);
     }
 
     INLINE QSPString qspGetNewText(QSPString val)

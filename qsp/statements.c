@@ -103,17 +103,19 @@ void qspInitStats()
     Format:
         qspAddStatement(
             Statement,
-            Extended Argument,
-            Statement's Function,
-            Minimum Arguments' Count,
-            Maximum Arguments' Count,
-            Arguments' Types [optional]
+            Handler,
+            Minimum arguments' count,
+            Maximum arguments' count,
+            Arguments' types [optional]
         );
 
-        "Arguments' Types":
-        -1 - Unknown / Any
-        0 - Number
-        1 - String
+        Types:
+        QSP_TYPE_UNDEFINED = -1,
+        QSP_TYPE_NUMBER = 0,
+        QSP_TYPE_STRING = 1,
+        QSP_TYPE_CODE = 2,
+        QSP_TYPE_TUPLE = 3,
+        QSP_TYPE_VARREF = 4
     */
     int i;
     for (i = 0; i < QSP_STATSLEVELS; ++i) qspStatsNamesCounts[i] = 0;
@@ -133,7 +135,7 @@ void qspInitStats()
     qspAddStatement(qspStatClose, qspStatementCloseFile, 0, 1, 1);
     qspAddStatement(qspStatClS, qspStatementClear, 0, 0);
     qspAddStatement(qspStatCmdClear, qspStatementClear, 0, 0);
-    qspAddStatement(qspStatCopyArr, qspStatementCopyArr, 2, 4, 1, 1, 0, 0);
+    qspAddStatement(qspStatCopyArr, qspStatementCopyArr, 2, 4, 4, 4, 0, 0);
     qspAddStatement(qspStatDelAct, qspStatementDelAct, 1, 1, 1);
     qspAddStatement(qspStatDelObj, qspStatementDelObj, 1, 1, 1);
     qspAddStatement(qspStatDynamic, qspStatementDynamic, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
@@ -146,8 +148,8 @@ void qspInitStats()
     qspAddStatement(qspStatJump, qspStatementJump, 1, 1, 1);
     qspAddStatement(qspStatKillAll, qspStatementClear, 0, 0);
     qspAddStatement(qspStatKillObj, qspStatementDelObj, 0, 1, 0);
-    qspAddStatement(qspStatKillVar, qspStatementKillVar, 0, 2, 1, 0);
-    qspAddStatement(qspStatMenu, qspStatementShowMenu, 1, 3, 1, 0, 0);
+    qspAddStatement(qspStatKillVar, qspStatementKillVar, 0, 2, 4, 0);
+    qspAddStatement(qspStatMenu, qspStatementShowMenu, 1, 3, 4, 0, 0);
     qspAddStatement(qspStatMClear, qspStatementClear, 0, 0);
     qspAddStatement(qspStatMNL, qspStatementAddText, 0, 1, 1);
     qspAddStatement(qspStatMPL, qspStatementAddText, 0, 1, 1);
