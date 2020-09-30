@@ -249,6 +249,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, int count)
 void qspRefreshCurLoc(QSP_BOOL isChangeDesc, QSPVariant *args, int count)
 {
     int oldRefreshCount;
+    if (qspCurLoc < 0) return;
     qspRestoreGlobalVars(); /* clean all local variables */
     if (qspErrorNum) return;
     qspClearActions(QSP_FALSE);
