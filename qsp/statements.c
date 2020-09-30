@@ -148,7 +148,7 @@ void qspInitStats()
     qspAddStatement(qspStatJump, qspStatementJump, 1, 1, 1);
     qspAddStatement(qspStatKillAll, qspStatementClear, 0, 0);
     qspAddStatement(qspStatKillObj, qspStatementDelObj, 0, 1, 0);
-    qspAddStatement(qspStatKillVar, qspStatementKillVar, 0, 2, 4, 0);
+    qspAddStatement(qspStatKillVar, qspStatementKillVar, 0, 2, 4, -1);
     qspAddStatement(qspStatMenu, qspStatementShowMenu, 1, 3, 4, 0, 0);
     qspAddStatement(qspStatMClear, qspStatementClear, 0, 0);
     qspAddStatement(qspStatMNL, qspStatementAddText, 0, 1, 1);
