@@ -243,9 +243,9 @@ int qspOpenTextData(QSP_CHAR *data, QSP_CHAR *locStart, QSP_CHAR *locEnd, QSP_BO
     {
         if (isInLoc)
         {
-            if (!quot && !quotsCount && qspIsEqual(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM)))
+            if (!quot && !quotsCount && (!codeLen || qspIsEqual(data, QSP_STRSDELIM, QSP_LEN(QSP_STRSDELIM))))
             {
-                line = qspSkipSpaces(data + QSP_LEN(QSP_STRSDELIM));
+                line = qspSkipSpaces(codeLen ? data + QSP_LEN(QSP_STRSDELIM) : data);
                 if (qspIsEqual(line, locEnd, locEndLen))
                 {
                     isInLoc = QSP_FALSE;
@@ -265,14 +265,14 @@ int qspOpenTextData(QSP_CHAR *data, QSP_CHAR *locStart, QSP_CHAR *locEnd, QSP_BO
                         break;
                 }
             }
-            if (isFill) codeLen = qspAddCharToBuffer(&locCode, *data, &bufSize, codeLen);
+            codeLen = (isFill ? qspAddCharToBuffer(&locCode, *data, &bufSize, codeLen) : codeLen + 1);
             if (quot)
             {
                 if (*data == quot)
                 {
                     if (*(data + 1) == quot)
                     {
-                        if (isFill) codeLen = qspAddCharToBuffer(&locCode, *data, &bufSize, codeLen);
+                        codeLen = (isFill ? qspAddCharToBuffer(&locCode, *data, &bufSize, codeLen) : codeLen + 1);
                         ++data;
                     }
                     else
@@ -299,6 +299,7 @@ int qspOpenTextData(QSP_CHAR *data, QSP_CHAR *locStart, QSP_CHAR *locEnd, QSP_BO
             if (qspIsEqual(line, locStart, locStartLen))
             {
                 isInLoc = QSP_TRUE;
+                codeLen = 0;
                 if (isFill)
                 {
                     line += locStartLen;
@@ -315,18 +316,12 @@ int qspOpenTextData(QSP_CHAR *data, QSP_CHAR *locStart, QSP_CHAR *locEnd, QSP_BO
                     printf("Location: %s\n", name);
                     free(name);
 
-                    codeLen = 0;
                     bufSize = 1024;
                     locCode = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
                 }
-                if (pos)
-                {
-                    data = pos;
-                    continue; /* we're inside the loc now */
-                }
             }
             if (pos)
-                data = pos + QSP_LEN(QSP_STRSDELIM); /* keep searching for a new loc */
+                data = pos + QSP_LEN(QSP_STRSDELIM);
             else
                 break;
         }
