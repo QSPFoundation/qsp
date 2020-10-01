@@ -1004,8 +1004,7 @@ INLINE QSP_BOOL qspStatementGoTo(QSPVariant *args, int count, QSPString *jumpTo,
 
 INLINE QSP_BOOL qspStatementJump(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
-    qspFreeString(*jumpTo);
-    *jumpTo = qspGetNewText(qspDelSpc(QSP_STR(args[0])));
+    qspUpdateText(jumpTo, qspDelSpc(QSP_STR(args[0])));
     qspUpperStr(jumpTo);
     return QSP_TRUE;
 }
