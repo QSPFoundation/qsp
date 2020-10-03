@@ -522,10 +522,10 @@ void QSPFrame::ReCreateGUI()
     menuBar->SetLabel(ID_SHOWHIDE, _("&Show / Hide"));
     menuBar->SetLabel(ID_FONT, _("&Font"));
     menuBar->SetLabel(ID_SELECTFONT, _("Select &font...\tAlt-F"));
-    menuBar->SetLabel(ID_USEFONTSIZE, _("&Always use selected font's size"));
+    menuBar->SetLabel(ID_USEFONTSIZE, _("&Always use selected font size"));
     menuBar->SetLabel(ID_COLORS, _("&Colors"));
-    menuBar->SetLabel(ID_SELECTFONTCOLOR, _("Select font's &color...\tAlt-C"));
-    menuBar->SetLabel(ID_SELECTBACKCOLOR, _("Select &background's color...\tAlt-B"));
+    menuBar->SetLabel(ID_SELECTFONTCOLOR, _("Select font &color...\tAlt-C"));
+    menuBar->SetLabel(ID_SELECTBACKCOLOR, _("Select &background color...\tAlt-B"));
     menuBar->SetLabel(ID_SELECTLINKCOLOR, _("Select l&inks' color...\tAlt-I"));
     menuBar->SetLabel(ID_VOLUME, _("Sound &volume"));
     menuBar->SetLabel(ID_VOLUME0, _("No sound\tAlt-1"));
@@ -850,7 +850,7 @@ void QSPFrame::OnSelectFontColor(wxCommandEvent& event)
     wxColourData data;
     data.SetColour(m_fontColor);
     wxColourDialog dialog(this, &data);
-    dialog.SetTitle(_("Select font's color"));
+    dialog.SetTitle(_("Select font color"));
     if (dialog.ShowModal() == wxID_OK)
     {
         m_fontColor = dialog.GetColourData().GetColour();
@@ -869,7 +869,7 @@ void QSPFrame::OnSelectBackColor(wxCommandEvent& event)
     wxColourData data;
     data.SetColour(m_backColor);
     wxColourDialog dialog(this, &data);
-    dialog.SetTitle(_("Select background's color"));
+    dialog.SetTitle(_("Select background color"));
     if (dialog.ShowModal() == wxID_OK)
     {
         m_backColor = dialog.GetColourData().GetColour();

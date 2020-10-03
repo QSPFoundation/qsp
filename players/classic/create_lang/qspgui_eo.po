@@ -82,7 +82,7 @@ msgstr "Ne eblas aldoni agon!"
 msgid "Can't add file!"
 msgstr "Ne eblas aldoni dosieron!"
 
-msgid "Can't add menu's item!"
+msgid "Can't add menu item!"
 msgstr "Ne eblas aldoni punkton de menuo!"
 
 msgid "Can't add object!"
@@ -119,7 +119,7 @@ msgstr "Ludo ne estas malfermita!"
 msgid "Incorrect arguments' count!"
 msgstr "Neĝusta kvanto da argumentoj de operatoro / funkcio!"
 
-msgid "Incorrect variable's name!"
+msgid "Incorrect variable name!"
 msgstr "Ne taŭgas nomo de variablo / masivo!"
 
 msgid "Info"
@@ -171,7 +171,7 @@ msgstr "Quest Soft Player 5"
 msgid "Quote not found!"
 msgstr "Mankas finiganta tekston citilo!"
 
-msgid "Regular expression's error!"
+msgid "Regular expression error!"
 msgstr "Eraro de kompilado de regula esprimo!"
 
 msgid "Saved game files (*.sav)|*.sav"
@@ -183,10 +183,10 @@ msgstr "&Tiparo"
 msgid "&Colors"
 msgstr "&Koloroj"
 
-msgid "&Always use selected font's size"
+msgid "&Always use selected font size"
 msgstr "Ĉiam uzi elektitan &grandecon de tiparo"
 
-msgid "Select &background's color...\tAlt-B"
+msgid "Select &background color...\tAlt-B"
 msgstr "Elekto de koloro de &fono...\tAlt-B"
 
 msgid "Select &font...\tAlt-F"
@@ -195,7 +195,7 @@ msgstr "Elekto de &tiparo...\tAlt-F"
 msgid "Select &language...\tAlt-L"
 msgstr "Elekto de &lingvo...\tAlt-L"
 
-msgid "Select background's color"
+msgid "Select background color"
 msgstr "Elektu koloron de fono"
 
 msgid "Select file to save"
@@ -204,10 +204,10 @@ msgstr "Elektu dosieron por savo"
 msgid "Select font"
 msgstr "Elektu tiparon"
 
-msgid "Select font's &color...\tAlt-C"
+msgid "Select font &color...\tAlt-C"
 msgstr "Elekto de &koloro de tiparo...\tAlt-C"
 
-msgid "Select font's color"
+msgid "Select font color"
 msgstr "Elektu koloron de tiparo"
 
 msgid "Select game file"

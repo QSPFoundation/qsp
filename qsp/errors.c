@@ -63,7 +63,7 @@ QSPString qspGetErrorDesc(int errorNum)
     case QSP_ERR_LOCNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Location not found!")); break;
     case QSP_ERR_ENDNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("[end] not found!")); break;
     case QSP_ERR_LABELNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Label not found!")); break;
-    case QSP_ERR_INCORRECTNAME: str = QSP_STATIC_STR(QSP_FMT("Incorrect variable's name!")); break;
+    case QSP_ERR_INCORRECTNAME: str = QSP_STATIC_STR(QSP_FMT("Incorrect variable name!")); break;
     case QSP_ERR_QUOTNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Quote not found!")); break;
     case QSP_ERR_BRACKNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Bracket not found!")); break;
     case QSP_ERR_BRACKSNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Brackets not found!")); break;
@@ -71,9 +71,9 @@ QSPString qspGetErrorDesc(int errorNum)
     case QSP_ERR_UNKNOWNACTION: str = QSP_STATIC_STR(QSP_FMT("Unknown action!")); break;
     case QSP_ERR_ARGSCOUNT: str = QSP_STATIC_STR(QSP_FMT("Incorrect arguments' count!")); break;
     case QSP_ERR_CANTADDOBJECT: str = QSP_STATIC_STR(QSP_FMT("Can't add object!")); break;
-    case QSP_ERR_CANTADDMENUITEM: str = QSP_STATIC_STR(QSP_FMT("Can't add menu's item!")); break;
+    case QSP_ERR_CANTADDMENUITEM: str = QSP_STATIC_STR(QSP_FMT("Can't add menu item!")); break;
     case QSP_ERR_TOOMANYVARS: str = QSP_STATIC_STR(QSP_FMT("Too many variables!")); break;
-    case QSP_ERR_INCORRECTREGEXP: str = QSP_STATIC_STR(QSP_FMT("Regular expression's error!")); break;
+    case QSP_ERR_INCORRECTREGEXP: str = QSP_STATIC_STR(QSP_FMT("Regular expression error!")); break;
     case QSP_ERR_CODENOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Code not found!")); break;
     case QSP_ERR_LOOPWHILENOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Loop condition not found!")); break;
     default: str = QSP_STATIC_STR(QSP_FMT("Unknown error!")); break;
