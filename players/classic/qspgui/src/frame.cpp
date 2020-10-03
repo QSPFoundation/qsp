@@ -774,7 +774,10 @@ void QSPFrame::OnQuit(wxCommandEvent& event)
 
 void QSPFrame::OnOpenGame(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Select game file"), wxEmptyString, wxEmptyString, _("QSP games (*.qsp;*.gam)|*.qsp;*.gam"), wxFD_OPEN);
+    wxFileDialog dialog(this, _("Select game file"),
+                        wxEmptyString, wxEmptyString,
+                        _("QSP games (*.qsp;*.gam)|*.qsp;*.gam"),
+                        wxFD_OPEN);
     if (dialog.ShowModal() == wxID_OK)
         OpenGameFile(dialog.GetPath());
 }
@@ -787,14 +790,20 @@ void QSPFrame::OnNewGame(wxCommandEvent& event)
 
 void QSPFrame::OnOpenGameStat(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
+    wxFileDialog dialog(this, _("Select saved game file"),
+                        wxEmptyString, wxEmptyString,
+                        _("Saved game files (*.sav)|*.sav"),
+                        wxFD_OPEN);
     if (dialog.ShowModal() == wxID_OK)
         OpenGameState(dialog.GetPath());
 }
 
 void QSPFrame::OnSaveGameStat(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
+    wxFileDialog dialog(this, _("Select file to save"),
+                        wxEmptyString, wxT("game.sav"),
+                        _("Saved game files (*.sav)|*.sav"),
+                        wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
     if (dialog.ShowModal() == wxID_OK)
         SaveGameState(dialog.GetPath());
 }
