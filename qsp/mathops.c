@@ -159,7 +159,7 @@ void qspInitMath()
     qspAddOperation(qspOpLt, 10, 0, 0, 2, 2, -1, -1);
     qspAddOperation(qspOpGt, 10, 0, 0, 2, 2, -1, -1);
     qspAddOperation(qspOpAppend, 12, 0, 1, 2, 2, 1, 1);
-    qspAddOperation(qspOpComma, 0, 0, 1, 2, 2, 1, 1);
+    qspAddOperation(qspOpComma, 0, 0, 3, 2, 2, 1, 1);
     qspAddOperation(qspOpAnd, 7, 0, 0, 2, 2, 0, 0);
     qspAddOperation(qspOpOr, 6, 0, 0, 2, 2, 0, 0);
     qspAddOperation(qspOpLoc, 11, 0, 0, 1, 1, 1);
