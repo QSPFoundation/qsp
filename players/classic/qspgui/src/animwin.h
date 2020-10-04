@@ -32,6 +32,7 @@
 
         // Methods
         void RefreshUI();
+        virtual bool LoadFile(const wxString& filename, wxAnimationType type = wxANIMATION_TYPE_ANY);
     protected:
         // Events
         void OnKeyUp(wxKeyEvent& event);

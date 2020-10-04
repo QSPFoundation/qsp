@@ -36,6 +36,20 @@ void QSPAnimWin::RefreshUI()
     Refresh();
 }
 
+bool QSPAnimWin::LoadFile(const wxString &filename, wxAnimationType type)
+{
+    // We have to stop animation even if the new one can't be loaded
+    if (IsPlaying())
+        Stop();
+
+    if (wxGenericAnimationCtrl::LoadFile(filename, type))
+    {
+        if (GetAnimation().GetFrameCount() > 1)
+            return true;
+    }
+    return false;
+}
+
 void QSPAnimWin::OnKeyUp(wxKeyEvent& event)
 {
     event.Skip();

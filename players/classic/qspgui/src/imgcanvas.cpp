@@ -44,35 +44,37 @@ QSPImgCanvas::~QSPImgCanvas()
 bool QSPImgCanvas::OpenFile(const wxString& fullPath)
 {
     bool ret;
-    if (m_path != fullPath)
+    if (m_path == fullPath)
+        return true;
+
+    m_animation->Stop();
+    m_isAnim = false;
+
+    if (wxFileExists(fullPath))
     {
-        if (wxFileExists(fullPath))
+        if (m_isAnim = m_animation->LoadFile(fullPath))
         {
-            if (m_isAnim = m_animation->LoadFile(fullPath))
-            {
-                m_animation->Show();
-                ret = true;
-            }
-            else
-            {
-                m_animation->Hide();
-                ret = m_image.LoadFile(fullPath);
-            }
-            if (ret)
-            {
-                wxSizeEvent e;
-                OnSize(e);
-                if (m_isAnim)
-                    m_animation->Play();
-                else
-                    Refresh();
-                m_path = fullPath;
-            }
-            return ret;
+            m_animation->Show();
+            ret = true;
         }
-        return false;
+        else
+        {
+            m_animation->Hide();
+            ret = m_image.LoadFile(fullPath);
+        }
+        if (ret)
+        {
+            wxSizeEvent e;
+            OnSize(e);
+            if (m_isAnim)
+                m_animation->Play();
+            else
+                Refresh();
+            m_path = fullPath;
+            return true;
+        }
     }
-    return true;
+    return false;
 }
 
 void QSPImgCanvas::RefreshUI()
