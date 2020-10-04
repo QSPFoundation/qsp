@@ -512,9 +512,9 @@ int qspArraySize(QSPString name)
 
 int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 {
-    int num, count, baseVarType;
+    int count, baseVarType;
     QSPVar *var;
-    QSPString str;
+    QSP_BOOL isFound;
     regex_t *regExp;
     if (!(var = qspVarReference(varName, QSP_FALSE))) return -1;
     baseVarType = QSP_VARBASETYPE(varName);
@@ -529,34 +529,36 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
         if (!regExp) return -1;
     }
     count = var->ValsCount;
-    if (ind < 0)
-        ind = 0;
-    else if (ind > count)
-        ind = count;
-    while (ind <= count)
+    if (ind < 0) ind = 0;
+    while (ind < count)
     {
         if (QSP_BASETYPE(var->Values[ind].Type) == QSP_BASETYPE(val->Type))
         {
             if (QSP_ISSTR(val->Type))
             {
-                str = (ind < count ? QSP_STR(var->Values[ind]) : qspNullString);
-                if (isRegExp)
-                {
-                    if (qspRegExpStrMatch(regExp, str)) return ind;
-                }
-                else
-                {
-                    if (!qspStrsComp(str, QSP_PSTR(val))) return ind;
-                }
+                isFound = isRegExp ?
+                          qspRegExpStrMatch(regExp, QSP_STR(var->Values[ind])) :
+                          !qspStrsComp(QSP_PSTR(val), QSP_STR(var->Values[ind]));
             }
             else
             {
-                num = (ind < count ? QSP_NUM(var->Values[ind]) : 0);
-                if (num == QSP_PNUM(val)) return ind;
+                isFound = (QSP_PNUM(val) == QSP_NUM(var->Values[ind]));
             }
+            if (isFound) return ind;
         }
         ++ind;
     }
+    if (QSP_ISSTR(val->Type))
+    {
+        isFound = isRegExp ?
+                  qspRegExpStrMatch(regExp, qspNullString) :
+                  !qspStrsComp(QSP_PSTR(val), qspNullString);
+    }
+    else
+    {
+        isFound = (QSP_PNUM(val) == 0);
+    }
+    if (isFound) return ind;
     return -1;
 }
 
