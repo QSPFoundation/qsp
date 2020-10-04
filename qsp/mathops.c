@@ -128,57 +128,57 @@ void qspInitMath()
         );
 
         Types:
-        QSP_TYPE_UNDEFINED = -1,
         QSP_TYPE_NUMBER = 0,
         QSP_TYPE_STRING = 1,
         QSP_TYPE_CODE = 2,
         QSP_TYPE_TUPLE = 3,
-        QSP_TYPE_VARREF = 4
+        QSP_TYPE_VARREF = 4,
+        QSP_TYPE_UNDEFINED = 64
     */
     int i;
     for (i = 0; i < QSP_OPSLEVELS; ++i) qspOpsNamesCounts[i] = 0;
     qspOpMaxLen = 0;
     qspAddOperation(qspOpValue, 0, 0, 0, 0, 0);
     qspAddOperation(qspOpValueToFormat, 0, 0, 0, 0, 0);
-    qspAddOperation(qspOpStart, 127, 0, -1, 0, 0);
-    qspAddOperation(qspOpEnd, 0, 0, -1, 0, 0);
-    qspAddOperation(qspOpOpenBracket, 127, 0, -1, 0, 0);
-    qspAddOperation(qspOpCloseBracket, 0, 0, -1, 0, 0);
-    qspAddOperation(qspOpOpenArrBracket, 127, 0, -1, 0, 0);
-    qspAddOperation(qspOpCloseArrBracket, 0, 0, -1, 0, 0);
+    qspAddOperation(qspOpStart, 127, 0, 64, 0, 0);
+    qspAddOperation(qspOpEnd, 0, 0, 64, 0, 0);
+    qspAddOperation(qspOpOpenBracket, 127, 0, 64, 0, 0);
+    qspAddOperation(qspOpCloseBracket, 0, 0, 64, 0, 0);
+    qspAddOperation(qspOpOpenArrBracket, 127, 0, 64, 0, 0);
+    qspAddOperation(qspOpCloseArrBracket, 0, 0, 64, 0, 0);
     qspAddOperation(qspOpNegation, 18, 0, 0, 1, 1, 0);
-    qspAddOperation(qspOpAdd, 14, 0, -1, 2, 2, -1, -1);
+    qspAddOperation(qspOpAdd, 14, 0, 64, 2, 2, 64, 64);
     qspAddOperation(qspOpSub, 14, 0, 0, 2, 2, 0, 0);
     qspAddOperation(qspOpMul, 17, 0, 0, 2, 2, 0, 0);
     qspAddOperation(qspOpDiv, 17, 0, 0, 2, 2, 0, 0);
     qspAddOperation(qspOpMod, 16, 0, 0, 2, 2, 0, 0);
-    qspAddOperation(qspOpNe, 10, 0, 0, 2, 2, -1, -1);
-    qspAddOperation(qspOpLeq, 10, 0, 0, 2, 2, -1, -1);
-    qspAddOperation(qspOpGeq, 10, 0, 0, 2, 2, -1, -1);
-    qspAddOperation(qspOpEq, 10, 0, 0, 2, 2, -1, -1);
-    qspAddOperation(qspOpLt, 10, 0, 0, 2, 2, -1, -1);
-    qspAddOperation(qspOpGt, 10, 0, 0, 2, 2, -1, -1);
+    qspAddOperation(qspOpNe, 10, 0, 0, 2, 2, 64, 64);
+    qspAddOperation(qspOpLeq, 10, 0, 0, 2, 2, 64, 64);
+    qspAddOperation(qspOpGeq, 10, 0, 0, 2, 2, 64, 64);
+    qspAddOperation(qspOpEq, 10, 0, 0, 2, 2, 64, 64);
+    qspAddOperation(qspOpLt, 10, 0, 0, 2, 2, 64, 64);
+    qspAddOperation(qspOpGt, 10, 0, 0, 2, 2, 64, 64);
     qspAddOperation(qspOpAppend, 12, 0, 1, 2, 2, 1, 1);
     qspAddOperation(qspOpComma, 0, 0, 3, 2, 2, 1, 1);
     qspAddOperation(qspOpAnd, 7, 0, 0, 2, 2, 0, 0);
     qspAddOperation(qspOpOr, 6, 0, 0, 2, 2, 0, 0);
     qspAddOperation(qspOpLoc, 11, 0, 0, 1, 1, 1);
     qspAddOperation(qspOpObj, 11, 0, 0, 1, 1, 1);
-    qspAddOperation(qspOpArrItem, 30, 0, -1, 1, 2, 4, -1);
-    qspAddOperation(qspOpLastArrItem, 30, 0, -1, 1, 1, 4);
+    qspAddOperation(qspOpArrItem, 30, 0, 64, 1, 2, 4, 64);
+    qspAddOperation(qspOpLastArrItem, 30, 0, 64, 1, 1, 4);
     qspAddOperation(qspOpNot, 8, 0, 0, 1, 1, 0);
-    qspAddOperation(qspOpMin, 30, qspFunctionMin, -1, 1, 20, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
-    qspAddOperation(qspOpMax, 30, qspFunctionMax, -1, 1, 20, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+    qspAddOperation(qspOpMin, 30, qspFunctionMin, 64, 1, 20, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64);
+    qspAddOperation(qspOpMax, 30, qspFunctionMax, 64, 1, 20, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64);
     qspAddOperation(qspOpRand, 30, qspFunctionRand, 0, 1, 2, 0, 0);
-    qspAddOperation(qspOpIIf, 30, 0, -1, 3, 3, 0, -1, -1);
+    qspAddOperation(qspOpIIf, 30, 0, 64, 3, 3, 0, 64, 64);
     qspAddOperation(qspOpRGB, 30, qspFunctionRGB, 0, 3, 4, 0, 0, 0, 0);
     qspAddOperation(qspOpLen, 30, 0, 0, 1, 1, 1);
-    qspAddOperation(qspOpIsNum, 30, 0, 0, 1, 1, -1);
+    qspAddOperation(qspOpIsNum, 30, 0, 0, 1, 1, 64);
     qspAddOperation(qspOpLCase, 30, 0, 1, 1, 1, 1);
     qspAddOperation(qspOpUCase, 30, 0, 1, 1, 1, 1);
     qspAddOperation(qspOpInput, 30, 0, 1, 1, 1, 1);
     qspAddOperation(qspOpStr, 30, 0, 1, 1, 1, 1);
-    qspAddOperation(qspOpVal, 30, 0, 0, 1, 1, -1);
+    qspAddOperation(qspOpVal, 30, 0, 0, 1, 1, 64);
     qspAddOperation(qspOpArrSize, 30, 0, 0, 1, 1, 4);
     qspAddOperation(qspOpIsPlay, 30, qspFunctionIsPlay, 0, 1, 1, 1);
     qspAddOperation(qspOpDesc, 30, qspFunctionDesc, 1, 1, 1, 1);
@@ -188,12 +188,12 @@ void qspInitMath()
     qspAddOperation(qspOpStrFind, 30, qspFunctionStrFind, 1, 2, 3, 1, 1, 0);
     qspAddOperation(qspOpStrPos, 30, qspFunctionStrPos, 0, 2, 3, 1, 1, 0);
     qspAddOperation(qspOpMid, 30, qspFunctionMid, 1, 2, 3, 1, 0, 0);
-    qspAddOperation(qspOpArrPos, 30, qspFunctionArrPos, 0, 2, 3, 4, -1, 0);
-    qspAddOperation(qspOpArrComp, 30, qspFunctionArrComp, 0, 2, 3, 4, -1, 0);
+    qspAddOperation(qspOpArrPos, 30, qspFunctionArrPos, 0, 2, 3, 4, 64, 0);
+    qspAddOperation(qspOpArrComp, 30, qspFunctionArrComp, 0, 2, 3, 4, 64, 0);
     qspAddOperation(qspOpInstr, 30, qspFunctionInstr, 0, 2, 3, 1, 1, 0);
     qspAddOperation(qspOpReplace, 30, qspFunctionReplace, 1, 2, 3, 1, 1, 1);
-    qspAddOperation(qspOpFunc, 30, qspFunctionFunc, -1, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
-    qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, -1, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+    qspAddOperation(qspOpFunc, 30, qspFunctionFunc, 64, 1, 20, 1, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64);
+    qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, 64, 1, 20, 1, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64);
     qspAddOperation(qspOpRnd, 30, 0, 0, 0, 0);
     qspAddOperation(qspOpCountObj, 30, 0, 0, 0, 0);
     qspAddOperation(qspOpMsecsCount, 30, 0, 0, 0, 0);

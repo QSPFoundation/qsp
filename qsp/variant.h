@@ -28,15 +28,15 @@
 
     enum
     {
-        QSP_TYPE_UNDEFINED = -1, /* not used for values */
         QSP_TYPE_NUMBER = 0,
         QSP_TYPE_STRING = 1,
         QSP_TYPE_CODE = 2,
         QSP_TYPE_TUPLE = 3,
-        QSP_TYPE_VARREF = 4
+        QSP_TYPE_VARREF = 4,
+        QSP_TYPE_UNDEFINED = 64, /* not used for values, it has to be a string-based type */
     };
 
-    #define QSP_ISDEF(a) ((a) >= QSP_TYPE_NUMBER)
+    #define QSP_ISDEF(a) ((a) != QSP_TYPE_UNDEFINED)
     #define QSP_ISNUM(a) ((a) == QSP_TYPE_NUMBER)
     #define QSP_ISSTR(a) ((a) > QSP_TYPE_NUMBER)
     #define QSP_BASETYPE(a) ((a) > QSP_TYPE_NUMBER) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */

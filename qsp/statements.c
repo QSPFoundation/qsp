@@ -110,17 +110,17 @@ void qspInitStats()
         );
 
         Types:
-        QSP_TYPE_UNDEFINED = -1,
         QSP_TYPE_NUMBER = 0,
         QSP_TYPE_STRING = 1,
         QSP_TYPE_CODE = 2,
         QSP_TYPE_TUPLE = 3,
-        QSP_TYPE_VARREF = 4
+        QSP_TYPE_VARREF = 4,
+        QSP_TYPE_UNDEFINED = 64
     */
     int i;
     for (i = 0; i < QSP_STATSLEVELS; ++i) qspStatsNamesCounts[i] = 0;
     qspStatMaxLen = 0;
-    qspAddStatement(qspStatImplicitStatement, qspStatementImplicitStatement, 1, 1, -1);
+    qspAddStatement(qspStatImplicitStatement, qspStatementImplicitStatement, 1, 1, 64);
     qspAddStatement(qspStatElse, 0, 0, 0);
     qspAddStatement(qspStatElseIf, 0, 1, 1, 0);
     qspAddStatement(qspStatEnd, 0, 0, 0);
@@ -138,17 +138,17 @@ void qspInitStats()
     qspAddStatement(qspStatCopyArr, qspStatementCopyArr, 2, 4, 4, 4, 0, 0);
     qspAddStatement(qspStatDelAct, qspStatementDelAct, 1, 1, 1);
     qspAddStatement(qspStatDelObj, qspStatementDelObj, 1, 1, 1);
-    qspAddStatement(qspStatDynamic, qspStatementDynamic, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+    qspAddStatement(qspStatDynamic, qspStatementDynamic, 1, 20, 1, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64);
     qspAddStatement(qspStatExec, qspStatementExec, 1, 1, 1);
     qspAddStatement(qspStatExit, qspStatementExit, 0, 0);
     qspAddStatement(qspStatFreeLib, qspStatementClear, 0, 0);
-    qspAddStatement(qspStatGoSub, qspStatementGoSub, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
-    qspAddStatement(qspStatGoTo, qspStatementGoTo, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+    qspAddStatement(qspStatGoSub, qspStatementGoSub, 1, 20, 1, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64);
+    qspAddStatement(qspStatGoTo, qspStatementGoTo, 1, 20, 1, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64);
     qspAddStatement(qspStatIncLib, qspStatementOpenQst, 1, 1, 1);
     qspAddStatement(qspStatJump, qspStatementJump, 1, 1, 1);
     qspAddStatement(qspStatKillAll, qspStatementClear, 0, 0);
     qspAddStatement(qspStatKillObj, qspStatementDelObj, 0, 1, 0);
-    qspAddStatement(qspStatKillVar, qspStatementKillVar, 0, 2, 4, -1);
+    qspAddStatement(qspStatKillVar, qspStatementKillVar, 0, 2, 4, 64);
     qspAddStatement(qspStatMenu, qspStatementShowMenu, 1, 3, 4, 0, 0);
     qspAddStatement(qspStatMClear, qspStatementClear, 0, 0);
     qspAddStatement(qspStatMNL, qspStatementAddText, 0, 1, 1);
@@ -172,7 +172,7 @@ void qspInitStats()
     qspAddStatement(qspStatUnSelect, qspStatementUnSelect, 0, 0);
     qspAddStatement(qspStatView, qspStatementView, 0, 1, 1);
     qspAddStatement(qspStatWait, qspStatementWait, 1, 1, 0);
-    qspAddStatement(qspStatXGoTo, qspStatementGoTo, 1, 20, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1);
+    qspAddStatement(qspStatXGoTo, qspStatementGoTo, 1, 20, 1, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64);
     /* Names */
     qspAddStatName(qspStatElse, QSP_STATIC_STR(QSP_STATELSE), 2);
     qspAddStatName(qspStatElseIf, QSP_STATIC_STR(QSP_FMT("ELSEIF")), 1);
