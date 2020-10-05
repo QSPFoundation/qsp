@@ -1,0 +1,3 @@
+#!/bin/sh
+
+find ../ -name "*.po" -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
