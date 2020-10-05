@@ -977,7 +977,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
     wxAboutDialogInfo info;
     info.SetIcon(wxIcon(logo_big_xpm));
     info.SetName(QSP_LOGO);
-    info.SetCopyright(wxT("Byte Soft, 2001-2010"));
+    info.SetCopyright(wxT("Byte Soft, 2001-2020"));
     QSPString version = QSPGetVersion();
     QSPString libCompiledDate = QSPGetCompiledDateTime();
     wxString guiCompiledDate(wxT(__DATE__) wxT(", ") wxT(__TIME__));
@@ -988,31 +988,6 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
         guiCompiledDate.wx_str()
     ));
     info.SetWebSite(wxT("http://qsp.su"));
-    // ----
-    info.AddDeveloper(wxT("Byte [nporep@mail.ru]"));
-    info.AddDocWriter(wxT("Korwin [tightbow@yandex.ru]"));
-    info.AddArtist(wxT("3dEyes [3deyes@gmail.com]"));
-    info.AddArtist(wxT("AI [gribanov_a@mail.ru]"));
-    info.AddArtist(wxT("Ajenta [ajenta.arrow@gmail.com]"));
-    info.AddArtist(wxT("Alex [dogmar88@mail.ru]"));
-    info.AddArtist(wxT("BalleR [vsevolod_kremyan@mail.ru]"));
-    info.AddArtist(wxT("BaxZzZz [bauer_v@mail.ru]"));
-    info.AddArtist(wxT("Belial [belgame@bk.ru]"));
-    info.AddArtist(wxT("DzafT [dzaft@mail.ru]"));
-    info.AddArtist(wxT("Fireton [fireton@mail.ru]"));
-    info.AddArtist(wxT("Gilving [mrgilving@gmail.com]"));
-    info.AddArtist(wxT("Goraph [goraph@gmail.com]"));
-    info.AddArtist(wxT("HIman [himan@rambler.ru]"));
-    info.AddArtist(wxT("Lostas [lostas@mail.ru]"));
-    info.AddArtist(wxT("Mioirel [mioirel@rambler.ru]"));
-    info.AddArtist(wxT("Morgan [gorgonyte@mail.ru]"));
-    info.AddArtist(wxT("Mortem [reijii@darthman.com]"));
-    info.AddArtist(wxT("Nex [nex@otaku.ru]"));
-    info.AddArtist(wxT("Ntropy [ntropy@yandex.ru]"));
-    info.AddArtist(wxT("Ondoo [ondoo@mail.ru]"));
-    info.AddArtist(wxT("RB [qsp1@narod.ru]"));
-    info.AddArtist(wxT("rrock.ru [rrock.ru@gmail.com]"));
-    info.AddArtist(wxT("WladySpb [wladyspb@mail.ru]"));
     // ----
     wxAboutBox(info, this);
 }
