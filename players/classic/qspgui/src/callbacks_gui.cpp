@@ -130,7 +130,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
     m_frame->GetObjects()->SetSelection(QSPGetSelObjectIndex());
     // -------------------------------
     if (QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("BACKIMAGE")), 0, &numVal, &strVal) && strVal.Str && strVal.Str != strVal.End)
-        m_frame->GetDesc()->LoadBackImage(m_frame->GetGamePath() + wxString(strVal.Str, strVal.End));
+        m_frame->GetDesc()->LoadBackImage(m_frame->ComposeGamePath(wxString(strVal.Str, strVal.End)));
     else
         m_frame->GetDesc()->LoadBackImage(wxEmptyString);
     // -------------------------------
@@ -155,7 +155,8 @@ void QSPCallBacks::SetInputStrText(QSPString text)
 QSP_BOOL QSPCallBacks::IsPlay(QSPString file)
 {
     FMOD_BOOL playing = FALSE;
-    QSPSounds::iterator elem = m_sounds.find(wxFileName(wxString(file.Str, file.End), wxPATH_DOS).GetFullPath().Upper());
+    wxString fileName(file.Str, file.End);
+    QSPSounds::iterator elem = m_sounds.find(fileName.Upper());
     if (elem != m_sounds.end())
         FMOD_Channel_IsPlaying(((QSPSound *)(&elem->second))->Channel, &playing);
     return (playing == TRUE);
@@ -165,7 +166,8 @@ void QSPCallBacks::CloseFile(QSPString file)
 {
     if (file.Str)
     {
-        QSPSounds::iterator elem = m_sounds.find(wxFileName(wxString(file.Str, file.End), wxPATH_DOS).GetFullPath().Upper());
+        wxString fileName(file.Str, file.End);
+        QSPSounds::iterator elem = m_sounds.find(fileName.Upper());
         if (elem != m_sounds.end())
         {
             ((QSPSound *)(&elem->second))->Free();
@@ -187,9 +189,10 @@ void QSPCallBacks::PlayFile(QSPString file, int volume)
     QSPSound snd;
     if (SetVolume(file, volume)) return;
     CloseFile(file);
-    wxString strFile(wxFileName(wxString(file.Str, file.End), wxPATH_DOS).GetFullPath());
+    wxString fileName(file.Str, file.End);
+    wxString filePath(m_frame->ComposeGamePath(fileName));
     #if defined(__WXMSW__) || defined(__WXOSX__)
-    if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(strFile.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, 0, &newSound))
+    if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(filePath.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, 0, &newSound))
     #else
     FMOD_CREATESOUNDEXINFO exInfo;
     memset(&exInfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
@@ -197,7 +200,7 @@ void QSPCallBacks::PlayFile(QSPString file, int volume)
     wxString dlsPath(QSPTools::GetAppPath() + QSP_MIDIDLS);
     wxCharBuffer dlsCharPath(wxConvFile.cWX2MB(dlsPath.c_str()));
     exInfo.dlsname = dlsCharPath;
-    if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(strFile.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, &exInfo, &newSound))
+    if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(filePath.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, &exInfo, &newSound))
     #endif
     {
         UpdateSounds();
@@ -205,7 +208,7 @@ void QSPCallBacks::PlayFile(QSPString file, int volume)
         snd.Channel = newChannel;
         snd.Sound = newSound;
         snd.Volume = volume;
-        m_sounds.insert(QSPSounds::value_type(strFile.Upper(), snd));
+        m_sounds.insert(QSPSounds::value_type(fileName.Upper(), snd));
         SetVolume(file, volume);
     }
 }
@@ -327,7 +330,7 @@ void QSPCallBacks::ShowImage(QSPString file)
     if (m_frame->IsQuit()) return;
     if (file.Str)
     {
-        wxString imgFullPath(wxFileName(m_frame->GetGamePath() + wxString(file.Str, file.End), wxPATH_DOS).GetFullPath());
+        wxString imgFullPath(m_frame->ComposeGamePath(wxString(file.Str, file.End)));
         m_frame->ShowPane(ID_VIEWPIC, m_frame->GetImgView()->OpenFile(imgFullPath));
     }
     else
@@ -339,7 +342,7 @@ void QSPCallBacks::ShowImage(QSPString file)
 void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
 {
     if (m_frame->IsQuit()) return;
-    wxString fullPath(wxFileName(m_frame->GetGamePath() + wxString(file.Str, file.End), wxPATH_DOS).GetFullPath());
+    wxString fullPath(m_frame->ComposeGamePath(wxString(file.Str, file.End)));
     if (wxFileExists(fullPath))
     {
         wxFile fileToLoad(fullPath);
@@ -423,10 +426,14 @@ void QSPCallBacks::SaveGameStatus(QSPString file)
 bool QSPCallBacks::SetVolume(QSPString file, int volume)
 {
     if (!IsPlay(file)) return false;
-    QSPSounds::iterator elem = m_sounds.find(wxFileName(wxString(file.Str, file.End), wxPATH_DOS).GetFullPath().Upper());
-    QSPSound *snd = (QSPSound *)&elem->second;
-    snd->Volume = volume;
-    FMOD_Channel_SetVolume(snd->Channel, (float)(m_volumeCoeff * volume) / 100);
+    wxString fileName(file.Str, file.End);
+    QSPSounds::iterator elem = m_sounds.find(fileName.Upper());
+    if (elem != m_sounds.end())
+    {
+        QSPSound *snd = (QSPSound *)&elem->second;
+        snd->Volume = volume;
+        FMOD_Channel_SetVolume(snd->Channel, (float)(m_volumeCoeff * volume) / 100);
+    }
     return true;
 }
 
