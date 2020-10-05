@@ -405,7 +405,7 @@ void QSPFrame::AddMenuItem(const wxString &name, const wxString &imgPath)
     else
     {
         wxMenuItem *item = new wxMenuItem(m_menu, m_menuItemId, name);
-        wxString imageFullPath(wxFileName(m_worldPath + imgPath, wxPATH_DOS).GetFullPath());
+        wxString imageFullPath(ComposeGamePath(imgPath));
         if (wxFileExists(imageFullPath))
         {
             wxBitmap itemBmp(imageFullPath, wxBITMAP_TYPE_ANY);
