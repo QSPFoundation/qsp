@@ -138,8 +138,8 @@ void qspInitMath()
     int i;
     for (i = 0; i < QSP_OPSLEVELS; ++i) qspOpsNamesCounts[i] = 0;
     qspOpMaxLen = 0;
-    qspAddOperation(qspOpValue, 0, 0, 0, 0, 0);
-    qspAddOperation(qspOpValueToFormat, 0, 0, 0, 0, 0);
+    qspAddOperation(qspOpValue, 0, 0, 64, 0, 0);
+    qspAddOperation(qspOpValueToFormat, 0, 0, 64, 0, 0);
     qspAddOperation(qspOpStart, 127, 0, 64, 0, 0);
     qspAddOperation(qspOpEnd, 0, 0, 64, 0, 0);
     qspAddOperation(qspOpOpenBracket, 127, 0, 64, 0, 0);
@@ -444,6 +444,7 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
                 {
                     name = QSP_STR(tos);
                     QSP_STR(tos) = qspFormatText(name, QSP_TRUE);
+                    if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
                     if (name.Str != QSP_STR(tos).Str) qspFreeString(name);
                 }
                 break;
@@ -1086,17 +1087,13 @@ INLINE void qspFunctionRand(QSPVariant *args, int count, QSPVariant *tos)
 
 INLINE void qspFunctionDesc(QSPVariant *args, int count, QSPVariant *tos)
 {
-    QSPString desc;
-    int oldRefreshCount, index = qspLocIndex(QSP_STR(args[0]));
+    int index = qspLocIndex(QSP_STR(args[0]));
     if (index < 0)
     {
         qspSetError(QSP_ERR_LOCNOTFOUND);
         return;
     }
-    oldRefreshCount = qspRefreshCount;
-    desc = qspFormatText(qspLocs[index].Desc, QSP_FALSE);
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-    QSP_PSTR(tos) = desc;
+    QSP_PSTR(tos) = qspFormatText(qspLocs[index].Desc, QSP_FALSE);
 }
 
 INLINE void qspFunctionGetObj(QSPVariant *args, int count, QSPVariant *tos)
