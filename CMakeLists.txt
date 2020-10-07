@@ -185,35 +185,3 @@ if(BUILD_QSPGUI)
 			DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
 	)
 endif()
-
-option(BUILD_TXT2GAM "Build txt2gam tool")
-if(BUILD_TXT2GAM)
-	set(TXT2GAM_SOURCES
-		txt2gam/src/coding.c
-		txt2gam/src/locations.c
-		txt2gam/src/main.c
-		txt2gam/src/memwatch.c
-		txt2gam/src/text.c
-		txt2gam/src/coding.h
-		txt2gam/src/declarations.h
-		txt2gam/src/locations.h
-		txt2gam/src/main.h
-		txt2gam/src/memwatch.h
-		txt2gam/src/text.h
-	)
-	add_executable(txt2gam ${TXT2GAM_SOURCES})
-	target_compile_definitions(txt2gam PRIVATE _UNICODE)
-	if(WIN32)
-		target_compile_definitions(txt2gam PRIVATE _CRT_SECURE_NO_WARNINGS)
-	endif()
-	if(SPEC_PASS)
-		target_compile_definitions(txt2gam PRIVATE SPEC_PASS=${SPEC_PASS})
-	endif()
-	target_compile_options(txt2gam PRIVATE ${PROJECT_COMPILER_FLAGS})
-	target_link_options(txt2gam PRIVATE ${PROJECT_LINKER_FLAGS})
-	install(TARGETS txt2gam
-			RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
-			LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
-			ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
-	)
-endif()
