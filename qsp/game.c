@@ -392,7 +392,7 @@ INLINE QSP_BOOL qspGetIntValueAndSkipLine(int *value, int *index, QSPString *str
 
 INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
 {
-    int i, j, ind, count, linesCount, lastInd, temp, selAction, selObject;
+    int i, j, ind, count, groupsCount, varValuesCount, lastInd, temp, selAction, selObject;
     ind = 16;
     if (ind > strsCount) return QSP_FALSE;
     if (qspStrsComp(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
@@ -422,10 +422,10 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
         /* image + description */
         if (!qspSkipLines(&ind, strsCount, 2)) return QSP_FALSE;
         /* lines of code count */
-        if (!qspGetIntValueAndSkipLine(&linesCount, &ind, strs, strsCount)) return QSP_FALSE;
-        if (linesCount < 0) return QSP_FALSE;
+        if (!qspGetIntValueAndSkipLine(&groupsCount, &ind, strs, strsCount)) return QSP_FALSE;
+        if (groupsCount < 0) return QSP_FALSE;
         /* lines */
-        for (j = 0; j < linesCount; ++j)
+        for (j = 0; j < groupsCount; ++j)
         {
             /* line of code */
             if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
@@ -458,15 +458,29 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
         /* variable's name */
         if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
         /* values count */
-        if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
-        if (temp < 0) return QSP_FALSE;
+        if (!qspGetIntValueAndSkipLine(&varValuesCount, &ind, strs, strsCount)) return QSP_FALSE;
+        if (varValuesCount < 0) return QSP_FALSE;
         /* values */
-        if (!qspSkipLines(&ind, strsCount, 2 * temp)) return QSP_FALSE;
+        for (j = 0; j < varValuesCount; ++j)
+        {
+            /* var type */
+            if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
+            if (temp < 0) return QSP_FALSE;
+            /* var value */
+            if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
+        }
         /* indices count */
-        if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
-        if (temp < 0) return QSP_FALSE;
+        if (!qspGetIntValueAndSkipLine(&groupsCount, &ind, strs, strsCount)) return QSP_FALSE;
+        if (groupsCount < 0) return QSP_FALSE;
         /* indices */
-        if (!qspSkipLines(&ind, strsCount, 2 * temp)) return QSP_FALSE;
+        for (j = 0; j < groupsCount; ++j)
+        {
+            /* value index */
+            if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
+            if (temp < 0 || temp >= varValuesCount) return QSP_FALSE;
+            /* text value */
+            if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
+        }
     }
     return (ind == strsCount - 1); /* the last line is always empty */
 }
