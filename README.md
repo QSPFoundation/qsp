@@ -4,8 +4,8 @@
 
 ```bash
 mkdir build && cd build
-cmake -DBUILD_QSPGUI=ON ..
-cmake --build . --config Release
+cmake -DBUILD_QSPGUI=ON -DCMAKE_BUILD_TYPE=Release ..
+cmake --build .
 ```
 
 ## Windows build
