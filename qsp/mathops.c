@@ -543,13 +543,13 @@ INLINE QSPVariant qspValue(int itemsCount, QSPVariant *compValues, int *compOpCo
                 QSP_NUM(tos) = -QSP_NUM(args[0]);
                 break;
             case qspOpNot:
-                QSP_NUM(tos) = ~QSP_NUM(args[0]);
+                QSP_NUM(tos) = QSP_TOBOOL(!QSP_NUM(args[0])); /* logical NOT operator */
                 break;
             case qspOpAnd:
-                QSP_NUM(tos) = QSP_NUM(args[0]) & QSP_NUM(args[1]);
+                QSP_NUM(tos) = QSP_NUM(args[0]) & QSP_NUM(args[1]); /* binary AND operator */
                 break;
             case qspOpOr:
-                QSP_NUM(tos) = QSP_NUM(args[0]) | QSP_NUM(args[1]);
+                QSP_NUM(tos) = QSP_NUM(args[0]) | QSP_NUM(args[1]); /* binary OR operator */
                 break;
             /* Embedded functions -------------------------------------------------------------- */
             case qspOpLoc:
