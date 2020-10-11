@@ -50,7 +50,7 @@
     #endif
 
     #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
-    #if defined(__GNUC__) || _MSC_VER >= 1800
+    #if defined(__GNUC__)
         #define QSP_STATIC_STR(x) ((QSPString) { (x), (x) + QSP_STATIC_LEN(x) })
     #else
         #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
