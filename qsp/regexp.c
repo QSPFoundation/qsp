@@ -44,6 +44,7 @@ regex_t *qspRegExpGetCompiled(QSPString exp)
 {
     int i;
     regex_t *onigExp;
+    QSPString safeExp;
     OnigErrorInfo onigInfo;
     QSPRegExp *compExp = qspCompiledRegExps;
     for (i = 0; i < QSP_MAXCACHEDREGEXPS; ++i)
@@ -53,7 +54,8 @@ regex_t *qspRegExpGetCompiled(QSPString exp)
             return compExp->CompiledExp;
         ++compExp;
     }
-    if (onig_new(&onigExp, (OnigUChar *)exp.Str, (OnigUChar *)exp.End,
+    safeExp = (exp.Str ? exp : QSP_STATIC_STR(QSP_FMT("")));
+    if (onig_new(&onigExp, (OnigUChar *)safeExp.Str, (OnigUChar *)safeExp.End,
         ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
     {
         qspSetError(QSP_ERR_INCORRECTREGEXP);

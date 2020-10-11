@@ -195,7 +195,7 @@
         QSP_CHAR *pos = str->Str;
         while (pos < str->End)
         {
-            *pos = QSP_CHRLWR(*pos);
+            *pos = (QSP_CHAR)QSP_CHRLWR(*pos);
             ++pos;
         }
     }
@@ -205,7 +205,7 @@
         QSP_CHAR *pos = str->Str;
         while (pos < str->End)
         {
-            *pos = QSP_CHRUPR(*pos);
+            *pos = (QSP_CHAR)QSP_CHRUPR(*pos);
             ++pos;
         }
     }
