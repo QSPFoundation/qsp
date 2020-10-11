@@ -157,7 +157,7 @@ int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL isCreate)
             --i;
         }
         ++i;
-        n = var->ValsCount;
+        n = var->ValsCount; /* point to a new array item */
         var->Indices[i].Str = uStr;
         var->Indices[i].Index = n;
         return n;
