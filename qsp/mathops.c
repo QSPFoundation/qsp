@@ -463,8 +463,6 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
     oldRefreshCount = qspRefreshCount;
     opCode = compOpCodes[valueIndex];
     argsCount = compArgsCounts[valueIndex];
-    type = qspOps[opCode].ResType;
-    if (QSP_ISDEF(type)) tos.Type = type;
     if (argsCount)
     {
         /* Find positions of arguments */
@@ -498,6 +496,8 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
             break;
         }
     }
+    type = qspOps[opCode].ResType;
+    if (QSP_ISDEF(type)) tos.Type = type;
     switch (opCode)
     {
     case qspOpValue:
