@@ -30,11 +30,11 @@
 
 QSPMathOperation qspOps[qspOpLast_Operation];
 QSPMathOpName qspOpsNames[QSP_OPSLEVELS][QSP_MAXOPSNAMES];
-QSP_TINYINT qspOpsNamesCounts[QSP_OPSLEVELS];
+int qspOpsNamesCounts[QSP_OPSLEVELS];
 int qspOpMaxLen = 0;
 
 INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...);
-INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, QSP_TINYINT level);
+INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level);
 INLINE int qspMathOpsCompare(const void *, const void *);
 INLINE int qspMathOpStringFullCompare(const void *, const void *);
 INLINE int qspMathOpStringCompare(const void *, const void *);
@@ -71,7 +71,7 @@ INLINE void qspFunctionMax(QSPVariant *, QSP_TINYINT, QSPVariant *);
 
 INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...)
 {
-    QSP_TINYINT i;
+    int i;
     va_list marker;
     qspOps[opCode].Priority = priority;
     qspOps[opCode].Func = func;
@@ -87,10 +87,9 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
     }
 }
 
-INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, QSP_TINYINT level)
+INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level)
 {
-    int len;
-    QSP_TINYINT count;
+    int len, count;
     QSPString name = qspStringFromC(opName);
     count = qspOpsNamesCounts[level];
     qspOpsNames[level][count].Name = name;
@@ -139,7 +138,7 @@ void qspInitMath()
         QSP_TYPE_VARREF = 4,
         QSP_TYPE_UNDEFINED = 64
     */
-    QSP_TINYINT i;
+    int i;
     for (i = 0; i < QSP_OPSLEVELS; ++i) qspOpsNamesCounts[i] = 0;
     qspOpMaxLen = 0;
     qspAddOperation(qspOpValue, 0, 0, 64, 0, 0);
@@ -342,7 +341,7 @@ INLINE QSPString qspGetName(QSPString *expr)
 
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr)
 {
-    QSP_TINYINT i;
+    int i;
     QSPMathOpName *name;
     if (qspIsEmpty(*expr)) return qspOpEnd;
     for (i = 0; i < QSP_OPSLEVELS; ++i)
@@ -397,7 +396,8 @@ INLINE QSPString qspGetQString(QSPString *expr)
 
 INLINE int qspFreeValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts)
 {
-    QSP_TINYINT i, argsCount;
+    int i;
+    QSP_TINYINT argsCount;
     if (valueIndex < 0) return -1;
     argsCount = compArgsCounts[valueIndex];
     if (argsCount)
@@ -422,7 +422,8 @@ INLINE int qspFreeValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *com
 
 INLINE int qspSkipValue(int valueIndex, QSP_TINYINT *compArgsCounts)
 {
-    QSP_TINYINT i, argsCount;
+    int i;
+    QSP_TINYINT argsCount;
     if (valueIndex < 0) return -1;
     argsCount = compArgsCounts[valueIndex];
     --valueIndex;
@@ -453,9 +454,9 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
 {
     QSPVar *var;
     QSPVariant args[QSP_OPMAXARGS], tos;
-    int oldRefreshCount, arrIndex, argIndices[QSP_OPMAXARGS];
+    int i, oldRefreshCount, arrIndex, argIndices[QSP_OPMAXARGS];
     QSPString name;
-    QSP_TINYINT i, type, opCode, argsCount;
+    QSP_TINYINT type, opCode, argsCount;
     if (valueIndex < 0)
     {
         qspSetError(QSP_ERR_SYNTAX);
@@ -1276,7 +1277,7 @@ INLINE void qspFunctionDynEval(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 
 INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    QSP_TINYINT i, minInd;
+    int i, minInd;
     if (count == 1)
     {
         qspConvertVariantTo(args, QSP_TYPE_VARREF);
@@ -1296,7 +1297,7 @@ INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 
 INLINE void qspFunctionMax(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    QSP_TINYINT i, maxInd;
+    int i, maxInd;
     if (count == 1)
     {
         qspConvertVariantTo(args, QSP_TYPE_VARREF);
