@@ -29,8 +29,8 @@
     #define QSP_VALSDELIM QSP_FMT("|")
 
     /* Helpers */
-    #define QSP_TOBOOL(x) (-((x) != 0))
-    #define QSP_ISTRUE(x) ((x) != 0)
+    #define QSP_TOBOOL(x) ((x) != 0) /* converts a number to a QSP boolean value */
+    #define QSP_ISTRUE(x) ((x) != 0) /* checks whether a QSP numeric value represents boolean 'true' */
 
     typedef void (*QSP_FUNCTION)(QSPVariant *, int, QSPVariant *);
 
