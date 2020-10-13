@@ -30,11 +30,11 @@
 
 QSPMathOperation qspOps[qspOpLast_Operation];
 QSPMathOpName qspOpsNames[QSP_OPSLEVELS][QSP_MAXOPSNAMES];
-int qspOpsNamesCounts[QSP_OPSLEVELS];
+QSP_TINYINT qspOpsNamesCounts[QSP_OPSLEVELS];
 int qspOpMaxLen = 0;
 
-INLINE void qspAddOperation(int opCode, int priority, QSP_FUNCTION func, int resType, int minArgs, int maxArgs, ...);
-INLINE void qspAddOpName(int, QSP_CHAR *, int);
+INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...);
+INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, QSP_TINYINT level);
 INLINE int qspMathOpsCompare(const void *, const void *);
 INLINE int qspMathOpStringFullCompare(const void *, const void *);
 INLINE int qspMathOpStringCompare(const void *, const void *);
@@ -46,32 +46,32 @@ INLINE QSPString qspGetString(QSPString *expr);
 INLINE QSPString qspGetQString(QSPString *expr);
 INLINE int qspFreeValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts);
 INLINE int qspSkipValue(int valueIndex, QSP_TINYINT *compArgsCounts);
-INLINE QSPVariant qspArgumentValue(int valueIndex, int type, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts);
+INLINE QSPVariant qspArgumentValue(int valueIndex, QSP_TINYINT type, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts);
 INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts);
 INLINE QSP_BOOL qspCompileExprPushOpCode(QSP_TINYINT *opStack, QSP_TINYINT *argStack, int *opSp, QSP_TINYINT opCode);
 INLINE QSP_BOOL qspAppendToCompiled(QSP_TINYINT opCode, int *itemsCount, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts, QSP_TINYINT argsCount, QSPVariant v);
 INLINE int qspCompileExpression(QSPString s, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts);
-INLINE void qspFunctionStrComp(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionStrFind(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionStrPos(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionRGB(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionMid(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionRand(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionDesc(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionGetObj(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionIsPlay(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionInstr(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionArrPos(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionArrComp(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionReplace(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionFunc(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionDynEval(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionMin(QSPVariant *, int, QSPVariant *);
-INLINE void qspFunctionMax(QSPVariant *, int, QSPVariant *);
+INLINE void qspFunctionStrComp(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionStrFind(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionStrPos(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionRGB(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionMid(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionRand(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionDesc(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionGetObj(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionIsPlay(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionInstr(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionArrPos(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionArrComp(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionReplace(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionFunc(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionDynEval(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionMin(QSPVariant *, QSP_TINYINT, QSPVariant *);
+INLINE void qspFunctionMax(QSPVariant *, QSP_TINYINT, QSPVariant *);
 
-INLINE void qspAddOperation(int opCode, int priority, QSP_FUNCTION func, int resType, int minArgs, int maxArgs, ...)
+INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...)
 {
-    int i;
+    QSP_TINYINT i;
     va_list marker;
     qspOps[opCode].Priority = priority;
     qspOps[opCode].Func = func;
@@ -87,9 +87,10 @@ INLINE void qspAddOperation(int opCode, int priority, QSP_FUNCTION func, int res
     }
 }
 
-INLINE void qspAddOpName(int opCode, QSP_CHAR *opName, int level)
+INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, QSP_TINYINT level)
 {
-    int count, len;
+    int len;
+    QSP_TINYINT count;
     QSPString name = qspStringFromC(opName);
     count = qspOpsNamesCounts[level];
     qspOpsNames[level][count].Name = name;
@@ -138,7 +139,7 @@ void qspInitMath()
         QSP_TYPE_VARREF = 4,
         QSP_TYPE_UNDEFINED = 64
     */
-    int i;
+    QSP_TINYINT i;
     for (i = 0; i < QSP_OPSLEVELS; ++i) qspOpsNamesCounts[i] = 0;
     qspOpMaxLen = 0;
     qspAddOperation(qspOpValue, 0, 0, 64, 0, 0);
@@ -341,7 +342,7 @@ INLINE QSPString qspGetName(QSPString *expr)
 
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr)
 {
-    int i;
+    QSP_TINYINT i;
     QSPMathOpName *name;
     if (qspIsEmpty(*expr)) return qspOpEnd;
     for (i = 0; i < QSP_OPSLEVELS; ++i)
@@ -433,7 +434,7 @@ INLINE int qspSkipValue(int valueIndex, QSP_TINYINT *compArgsCounts)
     return valueIndex;
 }
 
-INLINE QSPVariant qspArgumentValue(int valueIndex, int type, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts)
+INLINE QSPVariant qspArgumentValue(int valueIndex, QSP_TINYINT type, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts)
 {
     int oldRefreshCount = qspRefreshCount;
     QSPVariant res = qspValue(valueIndex, compValues, compOpCodes, compArgsCounts);
@@ -452,9 +453,9 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
 {
     QSPVar *var;
     QSPVariant args[QSP_OPMAXARGS], tos;
-    int type, oldRefreshCount, arrIndex, argIndices[QSP_OPMAXARGS];
+    int oldRefreshCount, arrIndex, argIndices[QSP_OPMAXARGS];
     QSPString name;
-    QSP_TINYINT i, opCode, argsCount;
+    QSP_TINYINT i, type, opCode, argsCount;
     if (valueIndex < 0)
     {
         qspSetError(QSP_ERR_SYNTAX);
@@ -1094,14 +1095,14 @@ QSPVariant qspExprValue(QSPString expr)
     return qspValue(--itemsCount, compValues, compOpCodes, compArgsCounts); /* the last item represents the whole expression */
 }
 
-INLINE void qspFunctionStrComp(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionStrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
     if (!regExp) return;
     QSP_PNUM(tos) = QSP_TOBOOL(qspRegExpStrMatch(regExp, QSP_STR(args[0])));
 }
 
-INLINE void qspFunctionStrFind(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionStrFind(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
     if (!regExp) return;
@@ -1111,7 +1112,7 @@ INLINE void qspFunctionStrFind(QSPVariant *args, int count, QSPVariant *tos)
         QSP_PSTR(tos) = qspRegExpStrFind(regExp, QSP_STR(args[0]), 0);
 }
 
-INLINE void qspFunctionStrPos(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionStrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
     if (!regExp) return;
@@ -1121,7 +1122,7 @@ INLINE void qspFunctionStrPos(QSPVariant *args, int count, QSPVariant *tos)
         QSP_PNUM(tos) = qspRegExpStrPos(regExp, QSP_STR(args[0]), 0);
 }
 
-INLINE void qspFunctionRGB(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionRGB(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     int r, g, b, a = 255;
     r = QSP_NUM(args[0]);
@@ -1150,7 +1151,7 @@ INLINE void qspFunctionRGB(QSPVariant *args, int count, QSPVariant *tos)
     QSP_PNUM(tos) = (a << 24) | (b << 16) | (g << 8) | r;
 }
 
-INLINE void qspFunctionMid(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     int len, subLen, beg = QSP_NUM(args[1]) - 1;
     if (beg < 0) beg = 0;
@@ -1172,7 +1173,7 @@ INLINE void qspFunctionMid(QSPVariant *args, int count, QSPVariant *tos)
         QSP_PSTR(tos) = qspNullString;
 }
 
-INLINE void qspFunctionRand(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionRand(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     int min, max;
     min = QSP_NUM(args[0]);
@@ -1185,7 +1186,7 @@ INLINE void qspFunctionRand(QSPVariant *args, int count, QSPVariant *tos)
     QSP_PNUM(tos) = qspRand() % (max - min + 1) + min;
 }
 
-INLINE void qspFunctionDesc(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionDesc(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     int index = qspLocIndex(QSP_STR(args[0]));
     if (index < 0)
@@ -1196,7 +1197,7 @@ INLINE void qspFunctionDesc(QSPVariant *args, int count, QSPVariant *tos)
     QSP_PSTR(tos) = qspFormatText(qspLocs[index].Desc, QSP_FALSE);
 }
 
-INLINE void qspFunctionGetObj(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionGetObj(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     int ind = QSP_NUM(args[0]) - 1;
     if (ind >= 0 && ind < qspCurObjectsCount)
@@ -1205,7 +1206,7 @@ INLINE void qspFunctionGetObj(QSPVariant *args, int count, QSPVariant *tos)
         QSP_PSTR(tos) = qspNullString;
 }
 
-INLINE void qspFunctionIsPlay(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionIsPlay(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     if (qspIsAnyString(QSP_STR(args[0])))
         QSP_PNUM(tos) = QSP_TOBOOL(qspCallIsPlayingFile(QSP_STR(args[0])) != 0);
@@ -1213,7 +1214,7 @@ INLINE void qspFunctionIsPlay(QSPVariant *args, int count, QSPVariant *tos)
         QSP_PNUM(tos) = QSP_TOBOOL(QSP_FALSE);
 }
 
-INLINE void qspFunctionInstr(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionInstr(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     int beg;
     QSP_CHAR *pos;
@@ -1236,7 +1237,7 @@ INLINE void qspFunctionInstr(QSPVariant *args, int count, QSPVariant *tos)
         QSP_PNUM(tos) = 0;
 }
 
-INLINE void qspFunctionArrPos(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionArrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     if (count == 2)
         QSP_PNUM(tos) = qspArrayPos(QSP_STR(args[0]), args + 1, 0, QSP_FALSE);
@@ -1244,7 +1245,7 @@ INLINE void qspFunctionArrPos(QSPVariant *args, int count, QSPVariant *tos)
         QSP_PNUM(tos) = qspArrayPos(QSP_STR(args[0]), args + 1, QSP_NUM(args[2]), QSP_FALSE);
 }
 
-INLINE void qspFunctionArrComp(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionArrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     if (count == 2)
         QSP_PNUM(tos) = qspArrayPos(QSP_STR(args[0]), args + 1, 0, QSP_TRUE);
@@ -1252,7 +1253,7 @@ INLINE void qspFunctionArrComp(QSPVariant *args, int count, QSPVariant *tos)
         QSP_PNUM(tos) = qspArrayPos(QSP_STR(args[0]), args + 1, QSP_NUM(args[2]), QSP_TRUE);
 }
 
-INLINE void qspFunctionReplace(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionReplace(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     QSPString searchTxt = QSP_STR(args[1]);
     if (qspIsEmpty(searchTxt))
@@ -1263,19 +1264,19 @@ INLINE void qspFunctionReplace(QSPVariant *args, int count, QSPVariant *tos)
         QSP_PSTR(tos) = qspReplaceText(QSP_STR(args[0]), searchTxt, QSP_STR(args[2]));
 }
 
-INLINE void qspFunctionFunc(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionFunc(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1, tos);
 }
 
-INLINE void qspFunctionDynEval(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionDynEval(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, tos);
 }
 
-INLINE void qspFunctionMin(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    int i, minInd;
+    QSP_TINYINT i, minInd;
     if (count == 1)
     {
         qspConvertVariantTo(args, QSP_TYPE_VARREF);
@@ -1293,9 +1294,9 @@ INLINE void qspFunctionMin(QSPVariant *args, int count, QSPVariant *tos)
     }
 }
 
-INLINE void qspFunctionMax(QSPVariant *args, int count, QSPVariant *tos)
+INLINE void qspFunctionMax(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    int i, maxInd;
+    QSP_TINYINT i, maxInd;
     if (count == 1)
     {
         qspConvertVariantTo(args, QSP_TYPE_VARREF);

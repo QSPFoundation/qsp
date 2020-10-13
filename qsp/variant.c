@@ -34,7 +34,7 @@ INLINE void qspFormatVariant(QSPVariant *val)
     }
 }
 
-QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type)
+QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
 {
     int num;
     QSP_CHAR buf[12];

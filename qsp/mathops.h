@@ -32,7 +32,7 @@
     #define QSP_TOBOOL(x) ((x) != 0) /* converts a number to a QSP boolean value */
     #define QSP_ISTRUE(x) ((x) != 0) /* checks whether a QSP numeric value represents boolean 'true' */
 
-    typedef void (*QSP_FUNCTION)(QSPVariant *, int, QSPVariant *);
+    typedef void (*QSP_FUNCTION)(QSPVariant *, QSP_TINYINT, QSPVariant *);
 
     typedef struct
     {
@@ -42,11 +42,11 @@
 
     typedef struct
     {
-        int Priority;
-        int ResType;
-        int MinArgsCount;
-        int MaxArgsCount;
-        int ArgsTypes[QSP_OPMAXARGS];
+        QSP_TINYINT Priority;
+        QSP_TINYINT ResType;
+        QSP_TINYINT MinArgsCount;
+        QSP_TINYINT MaxArgsCount;
+        QSP_TINYINT ArgsTypes[QSP_OPMAXARGS];
         QSP_FUNCTION Func;
     } QSPMathOperation;
 

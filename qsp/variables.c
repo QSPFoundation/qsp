@@ -512,7 +512,8 @@ int qspArraySize(QSPString name)
 
 int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 {
-    int count, baseVarType;
+    int count;
+    QSP_TINYINT baseVarType;
     QSPVar *var;
     QSP_BOOL isFound;
     regex_t *regExp;
@@ -567,7 +568,8 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
     QSPVar *var;
     QSPString str;
     QSPVariant res;
-    int baseVarType, curInd, count;
+    QSP_TINYINT baseVarType;
+    int curInd, count;
     if (!(var = qspVarReference(name, QSP_FALSE)))
         return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
     baseVarType = QSP_VARBASETYPE(name);

@@ -48,11 +48,11 @@
             QSPString Str;
             int Num;
         } Val;
-        int Type;
+        QSP_TINYINT Type;
     } QSPVariant;
 
     /* External functions */
-    QSP_BOOL qspConvertVariantTo(QSPVariant *val, int type);
+    QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
     int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2);
     void qspUpdateVariantValue(QSPVariant *dest, QSPVariant *src);
 
@@ -62,7 +62,7 @@
             if (QSP_ISSTR(args[count].Type)) qspFreeString(QSP_STR(args[count]));
     }
 
-    INLINE void qspInitVariant(QSPVariant *value, int type)
+    INLINE void qspInitVariant(QSPVariant *value, QSP_TINYINT type)
     {
         if (QSP_ISSTR(value->Type = type))
             QSP_PSTR(value) = qspNullString;
@@ -70,7 +70,7 @@
             QSP_PNUM(value) = 0;
     }
 
-    INLINE QSPVariant qspGetEmptyVariant(int type)
+    INLINE QSPVariant qspGetEmptyVariant(QSP_TINYINT type)
     {
         QSPVariant ret;
         qspInitVariant(&ret, type);

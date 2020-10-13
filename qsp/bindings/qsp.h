@@ -103,7 +103,7 @@
         QSPString Name;
     } QSPListItem;
 
-    typedef char QSP_TINYINT;
+    typedef unsigned char QSP_TINYINT;
     typedef char QSP_BOOL;
 
     #define QSP_TRUE 1
