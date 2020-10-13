@@ -83,7 +83,7 @@ INLINE int qspActIndex(QSPString name)
     return -1;
 }
 
-void qspAddAction(QSPVariant *args, int count, QSPLineOfCode *code, int start, int end)
+void qspAddAction(QSPVariant *args, QSP_TINYINT count, QSPLineOfCode *code, int start, int end)
 {
     QSPCurAct *act;
     QSPString imgPath;
@@ -229,7 +229,7 @@ void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine)
     qspFreeVariants(args, count);
 }
 
-QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+QSP_BOOL qspStatementDelAct(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
     int actInd = qspActIndex(QSP_STR(args[0]));
     if (actInd < 0) return QSP_FALSE;

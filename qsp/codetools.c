@@ -20,10 +20,10 @@
 #include "text.h"
 
 INLINE int qspStatStringCompare(const void *, const void *);
-INLINE int qspGetStatCode(QSPString s, QSP_CHAR **pos);
-INLINE int qspInitStatArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-INLINE int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-INLINE int qspInitRegularArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos);
+INLINE int qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE int qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE int qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
 INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs);
 INLINE int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **strs);
 
@@ -33,7 +33,7 @@ INLINE int qspStatStringCompare(const void *name, const void *compareTo)
     return qspStrsNComp(*(QSPString *)name, statName->Name, qspStrLen(statName->Name));
 }
 
-INLINE int qspGetStatCode(QSPString s, QSP_CHAR **pos)
+INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos)
 {
     int i, strLen, nameLen;
     QSPStatName *name;
@@ -58,7 +58,7 @@ INLINE int qspGetStatCode(QSPString s, QSP_CHAR **pos)
     return qspStatUnknown;
 }
 
-INLINE int qspInitStatArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE int qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
     *args = 0;
     *errorCode = 0;
@@ -79,7 +79,7 @@ INLINE int qspInitStatArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_C
     }
 }
 
-INLINE int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE int qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
     int argsCount;
     QSPString names, values, op;
@@ -120,7 +120,7 @@ INLINE int qspInitSetArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CH
     return argsCount;
 }
 
-INLINE int qspInitRegularArgs(QSPCachedArg **args, int statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE int qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
     QSPCachedArg *foundArgs;
     QSP_CHAR *pos, *brack;
@@ -206,7 +206,8 @@ QSPString qspGetLineLabel(QSPString str)
 void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 {
     QSP_BOOL isSearchElse;
-    int statCode, count = 0;
+    QSP_TINYINT statCode;
+    int count = 0;
     QSP_CHAR *temp, *nextPos, *elsePos, *delimPos = 0, *paramPos = 0;
     /* 'nextPos' points to the next position to search for a statement */
     /* 'delimPos' points to the statement separator (':' or '&') */
@@ -421,7 +422,8 @@ void qspFreePrepLines(QSPLineOfCode *strs, int count)
 void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int end)
 {
     QSPLineOfCode *line;
-    int i, j, statsCount, argsCount, linesCount = end - start;
+    QSP_TINYINT argsCount;
+    int i, j, statsCount, linesCount = end - start;
     if (src && linesCount)
     {
         *dest = (QSPLineOfCode *)malloc(linesCount * sizeof(QSPLineOfCode));
@@ -457,10 +459,7 @@ void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int e
             else
                 line->Stats = 0;
             line->IsMultiline = src[start].IsMultiline;
-            if (src[start].Label.Str)
-                line->Label = qspGetNewText(src[start].Label);
-            else
-                line->Label = qspNullString;
+            line->Label = qspGetNewText(src[start].Label);
             ++line;
             ++start;
         }

@@ -31,11 +31,11 @@
 
     typedef struct
     {
-        int Stat;
+        QSP_TINYINT Stat;
         int ParamPos;
         int EndPos;
         QSPCachedArg *Args;
-        int ArgsCount;
+        QSP_TINYINT ArgsCount;
         int ErrorCode;
     } QSPCachedStat;
 

@@ -23,7 +23,7 @@
 #include "text.h"
 #include "variables.h"
 
-QSP_BOOL qspStatementShowMenu(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
     QSPVar *var;
     QSPVariant arg;

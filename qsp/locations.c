@@ -33,7 +33,7 @@ int qspFullRefreshCount = 0;
 INLINE int qspLocsCompare(const void *, const void *);
 INLINE int qspLocStringCompare(const void *, const void *);
 INLINE void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc);
-INLINE void qspExecLocByIndexWithArgs(int locInd, QSP_BOOL isChangeDesc, QSPVariant *args, int count, QSPVariant *res);
+INLINE void qspExecLocByIndexWithArgs(int locInd, QSP_BOOL isChangeDesc, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 
 INLINE int qspLocsCompare(const void *locName1, const void *locName2)
 {
@@ -189,7 +189,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
     qspRealCurLoc = oldLoc;
 }
 
-INLINE void qspExecLocByIndexWithArgs(int locInd, QSP_BOOL isChangeDesc, QSPVariant *args, int count, QSPVariant *res)
+INLINE void qspExecLocByIndexWithArgs(int locInd, QSP_BOOL isChangeDesc, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int oldRefreshCount;
     QSPVar *varArgs, *varRes;
@@ -216,7 +216,7 @@ INLINE void qspExecLocByIndexWithArgs(int locInd, QSP_BOOL isChangeDesc, QSPVari
     qspReleaseSavedVarsGroup(QSP_FALSE);
 }
 
-void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, int count, QSPVariant *res)
+void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int locInd = qspLocIndex(name);
     if (locInd < 0)
@@ -227,7 +227,7 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, int count, QSPVa
     qspExecLocByIndexWithArgs(locInd, QSP_FALSE, args, count, res);
 }
 
-void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, int count)
+void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count)
 {
     QSPVar *var;
     QSPString locName;
@@ -246,7 +246,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, int count)
     }
 }
 
-void qspRefreshCurLoc(QSP_BOOL isChangeDesc, QSPVariant *args, int count)
+void qspRefreshCurLoc(QSP_BOOL isChangeDesc, QSPVariant *args, QSP_TINYINT count)
 {
     int oldRefreshCount;
     if (qspCurLoc < 0) return;

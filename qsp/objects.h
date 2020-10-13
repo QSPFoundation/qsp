@@ -40,8 +40,8 @@
     void qspClearObjectsWithNotify();
     int qspObjIndex(QSPString name);
     /* Statements */
-    QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-    QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-    QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    QSP_BOOL qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
+    QSP_BOOL qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
+    QSP_BOOL qspStatementUnSelect(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
 
 #endif

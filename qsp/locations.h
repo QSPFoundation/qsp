@@ -55,8 +55,8 @@
     void qspCreateWorld(int, int);
     void qspPrepareLocs();
     int qspLocIndex(QSPString name);
-    void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, int count, QSPVariant *res);
-    void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, int count);
-    void qspRefreshCurLoc(QSP_BOOL, QSPVariant *, int);
+    void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
+    void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count);
+    void qspRefreshCurLoc(QSP_BOOL isChangeDesc, QSPVariant *args, QSP_TINYINT count);
 
 #endif

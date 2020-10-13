@@ -42,12 +42,12 @@
 
     /* External functions */
     void qspClearActions(QSP_BOOL);
-    void qspAddAction(QSPVariant *args, int count, QSPLineOfCode *code, int start, int end);
+    void qspAddAction(QSPVariant *args, QSP_TINYINT count, QSPLineOfCode *code, int start, int end);
     void qspExecAction(int);
     QSPString qspGetAllActionsAsCode();
     /* Statements */
-    void qspStatementSinglelineAddAct(QSPLineOfCode *, int, int);
-    void qspStatementMultilineAddAct(QSPLineOfCode *, int, int);
-    QSP_BOOL qspStatementDelAct(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos);
+    void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine);
+    QSP_BOOL qspStatementDelAct(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
 
 #endif

@@ -37,8 +37,8 @@
     QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize);
     QSP_BOOL qspOpenGameStatus(void *data, int dataSize);
     /* Statements */
-    QSP_BOOL qspStatementOpenQst(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-    QSP_BOOL qspStatementOpenGame(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-    QSP_BOOL qspStatementSaveGame(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    QSP_BOOL qspStatementOpenQst(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
+    QSP_BOOL qspStatementOpenGame(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
+    QSP_BOOL qspStatementSaveGame(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
 
 #endif

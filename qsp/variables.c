@@ -310,7 +310,7 @@ INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op)
     }
 }
 
-void qspGetVarValueByReference(QSPVar *var, int ind, int baseType, QSPVariant *res)
+void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res)
 {
     if (ind >= 0 && ind < var->ValsCount)
     {
@@ -846,7 +846,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     free(names);
 }
 
-QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
     int start, num;
     QSPVar *dest, *src;
@@ -862,7 +862,7 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int
     return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementKillVar(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+QSP_BOOL qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
     QSPVar *var;
     int arrIndex;

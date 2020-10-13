@@ -125,7 +125,7 @@ int qspObjIndex(QSPString name)
     return -1;
 }
 
-QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+QSP_BOOL qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
     QSPObj *obj;
     int i, objInd;
@@ -159,7 +159,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, int count, QSPString *jumpTo, i
     return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+QSP_BOOL qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
     switch (extArg)
     {
@@ -176,7 +176,7 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, int count, QSPString *jumpTo, int 
     return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementUnSelect(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
+QSP_BOOL qspStatementUnSelect(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
     qspCurSelObject = -1;
     return QSP_FALSE;

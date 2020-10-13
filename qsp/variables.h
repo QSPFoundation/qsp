@@ -61,7 +61,7 @@
     QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate);
     void qspClearVars(QSP_BOOL isFirst);
     void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
-    void qspGetVarValueByReference(QSPVar *var, int ind, int baseType, QSPVariant *res);
+    void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
     int qspGetVarTextIndex(QSPVar *, QSPString, QSP_BOOL);
@@ -79,8 +79,8 @@
     /* Statements */
     void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat);
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);
-    QSP_BOOL qspStatementCopyArr(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
-    QSP_BOOL qspStatementKillVar(QSPVariant *args, int count, QSPString *jumpTo, int extArg);
+    QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
+    QSP_BOOL qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
 
     INLINE void qspInitVarData(QSPVar *var)
     {
