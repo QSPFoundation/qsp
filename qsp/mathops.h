@@ -35,7 +35,7 @@
 
     typedef struct
     {
-        int Code;
+        QSP_TINYINT Code;
         QSPString Name;
     } QSPMathOpName;
 
