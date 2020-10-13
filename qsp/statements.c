@@ -731,7 +731,7 @@ INLINE QSP_BOOL qspCheckCondition(QSPString expr)
         qspFreeString(QSP_STR(condValue));
         return QSP_FALSE;
     }
-    return (QSP_NUM(condValue) != 0);
+    return QSP_ISTRUE(QSP_NUM(condValue));
 }
 
 INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo)
@@ -1029,7 +1029,7 @@ INLINE QSP_BOOL qspStatementSetTimer(QSPVariant *args, int count, QSPString *jum
 
 INLINE QSP_BOOL qspStatementShowWin(QSPVariant *args, int count, QSPString *jumpTo, int extArg)
 {
-    QSP_BOOL val = QSP_NUM(args[0]) != 0;
+    QSP_BOOL val = QSP_ISTRUE(QSP_NUM(args[0]));
     switch (extArg)
     {
     case qspStatShowActs:

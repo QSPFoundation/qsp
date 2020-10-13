@@ -38,9 +38,9 @@ INLINE void qspAddOpName(int, QSP_CHAR *, int);
 INLINE int qspMathOpsCompare(const void *, const void *);
 INLINE int qspMathOpStringFullCompare(const void *, const void *);
 INLINE int qspMathOpStringCompare(const void *, const void *);
+INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName);
 INLINE int qspGetNumber(QSPString *expr);
 INLINE QSPString qspGetName(QSPString *expr);
-INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName);
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr);
 INLINE QSPString qspGetString(QSPString *expr);
 INLINE QSPString qspGetQString(QSPString *expr);
@@ -301,6 +301,19 @@ void qspInitMath()
         qsort(qspOpsNames[i], qspOpsNamesCounts[i], sizeof(QSPMathOpName), qspMathOpsCompare);
 }
 
+INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName)
+{
+    QSPMathOpName *name = (QSPMathOpName *)bsearch(
+        &funName,
+        qspOpsNames[QSP_OPSLEVELS - 1],
+        qspOpsNamesCounts[QSP_OPSLEVELS - 1],
+        sizeof(QSPMathOpName),
+        qspMathOpStringFullCompare);
+
+    if (name) return name->Code;
+    return qspOpUnknown;
+}
+
 INLINE int qspGetNumber(QSPString *expr)
 {
     int num = 0;
@@ -324,19 +337,6 @@ INLINE QSPString qspGetName(QSPString *expr)
     }
     expr->Str = pos;
     return qspStringFromPair(startPos, pos);
-}
-
-INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName)
-{
-    QSPMathOpName *name = (QSPMathOpName *)bsearch(
-        &funName,
-        qspOpsNames[QSP_OPSLEVELS - 1],
-        qspOpsNamesCounts[QSP_OPSLEVELS - 1],
-        sizeof(QSPMathOpName),
-        qspMathOpStringFullCompare);
-
-    if (name) return name->Code;
-    return qspOpUnknown;
 }
 
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr)
@@ -533,7 +533,7 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
             qspFreeValue(argIndices[1], compValues, compOpCodes, compArgsCounts);
             return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
         }
-        if (QSP_NUM(args[0]))
+        if (QSP_ISTRUE(QSP_NUM(args[0])))
         {
             args[1] = qspArgumentValue(argIndices[1], QSP_TYPE_NUMBER, compValues, compOpCodes, compArgsCounts);
             if (qspRefreshCount != oldRefreshCount || qspErrorNum)
@@ -553,7 +553,7 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
             qspFreeValue(argIndices[1], compValues, compOpCodes, compArgsCounts);
             return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
         }
-        if (QSP_NUM(args[0]))
+        if (QSP_ISTRUE(QSP_NUM(args[0])))
         {
             qspFreeValue(argIndices[1], compValues, compOpCodes, compArgsCounts);
             QSP_NUM(tos) = QSP_TOBOOL(QSP_TRUE);
@@ -577,7 +577,7 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
             qspFreeValue(argIndices[2], compValues, compOpCodes, compArgsCounts);
             return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
         }
-        if (QSP_NUM(args[0]))
+        if (QSP_ISTRUE(QSP_NUM(args[0])))
         {
             tos = qspArgumentValue(argIndices[1], QSP_TYPE_UNDEFINED, compValues, compOpCodes, compArgsCounts);
             qspFreeValue(argIndices[2], compValues, compOpCodes, compArgsCounts);
@@ -597,7 +597,7 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
         QSP_NUM(tos) = QSP_NUM(args[0]) * QSP_NUM(args[1]);
         break;
     case qspOpDiv:
-        if (!QSP_NUM(args[1]))
+        if (QSP_NUM(args[1]) == 0)
         {
             qspSetError(QSP_ERR_DIVBYZERO);
             break;
@@ -637,7 +637,7 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
         QSP_NUM(tos) = QSP_NUM(args[0]) - QSP_NUM(args[1]);
         break;
     case qspOpMod:
-        if (!QSP_NUM(args[1]))
+        if (QSP_NUM(args[1]) == 0)
         {
             qspSetError(QSP_ERR_DIVBYZERO);
             break;
@@ -654,7 +654,7 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
         qspAddText(&QSP_STR(tos), QSP_STR(args[1]), QSP_FALSE);
         break;
     case qspOpEq:
-        QSP_NUM(tos) = QSP_TOBOOL(!qspAutoConvertCompare(args, args + 1));
+        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) == 0);
         break;
     case qspOpLt:
         QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) < 0);

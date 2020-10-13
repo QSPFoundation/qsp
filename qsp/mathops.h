@@ -30,6 +30,7 @@
 
     /* Helpers */
     #define QSP_TOBOOL(x) (-((x) != 0))
+    #define QSP_ISTRUE(x) ((x) != 0)
 
     typedef void (*QSP_FUNCTION)(QSPVariant *, int, QSPVariant *);
 

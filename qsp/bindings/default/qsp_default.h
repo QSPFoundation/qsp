@@ -58,8 +58,8 @@
     #endif
 
     #define QSP_FIXBYTESORDER(a) ((*(char *)&(qspEndiannessTestValue) == 1) ? \
-            (a) : \
-            ((unsigned short)(((a) << 8) | ((a) >> 8))))
+                                 (a) : \
+                                 ((unsigned short)(((a) << 8) | ((a) >> 8))))
     #if defined(_MSC_VER)
         #define QSP_TIME _time64
     #else
