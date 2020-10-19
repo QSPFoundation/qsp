@@ -25,7 +25,6 @@ cmake --build . --target install --config Release
 * Implement new way to communicate with GUI (more specific callbacks)
 * Move global state into context parameter
 * Split QSP library and QSP player/editor into multiple repositories
-* Build web player
 * Document new features
 * ???
 
