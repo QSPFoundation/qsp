@@ -33,7 +33,6 @@ int qspFullRefreshCount = 0;
 INLINE int qspLocsCompare(const void *, const void *);
 INLINE int qspLocStringCompare(const void *, const void *);
 INLINE void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc);
-INLINE void qspExecLocByIndexWithArgs(int locInd, QSP_BOOL isChangeDesc, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 
 INLINE int qspLocsCompare(const void *locName1, const void *locName2)
 {
@@ -189,16 +188,21 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
     qspRealCurLoc = oldLoc;
 }
 
-INLINE void qspExecLocByIndexWithArgs(int locInd, QSP_BOOL isChangeDesc, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
+void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    int oldRefreshCount;
     QSPVar *varArgs, *varRes;
+    int oldRefreshCount, locInd = qspLocIndex(name);
+    if (locInd < 0)
+    {
+        qspSetError(QSP_ERR_LOCNOTFOUND);
+        return;
+    }
     if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return;
     if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE))) return;
     qspAllocateSavedVarsGroupWithArgs(varArgs, varRes);
     qspSetArgs(varArgs, args, count);
     oldRefreshCount = qspRefreshCount;
-    qspExecLocByIndex(locInd, isChangeDesc);
+    qspExecLocByIndex(locInd, QSP_FALSE);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -214,17 +218,6 @@ INLINE void qspExecLocByIndexWithArgs(int locInd, QSP_BOOL isChangeDesc, QSPVari
         qspApplyResult(varRes, res);
     }
     qspReleaseSavedVarsGroup(QSP_FALSE);
-}
-
-void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
-{
-    int locInd = qspLocIndex(name);
-    if (locInd < 0)
-    {
-        qspSetError(QSP_ERR_LOCNOTFOUND);
-        return;
-    }
-    qspExecLocByIndexWithArgs(locInd, QSP_FALSE, args, count, res);
 }
 
 void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count)
@@ -248,15 +241,27 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT c
 
 void qspRefreshCurLoc(QSP_BOOL isChangeDesc, QSPVariant *args, QSP_TINYINT count)
 {
+    QSPVar *varArgs;
     int oldRefreshCount;
     if (qspCurLoc < 0) return;
     qspRestoreGlobalVars(); /* clean all local variables */
     if (qspErrorNum) return;
+    /* We assign global ARGS here */
+    if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return;
+    qspEmptyVar(varArgs);
+    qspSetArgs(varArgs, args, count);
     qspClearActions(QSP_FALSE);
     ++qspRefreshCount;
     if (isChangeDesc) ++qspFullRefreshCount;
+    qspAllocateSavedVarsGroup();
     oldRefreshCount = qspRefreshCount;
-    qspExecLocByIndexWithArgs(qspCurLoc, isChangeDesc, args, count, 0);
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+    qspExecLocByIndex(qspCurLoc, isChangeDesc);
+    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+    {
+        qspReleaseSavedVarsGroup(QSP_TRUE);
+        return;
+    }
+    qspReleaseSavedVarsGroup(QSP_FALSE);
+    if (qspErrorNum) return;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONNEWLOC")), args, count);
 }
