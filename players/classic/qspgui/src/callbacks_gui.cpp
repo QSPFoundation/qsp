@@ -408,7 +408,7 @@ void QSPCallBacks::SaveGameStatus(QSPString file)
     void *fileData = (void *)malloc(fileSize);
     if (!QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
     {
-        if (!fileSize)
+        if (fileSize)
         {
             fileData = (void *)realloc(fileData, fileSize);
             if (!QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
