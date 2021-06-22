@@ -22,9 +22,9 @@ cmake --build . --target install --config Release
 * Test locals implementation
 * Test loop implementation
 * Update bindings
-* Implement new way to communicate with GUI (more specific callbacks)
-* Move global state into context parameter
-* Split QSP library and QSP player/editor into multiple repositories
+* Implement a new way to communicate with GUI (more specific callbacks)
+* Move the whole global state into a context parameter
+* Move a QSP player into a separate repository
 * Document new features
 * ???
 
