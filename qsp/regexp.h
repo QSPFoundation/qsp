@@ -25,14 +25,14 @@
     typedef struct
     {
         QSPString Text;
-        regex_t *CompiledExp;
+        RegExT CompiledExp;
     } QSPRegExp;
 
     /* External functions */
     void qspClearRegExps(QSP_BOOL);
-    regex_t *qspRegExpGetCompiled(QSPString exp);
-    QSP_BOOL qspRegExpStrMatch(regex_t *exp, QSPString str);
-    QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind);
-    int qspRegExpStrPos(regex_t *exp, QSPString str, int ind);
+    RegExT qspRegExpGetCompiled(QSPString exp);
+    QSP_BOOL qspRegExpStrMatch(RegExT exp, QSPString str);
+    QSPString qspRegExpStrFind(RegExT exp, QSPString str, int ind);
+    int qspRegExpStrPos(RegExT exp, QSPString str, int ind);
 
 #endif

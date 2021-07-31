@@ -19,6 +19,12 @@
 #include "errors.h"
 #include "text.h"
 
+#if !defined(USE_PCRE) || !USE_PCRE
+    RegExT WRONG_REGEX = NULL;
+#else
+    RegExT WRONG_REGEX = {.rx=NULL, .extra=NULL};
+#endif
+
 int qspCompiledRegExpsCurInd = 0;
 QSPRegExp qspCompiledRegExps[QSP_MAXCACHEDREGEXPS];
 
@@ -28,64 +34,94 @@ void qspClearRegExps(QSP_BOOL isFirst)
     QSPRegExp *exp = qspCompiledRegExps;
     for (i = 0; i < QSP_MAXCACHEDREGEXPS; ++i)
     {
-        if (!isFirst && exp->CompiledExp)
+        if (!isFirst && CHECK_REGEXP_PRESENCE(exp->CompiledExp))
         {
             qspFreeString(exp->Text);
+            #if defined(USE_PCRE)
+            pcre_free_study(exp->CompiledExp.extra);
+            pcre_free(exp->CompiledExp.rx);
+            #else
             onig_free(exp->CompiledExp);
+            #endif
         }
         exp->Text = qspNullString;
-        exp->CompiledExp = 0;
+        exp->CompiledExp = WRONG_REGEX;
         ++exp;
     }
     qspCompiledRegExpsCurInd = 0;
 }
 
-regex_t *qspRegExpGetCompiled(QSPString exp)
+RegExT qspRegExpGetCompiled(QSPString exp)
 {
     int i;
-    regex_t *onigExp;
+    RegExT nativeExp;
     QSPString safeExp;
+    #if !defined(USE_PCRE)
     OnigErrorInfo onigInfo;
+    #endif
+
     QSPRegExp *compExp = qspCompiledRegExps;
     for (i = 0; i < QSP_MAXCACHEDREGEXPS; ++i)
     {
-        if (!compExp->CompiledExp) break;
+        if (!CHECK_REGEXP_PRESENCE(compExp->CompiledExp)) break;
         if (!qspStrsComp(exp, compExp->Text))
             return compExp->CompiledExp;
         ++compExp;
     }
     safeExp = (exp.Str ? exp : QSP_STATIC_STR(QSP_FMT("")));
-    if (onig_new(&onigExp, (OnigUChar *)safeExp.Str, (OnigUChar *)safeExp.End,
-        ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo))
+    int rxCompileErrorCode = 0;
+    const char * rxCompileErrorPtr = NULL;
+    int errorOffset = 0;
+
+    #if defined(USE_PCRE)
+    nativeExp.rx = pcre_compile2((const char *) safeExp.Str, PCRE_UTF8 | PCRE_UCP, &rxCompileErrorCode, &rxCompileErrorPtr, &errorOffset, NULL);
+    nativeExp.extra = pcre_study(nativeExp.rx, PCRE_STUDY_JIT_COMPILE, &rxCompileErrorPtr);
+    #else
+    rxCompileErrorCode = onig_new(&nativeExp, (OnigUChar *)safeExp.Str, (OnigUChar *)safeExp.End,
+        ONIG_OPTION_DEFAULT, QSP_ONIG_ENC, ONIG_SYNTAX_PERL_NG, &onigInfo);
+    #endif
+
+    if (rxCompileErrorCode)
     {
         qspSetError(QSP_ERR_INCORRECTREGEXP);
-        return 0;
+        return WRONG_REGEX;
     }
     compExp = qspCompiledRegExps + qspCompiledRegExpsCurInd;
-    if (compExp->CompiledExp)
+    if (CHECK_REGEXP_PRESENCE(compExp->CompiledExp))
     {
         qspFreeString(compExp->Text);
+        #if defined(USE_PCRE)
+        pcre_free_study(compExp->CompiledExp.extra);
+        pcre_free(compExp->CompiledExp.rx);
+        #else
         onig_free(compExp->CompiledExp);
+        #endif
     }
     compExp->Text = qspGetNewText(exp);
-    compExp->CompiledExp = onigExp;
+    compExp->CompiledExp = nativeExp;
     if (++qspCompiledRegExpsCurInd == QSP_MAXCACHEDREGEXPS)
         qspCompiledRegExpsCurInd = 0;
-    return onigExp;
+    return nativeExp;
 }
 
-QSP_BOOL qspRegExpStrMatch(regex_t *exp, QSPString str)
+QSP_BOOL qspRegExpStrMatch(RegExT exp, QSPString str)
 {
+    #if !defined(USE_PCRE)
     OnigUChar *tempBeg, *tempEnd;
     tempBeg = (OnigUChar *)str.Str;
     tempEnd = (OnigUChar *)str.End;
     return (onig_match(exp, tempBeg, tempEnd, tempBeg, 0, ONIG_OPTION_NONE) == tempEnd - tempBeg);
+    #else
+    return !pcre_exec(exp.rx, exp.extra, (const char *) str.Str, str.End-str.Str, 0, 0, NULL, 0);
+    #endif
 }
 
-QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind)
+QSPString qspRegExpStrFind(RegExT exp, QSPString str, int ind)
 {
     QSPString res;
     int len, pos;
+
+    #if !defined(USE_PCRE)
     OnigUChar *tempBeg, *tempEnd;
     OnigRegion *onigReg = onig_region_new();
     tempBeg = (OnigUChar *)str.Str;
@@ -104,12 +140,34 @@ QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind)
     else
         res = qspNullString;
     onig_region_free(onigReg, 1);
+    #else
+	pos = (ind >= 0 ? ind : 0);
+    int maxGroups = pos + 1;
+    pcre_fullinfo(exp.rx, exp.extra, PCRE_INFO_CAPTURECOUNT, &maxGroups);
+    size_t groupsBuffSize = sizeof(int) * maxGroups * 3;
+    int* groups = alloca(groupsBuffSize);
+    memset(groups, 0, groupsBuffSize);
+    const char * tempBeg = (const char *) str.Str;
+    if (pcre_exec(exp.rx, exp.extra, tempBeg, str.End-str.Str, 0, PCRE_NEWLINE_ANYCRLF, groups, maxGroups))
+    {
+        if (pos < maxGroups && groups[pos * 2] >= 0)
+        {
+            len = (groups[pos * 2+1] - groups[pos * 2]) / sizeof(QSP_CHAR);
+            res = qspGetNewText(qspStringFromLen((QSP_CHAR *)(tempBeg + groups[pos * 2]), len));
+        }
+        else
+            res = qspNullString;
+    }
+    else
+        res = qspNullString;
+    #endif
     return res;
 }
 
-int qspRegExpStrPos(regex_t *exp, QSPString str, int ind)
+int qspRegExpStrPos(RegExT exp, QSPString str, int ind)
 {
     int pos, res;
+    #if !defined(USE_PCRE)
     OnigUChar *tempBeg, *tempEnd;
     OnigRegion *onigReg = onig_region_new();
     tempBeg = (OnigUChar *)str.Str;
@@ -125,5 +183,23 @@ int qspRegExpStrPos(regex_t *exp, QSPString str, int ind)
     else
         res = 0;
     onig_region_free(onigReg, 1);
+    #else
+	pos = (ind >= 0 ? ind : 0);
+    int maxGroups = pos + 1;
+    pcre_fullinfo(exp.rx, exp.extra, PCRE_INFO_CAPTURECOUNT, &maxGroups);
+    size_t groupsBuffSize = sizeof(int) * maxGroups * 3;
+    int* groups = alloca(groupsBuffSize);
+    memset(groups, 0, groupsBuffSize);
+    const char * tempBeg = (const char *) str.Str;
+    if (pcre_exec(exp.rx, exp.extra, tempBeg, str.End-str.Str, 0, PCRE_NEWLINE_ANYCRLF, groups, maxGroups))
+    {
+		if (pos < maxGroups && groups[pos] >= 0)
+            res = groups[pos] / sizeof(QSP_CHAR) + 1;
+        else
+            res = 0;
+    }
+    else
+        res = 0;
+    #endif
     return res;
 }
