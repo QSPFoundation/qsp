@@ -92,6 +92,7 @@ install(TARGETS qsp onig
 
 option(BUILD_QSPGUI "Build qspgui application")
 if(BUILD_QSPGUI)
+	option(USE_INSTALLED_WX OFF "Use wxWidgets installed into the main system")
 	if(USE_INSTALLED_WX)
 		find_package(wxWidgets REQUIRED base core adv aui html)
 		include(${wxWidgets_USE_FILE})
