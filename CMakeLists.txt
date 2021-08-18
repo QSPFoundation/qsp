@@ -186,6 +186,7 @@ if(BUILD_QSPGUI)
 	target_link_libraries(qspgui PRIVATE qsp fmod)
 	if(USE_INSTALLED_WX)
 		target_link_libraries(qspgui PRIVATE ${wxWidgets_LIBRARIES})
+		target_include_directories(qspgui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/players/classic/thirdParty/access_private/include")
 	else()
 		target_link_libraries(qspgui PRIVATE wxbase wxcore wxadv wxaui wxhtml)
 		install(TARGETS wxbase wxcore wxadv wxaui wxhtml

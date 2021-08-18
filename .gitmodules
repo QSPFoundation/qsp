@@ -1,0 +1,4 @@
+[submodule "players/classic/thirdParty/access_private"]
+	path = players/classic/thirdParty/access_private
+	url = https://github.com/martong/access_private
+	branch = master

@@ -17,6 +17,25 @@
 
 #include "listbox.h"
 
+#include "access_private.hpp"
+
+ACCESS_PRIVATE_FIELD(wxHtmlListBox, wxHtmlWinParser *, m_htmlParser);
+ACCESS_PRIVATE_FIELD(wxHtmlListBox, wxFileSystem, m_filesystem);
+
+wxHtmlWinParser * getPrivate_m_htmlParser(const wxHtmlListBox * a){
+	return access_private::m_htmlParser(*a);
+}
+
+void setPrivate_m_htmlParser(const wxHtmlListBox * a, wxHtmlWinParser * p){
+	auto &res = const_cast<wxHtmlWinParser *&>(access_private::m_htmlParser(*a));
+	res = p;
+}
+
+wxFileSystem& getPrivate_m_filesystem(const wxHtmlListBox * a){
+	auto &res = const_cast<wxFileSystem &>(access_private::m_filesystem(*a));
+	return res;
+}
+
 wxIMPLEMENT_CLASS(QSPListBox, wxHtmlListBox);
 
 BEGIN_EVENT_TABLE(QSPListBox, wxHtmlListBox)
@@ -57,7 +76,7 @@ QSPListBox::QSPListBox(wxWindow *parent, wxWindowID id, ListBoxType type) : wxHt
 void QSPListBox::SetStandardFonts(int size, const wxString& normal_face, const wxString& fixed_face)
 {
     CreateHTMLParser();
-    m_htmlParser->SetStandardFonts(size, normal_face, fixed_face);
+    getPrivate_m_htmlParser(this)->SetStandardFonts(size, normal_face, fixed_face);
     RefreshUI();
 }
 
@@ -128,28 +147,28 @@ void QSPListBox::SetTextFont(const wxFont& font)
 void QSPListBox::SetLinkColor(const wxColour& clr)
 {
     CreateHTMLParser();
-    m_htmlParser->SetLinkColor(clr);
+    getPrivate_m_htmlParser(this)->SetLinkColor(clr);
     RefreshUI();
 }
 
 const wxColour& QSPListBox::GetLinkColor() const
 {
     CreateHTMLParser();
-    return m_htmlParser->GetLinkColor();
+    return getPrivate_m_htmlParser(this)->GetLinkColor();
 }
 
 void QSPListBox::CreateHTMLParser() const
 {
-    if (!m_htmlParser)
+    if (!getPrivate_m_htmlParser(this))
     {
         QSPListBox *self = wxConstCast(this, QSPListBox);
-        self->m_htmlParser = new wxHtmlWinParser(self);
-        m_htmlParser->SetDC(new wxClientDC(self));
-        m_htmlParser->SetFS(&self->m_filesystem);
+        setPrivate_m_htmlParser(this, new wxHtmlWinParser(self));
+        getPrivate_m_htmlParser(this)->SetDC(new wxClientDC(self));
+        getPrivate_m_htmlParser(this)->SetFS(&getPrivate_m_filesystem(self));
         #if !wxUSE_UNICODE
-            m_htmlParser->SetInputEncoding(wxLocale::GetSystemEncoding());
+            getPrivate_m_htmlParser(this)->SetInputEncoding(wxLocale::GetSystemEncoding());
         #endif
-        m_htmlParser->SetStandardFonts();
+        getPrivate_m_htmlParser(this)->SetStandardFonts();
     }
 }
 
