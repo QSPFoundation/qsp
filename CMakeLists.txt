@@ -27,28 +27,43 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /DNDEBUG")
 endif()
 
-if(USE_INSTALLED_ONIGURUMA)
-	find_package(oniguruma CONFIG REQUIRED)
+option(USE_PCRE OFF "Use PCRE instead of oniguruma")
+
+if(NOT USE_PCRE)
+	if(USE_INSTALLED_ONIGURUMA)
+		find_package(oniguruma CONFIG REQUIRED)
+	else()
+		# Download and unpack oniguruma at configure time
+		configure_file(CMakeLists-oniguruma.txt.in "${CMAKE_BINARY_DIR}/oniguruma-download/CMakeLists.txt")
+		execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+				WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
+		)
+		execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+				WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
+		)
+		# Prevent oniguruma from overriding our compiler/linker options
+		# when building with Visual Studio
+		set(oniguruma_force_shared_crt ON CACHE BOOL "" FORCE)
+
+		# Configure the CRNL handling
+		add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR)
+
+		# Add oniguruma directly to our build
+		add_subdirectory("${CMAKE_BINARY_DIR}/oniguruma-src"
+						"${CMAKE_BINARY_DIR}/oniguruma-build"
+		)
+	endif()
 else()
-	# Download and unpack oniguruma at configure time
-	configure_file(CMakeLists-oniguruma.txt.in "${CMAKE_BINARY_DIR}/oniguruma-download/CMakeLists.txt")
-	execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-			WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
-	)
-	execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-			WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
-	)
-	# Prevent oniguruma from overriding our compiler/linker options
-	# when building with Visual Studio
-	set(oniguruma_force_shared_crt ON CACHE BOOL "" FORCE)
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(PCRE3 libpcre)
 
-	# Configure the CRNL handling
-	add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR)
+	set(CMAKE_CXX_STANDARD 20)
 
-	# Add oniguruma directly to our build
-	add_subdirectory("${CMAKE_BINARY_DIR}/oniguruma-src"
-					 "${CMAKE_BINARY_DIR}/oniguruma-build"
-	)
+	if(${CMAKE_VERSION} VERSION_GREATER "3.22")
+		set(CMAKE_C_STANDARD 23)
+	else()
+		set(CMAKE_C_STANDARD 11)
+	endif()
 endif()
 
 set(QSP_SOURCES
@@ -78,17 +93,34 @@ set(QSP_SOURCES
 )
 add_library(qsp SHARED ${QSP_SOURCES})
 target_compile_definitions(qsp PRIVATE _UNICODE EXPORT)
+
+if(USE_PCRE)
+	target_compile_definitions(qsp PRIVATE "-DUSE_PCRE=1")
+endif()
+
 if(WIN32)
 	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
 target_link_options(qsp PRIVATE ${PROJECT_LINKER_FLAGS})
-target_link_libraries(qsp PRIVATE onig)
-install(TARGETS qsp onig
+if(NOT USE_PCRE)
+	target_link_libraries(qsp PRIVATE onig)
+else()
+	target_link_libraries(qsp PRIVATE ${pkgconfig_lib_PCRE3_pcre})
+endif()
+
+install(TARGETS qsp
 		RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
 		LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
 		ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
 )
+if(NOT USE_PCRE)
+	install(TARGETS onig
+			RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+			LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
+			ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
+	)
+endif()
 
 option(BUILD_QSPGUI "Build qspgui application")
 if(BUILD_QSPGUI)

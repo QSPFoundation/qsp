@@ -14,6 +14,7 @@
 * along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
+#pragma once
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,7 +39,19 @@
 
 #include "bindings/bindings_config.h"
 #include "bindings/qsp.h"
-#include <oniguruma.h>
+
+#if !defined(USE_PCRE) || !USE_PCRE
+    #include <oniguruma.h>
+    typedef regex_t* RegExT;
+    #define CHECK_REGEXP_PRESENCE(v) v
+#else
+    #include <pcre.h>
+    typedef struct RegExT_{
+        pcre *rx;
+        pcre_extra *extra;
+    } RegExT;
+    #define CHECK_REGEXP_PRESENCE(v) v.rx
+#endif
 
 #ifndef QSP_DEFINES
     #define QSP_DEFINES
