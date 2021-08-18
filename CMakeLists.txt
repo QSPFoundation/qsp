@@ -173,8 +173,18 @@ if(BUILD_QSPGUI)
 	target_include_directories(qspgui PRIVATE qsp/bindings qsp/bindings/default)
 	target_compile_options(qspgui PRIVATE ${PROJECT_COMPILER_FLAGS})
 	target_link_options(qspgui PRIVATE ${PROJECT_LINKER_FLAGS})
-	target_link_libraries(qspgui PRIVATE qsp fmod wxbase wxcore wxadv wxaui wxhtml)
-	install(TARGETS qspgui qsp wxbase wxcore wxadv wxaui wxhtml
+	target_link_libraries(qspgui PRIVATE qsp fmod)
+	if(USE_INSTALLED_WX)
+		target_link_libraries(qspgui PRIVATE ${wxWidgets_LIBRARIES})
+	else()
+		target_link_libraries(qspgui PRIVATE wxbase wxcore wxadv wxaui wxhtml)
+		install(TARGETS wxbase wxcore wxadv wxaui wxhtml
+				RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+				LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
+				ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
+		)
+	endif()
+	install(TARGETS qspgui qsp
 			RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
 			LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
 			ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
