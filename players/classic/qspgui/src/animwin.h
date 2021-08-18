@@ -20,9 +20,14 @@
 
     #include <wx/wx.h>
     #include <wx/animate.h>
-    #include <wx/generic/animate.h>
+    #ifdef HAS_GENERIC_ANIMATE
+        #include <wx/generic/animate.h>
+        typedef wxGenericAnimationCtrl ChosenAnimationCtrlClass;
+    #else
+        typedef wxAnimationCtrl ChosenAnimationCtrlClass;
+    #endif
 
-    class QSPAnimWin : public wxGenericAnimationCtrl
+    class QSPAnimWin : public ChosenAnimationCtrlClass
     {
         DECLARE_CLASS(QSPAnimWin)
         DECLARE_EVENT_TABLE()

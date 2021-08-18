@@ -17,22 +17,24 @@
 
 #include "animwin.h"
 
-wxIMPLEMENT_CLASS(QSPAnimWin, wxGenericAnimationCtrl);
+wxIMPLEMENT_CLASS(QSPAnimWin, ChosenAnimationCtrlClass);
 
-BEGIN_EVENT_TABLE(QSPAnimWin, wxGenericAnimationCtrl)
+BEGIN_EVENT_TABLE(QSPAnimWin, ChosenAnimationCtrlClass)
     EVT_KEY_UP(QSPAnimWin::OnKeyUp)
     EVT_MOUSEWHEEL(QSPAnimWin::OnMouseWheel)
     EVT_LEFT_DOWN(QSPAnimWin::OnMouseClick)
 END_EVENT_TABLE()
 
 QSPAnimWin::QSPAnimWin(wxWindow *parent) :
-    wxGenericAnimationCtrl(parent, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxAC_NO_AUTORESIZE)
+    ChosenAnimationCtrlClass(parent, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxDefaultSize, wxNO_BORDER | wxAC_NO_AUTORESIZE)
 {
 }
 
 void QSPAnimWin::RefreshUI()
 {
+    #ifdef HAS_GENERIC_ANIMATE
     IncrementalUpdateBackingStore();
+    #endif
     Refresh();
 }
 
@@ -42,7 +44,7 @@ bool QSPAnimWin::LoadFile(const wxString &filename, wxAnimationType type)
     if (IsPlaying())
         Stop();
 
-    if (wxGenericAnimationCtrl::LoadFile(filename, type))
+    if (ChosenAnimationCtrlClass::LoadFile(filename, type))
     {
         if (GetAnimation().GetFrameCount() > 1)
             return true;
