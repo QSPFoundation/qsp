@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleGetInfoString</key>
-	<string>QspPlayer (c) qsp.su</string>
+	<string>QspPlayer (c) qsp.org</string>
 	<key>CFBundleIconFile</key>
 	<string>icon.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>su.qsp.QspPlayer</string>
+	<string>org.qsp.QspPlayer</string>
 	<key>CFBundleName</key>
 	<string>QspPlayer</string>
 </dict>

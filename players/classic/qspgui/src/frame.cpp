@@ -977,7 +977,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
     wxAboutDialogInfo info;
     info.SetIcon(wxIcon(logo_big_xpm));
     info.SetName(QSP_LOGO);
-    info.SetCopyright(wxT("Byte Soft, 2001-2020"));
+    info.SetCopyright(wxT("QSP Foundation, 2001-2022"));
     QSPString version = QSPGetVersion();
     QSPString libCompiledDate = QSPGetCompiledDateTime();
     wxString guiCompiledDate(wxT(__DATE__) wxT(", ") wxT(__TIME__));
@@ -987,7 +987,7 @@ void QSPFrame::OnAbout(wxCommandEvent& event)
         wxString(libCompiledDate.Str, libCompiledDate.End).wx_str(),
         guiCompiledDate.wx_str()
     ));
-    info.SetWebSite(wxT("http://qsp.su"));
+    info.SetWebSite(wxT("http://qsp.org"));
     // ----
     wxAboutBox(info, this);
 }
