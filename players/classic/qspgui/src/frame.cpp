@@ -21,7 +21,6 @@
 BEGIN_EVENT_TABLE(QSPFrame, wxFrame)
     EVT_INIT(QSPFrame::OnInit)
     EVT_CLOSE(QSPFrame::OnClose)
-    EVT_IDLE(QSPFrame::OnIdle)
     EVT_TIMER(ID_TIMER, QSPFrame::OnTimer)
     EVT_MENU(wxID_EXIT, QSPFrame::OnQuit)
     EVT_MENU(ID_OPENGAME, QSPFrame::OnOpenGame)
@@ -744,16 +743,10 @@ void QSPFrame::OnInit(wxInitEvent& event)
 
 void QSPFrame::OnClose(wxCloseEvent& event)
 {
-    if (event.CanVeto()) event.Veto();
     SaveSettings();
     EnableControls(false, true);
-    Hide();
+    Destroy();
     m_isQuit = true;
-}
-
-void QSPFrame::OnIdle(wxIdleEvent& event)
-{
-    if (m_isQuit) Destroy();
 }
 
 void QSPFrame::OnTimer(wxTimerEvent& event)
