@@ -1014,14 +1014,20 @@ void QSPFrame::OnLinkClicked(wxHtmlLinkEvent& event)
 
 void QSPFrame::OnObjectChange(wxCommandEvent& event)
 {
+    // show selection first
     m_objects->Update();
-    wxThread::Sleep(20);
+    wxThread::Sleep(10);
+    // execute the handler
     if (!QSPSetSelObjectIndex(event.GetInt(), QSP_TRUE))
         ShowError();
 }
 
 void QSPFrame::OnActionChange(wxCommandEvent& event)
 {
+    // show selection first
+    m_actions->Update();
+    wxThread::Sleep(10);
+    // execute the handler
     if (!QSPSetSelActionIndex(event.GetInt(), QSP_TRUE))
         ShowError();
 }
