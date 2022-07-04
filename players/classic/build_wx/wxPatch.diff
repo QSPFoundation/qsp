@@ -166,33 +166,6 @@ index 0262abfa5b..87d9a858c7 100644
      }
  }
  
-diff --git a/src/generic/scrlwing.cpp b/src/generic/scrlwing.cpp
-index 93456bcd1a..e107b72260 100644
---- a/src/generic/scrlwing.cpp
-+++ b/src/generic/scrlwing.cpp
-@@ -548,20 +548,11 @@ void wxScrollHelperBase::HandleOnScroll(wxScrollWinEvent& event)
-         m_win->SetScrollPos(wxVERTICAL, m_yScrollPosition);
-     }
- 
--    if ( needsRefresh )
--    {
--        m_targetWindow->Refresh(true, GetScrollRect());
--    }
--    else
-+    m_targetWindow->Refresh(true, GetScrollRect());
-+    if (!needsRefresh)
-     {
-         m_targetWindow->ScrollWindow(dx, dy, GetScrollRect());
-     }
--#ifdef __WXUNIVERSAL__
--    if (m_win != m_targetWindow)
--    {
--        m_win->Refresh(true, GetScrollRect());
--    }
--#endif // __WXUNIVERSAL__
- }
- 
- int wxScrollHelperBase::CalcScrollInc(wxScrollWinEvent& event)
 diff --git a/src/html/htmlwin.cpp b/src/html/htmlwin.cpp
 index 4e37e60cd2..a044ba7710 100644
 --- a/src/html/htmlwin.cpp
