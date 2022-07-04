@@ -213,9 +213,7 @@ void QSPListBox::OnKeyUp(wxKeyEvent& event)
 
 void QSPListBox::OnMouseWheel(wxMouseEvent& event)
 {
+    event.Skip();
     if (wxFindWindowAtPoint(wxGetMousePosition()) != this)
-    {
-        event.Skip();
-        event.m_wheelRotation = 0;
-    }
+        event.ResumePropagation(wxEVENT_PROPAGATE_MAX);
 }
