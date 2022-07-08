@@ -771,7 +771,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     QSPVar *var;
     QSP_BOOL isVarFound;
     QSPString *names, varName;
-    int i, namesCount, groupInd, varsCount, bufSize, oldRefreshCount;
+    int i, j, namesCount, groupInd, varsCount, bufSize, oldRefreshCount;
     if (stat->ErrorCode)
     {
         qspSetError(stat->ErrorCode);
@@ -800,9 +800,9 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
         if (*varName.Str == QSP_STRCHAR[0]) varName.Str += QSP_STATIC_LEN(QSP_STRCHAR);
         varName = qspGetVarNameOnly(varName);
         /* Check for the existence */
-        for (i = 0; i < varsCount; ++i)
+        for (j = 0; j < varsCount; ++j)
         {
-            if (!qspStrsComp(varName, qspSavedVarGroups[groupInd].Vars[i].Name))
+            if (!qspStrsComp(varName, qspSavedVarGroups[groupInd].Vars[j].Name))
             {
                 isVarFound = QSP_TRUE;
                 break;
