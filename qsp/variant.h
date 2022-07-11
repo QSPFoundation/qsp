@@ -33,6 +33,7 @@
         QSP_TYPE_CODE = 2,
         QSP_TYPE_TUPLE = 3,
         QSP_TYPE_VARREF = 4,
+        QSP_TYPE_DEFINED_TYPES = 5, /* represents a number of defined values */
         QSP_TYPE_UNDEFINED = 64, /* not used for values, it has to be a string-based type */
     };
 

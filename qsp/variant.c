@@ -18,34 +18,43 @@
 #include "variant.h"
 #include "text.h"
 
+static QSP_BOOL qspTypeConversionTable[QSP_TYPE_DEFINED_TYPES][QSP_TYPE_DEFINED_TYPES] =
+{
+    /*             NUMBER     STRING     CODE       TUPLE      VARREF */
+    /* NUMBER */ { QSP_FALSE, QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_TRUE },
+    /* STRING */ { QSP_TRUE,  QSP_FALSE, QSP_TRUE,  QSP_TRUE,  QSP_TRUE },
+    /* CODE */   { QSP_TRUE,  QSP_FALSE, QSP_FALSE, QSP_TRUE,  QSP_TRUE },
+    /* TUPLE */  { QSP_TRUE,  QSP_FALSE, QSP_TRUE,  QSP_FALSE, QSP_TRUE },
+    /* VARREF */ { QSP_TRUE,  QSP_FALSE, QSP_TRUE,  QSP_TRUE,  QSP_FALSE },
+};
+
 INLINE void qspFormatVariant(QSPVariant *val);
 
 INLINE void qspFormatVariant(QSPVariant *val)
 {
-    QSPString temp;
     switch (val->Type)
     {
         case QSP_TYPE_VARREF:
-            temp = qspGetNewText(qspDelSpc(QSP_PSTR(val)));
+        {
+            QSPString temp = qspGetNewText(qspDelSpc(QSP_PSTR(val)));
             qspUpperStr(&temp);
             qspFreeString(QSP_PSTR(val));
             QSP_PSTR(val) = temp;
             break;
+        }
     }
 }
 
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
 {
-    int num;
-    QSP_CHAR buf[12];
-    QSP_BOOL isValid;
-    if (val->Type != type)
+    if (val->Type != type && qspTypeConversionTable[val->Type][type])
     {
         if (QSP_ISNUM(type))
         {
             if (QSP_ISSTR(val->Type))
             {
-                num = qspStrToNum(QSP_PSTR(val), &isValid);
+                QSP_BOOL isValid;
+                int num = qspStrToNum(QSP_PSTR(val), &isValid);
                 if (!isValid) return QSP_FALSE;
                 qspFreeString(QSP_PSTR(val));
                 QSP_PNUM(val) = num;
@@ -55,6 +64,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
         {
             if (QSP_ISNUM(val->Type))
             {
+                QSP_CHAR buf[12];
                 QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)));
             }
         }

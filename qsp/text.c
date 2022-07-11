@@ -34,14 +34,13 @@ QSP_CHAR *qspStringToC(QSPString s)
 
 void qspAddText(QSPString *dest, QSPString val, QSP_BOOL isCreate)
 {
-    QSP_CHAR *destPtr;
-    int destLen, valLen = qspStrLen(val);
+    int valLen = qspStrLen(val);
     if (!isCreate && dest->Str)
     {
         if (valLen)
         {
-            destLen = qspStrLen(*dest);
-            destPtr = (QSP_CHAR *)realloc(dest->Str, (destLen + valLen) * sizeof(QSP_CHAR));
+            int destLen = qspStrLen(*dest);
+            QSP_CHAR *destPtr = (QSP_CHAR *)realloc(dest->Str, (destLen + valLen) * sizeof(QSP_CHAR));
             dest->Str = destPtr;
             destPtr += destLen;
             dest->End = destPtr + valLen;
@@ -52,7 +51,7 @@ void qspAddText(QSPString *dest, QSPString val, QSP_BOOL isCreate)
     {
         if (valLen)
         {
-            destPtr = (QSP_CHAR *)malloc(valLen * sizeof(QSP_CHAR));
+            QSP_CHAR *destPtr = (QSP_CHAR *)malloc(valLen * sizeof(QSP_CHAR));
             dest->Str = destPtr;
             dest->End = destPtr + valLen;
             memcpy(destPtr, val.Str, valLen * sizeof(QSP_CHAR));
