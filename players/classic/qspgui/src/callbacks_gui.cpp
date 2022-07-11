@@ -130,7 +130,7 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
     m_frame->GetObjects()->SetSelection(QSPGetSelObjectIndex());
     // -------------------------------
     if (QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("BACKIMAGE")), 0, &numVal, &strVal) && strVal.Str && strVal.Str != strVal.End)
-        m_frame->GetDesc()->LoadBackImage(m_frame->ComposeGamePath(wxString(strVal.Str, strVal.End)));
+        m_frame->GetDesc()->LoadBackImage(wxString(strVal.Str, strVal.End));
     else
         m_frame->GetDesc()->LoadBackImage(wxEmptyString);
     // -------------------------------
@@ -282,7 +282,7 @@ void QSPCallBacks::Msg(QSPString str)
         _("Info"),
         wxString(str.Str, str.End),
         m_isHtml,
-        m_frame->GetGamePath()
+        m_frame
     );
     m_frame->EnableControls(false);
     dialog.ShowModal();
@@ -313,7 +313,7 @@ void QSPCallBacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
         _("Input data"),
         wxString(text.Str, text.End),
         m_isHtml,
-        m_frame->GetGamePath()
+        m_frame
     );
     m_frame->EnableControls(false);
     dialog.ShowModal();

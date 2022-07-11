@@ -162,6 +162,11 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transHelper
     m_input = new QSPInputBox(this, ID_INPUT);
     m_manager->AddPane(m_input, wxAuiPaneInfo().Name(wxT("input")).MinSize(50, 20).BestSize(100, 20).Bottom().Layer(1));
     // --------------------------------------
+    m_desc->SetPathProvider(this);
+    m_objects->SetPathProvider(this);
+    m_actions->SetPathProvider(this);
+    m_vars->SetPathProvider(this);
+    // --------------------------------------
     SetMinClientSize(wxSize(450, 300));
     SetOverallVolume(100);
     m_savedGamePath.Clear();
@@ -424,24 +429,35 @@ int QSPFrame::ShowMenu()
 
 void QSPFrame::UpdateGamePath(const wxString &fullPath)
 {
-    wxFileName fileName(fullPath);
-    wxString directoryPath(fileName.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));
-
-    m_worldPath = directoryPath;
-    m_desc->SetGamePath(directoryPath);
-    m_vars->SetGamePath(directoryPath);
-    m_actions->SetGamePath(directoryPath);
-    m_objects->SetGamePath(directoryPath);
+    wxFileName fileName(fullPath, wxPATH_DOS);
+    m_worldPath = fileName.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
 }
 
 wxString QSPFrame::ComposeGamePath(const wxString &relativePath) const
 {
+    if (relativePath.IsEmpty())
+        return wxEmptyString;
+
     wxFileName fullPath(m_worldPath + relativePath, wxPATH_DOS);
-    fullPath.Normalize(wxPATH_NORM_ALL, m_worldPath);
+    fullPath.MakeAbsolute();
     wxString normalizedPath(fullPath.GetFullPath());
     if (normalizedPath.StartsWith(m_worldPath))
         return normalizedPath;
+
     return wxEmptyString;
+}
+
+bool QSPFrame::IsValidFullPath(const wxString &path) const
+{
+    if (path.IsEmpty())
+        return true;
+
+    wxFileName fullPath(path);
+    fullPath.MakeAbsolute();
+    if (fullPath.GetFullPath().StartsWith(m_worldPath))
+        return true;
+
+    return false;
 }
 
 void QSPFrame::ShowError()
@@ -476,7 +492,7 @@ void QSPFrame::ShowError()
                      _("Error"),
                      wxMessage,
                      false,
-                     m_worldPath
+                     this
     );
     oldIsProcessEvents = m_isProcessEvents;
     m_isProcessEvents = false;

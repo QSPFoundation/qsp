@@ -21,6 +21,7 @@
     #include <wx/wx.h>
     #include <wx/statline.h>
     #include "textbox.h"
+    #include "path_provider.h"
 
     enum
     {
@@ -46,7 +47,7 @@
                   const wxString& caption,
                   const wxString& text,
                   bool isHtml,
-                  const wxString& gamePath);
+                  PathProvider *pathProvider);
     protected:
         // Events
         void OnInitDialog(wxInitDialogEvent& event);

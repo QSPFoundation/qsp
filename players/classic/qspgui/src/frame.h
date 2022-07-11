@@ -33,6 +33,7 @@
     #include "listbox.h"
     #include "imgcanvas.h"
     #include "initevent.h"
+    #include "path_provider.h"
 
     #include "icons/logo.xpm"
     #include "icons/logo_big.xpm"
@@ -93,7 +94,7 @@
         ID_DUMMY
     };
 
-    class QSPFrame : public wxFrame
+    class QSPFrame : public wxFrame, public PathProvider
     {
         DECLARE_CLASS(QSPFrame)
         DECLARE_EVENT_TABLE()
@@ -113,6 +114,7 @@
         int ShowMenu();
         void UpdateGamePath(const wxString &fullPath);
         wxString ComposeGamePath(const wxString &relativePath) const;
+        bool IsValidFullPath(const wxString &path) const;
         wxString GetGamePath() const { return m_worldPath; }
 
         // Accessors

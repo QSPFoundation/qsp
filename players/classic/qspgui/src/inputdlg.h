@@ -22,6 +22,7 @@
     #include <wx/statline.h>
     #include <wx/valgen.h>
     #include "textbox.h"
+    #include "path_provider.h"
 
     enum
     {
@@ -47,7 +48,7 @@
                     const wxString& caption,
                     const wxString& text,
                     bool isHtml,
-                    const wxString& gamePath);
+                    PathProvider *pathProvider);
 
         // Accessors
         wxString GetText() const { return m_text; }

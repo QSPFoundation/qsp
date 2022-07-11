@@ -29,9 +29,13 @@ END_EVENT_TABLE()
 
 wxHtmlOpeningStatus QSPListBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
 {
-    if (wxFileName(url).IsAbsolute()) return wxHTML_OPEN;
-    *redirect = wxFileName(m_path + url, wxPATH_DOS).GetFullPath();
-    return wxHTML_REDIRECT;
+    if (m_pathProvider)
+    {
+        if (m_pathProvider->IsValidFullPath(url)) return wxHTML_OPEN;
+        *redirect = m_pathProvider->ComposeGamePath(url);
+        return wxHTML_REDIRECT;
+    }
+    return wxHTML_OPEN;
 }
 
 QSPListBox::QSPListBox(wxWindow *parent, wxWindowID id, ListBoxType type) : wxHtmlListBox(parent, id, wxDefaultPosition, wxDefaultSize, wxNO_BORDER)
@@ -40,6 +44,7 @@ QSPListBox::QSPListBox(wxWindow *parent, wxWindowID id, ListBoxType type) : wxHt
     m_isUseHtml = false;
     m_isShowNums = false;
     m_font = *wxNORMAL_FONT;
+    m_pathProvider = NULL;
     wxString commonPart(wxString::Format(
         wxT("<META HTTP-EQUIV = \"Content-Type\" CONTENT = \"text/html; charset=%s\">")
         wxT("<FONT COLOR = #%%%%s><TABLE CELLSPACING = 4 CELLPADDING = 0><TR>%%s</TR></TABLE></FONT>"),
@@ -155,22 +160,21 @@ void QSPListBox::CreateHTMLParser() const
 
 wxString QSPListBox::OnGetItem(size_t n) const
 {
-    wxString imageFullPath(wxFileName(m_path + m_images[n], wxPATH_DOS).GetFullPath());
     wxString color(QSPTools::GetHexColor(GetForegroundColour()));
     wxString text(QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_descs[n] : QSPTools::ProceedAsPlain(m_descs[n])));
     if (m_isShowNums && n < 9)
     {
-        if (wxFileExists(imageFullPath))
-            return wxString::Format(m_outFormatImageNums, color.wx_str(), n + 1, imageFullPath.wx_str(), text.wx_str());
-        else
+        if (m_images[n].IsEmpty())
             return wxString::Format(m_outFormatNums, color.wx_str(), n + 1, text.wx_str());
+        else
+            return wxString::Format(m_outFormatImageNums, color.wx_str(), n + 1, m_images[n].wx_str(), text.wx_str());
     }
     else
     {
-        if (wxFileExists(imageFullPath))
-            return wxString::Format(m_outFormatImage, color.wx_str(), imageFullPath.wx_str(), text.wx_str());
-        else
+        if (m_images[n].IsEmpty())
             return wxString::Format(m_outFormat, color.wx_str(), text.wx_str());
+        else
+            return wxString::Format(m_outFormatImage, color.wx_str(), m_images[n].wx_str(), text.wx_str());
     }
 }
 

@@ -22,6 +22,7 @@
     #include <wx/fontmap.h>
     #include <wx/html/htmlwin.h>
     #include "comtools.h"
+    #include "path_provider.h"
 
     class QSPTextBox : public wxHtmlWindow
     {
@@ -33,7 +34,8 @@
 
         // Methods
         void RefreshUI(bool isScroll = false);
-        void LoadBackImage(const wxString& fullPath);
+        void LoadBackImage(const wxString& imagePath);
+        void SetPathProvider(PathProvider *provider) { m_pathProvider = provider; }
 
         // Accessors
         void SetIsHtml(bool isHtml);
@@ -43,7 +45,6 @@
         wxString GetText() const { return m_text; }
         void SetLinkColor(const wxColour& clr);
         const wxColour& GetLinkColor() const { return m_Parser->GetLinkColor(); }
-        void SetGamePath(const wxString& path) { m_path = path; }
         void SetBackgroundImage(const wxBitmap& bmpBg);
     protected:
         // Internal methods
@@ -58,9 +59,9 @@
         void OnMouseClick(wxMouseEvent& event);
 
         // Fields
+        PathProvider *m_pathProvider;
         bool m_isUseHtml;
         wxString m_outFormat;
-        wxString m_path;
         wxString m_imagePath;
         wxFont m_font;
         wxString m_text;

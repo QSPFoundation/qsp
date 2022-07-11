@@ -32,14 +32,14 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
                          const wxString& caption,
                          const wxString& text,
                          bool isHtml,
-                         const wxString& gamePath)
+                         PathProvider *pathProvider)
 {
     if (!Create(parent, id, caption, wxDefaultPosition, wxDefaultSize, wxCAPTION | wxRESIZE_BORDER | wxSYSTEM_MENU)) return;
     // ----------
     SetBackgroundColour(backColor);
     wxSizer *sizerUp = new wxBoxSizer(wxVERTICAL);
     m_desc = new QSPTextBox(this, ID_INPUT_DESC);
-    m_desc->SetGamePath(gamePath);
+    m_desc->SetPathProvider(pathProvider);
     m_desc->SetIsHtml(isHtml);
     m_desc->SetBackgroundColour(backColor);
     m_desc->SetForegroundColour(fontColor);

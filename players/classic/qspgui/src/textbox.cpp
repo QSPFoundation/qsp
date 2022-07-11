@@ -29,9 +29,13 @@ END_EVENT_TABLE()
 
 wxHtmlOpeningStatus QSPTextBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
 {
-    if (wxFileName(url).IsAbsolute()) return wxHTML_OPEN;
-    *redirect = wxFileName(m_path + url, wxPATH_DOS).GetFullPath();
-    return wxHTML_REDIRECT;
+    if (m_pathProvider)
+    {
+        if (m_pathProvider->IsValidFullPath(url)) return wxHTML_OPEN;
+        *redirect = m_pathProvider->ComposeGamePath(url);
+        return wxHTML_REDIRECT;
+    }
+    return wxHTML_OPEN;
 }
 
 QSPTextBox::QSPTextBox(wxWindow *parent, wxWindowID id) : wxHtmlWindow(parent, id)
@@ -39,6 +43,7 @@ QSPTextBox::QSPTextBox(wxWindow *parent, wxWindowID id) : wxHtmlWindow(parent, i
     SetBorders(5);
     m_isUseHtml = false;
     m_font = *wxNORMAL_FONT;
+    m_pathProvider = NULL;
     m_outFormat = wxString::Format(
         wxT("<HTML><META HTTP-EQUIV = \"Content-Type\" CONTENT = \"text/html; charset=%s\">")
         wxT("<BODY><FONT COLOR = #%%s>%%s</FONT></BODY></HTML>"),
@@ -67,15 +72,21 @@ void QSPTextBox::RefreshUI(bool isScroll)
     if (isScroll) Scroll(0, 0x7FFFFFFF);
 }
 
-void QSPTextBox::LoadBackImage(const wxString& fullPath)
+void QSPTextBox::LoadBackImage(const wxString& imagePath)
 {
-    if (m_imagePath != fullPath)
+    if (m_imagePath != imagePath)
     {
-        m_imagePath = fullPath;
-        if (wxFileExists(fullPath))
+        m_imagePath = imagePath;
+        wxString fullImagePath;
+        if (m_pathProvider)
+            fullImagePath = m_pathProvider->ComposeGamePath(imagePath);
+        else
+            fullImagePath = imagePath;
+
+        if (wxFileExists(fullImagePath))
         {
             wxImage image;
-            if (image.LoadFile(fullPath))
+            if (image.LoadFile(fullImagePath))
             {
                 SetBackgroundImage(wxBitmap(image));
                 Refresh();

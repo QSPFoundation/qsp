@@ -32,14 +32,14 @@ QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
                      const wxString& caption,
                      const wxString& text,
                      bool isHtml,
-                     const wxString& gamePath)
+                     PathProvider *pathProvider)
 {
     if (!Create(parent, id, caption, wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)) return;
     // ----------
     SetBackgroundColour(backColor);
     wxSizer *sizerUp = new wxBoxSizer(wxVERTICAL);
     m_desc = new QSPTextBox(this, ID_MSG_DESC);
-    m_desc->SetGamePath(gamePath);
+    m_desc->SetPathProvider(pathProvider);
     m_desc->SetIsHtml(isHtml);
     m_desc->SetBackgroundColour(backColor);
     m_desc->SetForegroundColour(fontColor);

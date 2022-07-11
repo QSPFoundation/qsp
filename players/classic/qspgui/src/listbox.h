@@ -22,6 +22,7 @@
     #include <wx/fontmap.h>
     #include <wx/htmllbox.h>
     #include "comtools.h"
+    #include "path_provider.h"
 
     enum ListBoxType
     {
@@ -45,6 +46,7 @@
         void BeginItems();
         void AddItem(const wxString& image, const wxString& desc);
         void EndItems();
+        void SetPathProvider(PathProvider *provider) { m_pathProvider = provider; }
 
         // Accessors
         void SetIsHtml(bool isHtml);
@@ -53,7 +55,6 @@
         wxFont GetTextFont() const { return m_font; }
         void SetLinkColor(const wxColour& clr);
         const wxColour& GetLinkColor() const;
-        void SetGamePath(const wxString& path) { m_path = path; }
     protected:
         // Internal methods
         virtual wxString OnGetItem(size_t n) const;
@@ -68,6 +69,7 @@
         void OnMouseWheel(wxMouseEvent& event);
 
         // Fields
+        PathProvider *m_pathProvider;
         wxString m_outFormat;
         wxString m_outFormatNums;
         wxString m_outFormatImage;
@@ -75,7 +77,6 @@
         ListBoxType m_type;
         bool m_isUseHtml;
         bool m_isShowNums;
-        wxString m_path;
         wxFont m_font;
         wxArrayString m_images;
         wxArrayString m_descs;
