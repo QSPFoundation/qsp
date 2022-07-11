@@ -95,9 +95,11 @@ msgid "Cancel"
 msgstr "Отмена"
 
 msgid ""
+"Line: %ld\n"
 "Code: %ld\n"
 "Desc: %s"
 msgstr ""
+"Строка: %ld\n"
 "Код ошибки: %ld\n"
 "Описание: %s"
 

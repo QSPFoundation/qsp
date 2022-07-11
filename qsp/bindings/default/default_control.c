@@ -273,7 +273,7 @@ QSP_BOOL QSPExecString(QSPString s, QSP_BOOL isRefresh)
 {
     if (qspIsDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
-    qspExecStringAsCodeWithArgs(s, 0, 0, 0);
+    qspExecStringAsCodeWithArgs(s, 0, 0, 1, 0);
     if (qspErrorNum) return QSP_FALSE;
     if (isRefresh) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;

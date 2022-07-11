@@ -95,9 +95,11 @@ msgid "Cancel"
 msgstr "Nuligo"
 
 msgid ""
+"Line: %ld\n"
 "Code: %ld\n"
 "Desc: %s"
 msgstr ""
+"Linio: %ld\n"
 "Kodo de eraro: %ld\n"
 "Priskribo: %s"
 

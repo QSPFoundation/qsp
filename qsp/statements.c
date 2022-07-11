@@ -598,7 +598,7 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int end
     return isExit;
 }
 
-void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
+void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, int codeOffset, QSPVariant *res)
 {
     QSPLineOfCode *strs;
     QSPVar *varArgs, *varRes;
@@ -609,7 +609,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
     qspSetArgs(varArgs, args, count);
     linesCount = qspPreprocessData(s, &strs);
     oldRefreshCount = qspRefreshCount;
-    qspExecCode(strs, 0, linesCount, 0, 0);
+    qspExecCode(strs, 0, linesCount, codeOffset, 0);
     qspFreePrepLines(strs, linesCount);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum)
     {
@@ -1086,6 +1086,6 @@ INLINE QSP_BOOL qspStatementExec(QSPVariant *args, QSP_TINYINT count, QSPString 
 
 INLINE QSP_BOOL qspStatementDynamic(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
-    qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0);
+    qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0, 0);
     return QSP_FALSE;
 }

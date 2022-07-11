@@ -1272,7 +1272,7 @@ INLINE void qspFunctionFunc(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos
 
 INLINE void qspFunctionDynEval(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, tos);
+    qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0, tos);
 }
 
 INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)

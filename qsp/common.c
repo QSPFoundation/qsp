@@ -43,6 +43,12 @@ INLINE unsigned int qspURand();
 void qspPrepareExecution()
 {
     qspResetError();
+
+    /* reset execution state */
+    qspRealCurLoc = -1;
+    qspRealActIndex = -1;
+    qspRealLine = 0;
+
     qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_FALSE;
 }
 

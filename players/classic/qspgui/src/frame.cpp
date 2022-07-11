@@ -480,7 +480,8 @@ void QSPFrame::ShowError()
         );
     else
         wxMessage = wxString::Format(
-            _("Code: %ld\nDesc: %s"),
+            _("Line: %ld\nCode: %ld\nDesc: %s"),
+            (size_t)line,
             (size_t)code,
             wxGetTranslation(wxString(desc.Str, desc.End)).wx_str()
         );
