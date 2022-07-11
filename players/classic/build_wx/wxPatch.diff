@@ -173,7 +173,7 @@ index 93456bcd1a..e107b72260 100644
 @@ -548,20 +548,11 @@ void wxScrollHelperBase::HandleOnScroll(wxScrollWinEvent& event)
          m_win->SetScrollPos(wxVERTICAL, m_yScrollPosition);
      }
-
+ 
 -    if ( needsRefresh )
 -    {
 -        m_targetWindow->Refresh(true, GetScrollRect());
@@ -191,7 +191,7 @@ index 93456bcd1a..e107b72260 100644
 -    }
 -#endif // __WXUNIVERSAL__
  }
-
+ 
  int wxScrollHelperBase::CalcScrollInc(wxScrollWinEvent& event)
 diff --git a/src/html/htmlwin.cpp b/src/html/htmlwin.cpp
 index 4e37e60cd2..a044ba7710 100644
