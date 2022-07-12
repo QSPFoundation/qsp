@@ -336,13 +336,16 @@ void QSPCallBacks::Version(QSPString param, QSP_CHAR *buffer, int maxLen)
     wxString result;
     wxString request(param.Str, param.End);
 
-    QSPVersionInfoValues::iterator value = m_versionInfo.find(request.Lower());
-    if (value != m_versionInfo.end())
-        result = value->second;
-    else
+    if (request.IsEmpty())
     {
         QSPString libVersion = QSPGetVersion();
-        result = wxString(libVersion.Str, libVersion.End);
+        result = QSPTools::GetVersion(wxString(libVersion.Str, libVersion.End));
+    }
+    else
+    {
+        QSPVersionInfoValues::iterator value = m_versionInfo.find(request.Lower());
+        if (value != m_versionInfo.end())
+            result = value->second;
     }
 
 #ifdef _UNICODE

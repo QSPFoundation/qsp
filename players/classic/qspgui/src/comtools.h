@@ -31,6 +31,7 @@
         static wxString ProceedAsPlain(const wxString& str);
         static wxString GetAppPath();
         static wxString GetPlatform();
+        static wxString GetVersion(const wxString& libVersion);
     };
 
 #endif

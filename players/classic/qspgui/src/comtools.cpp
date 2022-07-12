@@ -175,3 +175,8 @@ wxString QSPTools::GetPlatform()
 
     return string;
 }
+
+wxString QSPTools::GetVersion(const wxString& libVersion)
+{
+    return wxString::Format(wxT("%s (classic)"), libVersion.wx_str());
+}
