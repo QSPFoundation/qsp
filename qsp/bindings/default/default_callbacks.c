@@ -260,7 +260,7 @@ QSPString qspCallInputBox(QSPString text)
     /* Get input from a user */
     QSPCallState state;
     QSP_CHAR *buffer;
-    int maxLen = 511;
+    const int maxLen = 511;
     if (qspCallBacks[QSP_CALL_INPUTBOX])
     {
         qspSaveCallState(&state, QSP_TRUE);
@@ -275,6 +275,28 @@ QSPString qspCallInputBox(QSPString text)
         return qspStringFromC(buffer);
     }
     return qspNullString;
+}
+
+QSPString qspCallVersion(QSPString param)
+{
+    /* Get info from the player */
+    QSPCallState state;
+    QSP_CHAR *buffer;
+    const int maxLen = 511;
+    if (qspCallBacks[QSP_CALL_VERSION])
+    {
+        qspSaveCallState(&state, QSP_TRUE);
+        /* Prepare buffer for the response */
+        buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
+        *buffer = 0;
+        /* Process request */
+        qspCallBacks[QSP_CALL_VERSION](param, buffer, maxLen);
+        buffer[maxLen] = 0;
+        /* Clean up */
+        qspRestoreCallState(&state);
+        return qspStringFromC(buffer);
+    }
+    return qspGetNewText(QSP_STATIC_STR(QSP_VER));
 }
 
 #endif

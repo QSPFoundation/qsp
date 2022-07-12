@@ -30,6 +30,7 @@
         static wxString HtmlizeWhitespaces(const wxString& str);
         static wxString ProceedAsPlain(const wxString& str);
         static wxString GetAppPath();
+        static wxString GetPlatform();
     };
 
 #endif

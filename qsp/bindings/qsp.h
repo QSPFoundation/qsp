@@ -88,6 +88,7 @@
         QSP_CALL_SLEEP, /* void func(int msecs) */
         QSP_CALL_GETMSCOUNT, /* int func() */
         QSP_CALL_INPUTBOX, /* void func(QSPString text, QSP_CHAR *buffer, int maxLen) */
+        QSP_CALL_VERSION, /* void func(QSPString param, QSP_CHAR *buffer, int maxLen) */
         QSP_CALL_DUMMY
     };
 

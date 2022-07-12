@@ -200,7 +200,7 @@ void qspInitMath()
     qspAddOperation(qspOpRnd, 30, 0, 0, 0, 0);
     qspAddOperation(qspOpCountObj, 30, 0, 0, 0, 0);
     qspAddOperation(qspOpMsecsCount, 30, 0, 0, 0, 0);
-    qspAddOperation(qspOpQSPVer, 30, 0, 1, 0, 0);
+    qspAddOperation(qspOpQSPVer, 30, 0, 1, 0, 1, 1);
     qspAddOperation(qspOpUserText, 30, 0, 1, 0, 0);
     qspAddOperation(qspOpCurLoc, 30, 0, 1, 0, 0);
     qspAddOperation(qspOpSelObj, 30, 0, 1, 0, 0);
@@ -725,7 +725,7 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
         QSP_NUM(tos) = qspGetTime();
         break;
     case qspOpQSPVer:
-        QSP_STR(tos) = qspGetNewText(QSP_STATIC_STR(QSP_VER));
+        QSP_STR(tos) = (argsCount > 0 ? qspCallVersion(QSP_STR(args[0])) : qspCallVersion(qspNullString));
         break;
     case qspOpUserText:
         QSP_STR(tos) = (qspCurInput.Str ? qspGetNewText(qspCurInput) : qspNullString);

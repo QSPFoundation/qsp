@@ -22,6 +22,7 @@ bool QSPCallBacks::m_isHtml;
 FMOD_SYSTEM *QSPCallBacks::m_sys;
 QSPSounds QSPCallBacks::m_sounds;
 float QSPCallBacks::m_volumeCoeff;
+QSPVersionInfoValues QSPCallBacks::m_versionInfo;
 
 void QSPCallBacks::Init(QSPFrame *frame)
 {
@@ -56,6 +57,11 @@ void QSPCallBacks::Init(QSPFrame *frame)
     QSPSetCallBack(QSP_CALL_OPENGAME, (QSP_CALLBACK)&OpenGame);
     QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
     QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
+    QSPSetCallBack(QSP_CALL_VERSION, (QSP_CALLBACK)&Version);
+
+    /* Prepare version values */
+    m_versionInfo["player"] = "Classic";
+    m_versionInfo["platform"] = QSPTools::GetPlatform();
 }
 
 void QSPCallBacks::DeInit()
@@ -323,6 +329,27 @@ void QSPCallBacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
     #else
         strncpy(buffer, dialog.GetText().c_str(), maxLen);
     #endif
+}
+
+void QSPCallBacks::Version(QSPString param, QSP_CHAR *buffer, int maxLen)
+{
+    wxString result;
+    wxString request(param.Str, param.End);
+
+    QSPVersionInfoValues::iterator value = m_versionInfo.find(request.Lower());
+    if (value != m_versionInfo.end())
+        result = value->second;
+    else
+    {
+        QSPString libVersion = QSPGetVersion();
+        result = wxString(libVersion.Str, libVersion.End);
+    }
+
+#ifdef _UNICODE
+    wcsncpy(buffer, result.c_str(), maxLen);
+#else
+    strncpy(buffer, result.c_str(), maxLen);
+#endif
 }
 
 void QSPCallBacks::ShowImage(QSPString file)

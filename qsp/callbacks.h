@@ -59,5 +59,6 @@
     void qspCallSaveGameStatus(QSPString file);
     QSPString qspCallInputBox(QSPString text);
     int qspCallShowMenu(QSPListItem *items, int count);
+    QSPString qspCallVersion(QSPString param);
 
 #endif

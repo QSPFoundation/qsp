@@ -158,3 +158,20 @@ wxString QSPTools::GetAppPath()
     wxFileName appPath(wxStandardPaths::Get().GetExecutablePath());
     return appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
 }
+
+wxString QSPTools::GetPlatform()
+{
+    wxOperatingSystemId osId = wxPlatformInfo::Get().GetOperatingSystemId();
+
+    const wxChar* string = wxT("Unknown");
+    if (osId & wxOS_WINDOWS)
+        string = wxT("Windows");
+    else if (osId & wxOS_MAC)
+        string = wxT("Macintosh");
+    else if (osId & wxOS_UNIX_LINUX)
+        string = wxT("Linux");
+    else if (osId & wxOS_UNIX)
+        string = wxT("Unix");
+
+    return string;
+}

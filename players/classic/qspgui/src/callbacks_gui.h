@@ -37,6 +37,7 @@
     } QSPSound;
 
     typedef std::map<wxString, QSPSound> QSPSounds;
+    typedef std::map<wxString, wxString> QSPVersionInfoValues;
 
     static QSPString qspStringFromPair(const QSP_CHAR *start, const QSP_CHAR *end)
     {
@@ -83,6 +84,7 @@
         static void OpenGame(QSPString file, QSP_BOOL isNewGame);
         static void OpenGameStatus(QSPString file);
         static void SaveGameStatus(QSPString file);
+        static void Version(QSPString param, QSP_CHAR *buffer, int maxLen);
     private:
         // Internal methods
         static bool SetVolume(QSPString file, int volume);
@@ -94,6 +96,7 @@
         static FMOD_SYSTEM *m_sys;
         static QSPSounds m_sounds;
         static float m_volumeCoeff;
+        static QSPVersionInfoValues m_versionInfo;
 
         static const int MAX_LIST_ITEMS = 1000;
     };
