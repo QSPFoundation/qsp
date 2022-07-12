@@ -1023,7 +1023,7 @@ void QSPFrame::OnLinkClicked(wxHtmlLinkEvent& event)
                 ShowError();
         }
         else
-            wxLaunchDefaultBrowser(href);
+            QSPTools::LaunchDefaultBrowser(href);
     }
     else
         event.Skip();

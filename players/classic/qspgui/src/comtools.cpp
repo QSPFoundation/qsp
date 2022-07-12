@@ -17,6 +17,26 @@
 
 #include "comtools.h"
 
+void QSPTools::LaunchDefaultBrowser(const wxString& url)
+{
+    /* Validate URLs, don't allow opening files & directories */
+    const wxURI uri(url);
+    bool hasValidScheme = uri.HasScheme() && uri.GetScheme().length() > 1;
+
+    if (hasValidScheme)
+    {
+        if (uri.GetScheme() == wxT("file"))
+            return;
+    }
+    else
+    {
+        if (wxFileExists(url) || wxDirExists(url))
+            return;
+    }
+
+    wxLaunchDefaultBrowser(url);
+}
+
 wxString QSPTools::GetHexColor(const wxColour& color)
 {
     return wxString::Format(wxT("%.2X%.2X%.2X"), (int)color.Red(), (int)color.Green(), (int)color.Blue());

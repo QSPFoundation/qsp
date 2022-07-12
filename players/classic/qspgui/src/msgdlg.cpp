@@ -88,7 +88,7 @@ void QSPMsgDlg::OnLinkClicked(wxHtmlLinkEvent& event)
         if (href[0] == wxT('#'))
             m_desc->LoadPage(href);
         else
-            wxLaunchDefaultBrowser(href);
+            QSPTools::LaunchDefaultBrowser(href);
     }
     else
         event.Skip();

@@ -22,10 +22,12 @@
     #include <wx/filename.h>
     #include <wx/stdpaths.h>
     #include <wx/scopeguard.h>
+    #include <wx/uri.h>
 
     class QSPTools
     {
     public:
+        static void LaunchDefaultBrowser(const wxString& url);
         static wxString GetHexColor(const wxColour& color);
         static wxString HtmlizeWhitespaces(const wxString& str);
         static wxString ProceedAsPlain(const wxString& str);
