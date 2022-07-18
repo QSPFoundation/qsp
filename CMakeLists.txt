@@ -93,9 +93,19 @@ install(TARGETS qsp onig
 
 option(BUILD_QSPGUI "Build qspgui application")
 if(BUILD_QSPGUI)
+	option(USE_INSTALLED_WX OFF "Use wxWidgets installed into the main system")
 	if(USE_INSTALLED_WX)
 		find_package(wxWidgets REQUIRED base core adv aui html)
 		include(${wxWidgets_USE_FILE})
+		include(CheckIncludeFile)
+		set(WX_GENERIC_BACKEND_PRESENT OFF)
+		foreach(wxIncludeDir ${wxWidgets_INCLUDE_DIRS})
+			CHECK_INCLUDE_FILE("${wxWidgets_INCLUDE_DIRS}" WX_GENERIC_BACKEND_PRESENT_IN_DIR)
+			if(WX_GENERIC_BACKEND_PRESENT_IN_DIR)
+				set(WX_GENERIC_BACKEND_PRESENT ON)
+			endif()
+		endforeach()
+		message(STATUS "WX_GENERIC_BACKEND_PRESENT ${WX_GENERIC_BACKEND_PRESENT}")
 	else()
 		# Download and unpack wxWidgets at configure time
 		configure_file(CMakeLists-wxWidgets.txt.in "${CMAKE_BINARY_DIR}/wxWidgets-download/CMakeLists.txt")
@@ -117,6 +127,7 @@ if(BUILD_QSPGUI)
 		set(wxUSE_LIBSDL OFF)
 		set(wxUSE_LIBMSPACK OFF)
 		set(wxUSE_GSTREAMER OFF)
+		set(WX_GENERIC_BACKEND_PRESENT ON)
 
 		# Prevent wxWidgets from overriding our compiler/linker options
 		# when building with Visual Studio
@@ -173,8 +184,22 @@ if(BUILD_QSPGUI)
 	target_include_directories(qspgui PRIVATE qsp/bindings qsp/bindings/default)
 	target_compile_options(qspgui PRIVATE ${PROJECT_COMPILER_FLAGS})
 	target_link_options(qspgui PRIVATE ${PROJECT_LINKER_FLAGS})
-	target_link_libraries(qspgui PRIVATE qsp fmod wxbase wxcore wxadv wxaui wxhtml)
-	install(TARGETS qspgui qsp wxbase wxcore wxadv wxaui wxhtml
+	target_link_libraries(qspgui PRIVATE qsp fmod)
+	if(USE_INSTALLED_WX)
+		target_link_libraries(qspgui PRIVATE ${wxWidgets_LIBRARIES})
+		target_include_directories(qspgui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/players/classic/thirdParty/access_private/include")
+	else()
+		target_link_libraries(qspgui PRIVATE wxbase wxcore wxadv wxaui wxhtml)
+		install(TARGETS wxbase wxcore wxadv wxaui wxhtml
+				RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+				LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
+				ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
+		)
+	endif()
+	if(WX_GENERIC_BACKEND_PRESENT)
+		target_compile_definitions(qspgui "-DHAS_GENERIC_ANIMATE=1")
+	endif()
+	install(TARGETS qspgui qsp
 			RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
 			LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
 			ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
