@@ -85,11 +85,7 @@ endif()
 target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
 target_link_options(qsp PRIVATE ${PROJECT_LINKER_FLAGS})
 target_link_libraries(qsp PRIVATE onig)
-install(TARGETS qsp onig
-		RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
-		LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
-		ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
-)
+install(TARGETS qsp onig)
 
 option(BUILD_QSPGUI "Build qspgui application")
 if(BUILD_QSPGUI)
@@ -140,7 +136,9 @@ if(BUILD_QSPGUI)
 		else()
 			set(FMOD_LIBRARY "${CMAKE_SOURCE_DIR}/players/classic/misc/linux_${TARGET_ARCH}/libfmodex64.so")
 		endif()
-		set_target_properties(fmod PROPERTIES IMPORTED_LOCATION ${FMOD_LIBRARY})
+		set_target_properties(fmod PROPERTIES
+			IMPORTED_NO_SONAME TRUE
+			IMPORTED_LOCATION ${FMOD_LIBRARY})
 	endif()
 
 	set(QSPGUI_SOURCES
@@ -163,22 +161,17 @@ if(BUILD_QSPGUI)
 		configure_file("${CMAKE_SOURCE_DIR}/players/classic/misc/common/icons/logo.ico" "${CMAKE_BINARY_DIR}/misc/icons/logo.ico" COPYONLY)
 		add_executable(qspgui WIN32 ${QSPGUI_SOURCES})
 		target_compile_definitions(qspgui PRIVATE _CRT_SECURE_NO_WARNINGS)
-		install(FILES ${FMOD_DLL}
-				DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
-		)
+		install(FILES ${FMOD_DLL} TYPE LIB)
 	else()
 		add_executable(qspgui ${QSPGUI_SOURCES})
+		install(FILES ${FMOD_LIBRARY} TYPE LIB)
 	endif()
 	target_compile_definitions(qspgui PRIVATE WXUSINGDLL _UNICODE)
 	target_include_directories(qspgui PRIVATE qsp/bindings qsp/bindings/default)
 	target_compile_options(qspgui PRIVATE ${PROJECT_COMPILER_FLAGS})
 	target_link_options(qspgui PRIVATE ${PROJECT_LINKER_FLAGS})
 	target_link_libraries(qspgui PRIVATE qsp fmod wxbase wxcore wxadv wxaui wxhtml)
-	install(TARGETS qspgui qsp wxbase wxcore wxadv wxaui wxhtml
-			RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
-			LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/lib"
-			ARCHIVE DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/static"
-	)
+	install(TARGETS qspgui qsp wxbase wxcore wxadv wxaui wxhtml)
 	install(DIRECTORY "${CMAKE_SOURCE_DIR}/players/classic/misc/common/langs"
 			DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
 	)
