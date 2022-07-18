@@ -102,6 +102,9 @@ if(BUILD_QSPGUI)
 				WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/wxWidgets-download"
 		)
 		# Patch wxWidgets
+		execute_process(COMMAND git checkout -- .
+				WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/wxWidgets-src"
+		)
 		execute_process(COMMAND git apply --ignore-whitespace --reject "${CMAKE_SOURCE_DIR}/players/classic/build_wx/wxPatch.diff"
 				WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/wxWidgets-src"
 		)
