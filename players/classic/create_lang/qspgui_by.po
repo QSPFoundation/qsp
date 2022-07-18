@@ -1,0 +1,307 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Belarusian 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-08-08 13:24+1100\n"
+"PO-Revision-Date: 2011-08-12 19:10+0200\n"
+"Last-Translator: Алексей <alekontin@gmail.com>\n"
+"Language-Team: Алексей <alekontin@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Belarusian\n"
+"X-Poedit-Country: Belarus\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+msgid "&About...\tCtrl-H"
+msgstr "&Аб праграме...\tCtrl-H"
+
+msgid "&Actions\tCtrl-2"
+msgstr "&Дзеянні\tCtrl-2"
+
+msgid "&Captions\tCtrl-5"
+msgstr "&Загалоўкі\tCtrl-5"
+
+msgid "&Game"
+msgstr "&Гульня"
+
+msgid "&Help"
+msgstr "&Дапамога"
+
+msgid "&Hotkeys for actions\tCtrl-6"
+msgstr "&Гарачыя клавішы для дзеянняў\tCtrl-6"
+
+msgid "&Input area\tCtrl-4"
+msgstr "&Поле ўводу\tCtrl-4"
+
+msgid "&Objects\tCtrl-1"
+msgstr "&Прадметы\tCtrl-1"
+
+msgid "&Open game...\tAlt-O"
+msgstr "&Загрузіць гульню...\tAlt-O"
+
+msgid "&Open saved game...\tCtrl-O"
+msgstr "&Загрузіць стан гульні...\tCtrl-O"
+
+msgid "&Quest"
+msgstr "&Квэст"
+
+msgid "&Quit\tAlt-X"
+msgstr "&Выйсці\tAlt-X"
+
+msgid "&Restart game\tAlt-N"
+msgstr "&Пачаць зноўку\tAlt-N"
+
+msgid "&Save game..."
+msgstr "&Захаваць стан гульні..."
+
+msgid "&Settings"
+msgstr "&Усталёўкі"
+
+msgid "&Show / Hide"
+msgstr "&Паказаць / Схаваць"
+
+msgid "A&dditional desc\tCtrl-3"
+msgstr "Д&адатковае апісанне\tCtrl-3"
+
+msgid "Actions"
+msgstr "Дзеянні"
+
+msgid "Additional desc"
+msgstr "Дадатковае апісанне"
+
+msgid "Bracket not found!"
+msgstr "Не адпавядае колькасць дужак, што адкрываюць і закрываюць!"
+
+msgid "Brackets not found!"
+msgstr "У выражэнні адсутнічаюць дужкі!"
+
+msgid "Can't add action!"
+msgstr "Нельга дадаць дзеянне!"
+
+msgid "Can't add file!"
+msgstr "Нельга дадаць файл!"
+
+msgid "Can't add menu item!"
+msgstr "Нельга дадаць пункт меню!"
+
+msgid "Can't add object!"
+msgstr "Нельга дадаць аб'ект!"
+
+msgid "Can't load file!"
+msgstr "Нельга загрузіць файл!"
+
+msgid "Cancel"
+msgstr "Адмена"
+
+msgid ""
+"Line: %ld\n"
+"Code: %ld\n"
+"Desc: %s"
+msgstr ""
+"Радок: %ld\n"
+"Код памылкі: %ld\n"
+"Апісанне: %s"
+
+msgid "Default"
+msgstr "Па змаўчанні"
+
+msgid "Division by zero!"
+msgstr "Дзяленне на 0!"
+
+msgid "Error"
+msgstr "Памылка"
+
+msgid "File not found!"
+msgstr "Указаны файл недаступны або не знойдзены!"
+
+msgid "Game not loaded!"
+msgstr "Гульня не загружана!"
+
+msgid "Incorrect arguments' count!"
+msgstr "Няправільная колькасць аргументаў аператара / функцыі!"
+
+msgid "Incorrect variable name!"
+msgstr "Недапушчальная назва пераменнай / масіва!"
+
+msgid "Info"
+msgstr "Інфармацыя"
+
+msgid "Input area"
+msgstr "Поле ўводу"
+
+msgid "Input data"
+msgstr "Увод дадзеных"
+
+msgid "Label not found!"
+msgstr "Указаная пазнака не знойдзена!"
+
+msgid "Language"
+msgstr "Мова"
+
+msgid "Location not found!"
+msgstr "Лакацыя з зададзенай назвай не існуе!"
+
+msgid ""
+"Location: %s\n"
+"Area: %s\n"
+"Line: %ld\n"
+"Code: %ld\n"
+"Desc: %s"
+msgstr ""
+"Лакацыя: %s\n"
+"Месца: %s\n"
+"Радок: %ld\n"
+"Код памылкі: %ld\n"
+"Апісанне: %s"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Objects"
+msgstr "Прадметы"
+
+msgid "Preview"
+msgstr "Прадпрагляд"
+
+msgid "QSP games (*.qsp;*.gam)|*.qsp;*.gam"
+msgstr "Файлы гульняў QSP (*.qsp;*.gam)|*.qsp;*.gam"
+
+msgid "Quest Soft Player 5"
+msgstr "Quest Soft Player 5"
+
+msgid "Quote not found!"
+msgstr "Адсутнічае двукоссе, што завяршае тэкст!"
+
+msgid "Regular expression error!"
+msgstr "Памылка кампіляцыі рэгулярнага выражэння!"
+
+msgid "Saved game files (*.sav)|*.sav"
+msgstr "Файлы гульнявых станаў QSP (*.sav)|*.sav"
+
+msgid "&Font"
+msgstr "&Шрыфт"
+
+msgid "&Colors"
+msgstr "&Колеры"
+
+msgid "&Always use selected font size"
+msgstr "&Заўсёды выкарыстоўваць выбраны памер шрыфта"
+
+msgid "Select &background color...\tAlt-B"
+msgstr "Выбраць колер &фону...\tAlt-B"
+
+msgid "Select &font...\tAlt-F"
+msgstr "Выбраць &шрыфт...\tAlt-F"
+
+msgid "Select &language...\tAlt-L"
+msgstr "Выбраць &мову...\tAlt-L"
+
+msgid "Select background color"
+msgstr "Выберыце колер фону"
+
+msgid "Select file to save"
+msgstr "Выберыце файл для захавання"
+
+msgid "Select font"
+msgstr "Выберыце шрыфт"
+
+msgid "Select font &color...\tAlt-C"
+msgstr "Выбраць &колер шрыфта...\tAlt-C"
+
+msgid "Select font color"
+msgstr "Выберыце колер шрыфта"
+
+msgid "Select game file"
+msgstr "Выберыце файл гульні"
+
+msgid "Select l&inks' color...\tAlt-I"
+msgstr "Выбраць колер &спасылак...\tAlt-I"
+
+msgid "Select language"
+msgstr "Выберыце мову"
+
+msgid "Select links' color"
+msgstr "Выберыце колер спасылак"
+
+msgid "Select saved game file"
+msgstr "Выберыце файл для загрузкі"
+
+msgid "Sign [:] not found!"
+msgstr "Знак [:] не знойдзены!"
+
+msgid "Sign [=] not found!"
+msgstr "Знак [=] не знойдзены!"
+
+msgid "Stack overflow!"
+msgstr "Перапаўненне стэка!"
+
+msgid "Syntax error!"
+msgstr "Памылка сінтаксісу!"
+
+msgid "Too many items in expression!"
+msgstr "Занадта шмат элементаў у выражэнні!"
+
+msgid "Too many variables!"
+msgstr "Занадта шмат пераменных з аднолькавым хэшэм!"
+
+msgid "Type mismatch!"
+msgstr "Неадпаведнасць тыпаў дадзеных!"
+
+msgid "Unknown action!"
+msgstr "Невядомае дзеянне!"
+
+msgid "Unknown error!"
+msgstr "Невядомая памылка!"
+
+msgid ""
+"Version: %s\n"
+"Engine Compiled: %s\n"
+"GUI Compiled: %s"
+msgstr ""
+"Версія: %s\n"
+"Дата кампіляцыі інтэрпрэтатара: %s\n"
+"Дата кампіляцыі інтэрфейсу: %s"
+
+msgid "Window / Fullscreen &mode\tAlt-Enter"
+msgstr "Аконны / Поўнаэкранны &рэжым\tAlt-Enter"
+
+msgid "[end] not found!"
+msgstr "Шматрадковыя формы аператараў павінны завяршацца словам [end]!"
+
+msgid "on action"
+msgstr "пры апрацоўцы выбару дзеяння"
+
+msgid "on visit"
+msgstr "пры наведванні"
+
+msgid "Sound &volume"
+msgstr "Гучнасць &гуку"
+
+msgid "No sound\tAlt-1"
+msgstr "Без гуку\tAlt-1"
+
+msgid "20%\tAlt-2"
+msgstr "20%\tAlt-2"
+
+msgid "40%\tAlt-3"
+msgstr "40%\tAlt-3"
+
+msgid "60%\tAlt-4"
+msgstr "60%\tAlt-4"
+
+msgid "80%\tAlt-5"
+msgstr "80%\tAlt-5"
+
+msgid "Initial volume\tAlt-6"
+msgstr "Зыходная гучнасць\tAlt-6"
+
+msgid "Code not found!"
+msgstr "Недакладны запіс аднарадковага аператара!"
+
+msgid "Loop condition not found!"
+msgstr "Умова цыкла не знойдзена!"
+
+msgid "&Quicksave\tCtrl-S"
+msgstr "&Хуткае захаванне\tCtrl-S"
+
