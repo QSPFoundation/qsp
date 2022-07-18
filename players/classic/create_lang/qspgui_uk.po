@@ -25,14 +25,8 @@ msgstr "&Заголовки\tCtrl-5"
 msgid "&Game"
 msgstr "&Гра"
 
-msgid "&Help"
-msgstr "&Довідка"
-
-msgid "&Hotkeys for actions\tCtrl-6"
-msgstr "&Гарячі клавіши для дій\tCtrl-6"
-
-msgid "&Input area\tCtrl-4"
-msgstr "Поле &вводу\tCtrl-4"
+msgid "&Help"msgid "Loop condition not found!"
+msgstr "Loop condition not found!"
 
 msgid "&Objects\tCtrl-1"
 msgstr "&Предмети\tCtrl-1"
@@ -53,25 +47,9 @@ msgid "&Restart game\tAlt-N"
 msgstr "&Розпочати спочатку\tAlt-N"
 
 msgid "&Save game..."
-msgstr "З&берегти стан гри..."
-
-msgid "&Settings"
-msgstr "&Налаштування"
-
-msgid "&Show / Hide"
-msgstr "&Показати / Сховати"
-
-msgid "A&dditional desc\tCtrl-3"
-msgstr "Д&одадкове описування\tCtrl-3"
-
-msgid "Actions"
-msgstr "Дії"
-
-msgid "Additional desc"
-msgstr "Додадкове описування"
-
-msgid "Bracket not found!"
-msgstr "Нэ відповідна кількість відкриваючих та закриваючих скобок!"
+msgstr "З&берегти стан гри..."msgid "Loop condition not found!"
+msgstr "Loop condition not found!"
+відкриваючих та закриваючих скобок!"
 
 msgid "Brackets not found!"
 msgstr "В виразі відсутні скобки!"
@@ -299,8 +277,8 @@ msgstr "Початкова гучність\tAlt-6"
 msgid "Code not found!"
 msgstr "Нэвірний запис однострокового оператора!"
 
-msgid "[to] not found!"
-msgstr "Слово [to] нэ знайдэно!"
+msgid "Loop condition not found!"
+msgstr "Умова циклу не знайдена!"
 
 msgid "&Quicksave\tCtrl-S"
 msgstr "&Швыдкэ збэригання\tCtrl-S"

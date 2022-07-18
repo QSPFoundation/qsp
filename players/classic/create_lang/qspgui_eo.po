@@ -142,29 +142,9 @@ msgstr "Lingvo"
 msgid "Location not found!"
 msgstr "Lokacio kun indikita nomo ne ekzistas!"
 
-msgid ""
-"Location: %s\n"
-"Area: %s\n"
-"Line: %ld\n"
-"Code: %ld\n"
-"Desc: %s"
-msgstr ""
-"Lokacio: %s\n"
-"Loko: %s\n"
-"Linio: %ld\n"
-"Kodo de eraro: %ld\n"
-"Priskribo: %s"
-
-msgid "OK"
-msgstr "OK"
-
-msgid "Objects"
-msgstr "Objektoj"
-
-msgid "Preview"
-msgstr "Antaŭrigardo"
-
-msgid "QSP games (*.qsp;*.gam)|*.qsp;*.gam"
+msgid ""msgid "Loop condition not found!"
+msgstr "Loop condition not found!"
+)|*.qsp;*.gam"
 msgstr "QSP ludoj (*.qsp;*.gam)|*.qsp;*.gam"
 
 msgid "Quest Soft Player 5"
@@ -299,8 +279,8 @@ msgstr "Origina nivelo\tAlt-6"
 msgid "Code not found!"
 msgstr "Neĝusta enskribo de unulinia operatoro!"
 
-msgid "[to] not found!"
-msgstr "La vorto [to] ne troveblis!"
+msgid "Loop condition not found!"
+msgstr "Buklokondiĉo ne estas trovita!"
 
 msgid "&Quicksave\tCtrl-S"
 msgstr "&Rapida savo\tCtrl-S"

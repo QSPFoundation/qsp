@@ -299,8 +299,8 @@ msgstr "Исходная громкость\tAlt-6"
 msgid "Code not found!"
 msgstr "Неверная запись однострочного оператора!"
 
-msgid "[to] not found!"
-msgstr "Слово [to] не найдено!"
+msgid "Loop condition not found!"
+msgstr "Условие цикла не найдено!"
 
 msgid "&Quicksave\tCtrl-S"
 msgstr "&Быстрое сохранение\tCtrl-S"

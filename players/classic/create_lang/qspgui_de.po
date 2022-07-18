@@ -299,8 +299,8 @@ msgstr "Voreingestellte Lautstärke\tAlt-6"
 msgid "Code not found!"
 msgstr "Der einzeilige Operator ist nicht korrekt!"
 
-msgid "[to] not found!"
-msgstr "Das Wort [to] ist nicht gefunden!"
+msgid "Loop condition not found!"
+msgstr "Schleifenbedingung nicht gefunden!"
 
 msgid "&Quicksave\tCtrl-S"
 msgstr "&Die schnelle Erhaltung\tCtrl-S"

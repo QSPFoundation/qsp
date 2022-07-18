@@ -83,27 +83,9 @@ msgid "Can't add file!"
 msgstr "Can't add file!"
 
 msgid "Can't add menu item!"
-msgstr "Can't add menu item!"
+msgstr "Can't add menu item!"msgid "Loop condition not found!"
+msgstr "Условие цикла не найдено!"
 
-msgid "Can't add object!"
-msgstr "Can't add object!"
-
-msgid "Can't load file!"
-msgstr "Can't load file!"
-
-msgid "Cancel"
-msgstr "Cancel"
-
-msgid ""
-"Line: %ld\n"
-"Code: %ld\n"
-"Desc: %s"
-msgstr ""
-"Line: %ld\n"
-"Code: %ld\n"
-"Desc: %s"
-
-msgid "Default"
 msgstr "Default"
 
 msgid "Division by zero!"
@@ -140,35 +122,9 @@ msgid "Language"
 msgstr "Language"
 
 msgid "Location not found!"
-msgstr "Location not found!"
+msgstr "Location not found!"msgid "Loop condition not found!"
+msgstr "Условие цикла не найдено!"
 
-msgid ""
-"Location: %s\n"
-"Area: %s\n"
-"Line: %ld\n"
-"Code: %ld\n"
-"Desc: %s"
-msgstr ""
-"Location: %s\n"
-"Area: %s\n"
-"Line: %ld\n"
-"Code: %ld\n"
-"Desc: %s"
-
-msgid "OK"
-msgstr "OK"
-
-msgid "Objects"
-msgstr "Objects"
-
-msgid "Preview"
-msgstr "Preview"
-
-msgid "QSP games (*.qsp;*.gam)|*.qsp;*.gam"
-msgstr "QSP games (*.qsp;*.gam)|*.qsp;*.gam"
-
-msgid "Quest Soft Player 5"
-msgstr "Quest Soft Player 5"
 
 msgid "Quote not found!"
 msgstr "Quote not found!"
@@ -299,8 +255,8 @@ msgstr "Initial volume\tAlt-6"
 msgid "Code not found!"
 msgstr "Code not found!"
 
-msgid "[to] not found!"
-msgstr "[to] not found!"
+msgid "Loop condition not found!"
+msgstr "Loop condition not found!"
 
 msgid "&Quicksave\tCtrl-S"
 msgstr "&Quicksave\tCtrl-S"
