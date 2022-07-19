@@ -29,7 +29,7 @@ msgid "&Help"
 msgstr "&Довідка"
 
 msgid "&Hotkeys for actions\tCtrl-6"
-msgstr "&Гарячі клавіши для дій\tCtrl-6"
+msgstr "&Гарячі клавіші для дій\tCtrl-6"
 
 msgid "&Input area\tCtrl-4"
 msgstr "Поле &вводу\tCtrl-4"
@@ -62,34 +62,34 @@ msgid "&Show / Hide"
 msgstr "&Показати / Сховати"
 
 msgid "A&dditional desc\tCtrl-3"
-msgstr "Д&одадкове описування\tCtrl-3"
+msgstr "Д&одатковий опис\tCtrl-3"
 
 msgid "Actions"
 msgstr "Дії"
 
 msgid "Additional desc"
-msgstr "Додадкове описування"
+msgstr "Додатковий опис"
 
 msgid "Bracket not found!"
-msgstr "Нэ відповідна кількість відкриваючих та закриваючих скобок!"
+msgstr "Не співпадає кількість дужок, що відкривають та закривають!"
 
 msgid "Brackets not found!"
-msgstr "В виразі відсутні скобки!"
+msgstr "В виразі відсутні дужки!"
 
 msgid "Can't add action!"
-msgstr "Нэможливо додати дію!"
+msgstr "Неможливо додати дію!"
 
 msgid "Can't add file!"
-msgstr "Нэможливо додати файл!"
+msgstr "Неможливо додати файл!"
 
 msgid "Can't add menu item!"
-msgstr "Нэможливо додати пункт меню!"
+msgstr "Неможливо додати пункт меню!"
 
 msgid "Can't add object!"
-msgstr "Нэможливо додати об`єкт!"
+msgstr "Неможливо додати об`єкт!"
 
 msgid "Can't load file!"
-msgstr "Нэможливо завантажити файл!"
+msgstr "Неможливо завантажити файл!"
 
 msgid "Cancel"
 msgstr "Скасувати"
@@ -99,12 +99,12 @@ msgid ""
 "Code: %ld\n"
 "Desc: %s"
 msgstr ""
-"Строка: %ld\n"
+"Рядок: %ld\n"
 "Код помилки: %ld\n"
-"Описування: %s"
+"Опис: %s"
 
 msgid "Default"
-msgstr "За промовчанням"
+msgstr "За замовчуванням"
 
 msgid "Division by zero!"
 msgstr "Ділення на 0!"
@@ -113,16 +113,16 @@ msgid "Error"
 msgstr "Помилка"
 
 msgid "File not found!"
-msgstr "Вказанный файл нэдоступний або нэ знайдений!"
+msgstr "Вказанный файл недоступний або не знайдений!"
 
 msgid "Game not loaded!"
-msgstr "Гра нэ завантажена!"
+msgstr "Гра не завантажена!"
 
 msgid "Incorrect arguments' count!"
-msgstr "Нэвірне число аргументів оператора / функції!"
+msgstr "Невірне число аргументів оператора / функції!"
 
 msgid "Incorrect variable name!"
-msgstr "Нэдопустима назва змінної / масива!"
+msgstr "Недопустима назва змінної / масиву!"
 
 msgid "Info"
 msgstr "Інформація"
@@ -131,16 +131,16 @@ msgid "Input area"
 msgstr "Поле вводу"
 
 msgid "Input data"
-msgstr "Ввод даних"
+msgstr "Введіть дані"
 
 msgid "Label not found!"
-msgstr "Вказаная мітка нэ знайдена!"
+msgstr "Вказаная мітка не знайдена!"
 
 msgid "Language"
 msgstr "Мова"
 
 msgid "Location not found!"
-msgstr "Локація с заданою назвою нэ існує!"
+msgstr "Локація с заданою назвою не існує!"
 
 msgid ""
 "Location: %s\n"
@@ -151,9 +151,9 @@ msgid ""
 msgstr ""
 "Локація: %s\n"
 "Місце: %s\n"
-"Строка: %ld\n"
+"Рядок: %ld\n"
 "Код помилки: %ld\n"
-"Описування: %s"
+"Опис: %s"
 
 msgid "OK"
 msgstr "OK"
@@ -162,16 +162,16 @@ msgid "Objects"
 msgstr "Предмети"
 
 msgid "Preview"
-msgstr "Предпросмотр"
+msgstr "Перегляд"
 
 msgid "QSP games (*.qsp;*.gam)|*.qsp;*.gam"
-msgstr "Файли ігр QSP (*.qsp;*.gam)|*.qsp;*.gam"
+msgstr "Файли гри QSP (*.qsp;*.gam)|*.qsp;*.gam"
 
 msgid "Quest Soft Player 5"
 msgstr "Quest Soft Player 5"
 
 msgid "Quote not found!"
-msgstr "Відсутні завершаючі текст лапки!"
+msgstr "Відсутні лапки в кінці тексту!"
 
 msgid "Regular expression error!"
 msgstr "Помилка компиляції регулярного виразу!"
@@ -216,22 +216,22 @@ msgid "Select game file"
 msgstr "Виберіть файл гри"
 
 msgid "Select l&inks' color...\tAlt-I"
-msgstr "Вибрати колір п&осиланнь...\tAlt-I"
+msgstr "Вибрати колір п&осилань...\tAlt-I"
 
 msgid "Select language"
 msgstr "Виберіть мову"
 
 msgid "Select links' color"
-msgstr "Виберіть колір посиланнь"
+msgstr "Виберіть колір посилань"
 
 msgid "Select saved game file"
 msgstr "Виберіть файл для завантаження"
 
 msgid "Sign [:] not found!"
-msgstr "Знак [:] нэ знайдено!"
+msgstr "Знак [:] не знайдено!"
 
 msgid "Sign [=] not found!"
-msgstr "Знак [=] нэ знайдено!"
+msgstr "Знак [=] не знайдено!"
 
 msgid "Stack overflow!"
 msgstr "Переповнення стеку!"
@@ -246,13 +246,13 @@ msgid "Too many variables!"
 msgstr "Занадто багато змінних з однаковим хешем!"
 
 msgid "Type mismatch!"
-msgstr "Нэвідповідність типів даних!"
+msgstr "Невідповідність типів даних!"
 
 msgid "Unknown action!"
-msgstr "Нэвідома дія!"
+msgstr "Невідома дія!"
 
 msgid "Unknown error!"
-msgstr "Нэвідома помилка!"
+msgstr "Невідома помилка!"
 
 msgid ""
 "Version: %s\n"
@@ -261,7 +261,7 @@ msgid ""
 msgstr ""
 "Версія: %s\n"
 "Дата компиляції інтерпретатора: %s\n"
-"Дата компиляції інтерфейса: %s"
+"Дата компиляції інтерфейсу: %s"
 
 msgid "Window / Fullscreen &mode\tAlt-Enter"
 msgstr "Віконний / Повноекранний &режим\tAlt-Enter"
@@ -273,7 +273,7 @@ msgid "on action"
 msgstr "при обробці вибору дії"
 
 msgid "on visit"
-msgstr "при відвідування"
+msgstr "при відвідуванні"
 
 msgid "Sound &volume"
 msgstr "Гучність &звуку"
@@ -297,11 +297,11 @@ msgid "Initial volume\tAlt-6"
 msgstr "Початкова гучність\tAlt-6"
 
 msgid "Code not found!"
-msgstr "Нэвірний запис однострокового оператора!"
+msgstr "Невірний запис однострокового оператора!"
 
 msgid "Loop condition not found!"
 msgstr "Умова циклу не знайдена!"
 
 msgid "&Quicksave\tCtrl-S"
-msgstr "&Швыдкэ збэригання\tCtrl-S"
+msgstr "&Швидке збереження\tCtrl-S"
 
