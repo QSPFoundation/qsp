@@ -1,3 +1,14 @@
 #!/bin/sh
 
-find ../ -name "*.po" -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+find "$SCRIPT_DIR/../" -name "*.po" -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
+
+MO_DIR=$( realpath "$SCRIPT_DIR/.." )
+DEST_LANG_DIR=$( realpath "$SCRIPT_DIR/../../misc/common/langs" )
+
+for f in $MO_DIR/*.mo ; do
+    filename=$( basename -- "$f" )
+    lang=${filename:7:2}
+    mv "$f" "$DEST_LANG_DIR/$lang/"
+done
