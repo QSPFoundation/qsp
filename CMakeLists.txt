@@ -116,6 +116,7 @@ if(BUILD_QSPGUI)
 		set(wxUSE_LIBSDL OFF)
 		set(wxUSE_LIBMSPACK OFF)
 		set(wxUSE_GSTREAMER OFF)
+		set(wxUSE_OPENGL OFF)
 
 		# Prevent wxWidgets from overriding our compiler/linker options
 		# when building with Visual Studio
