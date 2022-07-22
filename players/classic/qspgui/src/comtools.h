@@ -31,7 +31,9 @@
         static wxString GetHexColor(const wxColour& color);
         static wxString HtmlizeWhitespaces(const wxString& str);
         static wxString ProceedAsPlain(const wxString& str);
-        static wxString GetAppPath();
+        static wxString GetAppPath(const wxString &path = wxEmptyString);
+        static wxString GetResourcePath(const wxString &path = wxEmptyString);
+        static wxString GetConfigPath(const wxString &path = wxEmptyString);
         static wxString GetPlatform();
         static wxString GetVersion(const wxString& libVersion);
     };

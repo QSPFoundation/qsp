@@ -173,10 +173,23 @@ wxString QSPTools::ProceedAsPlain(const wxString& str)
     return out;
 }
 
-wxString QSPTools::GetAppPath()
+wxString QSPTools::GetAppPath(const wxString &path)
 {
-    wxFileName appPath(wxStandardPaths::Get().GetExecutablePath());
-    return appPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+    wxFileName appFullPath(wxStandardPaths::Get().GetExecutablePath());
+    wxFileName appPath(appFullPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR), path);
+    return appPath.GetFullPath();
+}
+
+wxString QSPTools::GetResourcePath(const wxString &path)
+{
+    wxFileName resourcePath(wxStandardPaths::Get().GetDataDir(), path);
+    return resourcePath.GetFullPath();
+}
+
+wxString QSPTools::GetConfigPath(const wxString &path)
+{
+    wxFileName configPath(wxStandardPaths::Get().GetUserConfigDir(), path);
+    return configPath.GetFullPath();
 }
 
 wxString QSPTools::GetPlatform()

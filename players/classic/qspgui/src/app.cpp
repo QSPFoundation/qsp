@@ -61,11 +61,13 @@ bool QSPApp::OnCmdLineParsed(wxCmdLineParser &parser)
 
 void QSPApp::InitUI()
 {
-    wxString appPathString = QSPTools::GetAppPath();
-    m_transHelper = new QSPTranslationHelper(QSP_APPNAME, appPathString + wxT("langs"));
-    wxString configPath = appPathString + QSP_CONFIG;
-    if (!(wxFileExists(configPath) || wxFileName::IsDirWritable(appPathString)))
-        configPath = wxFileName(wxStandardPaths::Get().GetUserConfigDir(), QSP_CONFIG).GetFullPath();
+    wxString configPath = QSPTools::GetAppPath(QSP_CONFIG);
+    if (!wxFileExists(configPath) && !wxFileName::IsDirWritable(QSPTools::GetAppPath()))
+        configPath = QSPTools::GetConfigPath(QSP_CONFIG);
+
+    wxString langsPath = QSPTools::GetResourcePath(QSP_TRANSLATIONS);
+    m_transHelper = new QSPTranslationHelper(QSP_APPNAME, langsPath);
+
     // ----------------------
     QSPFrame * frame = new QSPFrame(configPath, m_transHelper);
     frame->LoadSettings();

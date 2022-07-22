@@ -30,7 +30,7 @@ void QSPCallBacks::Init(QSPFrame *frame)
     m_volumeCoeff = 1.0;
 
     FMOD_System_Create(&m_sys);
-    wxString soundPath(QSPTools::GetAppPath() + QSP_SOUNDPLUGINS);
+    wxString soundPath(QSPTools::GetResourcePath(QSP_SOUNDPLUGINS));
     FMOD_System_SetPluginPath(m_sys, wxConvFile.cWX2MB(soundPath.c_str()));
     #ifdef __WXMSW__
         FMOD_System_SetOutput(m_sys, FMOD_OUTPUTTYPE_DSOUND);
@@ -203,7 +203,7 @@ void QSPCallBacks::PlayFile(QSPString file, int volume)
     FMOD_CREATESOUNDEXINFO exInfo;
     memset(&exInfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
     exInfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-    wxString dlsPath(QSPTools::GetAppPath() + QSP_MIDIDLS);
+    wxString dlsPath(QSPTools::GetResourcePath(QSP_MIDIDLS));
     wxCharBuffer dlsCharPath(wxConvFile.cWX2MB(dlsPath.c_str()));
     exInfo.dlsname = dlsCharPath;
     if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(filePath.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, &exInfo, &newSound))
