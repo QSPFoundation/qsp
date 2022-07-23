@@ -16,6 +16,7 @@
 */
 
 #include "inputdlg.h"
+#include "comtools.h"
 
 wxIMPLEMENT_CLASS(QSPInputDlg, wxDialog);
 

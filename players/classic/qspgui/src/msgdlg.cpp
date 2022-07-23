@@ -16,6 +16,7 @@
 */
 
 #include "msgdlg.h"
+#include "comtools.h"
 
 wxIMPLEMENT_CLASS(QSPMsgDlg, wxDialog);
 
