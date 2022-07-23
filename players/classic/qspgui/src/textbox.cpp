@@ -16,6 +16,7 @@
 */
 
 #include "textbox.h"
+#include "comtools.h"
 
 wxIMPLEMENT_CLASS(QSPTextBox, wxHtmlWindow);
 

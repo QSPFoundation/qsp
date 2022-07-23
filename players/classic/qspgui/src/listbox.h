@@ -21,7 +21,6 @@
     #include <wx/wx.h>
     #include <wx/fontmap.h>
     #include <wx/htmllbox.h>
-    #include "comtools.h"
     #include "path_provider.h"
 
     enum ListBoxType

@@ -46,11 +46,6 @@
     #include "icons/about.xpm"
 
     #define QSP_LOGO _("Quest Soft Player 5")
-    #define QSP_APPNAME wxT("qspgui")
-    #define QSP_CONFIG wxT("qspgui.cfg")
-    #define QSP_TRANSLATIONS wxT("langs")
-    #define QSP_SOUNDPLUGINS wxT("sound")
-    #define QSP_MIDIDLS wxT("sound/midi.dls")
 
     enum
     {

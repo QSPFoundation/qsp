@@ -22,7 +22,14 @@
     #include <wx/filename.h>
     #include <wx/stdpaths.h>
     #include <wx/scopeguard.h>
+    #include <wx/filefn.h>
     #include <wx/uri.h>
+
+    #define QSP_APPNAME wxT("qspgui")
+    #define QSP_CONFIG wxT("qspgui.cfg")
+    #define QSP_TRANSLATIONS wxT("langs")
+    #define QSP_SOUNDPLUGINS wxT("sound")
+    #define QSP_MIDIDLS wxT("midi.dls")
 
     class QSPTools
     {
@@ -31,9 +38,9 @@
         static wxString GetHexColor(const wxColour& color);
         static wxString HtmlizeWhitespaces(const wxString& str);
         static wxString ProceedAsPlain(const wxString& str);
-        static wxString GetAppPath(const wxString &path = wxEmptyString);
-        static wxString GetResourcePath(const wxString &path = wxEmptyString);
-        static wxString GetConfigPath(const wxString &path = wxEmptyString);
+        static wxString GetAppPath(const wxString &path = wxEmptyString, const wxString &file = wxEmptyString);
+        static wxString GetResourcePath(const wxString &path = wxEmptyString, const wxString &file = wxEmptyString);
+        static wxString GetConfigPath(const wxString &path = wxEmptyString, const wxString &file = wxEmptyString);
         static wxString GetPlatform();
         static wxString GetVersion(const wxString& libVersion);
     };

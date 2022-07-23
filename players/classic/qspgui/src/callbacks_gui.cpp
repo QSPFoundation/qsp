@@ -16,6 +16,7 @@
 */
 
 #include "callbacks_gui.h"
+#include "comtools.h"
 
 QSPFrame *QSPCallBacks::m_frame;
 bool QSPCallBacks::m_isHtml;
@@ -203,7 +204,7 @@ void QSPCallBacks::PlayFile(QSPString file, int volume)
     FMOD_CREATESOUNDEXINFO exInfo;
     memset(&exInfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
     exInfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
-    wxString dlsPath(QSPTools::GetResourcePath(QSP_MIDIDLS));
+    wxString dlsPath(QSPTools::GetResourcePath(QSP_SOUNDPLUGINS, QSP_MIDIDLS));
     wxCharBuffer dlsCharPath(wxConvFile.cWX2MB(dlsPath.c_str()));
     exInfo.dlsname = dlsCharPath;
     if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(filePath.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, &exInfo, &newSound))

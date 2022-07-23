@@ -16,6 +16,7 @@
 */
 
 #include "frame.h"
+#include "comtools.h"
 #include "callbacks_gui.h"
 
 BEGIN_EVENT_TABLE(QSPFrame, wxFrame)

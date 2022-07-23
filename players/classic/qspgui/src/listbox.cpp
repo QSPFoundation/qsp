@@ -16,6 +16,7 @@
 */
 
 #include "listbox.h"
+#include "comtools.h"
 
 wxIMPLEMENT_CLASS(QSPListBox, wxHtmlListBox);
 

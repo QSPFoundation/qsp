@@ -173,22 +173,49 @@ wxString QSPTools::ProceedAsPlain(const wxString& str)
     return out;
 }
 
-wxString QSPTools::GetAppPath(const wxString &path)
+wxString QSPTools::GetAppPath(const wxString &path, const wxString &file)
 {
     wxFileName appFullPath(wxStandardPaths::Get().GetExecutablePath());
-    wxFileName appPath(appFullPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR), path);
+    wxFileName appPath(appFullPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + path, file);
     return appPath.GetFullPath();
 }
 
-wxString QSPTools::GetResourcePath(const wxString &path)
+wxString QSPTools::GetResourcePath(const wxString &path, const wxString &file)
 {
-    wxFileName resourcePath(wxStandardPaths::Get().GetDataDir(), path);
-    return resourcePath.GetFullPath();
+    wxPathList resourcePathList;
+    resourcePathList.AddEnvList(wxT("XDG_DATA_DIRS"));
+    resourcePathList.Add(wxStandardPaths::Get().GetDataDir());
+
+    wxArrayString prefixes;
+    prefixes.Add(QSP_APPNAME);
+    prefixes.Add(wxEmptyString);
+
+    for (wxPathList::iterator it = resourcePathList.begin(); it != resourcePathList.end(); ++it)
+    {
+        for (wxArrayString::iterator prefixIt = prefixes.begin(); prefixIt != prefixes.end(); ++prefixIt)
+        {
+            wxFileName resourcePath(*it, file); /* directory & file names are separated */
+            if (!prefixIt->IsEmpty())
+                resourcePath.Assign(resourcePath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + *prefixIt, file);
+
+            if (!path.IsEmpty())
+                resourcePath.Assign(resourcePath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + path, file);
+
+            if (resourcePath.Exists())
+                return resourcePath.GetFullPath();
+        }
+    }
+
+    return GetAppPath(path, file);
 }
 
-wxString QSPTools::GetConfigPath(const wxString &path)
+wxString QSPTools::GetConfigPath(const wxString &path, const wxString &file)
 {
-    wxFileName configPath(wxStandardPaths::Get().GetUserConfigDir(), path);
+    wxFileName configPath(wxStandardPaths::Get().GetUserConfigDir(), file);
+
+    if (!path.IsEmpty())
+        configPath.Assign(configPath.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR) + path, file);
+
     return configPath.GetFullPath();
 }
 

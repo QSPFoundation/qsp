@@ -16,6 +16,7 @@
 */
 
 #include "app.h"
+#include "comtools.h"
 
 wxIMPLEMENT_APP(QSPApp);
 
@@ -61,9 +62,9 @@ bool QSPApp::OnCmdLineParsed(wxCmdLineParser &parser)
 
 void QSPApp::InitUI()
 {
-    wxString configPath = QSPTools::GetAppPath(QSP_CONFIG);
+    wxString configPath = QSPTools::GetAppPath(wxEmptyString, QSP_CONFIG);
     if (!wxFileExists(configPath) && !wxFileName::IsDirWritable(QSPTools::GetAppPath()))
-        configPath = QSPTools::GetConfigPath(QSP_CONFIG);
+        configPath = QSPTools::GetConfigPath(wxEmptyString, QSP_CONFIG);
 
     wxString langsPath = QSPTools::GetResourcePath(QSP_TRANSLATIONS);
     m_transHelper = new QSPTranslationHelper(QSP_APPNAME, langsPath);
