@@ -332,8 +332,7 @@ QSPString QSPGetErrorDesc(int errorNum)
 /* Load game from data */
 QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame)
 {
-    if (qspIsDisableCodeExec) return QSP_FALSE;
-    qspPrepareExecution();
+    /* we don't execute any game code */
     return qspOpenGame((void *)data, dataSize, isNewGame);
 }
 /* Save game state to a buffer */
