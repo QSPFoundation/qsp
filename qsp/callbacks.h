@@ -28,6 +28,9 @@
         QSP_BOOL IsVarsDescChanged;
         QSP_BOOL IsObjectsChanged;
         QSP_BOOL IsActionsChanged;
+        int RealCurLoc;
+        int RealLine;
+        int RealActIndex;
     } QSPCallState;
 
     extern QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];

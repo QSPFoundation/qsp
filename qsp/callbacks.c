@@ -19,6 +19,7 @@
 #include "callbacks.h"
 #include "actions.h"
 #include "common.h"
+#include "errors.h"
 #include "objects.h"
 
 QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
@@ -28,19 +29,33 @@ QSP_BOOL qspIsDisableCodeExec = QSP_FALSE; /* blocks major state changes, so we 
 void qspSaveCallState(QSPCallState *state, QSP_BOOL isDisableCodeExec)
 {
     state->IsInCallBack = qspIsInCallBack;
+    /* save a state of changes */
     state->IsDisableCodeExec = qspIsDisableCodeExec;
     state->IsMainDescChanged = qspIsMainDescChanged;
     state->IsVarsDescChanged = qspIsVarsDescChanged;
     state->IsObjectsChanged = qspIsObjectsChanged;
     state->IsActionsChanged = qspIsActionsChanged;
+    /* save an execution state */
+    state->RealCurLoc = qspRealCurLoc;
+    state->RealActIndex = qspRealActIndex;
+    state->RealLine = qspRealLine;
+    /* switch to a callback mode */
     qspIsInCallBack = QSP_TRUE;
     qspIsDisableCodeExec = isDisableCodeExec;
 }
 
 void qspRestoreCallState(QSPCallState *state)
 {
+    /* restore a previous mode */
     qspIsDisableCodeExec = state->IsDisableCodeExec;
     qspIsInCallBack = state->IsInCallBack;
+    /* restore an execution state */
+    /* it's still fine to restore old values even when a new game was started
+     * because we exit the old code & reset the state anyway */
+    qspRealCurLoc = state->RealCurLoc;
+    qspRealActIndex = state->RealActIndex;
+    qspRealLine = state->RealLine;
+    /* restore a state of changes */
     if (state->IsActionsChanged) qspIsActionsChanged = QSP_TRUE;
     if (state->IsObjectsChanged) qspIsObjectsChanged = QSP_TRUE;
     if (state->IsVarsDescChanged) qspIsVarsDescChanged = QSP_TRUE;

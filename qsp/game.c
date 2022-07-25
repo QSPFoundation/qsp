@@ -263,8 +263,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     if (isNewGame)
     {
         qspQstCRC = crc;
-        qspCurLoc = -1;
-        qspRealCurLoc = -1;
+        qspCurLoc = qspRealCurLoc = -1;
     }
     else
         qspCurIncLocsCount += count;
