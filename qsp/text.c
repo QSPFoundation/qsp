@@ -67,10 +67,9 @@ void qspAddText(QSPString *dest, QSPString val, QSP_BOOL isCreate)
 
 QSP_BOOL qspClearText(QSPString *s)
 {
-    int strLen;
     if (s->Str)
     {
-        strLen = (int)(s->End - s->Str);
+        int strLen = (int)(s->End - s->Str);
         free(s->Str);
         s->Str = 0;
         s->End = 0;
@@ -154,11 +153,11 @@ int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
 
 void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end)
 {
-    int i, count = end - start;
+    int count = end - start;
     if (src && count)
     {
+        int i = 0;
         *dest = (QSPString *)malloc(count * sizeof(QSPString));
-        i = 0;
         while (start < end)
             qspAddText(*dest + i++, src[start++], QSP_TRUE);
     }

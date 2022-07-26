@@ -110,7 +110,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
     QSPLineOfCode *code;
     int i, count, oldLoc, oldActIndex, oldLine, oldRefreshCount = qspRefreshCount;
     QSPLocation *loc = qspLocs + locInd;
-    /* remember a previous state to restore it after internal calls (GOSUB/etc) */
+    /* remember a previous state to restore it after internal calls */
     oldLoc = qspRealCurLoc;
     oldActIndex = qspRealActIndex;
     oldLine = qspRealLine;
@@ -185,6 +185,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL isChangeDesc)
         qspExecCode(code, 0, count, 1, 0);
         qspFreePrepLines(code, count);
     }
+    /* restore the old state */
     qspRealLine = oldLine;
     qspRealActIndex = oldActIndex;
     qspRealCurLoc = oldLoc;

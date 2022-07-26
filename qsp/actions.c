@@ -109,15 +109,11 @@ void qspAddAction(QSPVariant *args, QSP_TINYINT count, QSPLineOfCode *code, int 
 
 void qspExecAction(int ind)
 {
-    QSPCurAct *act;
-    QSPLineOfCode *code;
-    int count, oldLoc, oldActIndex;
     if (ind >= 0 && ind < qspCurActionsCount)
     {
-        /* remember a previous state to restore it after internal calls */
-        oldLoc = qspRealCurLoc;
-        oldActIndex = qspRealActIndex;
-        act = qspCurActions + ind;
+        int count;
+        QSPLineOfCode *code;
+        QSPCurAct *act = qspCurActions + ind;
         /* switch the current state */
         qspRealCurLoc = act->Location;
         qspRealActIndex = act->ActIndex;
@@ -125,8 +121,6 @@ void qspExecAction(int ind)
         qspCopyPrepLines(&code, act->OnPressLines, 0, count);
         qspExecCodeBlockWithLocals(code, 0, count, 1, 0);
         qspFreePrepLines(code, count);
-        qspRealActIndex = oldActIndex;
-        qspRealCurLoc = oldLoc;
     }
 }
 

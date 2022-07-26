@@ -71,8 +71,6 @@ INLINE void qspFunctionMax(QSPVariant *, QSP_TINYINT, QSPVariant *);
 
 INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...)
 {
-    int i;
-    va_list marker;
     qspOps[opCode].Priority = priority;
     qspOps[opCode].Func = func;
     qspOps[opCode].ResType = resType;
@@ -80,6 +78,8 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
     qspOps[opCode].MaxArgsCount = maxArgs;
     if (maxArgs > 0)
     {
+        int i;
+        va_list marker;
         va_start(marker, maxArgs);
         for (i = 0; i < maxArgs; ++i)
             qspOps[opCode].ArgsTypes[i] = va_arg(marker, int);
@@ -396,12 +396,12 @@ INLINE QSPString qspGetQString(QSPString *expr)
 
 INLINE int qspFreeValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts)
 {
-    int i;
     QSP_TINYINT argsCount;
     if (valueIndex < 0) return -1;
     argsCount = compArgsCounts[valueIndex];
     if (argsCount)
     {
+        int i;
         --valueIndex;
         for (i = 0; i < argsCount; ++i)
             valueIndex = qspFreeValue(valueIndex, compValues, compOpCodes, compArgsCounts);
@@ -422,13 +422,13 @@ INLINE int qspFreeValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *com
 
 INLINE int qspSkipValue(int valueIndex, QSP_TINYINT *compArgsCounts)
 {
-    int i;
     QSP_TINYINT argsCount;
     if (valueIndex < 0) return -1;
     argsCount = compArgsCounts[valueIndex];
     --valueIndex;
     if (argsCount)
     {
+        int i;
         for (i = 0; i < argsCount; ++i)
             valueIndex = qspSkipValue(valueIndex, compArgsCounts);
     }
@@ -452,9 +452,8 @@ INLINE QSPVariant qspArgumentValue(int valueIndex, QSP_TINYINT type, QSPVariant 
 
 INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *compOpCodes, QSP_TINYINT *compArgsCounts)
 {
-    QSPVar *var;
     QSPVariant args[QSP_OPMAXARGS], tos;
-    int i, oldRefreshCount, arrIndex, argIndices[QSP_OPMAXARGS];
+    int i, oldRefreshCount, argIndices[QSP_OPMAXARGS];
     QSPString name;
     QSP_TINYINT type, opCode, argsCount;
     if (valueIndex < 0)
@@ -517,17 +516,21 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
         break;
     case qspOpArrItem:
     case qspOpLastArrItem:
-        name = QSP_STR(args[0]);
-        var = qspVarReference(name, QSP_FALSE);
-        if (!var) break;
-        if (opCode == qspOpLastArrItem)
-            arrIndex = var->ValsCount - 1;
-        else if (argsCount == 2)
-            arrIndex = QSP_ISSTR(args[1].Type) ? qspGetVarTextIndex(var, QSP_STR(args[1]), QSP_FALSE) : QSP_NUM(args[1]);
-        else
-            arrIndex = 0;
-        qspGetVarValueByReference(var, arrIndex, QSP_VARBASETYPE(name), &tos);
-        break;
+        {
+            QSPVar *var;
+            int arrIndex;
+            name = QSP_STR(args[0]);
+            var = qspVarReference(name, QSP_FALSE);
+            if (!var) break;
+            if (opCode == qspOpLastArrItem)
+                arrIndex = var->ValsCount - 1;
+            else if (argsCount == 2)
+                arrIndex = QSP_ISSTR(args[1].Type) ? qspGetVarTextIndex(var, QSP_STR(args[1]), QSP_FALSE) : QSP_NUM(args[1]);
+            else
+                arrIndex = 0;
+            qspGetVarValueByReference(var, arrIndex, QSP_VARBASETYPE(name), &tos);
+            break;
+        }
     case qspOpAnd: /* logical AND operator */
         args[0] = qspArgumentValue(argIndices[0], QSP_TYPE_NUMBER, compValues, compOpCodes, compArgsCounts);
         if (qspRefreshCount != oldRefreshCount || qspErrorNum)
@@ -1154,7 +1157,7 @@ INLINE void qspFunctionRGB(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 
 INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    int len, subLen, beg = QSP_NUM(args[1]) - 1;
+    int len, beg = QSP_NUM(args[1]) - 1;
     if (beg < 0) beg = 0;
     len = qspStrLen(QSP_STR(args[0]));
     if (beg < len)
@@ -1162,7 +1165,7 @@ INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
         len -= beg;
         if (count == 3)
         {
-            subLen = QSP_NUM(args[2]);
+            int subLen = QSP_NUM(args[2]);
             if (subLen < 0)
                 len = 0;
             else if (subLen < len)
@@ -1218,8 +1221,6 @@ INLINE void qspFunctionIsPlay(QSPVariant *args, QSP_TINYINT count, QSPVariant *t
 INLINE void qspFunctionInstr(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
     int beg;
-    QSP_CHAR *pos;
-    QSPString subString;
     if (count == 2)
         beg = 0;
     else
@@ -1229,7 +1230,8 @@ INLINE void qspFunctionInstr(QSPVariant *args, QSP_TINYINT count, QSPVariant *to
     }
     if (beg < qspStrLen(QSP_STR(args[0])))
     {
-        subString = QSP_STR(args[0]);
+        QSP_CHAR *pos;
+        QSPString subString = QSP_STR(args[0]);
         subString.Str += beg;
         pos = qspStrStr(subString, QSP_STR(args[1]));
         QSP_PNUM(tos) = (pos ? (int)(pos - QSP_STR(args[0]).Str) + 1 : 0);
@@ -1277,7 +1279,6 @@ INLINE void qspFunctionDynEval(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 
 INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    int i, minInd;
     if (count == 1)
     {
         qspConvertVariantTo(args, QSP_TYPE_VARREF);
@@ -1285,7 +1286,7 @@ INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
     }
     else
     {
-        minInd = 0;
+        int i, minInd = 0;
         for (i = 1; i < count; ++i)
         {
             if (qspAutoConvertCompare(args + i, args + minInd) < 0)
@@ -1297,7 +1298,6 @@ INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 
 INLINE void qspFunctionMax(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    int i, maxInd;
     if (count == 1)
     {
         qspConvertVariantTo(args, QSP_TYPE_VARREF);
@@ -1305,7 +1305,7 @@ INLINE void qspFunctionMax(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
     }
     else
     {
-        maxInd = 0;
+        int i, maxInd = 0;
         for (i = 1; i < count; ++i)
         {
             if (qspAutoConvertCompare(args + i, args + maxInd) > 0)
