@@ -219,7 +219,7 @@ int qspStrToNum(QSPString s, QSP_BOOL *isValid)
         else if (*pos == QSP_FMT('+'))
             ++pos;
     }
-    else /* special case, i.e. empty string must be convertible to 0 */
+    else /* a special case, i.e. an empty string must be convertible to 0 */
     {
         if (isValid) *isValid = QSP_TRUE;
         return 0;
