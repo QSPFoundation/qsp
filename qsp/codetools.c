@@ -354,6 +354,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     if (count == 1 && line->Stats[0].Stat == qspStatElse && statCode == qspStatIf &&
         *(line->Str.Str + line->Stats[0].ParamPos) != QSP_COLONDELIM[0])
     {
+        /* Convert a multi-line ELSE IF to ELSEIF */
         count = 0;
         statCode = qspStatElseIf;
     }
