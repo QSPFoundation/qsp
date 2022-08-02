@@ -30,9 +30,9 @@
 
     /* External functions */
     void qspClearRegExps(QSP_BOOL);
-    regex_t *qspRegExpGetCompiled(QSPString exp);
-    QSP_BOOL qspRegExpStrMatch(regex_t *exp, QSPString str);
-    QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind);
-    int qspRegExpStrPos(regex_t *exp, QSPString str, int ind);
+    QSPRegExp *qspRegExpGetCompiled(QSPString exp);
+    QSP_BOOL qspRegExpStrMatch(QSPRegExp *exp, QSPString str);
+    QSPString qspRegExpStrFind(QSPRegExp *exp, QSPString str, int ind);
+    int qspRegExpStrPos(QSPRegExp *exp, QSPString str, int ind);
 
 #endif

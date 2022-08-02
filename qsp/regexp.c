@@ -40,7 +40,7 @@ void qspClearRegExps(QSP_BOOL isFirst)
     qspCompiledRegExpsCurInd = 0;
 }
 
-regex_t *qspRegExpGetCompiled(QSPString exp)
+QSPRegExp *qspRegExpGetCompiled(QSPString exp)
 {
     int i;
     regex_t *onigExp;
@@ -51,7 +51,7 @@ regex_t *qspRegExpGetCompiled(QSPString exp)
     {
         if (!compExp->CompiledExp) break;
         if (!qspStrsComp(exp, compExp->Text))
-            return compExp->CompiledExp;
+            return compExp;
         ++compExp;
     }
     safeExp = (exp.Str ? exp : QSP_STATIC_STR(QSP_FMT("")));
@@ -71,18 +71,18 @@ regex_t *qspRegExpGetCompiled(QSPString exp)
     compExp->CompiledExp = onigExp;
     if (++qspCompiledRegExpsCurInd == QSP_MAXCACHEDREGEXPS)
         qspCompiledRegExpsCurInd = 0;
-    return onigExp;
+    return compExp;
 }
 
-QSP_BOOL qspRegExpStrMatch(regex_t *exp, QSPString str)
+QSP_BOOL qspRegExpStrMatch(QSPRegExp *exp, QSPString str)
 {
     OnigUChar *tempBeg, *tempEnd;
     tempBeg = (OnigUChar *)str.Str;
     tempEnd = (OnigUChar *)str.End;
-    return (onig_match(exp, tempBeg, tempEnd, tempBeg, 0, ONIG_OPTION_NONE) == tempEnd - tempBeg);
+    return (onig_match(exp->CompiledExp, tempBeg, tempEnd, tempBeg, 0, ONIG_OPTION_NONE) == tempEnd - tempBeg);
 }
 
-QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind)
+QSPString qspRegExpStrFind(QSPRegExp *exp, QSPString str, int ind)
 {
     QSPString res;
     int len, pos;
@@ -90,7 +90,7 @@ QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind)
     OnigRegion *onigReg = onig_region_new();
     tempBeg = (OnigUChar *)str.Str;
     tempEnd = (OnigUChar *)str.End;
-    if (onig_search(exp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0)
+    if (onig_search(exp->CompiledExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0)
     {
         pos = (ind >= 0 ? ind : 0);
         if (pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
@@ -107,14 +107,14 @@ QSPString qspRegExpStrFind(regex_t *exp, QSPString str, int ind)
     return res;
 }
 
-int qspRegExpStrPos(regex_t *exp, QSPString str, int ind)
+int qspRegExpStrPos(QSPRegExp *exp, QSPString str, int ind)
 {
     int pos, res;
     OnigUChar *tempBeg, *tempEnd;
     OnigRegion *onigReg = onig_region_new();
     tempBeg = (OnigUChar *)str.Str;
     tempEnd = (OnigUChar *)str.End;
-    if (onig_search(exp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0)
+    if (onig_search(exp->CompiledExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0)
     {
         pos = (ind >= 0 ? ind : 0);
         if (pos < onigReg->num_regs && onigReg->beg[pos] >= 0)

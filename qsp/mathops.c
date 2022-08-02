@@ -1101,14 +1101,14 @@ QSPVariant qspExprValue(QSPString expr)
 
 INLINE void qspFunctionStrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
+    QSPRegExp *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
     if (!regExp) return;
     QSP_PNUM(tos) = QSP_TOBOOL(qspRegExpStrMatch(regExp, QSP_STR(args[0])));
 }
 
 INLINE void qspFunctionStrFind(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
+    QSPRegExp *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
     if (!regExp) return;
     if (count == 3 && QSP_NUM(args[2]) >= 0)
         QSP_PSTR(tos) = qspRegExpStrFind(regExp, QSP_STR(args[0]), QSP_NUM(args[2]));
@@ -1118,7 +1118,7 @@ INLINE void qspFunctionStrFind(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 
 INLINE void qspFunctionStrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *tos)
 {
-    regex_t *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
+    QSPRegExp *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
     if (!regExp) return;
     if (count == 3 && QSP_NUM(args[2]) >= 0)
         QSP_PNUM(tos) = qspRegExpStrPos(regExp, QSP_STR(args[0]), QSP_NUM(args[2]));

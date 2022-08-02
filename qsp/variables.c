@@ -515,7 +515,7 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
     QSP_TINYINT baseVarType;
     QSPVar *var;
     QSP_BOOL isFound;
-    regex_t *regExp;
+    QSPRegExp *regExp;
     if (!(var = qspVarReference(varName, QSP_FALSE))) return -1;
     baseVarType = QSP_VARBASETYPE(varName);
     if (!qspConvertVariantTo(val, (isRegExp || QSP_ISSTR(baseVarType) ? QSP_TYPE_STRING : QSP_TYPE_NUMBER)))
