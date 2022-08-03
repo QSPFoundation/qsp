@@ -510,7 +510,7 @@ int qspArraySize(QSPString name)
 int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 {
     int count;
-    QSP_TINYINT baseVarType;
+    QSP_TINYINT varType, baseVarType;
     QSPVar *var;
     QSP_BOOL isFound;
     QSPRegExp *regExp;
@@ -530,7 +530,8 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
     if (ind < 0) ind = 0;
     while (ind < count)
     {
-        if (QSP_BASETYPE(var->Values[ind].Type) == QSP_BASETYPE(val->Type))
+        varType = var->Values[ind].Type;
+        if (QSP_ISDEF(varType) && QSP_BASETYPE(varType) == QSP_BASETYPE(val->Type))
         {
             if (QSP_ISSTR(val->Type))
             {
@@ -546,17 +547,6 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
         }
         ++ind;
     }
-    if (QSP_ISSTR(val->Type))
-    {
-        isFound = isRegExp ?
-                  qspRegExpStrMatch(regExp, qspNullString) :
-                  !qspStrsComp(QSP_PSTR(val), qspNullString);
-    }
-    else
-    {
-        isFound = (QSP_PNUM(val) == 0);
-    }
-    if (isFound) return ind;
     return -1;
 }
 
