@@ -220,7 +220,7 @@ void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
         int count = var->ValsCount = ind + 1;
         var->Values = (QSPVariant *)realloc(var->Values, count * sizeof(QSPVariant));
         for (curValue = var->Values + oldCount; oldCount < count; ++curValue, ++oldCount)
-            qspInitVariant(curValue, QSP_BASETYPE(val->Type));
+            qspInitVariant(curValue, QSP_TYPE_UNDEFINED);
     }
     if (ind >= 0) qspUpdateVariantValue(var->Values + ind, val);
 }
@@ -313,7 +313,8 @@ void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVa
 {
     if (ind >= 0 && ind < var->ValsCount)
     {
-        if (QSP_BASETYPE(var->Values[ind].Type) == baseType)
+        QSP_TINYINT varType = var->Values[ind].Type;
+        if (QSP_ISDEF(varType) && QSP_BASETYPE(varType) == baseType)
         {
             qspCopyToNewVariant(res, var->Values + ind);
             return;
@@ -469,13 +470,10 @@ void qspClearVarsList(QSPVar *vars, int varsCount)
 INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 {
     int i, maxCount, newInd;
+    qspEmptyVar(dest);
     if (start < 0) start = 0;
     maxCount = src->ValsCount - start;
-    if (count <= 0 || maxCount <= 0)
-    {
-        qspInitVarData(dest);
-        return;
-    }
+    if (count <= 0 || maxCount <= 0) return;
     if (count < maxCount) maxCount = count;
     dest->ValsCount = maxCount;
     dest->Values = (QSPVariant *)malloc(maxCount * sizeof(QSPVariant));
@@ -566,7 +564,7 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
 {
     QSPVar *var;
     QSPVariant res;
-    QSP_TINYINT baseVarType;
+    QSP_TINYINT varType, baseVarType;
     int curInd, count;
     if (!(var = qspVarReference(name, QSP_FALSE)))
         return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
@@ -575,7 +573,8 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
     count = var->ValsCount;
     while (--count >= 0)
     {
-        if (QSP_BASETYPE(var->Values[count].Type) == baseVarType)
+        varType = var->Values[count].Type;
+        if (QSP_ISDEF(varType) && QSP_BASETYPE(varType) == baseVarType)
         {
             if (curInd >= 0)
             {
@@ -841,7 +840,6 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *jum
     {
         int start = (count >= 3 ? QSP_NUM(args[2]) : 0);
         int num = (count == 4 ? QSP_NUM(args[3]) : src->ValsCount);
-        qspEmptyVar(dest);
         qspCopyVar(dest, src, start, num);
     }
     return QSP_FALSE;
