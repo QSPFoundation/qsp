@@ -565,7 +565,6 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
 {
     QSPVar *var;
-    QSPString str;
     QSPVariant res;
     QSP_TINYINT baseVarType;
     int curInd, count;
@@ -578,28 +577,19 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
     {
         if (QSP_BASETYPE(var->Values[count].Type) == baseVarType)
         {
-            if (QSP_ISSTR(baseVarType))
+            if (curInd >= 0)
             {
-                str = QSP_STR(var->Values[count]);
-                if (!qspIsEmpty(str))
+                if (QSP_ISSTR(baseVarType))
                 {
-                    if (curInd >= 0)
+                    if (isMin)
                     {
-                        if (isMin)
-                        {
-                            if (qspStrsComp(str, QSP_STR(var->Values[curInd])) < 0)
-                                curInd = count;
-                        }
-                        else if (qspStrsComp(str, QSP_STR(var->Values[curInd])) > 0)
+                        if (qspStrsComp(QSP_STR(var->Values[count]), QSP_STR(var->Values[curInd])) < 0)
                             curInd = count;
                     }
-                    else
+                    else if (qspStrsComp(QSP_STR(var->Values[count]), QSP_STR(var->Values[curInd])) > 0)
                         curInd = count;
                 }
-            }
-            else
-            {
-                if (curInd >= 0)
+                else
                 {
                     if (isMin)
                     {
@@ -609,9 +599,9 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
                     else if (QSP_NUM(var->Values[count]) > QSP_NUM(var->Values[curInd]))
                         curInd = count;
                 }
-                else
-                    curInd = count;
             }
+            else
+                curInd = count;
         }
     }
     if (curInd < 0) return qspGetEmptyVariant(baseVarType);
