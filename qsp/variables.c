@@ -510,8 +510,9 @@ int qspArraySize(QSPString name)
 int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 {
     int count;
-    QSP_TINYINT varType, baseVarType;
+    QSP_TINYINT baseVarType;
     QSPVar *var;
+    QSPVariant defaultValue, *curValue;
     QSP_BOOL isFound;
     QSPRegExp *regExp;
     if (!(var = qspVarReference(varName, QSP_FALSE))) return -1;
@@ -526,22 +527,24 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
         regExp = qspRegExpGetCompiled(QSP_PSTR(val));
         if (!regExp) return -1;
     }
+    defaultValue = qspGetEmptyVariant(baseVarType);
     count = var->ValsCount;
     if (ind < 0) ind = 0;
     while (ind < count)
     {
-        varType = var->Values[ind].Type;
-        if (QSP_ISDEF(varType) && QSP_BASETYPE(varType) == QSP_BASETYPE(val->Type))
+        curValue = var->Values + ind;
+        if (!QSP_ISDEF(curValue->Type)) curValue = &defaultValue; /* check undefined values */
+        if (QSP_BASETYPE(curValue->Type) == QSP_BASETYPE(val->Type))
         {
             if (QSP_ISSTR(val->Type))
             {
                 isFound = isRegExp ?
-                          qspRegExpStrMatch(regExp, QSP_STR(var->Values[ind])) :
-                          !qspStrsComp(QSP_PSTR(val), QSP_STR(var->Values[ind]));
+                          qspRegExpStrMatch(regExp, QSP_PSTR(curValue)) :
+                          !qspStrsComp(QSP_PSTR(val), QSP_PSTR(curValue));
             }
             else
             {
-                isFound = (QSP_PNUM(val) == QSP_NUM(var->Values[ind]));
+                isFound = (QSP_PNUM(val) == QSP_PNUM(curValue));
             }
             if (isFound) return ind;
         }
@@ -553,18 +556,20 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
 {
     QSPVar *var;
-    QSPVariant res;
-    QSP_TINYINT varType, baseVarType;
+    QSPVariant resultValue, *curValue;
+    QSP_TINYINT baseVarType;
     int curInd, count;
     if (!(var = qspVarReference(name, QSP_FALSE)))
         return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
     baseVarType = QSP_VARBASETYPE(name);
+    resultValue = qspGetEmptyVariant(baseVarType);
     curInd = -1;
     count = var->ValsCount;
     while (--count >= 0)
     {
-        varType = var->Values[count].Type;
-        if (QSP_ISDEF(varType) && QSP_BASETYPE(varType) == baseVarType)
+        curValue = var->Values + count;
+        if (!QSP_ISDEF(curValue->Type)) curValue = &resultValue; /* check undefined values */
+        if (QSP_BASETYPE(curValue->Type) == baseVarType)
         {
             if (curInd >= 0)
             {
@@ -572,20 +577,20 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
                 {
                     if (isMin)
                     {
-                        if (qspStrsComp(QSP_STR(var->Values[count]), QSP_STR(var->Values[curInd])) < 0)
+                        if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(var->Values + curInd)) < 0)
                             curInd = count;
                     }
-                    else if (qspStrsComp(QSP_STR(var->Values[count]), QSP_STR(var->Values[curInd])) > 0)
+                    else if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(var->Values + curInd)) > 0)
                         curInd = count;
                 }
                 else
                 {
                     if (isMin)
                     {
-                        if (QSP_NUM(var->Values[count]) < QSP_NUM(var->Values[curInd]))
+                        if (QSP_PNUM(curValue) < QSP_PNUM(var->Values + curInd))
                             curInd = count;
                     }
-                    else if (QSP_NUM(var->Values[count]) > QSP_NUM(var->Values[curInd]))
+                    else if (QSP_PNUM(curValue) > QSP_PNUM(var->Values + curInd))
                         curInd = count;
                 }
             }
@@ -593,9 +598,8 @@ QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
                 curInd = count;
         }
     }
-    if (curInd < 0) return qspGetEmptyVariant(baseVarType);
-    qspCopyToNewVariant(&res, var->Values + curInd);
-    return res;
+    if (curInd >= 0) qspCopyToNewVariant(&resultValue, var->Values + curInd);
+    return resultValue;
 }
 
 int qspGetVarsCount()
