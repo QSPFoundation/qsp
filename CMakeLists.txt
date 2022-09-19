@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 3.15)
-project(qsp)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+project(qsp VERSION 5.8.0)
+
+set(QSP_GAMEMIN_VER "5.8.0")
 
 if(WIN32)
 	if(NOT MSVC OR MSVC_TOOLSET_VERSION LESS 110)
@@ -10,6 +12,12 @@ elseif(APPLE OR NOT UNIX)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+
+set(CMAKE_INCLUDE_CURRENT_DIR True)
+
+include(CMakePackageConfigHelpers)
+include(GenerateExportHeader)
+include(GNUInstallDirs)
 
 if(CMAKE_COMPILER_IS_GNUCC)
 	set(PROJECT_COMPILER_FLAGS "-Wall")
@@ -29,6 +37,8 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /DNDEBUG")
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
+
+option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" OFF)
 
 if(USE_INSTALLED_ONIGURUMA)
 	find_package(oniguruma REQUIRED)
@@ -53,6 +63,8 @@ else()
 					 "${CMAKE_BINARY_DIR}/oniguruma-build"
 	)
 endif()
+
+configure_file(qsp_config.h.cmakein qsp_config.h @ONLY)
 
 set(QSP_SOURCES
 	qsp/bindings/default/default_callbacks.c
@@ -80,7 +92,7 @@ set(QSP_SOURCES
 	qsp/variant.c
 )
 add_library(qsp SHARED ${QSP_SOURCES})
-target_compile_definitions(qsp PRIVATE _UNICODE EXPORT)
+target_compile_definitions(qsp PUBLIC _UNICODE)
 if(WIN32)
 	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
@@ -93,7 +105,52 @@ else()
 	install(TARGETS onig)
 endif()
 
-install(TARGETS qsp)
+target_include_directories(qsp
+	INTERFACE
+		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp>"
+		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp/default>"
+)
+
+install(TARGETS qsp EXPORT QspTargets DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime)
+
+generate_export_header(qsp
+  BASE_NAME Qsp
+  EXPORT_MACRO_NAME QSP_EXTERN
+)
+
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/QspConfigVersion.cmake COMPATIBILITY AnyNewerVersion)
+configure_package_config_file(QspConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/QspConfig.cmake
+	INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
+)
+
+export(TARGETS qsp NAMESPACE Qsp:: FILE "${PROJECT_BINARY_DIR}/QspTargets.cmake")
+install(EXPORT QspTargets NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp")
+install(FILES
+		${CMAKE_CURRENT_BINARY_DIR}/QspConfigVersion.cmake
+		${CMAKE_CURRENT_BINARY_DIR}/QspConfig.cmake
+	DESTINATION
+		"${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
+)
+
+install(FILES
+		${CMAKE_SOURCE_DIR}/cmake/Modules/Findoniguruma.cmake
+	DESTINATION
+		"${CMAKE_INSTALL_DATAROOTDIR}/cmake/Modules"
+)
+
+install(FILES
+		qsp/bindings/qsp.h
+		qsp/bindings/bindings_config.h
+		"${CMAKE_CURRENT_BINARY_DIR}/qsp_export.h"
+	DESTINATION
+		"${CMAKE_INSTALL_INCLUDEDIR}/qsp"
+)
+
+install(FILES
+		qsp/bindings/default/qsp_default.h
+	DESTINATION
+		"${CMAKE_INSTALL_INCLUDEDIR}/qsp/default"
+)
 
 option(BUILD_QSPGUI "Build qspgui application")
 if(BUILD_QSPGUI)

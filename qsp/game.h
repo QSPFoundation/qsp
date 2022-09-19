@@ -18,12 +18,14 @@
 #include "declarations.h"
 #include "variant.h"
 
+#include "qsp_config.h"
+
 #ifndef QSP_GAMEDEFINES
     #define QSP_GAMEDEFINES
 
     #define QSP_GAMEID QSP_FMT("QSPGAME")
     #define QSP_SAVEDGAMEID QSP_FMT("QSPSAVEDGAME")
-    #define QSP_GAMEMINVER QSP_FMT("5.8.0")
+    #define QSP_GAMEMINVER QSP_FMT(QSP_GAMEMINVER_VER_STR)
     #define QSP_MAXINCFILES 100
     #define QSP_DEFTIMERINTERVAL 500
 
