@@ -40,6 +40,8 @@
 #include "bindings/qsp.h"
 #include <oniguruma.h>
 
+#include "qsp_config.h"
+
 #ifndef QSP_DEFINES
     #define QSP_DEFINES
 
@@ -56,7 +58,7 @@
         #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
     #endif
 
-    #define QSP_VER QSP_FMT("5.8.0")
+    #define QSP_VER QSP_FMT(QSP_VER_STR)
     #define QSP_LOCALE "russian"
     #define QSP_STRCHAR QSP_FMT("$")
     #define QSP_LABEL QSP_FMT(":")

@@ -18,17 +18,7 @@
 #ifndef QSP_H
     #define QSP_H
 
-    #if defined(EXPORT) && defined(_WIN32)
-        #if defined(_MSC_VER)
-            #define QSP_EXTERN __declspec(dllexport)
-        #elif defined(__GNUC__)
-            #define QSP_EXTERN __attribute__ ((dllexport))
-        #else
-            #define QSP_EXTERN extern
-        #endif
-    #else
-        #define QSP_EXTERN
-    #endif
+    #include "qsp_export.h"
 
     enum
     {
