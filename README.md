@@ -19,8 +19,7 @@ cmake --build . --target install --config Release
 
 ## TODO
 
-* Test locals implementation
-* Test loop implementation
+* Test & improve implementation of loops
 * Update bindings
 * Implement a new way to communicate with GUI (more specific callbacks)
 * Move the whole global state into a context parameter
