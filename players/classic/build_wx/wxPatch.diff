@@ -32,7 +32,7 @@ index 9705a833cd..a246b4e733 100644
 +
  private:
      // wxHtmlWindowInterface methods:
-     virtual void SetHTMLWindowTitle(const wxString& title) wxOVERRIDE;
+     virtual void SetHTMLWindowTitle(const wxString& title) override;
 @@ -173,14 +182,6 @@ private:
      // this class caches the pre-parsed HTML to speed up display
      wxHtmlListBoxCache *m_cache;
@@ -219,7 +219,7 @@ index 221389d1c3..f3ca79bb2c 100644
      bool                m_bmpHpresent:1;
      bool                m_showFrame:1;
 @@ -370,6 +372,7 @@ wxHtmlImageCell::wxHtmlImageCell(wxHtmlWindowInterface *windowIface,
-     m_bitmap = NULL;
+     m_bitmap = nullptr;
      m_bmpW   = w;
      m_bmpH   = h;
 +    m_bmpMaxW = m_bmpMaxH = wxDefaultCoord;
@@ -254,7 +254,7 @@ index 221389d1c3..f3ca79bb2c 100644
                          }
 @@ -435,19 +439,8 @@ wxHtmlImageCell::wxHtmlImageCell(wxHtmlWindowInterface *windowIface,
          }
-         else // input==NULL, use "broken image" bitmap
+         else // input==nullptr, use "broken image" bitmap
          {
 -            if ( m_bmpW == wxDefaultCoord && m_bmpH == wxDefaultCoord )
 -            {
@@ -431,7 +431,7 @@ index a3f06e1d64..c06156dcf6 100644
 +++ b/src/html/winpars.cpp
 @@ -52,6 +52,7 @@ wxHtmlWinParser::wxHtmlWinParser(wxHtmlWindowInterface *wndIface)
      m_whitespaceMode = Whitespace_Normal;
-     m_lastWordCell = NULL;
+     m_lastWordCell = nullptr;
      m_posColumn = 0;
 +    m_LinkColor.Set(0, 0, 0xFF);
  
