@@ -5,7 +5,7 @@
 ```bash
 mkdir build && cd build
 cmake -DBUILD_QSPGUI=ON -DCMAKE_BUILD_TYPE=Release ..
-cmake --build .
+cmake --build . -j
 ```
 
 ## Windows build
