@@ -38,7 +38,6 @@ if(MSVC)
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
-set(CMAKE_C_VISIBILITY_PRESET "hidden")
 set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 
 option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" OFF)
@@ -54,6 +53,12 @@ else()
 	execute_process(COMMAND "${CMAKE_COMMAND}" --build .
 			WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
 	)
+
+	# Disable oniguruma features we don't need
+	set(INSTALL_DOCUMENTATION OFF)
+	set(INSTALL_EXAMPLES OFF)
+	set(BUILD_TEST OFF)
+
 	# Prevent oniguruma from overriding our compiler/linker options
 	# when building with Visual Studio
 	set(oniguruma_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -62,6 +67,8 @@ else()
 	add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR)
 
 	# Add oniguruma directly to our build
+	set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
+	set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 	add_subdirectory("${CMAKE_BINARY_DIR}/oniguruma-src"
 					 "${CMAKE_BINARY_DIR}/oniguruma-build"
 	)
@@ -126,7 +133,6 @@ configure_package_config_file(QspConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/Qsp
 	INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
 )
 
-export(TARGETS qsp NAMESPACE Qsp:: FILE "${PROJECT_BINARY_DIR}/QspTargets.cmake")
 install(EXPORT QspTargets NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp")
 install(FILES
 		${CMAKE_CURRENT_BINARY_DIR}/QspConfigVersion.cmake
@@ -201,6 +207,8 @@ if(BUILD_QSPGUI)
 		set(wxWidgets_force_shared_crt ON CACHE BOOL "" FORCE)
 
 		# Add wxWidgets directly to our build
+		set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
+		set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 		add_subdirectory("${CMAKE_BINARY_DIR}/wxWidgets-src"
 						 "${CMAKE_BINARY_DIR}/wxWidgets-build"
 		)
