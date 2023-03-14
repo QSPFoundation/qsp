@@ -97,31 +97,31 @@
     QSP_EXTERN void QSPSetInputStrText(QSPString str);
     /* Actions */
     QSP_EXTERN int QSPGetActions(QSPListItem *items, int itemsBufSize);
-    QSP_EXTERN QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL isRefresh);
+    QSP_EXTERN QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI);
     QSP_EXTERN int QSPGetSelActionIndex();
     QSP_EXTERN QSP_BOOL QSPIsActionsChanged();
-    QSP_EXTERN QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh);
+    QSP_EXTERN QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI);
     /* Objects */
     QSP_EXTERN int QSPGetObjects(QSPListItem *items, int itemsBufSize);
-    QSP_EXTERN QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh);
+    QSP_EXTERN QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI);
     QSP_EXTERN int QSPGetSelObjectIndex();
     QSP_EXTERN QSP_BOOL QSPIsObjectsChanged();
     /* Windows */
-    QSP_EXTERN void QSPShowWindow(int type, QSP_BOOL isShow);
+    QSP_EXTERN void QSPShowWindow(int type, QSP_BOOL toShow);
     /* Code execution */
-    QSP_EXTERN QSP_BOOL QSPExecString(QSPString str, QSP_BOOL isRefresh);
-    QSP_EXTERN QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh);
-    QSP_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh);
-    QSP_EXTERN QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL isRefresh);
+    QSP_EXTERN QSP_BOOL QSPExecString(QSPString str, QSP_BOOL toRefreshUI);
+    QSP_EXTERN QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI);
+    QSP_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI);
+    QSP_EXTERN QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI);
     /* Errors */
     QSP_EXTERN void QSPGetLastErrorData(int *errorNum, QSPString *errorLoc, int *errorActIndex, int *errorLine);
     QSP_EXTERN QSPString QSPGetErrorDesc(int errorNum);
     /* Game */
     QSP_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame);
-    QSP_EXTERN QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL isRefresh);
-    QSP_EXTERN QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRefresh);
+    QSP_EXTERN QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI);
+    QSP_EXTERN QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRefreshUI);
 
-    QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh);
+    QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI);
     /* Variables */
     QSP_EXTERN QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count);
     QSP_EXTERN QSP_BOOL QSPGetVarValues(QSPString name, int ind, int *numVal, QSPString *strVal);

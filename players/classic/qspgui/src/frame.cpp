@@ -172,7 +172,7 @@ QSPFrame::QSPFrame(const wxString &configPath, QSPTranslationHelper *transHelper
     SetOverallVolume(100);
     m_savedGamePath.Clear();
     m_worldPath.Clear();
-    m_isQuit = false;
+    m_toQuit = false;
     m_keyPressedWhileDisabled = false;
     m_isGameOpened = false;
 }
@@ -198,9 +198,9 @@ void QSPFrame::SaveSettings()
     cfg.Write(wxT("Colors/LinkColor"), m_linkColor.Blue() << 16 | m_linkColor.Green() << 8 | m_linkColor.Red());
     cfg.Write(wxT("Font/FontSize"), m_fontSize);
     cfg.Write(wxT("Font/FontName"), m_fontName);
-    cfg.Write(wxT("Font/UseFontSize"), m_isUseFontSize);
+    cfg.Write(wxT("Font/UseFontSize"), m_toUseFontSize);
     cfg.Write(wxT("General/Volume"), m_volume);
-    cfg.Write(wxT("General/ShowHotkeys"), m_isShowHotkeys);
+    cfg.Write(wxT("General/ShowHotkeys"), m_toShowHotkeys);
     cfg.Write(wxT("General/Panels"), m_manager->SavePerspective());
     m_transHelper->Save(cfg, wxT("General/Language"));
     GetPosition(&x, &y);
@@ -214,7 +214,7 @@ void QSPFrame::SaveSettings()
 
 void QSPFrame::LoadSettings()
 {
-    bool isMaximize;
+    bool toMaximize;
     int x, y, w, h, temp;
     Hide();
     wxFileConfig cfg(wxEmptyString, wxEmptyString, m_configPath);
@@ -228,14 +228,14 @@ void QSPFrame::LoadSettings()
     if (temp < 12) temp = 12;
     cfg.Read(wxT("Font/FontSize"), &m_fontSize, temp);
     cfg.Read(wxT("Font/FontName"), &m_fontName, wxNORMAL_FONT->GetFaceName());
-    cfg.Read(wxT("Font/UseFontSize"), &m_isUseFontSize, false);
-    cfg.Read(wxT("General/ShowHotkeys"), &m_isShowHotkeys, false);
+    cfg.Read(wxT("Font/UseFontSize"), &m_toUseFontSize, false);
+    cfg.Read(wxT("General/ShowHotkeys"), &m_toShowHotkeys, false);
     cfg.Read(wxT("General/Volume"), &m_volume, 100);
     cfg.Read(wxT("Pos/Left"), &x, 10);
     cfg.Read(wxT("Pos/Top"), &y, 10);
     cfg.Read(wxT("Pos/Width"), &w, 850);
     cfg.Read(wxT("Pos/Height"), &h, 650);
-    cfg.Read(wxT("Pos/Maximize"), &isMaximize, false);
+    cfg.Read(wxT("Pos/Maximize"), &toMaximize, false);
     wxString panels(wxT("layout2|") \
         wxT("name=imgview;state=1080035327;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=832;besth=150;minw=50;minh=50;maxw=-1;maxh=-1;floatx=175;floaty=148;floatw=518;floath=372|") \
         wxT("name=desc;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=613;besth=341;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|") \
@@ -258,7 +258,7 @@ void QSPFrame::LoadSettings()
         ApplyFontName(m_fontName);
     }
     RefreshUI();
-    m_settingsMenu->Check(ID_USEFONTSIZE, m_isUseFontSize);
+    m_settingsMenu->Check(ID_USEFONTSIZE, m_toUseFontSize);
     m_manager->LoadPerspective(panels);
     m_manager->RestoreMaximizedPane();
     // Check for correct position
@@ -280,7 +280,7 @@ void QSPFrame::LoadSettings()
     ShowPane(ID_VARSDESC, true);
     ShowPane(ID_INPUT, true);
     ReCreateGUI();
-    if (isMaximize) Maximize();
+    if (toMaximize) Maximize();
     Show();
     m_manager->Update();
 }
@@ -299,11 +299,11 @@ void QSPFrame::EnableControls(bool status, bool isExtended)
     m_objects->Enable(status);
     m_actions->Enable(status);
     m_input->SetEditable(status);
-    m_isProcessEvents = status;
+    m_toProcessEvents = status;
     m_keyPressedWhileDisabled = false;
 }
 
-void QSPFrame::ShowPane(wxWindowID id, bool isShow)
+void QSPFrame::ShowPane(wxWindowID id, bool toShow)
 {
     int i;
     wxAuiPaneInfoArray& allPanes = m_manager->GetAllPanes();
@@ -326,19 +326,19 @@ void QSPFrame::ShowPane(wxWindowID id, bool isShow)
         {
             if (maximizedPane == pane)
             {
-                if (!isShow)
+                if (!toShow)
                 {
                     m_manager->RestorePane(*pane);
                     pane->Hide();
                     m_manager->Update();
                 }
             }
-            else if (pane->HasFlag(wxAuiPaneInfo::savedHiddenState) == isShow)
-                pane->SetFlag(wxAuiPaneInfo::savedHiddenState, !isShow);
+            else if (pane->HasFlag(wxAuiPaneInfo::savedHiddenState) == toShow)
+                pane->SetFlag(wxAuiPaneInfo::savedHiddenState, !toShow);
         }
-        else if (pane->IsShown() != isShow)
+        else if (pane->IsShown() != toShow)
         {
-            pane->Show(isShow);
+            pane->Show(toShow);
             m_manager->Update();
         }
     }
@@ -351,33 +351,33 @@ void QSPFrame::ApplyParams()
     wxColour setBackColor, setFontColor, setLinkColor;
     wxString setFontName;
     int setFontSize;
-    bool isRefresh = false;
+    bool toRefreshUI = false;
     // --------------
     setBackColor = ((QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("BCOLOR")), 0, &numVal, &strVal) && numVal) ? wxColour(numVal) : m_backColor);
     if (setBackColor != m_desc->GetBackgroundColour())
     {
-        if (ApplyBackColor(setBackColor)) isRefresh = true;
+        if (ApplyBackColor(setBackColor)) toRefreshUI = true;
     }
     // --------------
     setFontColor = ((QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("FCOLOR")), 0, &numVal, &strVal) && numVal) ? wxColour(numVal) : m_fontColor);
     if (setFontColor != m_desc->GetForegroundColour())
     {
-        if (ApplyFontColor(setFontColor)) isRefresh = true;
+        if (ApplyFontColor(setFontColor)) toRefreshUI = true;
     }
     // --------------
     setLinkColor = ((QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("LCOLOR")), 0, &numVal, &strVal) && numVal) ? wxColour(numVal) : m_linkColor);
     if (setLinkColor != m_desc->GetLinkColor())
     {
-        if (ApplyLinkColor(setLinkColor)) isRefresh = true;
+        if (ApplyLinkColor(setLinkColor)) toRefreshUI = true;
     }
     // --------------
-    if (m_isUseFontSize)
+    if (m_toUseFontSize)
         setFontSize = m_fontSize;
     else
         setFontSize = ((QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("FSIZE")), 0, &numVal, &strVal) && numVal) ? numVal : m_fontSize);
     if (setFontSize != m_desc->GetTextFont().GetPointSize())
     {
-        if (ApplyFontSize(setFontSize)) isRefresh = true;
+        if (ApplyFontSize(setFontSize)) toRefreshUI = true;
     }
     // --------------
     setFontName = ((QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("FNAME")), 0, &numVal, &strVal) &&
@@ -385,14 +385,14 @@ void QSPFrame::ApplyParams()
     if (!setFontName.IsSameAs(m_desc->GetTextFont().GetFaceName(), false))
     {
         if (ApplyFontName(setFontName))
-            isRefresh = true;
+            toRefreshUI = true;
         else if (!m_fontName.IsSameAs(m_desc->GetTextFont().GetFaceName(), false))
         {
-            if (ApplyFontName(m_fontName)) isRefresh = true;
+            if (ApplyFontName(m_fontName)) toRefreshUI = true;
         }
     }
     // --------------
-    if (isRefresh) RefreshUI();
+    if (toRefreshUI) RefreshUI();
 }
 
 void QSPFrame::DeleteMenu()
@@ -463,11 +463,11 @@ bool QSPFrame::IsValidFullPath(const wxString &path) const
 
 void QSPFrame::ShowError()
 {
-    bool oldIsProcessEvents;
+    bool oldToProcessEvents;
     wxString wxMessage;
     QSPString loc;
     int code, actIndex, line;
-    if (m_isQuit) return;
+    if (m_toQuit) return;
     QSPGetLastErrorData(&code, &loc, &actIndex, &line);
     QSPString desc = QSPGetErrorDesc(code);
     if (loc.Str)
@@ -496,10 +496,10 @@ void QSPFrame::ShowError()
                      false,
                      this
     );
-    oldIsProcessEvents = m_isProcessEvents;
-    m_isProcessEvents = false;
+    oldToProcessEvents = m_toProcessEvents;
+    m_toProcessEvents = false;
     dialog.ShowModal();
-    m_isProcessEvents = oldIsProcessEvents;
+    m_toProcessEvents = oldToProcessEvents;
     if (m_isGameOpened) QSPCallBacks::RefreshInt(QSP_FALSE);
 }
 
@@ -633,21 +633,21 @@ bool QSPFrame::ApplyLinkColor(const wxColour& color)
     return true;
 }
 
-void QSPFrame::CallPaneFunc(wxWindowID id, QSP_BOOL isShow) const
+void QSPFrame::CallPaneFunc(wxWindowID id, QSP_BOOL toShow) const
 {
     switch (id)
     {
     case ID_ACTIONS:
-        QSPShowWindow(QSP_WIN_ACTS, isShow);
+        QSPShowWindow(QSP_WIN_ACTS, toShow);
         break;
     case ID_OBJECTS:
-        QSPShowWindow(QSP_WIN_OBJS, isShow);
+        QSPShowWindow(QSP_WIN_OBJS, toShow);
         break;
     case ID_VARSDESC:
-        QSPShowWindow(QSP_WIN_VARS, isShow);
+        QSPShowWindow(QSP_WIN_VARS, toShow);
         break;
     case ID_INPUT:
-        QSPShowWindow(QSP_WIN_INPUT, isShow);
+        QSPShowWindow(QSP_WIN_INPUT, toShow);
         break;
     }
 }
@@ -671,9 +671,9 @@ void QSPFrame::SetOverallVolume(int percents)
 
 void QSPFrame::TogglePane(wxWindowID id)
 {
-    bool isShow = !m_manager->GetPane(FindWindow(id)).IsShown();
-    CallPaneFunc(id, (QSP_BOOL)isShow);
-    ShowPane(id, isShow);
+    bool toShow = !m_manager->GetPane(FindWindow(id)).IsShown();
+    CallPaneFunc(id, (QSP_BOOL)toShow);
+    ShowPane(id, toShow);
 }
 
 void QSPFrame::OpenGameFile(const wxString& fullPath)
@@ -702,7 +702,7 @@ void QSPFrame::OpenGameFile(const wxString& fullPath)
                 wxCommandEvent dummy;
                 OnNewGame(dummy);
 
-                if (m_isQuit) return;
+                if (m_toQuit) return;
                 UpdateTitle();
                 EnableControls(true);
                 m_savedGamePath.Clear();
@@ -764,12 +764,12 @@ void QSPFrame::OnClose(wxCloseEvent& event)
     SaveSettings();
     EnableControls(false, true);
     Destroy();
-    m_isQuit = true;
+    m_toQuit = true;
 }
 
 void QSPFrame::OnTimer(wxTimerEvent& event)
 {
-    if (m_isProcessEvents && !QSPExecCounter(QSP_TRUE))
+    if (m_toProcessEvents && !QSPExecCounter(QSP_TRUE))
         ShowError();
 }
 
@@ -842,7 +842,7 @@ void QSPFrame::OnSelectFont(wxCommandEvent& event)
         font = dialog.GetFontData().GetChosenFont();
         m_fontSize = font.GetPointSize();
         m_fontName = font.GetFaceName();
-        if (m_isProcessEvents)
+        if (m_toProcessEvents)
             ApplyParams();
         else
         {
@@ -855,8 +855,8 @@ void QSPFrame::OnSelectFont(wxCommandEvent& event)
 
 void QSPFrame::OnUseFontSize(wxCommandEvent& event)
 {
-    m_isUseFontSize = !m_isUseFontSize;
-    if (m_isProcessEvents)
+    m_toUseFontSize = !m_toUseFontSize;
+    if (m_toProcessEvents)
         ApplyParams();
     else
     {
@@ -874,7 +874,7 @@ void QSPFrame::OnSelectFontColor(wxCommandEvent& event)
     if (dialog.ShowModal() == wxID_OK)
     {
         m_fontColor = dialog.GetColourData().GetColour();
-        if (m_isProcessEvents)
+        if (m_toProcessEvents)
             ApplyParams();
         else
         {
@@ -893,7 +893,7 @@ void QSPFrame::OnSelectBackColor(wxCommandEvent& event)
     if (dialog.ShowModal() == wxID_OK)
     {
         m_backColor = dialog.GetColourData().GetColour();
-        if (m_isProcessEvents)
+        if (m_toProcessEvents)
             ApplyParams();
         else
         {
@@ -912,7 +912,7 @@ void QSPFrame::OnSelectLinkColor(wxCommandEvent& event)
     if (dialog.ShowModal() == wxID_OK)
     {
         m_linkColor = dialog.GetColourData().GetColour();
-        if (m_isProcessEvents)
+        if (m_toProcessEvents)
             ApplyParams();
         else
         {
@@ -969,18 +969,18 @@ void QSPFrame::OnToggleInput(wxCommandEvent& event)
 void QSPFrame::OnToggleCaptions(wxCommandEvent& event)
 {
     int i;
-    bool isShow = !m_manager->GetPane(m_objects).HasCaption();
+    bool toShow = !m_manager->GetPane(m_objects).HasCaption();
     wxAuiPaneInfoArray& allPanes = m_manager->GetAllPanes();
     for (i = (int)allPanes.GetCount() - 1; i >= 0; --i)
-        allPanes.Item(i).CaptionVisible(isShow);
+        allPanes.Item(i).CaptionVisible(toShow);
     m_manager->GetPane(m_desc).CaptionVisible(false);
     m_manager->Update();
 }
 
 void QSPFrame::OnToggleHotkeys(wxCommandEvent& event)
 {
-    m_isShowHotkeys = !m_isShowHotkeys;
-    if (m_isProcessEvents) QSPCallBacks::RefreshInt(QSP_FALSE);
+    m_toShowHotkeys = !m_toShowHotkeys;
+    if (m_toProcessEvents) QSPCallBacks::RefreshInt(QSP_FALSE);
 }
 
 void QSPFrame::OnAbout(wxCommandEvent& event)
@@ -1020,7 +1020,7 @@ void QSPFrame::OnLinkClicked(wxHtmlLinkEvent& event)
         else if (href.Upper().StartsWith(wxT("EXEC:")))
         {
             wxString string = href.Mid(5);
-            if (m_isProcessEvents && !QSPExecString(qspStringFromLen(string.c_str(), string.Length()), QSP_TRUE))
+            if (m_toProcessEvents && !QSPExecString(qspStringFromLen(string.c_str(), string.Length()), QSP_TRUE))
                 ShowError();
         }
         else
@@ -1082,7 +1082,7 @@ void QSPFrame::OnKey(wxKeyEvent& event)
     if (event.GetKeyCode() == WXK_SPACE)
         m_keyPressedWhileDisabled = true;
     // Process action shortcut
-    if (m_isProcessEvents && !event.HasModifiers() && wxWindow::FindFocus() != m_input)
+    if (m_toProcessEvents && !event.HasModifiers() && wxWindow::FindFocus() != m_input)
     {
         int ind = -1;
         int actsCount = QSPGetActions(NULL, 0);
@@ -1126,7 +1126,7 @@ void QSPFrame::OnMouseClick(wxMouseEvent& event)
 
 void QSPFrame::OnPaneClose(wxAuiManagerEvent& event)
 {
-    if (m_isProcessEvents)
+    if (m_toProcessEvents)
         CallPaneFunc(event.GetPane()->window->GetId(), QSP_FALSE);
     else
         event.Veto();
@@ -1134,7 +1134,7 @@ void QSPFrame::OnPaneClose(wxAuiManagerEvent& event)
 
 void QSPFrame::OnDropFiles(wxDropFilesEvent& event)
 {
-    if (event.GetNumberOfFiles() && (!m_isGameOpened || m_isProcessEvents))
+    if (event.GetNumberOfFiles() && (!m_isGameOpened || m_toProcessEvents))
     {
         wxFileName path(*event.GetFiles());
         path.MakeAbsolute();

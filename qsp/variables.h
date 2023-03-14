@@ -59,7 +59,7 @@
 
     /* External functions */
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
-    void qspClearVars(QSP_BOOL isFirst);
+    void qspClearVars(QSP_BOOL toInit);
     void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
     void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);
     QSPString qspGetVarStrValue(QSPString name);
@@ -148,13 +148,13 @@
         return groupInd;
     }
 
-    INLINE void qspReleaseSavedVarsGroup(QSP_BOOL isKeepLocals)
+    INLINE void qspReleaseSavedVarsGroup(QSP_BOOL toKeepLocals)
     {
         int ind;
         if (qspSavedVarGroupsCount)
         {
             ind = --qspSavedVarGroupsCount;
-            if (isKeepLocals)
+            if (toKeepLocals)
                 qspClearVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
             else
                 qspRestoreVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);

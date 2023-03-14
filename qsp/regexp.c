@@ -22,13 +22,13 @@
 int qspCompiledRegExpsCurInd = 0;
 QSPRegExp qspCompiledRegExps[QSP_MAXCACHEDREGEXPS];
 
-void qspClearRegExps(QSP_BOOL isFirst)
+void qspClearRegExps(QSP_BOOL toInit)
 {
     int i;
     QSPRegExp *exp = qspCompiledRegExps;
     for (i = 0; i < QSP_MAXCACHEDREGEXPS; ++i)
     {
-        if (!isFirst && exp->CompiledExp)
+        if (!toInit && exp->CompiledExp)
         {
             qspFreeString(exp->Text);
             onig_free(exp->CompiledExp);

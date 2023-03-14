@@ -42,8 +42,8 @@ wxHtmlOpeningStatus QSPListBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxStr
 QSPListBox::QSPListBox(wxWindow *parent, wxWindowID id, ListBoxType type) : wxHtmlListBox(parent, id, wxDefaultPosition, wxDefaultSize, wxNO_BORDER)
 {
     m_type = type;
-    m_isUseHtml = false;
-    m_isShowNums = false;
+    m_toUseHtml = false;
+    m_toShowNums = false;
     m_font = *wxNORMAL_FONT;
     m_pathProvider = NULL;
     wxString commonPart(wxString::Format(
@@ -104,18 +104,18 @@ void QSPListBox::EndItems()
 
 void QSPListBox::SetIsHtml(bool isHtml)
 {
-    if (m_isUseHtml != isHtml)
+    if (m_toUseHtml != isHtml)
     {
-        m_isUseHtml = isHtml;
+        m_toUseHtml = isHtml;
         RefreshUI();
     }
 }
 
-void QSPListBox::SetIsShowNums(bool isShow)
+void QSPListBox::SetToShowNums(bool toShow)
 {
-    if (m_isShowNums != isShow)
+    if (m_toShowNums != toShow)
     {
-        m_isShowNums = isShow;
+        m_toShowNums = toShow;
         RefreshUI();
     }
 }
@@ -162,8 +162,8 @@ void QSPListBox::CreateHTMLParser() const
 wxString QSPListBox::OnGetItem(size_t n) const
 {
     wxString color(QSPTools::GetHexColor(GetForegroundColour()));
-    wxString text(QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_descs[n] : QSPTools::ProceedAsPlain(m_descs[n])));
-    if (m_isShowNums && n < 9)
+    wxString text(QSPTools::HtmlizeWhitespaces(m_toUseHtml ? m_descs[n] : QSPTools::ProceedAsPlain(m_descs[n])));
+    if (m_toShowNums && n < 9)
     {
         if (m_images[n].IsEmpty())
             return wxString::Format(m_outFormatNums, color.wx_str(), n + 1, text.wx_str());

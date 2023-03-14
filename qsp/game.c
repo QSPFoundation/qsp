@@ -90,10 +90,10 @@ INLINE int qspCRC(void *data, int len)
     return crc;
 }
 
-void qspClearIncludes(QSP_BOOL isFirst)
+void qspClearIncludes(QSP_BOOL toInit)
 {
     int i, count;
-    if (!isFirst)
+    if (!toInit)
     {
         for (i = 0; i < qspCurIncFilesCount; ++i)
             qspFreeString(qspCurIncFiles[i]);
@@ -138,7 +138,7 @@ INLINE void qspOpenIncludes()
     }
 }
 
-void qspNewGame(QSP_BOOL isReset)
+void qspNewGame(QSP_BOOL toReset)
 {
     if (!qspLocsCount)
     {
@@ -146,11 +146,11 @@ void qspNewGame(QSP_BOOL isReset)
         return;
     }
     qspCurLoc = 0;
-    if (isReset)
+    if (toReset)
     {
         qspSetSeed((unsigned int)QSP_TIME(0));
         qspTimerInterval = QSP_DEFTIMERINTERVAL;
-        qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
+        qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
         qspMemClear(QSP_FALSE);
         qspResetTime(0);
         qspCallShowWindow(QSP_WIN_ACTS, QSP_TRUE);
@@ -191,7 +191,7 @@ INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count)
 
 QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
 {
-    QSP_BOOL isOldFormat, isAddLoc, isUCS;
+    QSP_BOOL isOldFormat, toAddLoc, isUCS;
     int i, j, ind, crc, count, locsCount, actsCount, start, end;
     QSPString buf, gameString, *strs;
     if (isNewGame) crc = qspCRC(data, dataSize);
@@ -226,11 +226,11 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     for (i = start; i < end; ++i)
     {
         buf = qspCodeDeCode(strs[ind++], QSP_FALSE);
-        if (isAddLoc = (isNewGame || qspLocIndex(buf) < 0))
+        if (toAddLoc = (isNewGame || qspLocIndex(buf) < 0))
             qspLocs[locsCount].Name = buf;
         else
             qspFreeString(buf);
-        if (isAddLoc)
+        if (toAddLoc)
         {
             qspLocs[locsCount].Desc = qspCodeDeCode(strs[ind++], QSP_FALSE);
             buf = qspCodeDeCode(strs[ind++], QSP_FALSE);
@@ -240,7 +240,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
         else
             ind += 2;
         actsCount = (isOldFormat ? 20 : qspDeCodeGetIntVal(strs[ind++]));
-        if (isAddLoc)
+        if (toAddLoc)
         {
             for (j = 0; j < actsCount; ++j)
             {
@@ -302,10 +302,10 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     qspCodeWriteVal(&bufString, qspCurDesc, QSP_TRUE);
     qspCodeWriteVal(&bufString, qspCurVars, QSP_TRUE);
     qspCodeWriteVal(&bufString, locName, QSP_TRUE);
-    qspCodeWriteIntVal(&bufString, (int)qspCurIsShowActs, QSP_TRUE);
-    qspCodeWriteIntVal(&bufString, (int)qspCurIsShowObjs, QSP_TRUE);
-    qspCodeWriteIntVal(&bufString, (int)qspCurIsShowVars, QSP_TRUE);
-    qspCodeWriteIntVal(&bufString, (int)qspCurIsShowInput, QSP_TRUE);
+    qspCodeWriteIntVal(&bufString, (int)qspCurToShowActs, QSP_TRUE);
+    qspCodeWriteIntVal(&bufString, (int)qspCurToShowObjs, QSP_TRUE);
+    qspCodeWriteIntVal(&bufString, (int)qspCurToShowVars, QSP_TRUE);
+    qspCodeWriteIntVal(&bufString, (int)qspCurToShowInput, QSP_TRUE);
     qspCodeWriteIntVal(&bufString, qspTimerInterval, QSP_TRUE);
     qspCodeWriteIntVal(&bufString, qspPLFilesCount, QSP_TRUE);
     for (i = 0; i < qspPLFilesCount; ++i)
@@ -509,10 +509,10 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurDesc = qspCodeDeCode(strs[8], QSP_FALSE);
     qspCurVars = qspCodeDeCode(strs[9], QSP_FALSE);
     locName = qspCodeDeCode(strs[10], QSP_FALSE);
-    qspCurIsShowActs = qspDeCodeGetIntVal(strs[11]) != 0;
-    qspCurIsShowObjs = qspDeCodeGetIntVal(strs[12]) != 0;
-    qspCurIsShowVars = qspDeCodeGetIntVal(strs[13]) != 0;
-    qspCurIsShowInput = qspDeCodeGetIntVal(strs[14]) != 0;
+    qspCurToShowActs = qspDeCodeGetIntVal(strs[11]) != 0;
+    qspCurToShowObjs = qspDeCodeGetIntVal(strs[12]) != 0;
+    qspCurToShowVars = qspDeCodeGetIntVal(strs[13]) != 0;
+    qspCurToShowInput = qspDeCodeGetIntVal(strs[14]) != 0;
     qspTimerInterval = qspDeCodeGetIntVal(strs[15]);
     qspPLFilesCount = qspDeCodeGetIntVal(strs[16]);
     ind = 17;
@@ -585,10 +585,10 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurLoc = qspLocIndex(locName);
     qspFreeString(locName);
     if (qspErrorNum) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_ACTS, qspCurIsShowActs);
-    qspCallShowWindow(QSP_WIN_OBJS, qspCurIsShowObjs);
-    qspCallShowWindow(QSP_WIN_VARS, qspCurIsShowVars);
-    qspCallShowWindow(QSP_WIN_INPUT, qspCurIsShowInput);
+    qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs);
+    qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs);
+    qspCallShowWindow(QSP_WIN_VARS, qspCurToShowVars);
+    qspCallShowWindow(QSP_WIN_INPUT, qspCurToShowInput);
     qspCallSetInputStrText(qspCurInput);
     qspCallShowPicture(qspViewPath);
     qspPlayPLFiles();

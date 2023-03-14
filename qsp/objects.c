@@ -27,14 +27,14 @@ QSPObj qspCurObjects[QSP_MAXOBJECTS];
 int qspCurObjectsCount = 0;
 int qspCurSelObject = -1;
 QSP_BOOL qspIsObjectsChanged = QSP_FALSE;
-QSP_BOOL qspCurIsShowObjs = QSP_TRUE;
+QSP_BOOL qspCurToShowObjs = QSP_TRUE;
 
 INLINE void qspRemoveObject(int);
 
-void qspClearObjects(QSP_BOOL isFirst)
+void qspClearObjects(QSP_BOOL toInit)
 {
     int i;
-    if (!isFirst && qspCurObjectsCount)
+    if (!toInit && qspCurObjectsCount)
     {
         for (i = 0; i < qspCurObjectsCount; ++i)
         {

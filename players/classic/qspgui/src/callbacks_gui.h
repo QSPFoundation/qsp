@@ -68,13 +68,13 @@
         static void SetOverallVolume(float coeff);
 
         // CallBacks
-        static void RefreshInt(QSP_BOOL isRedraw);
+        static void RefreshInt(QSP_BOOL isForced);
         static void SetTimer(int msecs);
         static void SetInputStrText(QSPString text);
         static QSP_BOOL IsPlay(QSPString file);
         static void CloseFile(QSPString file);
         static void PlayFile(QSPString file, int volume);
-        static void ShowPane(int type, QSP_BOOL isShow);
+        static void ShowPane(int type, QSP_BOOL toShow);
         static void Sleep(int msecs);
         static int GetMSCount();
         static void Msg(QSPString str);

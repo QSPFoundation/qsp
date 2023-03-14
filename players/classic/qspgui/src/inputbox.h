@@ -34,7 +34,7 @@
         QSPInputBox(wxWindow *parent, wxWindowID id);
 
         // Accessors
-        void SetText(const wxString& text, bool isChangeValue = true);
+        void SetText(const wxString& text, bool toChangeValue = true);
         wxString GetText() const { return m_text; }
     protected:
         // Events

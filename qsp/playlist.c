@@ -23,13 +23,13 @@
 QSPString qspPLFiles[QSP_MAXPLFILES];
 int qspPLFilesCount = 0;
 
-INLINE void qspPlayFile(QSPString s, int volume, QSP_BOOL isAddToPlayList);
+INLINE void qspPlayFile(QSPString s, int volume, QSP_BOOL toAddToPlayList);
 INLINE int qspSearchPlayList(QSPString file);
 
-void qspClearPlayList(QSP_BOOL isFirst)
+void qspClearPlayList(QSP_BOOL toInit)
 {
     int i;
-    if (!isFirst)
+    if (!toInit)
     {
         for (i = 0; i < qspPLFilesCount; ++i)
             qspFreeString(qspPLFiles[i]);
@@ -37,7 +37,7 @@ void qspClearPlayList(QSP_BOOL isFirst)
     qspPLFilesCount = 0;
 }
 
-INLINE void qspPlayFile(QSPString s, int volume, QSP_BOOL isAddToPlayList)
+INLINE void qspPlayFile(QSPString s, int volume, QSP_BOOL toAddToPlayList)
 {
     QSPString file;
     QSP_CHAR buf[4];
@@ -47,7 +47,7 @@ INLINE void qspPlayFile(QSPString s, int volume, QSP_BOOL isAddToPlayList)
     else if (volume > 100)
         volume = 100;
     qspCallPlayFile(s, volume);
-    if (isAddToPlayList)
+    if (toAddToPlayList)
     {
         if (qspPLFilesCount == QSP_MAXPLFILES)
         {

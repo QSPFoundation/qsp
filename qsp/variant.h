@@ -86,7 +86,7 @@
             QSP_PNUM(dest) = QSP_PNUM(src);
     }
 
-    INLINE QSP_BOOL qspIsCanConvertToNum(QSPVariant *val)
+    INLINE QSP_BOOL qspCanConvertToNum(QSPVariant *val)
     {
         QSP_BOOL isValid;
         if (QSP_ISSTR(val->Type))

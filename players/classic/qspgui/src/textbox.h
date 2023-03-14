@@ -32,13 +32,13 @@
         QSPTextBox(wxWindow *parent, wxWindowID id);
 
         // Methods
-        void RefreshUI(bool isScroll = false);
+        void RefreshUI(bool toScroll = false);
         void LoadBackImage(const wxString& imagePath);
         void SetPathProvider(PathProvider *provider) { m_pathProvider = provider; }
 
         // Accessors
         void SetIsHtml(bool isHtml);
-        void SetText(const wxString& text, bool isScroll = false);
+        void SetText(const wxString& text, bool toScroll = false);
         void SetTextFont(const wxFont& font);
         wxFont GetTextFont() const { return m_font; }
         wxString GetText() const { return m_text; }
@@ -59,7 +59,7 @@
 
         // Fields
         PathProvider *m_pathProvider;
-        bool m_isUseHtml;
+        bool m_toUseHtml;
         wxString m_outFormat;
         wxString m_imagePath;
         wxFont m_font;

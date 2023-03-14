@@ -279,7 +279,7 @@ QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2)
     return qspStringFromLen(ret, len);
 }
 
-QSPString qspCodeDeCode(QSPString str, QSP_BOOL isCode)
+QSPString qspCodeDeCode(QSPString str, QSP_BOOL toCode)
 {
     QSP_CHAR ch, *origBuf, *buf;
     int curLen, len = qspStrLen(str);
@@ -287,7 +287,7 @@ QSPString qspCodeDeCode(QSPString str, QSP_BOOL isCode)
     buf = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
     origBuf = str.Str;
     curLen = len;
-    if (isCode)
+    if (toCode)
     {
         while (--curLen >= 0)
         {
@@ -323,11 +323,11 @@ int qspDeCodeGetIntVal(QSPString val)
     return num;
 }
 
-void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL isCode)
+void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL toCode)
 {
     QSP_CHAR buf[12];
     QSPString temp, str = qspNumToStr(buf, val);
-    if (isCode)
+    if (toCode)
     {
         temp = qspCodeDeCode(str, QSP_TRUE);
         qspAddText(s, temp, QSP_FALSE);
@@ -338,12 +338,12 @@ void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL isCode)
     qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
 }
 
-void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL isCode)
+void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL toCode)
 {
     QSPString temp;
     if (val.Str)
     {
-        if (isCode)
+        if (toCode)
         {
             temp = qspCodeDeCode(val, QSP_TRUE);
             qspAddText(s, temp, QSP_FALSE);

@@ -621,7 +621,7 @@ INLINE QSPVariant qspValue(int valueIndex, QSPVariant *compValues, QSP_TINYINT *
             qspAddText(&QSP_STR(tos), QSP_STR(args[1]), QSP_FALSE);
             tos.Type = QSP_TYPE_STRING;
         }
-        else if (qspIsCanConvertToNum(args) && qspIsCanConvertToNum(args + 1))
+        else if (qspCanConvertToNum(args) && qspCanConvertToNum(args + 1))
         {
             qspConvertVariantTo(args, QSP_TYPE_NUMBER);
             qspConvertVariantTo(args + 1, QSP_TYPE_NUMBER);

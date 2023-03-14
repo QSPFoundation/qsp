@@ -81,14 +81,14 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
     {
         if (QSP_ISSTR(v2->Type))
         {
-            if (qspIsCanConvertToNum(v2))
+            if (qspCanConvertToNum(v2))
                 qspConvertVariantTo(v2, v1->Type);
             else
                 qspConvertVariantTo(v1, v2->Type);
         }
         else
         {
-            if (qspIsCanConvertToNum(v1))
+            if (qspCanConvertToNum(v1))
                 qspConvertVariantTo(v1, v2->Type);
             else
                 qspConvertVariantTo(v2, v1->Type);

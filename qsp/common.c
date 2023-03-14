@@ -35,8 +35,8 @@ QSPString qspViewPath;
 int qspTimerInterval = 0;
 QSP_BOOL qspIsMainDescChanged = QSP_FALSE;
 QSP_BOOL qspIsVarsDescChanged = QSP_FALSE;
-QSP_BOOL qspCurIsShowVars = QSP_TRUE;
-QSP_BOOL qspCurIsShowInput = QSP_TRUE;
+QSP_BOOL qspCurToShowVars = QSP_TRUE;
+QSP_BOOL qspCurToShowInput = QSP_TRUE;
 
 INLINE unsigned int qspURand();
 
@@ -53,16 +53,16 @@ void qspPrepareExecution()
     qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_FALSE;
 }
 
-void qspMemClear(QSP_BOOL isFirst)
+void qspMemClear(QSP_BOOL toInit)
 {
     int i;
-    qspClearIncludes(isFirst);
-    qspClearVars(isFirst);
-    qspClearObjects(isFirst);
-    qspClearActions(isFirst);
-    qspClearPlayList(isFirst);
-    qspClearRegExps(isFirst);
-    if (!isFirst)
+    qspClearIncludes(toInit);
+    qspClearVars(toInit);
+    qspClearObjects(toInit);
+    qspClearActions(toInit);
+    qspClearPlayList(toInit);
+    qspClearRegExps(toInit);
+    if (!toInit)
     {
         if (!qspIsEmpty(qspCurDesc)) qspIsMainDescChanged = QSP_TRUE;
         if (!qspIsEmpty(qspCurVars)) qspIsVarsDescChanged = QSP_TRUE;

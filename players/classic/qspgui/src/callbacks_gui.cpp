@@ -74,48 +74,48 @@ void QSPCallBacks::DeInit()
 
 void QSPCallBacks::SetTimer(int msecs)
 {
-    if (m_frame->IsQuit()) return;
+    if (m_frame->ToQuit()) return;
     if (msecs)
         m_frame->GetTimer()->Start(msecs);
     else
         m_frame->GetTimer()->Stop();
 }
 
-void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
+void QSPCallBacks::RefreshInt(QSP_BOOL isForced)
 {
     static int oldFullRefreshCount = 0;
     int i, numVal;
-    bool isScroll, isCanSave;
+    bool toScroll, canSave;
     QSPString strVal;
     QSPListItem items[MAX_LIST_ITEMS];
-    if (m_frame->IsQuit()) return;
+    if (m_frame->ToQuit()) return;
     // -------------------------------
-    isScroll = !(QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("DISABLESCROLL")), 0, &numVal, &strVal) && numVal);
-    isCanSave = !(QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("NOSAVE")), 0, &numVal, &strVal) && numVal);
+    toScroll = !(QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("DISABLESCROLL")), 0, &numVal, &strVal) && numVal);
+    canSave = !(QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("NOSAVE")), 0, &numVal, &strVal) && numVal);
     m_isHtml = QSPGetVarValues(QSP_STATIC_STR(QSP_FMT("USEHTML")), 0, &numVal, &strVal) && numVal;
     // -------------------------------
     m_frame->GetVars()->SetIsHtml(m_isHtml);
     if (QSPIsVarsDescChanged())
     {
         QSPString varsDesc = QSPGetVarsDesc();
-        m_frame->GetVars()->SetText(wxString(varsDesc.Str, varsDesc.End), isScroll);
+        m_frame->GetVars()->SetText(wxString(varsDesc.Str, varsDesc.End), toScroll);
     }
     // -------------------------------
     int fullRefreshCount = QSPGetFullRefreshCount();
     if (oldFullRefreshCount != fullRefreshCount)
     {
-        isScroll = false;
+        toScroll = false;
         oldFullRefreshCount = fullRefreshCount;
     }
     m_frame->GetDesc()->SetIsHtml(m_isHtml);
     if (QSPIsMainDescChanged())
     {
         QSPString mainDesc = QSPGetMainDesc();
-        m_frame->GetDesc()->SetText(wxString(mainDesc.Str, mainDesc.End), isScroll);
+        m_frame->GetDesc()->SetText(wxString(mainDesc.Str, mainDesc.End), toScroll);
     }
     // -------------------------------
     m_frame->GetActions()->SetIsHtml(m_isHtml);
-    m_frame->GetActions()->SetIsShowNums(m_frame->IsShowHotkeys());
+    m_frame->GetActions()->SetToShowNums(m_frame->ToShowHotkeys());
     if (QSPIsActionsChanged())
     {
         int actionsCount = QSPGetActions(items, MAX_LIST_ITEMS);
@@ -142,20 +142,20 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isRedraw)
         m_frame->GetDesc()->LoadBackImage(wxEmptyString);
     // -------------------------------
     m_frame->ApplyParams();
-    if (isRedraw)
+    if (isForced)
     {
         m_frame->EnableControls(false, true);
         m_frame->Update();
         wxTheApp->Yield(true);
-        if (m_frame->IsQuit()) return;
+        if (m_frame->ToQuit()) return;
         m_frame->EnableControls(true, true);
     }
-    m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, isCanSave);
+    m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, canSave);
 }
 
 void QSPCallBacks::SetInputStrText(QSPString text)
 {
-    if (m_frame->IsQuit()) return;
+    if (m_frame->ToQuit()) return;
     m_frame->GetInput()->SetText(wxString(text.Str, text.End));
 }
 
@@ -220,31 +220,31 @@ void QSPCallBacks::PlayFile(QSPString file, int volume)
     }
 }
 
-void QSPCallBacks::ShowPane(int type, QSP_BOOL isShow)
+void QSPCallBacks::ShowPane(int type, QSP_BOOL toShow)
 {
-    if (m_frame->IsQuit()) return;
+    if (m_frame->ToQuit()) return;
     switch (type)
     {
     case QSP_WIN_ACTS:
-        m_frame->ShowPane(ID_ACTIONS, isShow != QSP_FALSE);
+        m_frame->ShowPane(ID_ACTIONS, toShow != QSP_FALSE);
         break;
     case QSP_WIN_OBJS:
-        m_frame->ShowPane(ID_OBJECTS, isShow != QSP_FALSE);
+        m_frame->ShowPane(ID_OBJECTS, toShow != QSP_FALSE);
         break;
     case QSP_WIN_VARS:
-        m_frame->ShowPane(ID_VARSDESC, isShow != QSP_FALSE);
+        m_frame->ShowPane(ID_VARSDESC, toShow != QSP_FALSE);
         break;
     case QSP_WIN_INPUT:
-        m_frame->ShowPane(ID_INPUT, isShow != QSP_FALSE);
+        m_frame->ShowPane(ID_INPUT, toShow != QSP_FALSE);
         break;
     }
 }
 
 void QSPCallBacks::Sleep(int msecs)
 {
-    if (m_frame->IsQuit()) return;
-    bool isSave = m_frame->GetGameMenu()->IsEnabled(ID_SAVEGAMESTAT);
-    bool isBreak = false;
+    if (m_frame->ToQuit()) return;
+    bool canSave = m_frame->GetGameMenu()->IsEnabled(ID_SAVEGAMESTAT);
+    bool toBreak = false;
     m_frame->EnableControls(false, true);
     int i, count = msecs / 50;
     for (i = 0; i < count; ++i)
@@ -252,21 +252,21 @@ void QSPCallBacks::Sleep(int msecs)
         wxThread::Sleep(50);
         m_frame->Update();
         wxTheApp->Yield(true);
-        if (m_frame->IsQuit() ||
+        if (m_frame->ToQuit() ||
             m_frame->IsKeyPressedWhileDisabled())
         {
-            isBreak = true;
+            toBreak = true;
             break;
         }
     }
-    if (!isBreak)
+    if (!toBreak)
     {
         wxThread::Sleep(msecs % 50);
         m_frame->Update();
         wxTheApp->Yield(true);
     }
     m_frame->EnableControls(true, true);
-    m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, isSave);
+    m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, canSave);
 }
 
 int QSPCallBacks::GetMSCount()
@@ -279,8 +279,7 @@ int QSPCallBacks::GetMSCount()
 
 void QSPCallBacks::Msg(QSPString str)
 {
-    if (m_frame->IsQuit()) return;
-    RefreshInt(QSP_FALSE);
+    if (m_frame->ToQuit()) return;
     QSPMsgDlg dialog(m_frame,
         wxID_ANY,
         m_frame->GetDesc()->GetBackgroundColour(),
@@ -298,7 +297,7 @@ void QSPCallBacks::Msg(QSPString str)
 
 int QSPCallBacks::ShowMenu(QSPListItem *items, int count)
 {
-    if (m_frame->IsQuit()) return -1;
+    if (m_frame->ToQuit()) return -1;
     m_frame->EnableControls(false);
     m_frame->DeleteMenu();
     for (int i = 0; i < count; ++i)
@@ -310,8 +309,7 @@ int QSPCallBacks::ShowMenu(QSPListItem *items, int count)
 
 void QSPCallBacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
 {
-    if (m_frame->IsQuit()) return;
-    RefreshInt(QSP_FALSE);
+    if (m_frame->ToQuit()) return;
     QSPInputDlg dialog(m_frame,
         wxID_ANY,
         m_frame->GetDesc()->GetBackgroundColour(),
@@ -358,7 +356,7 @@ void QSPCallBacks::Version(QSPString param, QSP_CHAR *buffer, int maxLen)
 
 void QSPCallBacks::ShowImage(QSPString file)
 {
-    if (m_frame->IsQuit()) return;
+    if (m_frame->ToQuit()) return;
     if (file.Str)
     {
         wxString imgFullPath(m_frame->ComposeGamePath(wxString(file.Str, file.End)));
@@ -372,7 +370,7 @@ void QSPCallBacks::ShowImage(QSPString file)
 
 void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
 {
-    if (m_frame->IsQuit()) return;
+    if (m_frame->ToQuit()) return;
     wxString fullPath(m_frame->ComposeGamePath(wxString(file.Str, file.End)));
     if (wxFileExists(fullPath))
     {
@@ -390,7 +388,7 @@ void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
 
 void QSPCallBacks::OpenGameStatus(QSPString file)
 {
-    if (m_frame->IsQuit()) return;
+    if (m_frame->ToQuit()) return;
     wxString fullPath;
     if (file.Str)
     {
@@ -419,7 +417,7 @@ void QSPCallBacks::OpenGameStatus(QSPString file)
 
 void QSPCallBacks::SaveGameStatus(QSPString file)
 {
-    if (m_frame->IsQuit()) return;
+    if (m_frame->ToQuit()) return;
     wxString fullPath;
     if (file.Str)
     {

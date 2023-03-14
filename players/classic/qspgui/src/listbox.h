@@ -49,7 +49,7 @@
 
         // Accessors
         void SetIsHtml(bool isHtml);
-        void SetIsShowNums(bool isShow);
+        void SetToShowNums(bool toShow);
         void SetTextFont(const wxFont& font);
         wxFont GetTextFont() const { return m_font; }
         void SetLinkColor(const wxColour& clr);
@@ -74,8 +74,8 @@
         wxString m_outFormatImage;
         wxString m_outFormatImageNums;
         ListBoxType m_type;
-        bool m_isUseHtml;
-        bool m_isShowNums;
+        bool m_toUseHtml;
+        bool m_toShowNums;
         wxFont m_font;
         wxArrayString m_images;
         wxArrayString m_descs;

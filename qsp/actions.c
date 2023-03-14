@@ -26,14 +26,14 @@ QSPCurAct qspCurActions[QSP_MAXACTIONS];
 int qspCurActionsCount = 0;
 int qspCurSelAction = -1;
 QSP_BOOL qspIsActionsChanged = QSP_FALSE;
-QSP_BOOL qspCurIsShowActs = QSP_TRUE;
+QSP_BOOL qspCurToShowActs = QSP_TRUE;
 
 INLINE int qspActIndex(QSPString name);
 
-void qspClearActions(QSP_BOOL isFirst)
+void qspClearActions(QSP_BOOL toInit)
 {
     int i;
-    if (!isFirst && qspCurActionsCount)
+    if (!toInit && qspCurActionsCount)
     {
         for (i = 0; i < qspCurActionsCount; ++i)
         {

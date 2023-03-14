@@ -116,29 +116,29 @@ int QSPGetActions(QSPListItem *items, int itemsBufSize)
     return qspCurActionsCount;
 }
 /* Set index of a selected action */
-QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL isRefresh)
+QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI)
 {
     if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
     {
-        if (qspIsDisableCodeExec) return QSP_FALSE;
+        if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution();
         qspCurSelAction = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONACTSEL")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
-        if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+        if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
     return QSP_TRUE;
 }
 /* Execute the selected action */
-QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL isRefresh)
+QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI)
 {
     if (qspCurSelAction >= 0)
     {
-        if (qspIsDisableCodeExec) return QSP_FALSE;
+        if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution();
         qspExecAction(qspCurSelAction);
         if (qspErrorNum) return QSP_FALSE;
-        if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+        if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
     return QSP_TRUE;
 }
@@ -167,16 +167,16 @@ int QSPGetObjects(QSPListItem *items, int itemsBufSize)
     return qspCurObjectsCount;
 }
 /* Set index of a selected object */
-QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL isRefresh)
+QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI)
 {
     if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
     {
-        if (qspIsDisableCodeExec) return QSP_FALSE;
+        if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution();
         qspCurSelObject = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJSEL")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
-        if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+        if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
     return QSP_TRUE;
 }
@@ -192,21 +192,21 @@ QSP_BOOL QSPIsObjectsChanged()
 }
 /* ------------------------------------------------------------ */
 /* Synchronize visibility of a region of the UI */
-void QSPShowWindow(int type, QSP_BOOL isShow)
+void QSPShowWindow(int type, QSP_BOOL toShow)
 {
     switch (type)
     {
     case QSP_WIN_ACTS:
-        qspCurIsShowActs = isShow;
+        qspCurToShowActs = toShow;
         break;
     case QSP_WIN_OBJS:
-        qspCurIsShowObjs = isShow;
+        qspCurToShowObjs = toShow;
         break;
     case QSP_WIN_VARS:
-        qspCurIsShowVars = isShow;
+        qspCurToShowVars = toShow;
         break;
     case QSP_WIN_INPUT:
-        qspCurIsShowInput = isShow;
+        qspCurToShowInput = toShow;
         break;
     }
 }
@@ -269,45 +269,45 @@ QSP_BOOL QSPGetVarNameByIndex(int index, QSPString *name)
 /* Code execution */
 
 /* Execute a line of code */
-QSP_BOOL QSPExecString(QSPString s, QSP_BOOL isRefresh)
+QSP_BOOL QSPExecString(QSPString s, QSP_BOOL toRefreshUI)
 {
-    if (qspIsDisableCodeExec) return QSP_FALSE;
+    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
     qspExecStringAsCodeWithArgs(s, 0, 0, 1, 0);
     if (qspErrorNum) return QSP_FALSE;
-    if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+    if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
 /* Execute code of the specified location */
-QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL isRefresh)
+QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI)
 {
-    if (qspIsDisableCodeExec) return QSP_FALSE;
+    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
     qspExecLocByNameWithArgs(name, 0, 0, 0);
     if (qspErrorNum) return QSP_FALSE;
-    if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+    if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
 /* Execute code of the special "COUNTER" location */
-QSP_BOOL QSPExecCounter(QSP_BOOL isRefresh)
+QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI)
 {
     if (!qspIsInCallBack)
     {
         qspPrepareExecution();
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("COUNTER")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
-        if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+        if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
     return QSP_TRUE;
 }
 /* Execute code of the special "USERCOM" location */
-QSP_BOOL QSPExecUserInput(QSP_BOOL isRefresh)
+QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI)
 {
-    if (qspIsDisableCodeExec) return QSP_FALSE;
+    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("USERCOM")), 0, 0);
     if (qspErrorNum) return QSP_FALSE;
-    if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+    if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
@@ -336,31 +336,31 @@ QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNew
     return qspOpenGame((void *)data, dataSize, isNewGame);
 }
 /* Save game state to a buffer */
-QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL isRefresh)
+QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI)
 {
-    if (qspIsDisableCodeExec) return QSP_FALSE;
+    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
     if (!qspSaveGameStatus(buf, bufSize)) return QSP_FALSE;
-    if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+    if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
 /* Load game state from data */
-QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL isRefresh)
+QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRefreshUI)
 {
-    if (qspIsDisableCodeExec) return QSP_FALSE;
+    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
     if (!qspOpenGameStatus((void *)data, dataSize)) return QSP_FALSE;
-    if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+    if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
 /* Restart current game */
-QSP_BOOL QSPRestartGame(QSP_BOOL isRefresh)
+QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI)
 {
-    if (qspIsDisableCodeExec) return QSP_FALSE;
+    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
     qspNewGame(QSP_TRUE);
     if (qspErrorNum) return QSP_FALSE;
-    if (isRefresh) qspCallRefreshInt(QSP_FALSE);
+    if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
@@ -389,7 +389,7 @@ void QSPInit()
     qspLocsCount = 0;
     qspCurLoc = -1;
     qspTimerInterval = 0;
-    qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
+    qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
     setlocale(LC_ALL, QSP_LOCALE);
     qspSetSeed(0);
     qspInitSymbolClasses();

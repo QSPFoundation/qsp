@@ -57,6 +57,6 @@
     int qspLocIndex(QSPString name);
     void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
     void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count);
-    void qspRefreshCurLoc(QSP_BOOL isChangeDesc, QSPVariant *args, QSP_TINYINT count);
+    void qspRefreshCurLoc(QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT count);
 
 #endif

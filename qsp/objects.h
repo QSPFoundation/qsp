@@ -33,7 +33,7 @@
     extern int qspCurObjectsCount;
     extern int qspCurSelObject;
     extern QSP_BOOL qspIsObjectsChanged;
-    extern QSP_BOOL qspCurIsShowObjs;
+    extern QSP_BOOL qspCurToShowObjs;
 
     /* External functions */
     void qspClearObjects(QSP_BOOL);

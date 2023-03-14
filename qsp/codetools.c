@@ -205,7 +205,7 @@ QSPString qspGetLineLabel(QSPString str)
 
 void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 {
-    QSP_BOOL isSearchElse;
+    QSP_BOOL toSearchElse;
     QSP_TINYINT statCode;
     int count = 0;
     QSP_CHAR *temp, *nextPos, *elsePos, *delimPos = 0, *paramPos = 0;
@@ -219,7 +219,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     statCode = qspGetStatCode(str, &paramPos);
     if (!qspIsEmpty(str) && statCode != qspStatComment)
     {
-        isSearchElse = QSP_TRUE;
+        toSearchElse = QSP_TRUE;
         elsePos = 0;
         switch (statCode)
         {
@@ -261,7 +261,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                     }
                 }
                 else
-                    isSearchElse = QSP_FALSE;
+                    toSearchElse = QSP_FALSE;
                 if (statCode == qspStatUnknown && str.Str != delimPos)
                 {
                     if (delimPos)
@@ -325,10 +325,10 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                         delimPos = qspDelimPos(str, QSP_STATDELIM[0]);
                         if (delimPos) nextPos = delimPos + QSP_STATIC_LEN(QSP_STATDELIM);
                         if (elsePos && str.Str >= elsePos) elsePos = 0;
-                        if (!elsePos && isSearchElse)
+                        if (!elsePos && toSearchElse)
                         {
                             elsePos = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
-                            if (!elsePos) isSearchElse = QSP_FALSE;
+                            if (!elsePos) toSearchElse = QSP_FALSE;
                         }
                         if (elsePos && (!delimPos || elsePos < delimPos))
                         {

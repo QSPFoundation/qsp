@@ -30,8 +30,8 @@
     extern int qspTimerInterval;
     extern QSP_BOOL qspIsMainDescChanged;
     extern QSP_BOOL qspIsVarsDescChanged;
-    extern QSP_BOOL qspCurIsShowVars;
-    extern QSP_BOOL qspCurIsShowInput;
+    extern QSP_BOOL qspCurToShowVars;
+    extern QSP_BOOL qspCurToShowInput;
 
     /* External functions */
     void qspPrepareExecution();

@@ -42,7 +42,7 @@ wxHtmlOpeningStatus QSPTextBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxStr
 QSPTextBox::QSPTextBox(wxWindow *parent, wxWindowID id) : wxHtmlWindow(parent, id)
 {
     SetBorders(5);
-    m_isUseHtml = false;
+    m_toUseHtml = false;
     m_font = *wxNORMAL_FONT;
     m_pathProvider = NULL;
     m_outFormat = wxString::Format(
@@ -56,21 +56,21 @@ QSPTextBox::QSPTextBox(wxWindow *parent, wxWindowID id) : wxHtmlWindow(parent, i
 
 void QSPTextBox::SetIsHtml(bool isHtml)
 {
-    if (m_isUseHtml != isHtml)
+    if (m_toUseHtml != isHtml)
     {
-        m_isUseHtml = isHtml;
+        m_toUseHtml = isHtml;
         RefreshUI();
     }
 }
 
-void QSPTextBox::RefreshUI(bool isScroll)
+void QSPTextBox::RefreshUI(bool toScroll)
 {
     wxString color(QSPTools::GetHexColor(GetForegroundColour()));
-    wxString text(QSPTools::HtmlizeWhitespaces(m_isUseHtml ? m_text : QSPTools::ProceedAsPlain(m_text)));
+    wxString text(QSPTools::HtmlizeWhitespaces(m_toUseHtml ? m_text : QSPTools::ProceedAsPlain(m_text)));
     wxON_BLOCK_EXIT_THIS0(QSPTextBox::Thaw);
     Freeze();
     SetPage(wxString::Format(m_outFormat, color.wx_str(), text.wx_str()));
-    if (isScroll) Scroll(0, 0x7FFFFFFF);
+    if (toScroll) Scroll(0, 0x7FFFFFFF);
 }
 
 void QSPTextBox::LoadBackImage(const wxString& imagePath)
@@ -99,17 +99,17 @@ void QSPTextBox::LoadBackImage(const wxString& imagePath)
     }
 }
 
-void QSPTextBox::SetText(const wxString& text, bool isScroll)
+void QSPTextBox::SetText(const wxString& text, bool toScroll)
 {
     if (m_text != text)
     {
-        if (isScroll)
+        if (toScroll)
         {
             if (m_text.IsEmpty() || !text.StartsWith(m_text))
-                isScroll = false;
+                toScroll = false;
         }
         m_text = text;
-        RefreshUI(isScroll);
+        RefreshUI(toScroll);
     }
 }
 

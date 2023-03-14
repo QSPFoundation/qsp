@@ -103,7 +103,7 @@
         void SaveSettings();
         void LoadSettings();
         void EnableControls(bool status, bool isExtended = false);
-        void ShowPane(wxWindowID id, bool isShow);
+        void ShowPane(wxWindowID id, bool toShow);
         void ApplyParams();
         void DeleteMenu();
         void AddMenuItem(const wxString &name, const wxString &imgPath);
@@ -122,8 +122,8 @@
         QSPListBox *GetObjects() const { return m_objects; }
         QSPImgCanvas *GetImgView() const { return m_imgView; }
         wxMenu *GetGameMenu() const { return m_gameMenu; }
-        bool IsShowHotkeys() const { return m_isShowHotkeys; }
-        bool IsQuit() const { return m_isQuit; }
+        bool ToShowHotkeys() const { return m_toShowHotkeys; }
+        bool ToQuit() const { return m_toQuit; }
         bool IsKeyPressedWhileDisabled() const { return m_keyPressedWhileDisabled; }
     protected:
         // Internal methods
@@ -137,7 +137,7 @@
         bool ApplyFontColor(const wxColour& color);
         bool ApplyBackColor(const wxColour& color);
         bool ApplyLinkColor(const wxColour& color);
-        void CallPaneFunc(wxWindowID id, QSP_BOOL isShow) const;
+        void CallPaneFunc(wxWindowID id, QSP_BOOL toShow) const;
         void TogglePane(wxWindowID id);
         void SetOverallVolume(int percents);
         void OpenGameFile(const wxString& fullPath);
@@ -207,11 +207,11 @@
         wxColour m_fontColor;
         int m_fontSize;
         wxString m_fontName;
-        bool m_isUseFontSize;
-        bool m_isProcessEvents;
-        bool m_isQuit;
+        bool m_toUseFontSize;
+        bool m_toProcessEvents;
+        bool m_toQuit;
         bool m_keyPressedWhileDisabled;
-        bool m_isShowHotkeys;
+        bool m_toShowHotkeys;
         int m_volume;
         int m_menuIndex;
     };

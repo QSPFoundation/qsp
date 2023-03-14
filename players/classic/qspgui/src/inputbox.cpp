@@ -32,12 +32,12 @@ QSPInputBox::QSPInputBox(wxWindow *parent, wxWindowID id) : wxTextCtrl(parent, i
     m_selIndex = -1;
 }
 
-void QSPInputBox::SetText(const wxString& text, bool isChangeValue)
+void QSPInputBox::SetText(const wxString& text, bool toChangeValue)
 {
     if (m_text != text)
     {
         m_text = text;
-        if (isChangeValue) ChangeValue(m_text);
+        if (toChangeValue) ChangeValue(m_text);
     }
 }
 

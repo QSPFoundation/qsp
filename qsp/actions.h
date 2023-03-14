@@ -38,7 +38,7 @@
     extern int qspCurActionsCount;
     extern int qspCurSelAction;
     extern QSP_BOOL qspIsActionsChanged;
-    extern QSP_BOOL qspCurIsShowActs;
+    extern QSP_BOOL qspCurToShowActs;
 
     /* External functions */
     void qspClearActions(QSP_BOOL);
