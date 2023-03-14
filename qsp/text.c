@@ -51,10 +51,10 @@ QSP_CHAR *qspStringToC(QSPString s)
     return string;
 }
 
-void qspAddText(QSPString *dest, QSPString val, QSP_BOOL isCreate)
+void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
 {
     int valLen = qspStrLen(val);
-    if (!isCreate && dest->Str)
+    if (!toCreate && dest->Str)
     {
         if (valLen)
         {

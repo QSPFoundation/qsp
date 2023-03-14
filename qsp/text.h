@@ -41,7 +41,7 @@
     /* External functions */
     void qspInitSymbolClasses();
     QSP_CHAR *qspStringToC(QSPString s);
-    void qspAddText(QSPString *dest, QSPString val, QSP_BOOL isCreate);
+    void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
     QSP_BOOL qspClearText(QSPString *s);
     QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars);
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);

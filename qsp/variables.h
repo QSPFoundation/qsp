@@ -58,7 +58,7 @@
     extern int qspSavedVarGroupsBufSize;
 
     /* External functions */
-    QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate);
+    QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
     void qspClearVars(QSP_BOOL isFirst);
     void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
     void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);

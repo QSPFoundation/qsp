@@ -42,7 +42,7 @@ INLINE int qspIndStringCompare(const void *name, const void *compareTo)
     return qspStrsComp(*(QSPString *)name, ((QSPVarIndex *)compareTo)->Str);
 }
 
-QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate)
+QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
 {
     int i;
     QSPVar *var;
@@ -67,7 +67,7 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL isCreate)
     {
         if (!var->Name.Str)
         {
-            if (isCreate) var->Name = qspGetNewText(name);
+            if (toCreate) var->Name = qspGetNewText(name);
             return var;
         }
         if (!qspStrsComp(var->Name, name)) return var;
@@ -127,7 +127,7 @@ INLINE void qspRemoveArrayItem(QSPVar *var, int index)
     }
 }
 
-int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL isCreate)
+int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL toCreate)
 {
     int n = var->IndsCount;
     QSPString uStr = qspGetNewText(str);
@@ -141,7 +141,7 @@ int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL isCreate)
             return ind->Index;
         }
     }
-    if (isCreate)
+    if (toCreate)
     {
         int i;
         var->IndsCount++;
