@@ -21,6 +21,25 @@
 #include "mathops.h"
 
 QSPString qspNullString;
+unsigned char qspAsciiClasses[128];
+
+INLINE void qspFillSymbolClass(unsigned char symbolClass, QSP_CHAR *symbols)
+{
+    while (*symbols)
+    {
+        qspAsciiClasses[*symbols] |= symbolClass;
+        ++symbols;
+    }
+}
+
+void qspInitSymbolClasses()
+{
+    qspFillSymbolClass(QSP_CHAR_SPACE, QSP_SPACES);
+    qspFillSymbolClass(QSP_CHAR_QUOT, QSP_QUOTS);
+    qspFillSymbolClass(QSP_CHAR_DELIM, QSP_DELIMS);
+    qspFillSymbolClass(QSP_CHAR_SIMPLEOP, QSP_ADD QSP_SUB QSP_DIV QSP_MUL);
+    qspFillSymbolClass(QSP_CHAR_EXPSTART, QSP_LQUOT QSP_LRBRACK QSP_LSBRACK);
+}
 
 QSP_CHAR *qspStringToC(QSPString s)
 {

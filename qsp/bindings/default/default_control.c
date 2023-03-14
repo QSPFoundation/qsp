@@ -392,6 +392,7 @@ void QSPInit()
     qspCurIsShowObjs = qspCurIsShowActs = qspCurIsShowVars = qspCurIsShowInput = QSP_TRUE;
     setlocale(LC_ALL, QSP_LOCALE);
     qspSetSeed(0);
+    qspInitSymbolClasses();
     qspPrepareExecution();
     qspMemClear(QSP_TRUE);
     qspInitCallBacks();
