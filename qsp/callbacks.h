@@ -38,7 +38,7 @@
     extern QSP_BOOL qspToDisableCodeExec;
 
     /* External functions */
-    void qspInitCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI);
+    void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI);
     void qspFinalizeCallBack(QSPCallState *state);
 
     void qspInitCallBacks();
