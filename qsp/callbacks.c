@@ -26,7 +26,7 @@ QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
 QSP_BOOL qspIsInCallBack = QSP_FALSE;
 QSP_BOOL qspToDisableCodeExec = QSP_FALSE; /* blocks major state changes, so we can skip some checks */
 
-void qspSaveCallState(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI)
+void qspInitCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI)
 {
     state->IsInCallBack = qspIsInCallBack;
     /* save a state of changes */
@@ -47,7 +47,7 @@ void qspSaveCallState(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL 
         qspCallBacks[QSP_CALL_REFRESHINT](QSP_TRUE);
 }
 
-void qspRestoreCallState(QSPCallState *state)
+void qspFinalizeCallBack(QSPCallState *state)
 {
     /* restore a previous mode */
     qspToDisableCodeExec = state->ToDisableCodeExec;
