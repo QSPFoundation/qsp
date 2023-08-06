@@ -739,15 +739,20 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
             }
         }
     }
-    while (--expression->ItemsCount >= 0)
+    if (expression->ItemsCount > 0)
     {
-        switch (expression->CompOpCodes[expression->ItemsCount])
+        int i;
+        for (i = expression->ItemsCount - 1; i >= 0; --i)
         {
-            case qspOpValue:
-            case qspOpValueToFormat:
-                if (QSP_ISSTR(expression->CompValues[expression->ItemsCount].Type)) qspFreeString(QSP_STR(expression->CompValues[expression->ItemsCount]));
-                break;
+            switch (expression->CompOpCodes[i])
+            {
+                case qspOpValue:
+                case qspOpValueToFormat:
+                    if (QSP_ISSTR(expression->CompValues[i].Type)) qspFreeString(QSP_STR(expression->CompValues[i]));
+                    break;
+            }
         }
+        expression->ItemsCount = 0;
     }
     return QSP_FALSE;
 }
