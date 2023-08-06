@@ -138,7 +138,7 @@
     {
         QSPVar *varsList;
         int groupInd = qspAllocateSavedVarsGroup();
-        varsList = (QSPVar *)malloc(2 * sizeof(QSPVar));
+        varsList = (QSPVar *)malloc(2 * sizeof(QSPVar)); /* ARGS & RESULT */
         varsList[0].Name = qspGetNewText(varArgs->Name);
         qspMoveVar(&varsList[0], varArgs);
         varsList[1].Name = qspGetNewText(varRes->Name);

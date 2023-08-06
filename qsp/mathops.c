@@ -388,7 +388,7 @@ INLINE QSPString qspGetQString(QSPString *expr)
         return qspNullString;
     }
     expr->Str = pos + QSP_STATIC_LEN(QSP_RQUOT);
-    return qspStringFromPair(buf + QSP_STATIC_LEN(QSP_LQUOT), pos);
+    return qspGetNewText(qspStringFromPair(buf + QSP_STATIC_LEN(QSP_LQUOT), pos));
 }
 
 INLINE int qspSkipValue(QSPMathExpression *expression, int valueIndex)
@@ -579,7 +579,8 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
                 if (qspErrorNum) break;
                 v.Type = QSP_TYPE_STRING;
                 QSP_STR(v) = name;
-                if (!qspAppendToCompiled(expression, qspOpValueToFormat, 0, v))
+                opCode = qspIsEmpty(name) ? qspOpValue : qspOpValueToFormat;
+                if (!qspAppendToCompiled(expression, opCode, 0, v))
                 {
                     qspFreeString(QSP_STR(v));
                     break;
@@ -591,7 +592,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
                 name = qspGetQString(&s);
                 if (qspErrorNum) break;
                 v.Type = QSP_TYPE_CODE;
-                QSP_STR(v) = qspGetNewText(name);
+                QSP_STR(v) = name;
                 if (!qspAppendToCompiled(expression, qspOpValue, 0, v))
                 {
                     qspFreeString(QSP_STR(v));
@@ -751,7 +752,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
     return QSP_FALSE;
 }
 
-int qspFreeValue(QSPMathExpression *expression, int valueIndex)
+int qspFreeValue(QSPMathExpression *expression, int valueIndex) /* the last item represents a whole expression */
 {
     QSP_TINYINT argsCount;
     if (valueIndex < 0) return -1;
@@ -777,7 +778,7 @@ int qspFreeValue(QSPMathExpression *expression, int valueIndex)
     return valueIndex;
 }
 
-QSPVariant qspValue(QSPMathExpression *expression, int valueIndex)
+QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last item represents a whole expression */
 {
     QSPVariant args[QSP_OPMAXARGS], tos;
     int i, oldRefreshCount, argIndices[QSP_OPMAXARGS];
@@ -1070,7 +1071,7 @@ QSPVariant qspExprValue(QSPString expr)
     QSPMathExpression expression;
     if (!qspCompileExpression(expr, &expression))
         return qspGetEmptyVariant(QSP_TYPE_UNDEFINED);
-    res = qspValue(&expression, expression.ItemsCount - 1); /* the last item represents a whole expression */
+    res = qspValue(&expression, expression.ItemsCount - 1);
     qspFreeValue(&expression, expression.ItemsCount - 1);
     return res;
 }

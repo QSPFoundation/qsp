@@ -741,7 +741,7 @@ INLINE QSP_BOOL qspCheckCondition(QSPString expr)
 INLINE QSP_BOOL qspCheckCompiledCondition(QSPMathExpression *expression)
 {
     int oldRefreshCount = qspRefreshCount;
-    QSPVariant condValue = qspValue(expression, expression->ItemsCount - 1); /* the last item represents a whole expression */
+    QSPVariant condValue = qspValue(expression, expression->ItemsCount - 1);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
     if (!qspConvertVariantTo(&condValue, QSP_TYPE_NUMBER))
     {
