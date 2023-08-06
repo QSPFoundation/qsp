@@ -50,6 +50,14 @@
         QSP_FUNCTION Func;
     } QSPMathOperation;
 
+    typedef struct
+    {
+        QSPVariant CompValues[QSP_MAXITEMS];
+        QSP_TINYINT CompOpCodes[QSP_MAXITEMS];
+        QSP_TINYINT CompArgsCounts[QSP_MAXITEMS];
+        int ItemsCount;
+    } QSPMathExpression;
+
     enum
     {
         qspOpUnknown,
@@ -128,6 +136,9 @@
 
     /* External functions */
     void qspInitMath();
+    QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression);
+    int qspFreeValue(QSPMathExpression *expression, int valueIndex);
+    QSPVariant qspValue(QSPMathExpression *expression, int valueIndex);
     QSPVariant qspExprValue(QSPString expr);
 
 #endif
