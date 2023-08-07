@@ -128,10 +128,10 @@
 
     INLINE QSP_BOOL qspIsInClass(QSP_CHAR ch, int charClass)
     {
-        if (ch >= sizeof(qspAsciiClasses))
-            return QSP_FALSE;
+        if (ch < sizeof(qspAsciiClasses))
+            return (qspAsciiClasses[ch] & charClass) != 0;
 
-        return (qspAsciiClasses[ch] & charClass) != 0;
+        return QSP_FALSE;
     }
 
     INLINE QSP_BOOL qspIsAnyInClass(QSPString str, int charClass)

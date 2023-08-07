@@ -34,6 +34,10 @@ INLINE void qspFillSymbolClass(unsigned char symbolClass, QSP_CHAR *symbols)
 
 void qspInitSymbolClasses()
 {
+    int i;
+    for (i = 0; i < sizeof(qspAsciiClasses); ++i)
+        qspAsciiClasses[i] = 0;
+
     qspFillSymbolClass(QSP_CHAR_SPACE, QSP_SPACES);
     qspFillSymbolClass(QSP_CHAR_QUOT, QSP_QUOTS);
     qspFillSymbolClass(QSP_CHAR_DELIM, QSP_DELIMS);
