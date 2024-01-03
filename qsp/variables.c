@@ -748,16 +748,24 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
 {
     QSP_BOOL isVarFound;
     QSPString *names, varName;
+    QSPVariant v;
     int i, j, namesCount, groupInd, varsCount, bufSize;
     if (stat->ErrorCode)
     {
         qspSetError(stat->ErrorCode);
         return;
     }
-    if (stat->ArgsCount > 1 && *(s.Str + stat->Args[1].StartPos) != QSP_EQUAL[0])
+    if (stat->ArgsCount > 1)
     {
-        qspSetError(QSP_ERR_SYNTAX);
-        return;
+        if (*(s.Str + stat->Args[1].StartPos) != QSP_EQUAL[0])
+        {
+            qspSetError(QSP_ERR_SYNTAX);
+            return;
+        }
+        /* We have to evaluate expression before allocation of local vars */
+        int oldRefreshCount = qspRefreshCount;
+        v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
+        if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
     }
     namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
     if (qspErrorNum) return;
@@ -811,14 +819,6 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     }
     if (stat->ArgsCount > 1)
     {
-        QSPVariant v;
-        int oldRefreshCount = qspRefreshCount;
-        v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
-        if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-        {
-            free(names);
-            return;
-        }
         qspSetVarsValues(names, namesCount, &v, QSP_EQUAL[0]);
         if (QSP_ISSTR(v.Type)) qspFreeString(QSP_STR(v));
     }
