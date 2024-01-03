@@ -757,13 +757,13 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     }
     if (stat->ArgsCount > 1)
     {
+        int oldRefreshCount = qspRefreshCount;
         if (*(s.Str + stat->Args[1].StartPos) != QSP_EQUAL[0])
         {
             qspSetError(QSP_ERR_SYNTAX);
             return;
         }
         /* We have to evaluate expression before allocation of local vars */
-        int oldRefreshCount = qspRefreshCount;
         v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
         if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
     }
