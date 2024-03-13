@@ -340,7 +340,16 @@ QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution();
-    if (!qspSaveGameStatus(buf, bufSize)) return QSP_FALSE;
+    if (!qspSaveGameStatus(buf, bufSize))
+    {
+        if (*bufSize)
+        {
+            /* happens when we passed insufficient buffer, the new value contains required buffer size */
+            /* we have to reserve some extra space to account for game updates during subsequent calls */
+            *bufSize += QSP_SAVEDGAMEDATAEXTRASPACE;
+        }
+        return QSP_FALSE;
+    }
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }

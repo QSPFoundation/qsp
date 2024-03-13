@@ -28,6 +28,7 @@
     #define QSP_GAMEMINVER QSP_FMT(QSP_GAMEMINVER_VER_STR)
     #define QSP_MAXINCFILES 100
     #define QSP_DEFTIMERINTERVAL 500
+    #define QSP_SAVEDGAMEDATAEXTRASPACE 8192
 
     extern int qspQstCRC;
     extern int qspCurIncLocsCount;

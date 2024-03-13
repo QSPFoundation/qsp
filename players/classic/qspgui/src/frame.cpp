@@ -736,15 +736,17 @@ void QSPFrame::SaveGameState(const wxString &fullPath)
     void *fileData = (void *)malloc(fileSize);
     if (!QSPSaveGameAsData(fileData, &fileSize, QSP_TRUE))
     {
-        if (fileSize)
+        while (fileSize)
         {
             fileData = (void *)realloc(fileData, fileSize);
-            if (!QSPSaveGameAsData(fileData, &fileSize, QSP_TRUE))
-            {
-                free(fileData);
-                ShowError();
-                return;
-            }
+            if (QSPSaveGameAsData(fileData, &fileSize, QSP_TRUE))
+                break;
+        }
+        if (!fileSize)
+        {
+            free(fileData);
+            ShowError();
+            return;
         }
     }
     wxFile fileToSave(fullPath, wxFile::write);

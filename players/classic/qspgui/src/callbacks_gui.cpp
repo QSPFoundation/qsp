@@ -437,14 +437,16 @@ void QSPCallBacks::SaveGameStatus(QSPString file)
     void *fileData = (void *)malloc(fileSize);
     if (!QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
     {
-        if (fileSize)
+        while (fileSize)
         {
             fileData = (void *)realloc(fileData, fileSize);
-            if (!QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
-            {
-                free(fileData);
-                return;
-            }
+            if (QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
+                break;
+        }
+        if (!fileSize)
+        {
+            free(fileData);
+            return;
         }
     }
     wxFile fileToSave(fullPath, wxFile::write);
