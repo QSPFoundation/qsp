@@ -400,18 +400,18 @@ void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGr
     int i, j, ind;
     if (savedVars)
     {
-        ind = 0;
-        for (i = groupsCount - 1; i >= 0; --i)
+        ind = varsCount - 1;
+        for (i = 0; i < groupsCount; ++i)
         {
-            for (j = savedGroups[i].VarsCount - 1; j >= 0; --j)
+            for (j = 0; j < savedGroups[i].VarsCount; ++j)
             {
                 if (!(var = qspVarReference(savedGroups[i].Vars[j].Name, QSP_TRUE)))
                 {
-                    while (ind < varsCount)
+                    while (ind >= 0)
                     {
                         /* savedVars don't have names here */
                         qspEmptyVar(savedVars + ind);
-                        ++ind;
+                        --ind;
                     }
                     free(savedVars);
                     return;
@@ -419,7 +419,7 @@ void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGr
                 /* savedVars don't have names here */
                 qspMoveVar(&savedGroups[i].Vars[j], var);
                 qspMoveVar(var, savedVars + ind);
-                ++ind;
+                --ind;
             }
         }
         free(savedVars);
