@@ -19,11 +19,10 @@ cmake --build . --target install --config Release
 
 ## TODO
 
-* Test & improve implementation of loops
 * Update bindings
 * Implement a new way to communicate with GUI (more specific callbacks)
 * Move the whole global state into a context parameter
-* Move a QSP player into a separate repository
+* Move the QSP player into a separate repository
 * Document new features
 * ???
 
