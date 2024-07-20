@@ -154,12 +154,12 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
             return;
         }
         qspRealActIndex = i;
-        actionArgs[0].Type = QSP_TYPE_STRING;
+        actionArgs[0].Type = QSP_TYPE_STR;
         QSP_STR(actionArgs[0]) = str;
         str = loc->Actions[i].Image;
         if (!qspIsEmpty(str))
         {
-            actionArgs[1].Type = QSP_TYPE_STRING;
+            actionArgs[1].Type = QSP_TYPE_STR;
             QSP_STR(actionArgs[1]) = str;
             count = 2;
         }

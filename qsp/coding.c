@@ -325,7 +325,7 @@ int qspDeCodeGetIntVal(QSPString val)
 
 void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL toCode)
 {
-    QSP_CHAR buf[12];
+    QSP_CHAR buf[QSP_NUMTOSTRBUF];
     QSPString temp, str = qspNumToStr(buf, val);
     if (toCode)
     {

@@ -19,6 +19,7 @@
     #define CALLBACKS_GUI_H
 
     #include <map>
+    #include <qsp_default.h>
     #include "frame.h"
     #include "msgdlg.h"
     #include "inputdlg.h"
@@ -53,6 +54,16 @@
         string.Str = (QSP_CHAR *)s;
         string.End = (QSP_CHAR *)s + len;
         return string;
+    }
+
+    static bool qspIsEmpty(QSPString s)
+    {
+        return (s.Str == s.End);
+    }
+
+    static wxString qspToWxString(QSPString s)
+    {
+        return wxString(s.Str, s.End);
     }
 
     /* Helpers */

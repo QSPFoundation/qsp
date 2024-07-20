@@ -88,7 +88,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *ju
         ind = qspCallShowMenu(menuItems, itemsCount);
         if (ind >= 0 && ind < itemsCount)
         {
-            arg.Type = QSP_TYPE_NUMBER;
+            arg.Type = QSP_TYPE_NUM;
             QSP_NUM(arg) = ind + 1;
             qspExecLocByNameWithArgs(menuLocs[ind], &arg, 1, 0);
         }

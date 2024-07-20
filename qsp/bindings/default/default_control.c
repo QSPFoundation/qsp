@@ -32,6 +32,7 @@
 #include "../../statements.h"
 #include "../../text.h"
 #include "../../time.h"
+#include "../../tuples.h"
 #include "../../variables.h"
 #include "../../variant.h"
 
@@ -213,7 +214,7 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 /* ------------------------------------------------------------ */
 /* Variables */
 
-/* Get number of items in an array */
+/* Get a number of items in an array */
 QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 {
     QSPVar *var;
@@ -226,28 +227,18 @@ QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
     *count = var->ValsCount;
     return QSP_TRUE;
 }
-/* Get values of the specified array item */
-QSP_BOOL QSPGetVarValues(QSPString name, int ind, int *numVal, QSPString *strVal)
+/* Get value of the specified array item */
+QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *res)
 {
-    QSPVar *var;
-    var = qspVarReference(name, QSP_FALSE);
-    if (!var || ind < 0 || ind >= var->ValsCount)
+    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    if (var && ind >= 0 && ind < var->ValsCount)
     {
-        *strVal = qspNullString;
-        *numVal = 0;
-        return QSP_FALSE;
+        *res = var->Values[ind];
+        return QSP_TRUE;
     }
-    if (QSP_ISSTR(var->Values[ind].Type))
-    {
-        *strVal = QSP_STR(var->Values[ind]);
-        *numVal = 0;
-    }
-    else
-    {
-        *strVal = qspNullString;
-        *numVal = QSP_NUM(var->Values[ind]);
-    }
-    return QSP_TRUE;
+
+    *res = qspGetEmptyVariant(QSP_TYPE_UNDEF);
+    return QSP_FALSE;
 }
 /* Get max number of variables */
 int QSPGetMaxVarsCount()
@@ -386,6 +377,7 @@ void QSPInit()
         mwInit();
     #endif
     qspNullString = qspStringFromPair(0, 0);
+    qspNullTuple = qspGetNewTuple(0, 0);
     qspIsDebug = QSP_FALSE;
     qspRefreshCount = qspFullRefreshCount = 0;
     qspQstCRC = 0;
@@ -401,6 +393,7 @@ void QSPInit()
     qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
     setlocale(LC_ALL, QSP_LOCALE);
     qspSetSeed(0);
+    qspInitVarTypes();
     qspInitSymbolClasses();
     qspPrepareExecution();
     qspMemClear(QSP_TRUE);

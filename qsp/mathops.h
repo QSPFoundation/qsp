@@ -32,7 +32,7 @@
     #define QSP_TOBOOL(x) ((x) != 0) /* converts a number to a QSP boolean value */
     #define QSP_ISTRUE(x) ((x) != 0) /* checks whether a QSP numeric value represents boolean 'true' */
 
-    typedef void (*QSP_FUNCTION)(QSPVariant *, QSP_TINYINT, QSPVariant *);
+    typedef void (*QSP_FUNCTION)(QSPVariant *args, QSP_TINYINT argsCount, QSPVariant *res);
 
     typedef struct
     {
@@ -61,16 +61,17 @@
     enum
     {
         qspOpUnknown,
-        qspOpStart,
-        qspOpEnd,
+        qspOpStart, /* sequence point */
+        qspOpEnd, /* sequence point */
+        qspOpComma, /* sequence point */
+        qspOpOpenArrBracket, /* sequence point */
+        qspOpCloseArrBracket, /* sequence point */
+        qspOpOpenBracket, /* sequence point */
+        qspOpCloseBracket, /* sequence point */
+        qspOpTuple,
         qspOpValue,
         qspOpValueToFormat,
-        qspOpOpenArrBracket,
-        qspOpCloseArrBracket,
-        qspOpOpenBracket,
-        qspOpCloseBracket,
         qspOpNegation,
-        qspOpComma,
         qspOpMul,
         qspOpDiv,
         qspOpAdd,

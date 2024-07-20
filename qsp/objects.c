@@ -58,7 +58,7 @@ void qspClearObjectsWithNotify()
         for (i = 0; i < oldCount; ++i)
             qspAddText(objs + i, qspCurObjects[i].Desc, QSP_TRUE);
         qspClearObjects(QSP_FALSE);
-        v.Type = QSP_TYPE_STRING;
+        v.Type = QSP_TYPE_STR;
         oldRefreshCount = qspRefreshCount;
         for (i = 0; i < oldCount; ++i)
         {
@@ -75,7 +75,7 @@ INLINE void qspRemoveObject(int index)
     QSPVariant name;
     if (index < 0 || index >= qspCurObjectsCount) return;
     if (qspCurSelObject >= index) qspCurSelObject = -1;
-    name.Type = QSP_TYPE_STRING;
+    name.Type = QSP_TYPE_STR;
     QSP_STR(name) = qspCurObjects[index].Desc;
     qspFreeString(qspCurObjects[index].Image);
     --qspCurObjectsCount;

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
-project(qsp VERSION 5.8.0)
+project(qsp VERSION 5.9.0)
 
-set(QSP_GAMEMIN_VER "5.8.0")
+set(QSP_GAMEMIN_VER "5.9.0")
 
 if(WIN32)
 	if(NOT MSVC OR MSVC_TOOLSET_VERSION LESS 110)
@@ -98,6 +98,7 @@ set(QSP_SOURCES
 	qsp/time.c
 	qsp/towlower.c
 	qsp/towupper.c
+	qsp/tuples.c
 	qsp/variables.c
 	qsp/variant.c
 )

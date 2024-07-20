@@ -82,22 +82,75 @@
         QSP_CALL_DUMMY
     };
 
-    typedef struct
+    enum
     {
-        QSP_CHAR *Str;
-        QSP_CHAR *End;
-    } QSPString;
-
-    typedef struct
-    {
-        QSPString Image;
-        QSPString Name;
-    } QSPListItem;
+        QSP_TYPE_TUPLE = 0,
+        QSP_TYPE_NUM = 1,
+        QSP_TYPE_STR = 2,
+        QSP_TYPE_CODE = 3,
+        QSP_TYPE_VARREF = 4,
+        QSP_TYPE_UNDEF = 5, /* not used for values, it has to be a string-based type */
+        QSP_TYPE_DEFINED_TYPES = 6, /* represents a number of defined values */
+    };
 
     typedef char QSP_TINYINT;
     typedef char QSP_BOOL;
 
     #define QSP_TRUE 1
     #define QSP_FALSE 0
+
+    static QSP_TINYINT qspBaseTypeTable[QSP_TYPE_DEFINED_TYPES] =
+    {
+        /* TUPLE */  QSP_TYPE_TUPLE,
+        /* NUMBER */ QSP_TYPE_NUM,
+        /* STRING */ QSP_TYPE_STR,
+        /* CODE */   QSP_TYPE_STR,
+        /* VARREF */ QSP_TYPE_STR,
+        /* UNDEFINED */ QSP_TYPE_STR
+    };
+
+    #define QSP_ISDEF(a) ((a) != QSP_TYPE_UNDEF)
+    #define QSP_ISTUPLE(a) (qspBaseTypeTable[a] == QSP_TYPE_TUPLE)
+    #define QSP_ISNUM(a) (qspBaseTypeTable[a] == QSP_TYPE_NUM)
+    #define QSP_ISSTR(a) (qspBaseTypeTable[a] == QSP_TYPE_STR)
+    #define QSP_BASETYPE(a) qspBaseTypeTable[a]
+
+    #define QSP_STR(a) (a).Val.Str
+    #define QSP_NUM(a) (a).Val.Num
+    #define QSP_TUPLE(a) (a).Val.Tuple
+    #define QSP_PSTR(a) (a)->Val.Str
+    #define QSP_PNUM(a) (a)->Val.Num
+    #define QSP_PTUPLE(a) (a)->Val.Tuple
+
+    typedef struct QSPVariant_s QSPVariant;
+
+    typedef struct
+    {
+        QSPVariant *Vals;
+        int Items;
+    } QSPTuple;
+
+    typedef struct
+    {
+        QSP_CHAR *Str;
+        QSP_CHAR *End;
+    } QSPString;
+
+    typedef struct QSPVariant_s
+    {
+        union
+        {
+            QSPString Str;
+            int Num;
+            QSPTuple Tuple;
+        } Val;
+        QSP_TINYINT Type;
+    } QSPVariant;
+
+    typedef struct
+    {
+        QSPString Image;
+        QSPString Name;
+    } QSPListItem;
 
 #endif

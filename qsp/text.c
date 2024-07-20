@@ -482,7 +482,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
             free(newTxt);
             return qspNullString;
         }
-        qspConvertVariantTo(&val, QSP_TYPE_STRING);
+        qspConvertVariantTo(&val, QSP_TYPE_STR);
         len = qspStrLen(QSP_STR(val));
         if (len)
         {

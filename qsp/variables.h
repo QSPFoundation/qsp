@@ -28,8 +28,6 @@
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
 
-    #define QSP_VARBASETYPE(name) (*(name).Str == QSP_STRCHAR[0]) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */
-
     typedef struct
     {
         int Index;
@@ -57,11 +55,15 @@
     extern int qspSavedVarGroupsCount;
     extern int qspSavedVarGroupsBufSize;
 
+    extern QSP_TINYINT qspSpecToBaseTypeTable[128];
+
     /* External functions */
+    void qspInitVarTypes();
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
     void qspClearVars(QSP_BOOL toInit);
     void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
     void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);
+    QSPTuple qspGetVarTupleValue(QSPString name);
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
     int qspGetVarTextIndex(QSPVar *, QSPString, QSP_BOOL);
@@ -81,6 +83,15 @@
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);
     QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
     QSP_BOOL qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
+
+    INLINE QSP_TINYINT qspGetVarType(QSPString str)
+    {
+        QSP_CHAR specSymbol = *str.Str;
+        if (specSymbol < sizeof(qspSpecToBaseTypeTable))
+            return qspSpecToBaseTypeTable[specSymbol];
+
+        return QSP_TYPE_NUM;
+    }
 
     INLINE void qspInitVarData(QSPVar *var)
     {
@@ -103,17 +114,14 @@
 
     INLINE void qspEmptyVar(QSPVar *var)
     {
-        int count;
         if (var->Values)
         {
-            count = var->ValsCount;
-            while (--count >= 0)
-                if (QSP_ISSTR(var->Values[count].Type)) qspFreeString(QSP_STR(var->Values[count]));
+            qspFreeVariants(var->Values, var->ValsCount);
             free(var->Values);
         }
         if (var->Indices)
         {
-            count = var->IndsCount;
+            int count = var->IndsCount;
             while (--count >= 0)
                 qspFreeString(var->Indices[count].Str);
             free(var->Indices);

@@ -17,58 +17,47 @@
 
 #include "declarations.h"
 #include "text.h"
+#include "tuples.h"
 
 #ifndef QSP_VARIANTDEFINES
     #define QSP_VARIANTDEFINES
-
-    #define QSP_STR(a) (a).Val.Str
-    #define QSP_NUM(a) (a).Val.Num
-    #define QSP_PSTR(a) (a)->Val.Str
-    #define QSP_PNUM(a) (a)->Val.Num
-
-    enum
-    {
-        QSP_TYPE_NUMBER = 0,
-        QSP_TYPE_STRING = 1,
-        QSP_TYPE_CODE = 2,
-        QSP_TYPE_TUPLE = 3,
-        QSP_TYPE_VARREF = 4,
-        QSP_TYPE_DEFINED_TYPES = 5, /* represents a number of defined values */
-        QSP_TYPE_UNDEFINED = 64, /* not used for values, it has to be a string-based type */
-    };
-
-    #define QSP_ISDEF(a) ((a) != QSP_TYPE_UNDEFINED)
-    #define QSP_ISNUM(a) ((a) == QSP_TYPE_NUMBER)
-    #define QSP_ISSTR(a) ((a) > QSP_TYPE_NUMBER)
-    #define QSP_BASETYPE(a) ((a) > QSP_TYPE_NUMBER) /* QSP_TYPE_STRING | QSP_TYPE_NUMBER */
-
-    typedef struct
-    {
-        union
-        {
-            QSPString Str;
-            int Num;
-        } Val;
-        QSP_TINYINT Type;
-    } QSPVariant;
 
     /* External functions */
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
     int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2);
     void qspUpdateVariantValue(QSPVariant *dest, QSPVariant *src);
+    QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, QSPVariant *res);
 
     INLINE void qspFreeVariants(QSPVariant *args, int count)
     {
         while (--count >= 0)
-            if (QSP_ISSTR(args[count].Type)) qspFreeString(QSP_STR(args[count]));
+        {
+            switch (QSP_BASETYPE(args[count].Type))
+            {
+                case QSP_TYPE_TUPLE:
+                    qspFreeTuple(QSP_TUPLE(args[count]));
+                    break;
+                case QSP_TYPE_STR:
+                    qspFreeString(QSP_STR(args[count]));
+                    break;
+            }
+        }
     }
 
     INLINE void qspInitVariant(QSPVariant *value, QSP_TINYINT type)
     {
-        if (QSP_ISSTR(value->Type = type))
-            QSP_PSTR(value) = qspNullString;
-        else
-            QSP_PNUM(value) = 0;
+        switch (QSP_BASETYPE(value->Type = type))
+        {
+            case QSP_TYPE_TUPLE:
+                QSP_PTUPLE(value) = qspNullTuple;
+                break;
+            case QSP_TYPE_NUM:
+                QSP_PNUM(value) = 0;
+                break;
+            case QSP_TYPE_STR:
+                QSP_PSTR(value) = qspNullString;
+                break;
+        }
     }
 
     INLINE QSPVariant qspGetEmptyVariant(QSP_TINYINT type)
@@ -80,20 +69,40 @@
 
     INLINE void qspCopyToNewVariant(QSPVariant *dest, QSPVariant *src)
     {
-        if (QSP_ISSTR(dest->Type = src->Type))
-            QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
-        else
-            QSP_PNUM(dest) = QSP_PNUM(src);
+        switch (QSP_BASETYPE(dest->Type = src->Type))
+        {
+            case QSP_TYPE_TUPLE:
+                QSP_PTUPLE(dest) = qspGetNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).Items);
+                break;
+            case QSP_TYPE_NUM:
+                QSP_PNUM(dest) = QSP_PNUM(src);
+                break;
+            case QSP_TYPE_STR:
+                QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
+                break;
+        }
     }
 
     INLINE QSP_BOOL qspCanConvertToNum(QSPVariant *val)
     {
-        QSP_BOOL isValid;
-        if (QSP_ISSTR(val->Type))
+        switch (QSP_BASETYPE(val->Type))
         {
-            qspStrToNum(QSP_PSTR(val), &isValid);
-            if (!isValid) return QSP_FALSE;
+            case QSP_TYPE_TUPLE:
+            {
+                QSP_BOOL isValid;
+                qspTupleToNum(QSP_PTUPLE(val), &isValid);
+                if (!isValid) return QSP_FALSE;
+                break;
+            }
+            case QSP_TYPE_STR:
+            {
+                QSP_BOOL isValid;
+                qspStrToNum(QSP_PSTR(val), &isValid);
+                if (!isValid) return QSP_FALSE;
+                break;
+            }
         }
+
         return QSP_TRUE;
     }
 

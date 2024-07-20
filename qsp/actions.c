@@ -127,8 +127,7 @@ void qspExecAction(int ind)
 QSPString qspGetAllActionsAsCode()
 {
     int count, i;
-    QSPString temp, res;
-    res = qspNullString;
+    QSPString temp, res = qspNullString;
     for (i = 0; i < qspCurActionsCount; ++i)
     {
         qspAddText(&res, QSP_STATIC_STR(QSP_FMT("ACT '")), QSP_FALSE);
