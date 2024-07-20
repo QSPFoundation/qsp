@@ -26,6 +26,7 @@
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
     int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2);
     void qspUpdateVariantValue(QSPVariant *dest, QSPVariant *src);
+    void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
     QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, QSPVariant *res);
 
     INLINE void qspFreeVariants(QSPVariant *args, int count)

@@ -86,28 +86,33 @@ QSPString qspTupleToStr(QSPTuple tuple)
 QSPTuple qspGetNewTuple(QSPVariant *values, int count)
 {
     QSPTuple tuple;
-
-    tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
     tuple.Items = count;
-
+    tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
     while (--count >= 0)
-    {
-        QSP_TINYINT type = values[count].Type;
-        switch (QSP_BASETYPE(type))
-        {
-            case QSP_TYPE_TUPLE:
-                QSP_TUPLE(tuple.Vals[count]) = qspGetNewTuple(QSP_TUPLE(values[count]).Vals, QSP_TUPLE(values[count]).Items);
-                break;
-            case QSP_TYPE_NUM:
-                QSP_NUM(tuple.Vals[count]) = QSP_NUM(values[count]);
-                break;
-            case QSP_TYPE_STR:
-                QSP_STR(tuple.Vals[count]) = qspGetNewText(QSP_STR(values[count]));
-                break;
-        }
-        tuple.Vals[count].Type = type;
-    }
+        qspCopyToNewVariant(tuple.Vals + count, values + count);
+    return tuple;
+}
 
+QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2)
+{
+    QSPTuple tuple;
+    QSPVariant *newItem, *item = list1;
+    tuple.Items = count1 + count2;
+    tuple.Vals = (QSPVariant *)malloc(tuple.Items * sizeof(QSPVariant));
+    newItem = tuple.Vals;
+    while (--count1 >= 0)
+    {
+        qspCopyToNewVariant(newItem, item);
+        ++item;
+        ++newItem;
+    }
+    item = list2;
+    while (--count2 >= 0)
+    {
+        qspCopyToNewVariant(newItem, item);
+        ++item;
+        ++newItem;
+    }
     return tuple;
 }
 
@@ -211,19 +216,4 @@ int qspTuplesComp(QSPTuple first, QSPTuple second)
     }
     if (delta) return delta;
     return (pos1 == end1) ? ((pos2 == end2) ? 0 : -1) : 1;
-}
-
-void qspExtendTuple(QSPTuple *tuple, QSPVariant *values, int count)
-{
-    QSPVariant *dest;
-    int i, oldCount = tuple->Items;
-    tuple->Items = oldCount + count;
-    tuple->Vals = (QSPVariant *)realloc(tuple->Vals, tuple->Items * sizeof(QSPVariant));
-    dest = tuple->Vals + oldCount;
-    for (i = 0; i < count; ++i)
-    {
-        qspCopyToNewVariant(dest, values);
-        ++dest;
-        ++values;
-    }
 }

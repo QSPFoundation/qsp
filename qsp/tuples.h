@@ -27,7 +27,7 @@
     int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid);
     QSPString qspTupleToStr(QSPTuple tuple);
     QSPTuple qspGetNewTuple(QSPVariant *values, int count);
+    QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);
     int qspTuplesComp(QSPTuple first, QSPTuple second);
-    void qspExtendTuple(QSPTuple *tuple, QSPVariant *values, int count);
 
 #endif

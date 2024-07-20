@@ -165,7 +165,7 @@ void qspInitMath()
     qspAddOperation(qspOpEq, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpLt, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpGt, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpAppend, 12, 0, QSP_TYPE_STR, 2, 2, QSP_TYPE_STR, QSP_TYPE_STR);
+    qspAddOperation(qspOpAppend, 12, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpComma, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpAnd, 7, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpOr, 6, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_NUM, QSP_TYPE_NUM);
@@ -962,8 +962,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
             QSP_NUM(tos) = QSP_NUM(args[0]) % QSP_NUM(args[1]);
             break;
         case qspOpAppend:
-            qspAddText(&QSP_STR(tos), QSP_STR(args[0]), QSP_TRUE);
-            qspAddText(&QSP_STR(tos), QSP_STR(args[1]), QSP_FALSE);
+            qspAutoConvertAppend(args, args + 1, &tos);
             break;
         case qspOpTuple:
             QSP_TUPLE(tos) = qspGetNewTuple(args, argsCount);
