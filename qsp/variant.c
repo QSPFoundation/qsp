@@ -273,36 +273,42 @@ void qspUpdateVariantValue(QSPVariant *dest, QSPVariant *src)
 
 void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
 {
-    if (QSP_BASETYPE(arg1->Type) == QSP_TYPE_TUPLE)
+    switch (QSP_BASETYPE(arg1->Type))
     {
+    case QSP_TYPE_TUPLE:
         switch (QSP_BASETYPE(arg2->Type))
         {
-            case QSP_TYPE_TUPLE:
-                QSP_PTUPLE(res) = qspMergeToTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
-                res->Type = QSP_TYPE_TUPLE;
-                break;
-            case QSP_TYPE_NUM:
-            case QSP_TYPE_STR:
-                QSP_PTUPLE(res) = qspMergeToTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, arg2, 1);
-                res->Type = QSP_TYPE_TUPLE;
-                break;
+        case QSP_TYPE_TUPLE:
+            QSP_PTUPLE(res) = qspMergeToTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
+            res->Type = QSP_TYPE_TUPLE;
+            break;
+        case QSP_TYPE_NUM:
+        case QSP_TYPE_STR:
+            QSP_PTUPLE(res) = qspMergeToTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, arg2, 1);
+            res->Type = QSP_TYPE_TUPLE;
+            break;
         }
-        return;
-    }
-    if (QSP_BASETYPE(arg2->Type) == QSP_TYPE_TUPLE)
-    {
-        /* it's always a single value in arg1, otherwise it'd be caught by the previous branch */
-        QSP_PTUPLE(res) = qspMergeToTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
-        res->Type = QSP_TYPE_TUPLE;
-        return;
-    }
+        break;
+    case QSP_TYPE_NUM:
+    case QSP_TYPE_STR:
+        switch (QSP_BASETYPE(arg2->Type))
+        {
+        case QSP_TYPE_TUPLE:
+            QSP_PTUPLE(res) = qspMergeToTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
+            res->Type = QSP_TYPE_TUPLE;
+            break;
+        case QSP_TYPE_NUM:
+        case QSP_TYPE_STR:
+            qspConvertVariantTo(arg1, QSP_TYPE_STR);
+            qspConvertVariantTo(arg2, QSP_TYPE_STR);
 
-    qspConvertVariantTo(arg1, QSP_TYPE_STR);
-    qspConvertVariantTo(arg2, QSP_TYPE_STR);
-
-    qspAddText(&QSP_PSTR(res), QSP_PSTR(arg1), QSP_TRUE);
-    qspAddText(&QSP_PSTR(res), QSP_PSTR(arg2), QSP_FALSE);
-    res->Type = QSP_TYPE_STR;
+            qspAddText(&QSP_PSTR(res), QSP_PSTR(arg1), QSP_TRUE);
+            qspAddText(&QSP_PSTR(res), QSP_PSTR(arg2), QSP_FALSE);
+            res->Type = QSP_TYPE_STR;
+            break;
+        }
+        break;
+    }
 }
 
 QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, QSPVariant *res)

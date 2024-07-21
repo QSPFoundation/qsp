@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "variant.h"
 
 #ifndef QSP_TUPLESDEFINES
     #define QSP_TUPLESDEFINES
@@ -26,8 +27,19 @@
     void qspFreeTuple(QSPTuple tuple);
     int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid);
     QSPString qspTupleToStr(QSPTuple tuple);
-    QSPTuple qspGetNewTuple(QSPVariant *values, int count);
     QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);
     int qspTuplesComp(QSPTuple first, QSPTuple second);
+
+    INLINE QSPTuple qspGetNewTuple(QSPVariant *values, int count)
+    {
+        QSPTuple tuple;
+        QSPVariant *newItem, *item;
+        tuple.Items = count;
+        tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+        newItem = tuple.Vals;
+        for (item = values; count > 0; --count, ++item, ++newItem)
+            qspCopyToNewVariant(newItem, item);
+        return tuple;
+    }
 
 #endif
