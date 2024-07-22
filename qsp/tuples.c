@@ -17,6 +17,7 @@
 
 #include "tuples.h"
 #include "text.h"
+#include "variant.h"
 
 QSPTuple qspNullTuple;
 
@@ -80,6 +81,18 @@ QSPString qspTupleToStr(QSPTuple tuple)
     }
 
     return qspNullString;
+}
+
+QSPTuple qspGetNewTuple(QSPVariant *values, int count)
+{
+    QSPTuple tuple;
+    QSPVariant *newItem, *item;
+    tuple.Items = count;
+    tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+    newItem = tuple.Vals;
+    for (item = values; count > 0; --count, ++item, ++newItem)
+        qspCopyToNewVariant(newItem, item);
+    return tuple;
 }
 
 QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2)
