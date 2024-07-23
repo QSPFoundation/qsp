@@ -255,10 +255,12 @@
         return 0;
     }
 
-    INLINE QSPBufString qspNewBufString(QSPString base, int extraCapacity)
+    INLINE QSPBufString qspNewBufString()
     {
         QSPBufString res;
-        qspAddBufText(&res, base, extraCapacity);
+        res.Str = 0;
+        res.Len = 0;
+        res.Capacity = 0;
         return res;
     }
 

@@ -41,14 +41,14 @@
 
     INLINE QSPString qspTupleToDisplayString(QSPTuple tuple)
     {
-        QSPBufString buf = qspNewBufString(qspNullString, 16);
+        QSPBufString buf = qspNewBufString();
         qspAppendTupleToDisplayString(&buf, tuple);
         return qspBufTextToString(buf);
     }
 
     INLINE QSPString qspTupleToIndexString(QSPTuple tuple)
     {
-        QSPBufString buf = qspNewBufString(qspNullString, 16);
+        QSPBufString buf = qspNewBufString();
         qspAppendTupleToIndexString(&buf, tuple);
         return qspBufTextToString(buf);
     }

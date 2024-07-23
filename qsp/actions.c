@@ -128,7 +128,7 @@ QSPString qspGetAllActionsAsCode()
 {
     int count, i;
     QSPString temp;
-    QSPBufString res = qspNewBufString(qspNullString, 256);
+    QSPBufString res = qspNewBufString();
     for (i = 0; i < qspCurActionsCount; ++i)
     {
         qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ") QSP_DEFQUOT), 256);
