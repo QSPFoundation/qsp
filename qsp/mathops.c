@@ -1051,7 +1051,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         case qspOpCurActs:
             QSP_STR(tos) = qspGetAllActionsAsCode();
             break;
-            /* External functions -------------------------------------------------------------- */
+        /* External functions -------------------------------------------------------------- */
         default:
             qspOps[opCode].Func(args, argsCount, &tos);
             break;
