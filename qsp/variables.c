@@ -32,7 +32,6 @@ QSP_TINYINT qspSpecToBaseTypeTable[128];
 
 INLINE int qspIndStringCompare(const void *name, const void *compareTo);
 INLINE void qspRemoveArrayItem(QSPVar *var, int index);
-INLINE QSPString qspTupleToIndexString(QSPTuple tuple);
 INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation);
 INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op);
 INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count);
@@ -143,33 +142,6 @@ INLINE void qspRemoveArrayItem(QSPVar *var, int index)
         if (ind->Index > index) ind->Index--;
         ++ind;
     }
-}
-
-INLINE QSPString qspTupleToIndexString(QSPTuple tuple)
-{
-    QSP_CHAR buf[QSP_NUMTOSTRBUF];
-    QSPString res = qspNullString;
-    QSPVariant *item = tuple.Vals, *itemsEnd = item + tuple.Items;
-    while (item < itemsEnd)
-    {
-        switch (QSP_BASETYPE(item->Type))
-        {
-            case QSP_TYPE_TUPLE:
-                qspAddText(&res, QSP_STATIC_STR(QSP_TUPLESTART), QSP_FALSE);
-                qspAddText(&res, qspTupleToIndexString(QSP_PTUPLE(item)), QSP_FALSE);
-                qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEEND), QSP_FALSE);
-                break;
-            case QSP_TYPE_NUM:
-                qspAddText(&res, qspNumToStr(buf, QSP_PNUM(item)), QSP_FALSE);
-                break;
-            case QSP_TYPE_STR:
-                qspAddText(&res, QSP_PSTR(item), QSP_FALSE);
-                break;
-        }
-        if (++item == itemsEnd) break;
-        qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEDELIM), QSP_FALSE);
-    }
-    return res;
 }
 
 int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)

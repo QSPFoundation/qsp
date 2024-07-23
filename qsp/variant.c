@@ -132,7 +132,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                 }
                 case QSP_TYPE_STR:
                 {
-                    QSPString str = qspTupleToStr(QSP_PTUPLE(val));
+                    QSPString str = qspTupleToDisplayString(QSP_PTUPLE(val));
                     qspFreeTuple(QSP_PTUPLE(val));
                     QSP_PSTR(val) = str;
                     break;

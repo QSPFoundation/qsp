@@ -27,9 +27,6 @@
     #define QSP_VARSCOUNT 256 * QSP_VARSSEEK
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
-    #define QSP_TUPLESTART QSP_FMT("\x02")
-    #define QSP_TUPLEEND QSP_FMT("\x03")
-    #define QSP_TUPLEDELIM QSP_FMT("\x1F")
 
     typedef struct
     {

@@ -20,12 +20,20 @@
 #ifndef QSP_TUPLESDEFINES
     #define QSP_TUPLESDEFINES
 
+    #define QSP_TUPLEDISPLAYSTART QSP_FMT("(")
+    #define QSP_TUPLEDISPLAYDELIM QSP_FMT("|")
+    #define QSP_TUPLEDISPLAYEND QSP_FMT(")")
+    #define QSP_TUPLEINDSTART QSP_FMT("\x02")
+    #define QSP_TUPLEINDDELIM QSP_FMT("\x1F")
+    #define QSP_TUPLEINDEND QSP_FMT("\x03")
+
     extern QSPTuple qspNullTuple;
 
     /* External functions */
     void qspFreeTuple(QSPTuple tuple);
     int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid);
-    QSPString qspTupleToStr(QSPTuple tuple);
+    QSPString qspTupleToDisplayString(QSPTuple tuple);
+    QSPString qspTupleToIndexString(QSPTuple tuple);
     QSPTuple qspGetNewTuple(QSPVariant *values, int count);
     QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);
     int qspTuplesComp(QSPTuple first, QSPTuple second);
