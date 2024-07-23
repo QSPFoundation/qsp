@@ -127,38 +127,39 @@ void qspExecAction(int ind)
 QSPString qspGetAllActionsAsCode()
 {
     int count, i;
-    QSPString temp, res = qspNullString;
+    QSPString temp;
+    QSPBufString res = qspNewBufString(qspNullString, 256);
     for (i = 0; i < qspCurActionsCount; ++i)
     {
-        qspAddText(&res, QSP_STATIC_STR(QSP_FMT("ACT '")), QSP_FALSE);
-        temp = qspReplaceText(qspCurActions[i].Desc, QSP_STATIC_STR(QSP_FMT("'")), QSP_STATIC_STR(QSP_FMT("''")));
-        qspAddText(&res, temp, QSP_FALSE);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ") QSP_DEFQUOT), 256);
+        temp = qspReplaceText(qspCurActions[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
+        qspAddBufText(&res, temp, 256);
         qspFreeString(temp);
         if (qspCurActions[i].Image.Str)
         {
-            qspAddText(&res, QSP_STATIC_STR(QSP_FMT("','")), QSP_FALSE);
-            temp = qspReplaceText(qspCurActions[i].Image, QSP_STATIC_STR(QSP_FMT("'")), QSP_STATIC_STR(QSP_FMT("''")));
-            qspAddText(&res, temp, QSP_FALSE);
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(",") QSP_DEFQUOT), 256);
+            temp = qspReplaceText(qspCurActions[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
+            qspAddBufText(&res, temp, 256);
             qspFreeString(temp);
         }
-        qspAddText(&res, QSP_STATIC_STR(QSP_FMT("':")), QSP_FALSE);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(":")), 256);
         count = qspCurActions[i].OnPressLinesCount;
         if (count == 1 && qspIsAnyString(qspCurActions[i].OnPressLines->Str))
-            qspAddText(&res, qspCurActions[i].OnPressLines->Str, QSP_FALSE);
+            qspAddBufText(&res, qspCurActions[i].OnPressLines->Str, 256);
         else
         {
             if (count >= 2)
             {
-                qspAddText(&res, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+                qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM), 256);
                 temp = qspJoinPrepLines(qspCurActions[i].OnPressLines, count, QSP_STATIC_STR(QSP_STRSDELIM));
-                qspAddText(&res, temp, QSP_FALSE);
+                qspAddBufText(&res, temp, 256);
                 qspFreeString(temp);
             }
-            qspAddText(&res, QSP_STATIC_STR(QSP_STRSDELIM QSP_FMT("END")), QSP_FALSE);
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM QSP_FMT("END")), 256);
         }
-        qspAddText(&res, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM), 256);
     }
-    return res;
+    return qspBufTextToString(res);
 }
 
 void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)

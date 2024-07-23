@@ -65,6 +65,8 @@
     #define QSP_LABEL QSP_FMT(":")
     #define QSP_COMMENT QSP_FMT("!")
     #define QSP_QUOTS QSP_FMT("'\"")
+    #define QSP_DEFQUOT QSP_FMT("'")
+    #define QSP_ESCDEFQUOT QSP_FMT("''")
     #define QSP_LQUOT QSP_FMT("{")
     #define QSP_RQUOT QSP_FMT("}")
     #define QSP_STATDELIM QSP_FMT("&")

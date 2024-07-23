@@ -65,55 +65,65 @@ int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
 QSPString qspTupleToDisplayString(QSPTuple tuple)
 {
     QSP_CHAR buf[QSP_NUMTOSTRBUF];
-    QSPString res = qspNullString;
+    QSPString temp;
+    QSPBufString res = qspNewBufString(qspNullString, 16);
     QSPVariant *item = tuple.Vals, *itemsEnd = item + tuple.Items;
-    qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEDISPLAYSTART), QSP_FALSE);
+    qspAddBufText(&res, QSP_STATIC_STR(QSP_TUPLEDISPLAYSTART), 16);
     while (item < itemsEnd)
     {
         switch (QSP_BASETYPE(item->Type))
         {
             case QSP_TYPE_TUPLE:
-                qspAddText(&res, qspTupleToDisplayString(QSP_PTUPLE(item)), QSP_FALSE);
+                temp = qspTupleToDisplayString(QSP_PTUPLE(item));
+                qspAddBufText(&res, temp, 16);
+                qspFreeString(temp);
                 break;
             case QSP_TYPE_NUM:
-                qspAddText(&res, qspNumToStr(buf, QSP_PNUM(item)), QSP_FALSE);
+                qspAddBufText(&res, qspNumToStr(buf, QSP_PNUM(item)), 16);
                 break;
             case QSP_TYPE_STR:
-                qspAddText(&res, QSP_PSTR(item), QSP_FALSE);
+                qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT), 16);
+                temp = qspReplaceText(QSP_PSTR(item), QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
+                qspAddBufText(&res, temp, 16);
+                qspFreeString(temp);
+                qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT), 16);
                 break;
         }
         if (++item == itemsEnd) break;
-        qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEDISPLAYDELIM), QSP_FALSE);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_TUPLEDISPLAYDELIM), 16);
     }
-    qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEDISPLAYEND), QSP_FALSE);
-    return res;
+    qspAddBufText(&res, QSP_STATIC_STR(QSP_TUPLEDISPLAYEND), 0);
+    return qspBufTextToString(res);
 }
 
 QSPString qspTupleToIndexString(QSPTuple tuple)
 {
     QSP_CHAR buf[QSP_NUMTOSTRBUF];
-    QSPString res = qspNullString;
+    QSPString temp;
+    QSPBufString res = qspNewBufString(qspNullString, 16);
     QSPVariant *item = tuple.Vals, *itemsEnd = item + tuple.Items;
     while (item < itemsEnd)
     {
         switch (QSP_BASETYPE(item->Type))
         {
             case QSP_TYPE_TUPLE:
-                qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEINDSTART), QSP_FALSE);
-                qspAddText(&res, qspTupleToIndexString(QSP_PTUPLE(item)), QSP_FALSE);
-                qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEINDEND), QSP_FALSE);
+                qspAddBufText(&res, QSP_STATIC_STR(QSP_TUPLEINDSTART), 16);
+                temp = qspTupleToIndexString(QSP_PTUPLE(item));
+                qspAddBufText(&res, temp, 16);
+                qspFreeString(temp);
+                qspAddBufText(&res, QSP_STATIC_STR(QSP_TUPLEINDEND), 16);
                 break;
             case QSP_TYPE_NUM:
-                qspAddText(&res, qspNumToStr(buf, QSP_PNUM(item)), QSP_FALSE);
+                qspAddBufText(&res, qspNumToStr(buf, QSP_PNUM(item)), 16);
                 break;
             case QSP_TYPE_STR:
-                qspAddText(&res, QSP_PSTR(item), QSP_FALSE);
+                qspAddBufText(&res, QSP_PSTR(item), 16);
                 break;
         }
         if (++item == itemsEnd) break;
-        qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEINDDELIM), QSP_FALSE);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_TUPLEINDDELIM), 16);
     }
-    return res;
+    return qspBufTextToString(res);
 }
 
 QSPTuple qspGetNewTuple(QSPVariant *values, int count)

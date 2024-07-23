@@ -36,6 +36,13 @@
         QSP_CHAR_EXPSTART = 1 << 4 /* beginning of an expression */
     };
 
+    typedef struct
+    {
+        QSP_CHAR *Str;
+        int Len;
+        int Capacity;
+    } QSPBufString;
+
     extern QSPString qspNullString;
     extern unsigned char qspAsciiClasses[128];
 
@@ -43,6 +50,7 @@
     void qspInitSymbolClasses();
     QSP_CHAR *qspStringToC(QSPString s);
     void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
+    void qspAddBufText(QSPBufString *dest, QSPString val, int extraCapacity);
     QSP_BOOL qspClearText(QSPString *s);
     QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars);
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
@@ -245,6 +253,26 @@
             ++pos;
         }
         return 0;
+    }
+
+    INLINE QSPBufString qspNewBufString(QSPString base, int extraCapacity)
+    {
+        QSPBufString res;
+        qspAddBufText(&res, base, extraCapacity);
+        return res;
+    }
+
+    INLINE QSPString qspBufTextToString(QSPBufString buf)
+    {
+        QSPString res;
+        res.Str = buf.Str;
+        res.End = buf.Str + buf.Len;
+        return res;
+    }
+
+    INLINE void qspFreeBufString(QSPBufString buf)
+    {
+        if (buf.Str) free(buf.Str);
     }
 
 #endif

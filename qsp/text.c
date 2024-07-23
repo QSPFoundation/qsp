@@ -88,6 +88,41 @@ void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
     }
 }
 
+void qspAddBufText(QSPBufString *dest, QSPString val, int extraCapacity)
+{
+    int valLen = qspStrLen(val);
+    if (dest->Str)
+    {
+        if (valLen)
+        {
+            if (dest->Len + valLen > dest->Capacity)
+            {
+                dest->Capacity = dest->Len + valLen + extraCapacity;
+                dest->Str = (QSP_CHAR *)realloc(dest->Str, dest->Capacity * sizeof(QSP_CHAR));
+            }
+            memcpy(dest->Str + dest->Len, val.Str, valLen * sizeof(QSP_CHAR));
+            dest->Len += valLen;
+        }
+    }
+    else
+    {
+        if (valLen)
+        {
+            dest->Capacity = valLen + extraCapacity;
+            dest->Str = (QSP_CHAR *)malloc(dest->Capacity * sizeof(QSP_CHAR));
+            memcpy(dest->Str, val.Str, valLen * sizeof(QSP_CHAR));
+            dest->Len = valLen;
+        }
+        else
+        {
+            /* Assign a null string */
+            dest->Capacity = 0;
+            dest->Str = 0;
+            dest->Len = 0;
+        }
+    }
+}
+
 QSP_BOOL qspClearText(QSPString *s)
 {
     if (s->Str)
