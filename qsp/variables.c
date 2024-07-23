@@ -30,11 +30,12 @@ int qspSavedVarGroupsBufSize = 0;
 
 QSP_TINYINT qspSpecToBaseTypeTable[128];
 
-INLINE int qspIndStringCompare(const void *, const void *);
+INLINE int qspIndStringCompare(const void *name, const void *compareTo);
 INLINE void qspRemoveArrayItem(QSPVar *var, int index);
+INLINE QSPString qspTupleToIndexString(QSPTuple tuple);
 INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation);
 INLINE void qspSetVar(QSPString name, QSPVariant *val, QSP_CHAR op);
-INLINE void qspCopyVar(QSPVar *, QSPVar *, int, int);
+INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count);
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames);
 INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, QSP_CHAR op);
 INLINE QSPString qspGetVarNameOnly(QSPString s);
@@ -144,14 +145,53 @@ INLINE void qspRemoveArrayItem(QSPVar *var, int index)
     }
 }
 
-int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL toCreate)
+INLINE QSPString qspTupleToIndexString(QSPTuple tuple)
 {
-    int n = var->IndsCount;
-    QSPString uStr = qspGetNewText(str);
-    qspUpperStr(&uStr);
-    if (n > 0)
+    QSP_CHAR buf[QSP_NUMTOSTRBUF];
+    QSPString res = qspNullString;
+    QSPVariant *item = tuple.Vals, *itemsEnd = item + tuple.Items;
+    while (item < itemsEnd)
     {
-        QSPVarIndex *ind = (QSPVarIndex *)bsearch(&uStr, var->Indices, n, sizeof(QSPVarIndex), qspIndStringCompare);
+        switch (QSP_BASETYPE(item->Type))
+        {
+            case QSP_TYPE_TUPLE:
+                qspAddText(&res, QSP_STATIC_STR(QSP_TUPLESTART), QSP_FALSE);
+                qspAddText(&res, qspTupleToIndexString(QSP_PTUPLE(item)), QSP_FALSE);
+                qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEEND), QSP_FALSE);
+                break;
+            case QSP_TYPE_NUM:
+                qspAddText(&res, qspNumToStr(buf, QSP_PNUM(item)), QSP_FALSE);
+                break;
+            case QSP_TYPE_STR:
+                qspAddText(&res, QSP_PSTR(item), QSP_FALSE);
+                break;
+        }
+        if (++item == itemsEnd) break;
+        qspAddText(&res, QSP_STATIC_STR(QSP_TUPLEDELIM), QSP_FALSE);
+    }
+    return res;
+}
+
+int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
+{
+    int indsCount;
+    QSPString uStr;
+    switch (QSP_BASETYPE(index.Type))
+    {
+        case QSP_TYPE_TUPLE:
+            uStr = qspTupleToIndexString(QSP_TUPLE(index));
+            break;
+        case QSP_TYPE_NUM:
+            return QSP_NUM(index);
+        case QSP_TYPE_STR:
+            uStr = qspGetNewText(QSP_STR(index));
+            break;
+    }
+    qspUpperStr(&uStr);
+    indsCount = var->IndsCount;
+    if (indsCount > 0)
+    {
+        QSPVarIndex *ind = (QSPVarIndex *)bsearch(&uStr, var->Indices, indsCount, sizeof(QSPVarIndex), qspIndStringCompare);
         if (ind)
         {
             qspFreeString(uStr);
@@ -162,22 +202,22 @@ int qspGetVarTextIndex(QSPVar *var, QSPString str, QSP_BOOL toCreate)
     {
         int i;
         var->IndsCount++;
-        if (n >= var->IndsBufSize)
+        if (indsCount >= var->IndsBufSize)
         {
-            var->IndsBufSize = n + 8;
+            var->IndsBufSize = indsCount + 8;
             var->Indices = (QSPVarIndex *)realloc(var->Indices, var->IndsBufSize * sizeof(QSPVarIndex));
         }
-        i = n - 1;
+        i = indsCount - 1;
         while (i >= 0 && qspStrsComp(var->Indices[i].Str, uStr) > 0)
         {
             var->Indices[i + 1] = var->Indices[i];
             --i;
         }
         ++i;
-        n = var->ValsCount; /* point to a new array item */
+        indsCount = var->ValsCount; /* point to the new array item */
         var->Indices[i].Str = uStr;
-        var->Indices[i].Index = n;
-        return n;
+        var->Indices[i].Index = indsCount;
+        return indsCount;
     }
     qspFreeString(uStr);
     return -1;
@@ -214,19 +254,8 @@ INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation)
             int oldRefreshCount = qspRefreshCount;
             ind = qspExprValue(qspStringFromPair(s.Str, rPos));
             if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
-            switch (QSP_BASETYPE(ind.Type))
-            {
-            case QSP_TYPE_TUPLE:
-                qspConvertVariantTo(&ind, QSP_TYPE_STR);
-                /* fall through */
-            case QSP_TYPE_STR:
-                *index = qspGetVarTextIndex(var, QSP_STR(ind), isSetOperation);
-                qspFreeString(QSP_STR(ind));
-                break;
-            case QSP_TYPE_NUM:
-                *index = QSP_NUM(ind);
-                break;
-            }
+            *index = qspGetVarIndex(var, ind, isSetOperation);
+            qspFreeVariants(&ind, 1);
         }
         return var;
     }
@@ -866,7 +895,7 @@ QSP_BOOL qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSPString *jum
             qspEmptyVar(var);
         else
         {
-            int arrIndex = QSP_ISSTR(args[1].Type) ? qspGetVarTextIndex(var, QSP_STR(args[1]), QSP_FALSE) : QSP_NUM(args[1]);
+            int arrIndex = qspGetVarIndex(var, args[1], QSP_FALSE);
             qspRemoveArrayItem(var, arrIndex);
         }
     }

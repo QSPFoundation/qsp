@@ -301,9 +301,8 @@ QSPString qspNumToStr(QSP_CHAR *buf, int val)
 
 QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
 {
-    QSP_CHAR quot, *pos;
     int c1 = 0, c2 = 0, c3 = 0;
-    pos = txt.Str;
+    QSP_CHAR quot, *pos = txt.Str;
     while (pos < txt.End)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))

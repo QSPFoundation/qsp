@@ -27,6 +27,9 @@
     #define QSP_VARSCOUNT 256 * QSP_VARSSEEK
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
+    #define QSP_TUPLESTART QSP_FMT("\x02")
+    #define QSP_TUPLEEND QSP_FMT("\x03")
+    #define QSP_TUPLEDELIM QSP_FMT("\x1F")
 
     typedef struct
     {
@@ -66,7 +69,7 @@
     QSPTuple qspGetVarTupleValue(QSPString name);
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
-    int qspGetVarTextIndex(QSPVar *, QSPString, QSP_BOOL);
+    int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     void qspRestoreGlobalVars();
     int qspSaveLocalVarsAndRestoreGlobals(QSPVar **);
     void qspRestoreLocalVars(QSPVar *, int, QSPVarsGroup *, int);

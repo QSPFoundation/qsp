@@ -888,7 +888,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
             if (opCode == qspOpLastArrItem)
                 arrIndex = var->ValsCount - 1;
             else if (argsCount == 2)
-                arrIndex = QSP_ISSTR(args[1].Type) ? qspGetVarTextIndex(var, QSP_STR(args[1]), QSP_FALSE) : QSP_NUM(args[1]);
+                arrIndex = qspGetVarIndex(var, args[1], QSP_FALSE);
             else
                 arrIndex = 0;
             type = qspGetVarType(name);
