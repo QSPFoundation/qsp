@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "text.h"
 
 #ifndef QSP_TUPLESDEFINES
     #define QSP_TUPLESDEFINES
@@ -32,10 +33,24 @@
     /* External functions */
     void qspFreeTuple(QSPTuple tuple);
     int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid);
-    QSPString qspTupleToDisplayString(QSPTuple tuple);
-    QSPString qspTupleToIndexString(QSPTuple tuple);
     QSPTuple qspGetNewTuple(QSPVariant *values, int count);
     QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);
     int qspTuplesComp(QSPTuple first, QSPTuple second);
+    void qspAppendTupleToDisplayString(QSPBufString *res, QSPTuple tuple);
+    void qspAppendTupleToIndexString(QSPBufString *res, QSPTuple tuple);
+
+    INLINE QSPString qspTupleToDisplayString(QSPTuple tuple)
+    {
+        QSPBufString buf = qspNewBufString(qspNullString, 16);
+        qspAppendTupleToDisplayString(&buf, tuple);
+        return qspBufTextToString(buf);
+    }
+
+    INLINE QSPString qspTupleToIndexString(QSPTuple tuple)
+    {
+        QSPBufString buf = qspNewBufString(qspNullString, 16);
+        qspAppendTupleToIndexString(&buf, tuple);
+        return qspBufTextToString(buf);
+    }
 
 #endif
