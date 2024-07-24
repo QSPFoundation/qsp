@@ -117,11 +117,10 @@ QSP_BOOL qspClearText(QSPString *s)
 {
     if (s->Str)
     {
-        int strLen = (int)(s->End - s->Str);
+        int oldLen = (int)(s->End - s->Str);
         free(s->Str);
-        s->Str = 0;
-        s->End = 0;
-        if (strLen) return QSP_TRUE;
+        s->Str = s->End = 0;
+        if (oldLen) return QSP_TRUE;
     }
     return QSP_FALSE;
 }
