@@ -65,12 +65,20 @@ int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
 QSPTuple qspGetNewTuple(QSPVariant *values, int count)
 {
     QSPTuple tuple;
-    QSPVariant *newItem, *item;
-    tuple.Items = count;
-    tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
-    newItem = tuple.Vals;
-    for (item = values; count > 0; --count, ++item, ++newItem)
-        qspCopyToNewVariant(newItem, item);
+    if (values)
+    {
+        QSPVariant *newItem, *srcItem;
+        tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+        tuple.Items = count;
+        newItem = tuple.Vals;
+        for (srcItem = values; count > 0; --count, ++srcItem, ++newItem)
+            qspCopyToNewVariant(newItem, srcItem);
+    }
+    else
+    {
+        tuple.Vals = 0;
+        tuple.Items = 0;
+    }
     return tuple;
 }
 

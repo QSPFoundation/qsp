@@ -555,49 +555,60 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin)
 {
     QSPVar *var;
-    QSPVariant resultValue, *curValue;
+    QSPVariant resultValue, *bestValue, *curValue;
     QSP_TINYINT baseVarType;
-    int curInd, count;
+    int count;
     if (!(var = qspVarReference(name, QSP_FALSE)))
         return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     baseVarType = qspGetVarType(name);
     resultValue = qspGetEmptyVariant(baseVarType);
-    curInd = -1;
+    bestValue = 0;
+    curValue = var->Values;
     count = var->ValsCount;
     while (--count >= 0)
     {
-        curValue = var->Values + count;
         if (!QSP_ISDEF(curValue->Type)) curValue = &resultValue; /* check undefined values */
         if (QSP_BASETYPE(curValue->Type) == baseVarType)
         {
-            if (curInd >= 0)
+            if (bestValue)
             {
-                if (QSP_ISSTR(baseVarType))
+                switch (baseVarType)
                 {
-                    if (isMin)
-                    {
-                        if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(var->Values + curInd)) < 0)
-                            curInd = count;
-                    }
-                    else if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(var->Values + curInd)) > 0)
-                        curInd = count;
-                }
-                else
-                {
-                    if (isMin)
-                    {
-                        if (QSP_PNUM(curValue) < QSP_PNUM(var->Values + curInd))
-                            curInd = count;
-                    }
-                    else if (QSP_PNUM(curValue) > QSP_PNUM(var->Values + curInd))
-                        curInd = count;
+                    case QSP_TYPE_TUPLE:
+                        if (isMin)
+                        {
+                            if (qspTuplesComp(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) < 0)
+                                bestValue = curValue;
+                        }
+                        else if (qspTuplesComp(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) > 0)
+                            bestValue = curValue;
+                        break;
+                    case QSP_TYPE_STR:
+                        if (isMin)
+                        {
+                            if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(bestValue)) < 0)
+                                bestValue = curValue;
+                        }
+                        else if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(bestValue)) > 0)
+                            bestValue = curValue;
+                        break;
+                    case QSP_TYPE_NUM:
+                        if (isMin)
+                        {
+                            if (QSP_PNUM(curValue) < QSP_PNUM(bestValue))
+                                bestValue = curValue;
+                        }
+                        else if (QSP_PNUM(curValue) > QSP_PNUM(bestValue))
+                            bestValue = curValue;
+                        break;
                 }
             }
             else
-                curInd = count;
+                bestValue = curValue;
         }
+        ++curValue;
     }
-    if (curInd >= 0) qspCopyToNewVariant(&resultValue, var->Values + curInd);
+    if (bestValue) qspCopyToNewVariant(&resultValue, bestValue);
     return resultValue;
 }
 
