@@ -17,6 +17,7 @@
 
 #include "coding.h"
 #include "text.h"
+#include "variant.h"
 
 unsigned char qspCP1251ToKOI8RTable[] =
 {
@@ -353,4 +354,63 @@ void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL toCode)
             qspAddText(s, val, QSP_FALSE);
     }
     qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+}
+
+void qspSerializeVariant(QSPString *s, QSPVariant val)
+{
+    qspCodeWriteIntVal(s, val.Type, QSP_TRUE);
+    switch (QSP_BASETYPE(val.Type))
+    {
+        case QSP_TYPE_TUPLE:
+        {
+            int i;
+            QSPTuple tuple = QSP_TUPLE(val);
+            qspCodeWriteIntVal(s, tuple.Items, QSP_TRUE);
+            for (i = 0; i < tuple.Items; ++i)
+                qspSerializeVariant(s, tuple.Vals[i]);
+            break;
+        }
+        case QSP_TYPE_STR:
+            qspCodeWriteVal(s, QSP_STR(val), QSP_TRUE);
+            break;
+        case QSP_TYPE_NUM:
+            qspCodeWriteIntVal(s, QSP_NUM(val), QSP_TRUE);
+            break;
+    }
+}
+
+QSP_BOOL qspDeserializeVariant(QSPString *strs, int strsCount, int *curIndex, QSPVariant *val)
+{
+    int ind = *curIndex;
+    if (ind >= strsCount) return QSP_FALSE;
+    val->Type = qspDeCodeGetIntVal(strs[ind++]);
+    switch (QSP_BASETYPE(val->Type))
+    {
+        case QSP_TYPE_TUPLE:
+        {
+            int i;
+            QSPTuple *tuple = &QSP_PTUPLE(val);
+            if (ind >= strsCount) return QSP_FALSE;
+            tuple->Items = qspDeCodeGetIntVal(strs[ind++]);
+            for (i = 0; i < tuple->Items; ++i)
+            {
+                if (!qspDeserializeVariant(strs, strsCount, &ind, tuple->Vals + i))
+                {
+                    qspFreeVariants(tuple->Vals, i);
+                    return QSP_FALSE;
+                }
+            }
+            break;
+        }
+        case QSP_TYPE_STR:
+            if (ind >= strsCount) return QSP_FALSE;
+            QSP_PSTR(val) = qspCodeDeCode(strs[ind++], QSP_FALSE);
+            break;
+        case QSP_TYPE_NUM:
+            if (ind >= strsCount) return QSP_FALSE;
+            QSP_PNUM(val) = qspDeCodeGetIntVal(strs[ind++]);
+            break;
+    }
+    *curIndex = ind;
+    return QSP_TRUE;
 }

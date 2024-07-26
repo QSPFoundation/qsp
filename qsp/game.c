@@ -76,8 +76,8 @@ INLINE int qspCRC(void *, int);
 INLINE void qspIncludeFile(QSPString s);
 INLINE void qspOpenIncludes();
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count);
-INLINE QSP_BOOL qspSkipLines(int *index, int totalLinesCount, int linesToSkip);
-INLINE QSP_BOOL qspGetIntValueAndSkipLine(int *value, int *index, QSPString *strs, int totalLinesCount);
+INLINE QSP_BOOL qspSkipLines(int totalLinesCount, int linesToSkip, int *index);
+INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, int *index, int *value);
 INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount);
 
 INLINE int qspCRC(void *data, int len)
@@ -342,13 +342,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
             qspCodeWriteVal(&bufString, qspVars[i].Name, QSP_TRUE);
             qspCodeWriteIntVal(&bufString, qspVars[i].ValsCount, QSP_TRUE);
             for (j = 0; j < qspVars[i].ValsCount; ++j)
-            {
-                qspCodeWriteIntVal(&bufString, qspVars[i].Values[j].Type, QSP_TRUE);
-                if (QSP_ISSTR(qspVars[i].Values[j].Type))
-                    qspCodeWriteVal(&bufString, QSP_STR(qspVars[i].Values[j]), QSP_TRUE);
-                else
-                    qspCodeWriteIntVal(&bufString, QSP_NUM(qspVars[i].Values[j]), QSP_TRUE);
-            }
+                qspSerializeVariant(&bufString, qspVars[i].Values[j]);
             qspCodeWriteIntVal(&bufString, qspVars[i].IndsCount, QSP_TRUE);
             for (j = 0; j < qspVars[i].IndsCount; ++j)
             {
@@ -378,23 +372,25 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     return QSP_TRUE;
 }
 
-INLINE QSP_BOOL qspSkipLines(int *index, int totalLinesCount, int linesToSkip)
+INLINE QSP_BOOL qspSkipLines(int totalLinesCount, int linesToSkip, int *index)
 {
     if ((*index += linesToSkip) >= totalLinesCount) return QSP_FALSE;
     return QSP_TRUE;
 }
 
-INLINE QSP_BOOL qspGetIntValueAndSkipLine(int *value, int *index, QSPString *strs, int totalLinesCount)
+INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, int *index, int *value)
 {
+    if (*index >= totalLinesCount) return QSP_FALSE;
     *value = qspDeCodeGetIntVal(strs[*index]);
-    return qspSkipLines(index, totalLinesCount, 1);
+    return qspSkipLines(totalLinesCount, 1, index);
 }
 
 INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
 {
+    QSPVariant val;
     int i, j, ind, count, groupsCount, varValuesCount, lastInd, temp, selAction, selObject;
     ind = 16;
-    if (ind > strsCount) return QSP_FALSE;
+    if (ind >= strsCount) return QSP_FALSE;
     if (qspStrsComp(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
         qspStrsComp(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
         qspStrsComp(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
@@ -404,82 +400,80 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
     selObject = qspDeCodeGetIntVal(strs[5]); /* qspCurSelObject */
     if (qspDeCodeGetIntVal(strs[15]) < 0) return QSP_FALSE; /* qspTimerInterval */
     /* qspPLFilesCount */
-    if (!qspGetIntValueAndSkipLine(&count, &ind, strs, strsCount)) return QSP_FALSE;
+    if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &count)) return QSP_FALSE;
     if (count < 0 || count > QSP_MAXPLFILES) return QSP_FALSE;
     /* files */
-    if (!qspSkipLines(&ind, strsCount, count)) return QSP_FALSE;
+    if (!qspSkipLines(strsCount, count, &ind)) return QSP_FALSE;
     /* qspCurIncFilesCount */
-    if (!qspGetIntValueAndSkipLine(&count, &ind, strs, strsCount)) return QSP_FALSE;
+    if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &count)) return QSP_FALSE;
     if (count < 0 || count > QSP_MAXINCFILES) return QSP_FALSE;
     /* includes */
-    if (!qspSkipLines(&ind, strsCount, count)) return QSP_FALSE;
+    if (!qspSkipLines(strsCount, count, &ind)) return QSP_FALSE;
     /* qspCurActionsCount */
-    if (!qspGetIntValueAndSkipLine(&count, &ind, strs, strsCount)) return QSP_FALSE;
+    if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &count)) return QSP_FALSE;
     if (count < 0 || count > QSP_MAXACTIONS || selAction >= count) return QSP_FALSE;
     /* actions */
     for (i = 0; i < count; ++i)
     {
         /* image + description */
-        if (!qspSkipLines(&ind, strsCount, 2)) return QSP_FALSE;
+        if (!qspSkipLines(strsCount, 2, &ind)) return QSP_FALSE;
         /* lines of code count */
-        if (!qspGetIntValueAndSkipLine(&groupsCount, &ind, strs, strsCount)) return QSP_FALSE;
+        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &groupsCount)) return QSP_FALSE;
         if (groupsCount < 0) return QSP_FALSE;
         /* lines */
         for (j = 0; j < groupsCount; ++j)
         {
             /* line of code */
-            if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
+            if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
             /* line number */
-            if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
+            if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &temp)) return QSP_FALSE;
             if (temp < 0) return QSP_FALSE;
         }
         /* action's location */
-        if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
+        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &temp)) return QSP_FALSE;
         if (temp < 0) return QSP_FALSE;
         /* action's source index */
-        if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
+        if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
     }
     /* qspCurObjectsCount */
-    if (!qspGetIntValueAndSkipLine(&count, &ind, strs, strsCount)) return QSP_FALSE;
+    if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &count)) return QSP_FALSE;
     if (count < 0 || count > QSP_MAXOBJECTS || selObject >= count) return QSP_FALSE;
     /* objects: image + description */
-    if (!qspSkipLines(&ind, strsCount, 2 * count)) return QSP_FALSE;
+    if (!qspSkipLines(strsCount, 2 * count, &ind)) return QSP_FALSE;
     /* variables count */
-    if (!qspGetIntValueAndSkipLine(&count, &ind, strs, strsCount)) return QSP_FALSE;
-    if (count < 0) return QSP_FALSE;
+    if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &count)) return QSP_FALSE;
+    if (count < 0 || count > QSP_VARSCOUNT) return QSP_FALSE;
     lastInd = -1;
     /* variables */
     for (i = 0; i < count; ++i)
     {
         /* variable's index */
-        if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
+        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &temp)) return QSP_FALSE;
         if (temp <= lastInd || temp >= QSP_VARSCOUNT) return QSP_FALSE;
         lastInd = temp;
         /* variable's name */
-        if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
+        if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
         /* values count */
-        if (!qspGetIntValueAndSkipLine(&varValuesCount, &ind, strs, strsCount)) return QSP_FALSE;
+        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &varValuesCount)) return QSP_FALSE;
         if (varValuesCount < 0) return QSP_FALSE;
         /* values */
         for (j = 0; j < varValuesCount; ++j)
         {
-            /* var type */
-            if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
-            if (temp < 0) return QSP_FALSE;
-            /* var value */
-            if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
+            /* var type + var value */
+            if (!qspDeserializeVariant(strs, strsCount, &ind, &val)) return QSP_FALSE;
+            qspFreeVariants(&val, 1);
         }
         /* indices count */
-        if (!qspGetIntValueAndSkipLine(&groupsCount, &ind, strs, strsCount)) return QSP_FALSE;
+        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &groupsCount)) return QSP_FALSE;
         if (groupsCount < 0) return QSP_FALSE;
         /* indices */
         for (j = 0; j < groupsCount; ++j)
         {
             /* value index */
-            if (!qspGetIntValueAndSkipLine(&temp, &ind, strs, strsCount)) return QSP_FALSE;
+            if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &temp)) return QSP_FALSE;
             if (temp < 0 || temp >= varValuesCount) return QSP_FALSE;
             /* text value */
-            if (!qspSkipLines(&ind, strsCount, 1)) return QSP_FALSE;
+            if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
         }
     }
     return (ind == strsCount - 1); /* the last line is always empty */
@@ -488,7 +482,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
 QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
 {
     QSPString *strs, locName, gameString;
-    int i, j, ind, type, count, varInd, varsCount, valsCount;
+    int i, j, ind, count, varInd, varsCount, valsCount;
     gameString = qspStringFromFileData(data, dataSize, QSP_TRUE);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     qspFreeString(gameString);
@@ -558,14 +552,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
             qspVars[varInd].ValsCount = valsCount;
             qspVars[varInd].Values = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
             for (j = 0; j < valsCount; ++j)
-            {
-                type = qspDeCodeGetIntVal(strs[ind++]);
-                if (QSP_ISSTR(qspVars[varInd].Values[j].Type = type))
-                    QSP_STR(qspVars[varInd].Values[j]) = qspCodeDeCode(strs[ind], QSP_FALSE);
-                else
-                    QSP_NUM(qspVars[varInd].Values[j]) = qspDeCodeGetIntVal(strs[ind]);
-                ++ind;
-            }
+                qspDeserializeVariant(strs, count, &ind, qspVars[varInd].Values + j);
         }
         valsCount = qspDeCodeGetIntVal(strs[ind++]);
         if (valsCount)

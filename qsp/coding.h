@@ -36,5 +36,7 @@
     int qspDeCodeGetIntVal(QSPString val);
     void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL toCode);
     void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL toCode);
+    void qspSerializeVariant(QSPString *s, QSPVariant val);
+    QSP_BOOL qspDeserializeVariant(QSPString *strs, int strsCount, int *curIndex, QSPVariant *val);
 
 #endif
