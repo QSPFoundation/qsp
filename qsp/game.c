@@ -302,10 +302,10 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     qspAppendEncodedStrVal(&bufString, qspCurDesc);
     qspAppendEncodedStrVal(&bufString, qspCurVars);
     qspAppendEncodedStrVal(&bufString, locName);
-    qspAppendEncodedIntVal(&bufString, (int) qspCurToShowActs);
-    qspAppendEncodedIntVal(&bufString, (int) qspCurToShowObjs);
-    qspAppendEncodedIntVal(&bufString, (int) qspCurToShowVars);
-    qspAppendEncodedIntVal(&bufString, (int) qspCurToShowInput);
+    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowActs);
+    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowObjs);
+    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowVars);
+    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowInput);
     qspAppendEncodedIntVal(&bufString, qspTimerInterval);
     qspAppendEncodedIntVal(&bufString, qspPLFilesCount);
     for (i = 0; i < qspPLFilesCount; ++i)
@@ -395,7 +395,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
         qspStrsComp(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
         qspStrsComp(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
     if (!qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DEBUG"))) &&
-            qspReadEncodedIntVal(strs[2]) != qspQstCRC) return QSP_FALSE;
+        qspReadEncodedIntVal(strs[2]) != qspQstCRC) return QSP_FALSE;
     selAction = qspReadEncodedIntVal(strs[4]); /* qspCurSelAction */
     selObject = qspReadEncodedIntVal(strs[5]); /* qspCurSelObject */
     if (qspReadEncodedIntVal(strs[15]) < 0) return QSP_FALSE; /* qspTimerInterval */
