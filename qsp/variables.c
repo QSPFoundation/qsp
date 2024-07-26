@@ -508,46 +508,48 @@ int qspArraySize(QSPString name)
 
 int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 {
-    int count;
-    QSP_TINYINT baseVarType;
     QSPVar *var;
+    QSP_TINYINT baseVarType;
     QSPVariant defaultValue, *curValue;
     QSP_BOOL isFound;
     QSPRegExp *regExp;
     if (!(var = qspVarReference(varName, QSP_FALSE))) return -1;
     baseVarType = qspGetVarType(varName);
-    if (!qspConvertVariantTo(val, (isRegExp || QSP_ISSTR(baseVarType) ? QSP_TYPE_STR : QSP_TYPE_NUM)))
+    if (isRegExp)
+    {
+        baseVarType = QSP_TYPE_STR;
+        qspConvertVariantTo(val, baseVarType);
+        regExp = qspRegExpGetCompiled(QSP_PSTR(val));
+        if (!regExp) return -1;
+    }
+    else if (!qspConvertVariantTo(val, baseVarType))
     {
         qspSetError(QSP_ERR_TYPEMISMATCH);
         return -1;
     }
-    if (isRegExp)
-    {
-        regExp = qspRegExpGetCompiled(QSP_PSTR(val));
-        if (!regExp) return -1;
-    }
     defaultValue = qspGetEmptyVariant(baseVarType);
-    count = var->ValsCount;
     if (ind < 0) ind = 0;
-    while (ind < count)
+    for (curValue = var->Values + ind; ind < var->ValsCount; ++ind, ++curValue)
     {
-        curValue = var->Values + ind;
         if (!QSP_ISDEF(curValue->Type)) curValue = &defaultValue; /* check undefined values */
-        if (QSP_BASETYPE(curValue->Type) == QSP_BASETYPE(val->Type))
+        if (QSP_BASETYPE(curValue->Type) == baseVarType)
         {
-            if (QSP_ISSTR(val->Type))
+            switch (baseVarType)
             {
-                isFound = isRegExp ?
-                          qspRegExpStrMatch(regExp, QSP_PSTR(curValue)) :
-                          !qspStrsComp(QSP_PSTR(val), QSP_PSTR(curValue));
-            }
-            else
-            {
-                isFound = (QSP_PNUM(val) == QSP_PNUM(curValue));
+                case QSP_TYPE_TUPLE:
+                    isFound = !qspTuplesComp(QSP_PTUPLE(val), QSP_PTUPLE(curValue));
+                    break;
+                case QSP_TYPE_STR:
+                    isFound = isRegExp ?
+                              qspRegExpStrMatch(regExp, QSP_PSTR(curValue)) :
+                              !qspStrsComp(QSP_PSTR(val), QSP_PSTR(curValue));
+                    break;
+                case QSP_TYPE_NUM:
+                    isFound = (QSP_PNUM(val) == QSP_PNUM(curValue));
+                    break;
             }
             if (isFound) return ind;
         }
-        ++ind;
     }
     return -1;
 }
