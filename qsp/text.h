@@ -16,7 +16,6 @@
 */
 
 #include "declarations.h"
-#include "coding.h"
 
 #ifndef QSP_TEXTDEFINES
     #define QSP_TEXTDEFINES
@@ -41,6 +40,7 @@
         QSP_CHAR *Str;
         int Len;
         int Capacity;
+        int CapacityIncrement;
     } QSPBufString;
 
     extern QSPString qspNullString;
@@ -50,7 +50,7 @@
     void qspInitSymbolClasses();
     QSP_CHAR *qspStringToC(QSPString s);
     void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
-    void qspAddBufText(QSPBufString *dest, QSPString val, int extraCapacity);
+    void qspAddBufText(QSPBufString *dest, QSPString val);
     QSP_BOOL qspClearText(QSPString *s);
     QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars);
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
@@ -255,12 +255,13 @@
         return 0;
     }
 
-    INLINE QSPBufString qspNewBufString()
+    INLINE QSPBufString qspNewBufString(int capacityIncrement)
     {
         QSPBufString res;
         res.Str = 0;
         res.Len = 0;
         res.Capacity = 0;
+        res.CapacityIncrement = capacityIncrement;
         return res;
     }
 

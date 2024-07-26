@@ -88,7 +88,7 @@ void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
     }
 }
 
-void qspAddBufText(QSPBufString *dest, QSPString val, int extraCapacity)
+void qspAddBufText(QSPBufString *dest, QSPString val)
 {
     int valLen = qspStrLen(val);
     if (valLen)
@@ -97,7 +97,7 @@ void qspAddBufText(QSPBufString *dest, QSPString val, int extraCapacity)
         {
             if (dest->Len + valLen > dest->Capacity)
             {
-                dest->Capacity = dest->Len + valLen + extraCapacity;
+                dest->Capacity = dest->Len + valLen + dest->CapacityIncrement;
                 dest->Str = (QSP_CHAR *)realloc(dest->Str, dest->Capacity * sizeof(QSP_CHAR));
             }
             memcpy(dest->Str + dest->Len, val.Str, valLen * sizeof(QSP_CHAR));
@@ -105,7 +105,7 @@ void qspAddBufText(QSPBufString *dest, QSPString val, int extraCapacity)
         }
         else
         {
-            dest->Capacity = valLen + extraCapacity;
+            dest->Capacity = valLen + dest->CapacityIncrement;
             dest->Str = (QSP_CHAR *)malloc(dest->Capacity * sizeof(QSP_CHAR));
             memcpy(dest->Str, val.Str, valLen * sizeof(QSP_CHAR));
             dest->Len = valLen;

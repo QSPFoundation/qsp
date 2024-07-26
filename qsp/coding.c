@@ -329,34 +329,34 @@ int qspReadEncodedIntVal(QSPString val)
     return num;
 }
 
-void qspAppendEncodedIntVal(QSPString *s, int val)
+void qspAppendEncodedIntVal(QSPBufString *s, int val)
 {
     QSP_CHAR buf[QSP_NUMTOSTRBUF];
     QSPString temp, str = qspNumToStr(buf, val);
     temp = qspEncodeString(str);
-    qspAddText(s, temp, QSP_FALSE);
+    qspAddBufText(s, temp);
     qspFreeString(temp);
-    qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+    qspAddBufText(s, QSP_STATIC_STR(QSP_STRSDELIM));
 }
 
-void qspAppendEncodedStrVal(QSPString *s, QSPString val)
+void qspAppendEncodedStrVal(QSPBufString *s, QSPString val)
 {
     if (val.Str)
     {
         QSPString temp = qspEncodeString(val);
-        qspAddText(s, temp, QSP_FALSE);
+        qspAddBufText(s, temp);
         qspFreeString(temp);
     }
-    qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+    qspAddBufText(s, QSP_STATIC_STR(QSP_STRSDELIM));
 }
 
-void qspAppendStrVal(QSPString *s, QSPString val)
+void qspAppendStrVal(QSPBufString *s, QSPString val)
 {
-    qspAddText(s, val, QSP_FALSE);
-    qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+    qspAddBufText(s, val);
+    qspAddBufText(s, QSP_STATIC_STR(QSP_STRSDELIM));
 }
 
-void qspAppendEncodedVariant(QSPString *s, QSPVariant val)
+void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val)
 {
     qspAppendEncodedIntVal(s, val.Type);
     switch (QSP_BASETYPE(val.Type))

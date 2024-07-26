@@ -128,36 +128,36 @@ QSPString qspGetAllActionsAsCode()
 {
     int count, i;
     QSPString temp;
-    QSPBufString res = qspNewBufString();
+    QSPBufString res = qspNewBufString(256);
     for (i = 0; i < qspCurActionsCount; ++i)
     {
-        qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ") QSP_DEFQUOT), 256);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ") QSP_DEFQUOT));
         temp = qspReplaceText(qspCurActions[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
-        qspAddBufText(&res, temp, 256);
+        qspAddBufText(&res, temp);
         qspFreeString(temp);
         if (qspCurActions[i].Image.Str)
         {
-            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(",") QSP_DEFQUOT), 256);
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(",") QSP_DEFQUOT));
             temp = qspReplaceText(qspCurActions[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
-            qspAddBufText(&res, temp, 256);
+            qspAddBufText(&res, temp);
             qspFreeString(temp);
         }
-        qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(":")), 256);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(":")));
         count = qspCurActions[i].OnPressLinesCount;
         if (count == 1 && qspIsAnyString(qspCurActions[i].OnPressLines->Str))
-            qspAddBufText(&res, qspCurActions[i].OnPressLines->Str, 256);
+            qspAddBufText(&res, qspCurActions[i].OnPressLines->Str);
         else
         {
             if (count >= 2)
             {
-                qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM), 256);
+                qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM));
                 temp = qspJoinPrepLines(qspCurActions[i].OnPressLines, count, QSP_STATIC_STR(QSP_STRSDELIM));
-                qspAddBufText(&res, temp, 256);
+                qspAddBufText(&res, temp);
                 qspFreeString(temp);
             }
-            qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM QSP_FMT("END")), 256);
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM QSP_FMT("END")));
         }
-        qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM), 256);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM));
     }
     return qspBufTextToString(res);
 }

@@ -273,7 +273,8 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
 QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
 {
     void *gameData;
-    QSPString bufString, locName;
+    QSPString locName;
+    QSPBufString bufString;
     QSPVar *savedVars;
     int i, j, dataSize, varsCount, oldRefreshCount = qspRefreshCount;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
@@ -288,7 +289,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
         *bufSize = 0;
         return QSP_FALSE;
     }
-    bufString = qspNullString;
+    bufString = qspNewBufString(1024);
     qspRefreshPlayList();
     locName = (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : qspNullString);
     qspAppendStrVal(&bufString, QSP_STATIC_STR(QSP_SAVEDGAMEID));
@@ -354,12 +355,12 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     qspRestoreLocalVars(savedVars, varsCount, qspSavedVarGroups, qspSavedVarGroupsCount);
     if (qspErrorNum)
     {
-        qspFreeString(bufString);
+        qspFreeBufString(bufString);
         *bufSize = 0;
         return QSP_FALSE;
     }
-    gameData = qspStringToFileData(bufString, QSP_TRUE, &dataSize);
-    qspFreeString(bufString);
+    gameData = qspStringToFileData(qspBufTextToString(bufString), QSP_TRUE, &dataSize);
+    qspFreeBufString(bufString);
     if (dataSize > *bufSize)
     {
         *bufSize = dataSize;

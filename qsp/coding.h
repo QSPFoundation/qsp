@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "text.h"
 
 #ifndef QSP_CODINGDEFINES
     #define QSP_CODINGDEFINES
@@ -35,10 +36,10 @@
     QSPString qspEncodeString(QSPString str);
     QSPString qspDecodeString(QSPString str);
     int qspReadEncodedIntVal(QSPString val);
-    void qspAppendEncodedIntVal(QSPString *s, int val);
-    void qspAppendEncodedStrVal(QSPString *s, QSPString val);
-    void qspAppendStrVal(QSPString *s, QSPString val);
-    void qspAppendEncodedVariant(QSPString *s, QSPVariant val);
+    void qspAppendEncodedIntVal(QSPBufString *s, int val);
+    void qspAppendEncodedStrVal(QSPBufString *s, QSPString val);
+    void qspAppendStrVal(QSPBufString *s, QSPString val);
+    void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val);
     QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QSPVariant *val);
 
 #endif
