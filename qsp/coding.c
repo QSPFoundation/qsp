@@ -280,7 +280,7 @@ QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2)
     return qspStringFromLen(ret, len);
 }
 
-QSPString qspCodeDeCode(QSPString str, QSP_BOOL toCode)
+QSPString qspEncodeString(QSPString str)
 {
     QSP_CHAR ch, *origBuf, *buf;
     int curLen, len = qspStrLen(str);
@@ -288,102 +288,102 @@ QSPString qspCodeDeCode(QSPString str, QSP_BOOL toCode)
     buf = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
     origBuf = str.Str;
     curLen = len;
-    if (toCode)
+    while (--curLen >= 0)
     {
-        while (--curLen >= 0)
-        {
-            ch = origBuf[curLen];
-            if (ch == QSP_CODREMOV)
-                ch = (QSP_CHAR)-QSP_CODREMOV;
-            else
-                ch -= QSP_CODREMOV;
-            buf[curLen] = ch;
-        }
-    }
-    else
-    {
-        while (--curLen >= 0)
-        {
-            ch = origBuf[curLen];
-            if (ch == (QSP_CHAR)-QSP_CODREMOV)
-                ch = QSP_CODREMOV;
-            else
-                ch += QSP_CODREMOV;
-            buf[curLen] = ch;
-        }
+        ch = origBuf[curLen];
+        if (ch == QSP_CODREMOV)
+            ch = (QSP_CHAR)-QSP_CODREMOV;
+        else
+            ch -= QSP_CODREMOV;
+        buf[curLen] = ch;
     }
     return qspStringFromLen(buf, len);
 }
 
-int qspDeCodeGetIntVal(QSPString val)
+QSPString qspDecodeString(QSPString str)
+{
+    QSP_CHAR ch, *origBuf, *buf;
+    int curLen, len = qspStrLen(str);
+    if (!len) return qspNullString;
+    buf = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
+    origBuf = str.Str;
+    curLen = len;
+    while (--curLen >= 0)
+    {
+        ch = origBuf[curLen];
+        if (ch == (QSP_CHAR)-QSP_CODREMOV)
+            ch = QSP_CODREMOV;
+        else
+            ch += QSP_CODREMOV;
+        buf[curLen] = ch;
+    }
+    return qspStringFromLen(buf, len);
+}
+
+int qspReadEncodedIntVal(QSPString val)
 {
     int num;
-    QSPString temp = qspCodeDeCode(val, QSP_FALSE);
+    QSPString temp = qspDecodeString(val);
     num = qspStrToNum(temp, 0);
     qspFreeString(temp);
     return num;
 }
 
-void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL toCode)
+void qspAppendEncodedIntVal(QSPString *s, int val)
 {
     QSP_CHAR buf[QSP_NUMTOSTRBUF];
     QSPString temp, str = qspNumToStr(buf, val);
-    if (toCode)
+    temp = qspEncodeString(str);
+    qspAddText(s, temp, QSP_FALSE);
+    qspFreeString(temp);
+    qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+}
+
+void qspAppendEncodedStrVal(QSPString *s, QSPString val)
+{
+    if (val.Str)
     {
-        temp = qspCodeDeCode(str, QSP_TRUE);
+        QSPString temp = qspEncodeString(val);
         qspAddText(s, temp, QSP_FALSE);
         qspFreeString(temp);
     }
-    else
-        qspAddText(s, str, QSP_FALSE);
     qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
 }
 
-void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL toCode)
+void qspAppendStrVal(QSPString *s, QSPString val)
 {
-    QSPString temp;
-    if (val.Str)
-    {
-        if (toCode)
-        {
-            temp = qspCodeDeCode(val, QSP_TRUE);
-            qspAddText(s, temp, QSP_FALSE);
-            qspFreeString(temp);
-        }
-        else
-            qspAddText(s, val, QSP_FALSE);
-    }
+    qspAddText(s, val, QSP_FALSE);
     qspAddText(s, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
 }
 
-void qspSerializeVariant(QSPString *s, QSPVariant val)
+void qspAppendEncodedVariant(QSPString *s, QSPVariant val)
 {
-    qspCodeWriteIntVal(s, val.Type, QSP_TRUE);
+    qspAppendEncodedIntVal(s, val.Type);
     switch (QSP_BASETYPE(val.Type))
     {
         case QSP_TYPE_TUPLE:
         {
             int i;
             QSPTuple tuple = QSP_TUPLE(val);
-            qspCodeWriteIntVal(s, tuple.Items, QSP_TRUE);
+            qspAppendEncodedIntVal(s, tuple.Items);
             for (i = 0; i < tuple.Items; ++i)
-                qspSerializeVariant(s, tuple.Vals[i]);
+                qspAppendEncodedVariant(s, tuple.Vals[i]);
             break;
         }
         case QSP_TYPE_STR:
-            qspCodeWriteVal(s, QSP_STR(val), QSP_TRUE);
+            qspAppendEncodedStrVal(s, QSP_STR(val));
             break;
         case QSP_TYPE_NUM:
-            qspCodeWriteIntVal(s, QSP_NUM(val), QSP_TRUE);
+            qspAppendEncodedIntVal(s, QSP_NUM(val));
             break;
     }
 }
 
-QSP_BOOL qspDeserializeVariant(QSPString *strs, int strsCount, int *curIndex, QSPVariant *val)
+QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QSPVariant *val)
 {
     int ind = *curIndex;
     if (ind >= strsCount) return QSP_FALSE;
-    val->Type = qspDeCodeGetIntVal(strs[ind++]);
+    val->Type = qspReadEncodedIntVal(strs[ind++]);
     switch (QSP_BASETYPE(val->Type))
     {
         case QSP_TYPE_TUPLE:
@@ -391,10 +391,10 @@ QSP_BOOL qspDeserializeVariant(QSPString *strs, int strsCount, int *curIndex, QS
             int i;
             QSPTuple *tuple = &QSP_PTUPLE(val);
             if (ind >= strsCount) return QSP_FALSE;
-            tuple->Items = qspDeCodeGetIntVal(strs[ind++]);
+            tuple->Items = qspReadEncodedIntVal(strs[ind++]);
             for (i = 0; i < tuple->Items; ++i)
             {
-                if (!qspDeserializeVariant(strs, strsCount, &ind, tuple->Vals + i))
+                if (!qspReadEncodedVariant(strs, strsCount, &ind, tuple->Vals + i))
                 {
                     qspFreeVariants(tuple->Vals, i);
                     return QSP_FALSE;
@@ -404,11 +404,11 @@ QSP_BOOL qspDeserializeVariant(QSPString *strs, int strsCount, int *curIndex, QS
         }
         case QSP_TYPE_STR:
             if (ind >= strsCount) return QSP_FALSE;
-            QSP_PSTR(val) = qspCodeDeCode(strs[ind++], QSP_FALSE);
+            QSP_PSTR(val) = qspDecodeString(strs[ind++]);
             break;
         case QSP_TYPE_NUM:
             if (ind >= strsCount) return QSP_FALSE;
-            QSP_PNUM(val) = qspDeCodeGetIntVal(strs[ind++]);
+            QSP_PNUM(val) = qspReadEncodedIntVal(strs[ind++]);
             break;
     }
     *curIndex = ind;

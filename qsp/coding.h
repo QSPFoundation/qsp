@@ -32,11 +32,13 @@
     /* External functions */
     void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize);
     QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2);
-    QSPString qspCodeDeCode(QSPString str, QSP_BOOL toCode);
-    int qspDeCodeGetIntVal(QSPString val);
-    void qspCodeWriteIntVal(QSPString *s, int val, QSP_BOOL toCode);
-    void qspCodeWriteVal(QSPString *s, QSPString val, QSP_BOOL toCode);
-    void qspSerializeVariant(QSPString *s, QSPVariant val);
-    QSP_BOOL qspDeserializeVariant(QSPString *strs, int strsCount, int *curIndex, QSPVariant *val);
+    QSPString qspEncodeString(QSPString str);
+    QSPString qspDecodeString(QSPString str);
+    int qspReadEncodedIntVal(QSPString val);
+    void qspAppendEncodedIntVal(QSPString *s, int val);
+    void qspAppendEncodedStrVal(QSPString *s, QSPString val);
+    void qspAppendStrVal(QSPString *s, QSPString val);
+    void qspAppendEncodedVariant(QSPString *s, QSPVariant val);
+    QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QSPVariant *val);
 
 #endif
