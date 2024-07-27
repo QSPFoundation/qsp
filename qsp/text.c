@@ -138,34 +138,15 @@ QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars)
 
 QSPString qspJoinStrs(QSPString *s, int count, QSPString delim)
 {
-    int i, curLen, txtLen = 0, txtRealLen = 0, bufSize = 256, delimLen = qspStrLen(delim);
-    QSP_CHAR *txt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+    int i;
+    QSPBufString buf = qspNewBufString(256);
     for (i = 0; i < count; ++i)
     {
-        curLen = qspStrLen(s[i]);
-        if (curLen)
-        {
-            if ((txtLen += curLen) > bufSize)
-            {
-                bufSize = txtLen + 128;
-                txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
-            }
-            memcpy(txt + txtRealLen, s[i].Str, curLen * sizeof(QSP_CHAR));
-            txtRealLen = txtLen;
-        }
-        if (i == count - 1) break;
-        if (delimLen)
-        {
-            if ((txtLen += delimLen) > bufSize)
-            {
-                bufSize = txtLen + 128;
-                txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
-            }
-            memcpy(txt + txtRealLen, delim.Str, delimLen * sizeof(QSP_CHAR));
-            txtRealLen = txtLen;
-        }
+        qspAddBufText(&buf, s[i]);
+        if (i == count - 1) break; /* don't add the delim */
+        qspAddBufText(&buf, delim);
     }
-    return qspStringFromLen(txt, txtLen);
+    return qspBufTextToString(buf);
 }
 
 int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
@@ -326,17 +307,24 @@ QSPString qspNumToStr(QSP_CHAR *buf, int val)
 QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
 {
     int c1 = 0, c2 = 0, c3 = 0;
-    QSP_CHAR quot, *pos = txt.Str;
+    QSP_CHAR *pos = txt.Str;
     while (pos < txt.End)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            quot = *pos;
+            QSP_CHAR quot = *pos;
             while (++pos < txt.End)
-                if (*pos == quot && (++pos >= txt.End || *pos != quot)) break;
-            if (pos >= txt.End) return 0;
+            {
+                if (*pos == quot)
+                {
+                    ++pos;
+                    if (pos >= txt.End) break;
+                    if (*pos != quot) break;
+                }
+            }
+            continue;
         }
-        if (*pos == QSP_LRBRACK[0])
+        else if (*pos == QSP_LRBRACK[0])
             ++c1;
         else if (*pos == QSP_RRBRACK[0])
         {
@@ -354,7 +342,8 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
         {
             if (c3) --c3;
         }
-        if (!(c1 || c2 || c3) && *pos == ch) return pos;
+        else if (!(c1 || c2 || c3) && *pos == ch)
+            return pos;
         ++pos;
     }
     return 0;
@@ -362,28 +351,35 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
 
 QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 {
-    QSP_BOOL isLastDelim;
-    QSP_CHAR quot, *lastPos, *pos;
+    QSP_BOOL isPrevDelim;
+    QSP_CHAR *lastPos, *pos;
     int c1, c2, c3, strLen = qspStrLen(str);
     if (!strLen) return txt.Str;
     pos = qspStrStr(txt, str);
     if (!pos) return 0;
     if (!(isIsolated || qspIsAnyInClass(txt, QSP_CHAR_QUOT | QSP_CHAR_EXPSTART))) return pos;
     c1 = c2 = c3 = 0;
-    isLastDelim = QSP_TRUE;
+    isPrevDelim = QSP_TRUE;
     pos = txt.Str;
     lastPos = txt.End - strLen;
     while (pos <= lastPos)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            quot = *pos;
+            QSP_CHAR quot = *pos;
             while (++pos <= lastPos)
-                if (*pos == quot && (++pos > lastPos || *pos != quot)) break;
-            if (pos > lastPos) return 0;
-            isLastDelim = QSP_TRUE;
+            {
+                if (*pos == quot)
+                {
+                    ++pos;
+                    if (pos > lastPos) break;
+                    if (*pos != quot) break;
+                }
+            }
+            isPrevDelim = QSP_TRUE;
+            continue;
         }
-        if (*pos == QSP_LRBRACK[0])
+        else if (*pos == QSP_LRBRACK[0])
             ++c1;
         else if (*pos == QSP_RRBRACK[0])
         {
@@ -403,24 +399,27 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
         }
         if (!(c1 || c2 || c3))
         {
-            if (isIsolated)
-            {
-                if (qspIsInClass(*pos, QSP_CHAR_DELIM))
-                    isLastDelim = QSP_TRUE;
-                else if (isLastDelim)
-                {
-                    if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
-                    {
-                        txt.Str = pos;
-                        if (!qspStrsNComp(txt, str, strLen)) return pos;
-                    }
-                    isLastDelim = QSP_FALSE;
-                }
-            }
+            if (qspIsInClass(*pos, QSP_CHAR_DELIM))
+                isPrevDelim = QSP_TRUE;
             else
             {
-                txt.Str = pos;
-                if (!qspStrsNComp(txt, str, strLen)) return pos;
+                if (isIsolated)
+                {
+                    if (isPrevDelim)
+                    {
+                        if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
+                        {
+                            txt.Str = pos;
+                            if (!qspStrsNComp(txt, str, strLen)) return pos;
+                        }
+                    }
+                }
+                else
+                {
+                    txt.Str = pos;
+                    if (!qspStrsNComp(txt, str, strLen)) return pos;
+                }
+                isPrevDelim = QSP_FALSE;
             }
         }
         ++pos;
@@ -430,99 +429,63 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 
 QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt)
 {
-    QSPString res;
-    int txtLen, oldTxtLen, bufSize, searchLen, repLen, len;
-    QSP_CHAR *newTxt, *pos = qspStrStr(txt, searchTxt);
+    QSPBufString res;
+    int searchLen;
+    QSP_CHAR *pos = qspStrStr(txt, searchTxt);
     if (!pos) return qspGetNewText(txt);
-    bufSize = 256;
-    txtLen = oldTxtLen = 0;
+    res = qspNewBufString(256);
     searchLen = qspStrLen(searchTxt);
-    repLen = qspStrLen(repTxt);
-    newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
     do
     {
-        len = (int)(pos - txt.Str);
-        if ((txtLen += len + repLen) > bufSize)
-        {
-            bufSize = txtLen + 128;
-            newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
-        }
-        if (len) memcpy(newTxt + oldTxtLen, txt.Str, len * sizeof(QSP_CHAR));
-        if (repLen) memcpy(newTxt + oldTxtLen + len, repTxt.Str, repLen * sizeof(QSP_CHAR));
-        oldTxtLen = txtLen;
+        qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
+        qspAddBufText(&res, repTxt);
         txt.Str = pos + searchLen;
         pos = qspStrStr(txt, searchTxt);
     } while (pos);
-    res = qspStringFromLen(newTxt, txtLen);
-    qspAddText(&res, txt, QSP_FALSE);
-    return res;
+    qspAddBufText(&res, txt);
+    return qspBufTextToString(res);
 }
 
 QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
 {
     QSPVariant val;
-    QSPString expr, res;
-    QSP_CHAR *newTxt, *lPos, *rPos;
-    int oldRefreshCount, len, txtLen, oldTxtLen, bufSize;
-    lPos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
-    if (!lPos)
+    QSPString expr;
+    QSPBufString res;
+    int oldRefreshCount;
+    QSP_CHAR *pos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
+    if (!pos)
     {
         if (canReturnSelf) return txt;
         return qspGetNewText(txt);
     }
-    bufSize = qspStrLen(txt);
-    newTxt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
-    txtLen = oldTxtLen = 0;
+    res = qspNewBufString(128);
     oldRefreshCount = qspRefreshCount;
     do
     {
-        len = (int)(lPos - txt.Str);
-        if (len)
-        {
-            txtLen += len;
-            if (txtLen > bufSize)
-            {
-                bufSize = txtLen + 128;
-                newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
-            }
-            memcpy(newTxt + oldTxtLen, txt.Str, len * sizeof(QSP_CHAR));
-            oldTxtLen = txtLen;
-        }
-        txt.Str = lPos + QSP_STATIC_LEN(QSP_LSUBEX);
-        rPos = qspStrPos(txt, QSP_STATIC_STR(QSP_RSUBEX), QSP_FALSE);
-        if (!rPos)
+        qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
+        txt.Str = pos + QSP_STATIC_LEN(QSP_LSUBEX);
+        pos = qspStrPos(txt, QSP_STATIC_STR(QSP_RSUBEX), QSP_FALSE);
+        if (!pos)
         {
             qspSetError(QSP_ERR_BRACKNOTFOUND);
-            free(newTxt);
+            qspFreeBufString(res);
             return qspNullString;
         }
-        expr = qspStringFromPair(txt.Str, rPos);
+        expr = qspStringFromPair(txt.Str, pos);
         /* looks like it's ok to modify the original string here */
         qspPrepareStringToExecution(&expr);
         val = qspExprValue(expr);
         if (qspRefreshCount != oldRefreshCount || qspErrorNum)
         {
-            free(newTxt);
+            qspFreeBufString(res);
             return qspNullString;
         }
         qspConvertVariantTo(&val, QSP_TYPE_STR);
-        len = qspStrLen(QSP_STR(val));
-        if (len)
-        {
-            txtLen += len;
-            if (txtLen > bufSize)
-            {
-                bufSize = txtLen + 128;
-                newTxt = (QSP_CHAR *)realloc(newTxt, bufSize * sizeof(QSP_CHAR));
-            }
-            memcpy(newTxt + oldTxtLen, QSP_STR(val).Str, len * sizeof(QSP_CHAR));
-            oldTxtLen = txtLen;
-        }
+        qspAddBufText(&res, QSP_STR(val));
         qspFreeString(QSP_STR(val));
-        txt.Str = rPos + QSP_STATIC_LEN(QSP_RSUBEX);
-        lPos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
-    } while (lPos);
-    res = qspStringFromLen(newTxt, txtLen);
-    qspAddText(&res, txt, QSP_FALSE);
-    return res;
+        txt.Str = pos + QSP_STATIC_LEN(QSP_RSUBEX);
+        pos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
+    } while (pos);
+    qspAddBufText(&res, txt);
+    return qspBufTextToString(res);
 }

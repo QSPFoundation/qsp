@@ -397,10 +397,10 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 
 void qspFreeLineOfCode(QSPLineOfCode *line)
 {
-    int i;
     qspFreeString(line->Label);
     if (line->Stats)
     {
+        int i;
         for (i = 0; i < line->StatsCount; ++i)
             if (line->Stats[i].Args) free(line->Stats[i].Args);
         free(line->Stats);
@@ -422,11 +422,12 @@ void qspFreePrepLines(QSPLineOfCode *strs, int count)
 
 void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int end)
 {
-    QSPLineOfCode *line;
-    QSP_TINYINT argsCount;
-    int i, j, statsCount, linesCount = end - start;
+    int linesCount = end - start;
     if (src && linesCount)
     {
+        int i, j, statsCount;
+        QSPLineOfCode *line;
+        QSP_TINYINT argsCount;
         *dest = (QSPLineOfCode *)malloc(linesCount * sizeof(QSPLineOfCode));
         line = *dest;
         while (start < end)
@@ -471,68 +472,45 @@ void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int e
 
 QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim)
 {
-    int i, itemLen, txtLen = 0, txtRealLen = 0, bufSize = 256, delimLen = qspStrLen(delim);
-    QSP_CHAR *txt = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+    int i;
+    QSPBufString res = qspNewBufString(256);
     for (i = 0; i < count; ++i)
     {
-        itemLen = qspStrLen(s[i].Str);
-        if (itemLen)
-        {
-            if ((txtLen += itemLen) > bufSize)
-            {
-                bufSize = txtLen + 128;
-                txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
-            }
-            memcpy(txt + txtRealLen, s[i].Str.Str, itemLen * sizeof(QSP_CHAR));
-            txtRealLen = txtLen;
-        }
+        qspAddBufText(&res, s[i].Str);
         if (i == count - 1) break; /* don't add the delim */
-        if (delimLen)
-        {
-            if ((txtLen += delimLen) > bufSize)
-            {
-                bufSize = txtLen + 128;
-                txt = (QSP_CHAR *)realloc(txt, bufSize * sizeof(QSP_CHAR));
-            }
-            memcpy(txt + txtRealLen, delim.Str, delimLen * sizeof(QSP_CHAR));
-            txtRealLen = txtLen;
-        }
+        qspAddBufText(&res, delim);
     }
-    return qspStringFromLen(txt, txtLen);
+    return qspBufTextToString(res);
 }
 
 void qspPrepareStringToExecution(QSPString *str)
 {
-    QSP_CHAR *pos, quot = 0, quotsCount = 0;
-    pos = str->Str;
+    int quotsCount = 0;
+    QSP_CHAR *pos = str->Str;
     while (pos < str->End)
     {
-        if (quot)
+        if (*pos == QSP_LQUOT[0])
+            ++quotsCount;
+        else if (*pos == QSP_RQUOT[0])
         {
-            if (*pos == quot)
+            if (quotsCount) --quotsCount;
+        }
+        else if (qspIsInClass(*pos, QSP_CHAR_QUOT))
+        {
+            QSP_CHAR quot = *pos;
+            while (++pos < str->End)
             {
-                ++pos;
-                if (pos >= str->End) break;
-                if (*pos != quot)
+                if (*pos == quot)
                 {
-                    quot = 0;
-                    continue;
+                    ++pos;
+                    if (pos >= str->End) break;
+                    if (*pos != quot) break;
                 }
             }
+            continue;
         }
-        else
-        {
-            if (*pos == QSP_LQUOT[0])
-                ++quotsCount;
-            else if (*pos == QSP_RQUOT[0])
-            {
-                if (quotsCount) --quotsCount;
-            }
-            else if (qspIsInClass(*pos, QSP_CHAR_QUOT))
-                quot = *pos;
-            else if (!quotsCount) /* we have to keep q-strings untouched */
-                *pos = QSP_CHRUPR(*pos);
-        }
+        else if (!quotsCount) /* we have to keep q-strings untouched */
+            *pos = QSP_CHRUPR(*pos);
         ++pos;
     }
 }
