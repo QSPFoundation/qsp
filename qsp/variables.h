@@ -121,9 +121,10 @@
         }
         if (var->Indices)
         {
+            QSPVarIndex *curIndex;
             int count = var->IndsCount;
-            while (--count >= 0)
-                qspFreeString(var->Indices[count].Str);
+            for (curIndex = var->Indices; count > 0; --count, ++curIndex)
+                qspFreeString(curIndex->Str);
             free(var->Indices);
         }
         qspInitVarData(var);
@@ -158,10 +159,9 @@
 
     INLINE void qspReleaseSavedVarsGroup(QSP_BOOL toKeepLocals)
     {
-        int ind;
         if (qspSavedVarGroupsCount)
         {
-            ind = --qspSavedVarGroupsCount;
+            int ind = --qspSavedVarGroupsCount;
             if (toKeepLocals)
                 qspClearVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
             else

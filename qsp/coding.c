@@ -381,10 +381,11 @@ void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val)
 
 QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QSPVariant *val)
 {
-    int ind = *curIndex;
+    int type, ind = *curIndex;
     if (ind >= strsCount) return QSP_FALSE;
-    val->Type = qspReadEncodedIntVal(strs[ind++]);
-    switch (QSP_BASETYPE(val->Type))
+    type = qspReadEncodedIntVal(strs[ind++]);
+    if (type < 0 || type >= QSP_TYPE_DEFINED_TYPES) return QSP_FALSE; /* unsupported value type */
+    switch (QSP_BASETYPE(type))
     {
         case QSP_TYPE_TUPLE:
         {
@@ -422,9 +423,8 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
             if (ind >= strsCount) return QSP_FALSE;
             QSP_PNUM(val) = qspReadEncodedIntVal(strs[ind++]);
             break;
-        default:
-            return QSP_FALSE; /* unsupported var type */
     }
+    val->Type = (QSP_TINYINT)type;
     *curIndex = ind;
     return QSP_TRUE;
 }

@@ -33,15 +33,16 @@
     {
         while (--count >= 0)
         {
-            switch (QSP_BASETYPE(args[count].Type))
+            switch (QSP_BASETYPE(args->Type))
             {
                 case QSP_TYPE_TUPLE:
-                    qspFreeTuple(QSP_TUPLE(args[count]));
+                    qspFreeTuple(QSP_PTUPLE(args));
                     break;
                 case QSP_TYPE_STR:
-                    qspFreeString(QSP_STR(args[count]));
+                    qspFreeString(QSP_PSTR(args));
                     break;
             }
+            ++args;
         }
     }
 
