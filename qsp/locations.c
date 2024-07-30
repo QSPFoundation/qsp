@@ -128,15 +128,15 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     }
     if (toChangeDesc)
     {
-        qspFreeString(qspCurDesc);
-        qspCurDesc = str;
+        qspFreeBufString(qspCurDesc);
+        qspCurDesc = qspStringToBufString(str, 512);
         qspIsMainDescChanged = QSP_TRUE;
     }
     else
     {
         if (!qspIsEmpty(str))
         {
-            qspAddText(&qspCurDesc, str, QSP_FALSE);
+            qspAddBufText(&qspCurDesc, str);
             qspIsMainDescChanged = QSP_TRUE;
         }
         qspFreeString(str);

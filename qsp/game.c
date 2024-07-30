@@ -300,8 +300,8 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     qspAppendEncodedIntVal(&bufString, qspCurSelObject);
     qspAppendEncodedStrVal(&bufString, qspViewPath);
     qspAppendEncodedStrVal(&bufString, qspCurInput);
-    qspAppendEncodedStrVal(&bufString, qspCurDesc);
-    qspAppendEncodedStrVal(&bufString, qspCurVars);
+    qspAppendEncodedStrVal(&bufString, qspBufTextToString(qspCurDesc));
+    qspAppendEncodedStrVal(&bufString, qspBufTextToString(qspCurVars));
     qspAppendEncodedStrVal(&bufString, locName);
     qspAppendEncodedIntVal(&bufString, (int)qspCurToShowActs);
     qspAppendEncodedIntVal(&bufString, (int)qspCurToShowObjs);
@@ -501,8 +501,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurSelObject = qspReadEncodedIntVal(strs[5]);
     qspViewPath = qspDecodeString(strs[6]);
     qspCurInput = qspDecodeString(strs[7]);
-    qspCurDesc = qspDecodeString(strs[8]);
-    qspCurVars = qspDecodeString(strs[9]);
+    qspCurDesc = qspStringToBufString(qspDecodeString(strs[8]), 512);
+    qspCurVars = qspStringToBufString(qspDecodeString(strs[9]), 512);
     locName = qspDecodeString(strs[10]);
     qspCurToShowActs = qspReadEncodedIntVal(strs[11]) != 0;
     qspCurToShowObjs = qspReadEncodedIntVal(strs[12]) != 0;

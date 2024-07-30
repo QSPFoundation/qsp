@@ -76,7 +76,7 @@ int QSPGetFullRefreshCount()
 /* Get text of the main description */
 QSPString QSPGetMainDesc()
 {
-    return qspCurDesc;
+    return qspBufTextToString(qspCurDesc);
 }
 /* Check whether the text has been updated */
 QSP_BOOL QSPIsMainDescChanged()
@@ -89,7 +89,7 @@ QSP_BOOL QSPIsMainDescChanged()
 /* Get text of the additional description */
 QSPString QSPGetVarsDesc()
 {
-    return qspCurVars;
+    return qspBufTextToString(qspCurVars);
 }
 /* Check whether the text has been updated */
 QSP_BOOL QSPIsVarsDescChanged()

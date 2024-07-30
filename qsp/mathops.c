@@ -1043,10 +1043,10 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
             QSP_STR(tos) = (qspCurSelAction >= 0 ? qspGetNewText(qspCurActions[qspCurSelAction].Desc) : qspNullString);
             break;
         case qspOpMainText:
-            QSP_STR(tos) = (qspCurDesc.Str ? qspGetNewText(qspCurDesc) : qspNullString);
+            QSP_STR(tos) = (qspCurDesc.Len > 0 ? qspGetNewText(qspBufTextToString(qspCurDesc)) : qspNullString);
             break;
         case qspOpStatText:
-            QSP_STR(tos) = (qspCurVars.Str ? qspGetNewText(qspCurVars) : qspNullString);
+            QSP_STR(tos) = (qspCurVars.Len > 0 ? qspGetNewText(qspBufTextToString(qspCurVars)) : qspNullString);
             break;
         case qspOpCurActs:
             QSP_STR(tos) = qspGetAllActionsAsCode();

@@ -51,7 +51,6 @@
     QSP_CHAR *qspStringToC(QSPString s);
     void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
     void qspAddBufText(QSPBufString *dest, QSPString val);
-    QSP_BOOL qspClearText(QSPString *s);
     QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars);
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);
@@ -113,6 +112,15 @@
     INLINE void qspFreeString(QSPString s)
     {
         if (s.Str) free(s.Str);
+    }
+
+    INLINE void qspClearText(QSPString *s)
+    {
+        if (s->Str)
+        {
+            free(s->Str);
+            s->Str = s->End = 0; /* assign a null string */
+        }
     }
 
     INLINE void qspUpdateText(QSPString *dest, QSPString val)
@@ -265,6 +273,16 @@
         return res;
     }
 
+    INLINE QSPBufString qspStringToBufString(QSPString str, int capacityIncrement)
+    {
+        QSPBufString res;
+        res.Str = str.Str;
+        res.Len = qspStrLen(str);
+        res.Capacity = res.Len;
+        res.CapacityIncrement = capacityIncrement;
+        return res;
+    }
+
     INLINE QSPString qspBufTextToString(QSPBufString buf)
     {
         QSPString res;
@@ -276,6 +294,18 @@
     INLINE void qspFreeBufString(QSPBufString buf)
     {
         if (buf.Str) free(buf.Str);
+    }
+
+    INLINE void qspClearBufString(QSPBufString *s)
+    {
+        if (s->Str)
+        {
+            free(s->Str);
+            s->Str = 0;
+            s->Len = 0;
+            s->Capacity = 0;
+            /* Keep old CapacityIncrement */
+        }
     }
 
 #endif

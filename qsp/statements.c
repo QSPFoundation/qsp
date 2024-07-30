@@ -935,8 +935,8 @@ INLINE QSP_BOOL qspStatementImplicitStatement(QSPVariant *args, QSP_TINYINT coun
     if (QSP_ISDEF(args[0].Type))
     {
         qspConvertVariantTo(args, QSP_TYPE_STR);
-        qspAddText(&qspCurDesc, QSP_STR(args[0]), QSP_FALSE);
-        qspAddText(&qspCurDesc, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+        qspAddBufText(&qspCurDesc, QSP_STR(args[0]));
+        qspAddBufText(&qspCurDesc, QSP_STATIC_STR(QSP_STRSDELIM));
         qspIsMainDescChanged = QSP_TRUE;
     }
     return QSP_FALSE;
@@ -949,35 +949,35 @@ INLINE QSP_BOOL qspStatementAddText(QSPVariant *args, QSP_TINYINT count, QSPStri
     case qspStatP:
         if (!qspIsEmpty(QSP_STR(args[0])))
         {
-            qspAddText(&qspCurVars, QSP_STR(args[0]), QSP_FALSE);
+            qspAddBufText(&qspCurVars, QSP_STR(args[0]));
             qspIsVarsDescChanged = QSP_TRUE;
         }
         break;
     case qspStatMP:
         if (!qspIsEmpty(QSP_STR(args[0])))
         {
-            qspAddText(&qspCurDesc, QSP_STR(args[0]), QSP_FALSE);
+            qspAddBufText(&qspCurDesc, QSP_STR(args[0]));
             qspIsMainDescChanged = QSP_TRUE;
         }
         break;
     case qspStatPL:
-        if (count) qspAddText(&qspCurVars, QSP_STR(args[0]), QSP_FALSE);
-        qspAddText(&qspCurVars, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+        if (count) qspAddBufText(&qspCurVars, QSP_STR(args[0]));
+        qspAddBufText(&qspCurVars, QSP_STATIC_STR(QSP_STRSDELIM));
         qspIsVarsDescChanged = QSP_TRUE;
         break;
     case qspStatMPL:
-        if (count) qspAddText(&qspCurDesc, QSP_STR(args[0]), QSP_FALSE);
-        qspAddText(&qspCurDesc, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
+        if (count) qspAddBufText(&qspCurDesc, QSP_STR(args[0]));
+        qspAddBufText(&qspCurDesc, QSP_STATIC_STR(QSP_STRSDELIM));
         qspIsMainDescChanged = QSP_TRUE;
         break;
     case qspStatNL:
-        qspAddText(&qspCurVars, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
-        if (count) qspAddText(&qspCurVars, QSP_STR(args[0]), QSP_FALSE);
+        qspAddBufText(&qspCurVars, QSP_STATIC_STR(QSP_STRSDELIM));
+        if (count) qspAddBufText(&qspCurVars, QSP_STR(args[0]));
         qspIsVarsDescChanged = QSP_TRUE;
         break;
     case qspStatMNL:
-        qspAddText(&qspCurDesc, QSP_STATIC_STR(QSP_STRSDELIM), QSP_FALSE);
-        if (count) qspAddText(&qspCurDesc, QSP_STR(args[0]), QSP_FALSE);
+        qspAddBufText(&qspCurDesc, QSP_STATIC_STR(QSP_STRSDELIM));
+        if (count) qspAddBufText(&qspCurDesc, QSP_STR(args[0]));
         qspIsMainDescChanged = QSP_TRUE;
         break;
     }
@@ -989,12 +989,18 @@ INLINE QSP_BOOL qspStatementClear(QSPVariant *args, QSP_TINYINT count, QSPString
     switch (extArg)
     {
     case qspStatClear:
-        if (qspClearText(&qspCurVars))
+        if (qspCurVars.Len > 0)
+        {
+            qspClearBufString(&qspCurVars);
             qspIsVarsDescChanged = QSP_TRUE;
+        }
         break;
     case qspStatMClear:
-        if (qspClearText(&qspCurDesc))
+        if (qspCurDesc.Len > 0)
+        {
+            qspClearBufString(&qspCurDesc);
             qspIsMainDescChanged = QSP_TRUE;
+        }
         break;
     case qspStatCmdClear:
         qspClearText(&qspCurInput);
@@ -1004,10 +1010,16 @@ INLINE QSP_BOOL qspStatementClear(QSPVariant *args, QSP_TINYINT count, QSPString
         qspClearActions(QSP_FALSE);
         break;
     case qspStatClS:
-        if (qspClearText(&qspCurVars))
+        if (qspCurVars.Len > 0)
+        {
+            qspClearBufString(&qspCurVars);
             qspIsVarsDescChanged = QSP_TRUE;
-        if (qspClearText(&qspCurDesc))
+        }
+        if (qspCurDesc.Len > 0)
+        {
+            qspClearBufString(&qspCurDesc);
             qspIsMainDescChanged = QSP_TRUE;
+        }
         qspClearText(&qspCurInput);
         qspClearActions(QSP_FALSE);
         qspCallSetInputStrText(qspNullString);

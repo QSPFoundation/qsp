@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "text.h"
 
 #ifndef QSP_COMMONDEFINES
     #define QSP_COMMONDEFINES
@@ -23,8 +24,8 @@
     #define QSP_RANDMASK 0x7FFFFFFF
 
     extern QSP_BOOL qspIsDebug;
-    extern QSPString qspCurDesc;
-    extern QSPString qspCurVars;
+    extern QSPBufString qspCurDesc;
+    extern QSPBufString qspCurVars;
     extern QSPString qspCurInput;
     extern QSPString qspViewPath;
     extern int qspTimerInterval;

@@ -81,9 +81,7 @@ void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
         }
         else
         {
-            /* Assign a null string */
-            dest->Str = 0;
-            dest->End = 0;
+            dest->Str = dest->End = 0; /* assign a null string */
         }
     }
 }
@@ -111,18 +109,6 @@ void qspAddBufText(QSPBufString *dest, QSPString val)
             dest->Len = valLen;
         }
     }
-}
-
-QSP_BOOL qspClearText(QSPString *s)
-{
-    if (s->Str)
-    {
-        int oldLen = (int)(s->End - s->Str);
-        free(s->Str);
-        s->Str = s->End = 0;
-        if (oldLen) return QSP_TRUE;
-    }
-    return QSP_FALSE;
 }
 
 QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars)
