@@ -477,7 +477,7 @@ INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
     dest->ValsCount = maxCount;
     dest->Values = (QSPVariant *)malloc(maxCount * sizeof(QSPVariant));
     for (i = 0; i < maxCount; ++i)
-        qspCopyToNewVariant(dest->Values + i, src->Values + i + start);
+        qspCopyToNewVariant(dest->Values + i, src->Values + start + i);
     dest->IndsBufSize = 0;
     dest->Indices = 0;
     count = 0;

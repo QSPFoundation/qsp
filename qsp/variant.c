@@ -315,39 +315,55 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
 {
     if (QSP_BASETYPE(arg1->Type) == QSP_TYPE_TUPLE)
     {
-        int i;
         QSPTuple *tuple = &QSP_PTUPLE(arg1);
-        QSPVariant *vals = (QSPVariant *)malloc(tuple->Items * sizeof(QSPVariant));
-        for (i = 0; i < tuple->Items; ++i)
+        if (tuple->Vals)
         {
-            if (!qspAutoConvertCombine(tuple->Vals + i, arg2, op, vals + i))
+            int i;
+            QSPVariant *vals = (QSPVariant *)malloc(tuple->Items * sizeof(QSPVariant));
+            for (i = 0; i < tuple->Items; ++i)
             {
-                qspFreeVariants(vals, i);
-                free(vals);
-                return QSP_FALSE;
+                if (!qspAutoConvertCombine(tuple->Vals + i, arg2, op, vals + i))
+                {
+                    qspFreeVariants(vals, i);
+                    free(vals);
+                    return QSP_FALSE;
+                }
             }
+            QSP_PTUPLE(res).Vals = vals;
+            QSP_PTUPLE(res).Items = tuple->Items;
         }
-        QSP_PTUPLE(res).Vals = vals;
-        QSP_PTUPLE(res).Items = tuple->Items;
+        else
+        {
+            QSP_PTUPLE(res).Vals = 0;
+            QSP_PTUPLE(res).Items = 0;
+        }
         res->Type = QSP_TYPE_TUPLE;
         return QSP_TRUE;
     }
     if (QSP_BASETYPE(arg2->Type) == QSP_TYPE_TUPLE)
     {
-        int i;
         QSPTuple *tuple = &QSP_PTUPLE(arg2);
-        QSPVariant *vals = (QSPVariant *)malloc(tuple->Items * sizeof(QSPVariant));
-        for (i = 0; i < tuple->Items; ++i)
+        if (tuple->Vals)
         {
-            if (!qspAutoConvertCombine(arg1, tuple->Vals + i, op, vals + i))
+            int i;
+            QSPVariant *vals = (QSPVariant *)malloc(tuple->Items * sizeof(QSPVariant));
+            for (i = 0; i < tuple->Items; ++i)
             {
-                qspFreeVariants(vals, i);
-                free(vals);
-                return QSP_FALSE;
+                if (!qspAutoConvertCombine(arg1, tuple->Vals + i, op, vals + i))
+                {
+                    qspFreeVariants(vals, i);
+                    free(vals);
+                    return QSP_FALSE;
+                }
             }
+            QSP_PTUPLE(res).Vals = vals;
+            QSP_PTUPLE(res).Items = tuple->Items;
         }
-        QSP_PTUPLE(res).Vals = vals;
-        QSP_PTUPLE(res).Items = tuple->Items;
+        else
+        {
+            QSP_PTUPLE(res).Vals = 0;
+            QSP_PTUPLE(res).Items = 0;
+        }
         res->Type = QSP_TYPE_TUPLE;
         return QSP_TRUE;
     }

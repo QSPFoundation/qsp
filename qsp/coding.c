@@ -388,17 +388,29 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
     {
         case QSP_TYPE_TUPLE:
         {
-            int i;
-            QSPTuple *tuple = &QSP_PTUPLE(val);
+            int itemsCount;
             if (ind >= strsCount) return QSP_FALSE;
-            tuple->Items = qspReadEncodedIntVal(strs[ind++]);
-            for (i = 0; i < tuple->Items; ++i)
+            itemsCount = qspReadEncodedIntVal(strs[ind++]);
+            if (itemsCount > 0)
             {
-                if (!qspReadEncodedVariant(strs, strsCount, &ind, tuple->Vals + i))
+                int i;
+                QSPVariant *vals = (QSPVariant *)malloc(itemsCount * sizeof(QSPVariant));
+                for (i = 0; i < itemsCount; ++i)
                 {
-                    qspFreeVariants(tuple->Vals, i);
-                    return QSP_FALSE;
+                    if (!qspReadEncodedVariant(strs, strsCount, &ind, vals + i))
+                    {
+                        qspFreeVariants(vals, i);
+                        free(vals);
+                        return QSP_FALSE;
+                    }
                 }
+                QSP_PTUPLE(val).Vals = vals;
+                QSP_PTUPLE(val).Items = itemsCount;
+            }
+            else
+            {
+                QSP_PTUPLE(val).Vals = 0;
+                QSP_PTUPLE(val).Items = 0;
             }
             break;
         }
@@ -410,6 +422,8 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
             if (ind >= strsCount) return QSP_FALSE;
             QSP_PNUM(val) = qspReadEncodedIntVal(strs[ind++]);
             break;
+        default:
+            return QSP_FALSE; /* unsupported var type */
     }
     *curIndex = ind;
     return QSP_TRUE;

@@ -85,14 +85,23 @@ QSPTuple qspGetNewTuple(QSPVariant *values, int count)
 QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2)
 {
     QSPTuple tuple;
-    QSPVariant *newItem, *item;
-    tuple.Items = count1 + count2;
-    tuple.Vals = (QSPVariant *)malloc(tuple.Items * sizeof(QSPVariant));
-    newItem = tuple.Vals;
-    for (item = list1; count1 > 0; --count1, ++item, ++newItem)
-        qspCopyToNewVariant(newItem, item);
-    for (item = list2; count2 > 0; --count2, ++item, ++newItem)
-        qspCopyToNewVariant(newItem, item);
+    int newCount = count1 + count2;
+    if (newCount > 0)
+    {
+        QSPVariant *newItem, *item;
+        tuple.Vals = (QSPVariant *)malloc(newCount * sizeof(QSPVariant));
+        tuple.Items = newCount;
+        newItem = tuple.Vals;
+        for (item = list1; count1 > 0; --count1, ++item, ++newItem)
+            qspCopyToNewVariant(newItem, item);
+        for (item = list2; count2 > 0; --count2, ++item, ++newItem)
+            qspCopyToNewVariant(newItem, item);
+    }
+    else
+    {
+        tuple.Vals = 0;
+        tuple.Items = 0;
+    }
     return tuple;
 }
 
