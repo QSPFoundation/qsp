@@ -328,7 +328,7 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
         {
             if (c3) --c3;
         }
-        else if (!(c1 || c2 || c3) && *pos == ch)
+        if (!(c1 || c2 || c3) && *pos == ch) /* include brackets */
             return pos;
         ++pos;
     }
