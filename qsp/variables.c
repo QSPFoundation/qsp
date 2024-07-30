@@ -350,9 +350,9 @@ int qspGetVarNumValue(QSPString name)
 
 void qspRestoreGlobalVars()
 {
-    int i;
     if (qspSavedVarGroupsCount)
     {
+        int i;
         for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
             qspRestoreVarsList(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
         qspSavedVarGroupsCount = 0;
@@ -395,11 +395,10 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVar **vars)
 
 void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGroups, int groupsCount)
 {
-    QSPVar *var;
-    int i, j, ind;
     if (savedVars)
     {
-        ind = varsCount - 1;
+        QSPVar *var;
+        int i, j, ind = varsCount - 1;
         for (i = 0; i < groupsCount; ++i)
         {
             for (j = 0; j < savedGroups[i].VarsCount; ++j)
@@ -427,10 +426,10 @@ void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGr
 
 void qspRestoreVarsList(QSPVar *vars, int varsCount)
 {
-    int i;
-    QSPVar *var;
     if (vars)
     {
+        int i;
+        QSPVar *var;
         for (i = 0; i < varsCount; ++i)
         {
             if (!(var = qspVarReference(vars[i].Name, QSP_TRUE)))

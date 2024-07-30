@@ -25,16 +25,17 @@ void qspFreeTuple(QSPTuple tuple)
 {
     if (tuple.Vals)
     {
+        QSPVariant *curValue;
         int count = tuple.Items;
-        while (--count >= 0)
+        for (curValue = tuple.Vals; count > 0; --count, ++curValue)
         {
-            switch (QSP_BASETYPE(tuple.Vals[count].Type))
+            switch (QSP_BASETYPE(curValue->Type))
             {
                 case QSP_TYPE_TUPLE:
-                    qspFreeTuple(QSP_TUPLE(tuple.Vals[count]));
+                    qspFreeTuple(QSP_PTUPLE(curValue));
                     break;
                 case QSP_TYPE_STR:
-                    qspFreeString(QSP_STR(tuple.Vals[count]));
+                    qspFreeString(QSP_PSTR(curValue));
                     break;
             }
         }

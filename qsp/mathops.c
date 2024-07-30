@@ -820,7 +820,6 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
 {
     QSPVariant args[QSP_OPMAXARGS], tos;
     int i, oldRefreshCount, argIndices[QSP_OPMAXARGS];
-    QSPString name;
     QSP_TINYINT type, opCode, argsCount;
     if (valueIndex < 0)
     {
@@ -871,10 +870,10 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
             qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
             if (QSP_ISSTR(tos.Type))
             {
-                name = QSP_STR(tos);
-                QSP_STR(tos) = qspFormatText(name, QSP_TRUE);
+                QSPString textToFormat = QSP_STR(tos);
+                QSP_STR(tos) = qspFormatText(textToFormat, QSP_TRUE);
+                if (QSP_STR(tos).Str != textToFormat.Str) qspFreeString(textToFormat);
                 if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
-                if (name.Str != QSP_STR(tos).Str) qspFreeString(name);
             }
             break;
         case qspOpArrItem:
@@ -882,8 +881,8 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         {
             QSPVar *var;
             int arrIndex;
-            name = QSP_STR(args[0]);
-            var = qspVarReference(name, QSP_FALSE);
+            QSPString varName = QSP_STR(args[0]);
+            var = qspVarReference(varName, QSP_FALSE);
             if (!var) break;
             if (opCode == qspOpLastArrItem)
                 arrIndex = var->ValsCount - 1;
@@ -891,7 +890,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
                 arrIndex = qspGetVarIndex(var, args[1], QSP_FALSE);
             else
                 arrIndex = 0;
-            type = qspGetVarType(name);
+            type = qspGetVarType(varName);
             qspGetVarValueByReference(var, arrIndex, type, &tos);
             break;
         }

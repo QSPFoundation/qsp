@@ -137,30 +137,26 @@ QSPString qspJoinStrs(QSPString *s, int count, QSPString delim)
 
 int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
 {
-    QSPString *ret;
-    int newStrLen, count = 0, bufSize = 8, delimLen = qspStrLen(delim);
-    QSP_CHAR *newStr, *found = qspStrStr(str, delim);
+    QSPString newStr, *ret;
+    int count = 0, bufSize = 8, delimLen = qspStrLen(delim);
+    QSP_CHAR *delimPos = qspStrStr(str, delim);
     ret = (QSPString *)malloc(bufSize * sizeof(QSPString));
-    while (found)
+    while (delimPos)
     {
-        newStrLen = (int)(found - str.Str);
-        newStr = (QSP_CHAR *)malloc(newStrLen * sizeof(QSP_CHAR));
-        memcpy(newStr, str.Str, newStrLen * sizeof(QSP_CHAR));
+        qspAddText(&newStr, qspStringFromPair(str.Str, delimPos), QSP_TRUE);
         if (count >= bufSize)
         {
             bufSize = count + 16;
             ret = (QSPString *)realloc(ret, bufSize * sizeof(QSPString));
         }
-        ret[count++] = qspStringFromLen(newStr, newStrLen);
-        str.Str = found + delimLen;
-        found = qspStrStr(str, delim);
+        ret[count++] = newStr;
+        str.Str = delimPos + delimLen;
+        delimPos = qspStrStr(str, delim);
     }
-    newStrLen = qspStrLen(str);
-    newStr = (QSP_CHAR *)malloc(newStrLen * sizeof(QSP_CHAR));
-    memcpy(newStr, str.Str, newStrLen * sizeof(QSP_CHAR));
+    qspAddText(&newStr, str, QSP_TRUE);
     if (count >= bufSize)
         ret = (QSPString *)realloc(ret, (count + 1) * sizeof(QSPString));
-    ret[count++] = qspStringFromLen(newStr, newStrLen);
+    ret[count++] = newStr;
     *res = ret;
     return count;
 }
@@ -183,7 +179,9 @@ void qspFreeStrs(QSPString *strs, int count)
 {
     if (strs)
     {
-        while (--count >= 0) qspFreeString(strs[count]);
+        QSPString *curStr;
+        for (curStr = strs; count > 0; --count, ++curStr)
+            qspFreeString(*curStr);
         free(strs);
     }
 }

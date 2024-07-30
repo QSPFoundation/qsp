@@ -183,7 +183,6 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
 
 int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
 {
-    int res;
     QSP_TINYINT firstBaseType = QSP_BASETYPE(v1->Type), secondBaseType = QSP_BASETYPE(v2->Type);
     if (firstBaseType != secondBaseType)
     {
@@ -245,16 +244,13 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
     switch (QSP_BASETYPE(v1->Type))
     {
     case QSP_TYPE_TUPLE:
-        res = qspTuplesComp(QSP_PTUPLE(v1), QSP_PTUPLE(v2));
-        break;
+        return qspTuplesComp(QSP_PTUPLE(v1), QSP_PTUPLE(v2));
     case QSP_TYPE_NUM:
-        res = (QSP_PNUM(v1) > QSP_PNUM(v2) ? 1 : (QSP_PNUM(v1) < QSP_PNUM(v2) ? -1 : 0));
-        break;
+        return (QSP_PNUM(v1) > QSP_PNUM(v2) ? 1 : (QSP_PNUM(v1) < QSP_PNUM(v2) ? -1 : 0));
     case QSP_TYPE_STR:
-        res = qspStrsComp(QSP_PSTR(v1), QSP_PSTR(v2));
-        break;
+        return qspStrsComp(QSP_PSTR(v1), QSP_PSTR(v2));
     }
-    return res;
+    return 0;
 }
 
 void qspUpdateVariantValue(QSPVariant *dest, QSPVariant *src)
