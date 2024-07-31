@@ -211,6 +211,7 @@ void qspInitMath()
     qspAddOperation(qspOpMainText, 30, 0, QSP_TYPE_STR, 0, 0);
     qspAddOperation(qspOpStatText, 30, 0, QSP_TYPE_STR, 0, 0);
     qspAddOperation(qspOpCurActs, 30, 0, QSP_TYPE_CODE, 0, 0);
+    qspAddOperation(qspOpCurObjs, 30, 0, QSP_TYPE_CODE, 0, 0);
     /* Names */
     qspAddOpName(qspOpCloseBracket, QSP_RRBRACK, 1);
     qspAddOpName(qspOpCloseArrBracket, QSP_RSBRACK, 1);
@@ -300,6 +301,8 @@ void qspInitMath()
     qspAddOpName(qspOpStatText, QSP_STRCHAR QSP_FMT("STATTXT"), 1);
     qspAddOpName(qspOpCurActs, QSP_FMT("CURACTS"), 1);
     qspAddOpName(qspOpCurActs, QSP_STRCHAR QSP_FMT("CURACTS"), 1);
+    qspAddOpName(qspOpCurObjs, QSP_FMT("CUROBJS"), 1);
+    qspAddOpName(qspOpCurObjs, QSP_STRCHAR QSP_FMT("CUROBJS"), 1);
     for (i = 0; i < QSP_OPSLEVELS; ++i)
         qsort(qspOpsNames[i], qspOpsNamesCounts[i], sizeof(QSPMathOpName), qspMathOpsCompare);
 }
@@ -1048,6 +1051,9 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
             break;
         case qspOpCurActs:
             QSP_STR(tos) = qspGetAllActionsAsCode();
+            break;
+        case qspOpCurObjs:
+            QSP_STR(tos) = qspGetAllObjectsAsCode();
             break;
         /* External functions -------------------------------------------------------------- */
         default:

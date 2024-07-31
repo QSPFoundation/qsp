@@ -130,6 +130,7 @@
         qspOpMainText,
         qspOpStatText,
         qspOpCurActs,
+        qspOpCurObjs,
 
         qspOpLast_Operation
     };

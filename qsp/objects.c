@@ -125,6 +125,29 @@ int qspObjIndex(QSPString name)
     return -1;
 }
 
+QSPString qspGetAllObjectsAsCode()
+{
+    int i;
+    QSPString temp;
+    QSPBufString res = qspNewBufString(256);
+    for (i = 0; i < qspCurObjectsCount; ++i)
+    {
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ADDOBJ ") QSP_DEFQUOT));
+        temp = qspReplaceText(qspCurObjects[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
+        qspAddBufText(&res, temp);
+        qspFreeString(&temp);
+        if (qspCurObjects[i].Image.Str)
+        {
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(",") QSP_DEFQUOT));
+            temp = qspReplaceText(qspCurObjects[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
+            qspAddBufText(&res, temp);
+            qspFreeString(&temp);
+        }
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_STRSDELIM));
+    }
+    return qspBufTextToString(res);
+}
+
 QSP_BOOL qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
     QSPObj *obj;
