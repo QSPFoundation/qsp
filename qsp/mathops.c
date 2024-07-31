@@ -166,7 +166,6 @@ void qspInitMath()
     qspAddOperation(qspOpLt, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpGt, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpAppend, 12, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpComma, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpAnd, 7, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpOr, 6, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpLoc, 11, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_STR);
@@ -186,7 +185,7 @@ void qspInitMath()
     qspAddOperation(qspOpInput, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpStr, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpVal, 30, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpArrSize, 30, 0, 0, 1, 1, QSP_TYPE_VARREF);
+    qspAddOperation(qspOpArrSize, 30, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_VARREF);
     qspAddOperation(qspOpIsPlay, 30, qspFunctionIsPlay, QSP_TYPE_NUM, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpDesc, 30, qspFunctionDesc, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpTrim, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
