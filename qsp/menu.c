@@ -94,9 +94,9 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *ju
         }
         while (--itemsCount >= 0)
         {
-            qspFreeString(menuItems[itemsCount].Name);
-            qspFreeString(menuItems[itemsCount].Image);
-            qspFreeString(menuLocs[itemsCount]);
+            qspFreeString(&menuItems[itemsCount].Name);
+            qspFreeString(&menuItems[itemsCount].Image);
+            qspFreeString(&menuLocs[itemsCount]);
         }
     }
     return QSP_FALSE;

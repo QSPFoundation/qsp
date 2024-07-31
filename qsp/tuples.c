@@ -21,25 +21,25 @@
 
 QSPTuple qspNullTuple;
 
-void qspFreeTuple(QSPTuple tuple)
+void qspFreeTuple(QSPTuple *tuple)
 {
-    if (tuple.Vals)
+    if (tuple->Vals)
     {
         QSPVariant *curValue;
-        int count = tuple.Items;
-        for (curValue = tuple.Vals; count > 0; --count, ++curValue)
+        int count = tuple->Items;
+        for (curValue = tuple->Vals; count > 0; --count, ++curValue)
         {
             switch (QSP_BASETYPE(curValue->Type))
             {
                 case QSP_TYPE_TUPLE:
-                    qspFreeTuple(QSP_PTUPLE(curValue));
+                    qspFreeTuple(&QSP_PTUPLE(curValue));
                     break;
                 case QSP_TYPE_STR:
-                    qspFreeString(QSP_PSTR(curValue));
+                    qspFreeString(&QSP_PSTR(curValue));
                     break;
             }
         }
-        free(tuple.Vals);
+        free(tuple->Vals);
     }
 }
 
@@ -134,13 +134,13 @@ int qspTuplesComp(QSPTuple first, QSPTuple second)
                         {
                             str = qspTupleToDisplayString(QSP_PTUPLE(pos1));
                             delta = qspStrsComp(str, qspNumToStr(buf, QSP_PNUM(pos2)));
-                            qspFreeString(str);
+                            qspFreeString(&str);
                         }
                         break;
                     case QSP_TYPE_STR:
                         str = qspTupleToDisplayString(QSP_PTUPLE(pos1));
                         delta = qspStrsComp(str, QSP_PSTR(pos2));
-                        qspFreeString(str);
+                        qspFreeString(&str);
                         break;
                 }
                 break;
@@ -157,7 +157,7 @@ int qspTuplesComp(QSPTuple first, QSPTuple second)
                         {
                             str = qspTupleToDisplayString(QSP_PTUPLE(pos2));
                             delta = qspStrsComp(qspNumToStr(buf, QSP_PNUM(pos1)), str);
-                            qspFreeString(str);
+                            qspFreeString(&str);
                         }
                         break;
                     case QSP_TYPE_NUM:
@@ -182,7 +182,7 @@ int qspTuplesComp(QSPTuple first, QSPTuple second)
                     case QSP_TYPE_TUPLE:
                         str = qspTupleToDisplayString(QSP_PTUPLE(pos2));
                         delta = qspStrsComp(QSP_PSTR(pos1), str);
-                        qspFreeString(str);
+                        qspFreeString(&str);
                         break;
                     case QSP_TYPE_NUM:
                         num = qspStrToNum(QSP_PSTR(pos1), &isValid);
@@ -228,7 +228,7 @@ void qspAppendTupleToDisplayString(QSPBufString *res, QSPTuple tuple)
                 qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
                 temp = qspReplaceText(QSP_PSTR(item), QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
                 qspAddBufText(res, temp);
-                qspFreeString(temp);
+                qspFreeString(&temp);
                 qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
                 break;
         }

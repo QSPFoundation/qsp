@@ -41,7 +41,7 @@ INLINE void qspFormatVariant(QSPVariant *val)
         {
             QSPString temp = qspGetNewText(qspDelSpc(QSP_PSTR(val)));
             qspUpperStr(&temp);
-            qspFreeString(QSP_PSTR(val));
+            qspFreeString(&QSP_PSTR(val));
             QSP_PSTR(val) = temp;
             break;
         }
@@ -126,14 +126,14 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                     QSP_BOOL isValid;
                     int num = qspTupleToNum(QSP_PTUPLE(val), &isValid);
                     if (!isValid) return QSP_FALSE;
-                    qspFreeTuple(QSP_PTUPLE(val));
+                    qspFreeTuple(&QSP_PTUPLE(val));
                     QSP_PNUM(val) = num;
                     break;
                 }
                 case QSP_TYPE_STR:
                 {
                     QSPString str = qspTupleToDisplayString(QSP_PTUPLE(val));
-                    qspFreeTuple(QSP_PTUPLE(val));
+                    qspFreeTuple(&QSP_PTUPLE(val));
                     QSP_PSTR(val) = str;
                     break;
                 }
@@ -159,7 +159,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                 case QSP_TYPE_TUPLE:
                 {
                     QSPTuple tuple = qspGetNewTuple(val, 1);
-                    qspFreeString(QSP_PSTR(val));
+                    qspFreeString(&QSP_PSTR(val));
                     QSP_PTUPLE(val) = tuple;
                     break;
                 }
@@ -168,7 +168,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                     QSP_BOOL isValid;
                     int num = qspStrToNum(QSP_PSTR(val), &isValid);
                     if (!isValid) return QSP_FALSE;
-                    qspFreeString(QSP_PSTR(val));
+                    qspFreeString(&QSP_PSTR(val));
                     QSP_PNUM(val) = num;
                     break;
                 }
@@ -258,10 +258,10 @@ void qspUpdateVariantValue(QSPVariant *dest, QSPVariant *src)
     switch (QSP_BASETYPE(dest->Type))
     {
     case QSP_TYPE_TUPLE:
-        qspFreeTuple(QSP_PTUPLE(dest));
+        qspFreeTuple(&QSP_PTUPLE(dest));
         break;
     case QSP_TYPE_STR:
-        qspFreeString(QSP_PSTR(dest));
+        qspFreeString(&QSP_PSTR(dest));
         break;
     }
     qspCopyToNewVariant(dest, src);

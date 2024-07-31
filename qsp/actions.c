@@ -37,8 +37,8 @@ void qspClearActions(QSP_BOOL toInit)
     {
         for (i = 0; i < qspCurActionsCount; ++i)
         {
-            qspFreeString(qspCurActions[i].Image);
-            qspFreeString(qspCurActions[i].Desc);
+            qspFreeString(&qspCurActions[i].Image);
+            qspFreeString(&qspCurActions[i].Desc);
             qspFreePrepLines(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount);
         }
         qspIsActionsChanged = QSP_TRUE;
@@ -73,12 +73,12 @@ INLINE int qspActIndex(QSPString name)
         qspUpperStr(&bufName);
         if (!qspStrsComp(bufName, name))
         {
-            qspFreeString(name);
+            qspFreeString(&name);
             free(buf);
             return i;
         }
     }
-    qspFreeString(name);
+    qspFreeString(&name);
     free(buf);
     return -1;
 }
@@ -134,13 +134,13 @@ QSPString qspGetAllActionsAsCode()
         qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ") QSP_DEFQUOT));
         temp = qspReplaceText(qspCurActions[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
         qspAddBufText(&res, temp);
-        qspFreeString(temp);
+        qspFreeString(&temp);
         if (qspCurActions[i].Image.Str)
         {
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(",") QSP_DEFQUOT));
             temp = qspReplaceText(qspCurActions[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
             qspAddBufText(&res, temp);
-            qspFreeString(temp);
+            qspFreeString(&temp);
         }
         qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(":")));
         count = qspCurActions[i].OnPressLinesCount;
@@ -153,7 +153,7 @@ QSPString qspGetAllActionsAsCode()
                 qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM));
                 temp = qspJoinPrepLines(qspCurActions[i].OnPressLines, count, QSP_STATIC_STR(QSP_STRSDELIM));
                 qspAddBufText(&res, temp);
-                qspFreeString(temp);
+                qspFreeString(&temp);
             }
             qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM QSP_FMT("END")));
         }
@@ -230,8 +230,8 @@ QSP_BOOL qspStatementDelAct(QSPVariant *args, QSP_TINYINT count, QSPString *jump
     int actInd = qspActIndex(QSP_STR(args[0]));
     if (actInd < 0) return QSP_FALSE;
     if (qspCurSelAction >= actInd) qspCurSelAction = -1;
-    qspFreeString(qspCurActions[actInd].Image);
-    qspFreeString(qspCurActions[actInd].Desc);
+    qspFreeString(&qspCurActions[actInd].Image);
+    qspFreeString(&qspCurActions[actInd].Desc);
     qspFreePrepLines(qspCurActions[actInd].OnPressLines, qspCurActions[actInd].OnPressLinesCount);
     --qspCurActionsCount;
     while (actInd < qspCurActionsCount)

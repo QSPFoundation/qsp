@@ -29,19 +29,24 @@
     void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
     QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, QSPVariant *res);
 
+    INLINE void qspFreeVariant(QSPVariant *val)
+    {
+        switch (QSP_BASETYPE(val->Type))
+        {
+            case QSP_TYPE_TUPLE:
+                qspFreeTuple(&QSP_PTUPLE(val));
+                break;
+            case QSP_TYPE_STR:
+                qspFreeString(&QSP_PSTR(val));
+                break;
+        }
+    }
+
     INLINE void qspFreeVariants(QSPVariant *args, int count)
     {
         while (--count >= 0)
         {
-            switch (QSP_BASETYPE(args->Type))
-            {
-                case QSP_TYPE_TUPLE:
-                    qspFreeTuple(QSP_PTUPLE(args));
-                    break;
-                case QSP_TYPE_STR:
-                    qspFreeString(QSP_PSTR(args));
-                    break;
-            }
+            qspFreeVariant(args);
             ++args;
         }
     }

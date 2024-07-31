@@ -96,7 +96,7 @@ void qspClearIncludes(QSP_BOOL toInit)
     if (!toInit)
     {
         for (i = 0; i < qspCurIncFilesCount; ++i)
-            qspFreeString(qspCurIncFiles[i]);
+            qspFreeString(qspCurIncFiles + i);
         if (qspCurIncLocsCount)
         {
             count = qspLocsCount - qspCurIncLocsCount;
@@ -198,7 +198,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     isUCS = (dataSize >= 2 && *((char *)data + 1) == 0);
     gameString = qspStringFromFileData(data, dataSize, isUCS);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
-    qspFreeString(gameString);
+    qspFreeString(&gameString);
     if (!qspCheckGame(strs, count))
     {
         qspSetError(QSP_ERR_CANTLOADFILE);
@@ -229,13 +229,13 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
         if (toAddLoc = (isNewGame || qspLocIndex(buf) < 0))
             qspLocs[locsCount].Name = buf;
         else
-            qspFreeString(buf);
+            qspFreeString(&buf);
         if (toAddLoc)
         {
             qspLocs[locsCount].Desc = qspDecodeString(strs[ind++]);
             buf = qspDecodeString(strs[ind++]);
             qspLocs[locsCount].OnVisitLinesCount = qspPreprocessData(buf, &qspLocs[locsCount].OnVisitLines);
-            qspFreeString(buf);
+            qspFreeString(&buf);
         }
         else
             ind += 2;
@@ -248,7 +248,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
                 qspLocs[locsCount].Actions[j].Desc = qspDecodeString(strs[ind++]);
                 buf = qspDecodeString(strs[ind++]);
                 qspLocs[locsCount].Actions[j].OnPressLinesCount = qspPreprocessData(buf, &qspLocs[locsCount].Actions[j].OnPressLines);
-                qspFreeString(buf);
+                qspFreeString(&buf);
             }
             ++locsCount;
         }
@@ -355,12 +355,12 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     qspRestoreLocalVars(savedVars, varsCount, qspSavedVarGroups, qspSavedVarGroupsCount);
     if (qspErrorNum)
     {
-        qspFreeBufString(bufString);
+        qspFreeBufString(&bufString);
         *bufSize = 0;
         return QSP_FALSE;
     }
     gameData = qspStringToFileData(qspBufTextToString(bufString), QSP_TRUE, &dataSize);
-    qspFreeBufString(bufString);
+    qspFreeBufString(&bufString);
     if (dataSize > *bufSize)
     {
         *bufSize = dataSize;
@@ -462,7 +462,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
         {
             /* var type + var value */
             if (!qspReadEncodedVariant(strs, strsCount, &ind, &val)) return QSP_FALSE;
-            qspFreeVariants(&val, 1);
+            qspFreeVariant(&val);
         }
         /* indices count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &groupsCount)) return QSP_FALSE;
@@ -486,7 +486,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     int i, j, ind, count, varInd, varsCount, valsCount;
     gameString = qspStringFromFileData(data, dataSize, QSP_TRUE);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
-    qspFreeString(gameString);
+    qspFreeString(&gameString);
     if (!qspCheckGameStatus(strs, count))
     {
         qspSetError(QSP_ERR_CANTLOADFILE);
@@ -550,7 +550,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         valsCount = qspReadEncodedIntVal(strs[ind++]);
         if (valsCount)
         {
-            qspVars[varInd].ValsCount = valsCount;
+            qspVars[varInd].ValsBufSize = qspVars[varInd].ValsCount = valsCount;
             qspVars[varInd].Values = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
             for (j = 0; j < valsCount; ++j)
                 qspReadEncodedVariant(strs, count, &ind, qspVars[varInd].Values + j);
@@ -571,7 +571,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_TRUE;
     qspOpenIncludes();
     qspCurLoc = qspLocIndex(locName);
-    qspFreeString(locName);
+    qspFreeString(&locName);
     if (qspErrorNum) return QSP_FALSE;
     qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs);
     qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs);

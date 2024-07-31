@@ -181,7 +181,7 @@ void qspFreeStrs(QSPString *strs, int count)
     {
         QSPString *curStr;
         for (curStr = strs; count > 0; --count, ++curStr)
-            qspFreeString(*curStr);
+            qspFreeString(curStr);
         free(strs);
     }
 }
@@ -454,7 +454,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         if (!pos)
         {
             qspSetError(QSP_ERR_BRACKNOTFOUND);
-            qspFreeBufString(res);
+            qspFreeBufString(&res);
             return qspNullString;
         }
         expr = qspStringFromPair(txt.Str, pos);
@@ -463,12 +463,12 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         val = qspExprValue(expr);
         if (qspRefreshCount != oldRefreshCount || qspErrorNum)
         {
-            qspFreeBufString(res);
+            qspFreeBufString(&res);
             return qspNullString;
         }
         qspConvertVariantTo(&val, QSP_TYPE_STR);
         qspAddBufText(&res, QSP_STR(val));
-        qspFreeString(QSP_STR(val));
+        qspFreeString(&QSP_STR(val));
         txt.Str = pos + QSP_STATIC_LEN(QSP_RSUBEX);
         pos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
     } while (pos);

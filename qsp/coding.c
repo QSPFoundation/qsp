@@ -325,7 +325,7 @@ int qspReadEncodedIntVal(QSPString val)
     int num;
     QSPString temp = qspDecodeString(val);
     num = qspStrToNum(temp, 0);
-    qspFreeString(temp);
+    qspFreeString(&temp);
     return num;
 }
 
@@ -335,7 +335,7 @@ void qspAppendEncodedIntVal(QSPBufString *s, int val)
     QSPString temp, str = qspNumToStr(buf, val);
     temp = qspEncodeString(str);
     qspAddBufText(s, temp);
-    qspFreeString(temp);
+    qspFreeString(&temp);
     qspAddBufText(s, QSP_STATIC_STR(QSP_STRSDELIM));
 }
 
@@ -345,7 +345,7 @@ void qspAppendEncodedStrVal(QSPBufString *s, QSPString val)
     {
         QSPString temp = qspEncodeString(val);
         qspAddBufText(s, temp);
-        qspFreeString(temp);
+        qspFreeString(&temp);
     }
     qspAddBufText(s, QSP_STATIC_STR(QSP_STRSDELIM));
 }

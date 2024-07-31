@@ -38,8 +38,8 @@ void qspClearObjects(QSP_BOOL toInit)
     {
         for (i = 0; i < qspCurObjectsCount; ++i)
         {
-            qspFreeString(qspCurObjects[i].Image);
-            qspFreeString(qspCurObjects[i].Desc);
+            qspFreeString(&qspCurObjects[i].Image);
+            qspFreeString(&qspCurObjects[i].Desc);
         }
         qspIsObjectsChanged = QSP_TRUE;
     }
@@ -77,7 +77,7 @@ INLINE void qspRemoveObject(int index)
     if (qspCurSelObject >= index) qspCurSelObject = -1;
     name.Type = QSP_TYPE_STR;
     QSP_STR(name) = qspCurObjects[index].Desc;
-    qspFreeString(qspCurObjects[index].Image);
+    qspFreeString(&qspCurObjects[index].Image);
     --qspCurObjectsCount;
     while (index < qspCurObjectsCount)
     {
@@ -86,7 +86,7 @@ INLINE void qspRemoveObject(int index)
     }
     qspIsObjectsChanged = QSP_TRUE;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &name, 1);
-    qspFreeString(QSP_STR(name));
+    qspFreeString(&QSP_STR(name));
 }
 
 int qspObjIndex(QSPString name)
@@ -115,12 +115,12 @@ int qspObjIndex(QSPString name)
         qspUpperStr(&bufName);
         if (!qspStrsComp(bufName, name))
         {
-            qspFreeString(name);
+            qspFreeString(&name);
             free(buf);
             return i;
         }
     }
-    qspFreeString(name);
+    qspFreeString(&name);
     free(buf);
     return -1;
 }

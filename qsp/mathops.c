@@ -421,7 +421,7 @@ INLINE QSPVariant qspArgumentValue(QSPMathExpression *expression, int valueIndex
     if (QSP_ISDEF(type) && !qspConvertVariantTo(&res, type))
     {
         qspSetError(QSP_ERR_TYPEMISMATCH);
-        qspFreeVariants(&res, 1);
+        qspFreeVariant(&res);
         return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     }
     return res;
@@ -614,7 +614,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
                 opCode = qspIsEmpty(name) ? qspOpValue : qspOpValueToFormat;
                 if (!qspAppendToCompiled(expression, opCode, 0, v))
                 {
-                    qspFreeString(QSP_STR(v));
+                    qspFreeString(&QSP_STR(v));
                     break;
                 }
                 waitForOperator = QSP_TRUE;
@@ -627,7 +627,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
                 QSP_STR(v) = name;
                 if (!qspAppendToCompiled(expression, qspOpValue, 0, v))
                 {
-                    qspFreeString(QSP_STR(v));
+                    qspFreeString(&QSP_STR(v));
                     break;
                 }
                 waitForOperator = QSP_TRUE;
@@ -681,7 +681,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
                     QSP_STR(v) = qspGetNewText(name);
                     if (!qspAppendToCompiled(expression, qspOpValue, 0, v))
                     {
-                        qspFreeString(QSP_STR(v));
+                        qspFreeString(&QSP_STR(v));
                         break;
                     }
                     /* Add a function call */
@@ -734,7 +734,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
                         QSP_STR(v) = qspGetNewText(name);
                         if (!qspAppendToCompiled(expression, qspOpValue, 0, v))
                         {
-                            qspFreeString(QSP_STR(v));
+                            qspFreeString(&QSP_STR(v));
                             break;
                         }
                         if (!qspIsEmpty(s) && *s.Str == QSP_LSBRACK[0])
@@ -780,7 +780,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
             {
                 case qspOpValue:
                 case qspOpValueToFormat:
-                    qspFreeVariants(expression->CompValues + i, 1);
+                    qspFreeVariant(expression->CompValues + i);
                     break;
             }
         }
@@ -807,7 +807,7 @@ int qspFreeValue(QSPMathExpression *expression, int valueIndex) /* the last item
         {
         case qspOpValue:
         case qspOpValueToFormat:
-            qspFreeVariants(expression->CompValues + valueIndex, 1);
+            qspFreeVariant(expression->CompValues + valueIndex);
             break;
         }
         --valueIndex;
@@ -871,7 +871,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
             {
                 QSPString textToFormat = QSP_STR(tos);
                 QSP_STR(tos) = qspFormatText(textToFormat, QSP_TRUE);
-                if (QSP_STR(tos).Str != textToFormat.Str) qspFreeString(textToFormat);
+                if (QSP_STR(tos).Str != textToFormat.Str) qspFreeString(&textToFormat);
                 if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
             }
             break;

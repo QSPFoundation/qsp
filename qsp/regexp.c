@@ -30,7 +30,7 @@ void qspClearRegExps(QSP_BOOL toInit)
     {
         if (!toInit && exp->CompiledExp)
         {
-            qspFreeString(exp->Text);
+            qspFreeString(&exp->Text);
             onig_free(exp->CompiledExp);
         }
         exp->Text = qspNullString;
@@ -64,7 +64,7 @@ QSPRegExp *qspRegExpGetCompiled(QSPString exp)
     compExp = qspCompiledRegExps + qspCompiledRegExpsCurInd;
     if (compExp->CompiledExp)
     {
-        qspFreeString(compExp->Text);
+        qspFreeString(&compExp->Text);
         onig_free(compExp->CompiledExp);
     }
     compExp->Text = qspGetNewText(exp);

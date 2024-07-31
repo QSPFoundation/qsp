@@ -39,6 +39,7 @@
         QSPString Name;
         QSPVariant *Values;
         int ValsCount;
+        int ValsBufSize;
         QSPVarIndex *Indices;
         int IndsCount;
         int IndsBufSize;
@@ -97,6 +98,7 @@
     {
         var->Values = 0;
         var->ValsCount = 0;
+        var->ValsBufSize = 0;
         var->Indices = 0;
         var->IndsCount = 0;
         var->IndsBufSize = 0;
@@ -106,6 +108,7 @@
     {
         dest->Values = src->Values;
         dest->ValsCount = src->ValsCount;
+        dest->ValsBufSize = src->ValsBufSize;
         dest->Indices = src->Indices;
         dest->IndsCount = src->IndsCount;
         dest->IndsBufSize = src->IndsBufSize;
@@ -124,7 +127,7 @@
             QSPVarIndex *curIndex;
             int count = var->IndsCount;
             for (curIndex = var->Indices; count > 0; --count, ++curIndex)
-                qspFreeString(curIndex->Str);
+                qspFreeString(&curIndex->Str);
             free(var->Indices);
         }
         qspInitVarData(var);

@@ -569,7 +569,7 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
         else
             action = qspFlowExecute;
     }
-    if (uLevel) qspFreeString(jumpToFake);
+    if (uLevel) qspFreeString(&jumpToFake);
     return toExit;
 }
 
@@ -736,7 +736,7 @@ INLINE QSP_BOOL qspCheckCondition(QSPString expr)
     if (!qspConvertVariantTo(&condValue, QSP_TYPE_NUM))
     {
         qspSetError(QSP_ERR_TYPEMISMATCH);
-        qspFreeVariants(&condValue, 1);
+        qspFreeVariant(&condValue);
         return QSP_FALSE;
     }
     return QSP_ISTRUE(QSP_NUM(condValue));
@@ -750,7 +750,7 @@ INLINE QSP_BOOL qspCheckCompiledCondition(QSPMathExpression *expression)
     if (!qspConvertVariantTo(&condValue, QSP_TYPE_NUM))
     {
         qspSetError(QSP_ERR_TYPEMISMATCH);
-        qspFreeVariants(&condValue, 1);
+        qspFreeVariant(&condValue);
         return QSP_FALSE;
     }
     return QSP_ISTRUE(QSP_NUM(condValue));

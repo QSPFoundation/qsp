@@ -49,16 +49,16 @@ void qspCreateWorld(int start, int locsCount)
     int i, j;
     for (i = start; i < qspLocsCount; ++i)
     {
-        qspFreeString(qspLocsNames[i].Name);
-        qspFreeString(qspLocs[i].Name);
-        qspFreeString(qspLocs[i].Desc);
+        qspFreeString(&qspLocsNames[i].Name);
+        qspFreeString(&qspLocs[i].Name);
+        qspFreeString(&qspLocs[i].Desc);
         qspFreePrepLines(qspLocs[i].OnVisitLines, qspLocs[i].OnVisitLinesCount);
         for (j = 0; j < QSP_MAXACTIONS; ++j)
         {
             if (qspLocs[i].Actions[j].Desc.Str)
             {
-                qspFreeString(qspLocs[i].Actions[j].Image);
-                qspFreeString(qspLocs[i].Actions[j].Desc);
+                qspFreeString(&qspLocs[i].Actions[j].Image);
+                qspFreeString(&qspLocs[i].Actions[j].Desc);
                 qspFreePrepLines(qspLocs[i].Actions[j].OnPressLines, qspLocs[i].Actions[j].OnPressLinesCount);
             }
         }
@@ -98,7 +98,7 @@ int qspLocIndex(QSPString name)
     name = qspGetNewText(name);
     qspUpperStr(&name);
     loc = (QSPLocName *)bsearch(&name, qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocStringCompare);
-    qspFreeString(name);
+    qspFreeString(&name);
     if (loc) return loc->Index;
     return -1;
 }
@@ -128,7 +128,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     }
     if (toChangeDesc)
     {
-        qspFreeBufString(qspCurDesc);
+        qspFreeBufString(&qspCurDesc);
         qspCurDesc = qspStringToBufString(str, 512);
         qspIsMainDescChanged = QSP_TRUE;
     }
@@ -139,7 +139,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
             qspAddBufText(&qspCurDesc, str);
             qspIsMainDescChanged = QSP_TRUE;
         }
-        qspFreeString(str);
+        qspFreeString(&str);
     }
     for (i = 0; i < QSP_MAXACTIONS; ++i)
     {
@@ -166,7 +166,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         else
             count = 1;
         qspAddAction(actionArgs, count, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount);
-        qspFreeString(QSP_STR(actionArgs[0]));
+        qspFreeString(&QSP_STR(actionArgs[0]));
         if (qspErrorNum)
         {
             qspRealLine = oldLine;

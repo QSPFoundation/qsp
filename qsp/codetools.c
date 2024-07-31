@@ -397,7 +397,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 
 void qspFreeLineOfCode(QSPLineOfCode *line)
 {
-    qspFreeString(line->Label);
+    qspFreeString(&line->Label);
     if (line->Stats)
     {
         int i;
@@ -413,7 +413,7 @@ void qspFreePrepLines(QSPLineOfCode *strs, int count)
     {
         while (--count >= 0)
         {
-            qspFreeString(strs[count].Str);
+            qspFreeString(&strs[count].Str);
             qspFreeLineOfCode(strs + count);
         }
         free(strs);

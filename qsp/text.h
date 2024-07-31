@@ -109,9 +109,9 @@
         return (s.Str == s.End);
     }
 
-    INLINE void qspFreeString(QSPString s)
+    INLINE void qspFreeString(QSPString *s)
     {
-        if (s.Str) free(s.Str);
+        if (s->Str) free(s->Str);
     }
 
     INLINE void qspClearText(QSPString *s)
@@ -125,7 +125,7 @@
 
     INLINE void qspUpdateText(QSPString *dest, QSPString val)
     {
-        qspFreeString(*dest);
+        qspFreeString(dest);
         qspAddText(dest, val, QSP_TRUE);
     }
 
@@ -291,9 +291,9 @@
         return res;
     }
 
-    INLINE void qspFreeBufString(QSPBufString buf)
+    INLINE void qspFreeBufString(QSPBufString *buf)
     {
-        if (buf.Str) free(buf.Str);
+        if (buf->Str) free(buf->Str);
     }
 
     INLINE void qspClearBufString(QSPBufString *s)
