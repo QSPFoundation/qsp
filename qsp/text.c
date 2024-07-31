@@ -341,7 +341,11 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
     if (!strLen) return txt.Str;
     pos = qspStrStr(txt, str);
     if (!pos) return 0;
-    if (!(isIsolated || qspIsAnyInClass(txt, QSP_CHAR_QUOT | QSP_CHAR_EXPSTART))) return pos;
+    if (!isIsolated)
+    {
+        QSPString prefix = qspStringFromPair(txt.Str, pos);
+        if (!qspIsAnyInClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_EXPSTART)) return pos;
+    }
     c1 = c2 = c3 = 0;
     isPrevDelim = QSP_TRUE;
     pos = txt.Str;
@@ -381,29 +385,27 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
         {
             if (c3) --c3;
         }
-        if (!(c1 || c2 || c3))
+        if (!(c1 || c2 || c3)) /* include brackets */
         {
-            if (qspIsInClass(*pos, QSP_CHAR_DELIM))
-                isPrevDelim = QSP_TRUE;
+            if (isIsolated)
+            {
+                if (qspIsInClass(*pos, QSP_CHAR_DELIM))
+                    isPrevDelim = QSP_TRUE;
+                else if (isPrevDelim)
+                {
+                    if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
+                    {
+                        txt.Str = pos;
+                        if (!qspStrsNComp(txt, str, strLen)) return pos;
+                    }
+                    isPrevDelim = QSP_FALSE;
+                }
+            }
             else
             {
-                if (isIsolated)
-                {
-                    if (isPrevDelim)
-                    {
-                        if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
-                        {
-                            txt.Str = pos;
-                            if (!qspStrsNComp(txt, str, strLen)) return pos;
-                        }
-                    }
-                }
-                else
-                {
-                    txt.Str = pos;
-                    if (!qspStrsNComp(txt, str, strLen)) return pos;
-                }
-                isPrevDelim = QSP_FALSE;
+                /* It must support searching for delimiters */
+                txt.Str = pos;
+                if (!qspStrsNComp(txt, str, strLen)) return pos;
             }
         }
         ++pos;
