@@ -907,156 +907,156 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
     }
     switch (opCode)
     {
-        case qspOpValue:
-            qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
-            break;
-        case qspOpValueToFormat:
-            qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
-            if (QSP_ISSTR(tos.Type))
-            {
-                QSPString textToFormat = QSP_STR(tos);
-                QSP_STR(tos) = qspFormatText(textToFormat, QSP_TRUE);
-                if (QSP_STR(tos).Str != textToFormat.Str) qspFreeString(&textToFormat);
-            }
-            break;
-        case qspOpArrItem:
-        case qspOpLastArrItem:
+    case qspOpValue:
+        qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
+        break;
+    case qspOpValueToFormat:
+        qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
+        if (QSP_ISSTR(tos.Type))
         {
-            QSPVar *var;
-            int arrIndex;
-            QSPString varName = QSP_STR(args[0]);
-            var = qspVarReference(varName, QSP_FALSE);
-            if (!var) break;
-            if (opCode == qspOpLastArrItem)
-                arrIndex = var->ValsCount - 1;
-            else if (argsCount == 2)
-                arrIndex = qspGetVarIndex(var, args[1], QSP_FALSE);
-            else
-                arrIndex = 0;
-            type = qspGetVarType(varName);
-            qspGetVarValueByReference(var, arrIndex, type, &tos);
+            QSPString textToFormat = QSP_STR(tos);
+            QSP_STR(tos) = qspFormatText(textToFormat, QSP_TRUE);
+            if (QSP_STR(tos).Str != textToFormat.Str) qspFreeString(&textToFormat);
+        }
+        break;
+    case qspOpArrItem:
+    case qspOpLastArrItem:
+    {
+        QSPVar *var;
+        int arrIndex;
+        QSPString varName = QSP_STR(args[0]);
+        var = qspVarReference(varName, QSP_FALSE);
+        if (!var) break;
+        if (opCode == qspOpLastArrItem)
+            arrIndex = var->ValsCount - 1;
+        else if (argsCount == 2)
+            arrIndex = qspGetVarIndex(var, args[1], QSP_FALSE);
+        else
+            arrIndex = 0;
+        type = qspGetVarType(varName);
+        qspGetVarValueByReference(var, arrIndex, type, &tos);
+        break;
+    }
+    case qspOpNegation:
+        QSP_NUM(tos) = -QSP_NUM(args[0]);
+        break;
+    case qspOpMul:
+        qspAutoConvertCombine(args, args + 1, QSP_MUL[0], &tos);
+        break;
+    case qspOpDiv:
+        qspAutoConvertCombine(args, args + 1, QSP_DIV[0], &tos);
+        break;
+    case qspOpAdd:
+        qspAutoConvertCombine(args, args + 1, QSP_ADD[0], &tos);
+        break;
+    case qspOpSub:
+        qspAutoConvertCombine(args, args + 1, QSP_SUB[0], &tos);
+        break;
+    case qspOpMod:
+        if (QSP_NUM(args[1]) == 0)
+        {
+            qspSetError(QSP_ERR_DIVBYZERO);
             break;
         }
-        case qspOpNegation:
-            QSP_NUM(tos) = -QSP_NUM(args[0]);
-            break;
-        case qspOpMul:
-            qspAutoConvertCombine(args, args + 1, QSP_MUL[0], &tos);
-            break;
-        case qspOpDiv:
-            qspAutoConvertCombine(args, args + 1, QSP_DIV[0], &tos);
-            break;
-        case qspOpAdd:
-            qspAutoConvertCombine(args, args + 1, QSP_ADD[0], &tos);
-            break;
-        case qspOpSub:
-            qspAutoConvertCombine(args, args + 1, QSP_SUB[0], &tos);
-            break;
-        case qspOpMod:
-            if (QSP_NUM(args[1]) == 0)
-            {
-                qspSetError(QSP_ERR_DIVBYZERO);
-                break;
-            }
-            QSP_NUM(tos) = QSP_NUM(args[0]) % QSP_NUM(args[1]);
-            break;
-        case qspOpAppend:
-            qspAutoConvertAppend(args, args + 1, &tos);
-            break;
-        case qspOpTuple:
-            QSP_TUPLE(tos) = qspGetNewTuple(args, argsCount);
-            break;
-        case qspOpEq:
-            QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) == 0);
-            break;
-        case qspOpLt:
-            QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) < 0);
-            break;
-        case qspOpGt:
-            QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) > 0);
-            break;
-        case qspOpLeq:
-            QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) <= 0);
-            break;
-        case qspOpGeq:
-            QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) >= 0);
-            break;
-        case qspOpNe:
-            QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) != 0);
-            break;
-        /* Embedded functions -------------------------------------------------------------- */
-        case qspOpLoc:
-            QSP_NUM(tos) = QSP_TOBOOL(qspLocIndex(QSP_STR(args[0])) >= 0);
-            break;
-        case qspOpObj:
-            QSP_NUM(tos) = QSP_TOBOOL(qspObjIndex(QSP_STR(args[0])) >= 0);
-            break;
-        case qspOpLCase:
-            QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]));
-            qspLowerStr(&QSP_STR(tos));
-            break;
-        case qspOpUCase:
-            QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]));
-            qspUpperStr(&QSP_STR(tos));
-            break;
-        case qspOpStr:
-            QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]));
-            break;
-        case qspOpVal:
-            if (qspConvertVariantTo(args, QSP_TYPE_NUM))
-                QSP_NUM(tos) = QSP_NUM(args[0]);
-            else
-                QSP_NUM(tos) = 0;
-            break;
-        case qspOpArrSize:
-            QSP_NUM(tos) = qspArraySize(QSP_STR(args[0]));
-            break;
-        case qspOpTrim:
-            QSP_STR(tos) = qspGetNewText(qspDelSpc(QSP_STR(args[0])));
-            break;
-        case qspOpInput:
-            QSP_STR(tos) = qspCallInputBox(QSP_STR(args[0]));
-            break;
-        case qspOpRnd:
-            QSP_NUM(tos) = qspRand() % 1000 + 1;
-            break;
-        case qspOpCountObj:
-            QSP_NUM(tos) = qspCurObjectsCount;
-            break;
-        case qspOpMsecsCount:
-            QSP_NUM(tos) = qspGetTime();
-            break;
-        case qspOpQSPVer:
-            QSP_STR(tos) = (argsCount > 0 ? qspCallVersion(QSP_STR(args[0])) : qspCallVersion(qspNullString));
-            break;
-        case qspOpUserText:
-            QSP_STR(tos) = (qspCurInput.Str ? qspGetNewText(qspCurInput) : qspNullString);
-            break;
-        case qspOpCurLoc:
-            QSP_STR(tos) = (qspCurLoc >= 0 ? qspGetNewText(qspLocs[qspCurLoc].Name) : qspNullString);
-            break;
-        case qspOpSelObj:
-            QSP_STR(tos) = (qspCurSelObject >= 0 ? qspGetNewText(qspCurObjects[qspCurSelObject].Desc) : qspNullString);
-            break;
-        case qspOpSelAct:
-            QSP_STR(tos) = (qspCurSelAction >= 0 ? qspGetNewText(qspCurActions[qspCurSelAction].Desc) : qspNullString);
-            break;
-        case qspOpMainText:
-            QSP_STR(tos) = (qspCurDesc.Len > 0 ? qspGetNewText(qspBufTextToString(qspCurDesc)) : qspNullString);
-            break;
-        case qspOpStatText:
-            QSP_STR(tos) = (qspCurVars.Len > 0 ? qspGetNewText(qspBufTextToString(qspCurVars)) : qspNullString);
-            break;
-        case qspOpCurActs:
-            QSP_STR(tos) = qspGetAllActionsAsCode();
-            break;
-        case qspOpCurObjs:
-            QSP_STR(tos) = qspGetAllObjectsAsCode();
-            break;
-        /* External functions -------------------------------------------------------------- */
-        default:
-            qspOps[opCode].Func(args, argsCount, &tos);
-            break;
+        QSP_NUM(tos) = QSP_NUM(args[0]) % QSP_NUM(args[1]);
+        break;
+    case qspOpAppend:
+        qspAutoConvertAppend(args, args + 1, &tos);
+        break;
+    case qspOpTuple:
+        QSP_TUPLE(tos) = qspGetNewTuple(args, argsCount);
+        break;
+    case qspOpEq:
+        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) == 0);
+        break;
+    case qspOpLt:
+        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) < 0);
+        break;
+    case qspOpGt:
+        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) > 0);
+        break;
+    case qspOpLeq:
+        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) <= 0);
+        break;
+    case qspOpGeq:
+        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) >= 0);
+        break;
+    case qspOpNe:
+        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) != 0);
+        break;
+    /* Embedded functions -------------------------------------------------------------- */
+    case qspOpLoc:
+        QSP_NUM(tos) = QSP_TOBOOL(qspLocIndex(QSP_STR(args[0])) >= 0);
+        break;
+    case qspOpObj:
+        QSP_NUM(tos) = QSP_TOBOOL(qspObjIndex(QSP_STR(args[0])) >= 0);
+        break;
+    case qspOpLCase:
+        QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]));
+        qspLowerStr(&QSP_STR(tos));
+        break;
+    case qspOpUCase:
+        QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]));
+        qspUpperStr(&QSP_STR(tos));
+        break;
+    case qspOpStr:
+        QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]));
+        break;
+    case qspOpVal:
+        if (qspConvertVariantTo(args, QSP_TYPE_NUM))
+            QSP_NUM(tos) = QSP_NUM(args[0]);
+        else
+            QSP_NUM(tos) = 0;
+        break;
+    case qspOpArrSize:
+        QSP_NUM(tos) = qspArraySize(QSP_STR(args[0]));
+        break;
+    case qspOpTrim:
+        QSP_STR(tos) = qspGetNewText(qspDelSpc(QSP_STR(args[0])));
+        break;
+    case qspOpInput:
+        QSP_STR(tos) = qspCallInputBox(QSP_STR(args[0]));
+        break;
+    case qspOpRnd:
+        QSP_NUM(tos) = qspRand() % 1000 + 1;
+        break;
+    case qspOpCountObj:
+        QSP_NUM(tos) = qspCurObjectsCount;
+        break;
+    case qspOpMsecsCount:
+        QSP_NUM(tos) = qspGetTime();
+        break;
+    case qspOpQSPVer:
+        QSP_STR(tos) = (argsCount > 0 ? qspCallVersion(QSP_STR(args[0])) : qspCallVersion(qspNullString));
+        break;
+    case qspOpUserText:
+        QSP_STR(tos) = (qspCurInput.Str ? qspGetNewText(qspCurInput) : qspNullString);
+        break;
+    case qspOpCurLoc:
+        QSP_STR(tos) = (qspCurLoc >= 0 ? qspGetNewText(qspLocs[qspCurLoc].Name) : qspNullString);
+        break;
+    case qspOpSelObj:
+        QSP_STR(tos) = (qspCurSelObject >= 0 ? qspGetNewText(qspCurObjects[qspCurSelObject].Desc) : qspNullString);
+        break;
+    case qspOpSelAct:
+        QSP_STR(tos) = (qspCurSelAction >= 0 ? qspGetNewText(qspCurActions[qspCurSelAction].Desc) : qspNullString);
+        break;
+    case qspOpMainText:
+        QSP_STR(tos) = (qspCurDesc.Len > 0 ? qspGetNewText(qspBufTextToString(qspCurDesc)) : qspNullString);
+        break;
+    case qspOpStatText:
+        QSP_STR(tos) = (qspCurVars.Len > 0 ? qspGetNewText(qspBufTextToString(qspCurVars)) : qspNullString);
+        break;
+    case qspOpCurActs:
+        QSP_STR(tos) = qspGetAllActionsAsCode();
+        break;
+    case qspOpCurObjs:
+        QSP_STR(tos) = qspGetAllObjectsAsCode();
+        break;
+    /* External functions -------------------------------------------------------------- */
+    default:
+        qspOps[opCode].Func(args, argsCount, &tos);
+        break;
     }
     if (argsCount) qspFreeVariants(args, argsCount);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
