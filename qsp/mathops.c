@@ -818,11 +818,11 @@ int qspFreeValue(QSPMathExpression *expression, int valueIndex) /* the last item
     return valueIndex;
 }
 
-QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last item represents a whole expression */
+QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last item represents the whole expression */
 {
     QSPVariant args[QSP_OPMAXARGS], tos;
-    int i, oldRefreshCount, argIndices[QSP_OPMAXARGS];
-    QSP_TINYINT type, opCode, argsCount;
+    QSP_TINYINT opCode, argsCount, type;
+    int oldRefreshCount;
     if (valueIndex < 0)
     {
         qspSetError(QSP_ERR_SYNTAX);
@@ -831,8 +831,11 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
     oldRefreshCount = qspRefreshCount;
     opCode = expression->CompOpCodes[valueIndex];
     argsCount = expression->CompArgsCounts[valueIndex];
+    type = qspOps[opCode].ResType;
+    if (QSP_ISDEF(type)) tos.Type = type;
     if (argsCount)
     {
+        int i, argIndices[QSP_OPMAXARGS];
         /* Find positions of arguments */
         --valueIndex; /* move to the last argument */
         for (i = argsCount - 1; i >= 0; --i)
@@ -842,11 +845,52 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         }
         switch (opCode)
         {
-        case qspOpAnd:
-        case qspOpOr:
-        case qspOpIIf:
-            /* We don't pre-evaluate arguments */
-            break;
+        case qspOpAnd: /* logical AND operator, we don't pre-evaluate arguments */
+            args[0] = qspArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
+            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+            if (QSP_ISTRUE(QSP_NUM(args[0])))
+            {
+                args[1] = qspArgumentValue(expression, argIndices[1], QSP_TYPE_NUM);
+                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                    return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+                QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(args[1]));
+            }
+            else
+            {
+                QSP_NUM(tos) = QSP_TOBOOL(QSP_FALSE);
+            }
+            return tos;
+        case qspOpOr: /* logical OR operator, we don't pre-evaluate arguments */
+            args[0] = qspArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
+            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+            if (QSP_ISTRUE(QSP_NUM(args[0])))
+            {
+                QSP_NUM(tos) = QSP_TOBOOL(QSP_TRUE);
+            }
+            else
+            {
+                args[1] = qspArgumentValue(expression, argIndices[1], QSP_TYPE_NUM);
+                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                    return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+                QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(args[1]));
+            }
+            return tos;
+        case qspOpNot: /* logical NOT operator, we don't pre-evaluate arguments */
+            args[0] = qspArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
+            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+            QSP_NUM(tos) = QSP_TOBOOL(!QSP_NUM(args[0]));
+            return tos;
+        case qspOpIIf: /* inline IF operator, we don't pre-evaluate arguments */
+            args[0] = qspArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
+            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+            tos = qspArgumentValue(expression, (QSP_ISTRUE(QSP_NUM(args[0])) ? argIndices[1] : argIndices[2]), QSP_TYPE_UNDEF);
+            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+            return tos;
         default:
             for (i = 0; i < argsCount; ++i)
             {
@@ -861,8 +905,6 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
             break;
         }
     }
-    type = qspOps[opCode].ResType;
-    if (QSP_ISDEF(type)) tos.Type = type;
     switch (opCode)
     {
         case qspOpValue:
@@ -875,7 +917,6 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
                 QSPString textToFormat = QSP_STR(tos);
                 QSP_STR(tos) = qspFormatText(textToFormat, QSP_TRUE);
                 if (QSP_STR(tos).Str != textToFormat.Str) qspFreeString(&textToFormat);
-                if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
             }
             break;
         case qspOpArrItem:
@@ -896,49 +937,6 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
             qspGetVarValueByReference(var, arrIndex, type, &tos);
             break;
         }
-        case qspOpAnd: /* logical AND operator */
-            args[0] = qspArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            if (QSP_ISTRUE(QSP_NUM(args[0])))
-            {
-                args[1] = qspArgumentValue(expression, argIndices[1], QSP_TYPE_NUM);
-                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                    return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-                QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(args[1]));
-            }
-            else
-            {
-                QSP_NUM(tos) = QSP_TOBOOL(QSP_FALSE);
-            }
-            return tos;
-        case qspOpOr: /* logical OR operator */
-            args[0] = qspArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            if (QSP_ISTRUE(QSP_NUM(args[0])))
-            {
-                QSP_NUM(tos) = QSP_TOBOOL(QSP_TRUE);
-            }
-            else
-            {
-                args[1] = qspArgumentValue(expression, argIndices[1], QSP_TYPE_NUM);
-                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                    return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-                QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(args[1]));
-            }
-            return tos;
-        case qspOpNot: /* logical NOT operator */
-            QSP_NUM(tos) = QSP_TOBOOL(!QSP_NUM(args[0]));
-            break;
-        case qspOpIIf:
-            args[0] = qspArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            tos = qspArgumentValue(expression, (QSP_ISTRUE(QSP_NUM(args[0])) ? argIndices[1] : argIndices[2]), QSP_TYPE_UNDEF);
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            return tos;
         case qspOpNegation:
             QSP_NUM(tos) = -QSP_NUM(args[0]);
             break;
