@@ -40,6 +40,7 @@ void qspInitSymbolClasses()
 
     qspFillSymbolClass(QSP_CHAR_SPACE, QSP_SPACES);
     qspFillSymbolClass(QSP_CHAR_QUOT, QSP_QUOTS);
+    qspFillSymbolClass(QSP_CHAR_DIGIT, QSP_DIGITS);
     qspFillSymbolClass(QSP_CHAR_DELIM, QSP_DELIMS);
     qspFillSymbolClass(QSP_CHAR_SIMPLEOP, QSP_ADD QSP_SUB QSP_DIV QSP_MUL);
     qspFillSymbolClass(QSP_CHAR_EXPSTART, QSP_LQUOT QSP_LRBRACK QSP_LSBRACK);
@@ -200,12 +201,12 @@ QSP_BOOL qspIsNumber(QSPString s)
     }
     else
         return QSP_FALSE;
-    if (pos < s.End && qspIsDigit(*pos))
+    if (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT))
     {
         do
         {
             ++pos;
-        } while (pos < s.End && qspIsDigit(*pos));
+        } while (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT));
     }
     else
         return QSP_FALSE;
@@ -236,14 +237,14 @@ int qspStrToNum(QSPString s, QSP_BOOL *isValid)
         if (isValid) *isValid = QSP_TRUE;
         return 0;
     }
-    if (pos < s.End && qspIsDigit(*pos))
+    if (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT))
     {
         num = 0;
         do
         {
             num = num * 10 + (*pos - QSP_FMT('0'));
             ++pos;
-        } while (pos < s.End && qspIsDigit(*pos));
+        } while (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT));
     }
     else
     {

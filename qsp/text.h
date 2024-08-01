@@ -30,9 +30,10 @@
     {
         QSP_CHAR_SPACE = 1 << 0, /* spaces */
         QSP_CHAR_QUOT = 1 << 1, /* quotes */
-        QSP_CHAR_DELIM = 1 << 2, /* delimiters */
-        QSP_CHAR_SIMPLEOP = 1 << 3, /* simple math operations */
-        QSP_CHAR_EXPSTART = 1 << 4 /* beginning of an expression */
+        QSP_CHAR_DIGIT = 1 << 2, /* digits */
+        QSP_CHAR_DELIM = 1 << 3, /* delimiters */
+        QSP_CHAR_SIMPLEOP = 1 << 4, /* simple math operations */
+        QSP_CHAR_EXPSTART = 1 << 5 /* beginning of an expression */
     };
 
     typedef struct
@@ -161,11 +162,6 @@
             ++pos;
         }
         return QSP_FALSE;
-    }
-
-    INLINE QSP_BOOL qspIsDigit(QSP_CHAR ch)
-    {
-        return (ch >= QSP_FMT('0') && ch <= QSP_FMT('9'));
     }
 
     INLINE void qspSkipSpaces(QSPString *s)

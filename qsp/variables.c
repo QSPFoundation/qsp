@@ -85,7 +85,7 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
     else if (*name.Str == QSP_TUPLECHAR[0])
         name.Str += QSP_STATIC_LEN(QSP_TUPLECHAR);
 
-    if (qspIsEmpty(name) || qspIsDigit(*name.Str) || qspIsAnyInClass(name, QSP_CHAR_DELIM))
+    if (qspIsEmpty(name) || qspIsInClass(*name.Str, QSP_CHAR_DIGIT) || qspIsAnyInClass(name, QSP_CHAR_DELIM))
     {
         qspSetError(QSP_ERR_INCORRECTNAME);
         return 0;

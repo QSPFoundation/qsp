@@ -64,6 +64,7 @@
     #define QSP_TUPLECHAR QSP_FMT("%")
     #define QSP_LABEL QSP_FMT(":")
     #define QSP_COMMENT QSP_FMT("!")
+    #define QSP_DIGITS QSP_FMT("0123456789")
     #define QSP_QUOTS QSP_FMT("'\"")
     #define QSP_DEFQUOT QSP_FMT("'")
     #define QSP_ESCDEFQUOT QSP_FMT("''")

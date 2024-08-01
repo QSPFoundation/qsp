@@ -324,7 +324,7 @@ INLINE int qspGetNumber(QSPString *expr)
 {
     int num = 0;
     QSP_CHAR *pos = expr->Str;
-    while (pos < expr->End && qspIsDigit(*pos))
+    while (pos < expr->End && qspIsInClass(*pos, QSP_CHAR_DIGIT))
     {
         num = num * 10 + (*pos - QSP_FMT('0'));
         ++pos;
@@ -596,7 +596,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
                     qspSetError(QSP_ERR_SYNTAX);
                 break;
             }
-            else if (qspIsDigit(*s.Str))
+            else if (qspIsInClass(*s.Str, QSP_CHAR_DIGIT))
             {
                 v.Type = QSP_TYPE_NUM;
                 QSP_NUM(v) = qspGetNumber(&s);
