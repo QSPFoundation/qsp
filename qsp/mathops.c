@@ -375,7 +375,11 @@ INLINE QSPString qspGetString(QSPString *expr)
             free(buf);
             return qspNullString;
         }
-        if (*pos == quot && (++pos >= expr->End || *pos != quot)) break;
+        if (*pos == quot)
+        {
+            ++pos;
+            if (pos >= expr->End || *pos != quot) break;
+        }
         if (strLen >= bufSize)
         {
             bufSize = strLen + 128;
