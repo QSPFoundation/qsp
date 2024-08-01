@@ -406,6 +406,7 @@ void QSPDeInit()
 {
     qspMemClear(QSP_FALSE);
     qspCreateWorld(0, 0);
+    qspDeInitMath();
     #ifdef _DEBUG
         mwTerm();
     #endif

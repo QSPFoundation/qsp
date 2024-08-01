@@ -34,7 +34,8 @@ int qspOpsNamesCounts[QSP_OPSLEVELS];
 int qspOpMaxLen = 0;
 
 INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...);
-INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level);
+INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT type, int level);
+INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BOOL isFunc);
 INLINE int qspMathOpsCompare(const void *opName1, const void *opName2);
 INLINE int qspMathOpStringFullCompare(const void *name, const void *compareTo);
 INLINE int qspMathOpStringCompare(const void *name, const void *compareTo);
@@ -98,14 +99,49 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
     }
 }
 
-INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level)
+INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT type, int level)
 {
-    int len, count;
+    int itemInd;
+    QSPBufString buf = qspNewBufString(16);
+    if (QSP_ISDEF(type))
+    {
+        switch (QSP_BASETYPE(type))
+        {
+        case QSP_TYPE_TUPLE:
+            qspAddBufText(&buf, QSP_STATIC_STR(QSP_TUPLECHAR));
+            break;
+        case QSP_TYPE_STR:
+            qspAddBufText(&buf, QSP_STATIC_STR(QSP_STRCHAR));
+            break;
+        }
+    }
+    qspAddBufText(&buf, opName);
+
+    itemInd = qspOpsNamesCounts[level]++;
+    qspOpsNames[level][itemInd].Name = qspBufTextToString(buf);
+    qspOpsNames[level][itemInd].Code = opCode;
+}
+
+INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BOOL isFunc)
+{
+    int len;
     QSPString name = qspStringFromC(opName);
-    count = qspOpsNamesCounts[level];
-    qspOpsNames[level][count].Name = name;
-    qspOpsNames[level][count].Code = opCode;
-    qspOpsNamesCounts[level] = count + 1;
+    /* Add base name */
+    qspAddSingleOpName(opCode, name, QSP_TYPE_UNDEF, level);
+    if (isFunc)
+    {
+        if (QSP_ISDEF(qspOps[opCode].ResType))
+        {
+            /* Add type-specific name */
+            qspAddSingleOpName(opCode, name, qspOps[opCode].ResType, level);
+        }
+        else
+        {
+            /* Add all possible type-specific names */
+            qspAddSingleOpName(opCode, name, QSP_TYPE_TUPLE, level);
+            qspAddSingleOpName(opCode, name, QSP_TYPE_STR, level);
+        }
+    }
     /* Max length */
     len = qspStrLen(name);
     if (len > qspOpMaxLen) qspOpMaxLen = len;
@@ -213,98 +249,83 @@ void qspInitMath()
     qspAddOperation(qspOpCurActs, 30, 0, QSP_TYPE_CODE, 0, 0);
     qspAddOperation(qspOpCurObjs, 30, 0, QSP_TYPE_CODE, 0, 0);
     /* Names */
-    qspAddOpName(qspOpCloseBracket, QSP_RRBRACK, 1);
-    qspAddOpName(qspOpCloseArrBracket, QSP_RSBRACK, 1);
-    qspAddOpName(qspOpAdd, QSP_ADD, 1);
-    qspAddOpName(qspOpSub, QSP_SUB, 1);
-    qspAddOpName(qspOpMul, QSP_MUL, 1);
-    qspAddOpName(qspOpDiv, QSP_DIV, 1);
-    qspAddOpName(qspOpMod, QSP_FMT("MOD"), 1);
-    qspAddOpName(qspOpNe, QSP_NOTEQUAL1, 1);
-    qspAddOpName(qspOpNe, QSP_NOTEQUAL2, 0);
-    qspAddOpName(qspOpLeq, QSP_LESSEQ1, 0);
-    qspAddOpName(qspOpLeq, QSP_LESSEQ2, 0);
-    qspAddOpName(qspOpGeq, QSP_GREATEQ1, 0);
-    qspAddOpName(qspOpGeq, QSP_GREATEQ2, 0);
-    qspAddOpName(qspOpEq, QSP_EQUAL, 1);
-    qspAddOpName(qspOpLt, QSP_LESS, 1);
-    qspAddOpName(qspOpGt, QSP_GREAT, 1);
-    qspAddOpName(qspOpAppend, QSP_APPEND, 1);
-    qspAddOpName(qspOpComma, QSP_COMMA, 1);
-    qspAddOpName(qspOpAnd, QSP_FMT("AND"), 1);
-    qspAddOpName(qspOpOr, QSP_FMT("OR"), 1);
-    qspAddOpName(qspOpArrItem, QSP_FMT("ARRITEM"), 1);
-    qspAddOpName(qspOpArrItem, QSP_STRCHAR QSP_FMT("ARRITEM"), 1);
-    qspAddOpName(qspOpLoc, QSP_FMT("LOC"), 1);
-    qspAddOpName(qspOpObj, QSP_FMT("OBJ"), 1);
-    qspAddOpName(qspOpNot, QSP_FMT("NO"), 1);
-    qspAddOpName(qspOpMin, QSP_FMT("MIN"), 1);
-    qspAddOpName(qspOpMin, QSP_STRCHAR QSP_FMT("MIN"), 1);
-    qspAddOpName(qspOpMax, QSP_FMT("MAX"), 1);
-    qspAddOpName(qspOpMax, QSP_STRCHAR QSP_FMT("MAX"), 1);
-    qspAddOpName(qspOpRand, QSP_FMT("RAND"), 1);
-    qspAddOpName(qspOpIIf, QSP_FMT("IIF"), 1);
-    qspAddOpName(qspOpIIf, QSP_STRCHAR QSP_FMT("IIF"), 1);
-    qspAddOpName(qspOpRGB, QSP_FMT("RGB"), 1);
-    qspAddOpName(qspOpLen, QSP_FMT("LEN"), 1);
-    qspAddOpName(qspOpIsNum, QSP_FMT("ISNUM"), 1);
-    qspAddOpName(qspOpLCase, QSP_FMT("LCASE"), 1);
-    qspAddOpName(qspOpLCase, QSP_STRCHAR QSP_FMT("LCASE"), 1);
-    qspAddOpName(qspOpUCase, QSP_FMT("UCASE"), 1);
-    qspAddOpName(qspOpUCase, QSP_STRCHAR QSP_FMT("UCASE"), 1);
-    qspAddOpName(qspOpInput, QSP_FMT("INPUT"), 1);
-    qspAddOpName(qspOpInput, QSP_STRCHAR QSP_FMT("INPUT"), 1);
-    qspAddOpName(qspOpStr, QSP_FMT("STR"), 1);
-    qspAddOpName(qspOpStr, QSP_STRCHAR QSP_FMT("STR"), 1);
-    qspAddOpName(qspOpVal, QSP_FMT("VAL"), 1);
-    qspAddOpName(qspOpArrSize, QSP_FMT("ARRSIZE"), 1);
-    qspAddOpName(qspOpIsPlay, QSP_FMT("ISPLAY"), 1);
-    qspAddOpName(qspOpDesc, QSP_FMT("DESC"), 1);
-    qspAddOpName(qspOpDesc, QSP_STRCHAR QSP_FMT("DESC"), 1);
-    qspAddOpName(qspOpTrim, QSP_FMT("TRIM"), 1);
-    qspAddOpName(qspOpTrim, QSP_STRCHAR QSP_FMT("TRIM"), 1);
-    qspAddOpName(qspOpGetObj, QSP_FMT("GETOBJ"), 1);
-    qspAddOpName(qspOpGetObj, QSP_STRCHAR QSP_FMT("GETOBJ"), 1);
-    qspAddOpName(qspOpStrComp, QSP_FMT("STRCOMP"), 1);
-    qspAddOpName(qspOpStrFind, QSP_FMT("STRFIND"), 1);
-    qspAddOpName(qspOpStrFind, QSP_STRCHAR QSP_FMT("STRFIND"), 1);
-    qspAddOpName(qspOpStrPos, QSP_FMT("STRPOS"), 1);
-    qspAddOpName(qspOpMid, QSP_FMT("MID"), 1);
-    qspAddOpName(qspOpMid, QSP_STRCHAR QSP_FMT("MID"), 1);
-    qspAddOpName(qspOpArrPos, QSP_FMT("ARRPOS"), 1);
-    qspAddOpName(qspOpArrComp, QSP_FMT("ARRCOMP"), 1);
-    qspAddOpName(qspOpInstr, QSP_FMT("INSTR"), 1);
-    qspAddOpName(qspOpReplace, QSP_FMT("REPLACE"), 1);
-    qspAddOpName(qspOpReplace, QSP_STRCHAR QSP_FMT("REPLACE"), 1);
-    qspAddOpName(qspOpFunc, QSP_FMT("FUNC"), 1);
-    qspAddOpName(qspOpFunc, QSP_STRCHAR QSP_FMT("FUNC"), 1);
-    qspAddOpName(qspOpDynEval, QSP_FMT("DYNEVAL"), 1);
-    qspAddOpName(qspOpDynEval, QSP_STRCHAR QSP_FMT("DYNEVAL"), 1);
-    qspAddOpName(qspOpRnd, QSP_FMT("RND"), 1);
-    qspAddOpName(qspOpCountObj, QSP_FMT("COUNTOBJ"), 1);
-    qspAddOpName(qspOpMsecsCount, QSP_FMT("MSECSCOUNT"), 1);
-    qspAddOpName(qspOpQSPVer, QSP_FMT("QSPVER"), 1);
-    qspAddOpName(qspOpQSPVer, QSP_STRCHAR QSP_FMT("QSPVER"), 1);
-    qspAddOpName(qspOpUserText, QSP_FMT("USER_TEXT"), 1);
-    qspAddOpName(qspOpUserText, QSP_STRCHAR QSP_FMT("USER_TEXT"), 1);
-    qspAddOpName(qspOpUserText, QSP_FMT("USRTXT"), 1);
-    qspAddOpName(qspOpUserText, QSP_STRCHAR QSP_FMT("USRTXT"), 1);
-    qspAddOpName(qspOpCurLoc, QSP_FMT("CURLOC"), 1);
-    qspAddOpName(qspOpCurLoc, QSP_STRCHAR QSP_FMT("CURLOC"), 1);
-    qspAddOpName(qspOpSelObj, QSP_FMT("SELOBJ"), 1);
-    qspAddOpName(qspOpSelObj, QSP_STRCHAR QSP_FMT("SELOBJ"), 1);
-    qspAddOpName(qspOpSelAct, QSP_FMT("SELACT"), 1);
-    qspAddOpName(qspOpSelAct, QSP_STRCHAR QSP_FMT("SELACT"), 1);
-    qspAddOpName(qspOpMainText, QSP_FMT("MAINTXT"), 1);
-    qspAddOpName(qspOpMainText, QSP_STRCHAR QSP_FMT("MAINTXT"), 1);
-    qspAddOpName(qspOpStatText, QSP_FMT("STATTXT"), 1);
-    qspAddOpName(qspOpStatText, QSP_STRCHAR QSP_FMT("STATTXT"), 1);
-    qspAddOpName(qspOpCurActs, QSP_FMT("CURACTS"), 1);
-    qspAddOpName(qspOpCurActs, QSP_STRCHAR QSP_FMT("CURACTS"), 1);
-    qspAddOpName(qspOpCurObjs, QSP_FMT("CUROBJS"), 1);
-    qspAddOpName(qspOpCurObjs, QSP_STRCHAR QSP_FMT("CUROBJS"), 1);
+    qspAddOpName(qspOpCloseBracket, QSP_RRBRACK, 1, QSP_FALSE);
+    qspAddOpName(qspOpCloseArrBracket, QSP_RSBRACK, 1, QSP_FALSE);
+    qspAddOpName(qspOpAdd, QSP_ADD, 1, QSP_FALSE);
+    qspAddOpName(qspOpSub, QSP_SUB, 1, QSP_FALSE);
+    qspAddOpName(qspOpMul, QSP_MUL, 1, QSP_FALSE);
+    qspAddOpName(qspOpDiv, QSP_DIV, 1, QSP_FALSE);
+    qspAddOpName(qspOpMod, QSP_FMT("MOD"), 1, QSP_FALSE);
+    qspAddOpName(qspOpNe, QSP_NOTEQUAL1, 1, QSP_FALSE);
+    qspAddOpName(qspOpNe, QSP_NOTEQUAL2, 0, QSP_FALSE);
+    qspAddOpName(qspOpLeq, QSP_LESSEQ1, 0, QSP_FALSE);
+    qspAddOpName(qspOpLeq, QSP_LESSEQ2, 0, QSP_FALSE);
+    qspAddOpName(qspOpGeq, QSP_GREATEQ1, 0, QSP_FALSE);
+    qspAddOpName(qspOpGeq, QSP_GREATEQ2, 0, QSP_FALSE);
+    qspAddOpName(qspOpEq, QSP_EQUAL, 1, QSP_FALSE);
+    qspAddOpName(qspOpLt, QSP_LESS, 1, QSP_FALSE);
+    qspAddOpName(qspOpGt, QSP_GREAT, 1, QSP_FALSE);
+    qspAddOpName(qspOpAppend, QSP_APPEND, 1, QSP_FALSE);
+    qspAddOpName(qspOpComma, QSP_COMMA, 1, QSP_FALSE);
+    qspAddOpName(qspOpAnd, QSP_FMT("AND"), 1, QSP_FALSE);
+    qspAddOpName(qspOpOr, QSP_FMT("OR"), 1, QSP_FALSE);
+    qspAddOpName(qspOpNot, QSP_FMT("NO"), 1, QSP_FALSE);
+    qspAddOpName(qspOpArrItem, QSP_FMT("ARRITEM"), 1, QSP_TRUE);
+    qspAddOpName(qspOpLoc, QSP_FMT("LOC"), 1, QSP_TRUE);
+    qspAddOpName(qspOpObj, QSP_FMT("OBJ"), 1, QSP_TRUE);
+    qspAddOpName(qspOpMin, QSP_FMT("MIN"), 1, QSP_TRUE);
+    qspAddOpName(qspOpMax, QSP_FMT("MAX"), 1, QSP_TRUE);
+    qspAddOpName(qspOpRand, QSP_FMT("RAND"), 1, QSP_TRUE);
+    qspAddOpName(qspOpIIf, QSP_FMT("IIF"), 1, QSP_TRUE);
+    qspAddOpName(qspOpRGB, QSP_FMT("RGB"), 1, QSP_TRUE);
+    qspAddOpName(qspOpLen, QSP_FMT("LEN"), 1, QSP_TRUE);
+    qspAddOpName(qspOpIsNum, QSP_FMT("ISNUM"), 1, QSP_TRUE);
+    qspAddOpName(qspOpLCase, QSP_FMT("LCASE"), 1, QSP_TRUE);
+    qspAddOpName(qspOpUCase, QSP_FMT("UCASE"), 1, QSP_TRUE);
+    qspAddOpName(qspOpInput, QSP_FMT("INPUT"), 1, QSP_TRUE);
+    qspAddOpName(qspOpStr, QSP_FMT("STR"), 1, QSP_TRUE);
+    qspAddOpName(qspOpVal, QSP_FMT("VAL"), 1, QSP_TRUE);
+    qspAddOpName(qspOpArrSize, QSP_FMT("ARRSIZE"), 1, QSP_TRUE);
+    qspAddOpName(qspOpIsPlay, QSP_FMT("ISPLAY"), 1, QSP_TRUE);
+    qspAddOpName(qspOpDesc, QSP_FMT("DESC"), 1, QSP_TRUE);
+    qspAddOpName(qspOpTrim, QSP_FMT("TRIM"), 1, QSP_TRUE);
+    qspAddOpName(qspOpGetObj, QSP_FMT("GETOBJ"), 1, QSP_TRUE);
+    qspAddOpName(qspOpStrComp, QSP_FMT("STRCOMP"), 1, QSP_TRUE);
+    qspAddOpName(qspOpStrFind, QSP_FMT("STRFIND"), 1, QSP_TRUE);
+    qspAddOpName(qspOpStrPos, QSP_FMT("STRPOS"), 1, QSP_TRUE);
+    qspAddOpName(qspOpMid, QSP_FMT("MID"), 1, QSP_TRUE);
+    qspAddOpName(qspOpArrPos, QSP_FMT("ARRPOS"), 1, QSP_TRUE);
+    qspAddOpName(qspOpArrComp, QSP_FMT("ARRCOMP"), 1, QSP_TRUE);
+    qspAddOpName(qspOpInstr, QSP_FMT("INSTR"), 1, QSP_TRUE);
+    qspAddOpName(qspOpReplace, QSP_FMT("REPLACE"), 1, QSP_TRUE);
+    qspAddOpName(qspOpFunc, QSP_FMT("FUNC"), 1, QSP_TRUE);
+    qspAddOpName(qspOpDynEval, QSP_FMT("DYNEVAL"), 1, QSP_TRUE);
+    qspAddOpName(qspOpRnd, QSP_FMT("RND"), 1, QSP_TRUE);
+    qspAddOpName(qspOpCountObj, QSP_FMT("COUNTOBJ"), 1, QSP_TRUE);
+    qspAddOpName(qspOpMsecsCount, QSP_FMT("MSECSCOUNT"), 1, QSP_TRUE);
+    qspAddOpName(qspOpQSPVer, QSP_FMT("QSPVER"), 1, QSP_TRUE);
+    qspAddOpName(qspOpUserText, QSP_FMT("USER_TEXT"), 1, QSP_TRUE);
+    qspAddOpName(qspOpUserText, QSP_FMT("USRTXT"), 1, QSP_TRUE);
+    qspAddOpName(qspOpCurLoc, QSP_FMT("CURLOC"), 1, QSP_TRUE);
+    qspAddOpName(qspOpSelObj, QSP_FMT("SELOBJ"), 1, QSP_TRUE);
+    qspAddOpName(qspOpSelAct, QSP_FMT("SELACT"), 1, QSP_TRUE);
+    qspAddOpName(qspOpMainText, QSP_FMT("MAINTXT"), 1, QSP_TRUE);
+    qspAddOpName(qspOpStatText, QSP_FMT("STATTXT"), 1, QSP_TRUE);
+    qspAddOpName(qspOpCurActs, QSP_FMT("CURACTS"), 1, QSP_TRUE);
+    qspAddOpName(qspOpCurObjs, QSP_FMT("CUROBJS"), 1, QSP_TRUE);
     for (i = 0; i < QSP_OPSLEVELS; ++i)
         qsort(qspOpsNames[i], qspOpsNamesCounts[i], sizeof(QSPMathOpName), qspMathOpsCompare);
+}
+
+void qspDeInitMath()
+{
+    int i, j, count;
+    for (i = 0; i < QSP_OPSLEVELS; ++i)
+    {
+        count = qspOpsNamesCounts[i];
+        for (j = 0; j < count; ++j)
+            qspFreeString(&qspOpsNames[i][j].Name);
+    }
 }
 
 INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName)

@@ -22,7 +22,7 @@
     #define QSP_MATHDEFINES
 
     #define QSP_OPSLEVELS 2
-    #define QSP_MAXOPSNAMES 100
+    #define QSP_MAXOPSNAMES 150
     #define QSP_OPMAXARGS 20
     #define QSP_STACKSIZE 30
     #define QSP_MAXITEMS 200
@@ -137,6 +137,7 @@
 
     /* External functions */
     void qspInitMath();
+    void qspDeInitMath();
     QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression);
     int qspFreeValue(QSPMathExpression *expression, int valueIndex);
     QSPVariant qspValue(QSPMathExpression *expression, int valueIndex);
