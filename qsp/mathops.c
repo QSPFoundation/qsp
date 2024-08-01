@@ -148,7 +148,7 @@ void qspInitMath()
     qspAddOperation(qspOpValueToFormat, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpStart, 127, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpEnd, 0, 0, QSP_TYPE_UNDEF, 0, 0);
-    qspAddOperation(qspOpTuple, 127, 0, QSP_TYPE_TUPLE, 0, 20, QSP_TYPE_UNDEF, -1);
+    qspAddOperation(qspOpTuple, 127, 0, QSP_TYPE_TUPLE, 0, QSP_OPMAXARGS, QSP_TYPE_UNDEF, -1);
     qspAddOperation(qspOpOpenBracket, 127, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpCloseBracket, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpOpenArrBracket, 127, 0, QSP_TYPE_UNDEF, 0, 0);
