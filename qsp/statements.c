@@ -97,10 +97,9 @@ INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYIN
 INLINE void qspAddStatName(QSP_TINYINT statCode, QSPString statName, int level)
 {
     int count, len = qspStrLen(statName);
-    count = qspStatsNamesCounts[level];
+    count = qspStatsNamesCounts[level]++;
     qspStatsNames[level][count].Name = statName;
     qspStatsNames[level][count].Code = statCode;
-    qspStatsNamesCounts[level] = count + 1;
     /* Max length */
     if (len > qspStatMaxLen) qspStatMaxLen = len;
 }

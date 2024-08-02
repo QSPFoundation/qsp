@@ -501,23 +501,28 @@ void qspClearVarsList(QSPVar *vars, int varsCount)
 
 INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 {
-    int i, maxCount, newInd;
+    int i, itemsToCopy, newInd;
+    /* Clear the dest array anyway */
     qspEmptyVar(dest);
+    /* Validate parameters */
+    if (count <= 0) return;
     if (start < 0) start = 0;
-    maxCount = src->ValsCount - start;
-    if (count <= 0 || maxCount <= 0) return;
-    if (count < maxCount) maxCount = count;
-    dest->ValsBufSize = dest->ValsCount = maxCount;
-    dest->Values = (QSPVariant *)malloc(maxCount * sizeof(QSPVariant));
-    for (i = 0; i < maxCount; ++i)
+    itemsToCopy = src->ValsCount - start;
+    if (itemsToCopy <= 0) return;
+    if (count < itemsToCopy) itemsToCopy = count;
+    /* Copy array values */
+    dest->ValsBufSize = dest->ValsCount = itemsToCopy;
+    dest->Values = (QSPVariant *)malloc(itemsToCopy * sizeof(QSPVariant));
+    for (i = 0; i < itemsToCopy; ++i)
         qspCopyToNewVariant(dest->Values + i, src->Values + start + i);
+    /* Copy array indices */
     dest->IndsBufSize = 0;
     dest->Indices = 0;
     count = 0;
     for (i = 0; i < src->IndsCount; ++i)
     {
         newInd = src->Indices[i].Index - start;
-        if (newInd >= 0 && newInd < maxCount)
+        if (newInd >= 0 && newInd < itemsToCopy)
         {
             if (count >= dest->IndsBufSize)
             {
@@ -898,8 +903,8 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *jum
     if (dest != src)
     {
         int start = (count >= 3 ? QSP_NUM(args[2]) : 0);
-        int num = (count == 4 ? QSP_NUM(args[3]) : src->ValsCount);
-        qspCopyVar(dest, src, start, num);
+        int maxCount = (count == 4 ? QSP_NUM(args[3]) : src->ValsCount);
+        qspCopyVar(dest, src, start, maxCount);
     }
     return QSP_FALSE;
 }
