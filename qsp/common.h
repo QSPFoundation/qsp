@@ -36,8 +36,8 @@
 
     /* External functions */
     void qspPrepareExecution();
-    void qspMemClear(QSP_BOOL);
-    void qspSetSeed(unsigned int);
+    void qspMemClear(QSP_BOOL toInit);
+    void qspSetSeed(unsigned int seed);
     int qspRand();
 
 #endif

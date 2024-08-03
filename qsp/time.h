@@ -23,7 +23,7 @@
     extern int qspMSCount;
 
     /* External functions */
-    void qspResetTime(int);
+    void qspResetTime(int msecs);
     int qspGetTime();
 
 #endif

@@ -43,7 +43,7 @@
     /* External functions */
     void qspClearAllActions(QSP_BOOL toInit);
     void qspAddAction(QSPVariant *args, QSP_TINYINT count, QSPLineOfCode *code, int start, int end);
-    void qspExecAction(int);
+    void qspExecAction(int ind);
     QSPString qspGetAllActionsAsCode();
     /* Statements */
     void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos);

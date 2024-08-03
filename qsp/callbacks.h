@@ -42,20 +42,20 @@
     void qspFinalizeCallBack(QSPCallState *state);
 
     void qspInitCallBacks();
-    void qspSetCallBack(int, QSP_CALLBACK);
+    void qspSetCallBack(int type, QSP_CALLBACK func);
 
     void qspCallDebug(QSPString str);
-    void qspCallSetTimer(int);
-    void qspCallRefreshInt(QSP_BOOL);
+    void qspCallSetTimer(int msecs);
+    void qspCallRefreshInt(QSP_BOOL isForced);
     void qspCallSetInputStrText(QSPString text);
     void qspCallShowMessage(QSPString text);
     void qspCallShowPicture(QSPString file);
-    void qspCallShowWindow(int, QSP_BOOL);
+    int qspCallShowMenu(QSPListItem *items, int count);
     void qspCallPlayFile(QSPString file, int volume);
     QSP_BOOL qspCallIsPlayingFile(QSPString file);
     void qspCallCloseFile(QSPString file);
     void qspCallSystem(QSPString cmd);
-    void qspCallSleep(int);
+    void qspCallSleep(int msecs);
     int qspCallGetMSCount();
     void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame);
     void qspCallOpenGameStatus(QSPString file);

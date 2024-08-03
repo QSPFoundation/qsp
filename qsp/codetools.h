@@ -53,8 +53,8 @@
     QSPString qspGetLineLabel(QSPString str);
     void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum);
     void qspFreeLineOfCode(QSPLineOfCode *line);
-    void qspFreePrepLines(QSPLineOfCode *, int);
-    void qspCopyPrepLines(QSPLineOfCode **, QSPLineOfCode *, int, int);
+    void qspFreePrepLines(QSPLineOfCode *strs, int count);
+    void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int end);
     QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim);
     void qspPrepareStringToExecution(QSPString *str);
     int qspPreprocessData(QSPString data, QSPLineOfCode **strs);

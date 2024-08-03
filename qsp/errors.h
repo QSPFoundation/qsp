@@ -29,7 +29,7 @@
     extern int qspRealActIndex;
 
     /* External functions */
-    void qspSetError(int);
+    void qspSetError(int num);
     void qspResetError();
     QSPString qspGetErrorDesc(int errorNum);
 
