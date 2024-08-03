@@ -36,8 +36,8 @@
     extern QSP_BOOL qspCurToShowObjs;
 
     /* External functions */
-    void qspClearObjects(QSP_BOOL);
-    void qspClearObjectsWithNotify();
+    void qspClearAllObjects(QSP_BOOL toInit);
+    void qspClearAllObjectsWithNotify();
     int qspObjIndex(QSPString name);
     QSPString qspGetAllObjectsAsCode();
     /* Statements */

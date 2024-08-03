@@ -22,7 +22,7 @@
 int qspCompiledRegExpsCurInd = 0;
 QSPRegExp qspCompiledRegExps[QSP_MAXCACHEDREGEXPS];
 
-void qspClearRegExps(QSP_BOOL toInit)
+void qspClearAllRegExps(QSP_BOOL toInit)
 {
     int i;
     QSPRegExp *exp = qspCompiledRegExps;

@@ -44,26 +44,26 @@ void qspPrepareExecution()
 {
     qspResetError();
 
-    /* reset an execution state */
+    /* Reset execution state */
     qspRealCurLoc = -1;
     qspRealActIndex = -1;
     qspRealLine = 0;
 
-    /* reset a state of changes */
+    /* Reset state of changes */
     qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_FALSE;
 }
 
 void qspMemClear(QSP_BOOL toInit)
 {
-    int i;
-    qspClearIncludes(toInit);
+    qspClearAllIncludes(toInit);
     qspClearAllVars(toInit);
-    qspClearObjects(toInit);
-    qspClearActions(toInit);
+    qspClearAllObjects(toInit);
+    qspClearAllActions(toInit);
     qspClearPlayList(toInit);
-    qspClearRegExps(toInit);
+    qspClearAllRegExps(toInit);
     if (!toInit)
     {
+        int i;
         if (qspCurDesc.Len > 0)
         {
             qspFreeBufString(&qspCurDesc);

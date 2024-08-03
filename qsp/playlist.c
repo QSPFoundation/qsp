@@ -28,9 +28,9 @@ INLINE int qspSearchPlayList(QSPString file);
 
 void qspClearPlayList(QSP_BOOL toInit)
 {
-    int i;
     if (!toInit)
     {
+        int i;
         for (i = 0; i < qspPLFilesCount; ++i)
             qspFreeString(qspPLFiles + i);
     }

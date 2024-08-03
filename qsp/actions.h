@@ -41,7 +41,7 @@
     extern QSP_BOOL qspCurToShowActs;
 
     /* External functions */
-    void qspClearActions(QSP_BOOL);
+    void qspClearAllActions(QSP_BOOL toInit);
     void qspAddAction(QSPVariant *args, QSP_TINYINT count, QSPLineOfCode *code, int start, int end);
     void qspExecAction(int);
     QSPString qspGetAllActionsAsCode();

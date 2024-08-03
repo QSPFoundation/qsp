@@ -30,11 +30,11 @@ QSP_BOOL qspCurToShowActs = QSP_TRUE;
 
 INLINE int qspActIndex(QSPString name);
 
-void qspClearActions(QSP_BOOL toInit)
+void qspClearAllActions(QSP_BOOL toInit)
 {
-    int i;
     if (!toInit && qspCurActionsCount)
     {
+        int i;
         for (i = 0; i < qspCurActionsCount; ++i)
         {
             qspFreeString(&qspCurActions[i].Image);

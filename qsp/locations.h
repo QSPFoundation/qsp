@@ -52,7 +52,7 @@
     extern int qspFullRefreshCount;
 
     /* External functions */
-    void qspCreateWorld(int, int);
+    void qspCreateWorld(int start, int newLocsCount);
     void qspPrepareLocs();
     int qspLocIndex(QSPString name);
     void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);

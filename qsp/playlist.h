@@ -28,7 +28,7 @@
     extern int qspPLFilesCount;
 
     /* External functions */
-    void qspClearPlayList(QSP_BOOL);
+    void qspClearPlayList(QSP_BOOL toInit);
     void qspPlayPLFiles();
     void qspRefreshPlayList();
     /* Statements */

@@ -90,16 +90,16 @@ INLINE int qspCRC(void *data, int len)
     return crc;
 }
 
-void qspClearIncludes(QSP_BOOL toInit)
+void qspClearAllIncludes(QSP_BOOL toInit)
 {
-    int i, count;
     if (!toInit)
     {
+        int i;
         for (i = 0; i < qspCurIncFilesCount; ++i)
             qspFreeString(qspCurIncFiles + i);
         if (qspCurIncLocsCount)
         {
-            count = qspLocsCount - qspCurIncLocsCount;
+            int count = qspLocsCount - qspCurIncLocsCount;
             qspCreateWorld(count, count);
             qspPrepareLocs();
         }
@@ -209,7 +209,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     locsCount = (isOldFormat ? qspStrToNum(strs[0], 0) : qspReadEncodedIntVal(strs[3]));
     if (isNewGame)
     {
-        qspClearIncludes(QSP_FALSE);
+        qspClearAllIncludes(QSP_FALSE);
         start = 0;
         end = locsCount;
     }

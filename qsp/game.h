@@ -34,8 +34,8 @@
     extern int qspCurIncLocsCount;
 
     /* External functions */
-    void qspClearIncludes(QSP_BOOL);
-    void qspNewGame(QSP_BOOL);
+    void qspClearAllIncludes(QSP_BOOL toInit);
+    void qspNewGame(QSP_BOOL toReset);
     QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame);
     QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize);
     QSP_BOOL qspOpenGameStatus(void *data, int dataSize);

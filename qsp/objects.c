@@ -31,11 +31,11 @@ QSP_BOOL qspCurToShowObjs = QSP_TRUE;
 
 INLINE void qspRemoveObject(int);
 
-void qspClearObjects(QSP_BOOL toInit)
+void qspClearAllObjects(QSP_BOOL toInit)
 {
-    int i;
     if (!toInit && qspCurObjectsCount)
     {
+        int i;
         for (i = 0; i < qspCurObjectsCount; ++i)
         {
             qspFreeString(&qspCurObjects[i].Image);
@@ -47,7 +47,7 @@ void qspClearObjects(QSP_BOOL toInit)
     qspCurSelObject = -1;
 }
 
-void qspClearObjectsWithNotify()
+void qspClearAllObjectsWithNotify()
 {
     QSPVariant v;
     QSPString *objs;
@@ -57,7 +57,7 @@ void qspClearObjectsWithNotify()
         objs = (QSPString *)malloc(oldCount * sizeof(QSPString));
         for (i = 0; i < oldCount; ++i)
             qspAddText(objs + i, qspCurObjects[i].Desc, QSP_TRUE);
-        qspClearObjects(QSP_FALSE);
+        qspClearAllObjects(QSP_FALSE);
         v.Type = QSP_TYPE_STR;
         oldRefreshCount = qspRefreshCount;
         for (i = 0; i < oldCount; ++i)
@@ -193,7 +193,7 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSPString *jump
         if (count)
             qspRemoveObject(QSP_NUM(args[0]) - 1);
         else
-            qspClearObjectsWithNotify();
+            qspClearAllObjectsWithNotify();
         break;
     }
     return QSP_FALSE;

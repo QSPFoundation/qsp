@@ -29,7 +29,7 @@
     } QSPRegExp;
 
     /* External functions */
-    void qspClearRegExps(QSP_BOOL);
+    void qspClearAllRegExps(QSP_BOOL toInit);
     QSPRegExp *qspRegExpGetCompiled(QSPString exp);
     QSP_BOOL qspRegExpStrMatch(QSPRegExp *exp, QSPString str);
     QSPString qspRegExpStrFind(QSPRegExp *exp, QSPString str, int ind);

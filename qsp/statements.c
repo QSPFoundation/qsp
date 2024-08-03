@@ -1008,7 +1008,7 @@ INLINE QSP_BOOL qspStatementClear(QSPVariant *args, QSP_TINYINT count, QSPString
         qspCallSetInputStrText(qspNullString);
         break;
     case qspStatClA:
-        qspClearActions(QSP_FALSE);
+        qspClearAllActions(QSP_FALSE);
         break;
     case qspStatClS:
         if (qspCurVars.Len > 0)
@@ -1022,15 +1022,15 @@ INLINE QSP_BOOL qspStatementClear(QSPVariant *args, QSP_TINYINT count, QSPString
             qspIsMainDescChanged = QSP_TRUE;
         }
         qspClearText(&qspCurInput);
-        qspClearActions(QSP_FALSE);
+        qspClearAllActions(QSP_FALSE);
         qspCallSetInputStrText(qspNullString);
         break;
     case qspStatKillAll:
         qspClearAllVars(QSP_FALSE);
-        qspClearObjectsWithNotify();
+        qspClearAllObjectsWithNotify();
         break;
     case qspStatFreeLib:
-        qspClearIncludes(QSP_FALSE);
+        qspClearAllIncludes(QSP_FALSE);
         if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
         break;
     }

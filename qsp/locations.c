@@ -30,8 +30,8 @@ int qspCurLoc = -1;
 int qspRefreshCount = 0;
 int qspFullRefreshCount = 0;
 
-INLINE int qspLocsCompare(const void *, const void *);
-INLINE int qspLocStringCompare(const void *, const void *);
+INLINE int qspLocsCompare(const void *locName1, const void *locName2);
+INLINE int qspLocStringCompare(const void *name, const void *compareTo);
 INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc);
 
 INLINE int qspLocsCompare(const void *locName1, const void *locName2)
@@ -44,7 +44,7 @@ INLINE int qspLocStringCompare(const void *name, const void *compareTo)
     return qspStrsComp(*(QSPString *)name, ((QSPLocName *)compareTo)->Name);
 }
 
-void qspCreateWorld(int start, int locsCount)
+void qspCreateWorld(int start, int newLocsCount)
 {
     int i, j;
     for (i = start; i < qspLocsCount; ++i)
@@ -63,9 +63,9 @@ void qspCreateWorld(int start, int locsCount)
             }
         }
     }
-    if (qspLocsCount != locsCount)
+    if (qspLocsCount != newLocsCount)
     {
-        qspLocsCount = locsCount;
+        qspLocsCount = newLocsCount;
         qspLocs = (QSPLocation *)realloc(qspLocs, qspLocsCount * sizeof(QSPLocation));
         qspLocsNames = (QSPLocName *)realloc(qspLocsNames, qspLocsCount * sizeof(QSPLocName));
     }
@@ -253,7 +253,7 @@ void qspRefreshCurLoc(QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT count
     if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return;
     qspEmptyVar(varArgs);
     qspSetArgs(varArgs, args, count);
-    qspClearActions(QSP_FALSE);
+    qspClearAllActions(QSP_FALSE);
     ++qspRefreshCount;
     if (toChangeDesc) ++qspFullRefreshCount;
     qspAllocateSavedVarsGroup();
