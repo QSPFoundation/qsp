@@ -55,6 +55,7 @@
         QSP_TINYINT CompOpCodes[QSP_MAXITEMS];
         QSP_TINYINT CompArgsCounts[QSP_MAXITEMS];
         int ItemsCount;
+        QSP_BOOL IsReusable;
     } QSPMathExpression;
 
     enum
@@ -138,7 +139,7 @@
     /* External functions */
     void qspInitMath();
     void qspDeInitMath();
-    QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression);
+    QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression);
     int qspFreeValue(QSPMathExpression *expression, int valueIndex);
     QSPVariant qspValue(QSPMathExpression *expression, int valueIndex);
     QSPVariant qspExprValue(QSPString expr);

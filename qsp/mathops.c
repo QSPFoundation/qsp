@@ -490,14 +490,15 @@ INLINE QSP_BOOL qspAppendToCompiled(QSPMathExpression *expression, QSP_TINYINT o
     return QSP_TRUE;
 }
 
-QSP_BOOL qspCompileExpression(QSPString s, QSPMathExpression *expression)
+QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression)
 {
     QSPVariant v;
     QSPString name;
-    QSP_BOOL waitForOperator = QSP_FALSE;
     QSP_TINYINT opCode, opStack[QSP_STACKSIZE], argStack[QSP_STACKSIZE];
+    QSP_BOOL waitForOperator = QSP_FALSE;
     int opSp = -1;
     expression->ItemsCount = 0;
+    expression->IsReusable = isReusable;
     if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpStart)) return QSP_FALSE;
     while (1)
     {
@@ -933,10 +934,16 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
     switch (opCode)
     {
     case qspOpValue:
-        qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
+        if (expression->IsReusable)
+            qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
+        else
+            qspMoveToNewVariant(&tos, expression->CompValues + valueIndex);
         break;
     case qspOpValueToFormat:
-        qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
+        if (expression->IsReusable)
+            qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
+        else
+            qspMoveToNewVariant(&tos, expression->CompValues + valueIndex);
         if (QSP_ISSTR(tos.Type))
         {
             QSPString textToFormat = QSP_STR(tos);
@@ -1092,7 +1099,7 @@ QSPVariant qspExprValue(QSPString expr)
 {
     QSPVariant res;
     QSPMathExpression expression;
-    if (!qspCompileExpression(expr, &expression))
+    if (!qspCompileExpression(expr, QSP_FALSE, &expression))
         return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     res = qspValue(&expression, expression.ItemsCount - 1);
     qspFreeValue(&expression, expression.ItemsCount - 1);

@@ -90,6 +90,13 @@
         }
     }
 
+    INLINE void qspMoveToNewVariant(QSPVariant *dest, QSPVariant *src)
+    {
+        dest->Type = src->Type;
+        dest->Val = src->Val;
+        qspInitVariant(src, src->Type);
+    }
+
     INLINE QSP_BOOL qspCanConvertToNum(QSPVariant *val)
     {
         switch (QSP_BASETYPE(val->Type))

@@ -140,6 +140,7 @@ void qspInitStats()
     qspAddStatement(qspStatClS, qspStatementClear, 0, 0);
     qspAddStatement(qspStatCmdClear, qspStatementClear, 0, 0);
     qspAddStatement(qspStatCopyArr, qspStatementCopyArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
+    qspAddStatement(qspStatSortArr, qspStatementSortArr, 1, 1, QSP_TYPE_VARREF);
     qspAddStatement(qspStatDelAct, qspStatementDelAct, 1, 1, QSP_TYPE_STR);
     qspAddStatement(qspStatDelObj, qspStatementDelObj, 1, 1, QSP_TYPE_STR);
     qspAddStatement(qspStatDynamic, qspStatementDynamic, 1, QSP_STATMAXARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, -1);
@@ -196,6 +197,7 @@ void qspInitStats()
     qspAddStatName(qspStatCmdClear, QSP_STATIC_STR(QSP_FMT("CMDCLEAR")), 2);
     qspAddStatName(qspStatCmdClear, QSP_STATIC_STR(QSP_FMT("CMDCLR")), 2);
     qspAddStatName(qspStatCopyArr, QSP_STATIC_STR(QSP_FMT("COPYARR")), 2);
+    qspAddStatName(qspStatSortArr, QSP_STATIC_STR(QSP_FMT("SORTARR")), 2);
     qspAddStatName(qspStatDelAct, QSP_STATIC_STR(QSP_FMT("DELACT")), 2);
     qspAddStatName(qspStatDelAct, QSP_STATIC_STR(QSP_FMT("DEL ACT")), 2);
     qspAddStatName(qspStatDelObj, QSP_STATIC_STR(QSP_FMT("DELOBJ")), 2);
@@ -780,7 +782,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *s, int startStat, int 
         QSP_BOOL conditionValue;
         QSPLineOfCode iteratorLine;
         QSPMathExpression expression;
-        if (!qspCompileExpression(condition, &expression))
+        if (!qspCompileExpression(condition, QSP_TRUE, &expression))
         {
             qspReleaseSavedVarsGroup(QSP_TRUE);
             return QSP_FALSE;
@@ -852,7 +854,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *s, int lineInd, int end
         QSP_BOOL conditionValue;
         QSPLineOfCode iteratorLine;
         QSPMathExpression expression;
-        if (!qspCompileExpression(condition, &expression))
+        if (!qspCompileExpression(condition, QSP_TRUE, &expression))
         {
             qspReleaseSavedVarsGroup(QSP_TRUE);
             return QSP_FALSE;
@@ -1024,7 +1026,7 @@ INLINE QSP_BOOL qspStatementClear(QSPVariant *args, QSP_TINYINT count, QSPString
         qspCallSetInputStrText(qspNullString);
         break;
     case qspStatKillAll:
-        qspClearVars(QSP_FALSE);
+        qspClearAllVars(QSP_FALSE);
         qspClearObjectsWithNotify();
         break;
     case qspStatFreeLib:

@@ -57,7 +57,7 @@ void qspMemClear(QSP_BOOL toInit)
 {
     int i;
     qspClearIncludes(toInit);
-    qspClearVars(toInit);
+    qspClearAllVars(toInit);
     qspClearObjects(toInit);
     qspClearActions(toInit);
     qspClearPlayList(toInit);
@@ -79,7 +79,7 @@ void qspMemClear(QSP_BOOL toInit)
         qspFreeString(&qspViewPath);
 
         for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
-            qspClearVarsList(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
+            qspClearVars(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
         if (qspSavedVarGroups) free(qspSavedVarGroups);
     }
     qspCurDesc = qspNewBufString(512);

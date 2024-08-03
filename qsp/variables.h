@@ -61,21 +61,21 @@
     /* External functions */
     void qspInitVarTypes();
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
-    void qspClearVars(QSP_BOOL toInit);
-    void qspSetVarValueByReference(QSPVar *, int, QSPVariant *);
+    void qspClearAllVars(QSP_BOOL toInit);
+    void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val);
     void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);
     QSPTuple qspGetVarTupleValue(QSPString name);
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     void qspRestoreGlobalVars();
-    int qspSaveLocalVarsAndRestoreGlobals(QSPVar **);
-    void qspRestoreLocalVars(QSPVar *, int, QSPVarsGroup *, int);
-    void qspRestoreVarsList(QSPVar *, int);
-    void qspClearVarsList(QSPVar *, int);
-    int qspArraySize(QSPString name);
+    int qspSaveLocalVarsAndRestoreGlobals(QSPVar **vars);
+    void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGroups, int groupsCount);
+    void qspRestoreVarsList(QSPVar *vars, int count);
+    void qspClearVars(QSPVar *vars, int count);
+    int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
-    QSPVariant qspArrayMinMaxItem(QSPString name, QSP_BOOL isMin);
+    QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin);
     int qspGetVarsCount();
     void qspSetArgs(QSPVar *var, QSPVariant *args, int count);
     void qspApplyResult(QSPVar *varRes, QSPVariant *res);
@@ -83,6 +83,7 @@
     void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat);
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);
     QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
+    QSP_BOOL qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
     QSP_BOOL qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
 
     INLINE QSP_TINYINT qspGetVarType(QSPString str)
@@ -166,7 +167,7 @@
         {
             int ind = --qspSavedVarGroupsCount;
             if (toKeepLocals)
-                qspClearVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
+                qspClearVars(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
             else
                 qspRestoreVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
         }
