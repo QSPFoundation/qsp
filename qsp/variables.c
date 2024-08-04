@@ -573,6 +573,11 @@ INLINE void qspSortArray(QSPString varName)
     indexMapping = (int *)malloc(valsCount * sizeof(int));
     for (i = 0; i < valsCount; ++i)
         indexMapping[valuePositions[i] - var->Values] = i;
+    /* Reorder indices */
+    indsCount = var->IndsCount;
+    for (i = 0; i < indsCount; ++i)
+        var->Indices[i].Index = indexMapping[var->Indices[i].Index];
+    free(indexMapping);
     /* Reorder values */
     sortedValues = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
     curValue = sortedValues;
@@ -581,11 +586,6 @@ INLINE void qspSortArray(QSPString varName)
     free(valuePositions);
     free(var->Values);
     var->Values = sortedValues;
-    /* Reorder indices */
-    indsCount = var->IndsCount;
-    for (i = 0; i < indsCount; ++i)
-        var->Indices[i].Index = indexMapping[var->Indices[i].Index];
-    free(indexMapping);
 }
 
 int qspArraySize(QSPString varName)
