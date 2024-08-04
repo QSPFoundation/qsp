@@ -1024,15 +1024,15 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         QSP_NUM(tos) = QSP_TOBOOL(qspObjIndex(QSP_STR(args[0])) >= 0);
         break;
     case qspOpLCase:
-        QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]));
+        qspMoveToNewVariant(&tos, args);
         qspLowerStr(&QSP_STR(tos));
         break;
     case qspOpUCase:
-        QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]));
+        qspMoveToNewVariant(&tos, args);
         qspUpperStr(&QSP_STR(tos));
         break;
     case qspOpStr:
-        QSP_STR(tos) = qspGetNewText(QSP_STR(args[0]));
+        qspMoveToNewVariant(&tos, args);
         break;
     case qspOpVal:
         if (qspConvertVariantTo(args, QSP_TYPE_NUM))
