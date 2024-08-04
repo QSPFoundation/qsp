@@ -30,6 +30,7 @@
     /* Helpers */
     #define QSP_TOBOOL(x) ((x) != 0) /* converts a number to a QSP boolean value */
     #define QSP_ISTRUE(x) ((x) != 0) /* checks whether a QSP numeric value represents boolean 'true' */
+    #define QSP_ISFALSE(x) ((x) == 0) /* checks whether a QSP numeric value represents boolean 'false' */
 
     typedef void (*QSP_FUNCTION)(QSPVariant *args, QSP_TINYINT argsCount, QSPVariant *res);
 
