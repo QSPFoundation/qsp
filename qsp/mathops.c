@@ -996,7 +996,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         qspAutoConvertAppend(args, args + 1, &tos);
         break;
     case qspOpTuple:
-        QSP_TUPLE(tos) = qspGetNewTuple(args, argsCount);
+        QSP_TUPLE(tos) = qspMoveToNewTuple(args, argsCount);
         break;
     case qspOpEq:
         QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) == 0);
@@ -1334,7 +1334,7 @@ INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
             if (qspAutoConvertCompare(args + i, args + minInd) < 0)
                 minInd = i;
         }
-        qspCopyToNewVariant(res, args + minInd);
+        qspMoveToNewVariant(res, args + minInd);
     }
 }
 
@@ -1353,6 +1353,6 @@ INLINE void qspFunctionMax(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
             if (qspAutoConvertCompare(args + i, args + maxInd) > 0)
                 maxInd = i;
         }
-        qspCopyToNewVariant(res, args + maxInd);
+        qspMoveToNewVariant(res, args + maxInd);
     }
 }

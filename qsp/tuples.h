@@ -34,6 +34,7 @@
     void qspFreeTuple(QSPTuple *tuple);
     int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid);
     QSPTuple qspGetNewTuple(QSPVariant *values, int count);
+    QSPTuple qspMoveToNewTuple(QSPVariant *values, int count);
     QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);
     int qspTuplesComp(QSPTuple first, QSPTuple second);
     void qspAppendTupleToDisplayString(QSPBufString *res, QSPTuple tuple);

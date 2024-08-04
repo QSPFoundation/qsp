@@ -83,6 +83,26 @@ QSPTuple qspGetNewTuple(QSPVariant *values, int count)
     return tuple;
 }
 
+QSPTuple qspMoveToNewTuple(QSPVariant *values, int count)
+{
+    QSPTuple tuple;
+    if (values)
+    {
+        QSPVariant *newItem, *srcItem;
+        tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+        tuple.Items = count;
+        newItem = tuple.Vals;
+        for (srcItem = values; count > 0; --count, ++srcItem, ++newItem)
+            qspMoveToNewVariant(newItem, srcItem);
+    }
+    else
+    {
+        tuple.Vals = 0;
+        tuple.Items = 0;
+    }
+    return tuple;
+}
+
 QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2)
 {
     QSPTuple tuple;
@@ -94,9 +114,9 @@ QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int c
         tuple.Items = newCount;
         newItem = tuple.Vals;
         for (item = list1; count1 > 0; --count1, ++item, ++newItem)
-            qspCopyToNewVariant(newItem, item);
+            qspMoveToNewVariant(newItem, item);
         for (item = list2; count2 > 0; --count2, ++item, ++newItem)
-            qspCopyToNewVariant(newItem, item);
+            qspMoveToNewVariant(newItem, item);
     }
     else
     {

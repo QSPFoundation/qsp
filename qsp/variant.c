@@ -143,7 +143,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
             switch (toBaseType)
             {
                 case QSP_TYPE_TUPLE:
-                    QSP_PTUPLE(val) = qspGetNewTuple(val, 1);
+                    QSP_PTUPLE(val) = qspMoveToNewTuple(val, 1);
                     break;
                 case QSP_TYPE_STR:
                 {
@@ -157,12 +157,8 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
             switch (toBaseType)
             {
                 case QSP_TYPE_TUPLE:
-                {
-                    QSPTuple tuple = qspGetNewTuple(val, 1);
-                    qspFreeString(&QSP_PSTR(val));
-                    QSP_PTUPLE(val) = tuple;
+                    QSP_PTUPLE(val) = qspMoveToNewTuple(val, 1);
                     break;
-                }
                 case QSP_TYPE_NUM:
                 {
                     QSP_BOOL isValid;
