@@ -422,7 +422,7 @@ INLINE QSPString qspGetQString(QSPString *expr)
         return qspNullString;
     }
     expr->Str = pos + QSP_STATIC_LEN(QSP_RQUOT);
-    return qspGetNewText(qspStringFromPair(buf + QSP_STATIC_LEN(QSP_LQUOT), pos));
+    return qspCopyToNewText(qspStringFromPair(buf + QSP_STATIC_LEN(QSP_LQUOT), pos));
 }
 
 INLINE int qspSkipValue(QSPMathExpression *expression, int valueIndex)
@@ -707,7 +707,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     name.Str += QSP_STATIC_LEN(QSP_USERFUNC);
                     /* Add the loc name */
                     v.Type = QSP_TYPE_STR;
-                    QSP_STR(v) = qspGetNewText(name);
+                    QSP_STR(v) = qspCopyToNewText(name);
                     if (!qspAppendToCompiled(expression, qspOpValue, 0, v))
                     {
                         qspFreeString(&QSP_STR(v));
@@ -760,7 +760,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     else
                     {
                         v.Type = QSP_TYPE_VARREF;
-                        QSP_STR(v) = qspGetNewText(name);
+                        QSP_STR(v) = qspCopyToNewText(name);
                         if (!qspAppendToCompiled(expression, qspOpValue, 0, v))
                         {
                             qspFreeString(&QSP_STR(v));
@@ -1044,7 +1044,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         QSP_NUM(tos) = qspArraySize(QSP_STR(args[0]));
         break;
     case qspOpTrim:
-        QSP_STR(tos) = qspGetNewText(qspDelSpc(QSP_STR(args[0])));
+        QSP_STR(tos) = qspCopyToNewText(qspDelSpc(QSP_STR(args[0])));
         break;
     case qspOpInput:
         QSP_STR(tos) = qspCallInputBox(QSP_STR(args[0]));
@@ -1062,22 +1062,22 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         QSP_STR(tos) = (argsCount > 0 ? qspCallVersion(QSP_STR(args[0])) : qspCallVersion(qspNullString));
         break;
     case qspOpUserText:
-        QSP_STR(tos) = (qspCurInput.Str ? qspGetNewText(qspCurInput) : qspNullString);
+        QSP_STR(tos) = (qspCurInput.Str ? qspCopyToNewText(qspCurInput) : qspNullString);
         break;
     case qspOpCurLoc:
-        QSP_STR(tos) = (qspCurLoc >= 0 ? qspGetNewText(qspLocs[qspCurLoc].Name) : qspNullString);
+        QSP_STR(tos) = (qspCurLoc >= 0 ? qspCopyToNewText(qspLocs[qspCurLoc].Name) : qspNullString);
         break;
     case qspOpSelObj:
-        QSP_STR(tos) = (qspCurSelObject >= 0 ? qspGetNewText(qspCurObjects[qspCurSelObject].Desc) : qspNullString);
+        QSP_STR(tos) = (qspCurSelObject >= 0 ? qspCopyToNewText(qspCurObjects[qspCurSelObject].Desc) : qspNullString);
         break;
     case qspOpSelAct:
-        QSP_STR(tos) = (qspCurSelAction >= 0 ? qspGetNewText(qspCurActions[qspCurSelAction].Desc) : qspNullString);
+        QSP_STR(tos) = (qspCurSelAction >= 0 ? qspCopyToNewText(qspCurActions[qspCurSelAction].Desc) : qspNullString);
         break;
     case qspOpMainText:
-        QSP_STR(tos) = (qspCurDesc.Len > 0 ? qspGetNewText(qspBufTextToString(qspCurDesc)) : qspNullString);
+        QSP_STR(tos) = (qspCurDesc.Len > 0 ? qspCopyToNewText(qspBufTextToString(qspCurDesc)) : qspNullString);
         break;
     case qspOpStatText:
-        QSP_STR(tos) = (qspCurVars.Len > 0 ? qspGetNewText(qspBufTextToString(qspCurVars)) : qspNullString);
+        QSP_STR(tos) = (qspCurVars.Len > 0 ? qspCopyToNewText(qspBufTextToString(qspCurVars)) : qspNullString);
         break;
     case qspOpCurActs:
         QSP_STR(tos) = qspGetAllActionsAsCode();
@@ -1213,7 +1213,7 @@ INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
             else if (subLen < len)
                 len = subLen;
         }
-        QSP_PSTR(res) = qspGetNewText(qspStringFromLen(QSP_STR(args[0]).Str + beg, len));
+        QSP_PSTR(res) = qspCopyToNewText(qspStringFromLen(QSP_STR(args[0]).Str + beg, len));
     }
     else
         QSP_PSTR(res) = qspNullString;
@@ -1247,7 +1247,7 @@ INLINE void qspFunctionGetObj(QSPVariant *args, QSP_TINYINT count, QSPVariant *r
 {
     int ind = QSP_NUM(args[0]) - 1;
     if (ind >= 0 && ind < qspCurObjectsCount)
-        QSP_PSTR(res) = qspGetNewText(qspCurObjects[ind].Desc);
+        QSP_PSTR(res) = qspCopyToNewText(qspCurObjects[ind].Desc);
     else
         QSP_PSTR(res) = qspNullString;
 }
@@ -1302,7 +1302,7 @@ INLINE void qspFunctionReplace(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 {
     QSPString searchTxt = QSP_STR(args[1]);
     if (qspIsEmpty(searchTxt))
-        QSP_PSTR(res) = qspGetNewText(QSP_STR(args[0]));
+        QSP_PSTR(res) = qspCopyToNewText(QSP_STR(args[0]));
     else if (count == 2)
         QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), searchTxt, qspNullString);
     else

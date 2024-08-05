@@ -72,7 +72,7 @@ INLINE int qspSearchPlayList(QSPString file)
     int i, bufSize, itemLen, fileLen;
     if (!qspPLFilesCount) return -1;
     fileLen = qspStrLen(file);
-    uName = qspGetNewText(file);
+    uName = qspCopyToNewText(file);
     qspUpperStr(&uName);
     bufSize = 32;
     buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
@@ -141,7 +141,7 @@ void qspRefreshPlayList()
         if (qspIsAnyString(curFile) && qspSearchPlayList(curFile) < 0)
         {
             if (qspCallIsPlayingFile(curFile))
-                qspPLFiles[qspPLFilesCount++] = qspGetNewText(s[count]);
+                qspPLFiles[qspPLFilesCount++] = qspCopyToNewText(s[count]);
         }
         qspFreeString(s + count);
     }

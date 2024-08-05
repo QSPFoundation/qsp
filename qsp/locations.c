@@ -95,7 +95,7 @@ int qspLocIndex(QSPString name)
     if (!qspLocsCount) return -1;
     name = qspDelSpc(name);
     if (qspIsEmpty(name)) return -1;
-    name = qspGetNewText(name);
+    name = qspCopyToNewText(name);
     qspUpperStr(&name);
     loc = (QSPLocName *)bsearch(&name, qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocStringCompare);
     qspFreeString(&name);

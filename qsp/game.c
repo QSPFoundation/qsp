@@ -125,7 +125,7 @@ INLINE void qspIncludeFile(QSPString s)
     oldRefreshCount = qspRefreshCount;
     qspCallOpenGame(s, QSP_FALSE);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-    qspCurIncFiles[qspCurIncFilesCount++] = qspGetNewText(s);
+    qspCurIncFiles[qspCurIncFilesCount++] = qspCopyToNewText(s);
 }
 
 INLINE void qspOpenIncludes()

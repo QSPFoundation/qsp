@@ -196,7 +196,7 @@ QSPString qspGetLineLabel(QSPString str)
             str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_LABEL), delimPos);
         else
             str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_LABEL), str.End);
-        str = qspGetNewText(qspDelSpc(str));
+        str = qspCopyToNewText(qspDelSpc(str));
         qspUpperStr(&str);
         return str;
     }
@@ -434,7 +434,7 @@ void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int e
         line = *dest;
         while (start < end)
         {
-            line->Str = qspGetNewText(src[start].Str);
+            line->Str = qspCopyToNewText(src[start].Str);
             line->LineNum = src[start].LineNum;
             statsCount = line->StatsCount = src[start].StatsCount;
             if (statsCount)
@@ -463,7 +463,7 @@ void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int e
             else
                 line->Stats = 0;
             line->IsMultiline = src[start].IsMultiline;
-            line->Label = qspGetNewText(src[start].Label);
+            line->Label = qspCopyToNewText(src[start].Label);
             ++line;
             ++start;
         }
@@ -582,7 +582,7 @@ INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
                 ret = (QSPLineOfCode *)realloc(ret, bufSize * sizeof(QSPLineOfCode));
             }
             line = ret + count++;
-            line->Str = qspGetNewText(qspDelSpc(qspStringFromLen(str, strLen)));
+            line->Str = qspCopyToNewText(qspDelSpc(qspStringFromLen(str, strLen)));
             line->LineNum = lastLineNum;
             line->Label = qspNullString;
             line->Stats = 0;
@@ -595,7 +595,7 @@ INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
     if (count >= bufSize)
         ret = (QSPLineOfCode *)realloc(ret, (count + 1) * sizeof(QSPLineOfCode));
     line = ret + count++;
-    line->Str = qspGetNewText(qspDelSpc(qspStringFromLen(str, strLen)));
+    line->Str = qspCopyToNewText(qspDelSpc(qspStringFromLen(str, strLen)));
     line->LineNum = lastLineNum;
     line->Label = qspNullString;
     line->Stats = 0;

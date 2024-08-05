@@ -63,7 +63,7 @@ int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
     return 0;
 }
 
-QSPTuple qspGetNewTuple(QSPVariant *values, int count)
+QSPTuple qspCopyToNewTuple(QSPVariant *values, int count)
 {
     QSPTuple tuple;
     if (values)
@@ -103,7 +103,7 @@ QSPTuple qspMoveToNewTuple(QSPVariant *values, int count)
     return tuple;
 }
 
-QSPTuple qspMergeToTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2)
+QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2)
 {
     QSPTuple tuple;
     int newCount = count1 + count2;

@@ -95,7 +95,7 @@ int qspObjIndex(QSPString name)
     int i, objNameLen, bufSize;
     QSP_CHAR *buf;
     if (!qspCurObjectsCount) return -1;
-    name = qspGetNewText(name);
+    name = qspCopyToNewText(name);
     qspUpperStr(&name);
     bufSize = 32;
     buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
@@ -167,7 +167,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSPString *j
     }
     if (qspCurSelObject >= objInd) qspCurSelObject = -1;
     if (count >= 2 && qspIsAnyString(QSP_STR(args[1])))
-        imgPath = qspGetNewText(QSP_STR(args[1]));
+        imgPath = qspCopyToNewText(QSP_STR(args[1]));
     else
         imgPath = qspNullString;
     for (i = qspCurObjectsCount; i > objInd; --i)
@@ -175,7 +175,7 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSPString *j
     ++qspCurObjectsCount;
     obj = qspCurObjects + objInd;
     obj->Image = imgPath;
-    obj->Desc = qspGetNewText(QSP_STR(args[0]));
+    obj->Desc = qspCopyToNewText(QSP_STR(args[0]));
     qspIsObjectsChanged = QSP_TRUE;
     if (count == 3) count = 2;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJADD")), args, count);

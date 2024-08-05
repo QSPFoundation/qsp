@@ -69,7 +69,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *ju
         if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
         {
             imgPath = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
-            imgPath = (qspIsAnyString(imgPath) ? qspGetNewText(imgPath) : qspNullString);
+            imgPath = (qspIsAnyString(imgPath) ? qspCopyToNewText(imgPath) : qspNullString);
         }
         else
         {
@@ -77,8 +77,8 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *ju
             pos2 = str.End;
             imgPath = qspNullString;
         }
-        menuLocs[itemsCount] = qspGetNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
-        menuItems[itemsCount].Name = qspGetNewText(qspStringFromPair(str.Str, pos));
+        menuLocs[itemsCount] = qspCopyToNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
+        menuItems[itemsCount].Name = qspCopyToNewText(qspStringFromPair(str.Str, pos));
         menuItems[itemsCount].Image = imgPath;
         ++itemsCount;
         ++ind;

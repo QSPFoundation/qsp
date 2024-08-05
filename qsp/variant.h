@@ -79,13 +79,13 @@
         switch (QSP_BASETYPE(dest->Type = src->Type))
         {
             case QSP_TYPE_TUPLE:
-                QSP_PTUPLE(dest) = qspGetNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).Items);
+                QSP_PTUPLE(dest) = qspCopyToNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).Items);
                 break;
             case QSP_TYPE_NUM:
                 QSP_PNUM(dest) = QSP_PNUM(src);
                 break;
             case QSP_TYPE_STR:
-                QSP_PSTR(dest) = qspGetNewText(QSP_PSTR(src));
+                QSP_PSTR(dest) = qspCopyToNewText(QSP_PSTR(src));
                 break;
         }
     }

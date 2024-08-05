@@ -296,7 +296,7 @@ QSPString qspCallVersion(QSPString param)
         qspFinalizeCallBack(&state);
         return qspStringFromC(buffer);
     }
-    return qspGetNewText(QSP_STATIC_STR(QSP_VER));
+    return qspCopyToNewText(QSP_STATIC_STR(QSP_VER));
 }
 
 #endif

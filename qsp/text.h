@@ -130,7 +130,7 @@
         qspAddText(dest, val, QSP_TRUE);
     }
 
-    INLINE QSPString qspGetNewText(QSPString val)
+    INLINE QSPString qspCopyToNewText(QSPString val)
     {
         QSPString string;
         qspAddText(&string, val, QSP_TRUE);

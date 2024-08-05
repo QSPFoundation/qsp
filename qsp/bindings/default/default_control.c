@@ -377,7 +377,7 @@ void QSPInit()
         mwInit();
     #endif
     qspNullString = qspStringFromPair(0, 0);
-    qspNullTuple = qspGetNewTuple(0, 0);
+    qspNullTuple = qspCopyToNewTuple(0, 0);
     qspIsDebug = QSP_FALSE;
     qspRefreshCount = qspFullRefreshCount = 0;
     qspQstCRC = 0;

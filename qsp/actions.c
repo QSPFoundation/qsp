@@ -53,7 +53,7 @@ INLINE int qspActIndex(QSPString name)
     int i, actNameLen, bufSize;
     QSP_CHAR *buf;
     if (!qspCurActionsCount) return -1;
-    name = qspGetNewText(name);
+    name = qspCopyToNewText(name);
     qspUpperStr(&name);
     bufSize = 64;
     buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
@@ -94,12 +94,12 @@ void qspAddAction(QSPVariant *args, QSP_TINYINT count, QSPLineOfCode *code, int 
         return;
     }
     if (count == 2 && qspIsAnyString(QSP_STR(args[1])))
-        imgPath = qspGetNewText(QSP_STR(args[1]));
+        imgPath = qspCopyToNewText(QSP_STR(args[1]));
     else
         imgPath = qspNullString;
     act = qspCurActions + qspCurActionsCount++;
     act->Image = imgPath;
-    act->Desc = qspGetNewText(QSP_STR(args[0]));
+    act->Desc = qspCopyToNewText(QSP_STR(args[0]));
     qspCopyPrepLines(&act->OnPressLines, code, start, end);
     act->OnPressLinesCount = end - start;
     act->Location = qspRealCurLoc;

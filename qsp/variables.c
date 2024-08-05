@@ -111,7 +111,7 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
     {
         if (!var->Name.Str)
         {
-            if (toCreate) var->Name = qspGetNewText(name);
+            if (toCreate) var->Name = qspCopyToNewText(name);
             return var;
         }
         if (!qspStrsComp(var->Name, name)) return var;
@@ -182,7 +182,7 @@ int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
         case QSP_TYPE_NUM:
             return QSP_NUM(index);
         case QSP_TYPE_STR:
-            uStr = qspGetNewText(QSP_STR(index));
+            uStr = qspCopyToNewText(QSP_STR(index));
             break;
     }
     qspUpperStr(&uStr);
@@ -547,7 +547,7 @@ INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
                 dest->Indices = (QSPVarIndex *)realloc(dest->Indices, dest->IndsBufSize * sizeof(QSPVarIndex));
             }
             dest->Indices[count].Index = newInd;
-            dest->Indices[count].Str = qspGetNewText(src->Indices[i].Str);
+            dest->Indices[count].Str = qspCopyToNewText(src->Indices[i].Str);
             ++count;
         }
     }
@@ -728,7 +728,7 @@ int qspGetVarsCount()
 
 void qspSetArgs(QSPVar *var, QSPVariant *args, int count)
 {
-    while (--count >= 0)
+    while (--count >= 0) /* iterate from top to bottom to optimize memory allocations */
         qspSetVarValueByReference(var, count, args + count);
 }
 
@@ -948,7 +948,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
                 curVarGroup->Vars = (QSPVar *)realloc(curVarGroup->Vars, bufSize * sizeof(QSPVar));
             }
             qspMoveVar(curVarGroup->Vars + varsCount, var);
-            curVarGroup->Vars[varsCount].Name = qspGetNewText(varName);
+            curVarGroup->Vars[varsCount].Name = qspCopyToNewText(varName);
             curVarGroup->VarsCount = ++varsCount;
         }
     }

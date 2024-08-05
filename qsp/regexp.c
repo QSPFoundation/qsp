@@ -67,7 +67,7 @@ QSPRegExp *qspRegExpGetCompiled(QSPString exp)
         qspFreeString(&compExp->Text);
         onig_free(compExp->CompiledExp);
     }
-    compExp->Text = qspGetNewText(exp);
+    compExp->Text = qspCopyToNewText(exp);
     compExp->CompiledExp = onigExp;
     if (++qspCompiledRegExpsCurInd == QSP_MAXCACHEDREGEXPS)
         qspCompiledRegExpsCurInd = 0;
@@ -96,7 +96,7 @@ QSPString qspRegExpStrFind(QSPRegExp *exp, QSPString str, int ind)
         if (pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
         {
             len = (onigReg->end[pos] - onigReg->beg[pos]) / sizeof(QSP_CHAR);
-            res = qspGetNewText(qspStringFromLen((QSP_CHAR *)(tempBeg + onigReg->beg[pos]), len));
+            res = qspCopyToNewText(qspStringFromLen((QSP_CHAR *) (tempBeg + onigReg->beg[pos]), len));
         }
         else
             res = qspNullString;

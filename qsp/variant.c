@@ -39,7 +39,7 @@ INLINE void qspFormatVariant(QSPVariant *val)
     {
         case QSP_TYPE_VARREF:
         {
-            QSPString temp = qspGetNewText(qspDelSpc(QSP_PSTR(val)));
+            QSPString temp = qspCopyToNewText(qspDelSpc(QSP_PSTR(val)));
             qspUpperStr(&temp);
             qspFreeString(&QSP_PSTR(val));
             QSP_PSTR(val) = temp;
@@ -148,7 +148,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                 case QSP_TYPE_STR:
                 {
                     QSP_CHAR buf[QSP_NUMTOSTRBUF];
-                    QSP_PSTR(val) = qspGetNewText(qspNumToStr(buf, QSP_PNUM(val)));
+                    QSP_PSTR(val) = qspCopyToNewText(qspNumToStr(buf, QSP_PNUM(val)));
                     break;
                 }
             }
@@ -271,12 +271,12 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
         switch (QSP_BASETYPE(arg2->Type))
         {
         case QSP_TYPE_TUPLE:
-            QSP_PTUPLE(res) = qspMergeToTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
+            QSP_PTUPLE(res) = qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
             res->Type = QSP_TYPE_TUPLE;
             break;
         case QSP_TYPE_NUM:
         case QSP_TYPE_STR:
-            QSP_PTUPLE(res) = qspMergeToTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, arg2, 1);
+            QSP_PTUPLE(res) = qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, arg2, 1);
             res->Type = QSP_TYPE_TUPLE;
             break;
         }
@@ -286,7 +286,7 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
         switch (QSP_BASETYPE(arg2->Type))
         {
         case QSP_TYPE_TUPLE:
-            QSP_PTUPLE(res) = qspMergeToTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
+            QSP_PTUPLE(res) = qspMergeToNewTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
             res->Type = QSP_TYPE_TUPLE;
             break;
         case QSP_TYPE_NUM:

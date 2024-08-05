@@ -419,7 +419,7 @@ QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt)
     QSPBufString res;
     int searchLen;
     QSP_CHAR *pos = qspStrStr(txt, searchTxt);
-    if (!pos) return qspGetNewText(txt);
+    if (!pos) return qspCopyToNewText(txt);
     res = qspNewBufString(256);
     searchLen = qspStrLen(searchTxt);
     do
@@ -443,7 +443,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
     if (!pos)
     {
         if (canReturnSelf) return txt;
-        return qspGetNewText(txt);
+        return qspCopyToNewText(txt);
     }
     res = qspNewBufString(128);
     oldRefreshCount = qspRefreshCount;
