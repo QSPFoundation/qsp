@@ -50,7 +50,7 @@
     void qspCallSetInputStrText(QSPString text);
     void qspCallShowMessage(QSPString text);
     void qspCallShowPicture(QSPString file);
-    int qspCallShowMenu(QSPListItem *items, int count);
+    void qspCallShowWindow(int type, QSP_BOOL toShow);
     void qspCallPlayFile(QSPString file, int volume);
     QSP_BOOL qspCallIsPlayingFile(QSPString file);
     void qspCallCloseFile(QSPString file);
