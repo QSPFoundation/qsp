@@ -60,12 +60,18 @@ else()
 	set(INSTALL_EXAMPLES OFF)
 	set(BUILD_TEST OFF)
 
-	# Prevent oniguruma from overriding our compiler/linker options
-	# when building with Visual Studio
+	if(WIN32)
+		set(BUILD_SHARED_LIBS OFF)
+		set(MSVC_STATIC_RUNTIME ON)
+	else()
+		set(BUILD_SHARED_LIBS ON)
+	endif()
+
+	# For Windows: Prevent overriding the parent project's compiler/linker settings
 	set(oniguruma_force_shared_crt ON CACHE BOOL "" FORCE)
 
 	# Configure the CRNL handling
-	add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR)
+	add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR=1)
 
 	# Add oniguruma directly to our build
 	set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
@@ -186,6 +192,7 @@ if(BUILD_QSPGUI)
 		)
 
 		# Disable wxWidgets features we don't need
+		set(wxUSE_ACTIVEX OFF)
 		set(wxUSE_LIBTIFF OFF)
 		set(wxUSE_REGEX OFF)
 		set(wxUSE_SECRETSTORE OFF)
@@ -204,8 +211,22 @@ if(BUILD_QSPGUI)
 		set(wxUSE_URL OFF)
 		set(wxUSE_FS_INET OFF)
 
-		# Prevent wxWidgets from overriding our compiler/linker options
-		# when building with Visual Studio
+		set(wxBUILD_MONOLITHIC OFF)
+		set(wxBUILD_SAMPLES OFF)
+		set(wxBUILD_TESTS OFF)
+		set(wxBUILD_DEMOS OFF)
+		set(wxBUILD_BENCHMARKS OFF)
+		set(wxBUILD_OPTIMISE ON)
+		set(wxBUILD_STRIPPED_RELEASE ON)
+
+		if(WIN32)
+			set(wxBUILD_SHARED OFF)
+			set(wxBUILD_USE_STATIC_RUNTIME ON)
+		else()
+			set(wxBUILD_SHARED ON)
+		endif()
+
+		# For Windows: Prevent overriding the parent project's compiler/linker settings
 		set(wxWidgets_force_shared_crt ON CACHE BOOL "" FORCE)
 
 		# Add wxWidgets directly to our build
@@ -260,7 +281,7 @@ if(BUILD_QSPGUI)
 		set(RESOURCES_DIR "${CMAKE_INSTALL_PREFIX}/share/qspgui")
 		install(FILES "${FMOD_LIBRARY}" TYPE LIB)
 	endif()
-	target_compile_definitions(qspgui PRIVATE WXUSINGDLL _UNICODE)
+	target_compile_definitions(qspgui PRIVATE _UNICODE)
 	target_include_directories(qspgui PRIVATE qsp/bindings qsp/bindings/default)
 	target_compile_options(qspgui PRIVATE ${PROJECT_COMPILER_FLAGS})
 	target_link_options(qspgui PRIVATE ${PROJECT_LINKER_FLAGS})
