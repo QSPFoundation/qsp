@@ -815,38 +815,38 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
     oldRefreshCount = qspRefreshCount;
     switch (QSP_BASETYPE(v->Type))
     {
-	    case QSP_TYPE_TUPLE:
-	    {
-	        int lastVarIndex = varsCount - 1, lastValIndex = QSP_PTUPLE(v).Items - 1;
-	        int minLastIndex = lastVarIndex < lastValIndex ? lastVarIndex : lastValIndex;
-	        for (i = 0; i < minLastIndex; ++i)
-	        {
-	            qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
-	            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-	                return;
-	        }
-	        if (i == lastVarIndex)
-	        {
-	            /* Only 1 variable left, fill it with the tuple containing all the values left */
-	            QSPVariant v2;
-	            v2.Type = QSP_TYPE_TUPLE;
-	            QSP_TUPLE(v2) = qspMoveToNewTuple(QSP_PTUPLE(v).Vals + lastVarIndex, QSP_PTUPLE(v).Items - lastVarIndex);
-	            qspSetVar(varNames[lastVarIndex], &v2, op);
-	            qspFreeVariant(&v2);
-	        }
-	        else if (i == lastValIndex)
-	        {
-	            /* Only 1 value left, fill the rest of vars with the last value */
-	            while (i < varsCount)
-	            {
-	                qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + lastValIndex, op);
-	                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-	                    return;
-	                ++i;
-	            }
-	        }
-	        else
-	        {
+        case QSP_TYPE_TUPLE:
+        {
+            int lastVarIndex = varsCount - 1, lastValIndex = QSP_PTUPLE(v).Items - 1;
+            int minLastIndex = lastVarIndex < lastValIndex ? lastVarIndex : lastValIndex;
+            for (i = 0; i < minLastIndex; ++i)
+            {
+                qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
+                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                    return;
+            }
+            if (i == lastVarIndex)
+            {
+                /* Only 1 variable left, fill it with the tuple containing all the values left */
+                QSPVariant v2;
+                v2.Type = QSP_TYPE_TUPLE;
+                QSP_TUPLE(v2) = qspMoveToNewTuple(QSP_PTUPLE(v).Vals + lastVarIndex, QSP_PTUPLE(v).Items - lastVarIndex);
+                qspSetVar(varNames[lastVarIndex], &v2, op);
+                qspFreeVariant(&v2);
+            }
+            else if (i == lastValIndex)
+            {
+                /* Only 1 value left, fill the rest of vars with the last value */
+                while (i < varsCount)
+                {
+                    qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + lastValIndex, op);
+                    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                        return;
+                    ++i;
+                }
+            }
+            else
+            {
                 /* No values, update vars with default values */
                 while (i < varsCount)
                 {
@@ -856,17 +856,17 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
                     ++i;
                 }
             }
-	        break;
-	    }
-	    case QSP_TYPE_NUM:
-	    case QSP_TYPE_STR:
-	        for (i = 0; i < varsCount; ++i)
-	        {
-	            qspSetVar(varNames[i], v, op);
-	            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-	                return;
-	        }
-	        break;
+            break;
+        }
+        case QSP_TYPE_NUM:
+        case QSP_TYPE_STR:
+            for (i = 0; i < varsCount; ++i)
+            {
+                qspSetVar(varNames[i], v, op);
+                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                    return;
+            }
+            break;
     }
 }
 
