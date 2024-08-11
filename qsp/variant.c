@@ -249,20 +249,6 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
     return 0;
 }
 
-void qspUpdateVariantValue(QSPVariant *dest, QSPVariant *src)
-{
-    switch (QSP_BASETYPE(dest->Type))
-    {
-    case QSP_TYPE_TUPLE:
-        qspFreeTuple(&QSP_PTUPLE(dest));
-        break;
-    case QSP_TYPE_STR:
-        qspFreeString(&QSP_PSTR(dest));
-        break;
-    }
-    qspCopyToNewVariant(dest, src);
-}
-
 void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
 {
     switch (QSP_BASETYPE(arg1->Type))
