@@ -818,42 +818,51 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
         case QSP_TYPE_TUPLE:
         {
             int lastVarIndex = varsCount - 1, lastValIndex = QSP_PTUPLE(v).Items - 1;
-            int minLastIndex = lastVarIndex < lastValIndex ? lastVarIndex : lastValIndex;
-            for (i = 0; i < minLastIndex; ++i)
+            if (lastVarIndex < lastValIndex)
             {
-                qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
-                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                    return;
-            }
-            if (i == lastVarIndex)
-            {
-                /* Only 1 variable left, fill it with the tuple containing all the values left */
+                /* Assign variables that contain single values */
                 QSPVariant v2;
+                for (i = 0; i < lastVarIndex; ++i)
+                {
+                    qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
+                    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                        return;
+                }
+                /* Only 1 variable left, fill it with the tuple containing all the values left */
                 v2.Type = QSP_TYPE_TUPLE;
-                QSP_TUPLE(v2) = qspMoveToNewTuple(QSP_PTUPLE(v).Vals + lastVarIndex, QSP_PTUPLE(v).Items - lastVarIndex);
+                QSP_TUPLE(v2) = qspMoveToNewTuple(QSP_PTUPLE(v).Vals + i, QSP_PTUPLE(v).Items - i);
                 qspSetVar(varNames[lastVarIndex], &v2, op);
                 qspFreeVariant(&v2);
             }
-            else if (i == lastValIndex)
-            {
-                /* Only 1 value left, fill the rest of vars with the last value */
-                while (i < varsCount)
-                {
-                    qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + lastValIndex, op);
-                    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                        return;
-                    ++i;
-                }
-            }
             else
             {
-                /* No values, update vars with default values */
-                while (i < varsCount)
+                if (lastValIndex >= 0)
                 {
-                    qspResetVar(varNames[i]);
-                    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-                        return;
-                    ++i;
+                    /* Assign variables that contain single values */
+                    for (i = 0; i < lastValIndex; ++i)
+                    {
+                        qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
+                        if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                            return;
+                    }
+                    /* Only 1 value left, fill the rest of vars with the last value */
+                    while (i < varsCount)
+                    {
+                        qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + lastValIndex, op);
+                        if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                            return;
+                        ++i;
+                    }
+                }
+                else
+                {
+                    /* No values, update vars with default values */
+                    for (i = 0; i < varsCount; ++i)
+                    {
+                        qspResetVar(varNames[i]);
+                        if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                            return;
+                    }
                 }
             }
             break;
