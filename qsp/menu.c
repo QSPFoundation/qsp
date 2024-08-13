@@ -23,81 +23,131 @@
 #include "text.h"
 #include "variables.h"
 
+INLINE qspFreeMenuItems(QSPListItem *items, int count);
+INLINE qspFreeMenuLocs(QSPString *locs, int count);
+
+INLINE qspFreeMenuItems(QSPListItem *items, int count)
+{
+    QSPListItem *curItem;
+    for (curItem = items; count > 0; --count, ++curItem)
+    {
+        qspFreeString(&curItem->Name);
+        qspFreeString(&curItem->Image);
+    }
+}
+
+INLINE qspFreeMenuLocs(QSPString *locs, int count)
+{
+    QSPString *curLoc;
+    for (curLoc = locs; count > 0; --count, ++curLoc)
+        qspFreeString(curLoc);
+}
+
 QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
 {
     QSPVar *var;
-    QSPVariant arg;
+    QSPVariant *curItem;
     int ind, itemsCount, maxItems;
     QSPListItem menuItems[QSP_MAXMENUITEMS];
-    QSPString menuLocs[QSP_MAXMENUITEMS], imgPath, str;
+    QSPString menuLocs[QSP_MAXMENUITEMS], itemName, itemLocation, itemImage, str;
+    QSPTuple tuple;
     QSP_CHAR *pos, *pos2;
     if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return QSP_FALSE;
-    if (count == 1)
-    {
-        ind = 0;
-        maxItems = QSP_MAXMENUITEMS;
-    }
-    else
+    if (count >= 2)
     {
         ind = QSP_NUM(args[1]);
         if (ind < 0) ind = 0;
-        if (count == 2)
-            maxItems = QSP_MAXMENUITEMS;
-        else
-        {
-            maxItems = QSP_NUM(args[2]);
-            if (maxItems < 0) maxItems = 0;
-        }
     }
+    else
+        ind = 0;
+    if (count == 3)
+    {
+        maxItems = QSP_NUM(args[2]);
+        if (maxItems < 0) maxItems = 0;
+    }
+    else
+        maxItems = QSP_MAXMENUITEMS;
     itemsCount = 0;
-    while (ind < var->ValsCount)
+    for (curItem = var->Values + ind; ind < var->ValsCount; ++ind, ++curItem)
     {
         if (itemsCount == maxItems) break;
-        if (!QSP_ISSTR(var->Values[ind].Type)) break;
-        str = QSP_STR(var->Values[ind]);
-        if (!(str.Str && qspIsAnyString(str))) break;
-        if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM)))
+        itemName = itemLocation = itemImage = qspNullString;
+        switch (QSP_BASETYPE(curItem->Type))
         {
-            qspSetError(QSP_ERR_COLONNOTFOUND);
-            return QSP_FALSE;
+        case QSP_TYPE_TUPLE:
+            tuple = QSP_PTUPLE(curItem);
+            if (tuple.Items < 2) break;
+            tuple = qspCopyToNewTuple(tuple.Vals, tuple.Items);
+            if (tuple.Items >= 3)
+            {
+                qspConvertVariantTo(&tuple.Vals[2], QSP_TYPE_STR);
+                itemImage = QSP_STR(tuple.Vals[2]);
+                itemImage = (qspIsAnyString(itemImage) ? qspCopyToNewText(itemImage) : qspNullString);
+            }
+            qspConvertVariantTo(&tuple.Vals[0], QSP_TYPE_STR);
+            qspConvertVariantTo(&tuple.Vals[1], QSP_TYPE_STR);
+            itemName = qspCopyToNewText(QSP_STR(tuple.Vals[0]));
+            itemLocation = qspCopyToNewText(QSP_STR(tuple.Vals[1]));
+            qspFreeTuple(&tuple);
+            break;
+        case QSP_TYPE_STR:
+            str = QSP_PSTR(curItem);
+            if (!qspIsAnyString(str)) break;
+            if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM)))
+            {
+                qspSetError(QSP_ERR_COLONNOTFOUND);
+                qspFreeMenuItems(menuItems, itemsCount);
+                qspFreeMenuLocs(menuLocs, itemsCount);
+                return QSP_FALSE;
+            }
+            if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
+            {
+                itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos));
+                itemLocation = qspCopyToNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
+                itemImage = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
+                itemImage = (qspIsAnyString(itemImage) ? qspCopyToNewText(itemImage) : qspNullString);
+            }
+            else
+            {
+                itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos2));
+                itemLocation = qspCopyToNewText(qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End));
+            }
+            break;
+        }
+        if (qspIsEmpty(itemName) && qspIsEmpty(itemLocation))
+        {
+            qspFreeString(&itemName);
+            qspFreeString(&itemLocation);
+            qspFreeString(&itemImage);
+            break;
         }
         if (itemsCount == QSP_MAXMENUITEMS)
         {
             qspSetError(QSP_ERR_CANTADDMENUITEM);
+            qspFreeString(&itemName);
+            qspFreeString(&itemLocation);
+            qspFreeString(&itemImage);
+            qspFreeMenuItems(menuItems, itemsCount);
+            qspFreeMenuLocs(menuLocs, itemsCount);
             return QSP_FALSE;
         }
-        if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
-        {
-            imgPath = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
-            imgPath = (qspIsAnyString(imgPath) ? qspCopyToNewText(imgPath) : qspNullString);
-        }
-        else
-        {
-            pos = pos2;
-            pos2 = str.End;
-            imgPath = qspNullString;
-        }
-        menuLocs[itemsCount] = qspCopyToNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
-        menuItems[itemsCount].Name = qspCopyToNewText(qspStringFromPair(str.Str, pos));
-        menuItems[itemsCount].Image = imgPath;
+        menuItems[itemsCount].Name = itemName;
+        menuItems[itemsCount].Image = itemImage;
+        menuLocs[itemsCount] = itemLocation;
         ++itemsCount;
-        ++ind;
     }
     if (itemsCount)
     {
         ind = qspCallShowMenu(menuItems, itemsCount);
         if (ind >= 0 && ind < itemsCount)
         {
+            QSPVariant arg;
             arg.Type = QSP_TYPE_NUM;
             QSP_NUM(arg) = ind + 1;
             qspExecLocByNameWithArgs(menuLocs[ind], &arg, 1, 0);
         }
-        while (--itemsCount >= 0)
-        {
-            qspFreeString(&menuItems[itemsCount].Name);
-            qspFreeString(&menuItems[itemsCount].Image);
-            qspFreeString(&menuLocs[itemsCount]);
-        }
+        qspFreeMenuItems(menuItems, itemsCount);
+        qspFreeMenuLocs(menuLocs, itemsCount);
     }
     return QSP_FALSE;
 }
