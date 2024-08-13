@@ -235,7 +235,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT c
         if (ind >= var->ValsCount) break;
         if (!QSP_ISSTR(var->Values[ind].Type)) break;
         locName = QSP_STR(var->Values[ind]);
-        if (!(locName.Str && qspIsAnyString(locName))) break;
+        if (!qspIsAnyString(locName)) break;
         qspExecLocByNameWithArgs(locName, args, count, 0);
         if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
         ++ind;
