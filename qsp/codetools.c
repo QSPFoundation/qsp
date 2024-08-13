@@ -122,61 +122,71 @@ INLINE int qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s
 
 INLINE int qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
-    QSPCachedArg *foundArgs;
-    int count;
+    QSPCachedArg *foundArgs = 0;
+    int count = 0;
     qspSkipSpaces(&s);
-    if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK[0])
-    {
-        QSP_CHAR *brack;
-        if (!(brack = qspDelimPos(s, QSP_RRBRACK[0])))
-        {
-            *errorCode = QSP_ERR_BRACKNOTFOUND;
-            return 0;
-        }
-        if (!qspIsAnyString(qspStringFromPair(brack + QSP_STATIC_LEN(QSP_RRBRACK), s.End)))
-        {
-            s = qspStringFromPair(s.Str + QSP_STATIC_LEN(QSP_LRBRACK), brack);
-            qspSkipSpaces(&s);
-        }
-    }
-    count = 0;
-    foundArgs = 0;
     if (!qspIsEmpty(s))
     {
-        QSP_CHAR *pos;
-        int bufSize = 0;
-        while (1)
+        if (statCode == qspStatImplicitStatement)
         {
-            if (count >= qspStats[statCode].MaxArgsCount)
+            /* It's always 1 argument only */
+            count = 1;
+            foundArgs = (QSPCachedArg *)malloc(count * sizeof(QSPCachedArg));
+            foundArgs[0].StartPos = (int)(s.Str - origStart);
+            foundArgs[0].EndPos = (int)(s.End - origStart);
+        }
+        else
+        {
+            QSP_CHAR *pos;
+            int bufSize = 0;
+            if (*s.Str == QSP_LRBRACK[0]) /* arguments might be specified using parentheses */
             {
-                *errorCode = QSP_ERR_ARGSCOUNT;
-                break;
+                QSP_CHAR *bracket;
+                if (!(bracket = qspDelimPos(s, QSP_RRBRACK[0])))
+                {
+                    *errorCode = QSP_ERR_BRACKNOTFOUND;
+                    return 0;
+                }
+                if (!qspIsAnyString(qspStringFromPair(bracket + QSP_STATIC_LEN(QSP_RRBRACK), s.End)))
+                {
+                    /* We'll parse arguments between parentheses */
+                    s = qspStringFromPair(s.Str + QSP_STATIC_LEN(QSP_LRBRACK), bracket);
+                    qspSkipSpaces(&s);
+                }
             }
-            if (count >= bufSize)
+            while (1)
             {
-                bufSize = count + 4;
-                foundArgs = (QSPCachedArg *)realloc(foundArgs, bufSize * sizeof(QSPCachedArg));
-            }
-            pos = qspDelimPos(s, QSP_COMMA[0]);
-            if (pos)
-            {
-                foundArgs[count].StartPos = (int)(s.Str - origStart);
-                foundArgs[count].EndPos = (int)(pos - origStart);
-                ++count;
-            }
-            else
-            {
-                foundArgs[count].StartPos = (int)(s.Str - origStart);
-                foundArgs[count].EndPos = (int)(s.End - origStart);
-                ++count;
-                break;
-            }
-            s.Str = pos + QSP_STATIC_LEN(QSP_COMMA);
-            qspSkipSpaces(&s);
-            if (qspIsEmpty(s))
-            {
-                *errorCode = QSP_ERR_SYNTAX;
-                break;
+                if (count >= qspStats[statCode].MaxArgsCount)
+                {
+                    *errorCode = QSP_ERR_ARGSCOUNT;
+                    break;
+                }
+                if (count >= bufSize)
+                {
+                    bufSize = count + 4;
+                    foundArgs = (QSPCachedArg *)realloc(foundArgs, bufSize * sizeof(QSPCachedArg));
+                }
+                pos = qspDelimPos(s, QSP_COMMA[0]);
+                if (pos)
+                {
+                    foundArgs[count].StartPos = (int)(s.Str - origStart);
+                    foundArgs[count].EndPos = (int)(pos - origStart);
+                    ++count;
+                }
+                else
+                {
+                    foundArgs[count].StartPos = (int)(s.Str - origStart);
+                    foundArgs[count].EndPos = (int)(s.End - origStart);
+                    ++count;
+                    break;
+                }
+                s.Str = pos + QSP_STATIC_LEN(QSP_COMMA);
+                qspSkipSpaces(&s);
+                if (qspIsEmpty(s))
+                {
+                    *errorCode = QSP_ERR_SYNTAX;
+                    break;
+                }
             }
         }
     }
