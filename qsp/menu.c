@@ -21,6 +21,7 @@
 #include "game.h"
 #include "locations.h"
 #include "text.h"
+#include "tuples.h"
 #include "variables.h"
 
 INLINE qspFreeMenuItems(QSPListItem *items, int count);
