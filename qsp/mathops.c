@@ -26,7 +26,9 @@
 #include "statements.h"
 #include "text.h"
 #include "time.h"
+#include "tuples.h"
 #include "variables.h"
+#include "variant.h"
 
 QSPMathOperation qspOps[qspOpLast_Operation];
 QSPMathOpName qspOpsNames[QSP_OPSLEVELS][QSP_MAXOPSNAMES];
