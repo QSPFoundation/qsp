@@ -48,7 +48,8 @@ INLINE QSPString qspGetQString(QSPString *expr);
 INLINE int qspSkipValue(QSPMathExpression *expression, int valueIndex);
 INLINE QSPVariant qspArgumentValue(QSPMathExpression *expression, int valueIndex, QSP_TINYINT type);
 INLINE QSP_BOOL qspCompileExprPushOpCode(QSP_TINYINT *opStack, QSP_TINYINT *argStack, int *opSp, QSP_TINYINT opCode);
-INLINE QSP_BOOL qspAppendToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSP_TINYINT argsCount, QSPVariant v);
+INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINYINT opCode, QSPVariant v);
+INLINE QSP_BOOL qspAppendToCompiled(QSPMathExpression* expression, QSP_TINYINT opCode, QSP_TINYINT argsCount);
 INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionStrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
@@ -185,10 +186,10 @@ void qspInitMath()
     qspAddOperation(qspOpStart, 127, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpEnd, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpTuple, 127, 0, QSP_TYPE_TUPLE, 0, QSP_OPMAXARGS, QSP_TYPE_UNDEF, -1);
-    qspAddOperation(qspOpOpenBracket, 127, 0, QSP_TYPE_UNDEF, 0, 0);
-    qspAddOperation(qspOpCloseBracket, 0, 0, QSP_TYPE_UNDEF, 0, 0);
-    qspAddOperation(qspOpOpenArrBracket, 127, 0, QSP_TYPE_UNDEF, 0, 0);
-    qspAddOperation(qspOpCloseArrBracket, 0, 0, QSP_TYPE_UNDEF, 0, 0);
+    qspAddOperation(qspOpOpenRoundBracket, 127, 0, QSP_TYPE_UNDEF, 0, 0);
+    qspAddOperation(qspOpCloseRoundBracket, 0, 0, QSP_TYPE_UNDEF, 0, 0);
+    qspAddOperation(qspOpOpenSquareBracket, 127, 0, QSP_TYPE_UNDEF, 0, 0);
+    qspAddOperation(qspOpCloseSquareBracket, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpNegation, 18, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_NUM);
     qspAddOperation(qspOpAdd, 14, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpSub, 14, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
@@ -249,8 +250,8 @@ void qspInitMath()
     qspAddOperation(qspOpCurActs, 30, 0, QSP_TYPE_CODE, 0, 0);
     qspAddOperation(qspOpCurObjs, 30, 0, QSP_TYPE_CODE, 0, 0);
     /* Names */
-    qspAddOpName(qspOpCloseBracket, QSP_RRBRACK, 1, QSP_FALSE);
-    qspAddOpName(qspOpCloseArrBracket, QSP_RSBRACK, 1, QSP_FALSE);
+    qspAddOpName(qspOpCloseRoundBracket, QSP_RRBRACK, 1, QSP_FALSE);
+    qspAddOpName(qspOpCloseSquareBracket, QSP_RSBRACK, 1, QSP_FALSE);
     qspAddOpName(qspOpAdd, QSP_ADD, 1, QSP_FALSE);
     qspAddOpName(qspOpSub, QSP_SUB, 1, QSP_FALSE);
     qspAddOpName(qspOpMul, QSP_MUL, 1, QSP_FALSE);
@@ -468,8 +469,23 @@ INLINE QSP_BOOL qspCompileExprPushOpCode(QSP_TINYINT *opStack, QSP_TINYINT *argS
     return QSP_TRUE;
 }
 
+INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINYINT opCode, QSPVariant v)
+{
+    int opIndex = expression->ItemsCount;
+    if (opIndex == QSP_MAXITEMS)
+    {
+        qspSetError(QSP_ERR_TOOMANYITEMS);
+        return QSP_FALSE;
+    }
+    expression->CompOpCodes[opIndex] = opCode;
+    expression->CompArgsCounts[opIndex] = 0;
+    expression->CompValues[opIndex] = v;
+    ++expression->ItemsCount;
+    return QSP_TRUE;
+}
+
 /* N.B. We can safely add operations with the highest priority directly to the output w/o intermediate stack */
-INLINE QSP_BOOL qspAppendToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSP_TINYINT argsCount, QSPVariant v)
+INLINE QSP_BOOL qspAppendToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSP_TINYINT argsCount)
 {
     int opIndex = expression->ItemsCount;
     if (opIndex == QSP_MAXITEMS)
@@ -479,13 +495,6 @@ INLINE QSP_BOOL qspAppendToCompiled(QSPMathExpression *expression, QSP_TINYINT o
     }
     expression->CompOpCodes[opIndex] = opCode;
     expression->CompArgsCounts[opIndex] = argsCount;
-    switch (opCode)
-    {
-        case qspOpValue:
-        case qspOpValueToFormat:
-            expression->CompValues[opIndex] = v;
-            break;
-    }
     ++expression->ItemsCount;
     return QSP_TRUE;
 }
@@ -523,15 +532,15 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
             }
             while (qspOps[opCode].Priority <= qspOps[opStack[opSp]].Priority && qspOps[opStack[opSp]].Priority != 127)
             {
-                if (!qspAppendToCompiled(expression, opStack[opSp], argStack[opSp], v)) break;
+                if (!qspAppendToCompiled(expression, opStack[opSp], argStack[opSp])) break;
                 --opSp; /* it's always positive */
             }
             if (qspErrorNum) break;
             switch (opCode)
             {
             case qspOpEnd:
-            case qspOpCloseBracket:
-            case qspOpCloseArrBracket:
+            case qspOpCloseRoundBracket:
+            case qspOpCloseSquareBracket:
                 if (opStack[opSp] == qspOpTuple)
                 {
                     if (++argStack[opSp] > qspOps[qspOpTuple].MaxArgsCount)
@@ -539,7 +548,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                         qspSetError(QSP_ERR_ARGSCOUNT);
                         break;
                     }
-                    if (!qspAppendToCompiled(expression, qspOpTuple, argStack[opSp], v)) break;
+                    if (!qspAppendToCompiled(expression, qspOpTuple, argStack[opSp])) break;
                     --opSp; /* it's always positive */
                 }
                 break;
@@ -554,8 +563,8 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     break;
                 }
                 return QSP_TRUE;
-            case qspOpCloseBracket:
-                if (opStack[opSp] != qspOpOpenBracket)
+            case qspOpCloseRoundBracket:
+                if (opStack[opSp] != qspOpOpenRoundBracket)
                 {
                     qspSetError(QSP_ERR_BRACKNOTFOUND);
                     break;
@@ -568,22 +577,20 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                         qspSetError(QSP_ERR_ARGSCOUNT);
                 }
                 break;
-            case qspOpCloseArrBracket:
-                if (opStack[opSp] != qspOpOpenArrBracket)
+            case qspOpCloseSquareBracket:
+                if (opStack[opSp] != qspOpOpenSquareBracket)
                 {
                     qspSetError(QSP_ERR_BRACKNOTFOUND);
                     break;
                 }
-                opCode = opStack[--opSp];
-                if (opCode != qspOpArrItem)
+                --opSp; /* it's always positive */
+                if (opStack[opSp] == qspOpArrItem)
                 {
-                    qspSetError(QSP_ERR_SYNTAX);
-                    break;
+                    ++argStack[opSp]; /* we don't need to check for max arguments */
                 }
-                ++argStack[opSp]; /* we don't need to check for max arguments */
                 break;
             case qspOpComma:
-                if (opStack[opSp] == qspOpOpenBracket && opStack[opSp - 1] >= qspOpFirst_Function)
+                if (opStack[opSp] == qspOpOpenRoundBracket && opStack[opSp - 1] >= qspOpFirst_Function)
                 {
                     if (++argStack[opSp - 1] > qspOps[opStack[opSp - 1]].MaxArgsCount)
                     {
@@ -631,7 +638,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     QSP_NUM(v) = -QSP_NUM(v);
                     --opSp;
                 }
-                if (!qspAppendToCompiled(expression, qspOpValue, 0, v)) break;
+                if (!qspAppendValueToCompiled(expression, qspOpValue, v)) break;
                 waitForOperator = QSP_TRUE;
             }
             else if (qspIsInClass(*s.Str, QSP_CHAR_QUOT))
@@ -641,7 +648,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                 v.Type = QSP_TYPE_STR;
                 QSP_STR(v) = name;
                 opCode = qspIsEmpty(name) ? qspOpValue : qspOpValueToFormat;
-                if (!qspAppendToCompiled(expression, opCode, 0, v))
+                if (!qspAppendValueToCompiled(expression, opCode, v))
                 {
                     qspFreeString(&QSP_STR(v));
                     break;
@@ -654,7 +661,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                 if (qspErrorNum) break;
                 v.Type = QSP_TYPE_CODE;
                 QSP_STR(v) = name;
-                if (!qspAppendToCompiled(expression, qspOpValue, 0, v))
+                if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                 {
                     qspFreeString(&QSP_STR(v));
                     break;
@@ -666,15 +673,15 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                 if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpNegation)) break;
                 s.Str += QSP_STATIC_LEN(QSP_NEGATION);
             }
-            else if (*s.Str == QSP_LRBRACK[0])
+            else if (*s.Str == QSP_LRBRACK[0]) /* a subexpression OR a tuple */
             {
-                if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpOpenBracket)) break;
+                if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
                 s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
             }
-            else if (*s.Str == QSP_RRBRACK[0])
+            else if (*s.Str == QSP_RRBRACK[0]) /* happens when "(" gets closed with ")" without any values */
             {
                 opCode = opStack[opSp];
-                if (opCode != qspOpOpenBracket)
+                if (opCode != qspOpOpenRoundBracket)
                 {
                     if (opCode >= qspOpFirst_Function)
                         qspSetError(QSP_ERR_ARGSCOUNT);
@@ -683,17 +690,43 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     break;
                 }
                 opCode = opStack[--opSp];
-                if (opCode < qspOpFirst_Function)
+                if (opCode >= qspOpFirst_Function)
+                {
+                    if (argStack[opSp] < qspOps[opCode].MinArgsCount)
+                    {
+                        qspSetError(QSP_ERR_ARGSCOUNT);
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!qspAppendToCompiled(expression, qspOpTuple, 0)) break;
+                }
+                s.Str += QSP_STATIC_LEN(QSP_RRBRACK);
+                waitForOperator = QSP_TRUE;
+            }
+            else if (*s.Str == QSP_LSBRACK[0]) /* a tuple */
+            {
+                if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpOpenSquareBracket)) break;
+                if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpTuple)) break;
+                s.Str += QSP_STATIC_LEN(QSP_LSBRACK);
+            }
+            else if (*s.Str == QSP_RSBRACK[0]) /* happens when "[" gets closed with "]" without any values */
+            {
+                if (opStack[opSp] != qspOpTuple)
                 {
                     qspSetError(QSP_ERR_SYNTAX);
                     break;
                 }
-                if (argStack[opSp] < qspOps[opCode].MinArgsCount)
+                if (!qspAppendToCompiled(expression, qspOpTuple, 0)) break;
+                --opSp; /* it's always positive */
+                if (opStack[opSp] != qspOpOpenSquareBracket)
                 {
-                    qspSetError(QSP_ERR_ARGSCOUNT);
+                    qspSetError(QSP_ERR_BRACKNOTFOUND);
                     break;
                 }
-                s.Str += QSP_STATIC_LEN(QSP_RRBRACK);
+                --opSp; /* it's always positive */
+                s.Str += QSP_STATIC_LEN(QSP_RSBRACK);
                 waitForOperator = QSP_TRUE;
             }
             else if (!qspIsInClass(*s.Str, QSP_CHAR_DELIM))
@@ -708,7 +741,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     /* Add the loc name */
                     v.Type = QSP_TYPE_STR;
                     QSP_STR(v) = qspCopyToNewText(name);
-                    if (!qspAppendToCompiled(expression, qspOpValue, 0, v))
+                    if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                     {
                         qspFreeString(&QSP_STR(v));
                         break;
@@ -718,7 +751,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     ++argStack[opSp]; /* added the function name already */
                     if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK[0])
                     {
-                        if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpOpenBracket)) break;
+                        if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
                         s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
                     }
                     else
@@ -734,7 +767,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                         if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK[0])
                         {
                             if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, opCode)) break;
-                            if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpOpenBracket)) break;
+                            if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
                             s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
                         }
                         else if (qspOps[opCode].MinArgsCount < 2)
@@ -761,7 +794,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     {
                         v.Type = QSP_TYPE_VARREF;
                         QSP_STR(v) = qspCopyToNewText(name);
-                        if (!qspAppendToCompiled(expression, qspOpValue, 0, v))
+                        if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                         {
                             qspFreeString(&QSP_STR(v));
                             break;
@@ -781,7 +814,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                             {
                                 if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpArrItem)) break;
                                 ++argStack[opSp]; /* added the var name already */
-                                if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpOpenArrBracket)) break;
+                                if (!qspCompileExprPushOpCode(opStack, argStack, &opSp, qspOpOpenSquareBracket)) break;
                             }
                         }
                         else

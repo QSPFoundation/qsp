@@ -65,10 +65,10 @@
         qspOpStart, /* sequence point */
         qspOpEnd, /* sequence point */
         qspOpComma, /* sequence point */
-        qspOpOpenArrBracket, /* sequence point */
-        qspOpCloseArrBracket, /* sequence point */
-        qspOpOpenBracket, /* sequence point */
-        qspOpCloseBracket, /* sequence point */
+        qspOpOpenSquareBracket, /* sequence point */
+        qspOpCloseSquareBracket, /* sequence point */
+        qspOpOpenRoundBracket, /* sequence point */
+        qspOpCloseRoundBracket, /* sequence point */
         qspOpTuple,
         qspOpValue,
         qspOpValueToFormat,
