@@ -1070,10 +1070,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         qspMoveToNewVariant(&tos, args);
         break;
     case qspOpVal:
-        if (qspConvertVariantTo(args, QSP_TYPE_NUM))
-            QSP_NUM(tos) = QSP_NUM(args[0]);
-        else
-            QSP_NUM(tos) = 0;
+        QSP_NUM(tos) = qspGetVariantAsNum(args, 0);
         break;
     case qspOpArrSize:
         QSP_NUM(tos) = qspArraySize(QSP_STR(args[0]));

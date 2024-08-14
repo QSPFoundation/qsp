@@ -78,18 +78,13 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *ju
         case QSP_TYPE_TUPLE:
             tuple = QSP_PTUPLE(curItem);
             if (tuple.Items < 2) break;
-            tuple = qspCopyToNewTuple(tuple.Vals, tuple.Items);
             if (tuple.Items >= 3)
             {
-                qspConvertVariantTo(&tuple.Vals[2], QSP_TYPE_STR);
-                itemImage = QSP_STR(tuple.Vals[2]);
-                itemImage = (qspIsAnyString(itemImage) ? qspCopyToNewText(itemImage) : qspNullString);
+                itemImage = qspGetVariantAsString(&tuple.Vals[2]);
+                if (!qspIsAnyString(itemImage)) qspClearText(&itemImage);
             }
-            qspConvertVariantTo(&tuple.Vals[0], QSP_TYPE_STR);
-            qspConvertVariantTo(&tuple.Vals[1], QSP_TYPE_STR);
-            itemName = qspCopyToNewText(QSP_STR(tuple.Vals[0]));
-            itemLocation = qspCopyToNewText(QSP_STR(tuple.Vals[1]));
-            qspFreeTuple(&tuple);
+            itemName = qspGetVariantAsString(&tuple.Vals[0]);
+            itemLocation = qspGetVariantAsString(&tuple.Vals[1]);
             break;
         case QSP_TYPE_STR:
             str = QSP_PSTR(curItem);
