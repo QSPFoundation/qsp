@@ -240,6 +240,18 @@ QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *res)
     *res = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     return QSP_FALSE;
 }
+/* Get display string of the specified value */
+QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize)
+{
+    int resLen;
+    QSPString res = qspGetVariantAsString(&value);
+    resLen = qspStrLen(res);
+    if (resLen >= bufSize) resLen = bufSize - 1;
+    memcpy(buf, res.Str, resLen * sizeof(QSP_CHAR));
+    buf[resLen] = 0;
+    qspFreeString(&res);
+    return QSP_TRUE;
+}
 /* Get max number of variables */
 int QSPGetMaxVarsCount()
 {

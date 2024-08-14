@@ -23,6 +23,8 @@
     #define QSP_VARIANTDEFINES
 
     /* External functions */
+    QSPString qspGetVariantAsString(QSPVariant *val);
+    int qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid);
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
     int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2);
     void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);

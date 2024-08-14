@@ -111,49 +111,43 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
     return QSP_TRUE;
 }
 
+QSPString qspGetVariantAsString(QSPVariant *val)
+{
+    switch (QSP_BASETYPE(val->Type))
+    {
+        case QSP_TYPE_TUPLE:
+            return qspTupleToDisplayString(QSP_PTUPLE(val));
+        case QSP_TYPE_NUM:
+        {
+            QSP_CHAR buf[QSP_NUMTOSTRBUF];
+            return qspCopyToNewText(qspNumToStr(buf, QSP_PNUM(val)));
+        }
+        case QSP_TYPE_STR:
+            return qspCopyToNewText(QSP_PSTR(val));
+    }
+}
+
+int qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
+{
+    switch (QSP_BASETYPE(val->Type))
+    {
+    case QSP_TYPE_TUPLE:
+        return qspTupleToNum(QSP_PTUPLE(val), isValid);
+    case QSP_TYPE_NUM:
+        if (isValid) *isValid = QSP_TRUE;
+        return QSP_PNUM(val);
+    case QSP_TYPE_STR:
+        return qspStrToNum(QSP_PSTR(val), isValid);
+    }
+}
+
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
 {
     if (val->Type != type && qspTypeConversionTable[val->Type][type])
     {
-        QSP_TINYINT fromBaseType = QSP_BASETYPE(val->Type), toBaseType = QSP_BASETYPE(type);
-        switch (fromBaseType)
+        QSP_TINYINT toBaseType = QSP_BASETYPE(type);
+        if (QSP_BASETYPE(val->Type) != toBaseType)
         {
-        case QSP_TYPE_TUPLE:
-            switch (toBaseType)
-            {
-                case QSP_TYPE_NUM:
-                {
-                    QSP_BOOL isValid;
-                    int num = qspTupleToNum(QSP_PTUPLE(val), &isValid);
-                    if (!isValid) return QSP_FALSE;
-                    qspFreeTuple(&QSP_PTUPLE(val));
-                    QSP_PNUM(val) = num;
-                    break;
-                }
-                case QSP_TYPE_STR:
-                {
-                    QSPString str = qspTupleToDisplayString(QSP_PTUPLE(val));
-                    qspFreeTuple(&QSP_PTUPLE(val));
-                    QSP_PSTR(val) = str;
-                    break;
-                }
-            }
-            break;
-        case QSP_TYPE_NUM:
-            switch (toBaseType)
-            {
-                case QSP_TYPE_TUPLE:
-                    QSP_PTUPLE(val) = qspMoveToNewTuple(val, 1);
-                    break;
-                case QSP_TYPE_STR:
-                {
-                    QSP_CHAR buf[QSP_NUMTOSTRBUF];
-                    QSP_PSTR(val) = qspCopyToNewText(qspNumToStr(buf, QSP_PNUM(val)));
-                    break;
-                }
-            }
-            break;
-        case QSP_TYPE_STR:
             switch (toBaseType)
             {
                 case QSP_TYPE_TUPLE:
@@ -162,14 +156,20 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                 case QSP_TYPE_NUM:
                 {
                     QSP_BOOL isValid;
-                    int num = qspStrToNum(QSP_PSTR(val), &isValid);
+                    int result = qspGetVariantAsNum(val, &isValid);
                     if (!isValid) return QSP_FALSE;
-                    qspFreeString(&QSP_PSTR(val));
-                    QSP_PNUM(val) = num;
+                    qspFreeVariant(val);
+                    QSP_PNUM(val) = result;
+                    break;
+                }
+                case QSP_TYPE_STR:
+                {
+                    QSPString result = qspGetVariantAsString(val);
+                    qspFreeVariant(val);
+                    QSP_PSTR(val) = result;
                     break;
                 }
             }
-            break;
         }
         val->Type = type;
         qspFormatVariant(val);
