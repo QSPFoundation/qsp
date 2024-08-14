@@ -18,11 +18,10 @@
 #include "menu.h"
 #include "callbacks.h"
 #include "errors.h"
-#include "game.h"
 #include "locations.h"
 #include "text.h"
-#include "tuples.h"
 #include "variables.h"
+#include "variant.h"
 
 INLINE qspFreeMenuItems(QSPListItem *items, int count);
 INLINE qspFreeMenuLocs(QSPString *locs, int count);
