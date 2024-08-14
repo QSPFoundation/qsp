@@ -43,7 +43,7 @@
     {
         QSPString Str;
         int LineNum;
-        QSP_BOOL IsMultiline;
+        int LinesToEnd; /* lines to skip to reach the end of multiline block */
         QSPString Label;
         QSPCachedStat *Stats;
         int StatsCount;

@@ -37,13 +37,13 @@ int qspStatMaxLen = 0;
 
 INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...);
 INLINE void qspAddStatName(QSP_TINYINT statCode, QSPString statName, int level);
-INLINE int qspStatsCompare(const void *, const void *);
-INLINE int qspSearchElse(QSPLineOfCode *, int, int);
-INLINE int qspSearchEnd(QSPLineOfCode *, int, int);
+INLINE int qspStatsCompare(const void *statName1, const void *statName2);
+INLINE int qspSearchElse(QSPLineOfCode *lines, int start, int end);
+INLINE int qspSearchEnd(QSPLineOfCode *lines, int start, int end);
 INLINE int qspSearchLabel(QSPLineOfCode *s, int start, int end, QSPString str);
 INLINE QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
-INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
-INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
+INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *lines, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
+INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
 INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *s, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo);
@@ -248,18 +248,18 @@ void qspInitStats()
         qsort(qspStatsNames[i], qspStatsNamesCounts[i], sizeof(QSPStatName), qspStatsCompare);
 }
 
-INLINE int qspSearchElse(QSPLineOfCode *s, int start, int end)
+INLINE int qspSearchElse(QSPLineOfCode *lines, int start, int end)
 {
     int c = 1;
-    s += start;
+    lines += start;
     while (start < end)
     {
-        switch (s->Stats->Stat)
+        switch (lines->Stats->Stat)
         {
         case qspStatAct:
         case qspStatLoop:
         case qspStatIf:
-            if (s->IsMultiline) ++c;
+            if (lines->LinesToEnd) ++c;
             break;
         case qspStatElse:
         case qspStatElseIf:
@@ -270,30 +270,44 @@ INLINE int qspSearchElse(QSPLineOfCode *s, int start, int end)
             break;
         }
         ++start;
-        ++s;
+        ++lines;
     }
     return -1;
 }
 
-INLINE int qspSearchEnd(QSPLineOfCode *s, int start, int end)
+INLINE int qspSearchEnd(QSPLineOfCode *lines, int start, int end)
 {
     int c = 1;
-    s += start;
+    QSPLineOfCode *startLine = lines + start;
+    /* Skip some lines before we start searching for the right one */
+    start += startLine->LinesToEnd;
+    lines += start;
     while (start < end)
     {
-        switch (s->Stats->Stat)
+        switch (lines->Stats->Stat)
         {
         case qspStatAct:
         case qspStatLoop:
         case qspStatIf:
-            if (s->IsMultiline) ++c;
+            if (lines->LinesToEnd)
+            {
+                ++c;
+                start += lines->LinesToEnd;
+                lines += lines->LinesToEnd;
+                continue;
+            }
             break;
         case qspStatEnd:
-            if (!(--c)) return start;
+            if (!(--c))
+            {
+                /* Update the number of lines to skip next time */
+                startLine->LinesToEnd = lines - startLine;
+                return start;
+            }
             break;
         }
         ++start;
-        ++s;
+        ++lines;
     }
     return -1;
 }
@@ -389,21 +403,19 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *s, int startStat, int endStat, QSPS
     return QSP_FALSE;
 }
 
-INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffset,
+INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *lines, int endLine, int codeOffset,
     QSPString *jumpTo, int *lineInd, int *action)
 {
     QSPLineOfCode *line;
-    QSP_TINYINT statCode;
     int ind = *lineInd;
-    endLine = qspSearchEnd(s, ind + 1, endLine);
+    endLine = qspSearchEnd(lines, ind, endLine);
     if (endLine < 0)
     {
         qspSetError(QSP_ERR_ENDNOTFOUND);
         return QSP_FALSE;
     }
-    line = s + ind;
-    statCode = line->Stats->Stat;
-    switch (statCode)
+    line = lines + ind;
+    switch (line->Stats->Stat)
     {
     case qspStatIf:
     case qspStatElseIf:
@@ -411,14 +423,14 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
             int elsePos, oldRefreshCount = qspRefreshCount;
             QSP_BOOL condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, line->Str.Str + line->Stats->EndPos));
             if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-            elsePos = qspSearchElse(s, ind + 1, endLine);
+            elsePos = qspSearchElse(lines, ind + 1, endLine);
             if (condition)
             {
                 *lineInd = endLine;
                 *action = qspFlowJumpToSpecified;
                 if (elsePos >= 0)
-                    return qspExecCodeBlockWithLocals(s, ind + 1, elsePos, codeOffset, jumpTo);
-                return qspExecCodeBlockWithLocals(s, ind + 1, endLine, codeOffset, jumpTo);
+                    return qspExecCodeBlockWithLocals(lines, ind + 1, elsePos, codeOffset, jumpTo);
+                return qspExecCodeBlockWithLocals(lines, ind + 1, endLine, codeOffset, jumpTo);
             }
             else
             {
@@ -430,21 +442,21 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *s, int endLine, int codeOffs
     case qspStatAct:
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
-        qspStatementMultilineAddAct(s, ind, endLine);
+        qspStatementMultilineAddAct(lines, ind, endLine);
         break;
     case qspStatLoop:
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
-        return qspStatementMultilineLoop(s, ind, endLine, codeOffset, jumpTo);
+        return qspStatementMultilineLoop(lines, ind, endLine, codeOffset, jumpTo);
     }
     return QSP_FALSE;
 }
 
-INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOffset,
+INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine, int codeOffset,
     QSPString *jumpTo, int *lineInd, int *action)
 {
     int elsePos, ind = *lineInd;
-    QSPLineOfCode *line = s + ind;
+    QSPLineOfCode *line = lines + ind;
     switch (line->Stats->Stat)
     {
     case qspStatElseIf:
@@ -457,7 +469,7 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
                 qspSetError(QSP_ERR_COLONNOTFOUND);
                 break;
             }
-            endLine = qspSearchEnd(s, ind + 1, endLine);
+            endLine = qspSearchEnd(lines, ind, endLine);
             if (endLine < 0)
             {
                 qspSetError(QSP_ERR_ENDNOTFOUND);
@@ -474,14 +486,14 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
             }
             else
             {
-                elsePos = qspSearchElse(s, ind + 1, endLine);
+                elsePos = qspSearchElse(lines, ind + 1, endLine);
                 *lineInd = (elsePos >= 0 ? elsePos : endLine);
                 *action = qspFlowJumpToSpecified;
             }
             break;
         }
     case qspStatElse:
-        endLine = qspSearchEnd(s, ind + 1, endLine);
+        endLine = qspSearchEnd(lines, ind, endLine);
         if (endLine < 0)
         {
             qspSetError(QSP_ERR_ENDNOTFOUND);
@@ -493,10 +505,10 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *s, int endLine, int codeOff
             return qspExecStringWithLocals(line, 1, line->StatsCount, jumpTo);
         else
         {
-            elsePos = qspSearchElse(s, ind + 1, endLine);
+            elsePos = qspSearchElse(lines, ind + 1, endLine);
             if (elsePos >= 0)
-                return qspExecCodeBlockWithLocals(s, ind + 1, elsePos, codeOffset, jumpTo);
-            return qspExecCodeBlockWithLocals(s, ind + 1, endLine, codeOffset, jumpTo);
+                return qspExecCodeBlockWithLocals(lines, ind + 1, elsePos, codeOffset, jumpTo);
+            return qspExecCodeBlockWithLocals(lines, ind + 1, endLine, codeOffset, jumpTo);
         }
         break;
     }
@@ -529,7 +541,7 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
                 if (qspRefreshCount != oldRefreshCount) break;
             }
         }
-        if (line->IsMultiline)
+        if (line->LinesToEnd)
             toExit = qspExecMultilineCode(s, endLine, codeOffset, jumpTo, &i, &action);
         else
             toExit = qspExecSinglelineCode(s, endLine, codeOffset, jumpTo, &i, &action);

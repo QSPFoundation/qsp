@@ -396,10 +396,13 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
         case qspStatLoop:
         case qspStatIf:
         case qspStatElseIf:
-            line->IsMultiline = (line->StatsCount == 1 && *(line->Str.End - 1) == QSP_COLONDELIM[0]);
+            if (line->StatsCount == 1 && *(line->Str.End - 1) == QSP_COLONDELIM[0])
+                line->LinesToEnd = 1; /* we don't have all the lines ready to find the right line yet */
+            else
+                line->LinesToEnd = 0;
             break;
         default:
-            line->IsMultiline = QSP_FALSE;
+            line->LinesToEnd = 0;
             break;
     }
     line->Label = qspGetLineLabel(line->Str);
@@ -472,7 +475,7 @@ void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int e
             }
             else
                 line->Stats = 0;
-            line->IsMultiline = src[start].IsMultiline;
+            line->LinesToEnd = src[start].LinesToEnd;
             line->Label = qspCopyToNewText(src[start].Label);
             ++line;
             ++start;
