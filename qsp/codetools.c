@@ -403,9 +403,10 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
         case qspStatElseIf:
         case qspStatElse:
             if (line->StatsCount == 1)
-                line->LinesToElse = line->LinesToEnd = 1; /* we don't have all the lines ready to find the right ones yet */
+                line->LinesToEnd = 1; /* we don't have all the lines ready to find the right ones yet */
             else
-                line->LinesToElse = line->LinesToEnd = 0;
+                line->LinesToEnd = 0;
+            line->LinesToElse = 1; /* always search next ELSE starting next line */
             break;
         default:
             line->LinesToElse = line->LinesToEnd = 0;
