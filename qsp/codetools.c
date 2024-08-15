@@ -397,12 +397,12 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
         case qspStatIf:
         case qspStatElseIf:
             if (line->StatsCount == 1 && *(line->Str.End - 1) == QSP_COLONDELIM[0])
-                line->LinesToEnd = 1; /* we don't have all the lines ready to find the right line yet */
+                line->LinesToElse = line->LinesToEnd = 1; /* we don't have all the lines ready to find the right ones yet */
             else
-                line->LinesToEnd = 0;
+                line->LinesToElse = line->LinesToEnd = 0;
             break;
         default:
-            line->LinesToEnd = 0;
+            line->LinesToElse = line->LinesToEnd = 0;
             break;
     }
     line->Label = qspGetLineLabel(line->Str);
@@ -476,6 +476,7 @@ void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int e
             else
                 line->Stats = 0;
             line->LinesToEnd = src[start].LinesToEnd;
+            line->LinesToElse = src[start].LinesToElse;
             line->Label = qspCopyToNewText(src[start].Label);
             ++line;
             ++start;
@@ -594,11 +595,14 @@ INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
                 bufSize = count + 16;
                 ret = (QSPLineOfCode *)realloc(ret, bufSize * sizeof(QSPLineOfCode));
             }
+            /* Initialize the line data, the line gets updated a bit later */
             line = ret + count++;
             line->Str = qspCopyToNewText(qspDelSpc(qspStringFromLen(str, strLen)));
             line->LineNum = lastLineNum;
             line->Label = qspNullString;
+            line->LinesToElse = line->LinesToEnd = 0;
             line->Stats = 0;
+            line->StatsCount = 0;
             lastLineNum = lineNum;
             strLen = 0;
             pos += QSP_STATIC_LEN(QSP_STRSDELIM);
@@ -607,11 +611,14 @@ INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
     }
     if (count >= bufSize)
         ret = (QSPLineOfCode *)realloc(ret, (count + 1) * sizeof(QSPLineOfCode));
+    /* Initialize the line data, the line gets updated a bit later */
     line = ret + count++;
     line->Str = qspCopyToNewText(qspDelSpc(qspStringFromLen(str, strLen)));
     line->LineNum = lastLineNum;
     line->Label = qspNullString;
+    line->LinesToElse = line->LinesToEnd = 0;
     line->Stats = 0;
+    line->StatsCount = 0;
     free(str);
     *strs = ret;
     return count;

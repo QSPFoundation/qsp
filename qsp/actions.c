@@ -189,7 +189,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
     code.Str = qspStringFromPair(firstPos, lastPos);
     code.Label = qspGetLineLabel(code.Str);
     code.LineNum = s->LineNum;
-    code.LinesToEnd = 0;
+    code.LinesToElse = code.LinesToEnd = 0;
     code.StatsCount = endPos - statPos;
     code.Stats = (QSPCachedStat *)malloc(code.StatsCount * sizeof(QSPCachedStat));
     offset = (int)(firstPos - s->Str.Str);

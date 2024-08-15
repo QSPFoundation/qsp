@@ -43,8 +43,9 @@
     {
         QSPString Str;
         int LineNum;
-        int LinesToEnd; /* lines to skip to reach the end of multiline block */
         QSPString Label;
+        int LinesToEnd; /* lines to skip to reach the end of multiline block */
+        int LinesToElse; /* lines to skip to reach the next ELSE branch within multiline block */
         QSPCachedStat *Stats;
         int StatsCount;
     } QSPLineOfCode;
