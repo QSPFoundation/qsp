@@ -402,8 +402,10 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
             break;
         case qspStatElseIf:
         case qspStatElse:
-            /* ELSE & ELSEIF at the beginning of the line are always multiline statements */
-            line->LinesToElse = line->LinesToEnd = 1; /* we don't have all the lines ready to find the right ones yet */
+            if (line->StatsCount == 1)
+                line->LinesToElse = line->LinesToEnd = 1; /* we don't have all the lines ready to find the right ones yet */
+            else
+                line->LinesToElse = line->LinesToEnd = 0;
             break;
         default:
             line->LinesToElse = line->LinesToEnd = 0;
@@ -418,8 +420,9 @@ void qspFreeLineOfCode(QSPLineOfCode *line)
     if (line->Stats)
     {
         int i;
-        for (i = 0; i < line->StatsCount; ++i)
-            if (line->Stats[i].Args) free(line->Stats[i].Args);
+        QSPCachedStat *stat = line->Stats;
+        for (i = 0; i < line->StatsCount; ++i, ++stat)
+            if (stat->Args) free(stat->Args);
         free(line->Stats);
     }
 }
@@ -439,49 +442,58 @@ void qspFreePrepLines(QSPLineOfCode *strs, int count)
     }
 }
 
+void qspCopyPrepStatements(QSPCachedStat **dest, QSPCachedStat *src, int start, int end, int codeOffset)
+{
+    int statsCount = end - start;
+    if (src && statsCount)
+    {
+        QSP_TINYINT i, argsCount;
+        QSPCachedStat *stat;
+        *dest = (QSPCachedStat *)malloc(statsCount * sizeof(QSPCachedStat));
+        stat = *dest;
+        while (start < end)
+        {
+            stat->Stat = src[start].Stat;
+            stat->ParamPos = src[start].ParamPos - codeOffset;
+            stat->EndPos = src[start].EndPos - codeOffset;
+            stat->ErrorCode = src[start].ErrorCode;
+            argsCount = stat->ArgsCount = src[start].ArgsCount;
+            if (argsCount)
+            {
+                stat->Args = (QSPCachedArg *)malloc(argsCount * sizeof(QSPCachedArg));
+                for (i = 0; i < argsCount; ++i)
+                {
+                    stat->Args[i].StartPos = src[start].Args[i].StartPos - codeOffset;
+                    stat->Args[i].EndPos = src[start].Args[i].EndPos - codeOffset;
+                }
+            }
+            else
+                stat->Args = 0;
+            ++stat;
+            ++start;
+        }
+    }
+    else
+        *dest = 0;
+}
+
 void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int end)
 {
     int linesCount = end - start;
     if (src && linesCount)
     {
-        int i, j, statsCount;
         QSPLineOfCode *line;
-        QSP_TINYINT argsCount;
         *dest = (QSPLineOfCode *)malloc(linesCount * sizeof(QSPLineOfCode));
         line = *dest;
         while (start < end)
         {
             line->Str = qspCopyToNewText(src[start].Str);
             line->LineNum = src[start].LineNum;
-            statsCount = line->StatsCount = src[start].StatsCount;
-            if (statsCount)
-            {
-                line->Stats = (QSPCachedStat *)malloc(statsCount * sizeof(QSPCachedStat));
-                for (i = 0; i < statsCount; ++i)
-                {
-                    line->Stats[i].Stat = src[start].Stats[i].Stat;
-                    line->Stats[i].ParamPos = src[start].Stats[i].ParamPos;
-                    line->Stats[i].EndPos = src[start].Stats[i].EndPos;
-                    line->Stats[i].ErrorCode = src[start].Stats[i].ErrorCode;
-                    argsCount = line->Stats[i].ArgsCount = src[start].Stats[i].ArgsCount;
-                    if (argsCount)
-                    {
-                        line->Stats[i].Args = (QSPCachedArg *)malloc(argsCount * sizeof(QSPCachedArg));
-                        for (j = 0; j < argsCount; ++j)
-                        {
-                            line->Stats[i].Args[j].StartPos = src[start].Stats[i].Args[j].StartPos;
-                            line->Stats[i].Args[j].EndPos = src[start].Stats[i].Args[j].EndPos;
-                        }
-                    }
-                    else
-                        line->Stats[i].Args = 0;
-                }
-            }
-            else
-                line->Stats = 0;
             line->LinesToEnd = src[start].LinesToEnd;
             line->LinesToElse = src[start].LinesToElse;
             line->Label = qspCopyToNewText(src[start].Label);
+            line->StatsCount = src[start].StatsCount;
+            qspCopyPrepStatements(&line->Stats, src[start].Stats, 0, src[start].StatsCount, 0);
             ++line;
             ++start;
         }

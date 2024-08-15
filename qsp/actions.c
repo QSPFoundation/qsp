@@ -166,7 +166,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
 {
     QSPVariant args[2];
     QSPLineOfCode code;
-    int i, j, oldRefreshCount, count, offset;
+    int oldRefreshCount, count;
     QSP_CHAR *lastPos, *firstPos = s->Str.Str + s->Stats[statPos].EndPos;
     if (firstPos == s->Str.End || *firstPos != QSP_COLONDELIM[0])
     {
@@ -191,23 +191,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
     code.LineNum = s->LineNum;
     code.LinesToElse = code.LinesToEnd = 0;
     code.StatsCount = endPos - statPos;
-    code.Stats = (QSPCachedStat *)malloc(code.StatsCount * sizeof(QSPCachedStat));
-    offset = (int)(firstPos - s->Str.Str);
-    for (i = 0; i < code.StatsCount; ++i)
-    {
-        code.Stats[i].Stat = s->Stats[statPos].Stat;
-        code.Stats[i].ParamPos = s->Stats[statPos].ParamPos - offset;
-        code.Stats[i].EndPos = s->Stats[statPos].EndPos - offset;
-        code.Stats[i].ErrorCode = s->Stats[statPos].ErrorCode;
-        code.Stats[i].ArgsCount = s->Stats[statPos].ArgsCount;
-        code.Stats[i].Args = (QSPCachedArg *)malloc(code.Stats[i].ArgsCount * sizeof(QSPCachedArg));
-        for (j = 0; j < code.Stats[i].ArgsCount; ++j)
-        {
-            code.Stats[i].Args[j].StartPos = s->Stats[statPos].Args[j].StartPos - offset;
-            code.Stats[i].Args[j].EndPos = s->Stats[statPos].Args[j].EndPos - offset;
-        }
-        ++statPos;
-    }
+    qspCopyPrepStatements(&code.Stats, s->Stats, statPos, endPos, (int)(firstPos - s->Str.Str));
     qspAddAction(args, count, &code, 0, 1);
     qspFreeVariants(args, count);
     qspFreeLineOfCode(&code);
