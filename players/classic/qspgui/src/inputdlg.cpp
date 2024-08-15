@@ -78,7 +78,7 @@ QSPInputDlg::QSPInputDlg(wxWindow* parent,
     inputStr->SetFocus();
 }
 
-void QSPInputDlg::OnInitDialog(wxInitDialogEvent& event)
+void QSPInputDlg::OnInitDialog(wxInitDialogEvent& WXUNUSED(event))
 {
     int deltaH = GetClientSize().GetHeight() - m_desc->GetSize().GetHeight();
     int deltaW = GetClientSize().GetWidth() - m_desc->GetSize().GetWidth();

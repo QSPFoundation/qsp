@@ -67,7 +67,7 @@ QSPMsgDlg::QSPMsgDlg(wxWindow* parent,
     btnOk->SetFocus();
 }
 
-void QSPMsgDlg::OnInitDialog(wxInitDialogEvent& event)
+void QSPMsgDlg::OnInitDialog(wxInitDialogEvent& WXUNUSED(event))
 {
     int deltaH = GetClientSize().GetHeight() - m_desc->GetSize().GetHeight();
     int deltaW = GetClientSize().GetWidth() - m_desc->GetSize().GetWidth();

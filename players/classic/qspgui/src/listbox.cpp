@@ -28,7 +28,7 @@ BEGIN_EVENT_TABLE(QSPListBox, wxHtmlListBox)
     EVT_MOUSEWHEEL(QSPListBox::OnMouseWheel)
 END_EVENT_TABLE()
 
-wxHtmlOpeningStatus QSPListBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
+wxHtmlOpeningStatus QSPListBox::OnHTMLOpeningURL(wxHtmlURLType WXUNUSED(type), const wxString& url, wxString *redirect) const
 {
     if (m_pathProvider)
     {

@@ -28,7 +28,7 @@ BEGIN_EVENT_TABLE(QSPTextBox, wxHtmlWindow)
     EVT_LEFT_DOWN(QSPTextBox::OnMouseClick)
 END_EVENT_TABLE()
 
-wxHtmlOpeningStatus QSPTextBox::OnHTMLOpeningURL(wxHtmlURLType type, const wxString& url, wxString *redirect) const
+wxHtmlOpeningStatus QSPTextBox::OnHTMLOpeningURL(wxHtmlURLType WXUNUSED(type), const wxString& url, wxString *redirect) const
 {
     if (m_pathProvider)
     {

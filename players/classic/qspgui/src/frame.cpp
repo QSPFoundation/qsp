@@ -766,7 +766,7 @@ void QSPFrame::OnInit(wxInitEvent& event)
     OpenGameFile(event.GetInitString());
 }
 
-void QSPFrame::OnClose(wxCloseEvent& event)
+void QSPFrame::OnClose(wxCloseEvent& WXUNUSED(event))
 {
     SaveSettings();
     EnableControls(false, true);
@@ -774,7 +774,7 @@ void QSPFrame::OnClose(wxCloseEvent& event)
     m_toQuit = true;
 }
 
-void QSPFrame::OnTimer(wxTimerEvent& event)
+void QSPFrame::OnTimer(wxTimerEvent& WXUNUSED(event))
 {
     if (m_toProcessEvents && !QSPExecCounter(QSP_TRUE))
         ShowError();
@@ -785,12 +785,12 @@ void QSPFrame::OnMenu(wxCommandEvent& event)
     m_menuIndex = event.GetId() - ID_BEGOFDYNMENU;
 }
 
-void QSPFrame::OnQuit(wxCommandEvent& event)
+void QSPFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
     Close();
 }
 
-void QSPFrame::OnOpenGame(wxCommandEvent& event)
+void QSPFrame::OnOpenGame(wxCommandEvent& WXUNUSED(event))
 {
     wxFileDialog dialog(this, _("Select game file"),
                         wxEmptyString, wxEmptyString,
@@ -800,13 +800,13 @@ void QSPFrame::OnOpenGame(wxCommandEvent& event)
         OpenGameFile(dialog.GetPath());
 }
 
-void QSPFrame::OnNewGame(wxCommandEvent& event)
+void QSPFrame::OnNewGame(wxCommandEvent& WXUNUSED(event))
 {
     if (!QSPRestartGame(QSP_TRUE))
         ShowError();
 }
 
-void QSPFrame::OnOpenGameStat(wxCommandEvent& event)
+void QSPFrame::OnOpenGameStat(wxCommandEvent& WXUNUSED(event))
 {
     wxFileDialog dialog(this, _("Select saved game file"),
                         wxEmptyString, wxEmptyString,
@@ -816,7 +816,7 @@ void QSPFrame::OnOpenGameStat(wxCommandEvent& event)
         OpenGameState(dialog.GetPath());
 }
 
-void QSPFrame::OnSaveGameStat(wxCommandEvent& event)
+void QSPFrame::OnSaveGameStat(wxCommandEvent& WXUNUSED(event))
 {
     wxFileDialog dialog(this, _("Select file to save"),
                         wxEmptyString, wxT("game.sav"),
@@ -834,7 +834,7 @@ void QSPFrame::OnQuickSave(wxCommandEvent& event)
         SaveGameState(m_savedGamePath);
 }
 
-void QSPFrame::OnSelectFont(wxCommandEvent& event)
+void QSPFrame::OnSelectFont(wxCommandEvent& WXUNUSED(event))
 {
     wxFontData data;
     wxFont font(m_desc->GetTextFont());
@@ -860,7 +860,7 @@ void QSPFrame::OnSelectFont(wxCommandEvent& event)
     }
 }
 
-void QSPFrame::OnUseFontSize(wxCommandEvent& event)
+void QSPFrame::OnUseFontSize(wxCommandEvent& WXUNUSED(event))
 {
     m_toUseFontSize = !m_toUseFontSize;
     if (m_toProcessEvents)
@@ -872,7 +872,7 @@ void QSPFrame::OnUseFontSize(wxCommandEvent& event)
     }
 }
 
-void QSPFrame::OnSelectFontColor(wxCommandEvent& event)
+void QSPFrame::OnSelectFontColor(wxCommandEvent& WXUNUSED(event))
 {
     wxColourData data;
     data.SetColour(m_fontColor);
@@ -891,7 +891,7 @@ void QSPFrame::OnSelectFontColor(wxCommandEvent& event)
     }
 }
 
-void QSPFrame::OnSelectBackColor(wxCommandEvent& event)
+void QSPFrame::OnSelectBackColor(wxCommandEvent& WXUNUSED(event))
 {
     wxColourData data;
     data.SetColour(m_backColor);
@@ -910,7 +910,7 @@ void QSPFrame::OnSelectBackColor(wxCommandEvent& event)
     }
 }
 
-void QSPFrame::OnSelectLinkColor(wxCommandEvent& event)
+void QSPFrame::OnSelectLinkColor(wxCommandEvent& WXUNUSED(event))
 {
     wxColourData data;
     data.SetColour(m_linkColor);
@@ -929,7 +929,7 @@ void QSPFrame::OnSelectLinkColor(wxCommandEvent& event)
     }
 }
 
-void QSPFrame::OnSelectLang(wxCommandEvent& event)
+void QSPFrame::OnSelectLang(wxCommandEvent& WXUNUSED(event))
 {
     if (m_transHelper->AskUserForLanguage()) ReCreateGUI();
 }
@@ -948,32 +948,32 @@ void QSPFrame::OnVolume(wxCommandEvent& event)
     SetOverallVolume(volume);
 }
 
-void QSPFrame::OnToggleWinMode(wxCommandEvent& event)
+void QSPFrame::OnToggleWinMode(wxCommandEvent& WXUNUSED(event))
 {
     ShowFullScreen(!IsFullScreen());
 }
 
-void QSPFrame::OnToggleObjs(wxCommandEvent& event)
+void QSPFrame::OnToggleObjs(wxCommandEvent& WXUNUSED(event))
 {
     TogglePane(ID_OBJECTS);
 }
 
-void QSPFrame::OnToggleActs(wxCommandEvent& event)
+void QSPFrame::OnToggleActs(wxCommandEvent& WXUNUSED(event))
 {
     TogglePane(ID_ACTIONS);
 }
 
-void QSPFrame::OnToggleDesc(wxCommandEvent& event)
+void QSPFrame::OnToggleDesc(wxCommandEvent& WXUNUSED(event))
 {
     TogglePane(ID_VARSDESC);
 }
 
-void QSPFrame::OnToggleInput(wxCommandEvent& event)
+void QSPFrame::OnToggleInput(wxCommandEvent& WXUNUSED(event))
 {
     TogglePane(ID_INPUT);
 }
 
-void QSPFrame::OnToggleCaptions(wxCommandEvent& event)
+void QSPFrame::OnToggleCaptions(wxCommandEvent& WXUNUSED(event))
 {
     int i;
     bool toShow = !m_manager->GetPane(m_objects).HasCaption();
@@ -984,13 +984,13 @@ void QSPFrame::OnToggleCaptions(wxCommandEvent& event)
     m_manager->Update();
 }
 
-void QSPFrame::OnToggleHotkeys(wxCommandEvent& event)
+void QSPFrame::OnToggleHotkeys(wxCommandEvent& WXUNUSED(event))
 {
     m_toShowHotkeys = !m_toShowHotkeys;
     if (m_toProcessEvents) QSPCallBacks::RefreshInt(QSP_FALSE);
 }
 
-void QSPFrame::OnAbout(wxCommandEvent& event)
+void QSPFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
     wxAboutDialogInfo info;
     info.SetIcon(wxIcon(logo_big_xpm));
@@ -1057,7 +1057,7 @@ void QSPFrame::OnActionChange(wxCommandEvent& event)
         ShowError();
 }
 
-void QSPFrame::OnActionDblClick(wxCommandEvent& event)
+void QSPFrame::OnActionDblClick(wxCommandEvent& WXUNUSED(event))
 {
     if (!QSPExecuteSelActionCode(QSP_TRUE))
         ShowError();
@@ -1070,7 +1070,7 @@ void QSPFrame::OnInputTextChange(wxCommandEvent& event)
     QSPSetInputStrText(qspStringFromLen(text.c_str(), text.Length()));
 }
 
-void QSPFrame::OnInputTextEnter(wxCommandEvent& event)
+void QSPFrame::OnInputTextEnter(wxCommandEvent& WXUNUSED(event))
 {
     if (!QSPExecUserInput(QSP_TRUE))
         ShowError();
