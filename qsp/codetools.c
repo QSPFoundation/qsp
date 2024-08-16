@@ -221,13 +221,15 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     /* 'nextPos' points to the next position to search for a statement */
     /* 'statDelimPos' points to the statement separator (':' or '&') */
     line->Str = str;
+    line->Label = qspNullString;
     line->LineNum = lineNum;
     line->LinesToElse = line->LinesToEnd = 0;
     line->StatsCount = 0;
     line->Stats = 0;
     qspSkipSpaces(&str);
+    if (qspIsEmpty(str)) return;
     statCode = qspGetStatCode(str, &paramPos);
-    if (!qspIsEmpty(str) && statCode != qspStatComment)
+    if (statCode != qspStatComment)
     {
         QSP_CHAR *temp;
         QSP_BOOL toSearchElse = QSP_TRUE;

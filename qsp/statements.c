@@ -925,31 +925,34 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
                 return QSP_FALSE;
             }
             if (toExit) break;
-            /* Execute iterator */
-            if (codeOffset > 0)
+            if (iteratorLine.StatsCount)
             {
-                qspRealLine = line->LineNum + codeOffset;
-                if (qspIsDebug)
+                /* Execute iterator */
+                if (codeOffset > 0)
                 {
-                    qspCallDebug(line->Str);
-                    if (qspRefreshCount != oldRefreshCount)
+                    qspRealLine = line->LineNum + codeOffset;
+                    if (qspIsDebug)
                     {
-                        qspFreeValue(&expression, expression.ItemsCount - 1);
-                        qspReleaseSavedVarsGroup(QSP_TRUE);
-                        qspFreeLineOfCode(&iteratorLine);
-                        return QSP_FALSE;
+                        qspCallDebug(line->Str);
+                        if (qspRefreshCount != oldRefreshCount)
+                        {
+                            qspFreeValue(&expression, expression.ItemsCount - 1);
+                            qspReleaseSavedVarsGroup(QSP_TRUE);
+                            qspFreeLineOfCode(&iteratorLine);
+                            return QSP_FALSE;
+                        }
                     }
                 }
+                toExit = qspExecStringWithLocals(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
+                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                {
+                    qspFreeValue(&expression, expression.ItemsCount - 1);
+                    qspReleaseSavedVarsGroup(QSP_TRUE);
+                    qspFreeLineOfCode(&iteratorLine);
+                    return QSP_FALSE;
+                }
+                if (toExit) break;
             }
-            toExit = qspExecStringWithLocals(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum)
-            {
-                qspFreeValue(&expression, expression.ItemsCount - 1);
-                qspReleaseSavedVarsGroup(QSP_TRUE);
-                qspFreeLineOfCode(&iteratorLine);
-                return QSP_FALSE;
-            }
-            if (toExit) break;
         }
         qspFreeValue(&expression, expression.ItemsCount - 1);
         qspFreeLineOfCode(&iteratorLine);

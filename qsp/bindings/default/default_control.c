@@ -45,11 +45,11 @@ void QSPEnableDebugMode(QSP_BOOL isDebug)
     qspIsDebug = isDebug;
 }
 /* Get current execution state */
-void QSPGetCurStateData(QSPString *loc, int *actIndex, int *line)
+void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum)
 {
     *loc = (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount ? qspLocs[qspRealCurLoc].Name : qspNullString);
     *actIndex = qspRealActIndex;
-    *line = qspRealLine;
+    *lineNum = qspRealLine;
 }
 /* ------------------------------------------------------------ */
 /* Version details */
