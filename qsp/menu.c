@@ -23,10 +23,10 @@
 #include "variables.h"
 #include "variant.h"
 
-INLINE qspFreeMenuItems(QSPListItem *items, int count);
-INLINE qspFreeMenuLocs(QSPString *locs, int count);
+INLINE void qspFreeMenuItems(QSPListItem *items, int count);
+INLINE void qspFreeMenuLocs(QSPString *locs, int count);
 
-INLINE qspFreeMenuItems(QSPListItem *items, int count)
+INLINE void qspFreeMenuItems(QSPListItem *items, int count)
 {
     QSPListItem *curItem;
     for (curItem = items; count > 0; --count, ++curItem)
@@ -36,7 +36,7 @@ INLINE qspFreeMenuItems(QSPListItem *items, int count)
     }
 }
 
-INLINE qspFreeMenuLocs(QSPString *locs, int count)
+INLINE void qspFreeMenuLocs(QSPString *locs, int count)
 {
     QSPString *curLoc;
     for (curLoc = locs; count > 0; --count, ++curLoc)
