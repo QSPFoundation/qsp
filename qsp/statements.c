@@ -43,7 +43,7 @@ INLINE int qspSearchEnd(QSPLineOfCode *lines, int start, int end);
 INLINE int qspSearchLabel(QSPLineOfCode *lines, int start, int end, QSPString str);
 INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *lines, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
-INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
+INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine, QSPString *jumpTo, int *lineInd, int *action);
 INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString *iterator, QSPString *jumpTo);
@@ -475,7 +475,7 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *lines, int endLine, int code
     return QSP_FALSE;
 }
 
-INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine, int codeOffset,
+INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine,
     QSPString *jumpTo, int *lineInd, int *action)
 {
     int ind = *lineInd;
@@ -558,7 +558,7 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
         if (line->LinesToEnd)
             toExit = qspExecMultilineCode(s, endLine, codeOffset, jumpTo, &i, &action);
         else
-            toExit = qspExecSinglelineCode(s, endLine, codeOffset, jumpTo, &i, &action);
+            toExit = qspExecSinglelineCode(s, endLine, jumpTo, &i, &action);
         if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
         if (toExit)
         {

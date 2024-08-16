@@ -125,6 +125,7 @@ QSPString qspGetVariantAsString(QSPVariant *val)
         case QSP_TYPE_STR:
             return qspCopyToNewText(QSP_PSTR(val));
     }
+    return qspNullString;
 }
 
 int qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
@@ -139,6 +140,7 @@ int qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
     case QSP_TYPE_STR:
         return qspStrToNum(QSP_PSTR(val), isValid);
     }
+    return 0;
 }
 
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
