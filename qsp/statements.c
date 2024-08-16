@@ -453,6 +453,15 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *lines, int endLine, int code
             }
             break;
         }
+    case qspStatElse:
+        {
+            int elsePos = qspSearchElse(lines, ind, endLine);
+            *lineInd = endLine;
+            *action = qspFlowJumpToSpecified;
+            if (elsePos >= 0)
+                return qspExecCodeBlockWithLocals(lines, ind + 1, elsePos, codeOffset, jumpTo);
+            return qspExecCodeBlockWithLocals(lines, ind + 1, endLine, codeOffset, jumpTo);
+        }
     case qspStatAct:
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
@@ -469,7 +478,7 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *lines, int endLine, int code
 INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine, int codeOffset,
     QSPString *jumpTo, int *lineInd, int *action)
 {
-    int elsePos, ind = *lineInd;
+    int ind = *lineInd;
     QSPLineOfCode *line = lines + ind;
     switch (line->Stats->Stat)
     {
@@ -500,7 +509,7 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine, int cod
             }
             else
             {
-                elsePos = qspSearchElse(lines, ind, endLine);
+                int elsePos = qspSearchElse(lines, ind, endLine);
                 *lineInd = (elsePos >= 0 ? elsePos : endLine);
                 *action = qspFlowJumpToSpecified;
             }
@@ -515,16 +524,7 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine, int cod
         }
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
-        if (line->StatsCount > 1)
-            return qspExecStringWithLocals(line, 1, line->StatsCount, jumpTo);
-        else
-        {
-            elsePos = qspSearchElse(lines, ind, endLine);
-            if (elsePos >= 0)
-                return qspExecCodeBlockWithLocals(lines, ind + 1, elsePos, codeOffset, jumpTo);
-            return qspExecCodeBlockWithLocals(lines, ind + 1, endLine, codeOffset, jumpTo);
-        }
-        break;
+        return qspExecStringWithLocals(line, 1, line->StatsCount, jumpTo);
     }
     return QSP_FALSE;
 }

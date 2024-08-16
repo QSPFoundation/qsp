@@ -222,6 +222,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     /* 'statDelimPos' points to the statement separator (':' or '&') */
     line->Str = str;
     line->LineNum = lineNum;
+    line->LinesToElse = line->LinesToEnd = 0;
     line->StatsCount = 0;
     line->Stats = 0;
     qspSkipSpaces(&str);
@@ -397,19 +398,12 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
         case qspStatIf:
             if (line->StatsCount == 1 && *(line->Str.End - 1) == QSP_COLONDELIM[0])
                 line->LinesToElse = line->LinesToEnd = 1; /* we don't have all the lines ready to find the right ones yet */
-            else
-                line->LinesToElse = line->LinesToEnd = 0;
             break;
         case qspStatElseIf:
         case qspStatElse:
             if (line->StatsCount == 1)
                 line->LinesToEnd = 1; /* we don't have all the lines ready to find the right ones yet */
-            else
-                line->LinesToEnd = 0;
             line->LinesToElse = 1; /* always search next ELSE starting next line */
-            break;
-        default:
-            line->LinesToElse = line->LinesToEnd = 0;
             break;
     }
     line->Label = qspGetLineLabel(line->Str);
