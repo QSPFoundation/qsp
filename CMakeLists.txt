@@ -124,6 +124,8 @@ target_link_libraries(qsp PRIVATE oniguruma::onig)
 
 target_include_directories(qsp
 	INTERFACE
+		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/qsp/bindings/default>"
+		"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp/default>"
 )
@@ -138,17 +140,17 @@ generate_export_header(qsp
   EXPORT_MACRO_NAME QSP_EXTERN
 )
 
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/QspConfigVersion.cmake COMPATIBILITY AnyNewerVersion)
-configure_package_config_file(QspConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/QspConfig.cmake
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfigVersion.cmake COMPATIBILITY AnyNewerVersion)
+configure_package_config_file(QspConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfig.cmake
 	INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
 )
 
+export(TARGETS qsp NAMESPACE Qsp:: FILE ${CMAKE_CURRENT_BINARY_DIR}/QspConfig.cmake)
 install(EXPORT QspTargets NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp")
-install(FILES
-		${CMAKE_CURRENT_BINARY_DIR}/QspConfigVersion.cmake
-		${CMAKE_CURRENT_BINARY_DIR}/QspConfig.cmake
-	DESTINATION
-		"${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
+
+install(
+	DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake
+	DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
 
 install(FILES
