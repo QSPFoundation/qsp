@@ -28,7 +28,7 @@
     extern int qspRealCurLoc;
     extern int qspRealActIndex; /* points to the base action */
     extern int qspRealLineNum; /* points to the top-level line within the game code */
-    extern QSPLineOfCode *qspRealLine = 0; /* contains the internal details */
+    extern QSPLineOfCode *qspRealLine; /* contains the internal details */
 
     /* External functions */
     void qspSetError(int num);
