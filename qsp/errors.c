@@ -22,6 +22,7 @@ int qspErrorNum = 0;
 int qspErrorLoc = -1;
 int qspErrorActIndex = -1;
 int qspErrorLineNum = 0;
+
 int qspRealCurLoc = -1;
 int qspRealActIndex = -1;
 int qspRealLineNum = 0;

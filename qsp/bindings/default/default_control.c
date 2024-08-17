@@ -317,12 +317,12 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI)
 /* Errors */
 
 /* Get details of a last error */
-void QSPGetLastErrorData(int *errorNum, QSPString *errorLoc, int *errorActIndex, int *errorLine)
+void QSPGetLastErrorData(int *errorNum, QSPString *errorLoc, int *errorActIndex, int *errorLineNum)
 {
     *errorNum = qspErrorNum;
     *errorLoc = (qspErrorLoc >= 0 && qspErrorLoc < qspLocsCount ? qspLocs[qspErrorLoc].Name : qspNullString);
     *errorActIndex = qspErrorActIndex;
-    *errorLine = qspErrorLineNum;
+    *errorLineNum = qspErrorLineNum;
 }
 /* Get error description by code */
 QSPString QSPGetErrorDesc(int errorNum)

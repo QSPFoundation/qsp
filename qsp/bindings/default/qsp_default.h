@@ -114,7 +114,7 @@
     QSP_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI);
     QSP_EXTERN QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI);
     /* Errors */
-    QSP_EXTERN void QSPGetLastErrorData(int *errorNum, QSPString *errorLoc, int *errorActIndex, int *errorLine);
+    QSP_EXTERN void QSPGetLastErrorData(int *errorNum, QSPString *errorLoc, int *errorActIndex, int *errorLineNum);
     QSP_EXTERN QSPString QSPGetErrorDesc(int errorNum);
     /* Game */
     QSP_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame);
