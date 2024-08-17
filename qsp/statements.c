@@ -83,7 +83,7 @@ INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYIN
         {
             if (!isFinished)
             {
-                QSP_TINYINT curType = va_arg(marker, int);
+                QSP_TINYINT curType = (QSP_TINYINT)va_arg(marker, int);
                 if (curType >= 0)
                     lastType = curType;
                 else
@@ -344,7 +344,7 @@ INLINE int qspSearchLabel(QSPLineOfCode *lines, int start, int end, QSPString st
     return -1;
 }
 
-int qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
+QSP_TINYINT qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
 {
     if (stat->ErrorCode)
     {
@@ -353,8 +353,8 @@ int qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
     }
     if (stat->ArgsCount > 0)
     {
-        QSP_TINYINT type;
-        int argIndex, oldRefreshCount = qspRefreshCount;
+        QSP_TINYINT argIndex, type;
+        int oldRefreshCount = qspRefreshCount;
         for (argIndex = 0; argIndex < stat->ArgsCount; ++argIndex)
         {
             args[argIndex] = qspExprValue(qspStringFromPair(s.Str + stat->Args[argIndex].StartPos, s.Str + stat->Args[argIndex].EndPos));
@@ -411,10 +411,10 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
             {
                 QSP_BOOL toExit;
                 QSPVariant args[QSP_STATMAXARGS];
-                int count = qspGetStatArgs(line->Str, line->Stats + i, args);
+                QSP_TINYINT argsCount = qspGetStatArgs(line->Str, line->Stats + i, args);
                 if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
-                toExit = qspStats[statCode].Func(args, count, jumpTo, statCode);
-                qspFreeVariants(args, count);
+                toExit = qspStats[statCode].Func(args, argsCount, jumpTo, statCode);
+                qspFreeVariants(args, argsCount);
                 if (toExit || qspRefreshCount != oldRefreshCount || qspErrorNum) return toExit;
                 break;
             }
@@ -562,7 +562,7 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
 
         if (codeOffset > 0)
         {
-            qspRealLine = line->LineNum + codeOffset;
+            qspRealLineNum = line->LineNum + codeOffset;
             if (qspIsDebug)
             {
                 qspCallDebug(line->Str);
@@ -914,7 +914,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
         {
             if (codeOffset > 0)
             {
-                qspRealLine = line->LineNum + codeOffset;
+                qspRealLineNum = line->LineNum + codeOffset;
                 if (qspIsDebug)
                 {
                     qspCallDebug(line->Str);
@@ -952,7 +952,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
             {
                 if (codeOffset > 0)
                 {
-                    qspRealLine = line->LineNum + codeOffset;
+                    qspRealLineNum = line->LineNum + codeOffset;
                     if (qspIsDebug)
                     {
                         qspCallDebug(line->Str);

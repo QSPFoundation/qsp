@@ -49,7 +49,7 @@ void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum)
 {
     *loc = (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount ? qspLocs[qspRealCurLoc].Name : qspNullString);
     *actIndex = qspRealActIndex;
-    *lineNum = qspRealLine;
+    *lineNum = qspRealLineNum;
 }
 /* ------------------------------------------------------------ */
 /* Version details */
@@ -322,7 +322,7 @@ void QSPGetLastErrorData(int *errorNum, QSPString *errorLoc, int *errorActIndex,
     *errorNum = qspErrorNum;
     *errorLoc = (qspErrorLoc >= 0 && qspErrorLoc < qspLocsCount ? qspLocs[qspErrorLoc].Name : qspNullString);
     *errorActIndex = qspErrorActIndex;
-    *errorLine = qspErrorLine;
+    *errorLine = qspErrorLineNum;
 }
 /* Get error description by code */
 QSPString QSPGetErrorDesc(int errorNum)
@@ -395,7 +395,7 @@ void QSPInit()
     qspQstCRC = 0;
     qspRealCurLoc = -1;
     qspRealActIndex = -1;
-    qspRealLine = 0;
+    qspRealLineNum = 0;
     qspMSCount = 0;
     qspLocs = 0;
     qspLocsNames = 0;

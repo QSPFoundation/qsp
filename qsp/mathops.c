@@ -90,7 +90,7 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
         {
             if (!isFinished)
             {
-                QSP_TINYINT curType = va_arg(marker, int);
+                QSP_TINYINT curType = (QSP_TINYINT)va_arg(marker, int);
                 if (curType >= 0)
                     lastType = curType;
                 else

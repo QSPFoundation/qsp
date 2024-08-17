@@ -47,7 +47,7 @@ void qspPrepareExecution()
     /* Reset execution state */
     qspRealCurLoc = -1;
     qspRealActIndex = -1;
-    qspRealLine = 0;
+    qspRealLineNum = 0;
 
     /* Reset state of changes */
     qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_FALSE;

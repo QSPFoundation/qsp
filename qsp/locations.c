@@ -113,15 +113,15 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     /* remember a previous state to restore it after internal calls */
     oldLoc = qspRealCurLoc;
     oldActIndex = qspRealActIndex;
-    oldLine = qspRealLine;
+    oldLine = qspRealLineNum;
     /* switch the current state */
     qspRealCurLoc = locInd;
     qspRealActIndex = -1;
-    qspRealLine = 0;
+    qspRealLineNum = 0;
     str = qspFormatText(loc->Desc, QSP_FALSE);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum)
     {
-        qspRealLine = oldLine;
+        qspRealLineNum = oldLine;
         qspRealActIndex = oldActIndex;
         qspRealCurLoc = oldLoc;
         return;
@@ -148,7 +148,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         str = qspFormatText(str, QSP_FALSE);
         if (qspRefreshCount != oldRefreshCount || qspErrorNum)
         {
-            qspRealLine = oldLine;
+            qspRealLineNum = oldLine;
             qspRealActIndex = oldActIndex;
             qspRealCurLoc = oldLoc;
             return;
@@ -169,7 +169,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         qspFreeString(&QSP_STR(actionArgs[0]));
         if (qspErrorNum)
         {
-            qspRealLine = oldLine;
+            qspRealLineNum = oldLine;
             qspRealActIndex = oldActIndex;
             qspRealCurLoc = oldLoc;
             return;
@@ -186,7 +186,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         qspFreePrepLines(code, count);
     }
     /* restore the old state */
-    qspRealLine = oldLine;
+    qspRealLineNum = oldLine;
     qspRealActIndex = oldActIndex;
     qspRealCurLoc = oldLoc;
 }

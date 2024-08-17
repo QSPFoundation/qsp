@@ -165,8 +165,9 @@ QSPString qspGetAllActionsAsCode()
 void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
 {
     QSPVariant args[2];
+    QSP_TINYINT argsCount;
     QSPLineOfCode code;
-    int oldRefreshCount, count;
+    int oldRefreshCount;
     QSP_CHAR *lastPos, *firstPos = s->Str.Str + s->Stats[statPos].EndPos;
     if (firstPos == s->Str.End || *firstPos != QSP_COLONDELIM[0])
     {
@@ -179,7 +180,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
         return;
     }
     oldRefreshCount = qspRefreshCount;
-    count = qspGetStatArgs(s->Str, s->Stats + statPos, args);
+    argsCount = qspGetStatArgs(s->Str, s->Stats + statPos, args);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum)
         return;
     ++statPos; /* start with the internal code */
@@ -192,21 +193,21 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
     code.LinesToElse = code.LinesToEnd = 0;
     code.StatsCount = endPos - statPos;
     qspCopyPrepStatements(&code.Stats, s->Stats, statPos, endPos, (int)(firstPos - s->Str.Str));
-    qspAddAction(args, count, &code, 0, 1);
-    qspFreeVariants(args, count);
+    qspAddAction(args, argsCount, &code, 0, 1);
+    qspFreeVariants(args, argsCount);
     qspFreeLineOfCode(&code);
 }
 
 void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine)
 {
     QSPVariant args[2];
-    int count, oldRefreshCount;
+    QSP_TINYINT argsCount;
+    int oldRefreshCount = qspRefreshCount;
     QSPLineOfCode *line = s + lineInd;
-    oldRefreshCount = qspRefreshCount;
-    count = qspGetStatArgs(line->Str, line->Stats, args);
+    argsCount = qspGetStatArgs(line->Str, line->Stats, args);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
-    qspAddAction(args, count, s, lineInd + 1, endLine);
-    qspFreeVariants(args, count);
+    qspAddAction(args, argsCount, s, lineInd + 1, endLine);
+    qspFreeVariants(args, argsCount);
 }
 
 QSP_BOOL qspStatementDelAct(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)

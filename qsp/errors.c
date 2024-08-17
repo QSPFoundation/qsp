@@ -20,11 +20,11 @@
 
 int qspErrorNum = 0;
 int qspErrorLoc = -1;
-int qspErrorLine = 0;
 int qspErrorActIndex = -1;
+int qspErrorLineNum = 0;
 int qspRealCurLoc = -1;
-int qspRealLine = 0;
 int qspRealActIndex = -1;
+int qspRealLineNum = 0;
 
 void qspSetError(int num)
 {
@@ -33,7 +33,7 @@ void qspSetError(int num)
         qspErrorNum = num;
         qspErrorLoc = qspRealCurLoc;
         qspErrorActIndex = qspRealActIndex;
-        qspErrorLine = qspRealLine;
+        qspErrorLineNum = qspRealLineNum;
     }
 }
 
@@ -42,7 +42,7 @@ void qspResetError()
     qspErrorNum = 0;
     qspErrorLoc = -1;
     qspErrorActIndex = -1;
-    qspErrorLine = 0;
+    qspErrorLineNum = 0;
 }
 
 QSPString qspGetErrorDesc(int errorNum)

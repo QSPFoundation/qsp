@@ -38,7 +38,7 @@ void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOO
     /* save an execution state */
     state->RealCurLoc = qspRealCurLoc;
     state->RealActIndex = qspRealActIndex;
-    state->RealLine = qspRealLine;
+    state->RealLine = qspRealLineNum;
     /* switch to a callback mode */
     qspIsInCallBack = QSP_TRUE;
     qspToDisableCodeExec = toDisableCodeExec;
@@ -57,7 +57,7 @@ void qspFinalizeCallBack(QSPCallState *state)
      * because we exit the old code & reset the state anyway */
     qspRealCurLoc = state->RealCurLoc;
     qspRealActIndex = state->RealActIndex;
-    qspRealLine = state->RealLine;
+    qspRealLineNum = state->RealLine;
     /* restore a state of changes */
     if (state->IsActionsChanged) qspIsActionsChanged = QSP_TRUE;
     if (state->IsObjectsChanged) qspIsObjectsChanged = QSP_TRUE;

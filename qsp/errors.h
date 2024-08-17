@@ -22,11 +22,11 @@
 
     extern int qspErrorNum;
     extern int qspErrorLoc;
-    extern int qspErrorLine;
     extern int qspErrorActIndex;
+    extern int qspErrorLineNum;
     extern int qspRealCurLoc;
-    extern int qspRealLine;
     extern int qspRealActIndex;
+    extern int qspRealLineNum;
 
     /* External functions */
     void qspSetError(int num);
