@@ -474,19 +474,25 @@ void QSPFrame::ShowError()
     QSPErrorInfo errorInfo = QSPGetLastErrorData();
     wxString locName(errorInfo.LocName.Str, errorInfo.LocName.End);
     wxString errorDesc(errorInfo.ErrorDesc.Str, errorInfo.ErrorDesc.End);
+    wxString line(errorInfo.IntLine.Str, errorInfo.IntLine.End);
+    if (line.IsEmpty())
+        line = _("Unknown");
+
     if (!locName.IsEmpty())
         wxMessage = wxString::Format(
-            _("Location: %s\nArea: %s\nLine: %d\nCode: %d\nDesc: %s"),
+            _("Location: %s\nArea: %s\nLine %d: %s\nCode: %d\nDesc: %s"),
             locName.wx_str(),
             (errorInfo.ActIndex < 0 ? _("on visit").wx_str() : _("on action").wx_str()),
             errorInfo.TopLineNum,
+            line.wx_str(),
             errorInfo.ErrorNum,
             wxGetTranslation(errorDesc).wx_str()
         );
     else
         wxMessage = wxString::Format(
-            _("Line: %ld\nCode: %ld\nDesc: %s"),
-            errorInfo.TopLineNum,
+            _("Line %d: %s\nCode: %d\nDesc: %s"),
+            errorInfo.IntLineNum,
+            line.wx_str(),
             errorInfo.ErrorNum,
             wxGetTranslation(errorDesc).wx_str()
         );
