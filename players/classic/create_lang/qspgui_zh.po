@@ -1,0 +1,306 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Simplified Chinese 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2024-08-17 22:44+0200\n"
+"Last-Translator: Byte <nporep@mail.ru>\n"
+"Language-Team: English <nporep@mail.ru>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 3.4.4\n"
+
+msgid "&About...\tCtrl-H"
+msgstr "&关于… Ctrl-H"
+
+msgid "&Actions\tCtrl-2"
+msgstr "&动作 Ctrl-2"
+
+msgid "&Always use selected font size"
+msgstr "&总是使用选定的字体大小"
+
+msgid "&Captions\tCtrl-5"
+msgstr "&标题 Ctrl-5"
+
+msgid "&Colors"
+msgstr "&颜色"
+
+msgid "&Font"
+msgstr "&字体"
+
+msgid "&Game"
+msgstr "&游戏"
+
+msgid "&Help"
+msgstr "&帮助"
+
+msgid "&Hotkeys for actions\tCtrl-6"
+msgstr "&动作的热键 Ctrl-6"
+
+msgid "&Input area\tCtrl-4"
+msgstr "&输入区域 Ctrl-4"
+
+msgid "&Objects\tCtrl-1"
+msgstr "&对象 Ctrl-1"
+
+msgid "&Open game...\tAlt-O"
+msgstr "&打开游戏… Alt-O"
+
+msgid "&Open saved game...\tCtrl-O"
+msgstr "&打开已保存的游戏… Ctrl-O"
+
+msgid "&Quest"
+msgstr "&任务"
+
+msgid "&Quicksave\tCtrl-S"
+msgstr "&快速保存 Ctrl-S"
+
+msgid "&Quit\tAlt-X"
+msgstr "&退出 Alt-X"
+
+msgid "&Restart game\tAlt-N"
+msgstr "&重新开始游戏 Alt-N"
+
+msgid "&Save game..."
+msgstr "&保存游戏…"
+
+msgid "&Settings"
+msgstr "&设置"
+
+msgid "&Show / Hide"
+msgstr "&显示 / 隐藏"
+
+msgid "20%\tAlt-2"
+msgstr "20%\tAlt-2"
+
+msgid "40%\tAlt-3"
+msgstr "40%\tAlt-3"
+
+msgid "60%\tAlt-4"
+msgstr "60%\tAlt-4"
+
+msgid "80%\tAlt-5"
+msgstr "80%\tAlt-5"
+
+msgid "A&dditional desc\tCtrl-3"
+msgstr "&附加描述 Ctrl-3"
+
+msgid "Actions"
+msgstr "动作"
+
+msgid "Additional desc"
+msgstr "附加描述"
+
+msgid "Bracket not found!"
+msgstr "未找到括号！"
+
+msgid "Brackets not found!"
+msgstr "未找到括号！"
+
+msgid "Can't add action!"
+msgstr "无法添加动作！"
+
+msgid "Can't add file!"
+msgstr "无法添加文件！"
+
+msgid "Can't add menu item!"
+msgstr "无法添加菜单项！"
+
+msgid "Can't add object!"
+msgstr "无法添加对象！"
+
+msgid "Can't load file!"
+msgstr "无法加载文件！"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Code not found!"
+msgstr "未找到代码！"
+
+msgid "Default"
+msgstr "默认"
+
+msgid "Division by zero!"
+msgstr "除以零！"
+
+msgid "Error"
+msgstr "错误"
+
+msgid "File not found!"
+msgstr "文件未找到！"
+
+msgid "Game not loaded!"
+msgstr "游戏未加载！"
+
+msgid "Incorrect arguments' count!"
+msgstr "参数数量不正确！"
+
+msgid "Incorrect variable name!"
+msgstr "变量名不正确！"
+
+msgid "Info"
+msgstr "信息"
+
+msgid "Initial volume\tAlt-6"
+msgstr "初始音量 Alt-6"
+
+msgid "Input area"
+msgstr "输入区域"
+
+msgid "Input data"
+msgstr "输入数据"
+
+msgid "Label not found!"
+msgstr "未找到标签！"
+
+msgid "Language"
+msgstr "语言"
+
+msgid ""
+"Line: %ld\n"
+"Code: %ld\n"
+"Desc: %s"
+msgstr ""
+"行：%\n"
+"ld 代码：%\n"
+"ld 描述：%s"
+
+msgid "Location not found!"
+msgstr "未找到位置！"
+
+msgid ""
+"Location: %s\n"
+"Area: %s\n"
+"Line: %ld\n"
+"Code: %ld\n"
+"Desc: %s"
+msgstr ""
+"位置：%s \n"
+"区域：%s\n"
+"行：%ld\n"
+"代码：%\n"
+"ld 描述：%s"
+
+msgid "Loop condition not found!"
+msgstr "未找到循环条件！"
+
+msgid "No sound\tAlt-1"
+msgstr "无声音 Alt-1"
+
+msgid "OK"
+msgstr "确定"
+
+msgid "Objects"
+msgstr "对象"
+
+msgid "Preview"
+msgstr "预览"
+
+msgid "QSP games (*.qsp;*.gam)|*.qsp;*.gam"
+msgstr "QSP游戏 (.qsp;.gam)|.qsp;.gam"
+
+msgid "Quest Soft Player 5"
+msgstr "Quest Soft Player 5"
+
+msgid "Quote not found!"
+msgstr "未找到引用！"
+
+msgid "Regular expression error!"
+msgstr "正则表达式错误！"
+
+msgid "Saved game files (*.sav)|*.sav"
+msgstr "已保存的游戏文件 (.sav)|.sav"
+
+msgid "Select &background color...\tAlt-B"
+msgstr "选择 &背景颜色… Alt-B"
+
+msgid "Select &font...\tAlt-F"
+msgstr "选择&字体… Alt-F"
+
+msgid "Select &language...\tAlt-L"
+msgstr "选择 &语言… Alt-L"
+
+msgid "Select background color"
+msgstr "选择背景颜色"
+
+msgid "Select file to save"
+msgstr "选择要保存的文件"
+
+msgid "Select font"
+msgstr "选择字体"
+
+msgid "Select font &color...\tAlt-C"
+msgstr "选择字体 &颜色… Alt-C"
+
+msgid "Select font color"
+msgstr "选择字体颜色"
+
+msgid "Select game file"
+msgstr "选择游戏文件"
+
+msgid "Select l&inks' color...\tAlt-I"
+msgstr "选择 &链接颜色… Alt-I"
+
+msgid "Select language"
+msgstr "选择语言"
+
+msgid "Select links' color"
+msgstr "选择链接颜色"
+
+msgid "Select saved game file"
+msgstr "选择已保存的游戏文件"
+
+msgid "Sign [:] not found!"
+msgstr "未找到符号 [:]！"
+
+msgid "Sign [=] not found!"
+msgstr "未找到符号 [=]！"
+
+msgid "Sound &volume"
+msgstr "声音 &音量"
+
+msgid "Stack overflow!"
+msgstr "栈溢出！"
+
+msgid "Syntax error!"
+msgstr "语法错误！"
+
+msgid "Too many items in expression!"
+msgstr "表达式中的项过多！"
+
+msgid "Too many variables!"
+msgstr "变量过多！"
+
+msgid "Type mismatch!"
+msgstr "类型不匹配！"
+
+msgid "Unknown action!"
+msgstr "未知动作！"
+
+msgid "Unknown error!"
+msgstr "未知错误！"
+
+msgid ""
+"Version: %s\n"
+"Engine Compiled: %s\n"
+"GUI Compiled: %s"
+msgstr ""
+"版本：%s \n"
+"引擎编译时间：%s\n"
+"GUI编译时间：%s"
+
+msgid "Window / Fullscreen &mode\tAlt-Enter"
+msgstr "窗口 / 全屏 &模式 Alt-Enter"
+
+msgid "[end] not found!"
+msgstr "未找到 [结束]"
+
+msgid "on action"
+msgstr "执行动作时"
+
+msgid "on visit"
+msgstr "访问时"
