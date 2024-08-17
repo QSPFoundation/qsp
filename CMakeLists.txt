@@ -79,6 +79,7 @@ else()
 	add_subdirectory("${CMAKE_BINARY_DIR}/oniguruma-src"
 					 "${CMAKE_BINARY_DIR}/oniguruma-build"
 	)
+	add_library(oniguruma::onig ALIAS onig)
 endif()
 
 configure_file(qsp_config.h.cmakein qsp_config.h @ONLY)
@@ -119,12 +120,7 @@ if(WIN32)
 endif()
 target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
 target_link_options(qsp PRIVATE ${PROJECT_LINKER_FLAGS})
-if(USE_INSTALLED_ONIGURUMA)
-	target_link_libraries(qsp PRIVATE oniguruma::onig)
-else()
-	target_link_libraries(qsp PRIVATE onig)
-	install(TARGETS onig)
-endif()
+target_link_libraries(qsp PRIVATE oniguruma::onig)
 
 target_include_directories(qsp
 	INTERFACE
@@ -133,6 +129,9 @@ target_include_directories(qsp
 )
 
 install(TARGETS qsp EXPORT QspTargets DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime)
+if(NOT USE_INSTALLED_ONIGURUMA)
+	install(TARGETS onig DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime)
+endif()
 
 generate_export_header(qsp
   BASE_NAME Qsp
