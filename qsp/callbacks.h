@@ -16,6 +16,7 @@
 */
 
 #include "declarations.h"
+#include "codetools.h"
 
 #ifndef QSP_CALLSDEFINES
     #define QSP_CALLSDEFINES
@@ -29,8 +30,9 @@
         QSP_BOOL IsObjectsChanged;
         QSP_BOOL IsActionsChanged;
         int RealCurLoc;
-        int RealLine;
         int RealActIndex;
+        int RealLineNum;
+        QSPLineOfCode *RealLine;
     } QSPCallState;
 
     extern QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];

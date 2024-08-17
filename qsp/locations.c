@@ -107,21 +107,24 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
 {
     QSPVariant actionArgs[2];
     QSPString str;
-    QSPLineOfCode *code;
-    int i, count, oldLoc, oldActIndex, oldLine, oldRefreshCount = qspRefreshCount;
+    QSPLineOfCode *oldLine, *code;
+    int i, count, oldLoc, oldActIndex, oldLineNum, oldRefreshCount = qspRefreshCount;
     QSPLocation *loc = qspLocs + locInd;
     /* remember a previous state to restore it after internal calls */
     oldLoc = qspRealCurLoc;
     oldActIndex = qspRealActIndex;
-    oldLine = qspRealLineNum;
+    oldLineNum = qspRealLineNum;
+    oldLine = qspRealLine;
     /* switch the current state */
     qspRealCurLoc = locInd;
     qspRealActIndex = -1;
     qspRealLineNum = 0;
+    qspRealLine = 0;
     str = qspFormatText(loc->Desc, QSP_FALSE);
     if (qspRefreshCount != oldRefreshCount || qspErrorNum)
     {
-        qspRealLineNum = oldLine;
+        qspRealLine = oldLine;
+        qspRealLineNum = oldLineNum;
         qspRealActIndex = oldActIndex;
         qspRealCurLoc = oldLoc;
         return;
@@ -148,7 +151,8 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         str = qspFormatText(str, QSP_FALSE);
         if (qspRefreshCount != oldRefreshCount || qspErrorNum)
         {
-            qspRealLineNum = oldLine;
+            qspRealLine = oldLine;
+            qspRealLineNum = oldLineNum;
             qspRealActIndex = oldActIndex;
             qspRealCurLoc = oldLoc;
             return;
@@ -169,7 +173,8 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         qspFreeString(&QSP_STR(actionArgs[0]));
         if (qspErrorNum)
         {
-            qspRealLineNum = oldLine;
+            qspRealLine = oldLine;
+            qspRealLineNum = oldLineNum;
             qspRealActIndex = oldActIndex;
             qspRealCurLoc = oldLoc;
             return;
@@ -186,7 +191,8 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         qspFreePrepLines(code, count);
     }
     /* restore the old state */
-    qspRealLineNum = oldLine;
+    qspRealLine = oldLine;
+    qspRealLineNum = oldLineNum;
     qspRealActIndex = oldActIndex;
     qspRealCurLoc = oldLoc;
 }

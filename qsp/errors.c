@@ -25,6 +25,7 @@ int qspErrorLineNum = 0;
 int qspRealCurLoc = -1;
 int qspRealActIndex = -1;
 int qspRealLineNum = 0;
+QSPLineOfCode *qspRealLine = 0;
 
 void qspSetError(int num)
 {

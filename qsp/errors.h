@@ -16,17 +16,19 @@
 */
 
 #include "declarations.h"
+#include "codetools.h"
 
 #ifndef QSP_ERRSDEFINES
     #define QSP_ERRSDEFINES
 
     extern int qspErrorNum;
     extern int qspErrorLoc;
-    extern int qspErrorActIndex;
-    extern int qspErrorLineNum;
+    extern int qspErrorActIndex; /* points to the base action */
+    extern int qspErrorLineNum; /* points to the top-level line within the game code */
     extern int qspRealCurLoc;
-    extern int qspRealActIndex;
-    extern int qspRealLineNum;
+    extern int qspRealActIndex; /* points to the base action */
+    extern int qspRealLineNum; /* points to the top-level line within the game code */
+    extern QSPLineOfCode *qspRealLine = 0; /* contains the internal details */
 
     /* External functions */
     void qspSetError(int num);

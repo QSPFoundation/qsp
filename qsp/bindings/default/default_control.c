@@ -396,6 +396,7 @@ void QSPInit()
     qspRealCurLoc = -1;
     qspRealActIndex = -1;
     qspRealLineNum = 0;
+    qspRealLine = 0;
     qspMSCount = 0;
     qspLocs = 0;
     qspLocsNames = 0;
