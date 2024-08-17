@@ -320,7 +320,7 @@ void qspInitMath()
         qsort(qspOpsNames[i], qspOpsNamesCounts[i], sizeof(QSPMathOpName), qspMathOpsCompare);
 }
 
-void qspDeInitMath()
+void qspDeinitMath()
 {
     int i, j, count;
     for (i = 0; i < QSP_OPSLEVELS; ++i)

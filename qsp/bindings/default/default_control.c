@@ -385,44 +385,18 @@ void QSPSetCallBack(int type, QSP_CALLBACK func)
 /* Initialization of the engine */
 void QSPInit()
 {
-    #ifdef _DEBUG
-        mwInit();
-    #endif
-    qspNullString = qspStringFromPair(0, 0);
-    qspNullTuple = qspCopyToNewTuple(0, 0);
-    qspIsDebug = QSP_FALSE;
-    qspRefreshCount = qspFullRefreshCount = 0;
-    qspQstCRC = 0;
-    qspRealCurLoc = -1;
-    qspRealActIndex = -1;
-    qspRealLineNum = 0;
-    qspRealLine = 0;
-    qspMSCount = 0;
-    qspLocs = 0;
-    qspLocsNames = 0;
-    qspLocsCount = 0;
-    qspCurLoc = -1;
-    qspTimerInterval = 0;
-    qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
-    setlocale(LC_ALL, QSP_LOCALE);
-    qspSetSeed(0);
-    qspInitVarTypes();
-    qspInitSymbolClasses();
-    qspPrepareExecution();
-    qspMemClear(QSP_TRUE);
-    qspInitCallBacks();
-    qspInitStats();
-    qspInitMath();
+#ifdef _DEBUG
+    mwInit();
+#endif
+    qspInitRuntime();
 }
-/* Deallocate all the resources */
+/* Deallocate all resources */
 void QSPDeInit()
 {
-    qspMemClear(QSP_FALSE);
-    qspCreateWorld(0, 0);
-    qspDeInitMath();
-    #ifdef _DEBUG
-        mwTerm();
-    #endif
+    qspDeinitRuntime();
+#ifdef _DEBUG
+    mwTerm();
+#endif
 }
 
 #endif

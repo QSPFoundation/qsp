@@ -17,12 +17,17 @@
 
 #include "common.h"
 #include "actions.h"
+#include "callbacks.h"
 #include "errors.h"
 #include "game.h"
+#include "locations.h"
+#include "mathops.h"
 #include "objects.h"
 #include "playlist.h"
 #include "regexp.h"
+#include "statements.h"
 #include "text.h"
+#include "time.h"
 #include "variables.h"
 
 static unsigned int qspRandX[55], qspRandY[256], qspRandZ;
@@ -39,6 +44,48 @@ QSP_BOOL qspCurToShowVars = QSP_TRUE;
 QSP_BOOL qspCurToShowInput = QSP_TRUE;
 
 INLINE unsigned int qspURand();
+
+void qspInitRuntime()
+{
+    qspNullString = qspStringFromPair(0, 0);
+    qspNullTuple = qspCopyToNewTuple(0, 0);
+
+    qspErrorIntLineNum = 0;
+    qspErrorIntLine = qspNullString;
+
+    qspRealCurLoc = -1;
+    qspRealActIndex = -1;
+    qspRealLineNum = 0;
+    qspRealLine = 0;
+
+    qspIsDebug = QSP_FALSE;
+    qspRefreshCount = qspFullRefreshCount = 0;
+    qspQstCRC = 0;
+    qspMSCount = 0;
+    qspLocs = 0;
+    qspLocsNames = 0;
+    qspLocsCount = 0;
+    qspCurLoc = -1;
+    qspTimerInterval = 0;
+    qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
+    setlocale(LC_ALL, QSP_LOCALE);
+    qspSetSeed(0);
+    qspInitVarTypes();
+    qspInitSymbolClasses();
+    qspPrepareExecution();
+    qspMemClear(QSP_TRUE);
+    qspInitCallBacks();
+    qspInitStats();
+    qspInitMath();
+}
+
+void qspDeinitRuntime()
+{
+    qspMemClear(QSP_FALSE);
+    qspCreateWorld(0, 0);
+    qspDeinitMath();
+    qspResetError();
+}
 
 void qspPrepareExecution()
 {

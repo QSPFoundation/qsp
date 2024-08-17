@@ -26,6 +26,9 @@
     extern int qspErrorActIndex; /* points to the base action */
     extern int qspErrorLineNum; /* points to the top-level line within the game code */
 
+    extern int qspErrorIntLineNum; /* contains line number of the actual code */
+    extern QSPString qspErrorIntLine; /* contains line of the actual code */
+
     extern int qspRealCurLoc;
     extern int qspRealActIndex; /* points to the base action */
     extern int qspRealLineNum; /* points to the top-level line within the game code */

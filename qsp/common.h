@@ -24,17 +24,20 @@
     #define QSP_RANDMASK 0x7FFFFFFF
 
     extern QSP_BOOL qspIsDebug;
+    extern int qspTimerInterval;
+
     extern QSPBufString qspCurDesc;
     extern QSPBufString qspCurVars;
     extern QSPString qspCurInput;
     extern QSPString qspViewPath;
-    extern int qspTimerInterval;
     extern QSP_BOOL qspIsMainDescChanged;
     extern QSP_BOOL qspIsVarsDescChanged;
     extern QSP_BOOL qspCurToShowVars;
     extern QSP_BOOL qspCurToShowInput;
 
     /* External functions */
+    void qspInitRuntime();
+    void qspDeinitRuntime();
     void qspPrepareExecution();
     void qspMemClear(QSP_BOOL toInit);
     void qspSetSeed(unsigned int seed);

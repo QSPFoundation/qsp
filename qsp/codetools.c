@@ -21,9 +21,9 @@
 
 INLINE int qspStatStringCompare(const void *name, const void *compareTo);
 INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos);
-INLINE int qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-INLINE int qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-INLINE int qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
 INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs);
 INLINE int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **strs);
 
@@ -58,7 +58,7 @@ INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos)
     return qspStatUnknown;
 }
 
-INLINE int qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
     *args = 0;
     *errorCode = 0;
@@ -79,9 +79,9 @@ INLINE int qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString 
     }
 }
 
-INLINE int qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
-    int argsCount;
+    QSP_TINYINT argsCount;
     QSPCachedArg *foundArgs;
     QSP_CHAR *pos;
     qspSkipSpaces(&s);
@@ -120,18 +120,18 @@ INLINE int qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s
     return argsCount;
 }
 
-INLINE int qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
 {
     QSPCachedArg *foundArgs = 0;
-    int count = 0;
+    QSP_TINYINT argsCount = 0;
     qspSkipSpaces(&s);
     if (!qspIsEmpty(s))
     {
         if (statCode == qspStatImplicitStatement)
         {
             /* It's always 1 argument only */
-            count = 1;
-            foundArgs = (QSPCachedArg *)malloc(count * sizeof(QSPCachedArg));
+            argsCount = 1;
+            foundArgs = (QSPCachedArg *)malloc(argsCount * sizeof(QSPCachedArg));
             foundArgs[0].StartPos = (int)(s.Str - origStart);
             foundArgs[0].EndPos = (int)(s.End - origStart);
         }
@@ -156,28 +156,28 @@ INLINE int qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPStri
             }
             while (1)
             {
-                if (count >= qspStats[statCode].MaxArgsCount)
+                if (argsCount >= qspStats[statCode].MaxArgsCount)
                 {
                     *errorCode = QSP_ERR_ARGSCOUNT;
                     break;
                 }
-                if (count >= bufSize)
+                if (argsCount >= bufSize)
                 {
-                    bufSize = count + 4;
+                    bufSize = argsCount + 4;
                     foundArgs = (QSPCachedArg *)realloc(foundArgs, bufSize * sizeof(QSPCachedArg));
                 }
                 pos = qspDelimPos(s, QSP_COMMA[0]);
                 if (pos)
                 {
-                    foundArgs[count].StartPos = (int)(s.Str - origStart);
-                    foundArgs[count].EndPos = (int)(pos - origStart);
-                    ++count;
+                    foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
+                    foundArgs[argsCount].EndPos = (int)(pos - origStart);
+                    ++argsCount;
                 }
                 else
                 {
-                    foundArgs[count].StartPos = (int)(s.Str - origStart);
-                    foundArgs[count].EndPos = (int)(s.End - origStart);
-                    ++count;
+                    foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
+                    foundArgs[argsCount].EndPos = (int)(s.End - origStart);
+                    ++argsCount;
                     break;
                 }
                 s.Str = pos + QSP_STATIC_LEN(QSP_COMMA);
@@ -190,10 +190,10 @@ INLINE int qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPStri
             }
         }
     }
-    if (count < qspStats[statCode].MinArgsCount)
+    if (argsCount < qspStats[statCode].MinArgsCount)
         *errorCode = QSP_ERR_ARGSCOUNT;
     *args = foundArgs;
-    return count;
+    return argsCount;
 }
 
 QSPString qspGetLineLabel(QSPString str)
