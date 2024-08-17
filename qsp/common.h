@@ -38,7 +38,7 @@
     /* External functions */
     void qspInitRuntime();
     void qspDeinitRuntime();
-    void qspPrepareExecution();
+    void qspPrepareExecution(QSP_BOOL toInit);
     void qspMemClear(QSP_BOOL toInit);
     void qspSetSeed(unsigned int seed);
     int qspRand();

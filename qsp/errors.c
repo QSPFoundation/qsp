@@ -16,14 +16,11 @@
 */
 
 #include "errors.h"
+#include "locations.h"
 #include "text.h"
 
 int qspErrorNum = 0;
-int qspErrorLoc = -1;
-int qspErrorActIndex = -1;
-int qspErrorLineNum = 0;
-int qspErrorIntLineNum = 0;
-QSPString qspErrorIntLine;
+QSPErrorInfo qspLastError;
 
 int qspRealCurLoc = -1;
 int qspRealActIndex = -1;
@@ -35,32 +32,47 @@ void qspSetError(int num)
     if (!qspErrorNum)
     {
         qspErrorNum = num;
-        qspErrorLoc = qspRealCurLoc;
-        qspErrorActIndex = qspRealActIndex;
-        qspErrorLineNum = qspRealLineNum;
+        qspLastError.ErrorNum = num;
+        qspLastError.ErrorDesc = qspGetErrorDesc(num);
+        qspLastError.ActIndex = qspRealActIndex;
+        qspLastError.TopLineNum = qspRealLineNum;
+
+        if (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount)
+            qspUpdateText(&qspLastError.LocName, qspLocs[qspRealCurLoc].Name);
+        else
+            qspClearText(&qspLastError.LocName);
 
         if (qspRealLine)
         {
-            qspErrorIntLineNum = qspRealLine->LineNum + 1;
-            qspUpdateText(&qspErrorIntLine, qspRealLine->Str);
+            qspLastError.IntLineNum = qspRealLine->LineNum + 1;
+            qspUpdateText(&qspLastError.IntLine, qspRealLine->Str);
         }
         else
         {
-            qspErrorIntLineNum = 0;
-            qspClearText(&qspErrorIntLine);
+            qspLastError.IntLineNum = 0;
+            qspClearText(&qspLastError.IntLine);
         }
     }
 }
 
-void qspResetError()
+void qspResetError(QSP_BOOL toInit)
 {
     qspErrorNum = 0;
-    qspErrorLoc = -1;
-    qspErrorActIndex = -1;
-    qspErrorLineNum = 0;
-
-    qspErrorIntLineNum = 0;
-    qspClearText(&qspErrorIntLine);
+    qspLastError.ErrorNum = 0;
+    qspLastError.ErrorDesc = qspNullString;
+    qspLastError.ActIndex = -1;
+    qspLastError.TopLineNum = 0;
+    qspLastError.IntLineNum = 0;
+    if (toInit)
+    {
+        qspLastError.LocName = qspNullString;
+        qspLastError.IntLine = qspNullString;
+    }
+    else
+    {
+        qspClearText(&qspLastError.LocName);
+        qspClearText(&qspLastError.IntLine);
+    }
 }
 
 QSPString qspGetErrorDesc(int errorNum)

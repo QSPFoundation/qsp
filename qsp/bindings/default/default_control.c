@@ -122,7 +122,7 @@ QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI)
     if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
     {
         if (qspToDisableCodeExec) return QSP_FALSE;
-        qspPrepareExecution();
+        qspPrepareExecution(QSP_FALSE);
         qspCurSelAction = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONACTSEL")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
@@ -136,7 +136,7 @@ QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI)
     if (qspCurSelAction >= 0)
     {
         if (qspToDisableCodeExec) return QSP_FALSE;
-        qspPrepareExecution();
+        qspPrepareExecution(QSP_FALSE);
         qspExecAction(qspCurSelAction);
         if (qspErrorNum) return QSP_FALSE;
         if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
@@ -173,7 +173,7 @@ QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI)
     if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
     {
         if (qspToDisableCodeExec) return QSP_FALSE;
-        qspPrepareExecution();
+        qspPrepareExecution(QSP_FALSE);
         qspCurSelObject = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJSEL")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
@@ -275,7 +275,7 @@ QSP_BOOL QSPGetVarNameByIndex(int index, QSPString *name)
 QSP_BOOL QSPExecString(QSPString s, QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
-    qspPrepareExecution();
+    qspPrepareExecution(QSP_FALSE);
     qspExecStringAsCodeWithArgs(s, 0, 0, 1, 0);
     if (qspErrorNum) return QSP_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
@@ -285,7 +285,7 @@ QSP_BOOL QSPExecString(QSPString s, QSP_BOOL toRefreshUI)
 QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
-    qspPrepareExecution();
+    qspPrepareExecution(QSP_FALSE);
     qspExecLocByNameWithArgs(name, 0, 0, 0);
     if (qspErrorNum) return QSP_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
@@ -296,7 +296,7 @@ QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI)
 {
     if (!qspIsInCallBack)
     {
-        qspPrepareExecution();
+        qspPrepareExecution(QSP_FALSE);
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("COUNTER")), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
         if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
@@ -307,7 +307,7 @@ QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI)
 QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
-    qspPrepareExecution();
+    qspPrepareExecution(QSP_FALSE);
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("USERCOM")), 0, 0);
     if (qspErrorNum) return QSP_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
@@ -316,13 +316,10 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI)
 /* ------------------------------------------------------------ */
 /* Errors */
 
-/* Get details of a last error */
-void QSPGetLastErrorData(int *errorNum, QSPString *errorLoc, int *errorActIndex, int *errorLineNum)
+/* Get details of the last error */
+QSPErrorInfo QSPGetLastErrorData()
 {
-    *errorNum = qspErrorNum;
-    *errorLoc = (qspErrorLoc >= 0 && qspErrorLoc < qspLocsCount ? qspLocs[qspErrorLoc].Name : qspNullString);
-    *errorActIndex = qspErrorActIndex;
-    *errorLineNum = qspErrorLineNum;
+    return qspLastError;
 }
 /* Get error description by code */
 QSPString QSPGetErrorDesc(int errorNum)
@@ -342,7 +339,7 @@ QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNew
 QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
-    qspPrepareExecution();
+    qspPrepareExecution(QSP_FALSE);
     if (!qspSaveGameStatus(buf, bufSize))
     {
         if (*bufSize)
@@ -360,7 +357,7 @@ QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI)
 QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
-    qspPrepareExecution();
+    qspPrepareExecution(QSP_FALSE);
     if (!qspOpenGameStatus((void *)data, dataSize)) return QSP_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
@@ -369,7 +366,7 @@ QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRef
 QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
-    qspPrepareExecution();
+    qspPrepareExecution(QSP_FALSE);
     qspNewGame(QSP_TRUE);
     if (qspErrorNum) return QSP_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);

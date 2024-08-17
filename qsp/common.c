@@ -50,9 +50,6 @@ void qspInitRuntime()
     qspNullString = qspStringFromPair(0, 0);
     qspNullTuple = qspCopyToNewTuple(0, 0);
 
-    qspErrorIntLineNum = 0;
-    qspErrorIntLine = qspNullString;
-
     qspRealCurLoc = -1;
     qspRealActIndex = -1;
     qspRealLineNum = 0;
@@ -68,11 +65,12 @@ void qspInitRuntime()
     qspCurLoc = -1;
     qspTimerInterval = 0;
     qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
+
     setlocale(LC_ALL, QSP_LOCALE);
     qspSetSeed(0);
     qspInitVarTypes();
     qspInitSymbolClasses();
-    qspPrepareExecution();
+    qspPrepareExecution(QSP_TRUE);
     qspMemClear(QSP_TRUE);
     qspInitCallBacks();
     qspInitStats();
@@ -84,12 +82,12 @@ void qspDeinitRuntime()
     qspMemClear(QSP_FALSE);
     qspCreateWorld(0, 0);
     qspDeinitMath();
-    qspResetError();
+    qspResetError(QSP_FALSE);
 }
 
-void qspPrepareExecution()
+void qspPrepareExecution(QSP_BOOL toInit)
 {
-    qspResetError();
+    qspResetError(toInit);
 
     /* Reset execution state */
     qspRealCurLoc = -1;

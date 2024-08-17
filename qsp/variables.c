@@ -385,7 +385,7 @@ QSPTuple qspGetVarTupleValue(QSPString name)
             return QSP_TUPLE(var->Values[0]);
     }
     else
-        qspResetError();
+        qspResetError(QSP_FALSE);
     return qspNullTuple;
 }
 
@@ -398,7 +398,7 @@ QSPString qspGetVarStrValue(QSPString name)
             return QSP_STR(var->Values[0]);
     }
     else
-        qspResetError();
+        qspResetError(QSP_FALSE);
     return qspNullString;
 }
 
@@ -411,7 +411,7 @@ int qspGetVarNumValue(QSPString name)
             return QSP_NUM(var->Values[0]);
     }
     else
-        qspResetError();
+        qspResetError(QSP_FALSE);
     return 0;
 }
 

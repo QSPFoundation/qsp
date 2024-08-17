@@ -470,26 +470,25 @@ void QSPFrame::ShowError()
 {
     bool oldToProcessEvents;
     wxString wxMessage;
-    QSPString loc;
-    int code, actIndex, line;
     if (m_toQuit) return;
-    QSPGetLastErrorData(&code, &loc, &actIndex, &line);
-    QSPString desc = QSPGetErrorDesc(code);
-    if (loc.Str)
+    QSPErrorInfo errorInfo = QSPGetLastErrorData();
+    wxString locName(errorInfo.LocName.Str, errorInfo.LocName.End);
+    wxString errorDesc(errorInfo.ErrorDesc.Str, errorInfo.ErrorDesc.End);
+    if (!locName.IsEmpty())
         wxMessage = wxString::Format(
-            _("Location: %s\nArea: %s\nLine: %ld\nCode: %ld\nDesc: %s"),
-            wxString(loc.Str, loc.End).wx_str(),
-            (actIndex < 0 ? _("on visit").wx_str() : _("on action").wx_str()),
-            (size_t)line,
-            (size_t)code,
-            wxGetTranslation(wxString(desc.Str, desc.End)).wx_str()
+            _("Location: %s\nArea: %s\nLine: %d\nCode: %d\nDesc: %s"),
+            locName.wx_str(),
+            (errorInfo.ActIndex < 0 ? _("on visit").wx_str() : _("on action").wx_str()),
+            errorInfo.TopLineNum,
+            errorInfo.ErrorNum,
+            wxGetTranslation(errorDesc).wx_str()
         );
     else
         wxMessage = wxString::Format(
             _("Line: %ld\nCode: %ld\nDesc: %s"),
-            (size_t)line,
-            (size_t)code,
-            wxGetTranslation(wxString(desc.Str, desc.End)).wx_str()
+            errorInfo.TopLineNum,
+            errorInfo.ErrorNum,
+            wxGetTranslation(errorDesc).wx_str()
         );
     QSPMsgDlg dialog(this,
                      wxID_ANY,

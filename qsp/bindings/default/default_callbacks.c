@@ -50,7 +50,7 @@ void qspCallDebug(QSPString str)
         qspPrepareCallBack(&state, QSP_FALSE, QSP_FALSE);
         qspCallBacks[QSP_CALL_DEBUG](str);
         qspFinalizeCallBack(&state);
-        qspResetError();
+        qspResetError(QSP_FALSE);
     }
 }
 
