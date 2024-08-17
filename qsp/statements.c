@@ -560,9 +560,9 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
             continue;
         }
 
+        qspRealLine = line;
         if (codeOffset > 0)
         {
-            qspRealLine = line;
             qspRealLineNum = line->LineNum + codeOffset;
             if (qspIsDebug)
             {
@@ -913,9 +913,9 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
         ++lineInd;
         while (1)
         {
+            qspRealLine = line;
             if (codeOffset > 0)
             {
-                qspRealLine = line;
                 qspRealLineNum = line->LineNum + codeOffset;
                 if (qspIsDebug)
                 {
@@ -952,9 +952,9 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
             /* Execute iterator */
             if (iteratorLine.StatsCount)
             {
+                qspRealLine = line;
                 if (codeOffset > 0)
                 {
-                    qspRealLine = line;
                     qspRealLineNum = line->LineNum + codeOffset;
                     if (qspIsDebug)
                     {

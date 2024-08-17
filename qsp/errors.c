@@ -39,8 +39,16 @@ void qspSetError(int num)
         qspErrorActIndex = qspRealActIndex;
         qspErrorLineNum = qspRealLineNum;
 
-        qspErrorIntLineNum = qspRealLine->LineNum + 1;
-        qspUpdateText(&qspErrorIntLine, qspRealLine->Str);
+        if (qspRealLine)
+        {
+            qspErrorIntLineNum = qspRealLine->LineNum + 1;
+            qspUpdateText(&qspErrorIntLine, qspRealLine->Str);
+        }
+        else
+        {
+            qspErrorIntLineNum = 0;
+            qspClearText(&qspErrorIntLine);
+        }
     }
 }
 
