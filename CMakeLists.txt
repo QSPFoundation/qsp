@@ -84,30 +84,33 @@ endif()
 configure_file(qsp_config.h.cmakein qsp_config.h @ONLY)
 
 set(QSP_SOURCES
+	qsp/bindings/bindings_config.h
 	qsp/bindings/default/default_callbacks.c
 	qsp/bindings/default/default_control.c
-	qsp/actions.c
-	qsp/callbacks.c
-	qsp/codetools.c
-	qsp/coding.c
-	qsp/common.c
-	qsp/errors.c
-	qsp/game.c
-	qsp/locations.c
-	qsp/mathops.c
-	qsp/memwatch.c
-	qsp/menu.c
-	qsp/objects.c
-	qsp/playlist.c
-	qsp/regexp.c
-	qsp/statements.c
-	qsp/text.c
-	qsp/time.c
+	qsp/bindings/default/qsp_default.h
+	qsp/bindings/qsp.h
+	qsp/actions.c qsp/actions.h
+	qsp/callbacks.c qsp/callbacks.h
+	qsp/codetools.c qsp/codetools.h
+	qsp/coding.c qsp/coding.h
+	qsp/common.c qsp/common.h
+	qsp/errors.c qsp/errors.h
+	qsp/game.c qsp/game.h
+	qsp/locations.c qsp/locations.h
+	qsp/mathops.c qsp/mathops.h
+	qsp/memwatch.c qsp/memwatch.h
+	qsp/menu.c qsp/menu.h
+	qsp/objects.c qsp/objects.h
+	qsp/playlist.c qsp/playlist.h
+	qsp/regexp.c qsp/regexp.h
+	qsp/statements.c qsp/statements.h
+	qsp/text.c qsp/text.h
+	qsp/time.c qsp/time.h
 	qsp/towlower.c
 	qsp/towupper.c
-	qsp/tuples.c
-	qsp/variables.c
-	qsp/variant.c
+	qsp/tuples.c qsp/tuples.h
+	qsp/variables.c qsp/variables.h
+	qsp/variant.c qsp/variant.h
 )
 add_library(qsp SHARED ${QSP_SOURCES})
 target_compile_definitions(qsp PUBLIC _UNICODE)
