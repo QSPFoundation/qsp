@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 project(qsp VERSION 5.9.0)
 
 set(QSP_GAMEMIN_VER "5.9.0")
@@ -80,6 +80,14 @@ else()
 					 "${CMAKE_BINARY_DIR}/oniguruma-build"
 	)
 	add_library(oniguruma::onig ALIAS onig)
+endif()
+
+if (CMAKE_C_BYTE_ORDER STREQUAL "LITTLE_ENDIAN")
+	set(QSP_LITTLE_ENDIAN 1)
+elseif (CMAKE_C_BYTE_ORDER STREQUAL "BIG_ENDIAN")
+	set(QSP_LITTLE_ENDIAN 0)
+else()
+	message(FATAL_ERROR "Could not recognize endianess: ${CMAKE_C_BYTE_ORDER}")
 endif()
 
 configure_file(qsp_config.h.cmakein qsp_config.h @ONLY)
