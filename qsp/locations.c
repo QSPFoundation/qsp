@@ -182,7 +182,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         }
     }
     qspRealActIndex = -1;
-    if (locInd < qspLocsCount - qspCurIncLocsCount)
+    if (locInd < qspLocsCount - qspCurIncLocsCount) /* location is inside the base game file */
         qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0);
     else
     {
