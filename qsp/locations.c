@@ -239,6 +239,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT c
     /* We execute all locations specified in the array */
     while (1)
     {
+        /* The variable might be updated during the previous code execution */
         if (!(var = qspVarReference(name, QSP_FALSE))) break;
         if (ind >= var->ValsCount) break;
         if (!QSP_ISSTR(var->Values[ind].Type)) break;

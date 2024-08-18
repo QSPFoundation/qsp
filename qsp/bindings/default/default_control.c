@@ -217,8 +217,7 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 /* Get the number of items in an array */
 QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 {
-    QSPVar *var;
-    var = qspVarReference(name, QSP_FALSE);
+    QSPVar *var = qspVarReference(name, QSP_FALSE);
     if (!var)
     {
         *count = 0;
@@ -321,7 +320,7 @@ QSPErrorInfo QSPGetLastErrorData(void)
 {
     return qspLastError;
 }
-/* Get error description by code */
+/* Get error description by numeric code */
 QSPString QSPGetErrorDesc(int errorNum)
 {
     return qspGetErrorDesc(errorNum);
@@ -332,7 +331,7 @@ QSPString QSPGetErrorDesc(int errorNum)
 /* Load game from data */
 QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame)
 {
-    /* we don't execute any game code */
+    /* We don't execute any game code here */
     return qspOpenGame((void *)data, dataSize, isNewGame);
 }
 /* Save game state to a buffer */
@@ -344,8 +343,8 @@ QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI)
     {
         if (*bufSize)
         {
-            /* happens when we passed insufficient buffer, the new value contains required buffer size */
-            /* we have to reserve some extra space to account for game updates during subsequent calls */
+            /* Happens when we passed insufficient buffer, the new value contains required buffer size */
+            /* We have to reserve some extra space to account for game updates during subsequent calls */
             *bufSize += QSP_SAVEDGAMEDATAEXTRASPACE;
         }
         return QSP_FALSE;
