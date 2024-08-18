@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2020 Valeriy Argunov (byte AT qsp DOT org) */
+/* Copyright (C) 2001-2024 Val Argunov (byte AT qsp DOT org) */
 /*
 * This library is free software; you can redistribute it and/or modify
 * it under the terms of the GNU Lesser General Public License as published by
@@ -108,7 +108,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     QSPVariant actionArgs[2];
     QSP_TINYINT argsCount;
     QSPString str;
-    QSPLineOfCode *oldLine, *code;
+    QSPLineOfCode *oldLine;
     int i, oldLoc, oldActIndex, oldLineNum, oldRefreshCount = qspRefreshCount;
     QSPLocation *loc = qspLocs + locInd;
     /* remember a previous state to restore it after internal calls */
@@ -186,6 +186,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0);
     else
     {
+        QSPLineOfCode *code;
         int count = loc->OnVisitLinesCount;
         qspCopyPrepLines(&code, loc->OnVisitLines, 0, count);
         qspExecCode(code, 0, count, 1, 0);

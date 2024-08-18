@@ -1,4 +1,4 @@
-// Copyright (C) 2001-2020 Valeriy Argunov (byte AT qsp DOT org)
+// Copyright (C) 2001-2024 Val Argunov (byte AT qsp DOT org)
 /*
 * This program is free software; you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
