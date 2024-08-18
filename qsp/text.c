@@ -82,7 +82,7 @@ void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
         }
         else
         {
-            dest->Str = dest->End = 0; /* assign a null string */
+            dest->Str = dest->End = 0; /* assign the null string */
         }
     }
 }

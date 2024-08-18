@@ -29,18 +29,18 @@ QSP_BOOL qspToDisableCodeExec = QSP_FALSE; /* blocks major state changes, so we 
 void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI)
 {
     state->IsInCallBack = qspIsInCallBack;
-    /* save a state of changes */
+    /* save the state of changes */
     state->ToDisableCodeExec = qspToDisableCodeExec;
     state->IsMainDescChanged = qspIsMainDescChanged;
     state->IsVarsDescChanged = qspIsVarsDescChanged;
     state->IsObjectsChanged = qspIsObjectsChanged;
     state->IsActionsChanged = qspIsActionsChanged;
-    /* save an execution state */
+    /* save the execution state */
     state->RealCurLoc = qspRealCurLoc;
     state->RealActIndex = qspRealActIndex;
     state->RealLineNum = qspRealLineNum;
     state->RealLine = qspRealLine;
-    /* switch to a callback mode */
+    /* switch to the callback mode */
     qspIsInCallBack = QSP_TRUE;
     qspToDisableCodeExec = toDisableCodeExec;
 
@@ -50,17 +50,17 @@ void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOO
 
 void qspFinalizeCallBack(QSPCallState *state)
 {
-    /* restore a previous mode */
+    /* restore the previous mode */
     qspToDisableCodeExec = state->ToDisableCodeExec;
     qspIsInCallBack = state->IsInCallBack;
-    /* restore an execution state */
+    /* restore the execution state */
     /* it's still fine to restore old values even when a new game was started
      * because we exit the old code & reset the state anyway */
     qspRealCurLoc = state->RealCurLoc;
     qspRealActIndex = state->RealActIndex;
     qspRealLineNum = state->RealLineNum;
     qspRealLine = state->RealLine;
-    /* restore a state of changes */
+    /* restore the state of changes */
     if (state->IsActionsChanged) qspIsActionsChanged = QSP_TRUE;
     if (state->IsObjectsChanged) qspIsObjectsChanged = QSP_TRUE;
     if (state->IsVarsDescChanged) qspIsVarsDescChanged = QSP_TRUE;

@@ -120,7 +120,7 @@
         if (s->Str)
         {
             free(s->Str);
-            s->Str = s->End = 0; /* assign a null string */
+            s->Str = s->End = 0; /* assign the null string */
         }
     }
 

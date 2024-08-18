@@ -116,7 +116,7 @@ int QSPGetActions(QSPListItem *items, int itemsBufSize)
     }
     return qspCurActionsCount;
 }
-/* Set index of a selected action */
+/* Set index of the selected action */
 QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI)
 {
     if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
@@ -167,7 +167,7 @@ int QSPGetObjects(QSPListItem *items, int itemsBufSize)
     }
     return qspCurObjectsCount;
 }
-/* Set index of a selected object */
+/* Set index of the selected object */
 QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI)
 {
     if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
@@ -214,7 +214,7 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 /* ------------------------------------------------------------ */
 /* Variables */
 
-/* Get a number of items in an array */
+/* Get the number of items in an array */
 QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 {
     QSPVar *var;

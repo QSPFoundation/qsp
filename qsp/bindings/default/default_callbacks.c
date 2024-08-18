@@ -116,7 +116,7 @@ void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
 
 void qspCallOpenGameStatus(QSPString file)
 {
-    /* Open game state (showing a dialog to choose a file) */
+    /* Open game state (showing the dialog to choose a file) */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_OPENGAMESTATUS])
     {
@@ -128,7 +128,7 @@ void qspCallOpenGameStatus(QSPString file)
 
 void qspCallSaveGameStatus(QSPString file)
 {
-    /* Save game state (showing a dialog to choose a file) */
+    /* Save game state (showing the dialog to choose a file) */
     QSPCallState state;
     if (qspCallBacks[QSP_CALL_SAVEGAMESTATUS])
     {
@@ -257,7 +257,7 @@ int qspCallGetMSCount(void)
 
 QSPString qspCallInputBox(QSPString text)
 {
-    /* Get input from a user */
+    /* Get input from the user */
     QSPCallState state;
     QSP_CHAR *buffer;
     const int maxLen = 511;
