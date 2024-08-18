@@ -124,7 +124,7 @@ void qspExecAction(int ind)
     }
 }
 
-QSPString qspGetAllActionsAsCode()
+QSPString qspGetAllActionsAsCode(void)
 {
     int count, i;
     QSPString temp;

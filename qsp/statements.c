@@ -110,7 +110,7 @@ INLINE int qspStatsCompare(const void *statName1, const void *statName2)
     return qspStrsComp(((QSPStatName *)statName1)->Name, ((QSPStatName *)statName2)->Name);
 }
 
-void qspInitStats()
+void qspInitStats(void)
 {
     /*
     Format:

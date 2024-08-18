@@ -27,7 +27,7 @@
 #include "../../objects.h"
 #include "../../text.h"
 
-void qspInitCallBacks()
+void qspInitCallBacks(void)
 {
     int i;
     qspIsInCallBack = QSP_FALSE;
@@ -240,7 +240,7 @@ void qspCallSleep(int msecs)
     }
 }
 
-int qspCallGetMSCount()
+int qspCallGetMSCount(void)
 {
     /* Get the number of milliseconds since the last call of this function */
     QSPCallState state;

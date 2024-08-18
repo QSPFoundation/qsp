@@ -24,6 +24,6 @@
 
     /* External functions */
     void qspResetTime(int msecs);
-    int qspGetTime();
+    int qspGetTime(void);
 
 #endif

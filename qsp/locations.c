@@ -77,7 +77,7 @@ void qspCreateWorld(int start, int newLocsCount)
     }
 }
 
-void qspPrepareLocs()
+void qspPrepareLocs(void)
 {
     int i;
     for (i = 0; i < qspLocsCount; ++i)
@@ -106,9 +106,10 @@ int qspLocIndex(QSPString name)
 INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
 {
     QSPVariant actionArgs[2];
+    QSP_TINYINT argsCount;
     QSPString str;
     QSPLineOfCode *oldLine, *code;
-    int i, count, oldLoc, oldActIndex, oldLineNum, oldRefreshCount = qspRefreshCount;
+    int i, oldLoc, oldActIndex, oldLineNum, oldRefreshCount = qspRefreshCount;
     QSPLocation *loc = qspLocs + locInd;
     /* remember a previous state to restore it after internal calls */
     oldLoc = qspRealCurLoc;
@@ -165,11 +166,11 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         {
             actionArgs[1].Type = QSP_TYPE_STR;
             QSP_STR(actionArgs[1]) = str;
-            count = 2;
+            argsCount = 2;
         }
         else
-            count = 1;
-        qspAddAction(actionArgs, count, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount);
+            argsCount = 1;
+        qspAddAction(actionArgs, argsCount, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount);
         qspFreeString(&QSP_STR(actionArgs[0]));
         if (qspErrorNum)
         {
@@ -185,7 +186,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         qspExecCode(loc->OnVisitLines, 0, loc->OnVisitLinesCount, 1, 0);
     else
     {
-        count = loc->OnVisitLinesCount;
+        int count = loc->OnVisitLinesCount;
         qspCopyPrepLines(&code, loc->OnVisitLines, 0, count);
         qspExecCode(code, 0, count, 1, 0);
         qspFreePrepLines(code, count);

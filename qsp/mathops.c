@@ -166,7 +166,7 @@ INLINE int qspMathOpStringCompare(const void *name, const void *compareTo)
     return qspStrsNComp(*(QSPString *)name, opName->Name, qspStrLen(opName->Name));
 }
 
-void qspInitMath()
+void qspInitMath(void)
 {
     /*
     Format:
@@ -320,7 +320,7 @@ void qspInitMath()
         qsort(qspOpsNames[i], qspOpsNamesCounts[i], sizeof(QSPMathOpName), qspMathOpsCompare);
 }
 
-void qspDeinitMath()
+void qspTerminateMath(void)
 {
     int i, j, count;
     for (i = 0; i < QSP_OPSLEVELS; ++i)

@@ -36,11 +36,11 @@
     extern QSP_BOOL qspCurToShowInput;
 
     /* External functions */
-    void qspInitRuntime();
-    void qspDeinitRuntime();
+    void qspInitRuntime(void);
+    void qspTerminateRuntime(void);
     void qspPrepareExecution(QSP_BOOL toInit);
     void qspMemClear(QSP_BOOL toInit);
     void qspSetSeed(unsigned int seed);
-    int qspRand();
+    int qspRand(void);
 
 #endif

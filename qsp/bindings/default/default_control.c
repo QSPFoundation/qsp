@@ -55,18 +55,18 @@ void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum)
 /* Version details */
 
 /* Get version of the libqsp */
-QSPString QSPGetVersion()
+QSPString QSPGetVersion(void)
 {
     return QSP_STATIC_STR(QSP_VER);
 }
 /* Get build datetime of the libqsp */
-QSPString QSPGetCompiledDateTime()
+QSPString QSPGetCompiledDateTime(void)
 {
     return QSP_STATIC_STR(QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__));
 }
 /* ------------------------------------------------------------ */
 /* Get number of the full location updates */
-int QSPGetFullRefreshCount()
+int QSPGetFullRefreshCount(void)
 {
     return qspFullRefreshCount;
 }
@@ -74,12 +74,12 @@ int QSPGetFullRefreshCount()
 /* Main description */
 
 /* Get text of the main description */
-QSPString QSPGetMainDesc()
+QSPString QSPGetMainDesc(void)
 {
     return qspBufTextToString(qspCurDesc);
 }
 /* Check whether the text has been updated */
-QSP_BOOL QSPIsMainDescChanged()
+QSP_BOOL QSPIsMainDescChanged(void)
 {
     return qspIsMainDescChanged;
 }
@@ -87,12 +87,12 @@ QSP_BOOL QSPIsMainDescChanged()
 /* Additional description */
 
 /* Get text of the additional description */
-QSPString QSPGetVarsDesc()
+QSPString QSPGetVarsDesc(void)
 {
     return qspBufTextToString(qspCurVars);
 }
 /* Check whether the text has been updated */
-QSP_BOOL QSPIsVarsDescChanged()
+QSP_BOOL QSPIsVarsDescChanged(void)
 {
     return qspIsVarsDescChanged;
 }
@@ -144,12 +144,12 @@ QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI)
     return QSP_TRUE;
 }
 /* Get index of the selected action */
-int QSPGetSelActionIndex()
+int QSPGetSelActionIndex(void)
 {
     return qspCurSelAction;
 }
 /* Check whether the actions have been updated */
-QSP_BOOL QSPIsActionsChanged()
+QSP_BOOL QSPIsActionsChanged(void)
 {
     return qspIsActionsChanged;
 }
@@ -182,12 +182,12 @@ QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI)
     return QSP_TRUE;
 }
 /* Get index of the selected object */
-int QSPGetSelObjectIndex()
+int QSPGetSelObjectIndex(void)
 {
     return qspCurSelObject;
 }
 /* Check whether the objects have been updated */
-QSP_BOOL QSPIsObjectsChanged()
+QSP_BOOL QSPIsObjectsChanged(void)
 {
     return qspIsObjectsChanged;
 }
@@ -253,7 +253,7 @@ QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize)
     return QSP_TRUE;
 }
 /* Get max number of variables */
-int QSPGetMaxVarsCount()
+int QSPGetMaxVarsCount(void)
 {
     return QSP_VARSCOUNT;
 }
@@ -317,7 +317,7 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI)
 /* Errors */
 
 /* Get details of the last error */
-QSPErrorInfo QSPGetLastErrorData()
+QSPErrorInfo QSPGetLastErrorData(void)
 {
     return qspLastError;
 }
@@ -380,7 +380,7 @@ void QSPSetCallBack(int type, QSP_CALLBACK func)
 }
 /* ------------------------------------------------------------ */
 /* Initialization of the engine */
-void QSPInit()
+void QSPInit(void)
 {
 #ifdef _DEBUG
     mwInit();
@@ -388,9 +388,9 @@ void QSPInit()
     qspInitRuntime();
 }
 /* Deallocate all resources */
-void QSPDeInit()
+void QSPTerminate(void)
 {
-    qspDeinitRuntime();
+    qspTerminateRuntime();
 #ifdef _DEBUG
     mwTerm();
 #endif

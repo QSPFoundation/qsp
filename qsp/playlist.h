@@ -29,8 +29,8 @@
 
     /* External functions */
     void qspClearPlayList(QSP_BOOL toInit);
-    void qspPlayPLFiles();
-    void qspRefreshPlayList();
+    void qspPlayPLFiles(void);
+    void qspRefreshPlayList(void);
     /* Statements */
     QSP_BOOL qspStatementPlayFile(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
     QSP_BOOL qspStatementCloseFile(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);

@@ -44,7 +44,7 @@ INLINE int qspGetVarsNames(QSPString names, QSPString **varNames);
 INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, QSP_CHAR op);
 INLINE QSPString qspGetVarNameOnly(QSPString s);
 
-void qspInitVarTypes()
+void qspInitVarTypes(void)
 {
     int i;
     for (i = 0; i < sizeof(qspSpecToBaseTypeTable); ++i)
@@ -415,7 +415,7 @@ int qspGetVarNumValue(QSPString name)
     return 0;
 }
 
-void qspRestoreGlobalVars()
+void qspRestoreGlobalVars(void)
 {
     if (qspSavedVarGroupsCount)
     {
@@ -738,7 +738,7 @@ QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
     return resultValue;
 }
 
-int qspGetVarsCount()
+int qspGetVarsCount(void)
 {
     int i, count = 0;
     for (i = 0; i < QSP_VARSCOUNT; ++i)

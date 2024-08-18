@@ -37,9 +37,9 @@
 
     /* External functions */
     void qspClearAllObjects(QSP_BOOL toInit);
-    void qspClearAllObjectsWithNotify();
+    void qspClearAllObjectsWithNotify(void);
     int qspObjIndex(QSPString name);
-    QSPString qspGetAllObjectsAsCode();
+    QSPString qspGetAllObjectsAsCode(void);
     /* Statements */
     QSP_BOOL qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
     QSP_BOOL qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);

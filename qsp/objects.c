@@ -47,7 +47,7 @@ void qspClearAllObjects(QSP_BOOL toInit)
     qspCurSelObject = -1;
 }
 
-void qspClearAllObjectsWithNotify()
+void qspClearAllObjectsWithNotify(void)
 {
     QSPVariant v;
     QSPString *objs;
@@ -125,7 +125,7 @@ int qspObjIndex(QSPString name)
     return -1;
 }
 
-QSPString qspGetAllObjectsAsCode()
+QSPString qspGetAllObjectsAsCode(void)
 {
     int i;
     QSPString temp;

@@ -26,7 +26,7 @@ void qspResetTime(int msecs)
     qspCallGetMSCount();
 }
 
-int qspGetTime()
+int qspGetTime(void)
 {
     if ((qspMSCount += qspCallGetMSCount()) < 0) qspMSCount = 0;
     return qspMSCount;

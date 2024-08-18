@@ -43,9 +43,9 @@ QSP_BOOL qspIsVarsDescChanged = QSP_FALSE;
 QSP_BOOL qspCurToShowVars = QSP_TRUE;
 QSP_BOOL qspCurToShowInput = QSP_TRUE;
 
-INLINE unsigned int qspURand();
+INLINE unsigned int qspURand(void);
 
-void qspInitRuntime()
+void qspInitRuntime(void)
 {
     qspNullString = qspStringFromPair(0, 0);
     qspNullTuple = qspCopyToNewTuple(0, 0);
@@ -77,11 +77,11 @@ void qspInitRuntime()
     qspInitMath();
 }
 
-void qspDeinitRuntime()
+void qspTerminateRuntime(void)
 {
     qspMemClear(QSP_FALSE);
     qspCreateWorld(0, 0);
-    qspDeinitMath();
+    qspTerminateMath();
     qspResetError(QSP_FALSE);
 }
 
@@ -151,14 +151,14 @@ void qspSetSeed(unsigned int seed)
     qspRandZ = qspURand();
 }
 
-INLINE unsigned int qspURand()
+INLINE unsigned int qspURand(void)
 {
     if (--qspRandI < 0) qspRandI = 54;
     if (--qspRandJ < 0) qspRandJ = 54;
     return qspRandX[qspRandJ] += qspRandX[qspRandI];
 }
 
-int qspRand()
+int qspRand(void)
 {
     int i = qspRandZ >> 24;
     qspRandZ = qspRandY[i];

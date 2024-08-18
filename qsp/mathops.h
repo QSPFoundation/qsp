@@ -138,8 +138,8 @@
     };
 
     /* External functions */
-    void qspInitMath();
-    void qspDeinitMath();
+    void qspInitMath(void);
+    void qspTerminateMath(void);
     QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression);
     int qspFreeValue(QSPMathExpression *expression, int valueIndex);
     QSPVariant qspValue(QSPMathExpression *expression, int valueIndex);

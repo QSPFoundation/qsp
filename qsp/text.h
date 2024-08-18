@@ -48,7 +48,7 @@
     extern unsigned char qspAsciiClasses[128];
 
     /* External functions */
-    void qspInitSymbolClasses();
+    void qspInitSymbolClasses(void);
     QSP_CHAR *qspStringToC(QSPString s);
     void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
     void qspAddBufText(QSPBufString *dest, QSPString val);

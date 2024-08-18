@@ -53,7 +53,7 @@
 
     /* External functions */
     void qspCreateWorld(int start, int newLocsCount);
-    void qspPrepareLocs();
+    void qspPrepareLocs(void);
     int qspLocIndex(QSPString name);
     void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
     void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count);

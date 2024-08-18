@@ -34,7 +34,7 @@ bool QSPApp::OnInit()
 
 int QSPApp::OnExit()
 {
-    QSPDeInit();
+    QSPTerminate();
     QSPCallBacks::DeInit();
     delete m_transHelper;
     wxTheClipboard->Flush();

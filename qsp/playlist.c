@@ -105,7 +105,7 @@ INLINE int qspSearchPlayList(QSPString file)
     return -1;
 }
 
-void qspPlayPLFiles()
+void qspPlayPLFiles(void)
 {
     int i, volume;
     QSP_CHAR *pos;
@@ -123,7 +123,7 @@ void qspPlayPLFiles()
     }
 }
 
-void qspRefreshPlayList()
+void qspRefreshPlayList(void)
 {
     QSP_CHAR *pos;
     QSPString *s, curFile;

@@ -59,7 +59,7 @@
     extern QSP_TINYINT qspSpecToBaseTypeTable[128];
 
     /* External functions */
-    void qspInitVarTypes();
+    void qspInitVarTypes(void);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
     void qspClearAllVars(QSP_BOOL toInit);
     void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val);
@@ -68,7 +68,7 @@
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
-    void qspRestoreGlobalVars();
+    void qspRestoreGlobalVars(void);
     int qspSaveLocalVarsAndRestoreGlobals(QSPVar **vars);
     void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGroups, int groupsCount);
     void qspRestoreVarsList(QSPVar *vars, int count);
@@ -76,7 +76,7 @@
     int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
     QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin);
-    int qspGetVarsCount();
+    int qspGetVarsCount(void);
     void qspSetArgs(QSPVar *var, QSPVariant *args, int count);
     void qspApplyResult(QSPVar *varRes, QSPVariant *res);
     /* Statements */

@@ -74,7 +74,7 @@ int qspCRCTable[256] =
 
 INLINE int qspCRC(void *, int);
 INLINE void qspIncludeFile(QSPString s);
-INLINE void qspOpenIncludes();
+INLINE void qspOpenIncludes(void);
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count);
 INLINE QSP_BOOL qspSkipLines(int totalLinesCount, int linesToSkip, int *index);
 INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, int *index, int *value);
@@ -128,7 +128,7 @@ INLINE void qspIncludeFile(QSPString s)
     qspCurIncFiles[qspCurIncFilesCount++] = qspCopyToNewText(s);
 }
 
-INLINE void qspOpenIncludes()
+INLINE void qspOpenIncludes(void)
 {
     int i, oldRefreshCount = qspRefreshCount;
     for (i = 0; i < qspCurIncFilesCount; ++i)

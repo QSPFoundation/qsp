@@ -79,33 +79,33 @@
     {
     #endif
 
-    QSP_EXTERN void QSPInit();
-    QSP_EXTERN void QSPDeInit();
+    QSP_EXTERN void QSPInit(void);
+    QSP_EXTERN void QSPTerminate(void);
     QSP_EXTERN void QSPSetCallBack(int type, QSP_CALLBACK func);
     QSP_EXTERN void QSPEnableDebugMode(QSP_BOOL isDebug);
     QSP_EXTERN void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum);
-    QSP_EXTERN QSPString QSPGetVersion();
-    QSP_EXTERN QSPString QSPGetCompiledDateTime();
-    QSP_EXTERN int QSPGetFullRefreshCount();
+    QSP_EXTERN QSPString QSPGetVersion(void);
+    QSP_EXTERN QSPString QSPGetCompiledDateTime(void);
+    QSP_EXTERN int QSPGetFullRefreshCount(void);
     /* Main desc */
-    QSP_EXTERN QSPString QSPGetMainDesc();
-    QSP_EXTERN QSP_BOOL QSPIsMainDescChanged();
+    QSP_EXTERN QSPString QSPGetMainDesc(void);
+    QSP_EXTERN QSP_BOOL QSPIsMainDescChanged(void);
     /* Vars desc */
-    QSP_EXTERN QSPString QSPGetVarsDesc();
-    QSP_EXTERN QSP_BOOL QSPIsVarsDescChanged();
+    QSP_EXTERN QSPString QSPGetVarsDesc(void);
+    QSP_EXTERN QSP_BOOL QSPIsVarsDescChanged(void);
     /* Input string */
     QSP_EXTERN void QSPSetInputStrText(QSPString str);
     /* Actions */
     QSP_EXTERN int QSPGetActions(QSPListItem *items, int itemsBufSize);
     QSP_EXTERN QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI);
-    QSP_EXTERN int QSPGetSelActionIndex();
-    QSP_EXTERN QSP_BOOL QSPIsActionsChanged();
+    QSP_EXTERN int QSPGetSelActionIndex(void);
+    QSP_EXTERN QSP_BOOL QSPIsActionsChanged(void);
     QSP_EXTERN QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI);
     /* Objects */
     QSP_EXTERN int QSPGetObjects(QSPListItem *items, int itemsBufSize);
     QSP_EXTERN QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI);
-    QSP_EXTERN int QSPGetSelObjectIndex();
-    QSP_EXTERN QSP_BOOL QSPIsObjectsChanged();
+    QSP_EXTERN int QSPGetSelObjectIndex(void);
+    QSP_EXTERN QSP_BOOL QSPIsObjectsChanged(void);
     /* Windows */
     QSP_EXTERN void QSPShowWindow(int type, QSP_BOOL toShow);
     /* Code execution */
@@ -114,7 +114,7 @@
     QSP_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI);
     QSP_EXTERN QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI);
     /* Errors */
-    QSP_EXTERN QSPErrorInfo QSPGetLastErrorData();
+    QSP_EXTERN QSPErrorInfo QSPGetLastErrorData(void);
     QSP_EXTERN QSPString QSPGetErrorDesc(int errorNum);
     /* Game */
     QSP_EXTERN QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame);
@@ -125,7 +125,7 @@
     /* Variables */
     QSP_EXTERN QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count);
     QSP_EXTERN QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *res);
-    QSP_EXTERN int QSPGetMaxVarsCount();
+    QSP_EXTERN int QSPGetMaxVarsCount(void);
     QSP_EXTERN QSP_BOOL QSPGetVarNameByIndex(int ind, QSPString *name);
 
     #ifdef __cplusplus

@@ -32,7 +32,7 @@ INLINE void qspFillSymbolClass(unsigned char symbolClass, QSP_CHAR *symbols)
     }
 }
 
-void qspInitSymbolClasses()
+void qspInitSymbolClasses(void)
 {
     int i;
     for (i = 0; i < sizeof(qspAsciiClasses); ++i)

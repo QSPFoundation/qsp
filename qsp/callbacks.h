@@ -43,7 +43,7 @@
     void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI);
     void qspFinalizeCallBack(QSPCallState *state);
 
-    void qspInitCallBacks();
+    void qspInitCallBacks(void);
     void qspSetCallBack(int type, QSP_CALLBACK func);
 
     void qspCallDebug(QSPString str);
@@ -58,7 +58,7 @@
     void qspCallCloseFile(QSPString file);
     void qspCallSystem(QSPString cmd);
     void qspCallSleep(int msecs);
-    int qspCallGetMSCount();
+    int qspCallGetMSCount(void);
     void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame);
     void qspCallOpenGameStatus(QSPString file);
     void qspCallSaveGameStatus(QSPString file);
