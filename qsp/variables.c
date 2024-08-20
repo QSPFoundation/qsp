@@ -378,8 +378,8 @@ void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVa
 
 QSPTuple qspGetVarTupleValue(QSPString name)
 {
-    QSPVar *var;
-    if (var = qspVarReference(name, QSP_FALSE))
+    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    if (var)
     {
         if (var->ValsCount && QSP_ISTUPLE(var->Values[0].Type))
             return QSP_TUPLE(var->Values[0]);
@@ -391,8 +391,8 @@ QSPTuple qspGetVarTupleValue(QSPString name)
 
 QSPString qspGetVarStrValue(QSPString name)
 {
-    QSPVar *var;
-    if (var = qspVarReference(name, QSP_FALSE))
+    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    if (var)
     {
         if (var->ValsCount && QSP_ISSTR(var->Values[0].Type))
             return QSP_STR(var->Values[0]);
@@ -404,8 +404,8 @@ QSPString qspGetVarStrValue(QSPString name)
 
 int qspGetVarNumValue(QSPString name)
 {
-    QSPVar *var;
-    if (var = qspVarReference(name, QSP_FALSE))
+    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    if (var)
     {
         if (var->ValsCount && QSP_ISNUM(var->Values[0].Type))
             return QSP_NUM(var->Values[0]);
@@ -1001,7 +1001,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     free(names);
 }
 
-QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
+QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
 {
     QSPVar *dest, *src;
     if (!(dest = qspVarReference(QSP_STR(args[0]), QSP_TRUE))) return QSP_FALSE;
@@ -1015,7 +1015,7 @@ QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *jum
     return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
+QSP_BOOL qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
 {
     if (count == 2)
         qspSortArray(QSP_STR(args[0]), QSP_ISFALSE(QSP_NUM(args[1])));
@@ -1024,7 +1024,7 @@ QSP_BOOL qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSPString *jum
     return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
+QSP_BOOL qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
 {
     if (count == 0)
         qspClearAllVars(QSP_FALSE);

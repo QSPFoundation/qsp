@@ -1138,7 +1138,7 @@ QSPVariant qspExprValue(QSPString expr)
     return res;
 }
 
-INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
+INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
     switch (QSP_BASETYPE(args[0].Type))
     {
@@ -1157,7 +1157,7 @@ INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
     }
 }
 
-INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
+INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
     switch (QSP_BASETYPE(args[0].Type))
     {
@@ -1173,7 +1173,7 @@ INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT count, QSPVariant *re
     }
 }
 
-INLINE void qspFunctionStrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
+INLINE void qspFunctionStrComp(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
     QSPRegExp *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
     if (!regExp) return;
@@ -1264,7 +1264,7 @@ INLINE void qspFunctionRand(QSPVariant *args, QSP_TINYINT count, QSPVariant *res
     QSP_PNUM(res) = qspRand() % (max - min + 1) + min;
 }
 
-INLINE void qspFunctionDesc(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
+INLINE void qspFunctionDesc(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
     int index = qspLocIndex(QSP_STR(args[0]));
     if (index < 0)
@@ -1275,7 +1275,7 @@ INLINE void qspFunctionDesc(QSPVariant *args, QSP_TINYINT count, QSPVariant *res
     QSP_PSTR(res) = qspFormatText(qspLocs[index].Desc, QSP_FALSE);
 }
 
-INLINE void qspFunctionGetObj(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
+INLINE void qspFunctionGetObj(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
     int ind = QSP_NUM(args[0]) - 1;
     if (ind >= 0 && ind < qspCurObjectsCount)
@@ -1284,7 +1284,7 @@ INLINE void qspFunctionGetObj(QSPVariant *args, QSP_TINYINT count, QSPVariant *r
         QSP_PSTR(res) = qspNullString;
 }
 
-INLINE void qspFunctionIsPlay(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
+INLINE void qspFunctionIsPlay(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
     if (qspIsAnyString(QSP_STR(args[0])))
         QSP_PNUM(res) = QSP_TOBOOL(qspCallIsPlayingFile(QSP_STR(args[0])) != 0);

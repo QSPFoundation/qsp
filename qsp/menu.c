@@ -43,7 +43,7 @@ INLINE void qspFreeMenuLocs(QSPString *locs, int count)
         qspFreeString(curLoc);
 }
 
-QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
+QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
 {
     QSPVar *var;
     QSPVariant *curItem;

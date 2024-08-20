@@ -148,14 +148,14 @@ void qspRefreshPlayList(void)
     free(s);
 }
 
-QSP_BOOL qspStatementPlayFile(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
+QSP_BOOL qspStatementPlayFile(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
 {
     int volume = (count == 2 ? QSP_NUM(args[1]) : 100);
     qspPlayFile(QSP_STR(args[0]), volume, QSP_TRUE);
     return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementCloseFile(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
+QSP_BOOL qspStatementCloseFile(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
 {
     int pos;
     if (!qspPLFilesCount) return QSP_FALSE;

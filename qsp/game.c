@@ -585,7 +585,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     return QSP_TRUE;
 }
 
-QSP_BOOL qspStatementOpenQst(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
+QSP_BOOL qspStatementOpenQst(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT extArg)
 {
     int oldRefreshCount;
     switch (extArg)
@@ -606,7 +606,7 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, QSP_TINYINT count, QSPString *jum
     return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementOpenGame(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
+QSP_BOOL qspStatementOpenGame(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
 {
     if (count && qspIsAnyString(QSP_STR(args[0])))
         qspCallOpenGameStatus(QSP_STR(args[0]));
@@ -615,7 +615,7 @@ QSP_BOOL qspStatementOpenGame(QSPVariant *args, QSP_TINYINT count, QSPString *ju
     return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementSaveGame(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg)
+QSP_BOOL qspStatementSaveGame(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
 {
     if (count && qspIsAnyString(QSP_STR(args[0])))
         qspCallSaveGameStatus(QSP_STR(args[0]));

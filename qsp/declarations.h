@@ -51,6 +51,18 @@
         #define INLINE static
     #endif
 
+    #if defined(__GNUC__) || defined(__clang__)
+        #define QSP_UNUSED(x) unused_ ## x __attribute__((unused))
+    #elif defined(_MSC_VER)
+        #define QSP_UNUSED(x) \
+            __pragma(warning(push)) \
+            __pragma(warning(suppress: 4100)) \
+            unused_ ## x \
+            __pragma(warning(pop))
+    #else
+        #define QSP_UNUSED(x) unused_ ## x
+    #endif
+
     #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
     #if defined(__GNUC__)
         #define QSP_STATIC_STR(x) ((QSPString) { (x), (x) + QSP_STATIC_LEN(x) })
