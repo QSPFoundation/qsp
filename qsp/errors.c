@@ -65,16 +65,13 @@ void qspResetError(QSP_BOOL toInit)
     qspLastError.ActIndex = -1;
     qspLastError.TopLineNum = 0;
     qspLastError.IntLineNum = 0;
-    if (toInit)
+    if (!toInit)
     {
-        qspLastError.LocName = qspNullString;
-        qspLastError.IntLine = qspNullString;
+        qspFreeString(&qspLastError.LocName);
+        qspFreeString(&qspLastError.IntLine);
     }
-    else
-    {
-        qspClearText(&qspLastError.LocName);
-        qspClearText(&qspLastError.IntLine);
-    }
+    qspLastError.LocName = qspNullString;
+    qspLastError.IntLine = qspNullString;
 }
 
 QSPString qspGetErrorDesc(int errorNum)
