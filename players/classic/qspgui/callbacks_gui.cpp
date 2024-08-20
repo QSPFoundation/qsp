@@ -72,23 +72,24 @@ void QSPCallBacks::DeInit()
     FMOD_System_Release(m_sys);
 }
 
-void QSPCallBacks::SetTimer(int msecs)
+int QSPCallBacks::SetTimer(int msecs)
 {
-    if (m_frame->ToQuit()) return;
+    if (m_frame->ToQuit()) return 0;
     if (msecs)
         m_frame->GetTimer()->Start(msecs);
     else
         m_frame->GetTimer()->Stop();
+    return 0;
 }
 
-void QSPCallBacks::RefreshInt(QSP_BOOL isForced)
+int QSPCallBacks::RefreshInt(QSP_BOOL isForced)
 {
     static int oldFullRefreshCount = 0;
     int i;
     bool toScroll, canSave;
     QSPListItem items[MAX_LIST_ITEMS];
     QSPVariant val;
-    if (m_frame->ToQuit()) return;
+    if (m_frame->ToQuit()) return 0;
     // -------------------------------
     toScroll = !(QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("DISABLESCROLL")), 0, &val) && QSP_ISNUM(val.Type) && QSP_NUM(val));
     canSave = !(QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("NOSAVE")), 0, &val) && QSP_ISNUM(val.Type) && QSP_NUM(val));
@@ -147,19 +148,21 @@ void QSPCallBacks::RefreshInt(QSP_BOOL isForced)
         m_frame->EnableControls(false, true);
         m_frame->Update();
         wxTheApp->Yield(true);
-        if (m_frame->ToQuit()) return;
+        if (m_frame->ToQuit()) return 0;
         m_frame->EnableControls(true, true);
     }
     m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, canSave);
+    return 0;
 }
 
-void QSPCallBacks::SetInputStrText(QSPString text)
+int QSPCallBacks::SetInputStrText(QSPString text)
 {
-    if (m_frame->ToQuit()) return;
+    if (m_frame->ToQuit()) return 0;
     m_frame->GetInput()->SetText(wxString(text.Str, text.End));
+    return 0;
 }
 
-QSP_BOOL QSPCallBacks::IsPlay(QSPString file)
+int QSPCallBacks::IsPlay(QSPString file)
 {
     FMOD_BOOL playing = FALSE;
     wxString fileName(file.Str, file.End);
@@ -169,7 +172,7 @@ QSP_BOOL QSPCallBacks::IsPlay(QSPString file)
     return (playing == TRUE);
 }
 
-void QSPCallBacks::CloseFile(QSPString file)
+int QSPCallBacks::CloseFile(QSPString file)
 {
     if (file.Str)
     {
@@ -187,20 +190,21 @@ void QSPCallBacks::CloseFile(QSPString file)
             ((QSPSound *)(&i->second))->Free();
         m_sounds.clear();
     }
+    return 0;
 }
 
-void QSPCallBacks::PlayFile(QSPString file, int volume)
+int QSPCallBacks::PlayFile(QSPString file, int volume)
 {
     FMOD_SOUND *newSound;
     FMOD_CHANNEL *newChannel;
     QSPSound snd;
-    if (SetVolume(file, volume)) return;
+    if (SetVolume(file, volume)) return 0;
     CloseFile(file);
     wxString fileName(file.Str, file.End);
     wxString filePath(m_frame->ComposeGamePath(fileName));
-    #if defined(__WXMSW__) || defined(__WXOSX__)
+#if defined(__WXMSW__) || defined(__WXOSX__)
     if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(filePath.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, 0, &newSound))
-    #else
+#else
     FMOD_CREATESOUNDEXINFO exInfo;
     memset(&exInfo, 0, sizeof(FMOD_CREATESOUNDEXINFO));
     exInfo.cbsize = sizeof(FMOD_CREATESOUNDEXINFO);
@@ -208,7 +212,7 @@ void QSPCallBacks::PlayFile(QSPString file, int volume)
     wxCharBuffer dlsCharPath(wxConvFile.cWX2MB(dlsPath.c_str()));
     exInfo.dlsname = dlsCharPath;
     if (!FMOD_System_CreateSound(m_sys, wxConvFile.cWX2MB(filePath.c_str()), FMOD_SOFTWARE | FMOD_CREATESTREAM, &exInfo, &newSound))
-    #endif
+#endif
     {
         UpdateSounds();
         FMOD_System_PlaySound(m_sys, FMOD_CHANNEL_FREE, newSound, FALSE, &newChannel);
@@ -218,11 +222,12 @@ void QSPCallBacks::PlayFile(QSPString file, int volume)
         m_sounds.insert(QSPSounds::value_type(fileName.Upper(), snd));
         SetVolume(file, volume);
     }
+    return 0;
 }
 
-void QSPCallBacks::ShowPane(int type, QSP_BOOL toShow)
+int QSPCallBacks::ShowPane(int type, QSP_BOOL toShow)
 {
-    if (m_frame->ToQuit()) return;
+    if (m_frame->ToQuit()) return 0;
     switch (type)
     {
     case QSP_WIN_ACTS:
@@ -238,11 +243,12 @@ void QSPCallBacks::ShowPane(int type, QSP_BOOL toShow)
         m_frame->ShowPane(ID_INPUT, toShow != QSP_FALSE);
         break;
     }
+    return 0;
 }
 
-void QSPCallBacks::Sleep(int msecs)
+int QSPCallBacks::Sleep(int msecs)
 {
-    if (m_frame->ToQuit()) return;
+    if (m_frame->ToQuit()) return 0;
     bool canSave = m_frame->GetGameMenu()->IsEnabled(ID_SAVEGAMESTAT);
     bool toBreak = false;
     m_frame->EnableControls(false, true);
@@ -267,6 +273,7 @@ void QSPCallBacks::Sleep(int msecs)
     }
     m_frame->EnableControls(true, true);
     m_frame->GetGameMenu()->Enable(ID_SAVEGAMESTAT, canSave);
+    return 0;
 }
 
 int QSPCallBacks::GetMSCount()
@@ -277,9 +284,9 @@ int QSPCallBacks::GetMSCount()
     return ret;
 }
 
-void QSPCallBacks::Msg(QSPString str)
+int QSPCallBacks::Msg(QSPString str)
 {
-    if (m_frame->ToQuit()) return;
+    if (m_frame->ToQuit()) return 0;
     QSPMsgDlg dialog(m_frame,
         wxID_ANY,
         m_frame->GetDesc()->GetBackgroundColour(),
@@ -293,6 +300,7 @@ void QSPCallBacks::Msg(QSPString str)
     m_frame->EnableControls(false);
     dialog.ShowModal();
     m_frame->EnableControls(true);
+    return 0;
 }
 
 int QSPCallBacks::ShowMenu(QSPListItem *items, int count)
@@ -307,9 +315,9 @@ int QSPCallBacks::ShowMenu(QSPListItem *items, int count)
     return index;
 }
 
-void QSPCallBacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
+int QSPCallBacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
 {
-    if (m_frame->ToQuit()) return;
+    if (m_frame->ToQuit()) return 0;
     QSPInputDlg dialog(m_frame,
         wxID_ANY,
         m_frame->GetDesc()->GetBackgroundColour(),
@@ -323,14 +331,119 @@ void QSPCallBacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
     m_frame->EnableControls(false);
     dialog.ShowModal();
     m_frame->EnableControls(true);
-    #ifdef _UNICODE
-        wcsncpy(buffer, dialog.GetText().c_str(), maxLen);
-    #else
-        strncpy(buffer, dialog.GetText().c_str(), maxLen);
-    #endif
+#ifdef _UNICODE
+    wcsncpy(buffer, dialog.GetText().c_str(), maxLen);
+#else
+    strncpy(buffer, dialog.GetText().c_str(), maxLen);
+#endif
+    return 0;
 }
 
-void QSPCallBacks::Version(QSPString param, QSP_CHAR *buffer, int maxLen)
+int QSPCallBacks::ShowImage(QSPString file)
+{
+    if (m_frame->ToQuit()) return 0;
+    if (file.Str)
+    {
+        wxString imgFullPath(m_frame->ComposeGamePath(wxString(file.Str, file.End)));
+        m_frame->ShowPane(ID_VIEWPIC, m_frame->GetImgView()->OpenFile(imgFullPath));
+    }
+    else
+    {
+        m_frame->ShowPane(ID_VIEWPIC, false);
+    }
+    return 0;
+}
+
+int QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
+{
+    if (m_frame->ToQuit()) return 0;
+    wxString fullPath(m_frame->ComposeGamePath(wxString(file.Str, file.End)));
+    if (wxFileExists(fullPath))
+    {
+        wxFile fileToLoad(fullPath);
+        int fileSize = fileToLoad.Length();
+        void *fileData = (void *)malloc(fileSize);
+        if (fileToLoad.Read(fileData, fileSize) == fileSize)
+        {
+            if (QSPLoadGameWorldFromData(fileData, fileSize, isNewGame) && isNewGame)
+                m_frame->UpdateGamePath(fullPath);
+        }
+        free(fileData);
+    }
+    return 0;
+}
+
+int QSPCallBacks::OpenGameStatus(QSPString file)
+{
+    if (m_frame->ToQuit()) return 0;
+    wxString fullPath;
+    if (file.Str)
+    {
+        fullPath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
+    }
+    else
+    {
+        wxFileDialog dialog(m_frame, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
+        m_frame->EnableControls(false);
+        int res = dialog.ShowModal();
+        m_frame->EnableControls(true);
+        if (res != wxID_OK)
+            return 0;
+        fullPath = dialog.GetPath();
+    }
+    if (wxFileExists(fullPath))
+    {
+        wxFile fileToLoad(fullPath);
+        int fileSize = fileToLoad.Length();
+        void *fileData = (void *)malloc(fileSize);
+        if (fileToLoad.Read(fileData, fileSize) == fileSize)
+            QSPOpenSavedGameFromData(fileData, fileSize, QSP_FALSE);
+        free(fileData);
+    }
+    return 0;
+}
+
+int QSPCallBacks::SaveGameStatus(QSPString file)
+{
+    if (m_frame->ToQuit()) return 0;
+    wxString fullPath;
+    if (file.Str)
+    {
+        fullPath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
+    }
+    else
+    {
+        wxFileDialog dialog(m_frame, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
+        m_frame->EnableControls(false);
+        int res = dialog.ShowModal();
+        m_frame->EnableControls(true);
+        if (res != wxID_OK)
+            return 0;
+        fullPath = dialog.GetPath();
+    }
+    int fileSize = 64 * 1024;
+    void *fileData = (void *)malloc(fileSize);
+    if (!QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
+    {
+        while (fileSize)
+        {
+            fileData = (void *)realloc(fileData, fileSize);
+            if (QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
+                break;
+        }
+        if (!fileSize)
+        {
+            free(fileData);
+            return 0;
+        }
+    }
+    wxFile fileToSave(fullPath, wxFile::write);
+    fileToSave.Write(fileData, fileSize);
+    free(fileData);
+    return 0;
+}
+
+int QSPCallBacks::Version(QSPString param, QSP_CHAR *buffer, int maxLen)
 {
     wxString result;
     wxString request(param.Str, param.End);
@@ -352,106 +465,7 @@ void QSPCallBacks::Version(QSPString param, QSP_CHAR *buffer, int maxLen)
 #else
     strncpy(buffer, result.c_str(), maxLen);
 #endif
-}
-
-void QSPCallBacks::ShowImage(QSPString file)
-{
-    if (m_frame->ToQuit()) return;
-    if (file.Str)
-    {
-        wxString imgFullPath(m_frame->ComposeGamePath(wxString(file.Str, file.End)));
-        m_frame->ShowPane(ID_VIEWPIC, m_frame->GetImgView()->OpenFile(imgFullPath));
-    }
-    else
-    {
-        m_frame->ShowPane(ID_VIEWPIC, false);
-    }
-}
-
-void QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
-{
-    if (m_frame->ToQuit()) return;
-    wxString fullPath(m_frame->ComposeGamePath(wxString(file.Str, file.End)));
-    if (wxFileExists(fullPath))
-    {
-        wxFile fileToLoad(fullPath);
-        int fileSize = fileToLoad.Length();
-        void *fileData = (void *)malloc(fileSize);
-        if (fileToLoad.Read(fileData, fileSize) == fileSize)
-        {
-            if (QSPLoadGameWorldFromData(fileData, fileSize, isNewGame) && isNewGame)
-                m_frame->UpdateGamePath(fullPath);
-        }
-        free(fileData);
-    }
-}
-
-void QSPCallBacks::OpenGameStatus(QSPString file)
-{
-    if (m_frame->ToQuit()) return;
-    wxString fullPath;
-    if (file.Str)
-    {
-        fullPath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
-    }
-    else
-    {
-        wxFileDialog dialog(m_frame, _("Select saved game file"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_OPEN);
-        m_frame->EnableControls(false);
-        int res = dialog.ShowModal();
-        m_frame->EnableControls(true);
-        if (res != wxID_OK)
-            return;
-        fullPath = dialog.GetPath();
-    }
-    if (wxFileExists(fullPath))
-    {
-        wxFile fileToLoad(fullPath);
-        int fileSize = fileToLoad.Length();
-        void *fileData = (void *)malloc(fileSize);
-        if (fileToLoad.Read(fileData, fileSize) == fileSize)
-            QSPOpenSavedGameFromData(fileData, fileSize, QSP_FALSE);
-        free(fileData);
-    }
-}
-
-void QSPCallBacks::SaveGameStatus(QSPString file)
-{
-    if (m_frame->ToQuit()) return;
-    wxString fullPath;
-    if (file.Str)
-    {
-        fullPath = m_frame->ComposeGamePath(wxString(file.Str, file.End));
-    }
-    else
-    {
-        wxFileDialog dialog(m_frame, _("Select file to save"), wxEmptyString, wxEmptyString, _("Saved game files (*.sav)|*.sav"), wxFD_SAVE);
-        m_frame->EnableControls(false);
-        int res = dialog.ShowModal();
-        m_frame->EnableControls(true);
-        if (res != wxID_OK)
-            return;
-        fullPath = dialog.GetPath();
-    }
-    int fileSize = 64 * 1024;
-    void *fileData = (void *)malloc(fileSize);
-    if (!QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
-    {
-        while (fileSize)
-        {
-            fileData = (void *)realloc(fileData, fileSize);
-            if (QSPSaveGameAsData(fileData, &fileSize, QSP_FALSE))
-                break;
-        }
-        if (!fileSize)
-        {
-            free(fileData);
-            return;
-        }
-    }
-    wxFile fileToSave(fullPath, wxFile::write);
-    fileToSave.Write(fileData, fileSize);
-    free(fileData);
+    return 0;
 }
 
 bool QSPCallBacks::SetVolume(QSPString file, int volume)

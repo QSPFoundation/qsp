@@ -79,23 +79,23 @@
         static void SetOverallVolume(float coeff);
 
         // CallBacks
-        static void RefreshInt(QSP_BOOL isForced);
-        static void SetTimer(int msecs);
-        static void SetInputStrText(QSPString text);
-        static QSP_BOOL IsPlay(QSPString file);
-        static void CloseFile(QSPString file);
-        static void PlayFile(QSPString file, int volume);
-        static void ShowPane(int type, QSP_BOOL toShow);
-        static void Sleep(int msecs);
+        static int RefreshInt(QSP_BOOL isForced);
+        static int SetTimer(int msecs);
+        static int SetInputStrText(QSPString text);
+        static int IsPlay(QSPString file);
+        static int CloseFile(QSPString file);
+        static int PlayFile(QSPString file, int volume);
+        static int ShowPane(int type, QSP_BOOL toShow);
+        static int Sleep(int msecs);
         static int GetMSCount();
-        static void Msg(QSPString str);
+        static int Msg(QSPString str);
         static int ShowMenu(QSPListItem *items, int count);
-        static void Input(QSPString text, QSP_CHAR *buffer, int maxLen);
-        static void ShowImage(QSPString file);
-        static void OpenGame(QSPString file, QSP_BOOL isNewGame);
-        static void OpenGameStatus(QSPString file);
-        static void SaveGameStatus(QSPString file);
-        static void Version(QSPString param, QSP_CHAR *buffer, int maxLen);
+        static int Input(QSPString text, QSP_CHAR *buffer, int maxLen);
+        static int ShowImage(QSPString file);
+        static int OpenGame(QSPString file, QSP_BOOL isNewGame);
+        static int OpenGameStatus(QSPString file);
+        static int SaveGameStatus(QSPString file);
+        static int Version(QSPString param, QSP_CHAR *buffer, int maxLen);
     private:
         // Internal methods
         static bool SetVolume(QSPString file, int volume);
