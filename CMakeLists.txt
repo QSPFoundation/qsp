@@ -255,19 +255,19 @@ if(BUILD_QSPGUI)
 	endif()
 
 	set(QSPGUI_SOURCES
-		players/classic/qspgui/src/animwin.cpp
-		players/classic/qspgui/src/app.cpp
-		players/classic/qspgui/src/callbacks_gui.cpp
-		players/classic/qspgui/src/comtools.cpp
-		players/classic/qspgui/src/frame.cpp
-		players/classic/qspgui/src/imgcanvas.cpp
-		players/classic/qspgui/src/initevent.cpp
-		players/classic/qspgui/src/inputbox.cpp
-		players/classic/qspgui/src/inputdlg.cpp
-		players/classic/qspgui/src/listbox.cpp
-		players/classic/qspgui/src/msgdlg.cpp
-		players/classic/qspgui/src/textbox.cpp
-		players/classic/qspgui/src/transhelper.cpp
+		players/classic/qspgui/animwin.cpp
+		players/classic/qspgui/app.cpp
+		players/classic/qspgui/callbacks_gui.cpp
+		players/classic/qspgui/comtools.cpp
+		players/classic/qspgui/frame.cpp
+		players/classic/qspgui/imgcanvas.cpp
+		players/classic/qspgui/initevent.cpp
+		players/classic/qspgui/inputbox.cpp
+		players/classic/qspgui/inputdlg.cpp
+		players/classic/qspgui/listbox.cpp
+		players/classic/qspgui/msgdlg.cpp
+		players/classic/qspgui/textbox.cpp
+		players/classic/qspgui/transhelper.cpp
 	)
 	if(WIN32)
 		list(APPEND QSPGUI_SOURCES players/classic/qspgui/src/rsc/res.rc)
