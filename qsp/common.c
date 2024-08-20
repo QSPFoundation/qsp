@@ -50,11 +50,6 @@ void qspInitRuntime(void)
     qspNullString = qspStringFromPair(0, 0);
     qspNullTuple = qspCopyToNewTuple(0, 0);
 
-    qspRealCurLoc = -1;
-    qspRealActIndex = -1;
-    qspRealLineNum = 0;
-    qspRealLine = 0;
-
     qspIsDebug = QSP_FALSE;
     qspLocationState = 0;
     qspFullRefreshCount = 0;
