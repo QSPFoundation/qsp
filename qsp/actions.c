@@ -167,7 +167,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
     QSPVariant args[2];
     QSP_TINYINT argsCount;
     QSPLineOfCode code;
-    int oldRefreshCount;
+    int oldLocationState;
     QSP_CHAR *lastPos, *firstPos = s->Str.Str + s->Stats[statPos].EndPos;
     if (firstPos == s->Str.End || *firstPos != QSP_COLONDELIM[0])
     {
@@ -179,9 +179,9 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
         qspSetError(QSP_ERR_CODENOTFOUND);
         return;
     }
-    oldRefreshCount = qspRefreshCount;
+    oldLocationState = qspLocationState;
     argsCount = qspGetStatArgs(s->Str, s->Stats + statPos, args);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
         return;
     ++statPos; /* start with the internal code */
     firstPos += QSP_STATIC_LEN(QSP_COLONDELIM);
@@ -202,10 +202,10 @@ void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine)
 {
     QSPVariant args[2];
     QSP_TINYINT argsCount;
-    int oldRefreshCount = qspRefreshCount;
+    int oldLocationState = qspLocationState;
     QSPLineOfCode *line = s + lineInd;
     argsCount = qspGetStatArgs(line->Str, line->Stats, args);
-    if (qspRefreshCount != oldRefreshCount) return;
+    if (qspLocationState != oldLocationState) return;
     qspAddAction(args, argsCount, s, lineInd + 1, endLine);
     qspFreeVariants(args, argsCount);
 }

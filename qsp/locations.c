@@ -27,7 +27,7 @@ QSPLocation *qspLocs = 0;
 QSPLocName *qspLocsNames = 0;
 int qspLocsCount = 0;
 int qspCurLoc = -1;
-int qspRefreshCount = 0;
+int qspLocationState = 0;
 int qspFullRefreshCount = 0;
 
 INLINE int qspLocsCompare(const void *locName1, const void *locName2);
@@ -109,7 +109,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     QSP_TINYINT argsCount;
     QSPString str;
     QSPLineOfCode *oldLine;
-    int i, oldLoc, oldActIndex, oldLineNum, oldRefreshCount = qspRefreshCount;
+    int i, oldLoc, oldActIndex, oldLineNum, oldLocationState = qspLocationState;
     QSPLocation *loc = qspLocs + locInd;
     /* remember the previous state to restore it after internal calls */
     oldLoc = qspRealCurLoc;
@@ -122,7 +122,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     qspRealLineNum = 0;
     qspRealLine = 0;
     str = qspFormatText(loc->Desc, QSP_FALSE);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
     {
         qspRealLine = oldLine;
         qspRealLineNum = oldLineNum;
@@ -150,7 +150,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         str = loc->Actions[i].Desc;
         if (qspIsEmpty(str)) break;
         str = qspFormatText(str, QSP_FALSE);
-        if (qspRefreshCount != oldRefreshCount)
+        if (qspLocationState != oldLocationState)
         {
             qspRealLine = oldLine;
             qspRealLineNum = oldLineNum;
@@ -202,7 +202,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
 void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     QSPVar *varArgs, *varRes;
-    int oldRefreshCount, locInd = qspLocIndex(name);
+    int oldLocationState, locInd = qspLocIndex(name);
     if (locInd < 0)
     {
         qspSetError(QSP_ERR_LOCNOTFOUND);
@@ -212,9 +212,9 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT coun
     if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE))) return;
     qspAllocateSavedVarsGroupWithArgs(varArgs, varRes);
     qspSetArgs(varArgs, args, count);
-    oldRefreshCount = qspRefreshCount;
+    oldLocationState = qspLocationState;
     qspExecLocByIndex(locInd, QSP_FALSE);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return;
@@ -235,7 +235,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT c
 {
     QSPVar *var;
     QSPString locName;
-    int ind = 0, oldRefreshCount = qspRefreshCount;
+    int ind = 0, oldLocationState = qspLocationState;
     /* We execute all locations specified in the array */
     while (1)
     {
@@ -246,7 +246,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT c
         locName = QSP_STR(var->Values[ind]);
         if (!qspIsAnyString(locName)) break;
         qspExecLocByNameWithArgs(locName, args, count, 0);
-        if (qspRefreshCount != oldRefreshCount) break;
+        if (qspLocationState != oldLocationState) break;
         ++ind;
     }
 }
@@ -254,7 +254,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT c
 void qspRefreshCurLoc(QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT count)
 {
     QSPVar *varArgs;
-    int oldRefreshCount;
+    int oldLocationState;
     if (qspCurLoc < 0) return;
     qspRestoreGlobalVars(); /* clean all local variables */
     if (qspErrorNum) return;
@@ -263,12 +263,12 @@ void qspRefreshCurLoc(QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT count
     qspEmptyVar(varArgs);
     qspSetArgs(varArgs, args, count);
     qspClearAllActions(QSP_FALSE);
-    ++qspRefreshCount;
+    ++qspLocationState;
     if (toChangeDesc) ++qspFullRefreshCount;
     qspAllocateSavedVarsGroup();
-    oldRefreshCount = qspRefreshCount;
+    oldLocationState = qspLocationState;
     qspExecLocByIndex(qspCurLoc, toChangeDesc);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return;

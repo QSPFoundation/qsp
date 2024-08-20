@@ -56,7 +56,8 @@ void qspInitRuntime(void)
     qspRealLine = 0;
 
     qspIsDebug = QSP_FALSE;
-    qspRefreshCount = qspFullRefreshCount = 0;
+    qspLocationState = 0;
+    qspFullRefreshCount = 0;
     qspQstCRC = 0;
     qspMSCount = 0;
     qspLocs = 0;

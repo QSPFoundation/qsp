@@ -31,7 +31,7 @@ void qspSetError(int num)
 {
     if (!qspErrorNum)
     {
-        ++qspRefreshCount; /* terminate execution of the code */
+        ++qspLocationState; /* terminate execution of the code */
 
         qspErrorNum = num;
         qspLastError.ErrorNum = num;

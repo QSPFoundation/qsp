@@ -352,11 +352,11 @@ QSP_TINYINT qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
     if (stat->ArgsCount > 0)
     {
         QSP_TINYINT argIndex, type;
-        int oldRefreshCount = qspRefreshCount;
+        int oldLocationState = qspLocationState;
         for (argIndex = 0; argIndex < stat->ArgsCount; ++argIndex)
         {
             args[argIndex] = qspExprValue(qspStringFromPair(s.Str + stat->Args[argIndex].StartPos, s.Str + stat->Args[argIndex].EndPos));
-            if (qspRefreshCount != oldRefreshCount)
+            if (qspLocationState != oldLocationState)
             {
                 qspFreeVariants(args, argIndex);
                 return 0;
@@ -376,7 +376,7 @@ QSP_TINYINT qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
 INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_TINYINT statCode;
-    int i, oldRefreshCount = qspRefreshCount;
+    int i, oldLocationState = qspLocationState;
     for (i = startStat; i < endStat; ++i)
     {
         statCode = line->Stats[i].Stat;
@@ -399,11 +399,11 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
             return qspStatementSinglelineLoop(line, i, endStat, jumpTo);
         case qspStatLocal:
             qspStatementLocal(line->Str, line->Stats + i);
-            if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+            if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatSet:
             qspStatementSetVarValue(line->Str, line->Stats + i);
-            if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+            if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatExit:
             return QSP_TRUE;
@@ -411,7 +411,7 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
             {
                 QSPVariant arg; /* 1 argument only */
                 qspGetStatArgs(line->Str, line->Stats + i, &arg);
-                if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+                if (qspLocationState != oldLocationState) return QSP_FALSE;
                 qspUpdateText(jumpTo, qspDelSpc(QSP_STR(arg)));
                 qspUpperStr(jumpTo);
                 qspFreeVariant(&arg);
@@ -421,10 +421,10 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
             {
                 QSPVariant args[QSP_STATMAXARGS];
                 QSP_TINYINT argsCount = qspGetStatArgs(line->Str, line->Stats + i, args);
-                if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+                if (qspLocationState != oldLocationState) return QSP_FALSE;
                 qspStats[statCode].Func(args, argsCount, statCode);
                 qspFreeVariants(args, argsCount);
-                if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+                if (qspLocationState != oldLocationState) return QSP_FALSE;
                 break;
             }
         }
@@ -449,9 +449,9 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *lines, int endLine, int code
     case qspStatIf:
     case qspStatElseIf:
         {
-            int elsePos, oldRefreshCount = qspRefreshCount;
+            int elsePos, oldLocationState = qspLocationState;
             QSP_BOOL condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, line->Str.Str + line->Stats->EndPos));
-            if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+            if (qspLocationState != oldLocationState) return QSP_FALSE;
             elsePos = qspSearchElse(lines, ind, endLine);
             if (condition)
             {
@@ -499,7 +499,7 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine,
     {
     case qspStatElseIf:
         {
-            int oldRefreshCount;
+            int oldLocationState;
             QSP_BOOL condition;
             QSP_CHAR *pos = line->Str.Str + line->Stats->EndPos;
             if (pos == line->Str.End || *pos != QSP_COLONDELIM[0])
@@ -513,9 +513,9 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine,
                 qspSetError(QSP_ERR_ENDNOTFOUND);
                 break;
             }
-            oldRefreshCount = qspRefreshCount;
+            oldLocationState = qspLocationState;
             condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, pos));
-            if (qspRefreshCount != oldRefreshCount) break;
+            if (qspLocationState != oldLocationState) break;
             if (condition)
             {
                 *lineInd = endLine;
@@ -549,7 +549,7 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
     QSPLineOfCode *line;
     QSPString jumpToFake;
     QSP_BOOL uLevel, toExit = QSP_FALSE;
-    int i, oldRefreshCount = qspRefreshCount, action = qspFlowExecute;
+    int i, oldLocationState = qspLocationState, action = qspFlowExecute;
     /* Prepare temporary data */
     if (uLevel = !jumpTo)
     {
@@ -576,14 +576,14 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
             if (qspIsDebug)
             {
                 qspCallDebug(line->Str);
-                if (qspRefreshCount != oldRefreshCount) break;
+                if (qspLocationState != oldLocationState) break;
             }
         }
         if (line->LinesToEnd)
             toExit = qspExecMultilineCode(s, endLine, codeOffset, jumpTo, &i, &action);
         else
             toExit = qspExecSinglelineCode(s, endLine, jumpTo, &i, &action);
-        if (qspRefreshCount != oldRefreshCount) break;
+        if (qspLocationState != oldLocationState) break;
         if (toExit)
         {
             if (!qspIsEmpty(*jumpTo))
@@ -601,7 +601,7 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
         if (action == qspFlowExecute)
         {
             toExit = qspExecString(line, 0, line->StatsCount, jumpTo);
-            if (qspRefreshCount != oldRefreshCount) break;
+            if (qspLocationState != oldLocationState) break;
             if (toExit)
             {
                 if (!qspIsEmpty(*jumpTo))
@@ -628,10 +628,10 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
 QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
-    int oldRefreshCount = qspRefreshCount;
+    int oldLocationState = qspLocationState;
     qspAllocateSavedVarsGroup();
     toExit = qspExecCode(s, startLine, endLine, codeOffset, jumpTo);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return QSP_FALSE;
@@ -643,10 +643,10 @@ QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine
 INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
-    int oldRefreshCount = qspRefreshCount;
+    int oldLocationState = qspLocationState;
     qspAllocateSavedVarsGroup();
     toExit = qspExecString(line, startStat, endStat, jumpTo);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return QSP_FALSE;
@@ -659,16 +659,16 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
 {
     QSPLineOfCode *strs;
     QSPVar *varArgs, *varRes;
-    int oldRefreshCount, linesCount;
+    int oldLocationState, linesCount;
     if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return;
     if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE))) return;
     qspAllocateSavedVarsGroupWithArgs(varArgs, varRes);
     qspSetArgs(varArgs, args, count);
     linesCount = qspPreprocessData(s, &strs);
-    oldRefreshCount = qspRefreshCount;
+    oldLocationState = qspLocationState;
     qspExecCode(strs, 0, linesCount, codeOffset, 0);
     qspFreePrepLines(strs, linesCount);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return;
@@ -688,7 +688,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
 INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_BOOL condition;
-    int i, c, elseStat, oldRefreshCount;
+    int i, c, elseStat, oldLocationState;
     QSP_CHAR *pos = line->Str.Str + line->Stats[startStat].EndPos;
     if (pos == line->Str.End || *pos != QSP_COLONDELIM[0])
     {
@@ -732,9 +732,9 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
         qspSetError(QSP_ERR_CODENOTFOUND);
         return QSP_FALSE;
     }
-    oldRefreshCount = qspRefreshCount;
+    oldLocationState = qspLocationState;
     condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats[startStat].ParamPos, pos));
-    if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+    if (qspLocationState != oldLocationState) return QSP_FALSE;
     if (condition)
     {
         if (elseStat)
@@ -762,9 +762,9 @@ INLINE QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString
     qspInitLineOfCode(&initializatorLine, qspStringFromPair(params.Str, whilePos), 0);
     if (initializatorLine.StatsCount)
     {
-        int oldRefreshCount = qspRefreshCount;
+        int oldLocationState = qspLocationState;
         QSP_BOOL toExit = qspExecString(&initializatorLine, 0, initializatorLine.StatsCount, jumpTo);
-        if (toExit || qspRefreshCount != oldRefreshCount)
+        if (toExit || qspLocationState != oldLocationState)
         {
             qspFreeLineOfCode(&initializatorLine);
             return toExit;
@@ -787,9 +787,9 @@ INLINE QSP_BOOL qspPrepareLoop(QSPString params, QSPString *condition, QSPString
 
 INLINE QSP_BOOL qspCheckCondition(QSPString expr)
 {
-    int oldRefreshCount = qspRefreshCount;
+    int oldLocationState = qspLocationState;
     QSPVariant condValue = qspExprValue(expr);
-    if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+    if (qspLocationState != oldLocationState) return QSP_FALSE;
     if (!qspConvertVariantTo(&condValue, QSP_TYPE_NUM))
     {
         qspSetError(QSP_ERR_TYPEMISMATCH);
@@ -801,9 +801,9 @@ INLINE QSP_BOOL qspCheckCondition(QSPString expr)
 
 INLINE QSP_BOOL qspCheckCompiledCondition(QSPMathExpression *expression)
 {
-    int oldRefreshCount = qspRefreshCount;
+    int oldLocationState = qspLocationState;
     QSPVariant condValue = qspValue(expression, expression->ItemsCount - 1);
-    if (qspRefreshCount != oldRefreshCount) return QSP_FALSE;
+    if (qspLocationState != oldLocationState) return QSP_FALSE;
     if (!qspConvertVariantTo(&condValue, QSP_TYPE_NUM))
     {
         qspSetError(QSP_ERR_TYPEMISMATCH);
@@ -816,7 +816,7 @@ INLINE QSP_BOOL qspCheckCompiledCondition(QSPMathExpression *expression)
 INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
-    int oldRefreshCount;
+    int oldLocationState;
     QSP_CHAR *endPos;
     QSPString condition, iterator;
     endPos = line->Str.Str + line->Stats[startStat].EndPos;
@@ -826,9 +826,9 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
         return QSP_FALSE;
     }
     qspAllocateSavedVarsGroup();
-    oldRefreshCount = qspRefreshCount;
+    oldLocationState = qspLocationState;
     toExit = qspPrepareLoop(qspStringFromPair(line->Str.Str + line->Stats[startStat].ParamPos, endPos), &condition, &iterator, jumpTo);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return QSP_FALSE;
@@ -848,7 +848,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
         {
             /* Check condition */
             conditionValue = qspCheckCompiledCondition(&expression);
-            if (qspRefreshCount != oldRefreshCount)
+            if (qspLocationState != oldLocationState)
             {
                 qspFreeValue(&expression, expression.ItemsCount - 1);
                 qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -858,7 +858,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
             if (!conditionValue) break;
             /* Execute body */
             toExit = qspExecStringWithLocals(line, startStat + 1, endStat, jumpTo);
-            if (qspRefreshCount != oldRefreshCount)
+            if (qspLocationState != oldLocationState)
             {
                 qspFreeValue(&expression, expression.ItemsCount - 1);
                 qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -870,7 +870,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
             if (iteratorLine.StatsCount)
             {
                 toExit = qspExecStringWithLocals(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
-                if (qspRefreshCount != oldRefreshCount)
+                if (qspLocationState != oldLocationState)
                 {
                     qspFreeValue(&expression, expression.ItemsCount - 1);
                     qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -891,7 +891,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
     int codeOffset, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
-    int oldRefreshCount;
+    int oldLocationState;
     QSPString condition, iterator;
     QSPLineOfCode *line = lines + lineInd;
     QSP_CHAR *endPos = line->Str.Str + line->Stats->EndPos;
@@ -901,9 +901,9 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
         return QSP_FALSE;
     }
     qspAllocateSavedVarsGroup();
-    oldRefreshCount = qspRefreshCount;
+    oldLocationState = qspLocationState;
     toExit = qspPrepareLoop(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, endPos), &condition, &iterator, jumpTo);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return QSP_FALSE;
@@ -929,7 +929,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
                 if (qspIsDebug)
                 {
                     qspCallDebug(line->Str);
-                    if (qspRefreshCount != oldRefreshCount)
+                    if (qspLocationState != oldRefreshCount)
                     {
                         qspFreeValue(&expression, expression.ItemsCount - 1);
                         qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -940,7 +940,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
             }
             /* Check condition */
             conditionValue = qspCheckCompiledCondition(&expression);
-            if (qspRefreshCount != oldRefreshCount)
+            if (qspLocationState != oldRefreshCount)
             {
                 qspFreeValue(&expression, expression.ItemsCount - 1);
                 qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -950,7 +950,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
             if (!conditionValue) break;
             /* Execute body */
             toExit = qspExecCodeBlockWithLocals(lines, lineInd, endLine, codeOffset, jumpTo);
-            if (qspRefreshCount != oldRefreshCount)
+            if (qspLocationState != oldRefreshCount)
             {
                 qspFreeValue(&expression, expression.ItemsCount - 1);
                 qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -968,7 +968,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
                     if (qspIsDebug)
                     {
                         qspCallDebug(line->Str);
-                        if (qspRefreshCount != oldRefreshCount)
+                        if (qspLocationState != oldRefreshCount)
                         {
                             qspFreeValue(&expression, expression.ItemsCount - 1);
                             qspReleaseSavedVarsGroup(QSP_TRUE);
@@ -978,7 +978,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
                     }
                 }
                 toExit = qspExecStringWithLocals(&iteratorLine, 0, iteratorLine.StatsCount, jumpTo);
-                if (qspRefreshCount != oldRefreshCount)
+                if (qspLocationState != oldRefreshCount)
                 {
                     qspFreeValue(&expression, expression.ItemsCount - 1);
                     qspReleaseSavedVarsGroup(QSP_TRUE);

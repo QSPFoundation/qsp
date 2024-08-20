@@ -438,7 +438,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
     QSPVariant val;
     QSPString expr;
     QSPBufString res;
-    int oldRefreshCount;
+    int oldLocationState;
     QSP_CHAR *pos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
     if (!pos)
     {
@@ -446,7 +446,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         return qspCopyToNewText(txt);
     }
     res = qspNewBufString(128);
-    oldRefreshCount = qspRefreshCount;
+    oldLocationState = qspLocationState;
     do
     {
         qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
@@ -462,7 +462,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         /* looks like it's ok to modify the original string here */
         qspPrepareStringToExecution(&expr);
         val = qspExprValue(expr);
-        if (qspRefreshCount != oldRefreshCount)
+        if (qspLocationState != oldLocationState)
         {
             qspFreeBufString(&res);
             return qspNullString;

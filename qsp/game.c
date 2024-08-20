@@ -110,7 +110,7 @@ void qspClearAllIncludes(QSP_BOOL toInit)
 
 INLINE void qspIncludeFile(QSPString s)
 {
-    int i, oldRefreshCount;
+    int i, oldLocationState;
     if (!qspIsAnyString(s)) return;
     if (qspCurIncFilesCount == QSP_MAXINCFILES)
     {
@@ -122,19 +122,19 @@ INLINE void qspIncludeFile(QSPString s)
         if (!qspStrsComp(qspCurIncFiles[i], s))
             return;
     }
-    oldRefreshCount = qspRefreshCount;
+    oldLocationState = qspLocationState;
     qspCallOpenGame(s, QSP_FALSE);
-    if (qspRefreshCount != oldRefreshCount) return;
+    if (qspLocationState != oldLocationState) return;
     qspCurIncFiles[qspCurIncFilesCount++] = qspCopyToNewText(s);
 }
 
 INLINE void qspOpenIncludes(void)
 {
-    int i, oldRefreshCount = qspRefreshCount;
+    int i, oldLocationState = qspLocationState;
     for (i = 0; i < qspCurIncFilesCount; ++i)
     {
         qspCallOpenGame(qspCurIncFiles[i], QSP_FALSE);
-        if (qspRefreshCount != oldRefreshCount) return;
+        if (qspLocationState != oldLocationState) return;
     }
 }
 
@@ -276,9 +276,9 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     QSPString locName;
     QSPBufString bufString;
     QSPVar *savedVars;
-    int i, j, dataSize, varsCount, oldRefreshCount = qspRefreshCount;
+    int i, j, dataSize, varsCount, oldLocationState = qspLocationState;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
-    if (qspRefreshCount != oldRefreshCount)
+    if (qspLocationState != oldLocationState)
     {
         *bufSize = 0;
         return QSP_FALSE;
@@ -493,7 +493,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         qspFreeStrs(strs, count);
         return QSP_FALSE;
     }
-    ++qspRefreshCount;
+    ++qspLocationState;
     ++qspFullRefreshCount;
     qspMemClear(QSP_FALSE);
     qspResetTime(qspReadEncodedIntVal(strs[3]));
@@ -592,9 +592,9 @@ void qspStatementOpenQst(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TI
     case qspStatOpenQst:
         if (qspIsAnyString(QSP_STR(args[0])))
         {
-            int oldRefreshCount = qspRefreshCount;
+            int oldLocationState = qspLocationState;
             qspCallOpenGame(QSP_STR(args[0]), QSP_TRUE);
-            if (qspRefreshCount != oldRefreshCount) return;
+            if (qspLocationState != oldLocationState) return;
             qspNewGame(QSP_FALSE);
         }
         break;
