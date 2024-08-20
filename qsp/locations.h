@@ -48,7 +48,7 @@
     extern QSPLocName *qspLocsNames;
     extern int qspLocsCount;
     extern int qspCurLoc;
-    extern int qspLocationState;
+    extern int qspLocationState; /* allows to check if we have to terminate execution of the code */
     extern int qspFullRefreshCount;
 
     /* External functions */
