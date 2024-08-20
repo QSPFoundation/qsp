@@ -64,7 +64,7 @@ void qspClearAllObjectsWithNotify(void)
         {
             QSP_STR(v) = objs[i];
             qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &v, 1);
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+            if (qspRefreshCount != oldRefreshCount) break;
         }
         qspFreeStrs(objs, oldCount);
     }

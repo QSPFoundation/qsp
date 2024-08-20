@@ -124,7 +124,7 @@ INLINE void qspIncludeFile(QSPString s)
     }
     oldRefreshCount = qspRefreshCount;
     qspCallOpenGame(s, QSP_FALSE);
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+    if (qspRefreshCount != oldRefreshCount) return;
     qspCurIncFiles[qspCurIncFilesCount++] = qspCopyToNewText(s);
 }
 
@@ -134,7 +134,7 @@ INLINE void qspOpenIncludes(void)
     for (i = 0; i < qspCurIncFilesCount; ++i)
     {
         qspCallOpenGame(qspCurIncFiles[i], QSP_FALSE);
-        if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+        if (qspRefreshCount != oldRefreshCount) return;
     }
 }
 
@@ -278,7 +278,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     QSPVar *savedVars;
     int i, j, dataSize, varsCount, oldRefreshCount = qspRefreshCount;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+    if (qspRefreshCount != oldRefreshCount)
     {
         *bufSize = 0;
         return QSP_FALSE;
@@ -594,7 +594,7 @@ void qspStatementOpenQst(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TI
         {
             int oldRefreshCount = qspRefreshCount;
             qspCallOpenGame(QSP_STR(args[0]), QSP_TRUE);
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+            if (qspRefreshCount != oldRefreshCount) return;
             qspNewGame(QSP_FALSE);
         }
         break;

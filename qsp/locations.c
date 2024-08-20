@@ -122,7 +122,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     qspRealLineNum = 0;
     qspRealLine = 0;
     str = qspFormatText(loc->Desc, QSP_FALSE);
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+    if (qspRefreshCount != oldRefreshCount)
     {
         qspRealLine = oldLine;
         qspRealLineNum = oldLineNum;
@@ -150,7 +150,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         str = loc->Actions[i].Desc;
         if (qspIsEmpty(str)) break;
         str = qspFormatText(str, QSP_FALSE);
-        if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+        if (qspRefreshCount != oldRefreshCount)
         {
             qspRealLine = oldLine;
             qspRealLineNum = oldLineNum;
@@ -214,7 +214,7 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT coun
     qspSetArgs(varArgs, args, count);
     oldRefreshCount = qspRefreshCount;
     qspExecLocByIndex(locInd, QSP_FALSE);
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+    if (qspRefreshCount != oldRefreshCount)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return;
@@ -246,7 +246,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT c
         locName = QSP_STR(var->Values[ind]);
         if (!qspIsAnyString(locName)) break;
         qspExecLocByNameWithArgs(locName, args, count, 0);
-        if (qspRefreshCount != oldRefreshCount || qspErrorNum) break;
+        if (qspRefreshCount != oldRefreshCount) break;
         ++ind;
     }
 }
@@ -268,7 +268,7 @@ void qspRefreshCurLoc(QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT count
     qspAllocateSavedVarsGroup();
     oldRefreshCount = qspRefreshCount;
     qspExecLocByIndex(qspCurLoc, toChangeDesc);
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+    if (qspRefreshCount != oldRefreshCount)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);
         return;

@@ -181,7 +181,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
     }
     oldRefreshCount = qspRefreshCount;
     argsCount = qspGetStatArgs(s->Str, s->Stats + statPos, args);
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+    if (qspRefreshCount != oldRefreshCount)
         return;
     ++statPos; /* start with the internal code */
     firstPos += QSP_STATIC_LEN(QSP_COLONDELIM);
@@ -205,7 +205,7 @@ void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine)
     int oldRefreshCount = qspRefreshCount;
     QSPLineOfCode *line = s + lineInd;
     argsCount = qspGetStatArgs(line->Str, line->Stats, args);
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+    if (qspRefreshCount != oldRefreshCount) return;
     qspAddAction(args, argsCount, s, lineInd + 1, endLine);
     qspFreeVariants(args, argsCount);
 }

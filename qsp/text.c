@@ -462,7 +462,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         /* looks like it's ok to modify the original string here */
         qspPrepareStringToExecution(&expr);
         val = qspExprValue(expr);
-        if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+        if (qspRefreshCount != oldRefreshCount)
         {
             qspFreeBufString(&res);
             return qspNullString;

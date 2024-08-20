@@ -263,7 +263,7 @@ INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation)
             QSPVariant ind;
             int oldRefreshCount = qspRefreshCount;
             ind = qspExprValue(qspStringFromPair(s.Str, rPos));
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum) return 0;
+            if (qspRefreshCount != oldRefreshCount) return 0;
             *index = qspGetVarIndex(var, ind, isSetOperation);
             qspFreeVariant(&ind);
         }
@@ -825,7 +825,7 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
                 for (i = 0; i < lastVarIndex; ++i)
                 {
                     qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
-                    if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                    if (qspRefreshCount != oldRefreshCount)
                         return;
                 }
                 /* Only 1 variable left, fill it with the tuple containing all the values left */
@@ -842,14 +842,14 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
                     for (i = 0; i < lastValIndex; ++i)
                     {
                         qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
-                        if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                        if (qspRefreshCount != oldRefreshCount)
                             return;
                     }
                     /* Only 1 value left, fill the rest of vars with the last value */
                     while (i < varsCount)
                     {
                         qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + lastValIndex, op);
-                        if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                        if (qspRefreshCount != oldRefreshCount)
                             return;
                         ++i;
                     }
@@ -860,7 +860,7 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
                     for (i = 0; i < varsCount; ++i)
                     {
                         qspResetVar(varNames[i]);
-                        if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                        if (qspRefreshCount != oldRefreshCount)
                             return;
                     }
                 }
@@ -872,7 +872,7 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
             for (i = 0; i < varsCount; ++i)
             {
                 qspSetVar(varNames[i], v, op);
-                if (qspRefreshCount != oldRefreshCount || qspErrorNum)
+                if (qspRefreshCount != oldRefreshCount)
                     return;
             }
             break;
@@ -897,7 +897,7 @@ void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat)
     }
     oldRefreshCount = qspRefreshCount;
     v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
-    if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+    if (qspRefreshCount != oldRefreshCount) return;
     namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
     if (qspErrorNum) return;
     op = *(s.Str + stat->Args[1].StartPos);
@@ -935,7 +935,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
         }
         /* We have to evaluate expression before allocation of local vars */
         v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
-        if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
+        if (qspRefreshCount != oldRefreshCount) return;
     }
     namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
     if (qspErrorNum) return;
