@@ -210,10 +210,10 @@ void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine)
     qspFreeVariants(args, argsCount);
 }
 
-QSP_BOOL qspStatementDelAct(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementDelAct(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT QSP_UNUSED(extArg))
 {
     int actInd = qspActIndex(QSP_STR(args[0]));
-    if (actInd < 0) return QSP_FALSE;
+    if (actInd < 0) return;
     if (qspCurSelAction >= actInd) qspCurSelAction = -1;
     qspFreeString(&qspCurActions[actInd].Image);
     qspFreeString(&qspCurActions[actInd].Desc);
@@ -225,5 +225,4 @@ QSP_BOOL qspStatementDelAct(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP
         ++actInd;
     }
     qspIsActionsChanged = QSP_TRUE;
-    return QSP_FALSE;
 }

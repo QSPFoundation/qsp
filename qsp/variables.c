@@ -1001,37 +1001,35 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     free(names);
 }
 
-QSP_BOOL qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     QSPVar *dest, *src;
-    if (!(dest = qspVarReference(QSP_STR(args[0]), QSP_TRUE))) return QSP_FALSE;
-    if (!(src = qspVarReference(QSP_STR(args[1]), QSP_FALSE))) return QSP_FALSE;
+    if (!(dest = qspVarReference(QSP_STR(args[0]), QSP_TRUE))) return;
+    if (!(src = qspVarReference(QSP_STR(args[1]), QSP_FALSE))) return;
     if (dest != src)
     {
         int start = (count >= 3 ? QSP_NUM(args[2]) : 0);
         int maxCount = (count == 4 ? QSP_NUM(args[3]) : src->ValsCount);
         qspCopyVar(dest, src, start, maxCount);
     }
-    return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     if (count == 2)
         qspSortArray(QSP_STR(args[0]), QSP_ISFALSE(QSP_NUM(args[1])));
     else
         qspSortArray(QSP_STR(args[0]), QSP_TRUE);
-    return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     if (count == 0)
         qspClearAllVars(QSP_FALSE);
     else
     {
         QSPVar *var;
-        if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return QSP_FALSE;
+        if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return;
         if (count == 1)
             qspEmptyVar(var);
         else
@@ -1040,5 +1038,4 @@ QSP_BOOL qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSPString *QSP
             qspRemoveArrayItem(var, arrIndex);
         }
     }
-    return QSP_FALSE;
 }

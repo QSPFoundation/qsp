@@ -43,7 +43,7 @@ INLINE void qspFreeMenuLocs(QSPString *locs, int count)
         qspFreeString(curLoc);
 }
 
-QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     QSPVar *var;
     QSPVariant *curItem;
@@ -52,7 +52,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *QS
     QSPString menuLocs[QSP_MAXMENUITEMS], itemName, itemLocation, itemImage, str;
     QSPTuple tuple;
     QSP_CHAR *pos, *pos2;
-    if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return QSP_FALSE;
+    if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return;
     if (count >= 2)
     {
         ind = QSP_NUM(args[1]);
@@ -93,7 +93,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *QS
                 qspSetError(QSP_ERR_COLONNOTFOUND);
                 qspFreeMenuItems(menuItems, itemsCount);
                 qspFreeMenuLocs(menuLocs, itemsCount);
-                return QSP_FALSE;
+                return;
             }
             if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
             {
@@ -124,7 +124,7 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *QS
             qspFreeString(&itemImage);
             qspFreeMenuItems(menuItems, itemsCount);
             qspFreeMenuLocs(menuLocs, itemsCount);
-            return QSP_FALSE;
+            return;
         }
         menuItems[itemsCount].Name = itemName;
         menuItems[itemsCount].Image = itemImage;
@@ -144,5 +144,4 @@ QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *QS
         qspFreeMenuItems(menuItems, itemsCount);
         qspFreeMenuLocs(menuLocs, itemsCount);
     }
-    return QSP_FALSE;
 }

@@ -29,7 +29,7 @@
     #define QSP_STATLOOPWHILE QSP_FMT("WHILE")
     #define QSP_STATLOOPSTEP QSP_FMT("STEP")
 
-    typedef QSP_BOOL (*QSP_STATEMENT)(QSPVariant *args, QSP_TINYINT argsCount, QSPString *jumpTo, QSP_TINYINT statCode);
+    typedef void (*QSP_STATEMENT)(QSPVariant *args, QSP_TINYINT argsCount, QSP_TINYINT statCode);
 
     typedef struct
     {

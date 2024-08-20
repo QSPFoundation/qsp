@@ -585,17 +585,16 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     return QSP_TRUE;
 }
 
-QSP_BOOL qspStatementOpenQst(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT extArg)
+void qspStatementOpenQst(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT extArg)
 {
-    int oldRefreshCount;
     switch (extArg)
     {
     case qspStatOpenQst:
         if (qspIsAnyString(QSP_STR(args[0])))
         {
-            oldRefreshCount = qspRefreshCount;
+            int oldRefreshCount = qspRefreshCount;
             qspCallOpenGame(QSP_STR(args[0]), QSP_TRUE);
-            if (qspRefreshCount != oldRefreshCount || qspErrorNum) return QSP_FALSE;
+            if (qspRefreshCount != oldRefreshCount || qspErrorNum) return;
             qspNewGame(QSP_FALSE);
         }
         break;
@@ -603,23 +602,20 @@ QSP_BOOL qspStatementOpenQst(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QS
         qspIncludeFile(QSP_STR(args[0]));
         break;
     }
-    return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementOpenGame(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementOpenGame(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     if (count && qspIsAnyString(QSP_STR(args[0])))
         qspCallOpenGameStatus(QSP_STR(args[0]));
     else
         qspCallOpenGameStatus(qspNullString);
-    return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementSaveGame(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementSaveGame(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     if (count && qspIsAnyString(QSP_STR(args[0])))
         qspCallSaveGameStatus(QSP_STR(args[0]));
     else
         qspCallSaveGameStatus(qspNullString);
-    return QSP_FALSE;
 }

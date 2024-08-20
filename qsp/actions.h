@@ -48,6 +48,6 @@
     /* Statements */
     void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos);
     void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine);
-    QSP_BOOL qspStatementDelAct(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
+    void qspStatementDelAct(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 
 #endif

@@ -25,6 +25,6 @@
     #define QSP_MENUDELIM QSP_FMT(":")
 
     /* Statements */
-    QSP_BOOL qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSPString *jumpTo, QSP_TINYINT extArg);
+    void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 
 #endif

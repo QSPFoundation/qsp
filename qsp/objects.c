@@ -148,7 +148,7 @@ QSPString qspGetAllObjectsAsCode(void)
     return qspBufTextToString(res);
 }
 
-QSP_BOOL qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     QSPObj *obj;
     int i, objInd;
@@ -156,14 +156,14 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSPString *Q
     if (count == 3)
     {
         objInd = QSP_NUM(args[2]) - 1;
-        if (objInd < 0 || objInd > qspCurObjectsCount) return QSP_FALSE;
+        if (objInd < 0 || objInd > qspCurObjectsCount) return;
     }
     else
         objInd = qspCurObjectsCount;
     if (qspCurObjectsCount == QSP_MAXOBJECTS)
     {
         qspSetError(QSP_ERR_CANTADDOBJECT);
-        return QSP_FALSE;
+        return;
     }
     if (qspCurSelObject >= objInd) qspCurSelObject = -1;
     if (count >= 2 && qspIsAnyString(QSP_STR(args[1])))
@@ -179,10 +179,9 @@ QSP_BOOL qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSPString *Q
     qspIsObjectsChanged = QSP_TRUE;
     if (count == 3) count = 2;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJADD")), args, count);
-    return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT extArg)
+void qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
 {
     switch (extArg)
     {
@@ -196,11 +195,9 @@ QSP_BOOL qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSPString *QSP_
             qspClearAllObjectsWithNotify();
         break;
     }
-    return QSP_FALSE;
 }
 
-QSP_BOOL qspStatementUnSelect(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUSED(count), QSPString *QSP_UNUSED(jumpTo), QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementUnSelect(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT QSP_UNUSED(extArg))
 {
     qspCurSelObject = -1;
-    return QSP_FALSE;
 }
