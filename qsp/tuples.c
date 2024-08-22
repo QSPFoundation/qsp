@@ -251,9 +251,9 @@ void qspAppendTupleToDisplayString(QSPBufString *res, QSPTuple tuple)
                 break;
             case QSP_TYPE_STR:
                 qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
-                temp = qspReplaceText(QSP_PSTR(item), QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
+                temp = qspReplaceText(QSP_PSTR(item), QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), QSP_TRUE);
                 qspAddBufText(res, temp);
-                qspFreeString(&temp);
+                qspFreeNewString(&temp, &QSP_PSTR(item));
                 qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
                 break;
         }
@@ -277,9 +277,10 @@ void qspAppendTupleToIndexString(QSPBufString *res, QSPTuple tuple)
                 qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEINDEND));
                 break;
             case QSP_TYPE_NUM:
-                qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(item)));
+                qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(item))); /* type id isn't necessary */
                 break;
             case QSP_TYPE_STR:
+                qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEINDSTRID)); /* type id to separate ['a',2] from ['a','2'] */
                 qspAddBufText(res, QSP_PSTR(item));
                 break;
         }

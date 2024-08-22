@@ -27,6 +27,7 @@
     #define QSP_TUPLEINDSTART QSP_FMT("\x02")
     #define QSP_TUPLEINDDELIM QSP_FMT("\x1F")
     #define QSP_TUPLEINDEND QSP_FMT("\x03")
+    #define QSP_TUPLEINDSTRID QSP_FMT("\x01")
 
     extern QSPTuple qspNullTuple;
 

@@ -983,7 +983,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         {
             QSPString textToFormat = QSP_STR(tos);
             QSP_STR(tos) = qspFormatText(textToFormat, QSP_TRUE);
-            if (QSP_STR(tos).Str != textToFormat.Str) qspFreeString(&textToFormat);
+            qspFreeNewString(&textToFormat, &QSP_STR(tos)); /* release the old one, keep the new one */
         }
         break;
     case qspOpArrItem:
@@ -1336,9 +1336,9 @@ INLINE void qspFunctionReplace(QSPVariant *args, QSP_TINYINT count, QSPVariant *
     if (qspIsEmpty(searchTxt))
         QSP_PSTR(res) = qspCopyToNewText(QSP_STR(args[0]));
     else if (count == 2)
-        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), searchTxt, qspNullString);
+        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), searchTxt, qspNullString, QSP_FALSE);
     else
-        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), searchTxt, QSP_STR(args[2]));
+        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), searchTxt, QSP_STR(args[2]), QSP_FALSE);
 }
 
 INLINE void qspFunctionFunc(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)

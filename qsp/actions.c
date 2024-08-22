@@ -132,15 +132,15 @@ QSPString qspGetAllActionsAsCode(void)
     for (i = 0; i < qspCurActionsCount; ++i)
     {
         qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ") QSP_DEFQUOT));
-        temp = qspReplaceText(qspCurActions[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
+        temp = qspReplaceText(qspCurActions[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), QSP_TRUE);
         qspAddBufText(&res, temp);
-        qspFreeString(&temp);
+        qspFreeNewString(&temp, &qspCurActions[i].Desc);
         if (qspCurActions[i].Image.Str)
         {
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(",") QSP_DEFQUOT));
-            temp = qspReplaceText(qspCurActions[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT));
+            temp = qspReplaceText(qspCurActions[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), QSP_TRUE);
             qspAddBufText(&res, temp);
-            qspFreeString(&temp);
+            qspFreeNewString(&temp, &qspCurActions[i].Image);
         }
         qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(":")));
         count = qspCurActions[i].OnPressLinesCount;

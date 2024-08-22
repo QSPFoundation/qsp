@@ -414,12 +414,16 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
     return 0;
 }
 
-QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt)
+QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, QSP_BOOL canReturnSelf)
 {
     QSPBufString res;
     int searchLen;
     QSP_CHAR *pos = qspStrStr(txt, searchTxt);
-    if (!pos) return qspCopyToNewText(txt);
+    if (!pos)
+    {
+        if (canReturnSelf) return txt;
+        return qspCopyToNewText(txt);
+    }
     res = qspNewBufString(256);
     searchLen = qspStrLen(searchTxt);
     do
