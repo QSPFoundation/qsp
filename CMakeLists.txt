@@ -270,7 +270,7 @@ if(BUILD_QSPGUI)
 		players/classic/qspgui/transhelper.cpp
 	)
 	if(WIN32)
-		list(APPEND QSPGUI_SOURCES players/classic/qspgui/src/rsc/res.rc)
+		list(APPEND QSPGUI_SOURCES players/classic/qspgui/rsc/res.rc)
 		configure_file("${CMAKE_SOURCE_DIR}/players/classic/misc/common/icons/logo.ico" "${CMAKE_BINARY_DIR}/misc/icons/logo.ico" COPYONLY)
 		add_executable(qspgui WIN32 ${QSPGUI_SOURCES})
 		target_compile_definitions(qspgui PRIVATE _CRT_SECURE_NO_WARNINGS)
