@@ -116,7 +116,7 @@ QSPString qspGetVariantAsString(QSPVariant *val)
     switch (QSP_BASETYPE(val->Type))
     {
         case QSP_TYPE_TUPLE:
-            return qspTupleToDisplayString(QSP_PTUPLE(val));
+            return qspGetTupleAsString(QSP_PTUPLE(val));
         case QSP_TYPE_NUM:
         {
             QSP_CHAR buf[QSP_NUMTOSTRBUF];
@@ -140,6 +140,7 @@ int qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
     case QSP_TYPE_STR:
         return qspStrToNum(QSP_PSTR(val), isValid);
     }
+    if (isValid) *isValid = QSP_FALSE; /* shouldn't happen */
     return 0;
 }
 
@@ -376,4 +377,38 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
     }
     res->Type = QSP_TYPE_NUM;
     return QSP_TRUE;
+}
+
+void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val)
+{
+    QSP_CHAR buf[QSP_NUMTOSTRBUF];
+    switch (QSP_BASETYPE(val->Type))
+    {
+        case QSP_TYPE_TUPLE:
+        {
+            int items = QSP_PTUPLE(val).Items;
+            qspAddBufText(res, qspNumToStr(buf, items));
+            qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));
+            if (items > 0)
+            {
+                QSPVariant *item = QSP_PTUPLE(val).Vals;
+                while (--items > 0)
+                {
+                    qspAppendVariantToIndexString(res, item);
+                    qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));
+                    ++item;
+                }
+                qspAppendVariantToIndexString(res, item);
+            }
+            break;
+        }
+        case QSP_TYPE_NUM:
+            qspAddBufText(res, QSP_STATIC_STR(QSP_IND_NUMID)); /* type id */
+            qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(val)));
+            break;
+        case QSP_TYPE_STR:
+            qspAddBufText(res, QSP_STATIC_STR(QSP_IND_STRID)); /* type id */
+            qspAddBufText(res, QSP_PSTR(val));
+            break;
+    }
 }

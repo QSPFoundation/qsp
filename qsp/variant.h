@@ -22,6 +22,10 @@
 #ifndef QSP_VARIANTDEFINES
     #define QSP_VARIANTDEFINES
 
+    #define QSP_IND_STRID QSP_FMT("$")
+    #define QSP_IND_NUMID QSP_FMT("#")
+    #define QSP_IND_DELIM QSP_FMT("\0")
+
     /* External functions */
     QSPString qspGetVariantAsString(QSPVariant *val);
     int qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid);
@@ -29,6 +33,7 @@
     int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2);
     void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
     QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, QSPVariant *res);
+    void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val);
 
     INLINE void qspFreeVariant(QSPVariant *val)
     {
@@ -117,8 +122,14 @@
                 break;
             }
         }
-
         return QSP_TRUE;
+    }
+
+    INLINE QSPString qspGetVariantAsIndexString(QSPVariant *val)
+    {
+        QSPBufString buf = qspNewBufString(16);
+        qspAppendVariantToIndexString(&buf, val);
+        return qspBufTextToString(buf);
     }
 
 #endif

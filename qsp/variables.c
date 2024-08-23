@@ -175,17 +175,8 @@ int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
 {
     int indsCount;
     QSPString uStr;
-    switch (QSP_BASETYPE(index.Type))
-    {
-        case QSP_TYPE_TUPLE:
-            uStr = qspTupleToIndexString(QSP_TUPLE(index));
-            break;
-        case QSP_TYPE_NUM:
-            return QSP_NUM(index);
-        case QSP_TYPE_STR:
-            uStr = qspCopyToNewText(QSP_STR(index));
-            break;
-    }
+    if (QSP_ISNUM(index.Type)) return QSP_NUM(index);
+    uStr = qspGetVariantAsIndexString(&index);
     qspUpperStr(&uStr);
     indsCount = var->IndsCount;
     if (indsCount > 0)
@@ -899,7 +890,7 @@ void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat)
     v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
     if (qspLocationState != oldLocationState) return;
     namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
-    if (qspErrorNum) return;
+    if (!namesCount) return;
     op = *(s.Str + stat->Args[1].StartPos);
     qspSetVarsValues(names, namesCount, &v, op);
     qspFreeVariant(&v);
@@ -938,7 +929,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
         if (qspLocationState != oldLocationState) return;
     }
     namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
-    if (qspErrorNum) return;
+    if (!namesCount) return;
     groupInd = qspSavedVarGroupsCount - 1;
     curVarGroup = qspSavedVarGroups + groupInd;
     varsCount = bufSize = curVarGroup->VarsCount;
