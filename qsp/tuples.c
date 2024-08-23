@@ -238,7 +238,7 @@ void qspAppendTupleToDisplayString(QSPBufString *res, QSPTuple tuple)
     QSP_CHAR buf[QSP_NUMTOSTRBUF];
     QSPString temp;
     QSPVariant *item = tuple.Vals, *itemsEnd = item + tuple.Items;
-    qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAYSTART));
+    qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAY_START));
     while (item < itemsEnd)
     {
         switch (QSP_BASETYPE(item->Type))
@@ -258,9 +258,9 @@ void qspAppendTupleToDisplayString(QSPBufString *res, QSPTuple tuple)
                 break;
         }
         if (++item == itemsEnd) break;
-        qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAYDELIM));
+        qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAY_DELIM));
     }
-    qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAYEND));
+    qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAY_END));
 }
 
 void qspAppendTupleToIndexString(QSPBufString *res, QSPTuple tuple)
@@ -272,19 +272,19 @@ void qspAppendTupleToIndexString(QSPBufString *res, QSPTuple tuple)
         switch (QSP_BASETYPE(item->Type))
         {
             case QSP_TYPE_TUPLE:
-                qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEINDSTART));
+                qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEIND_STARTID));
                 qspAppendTupleToIndexString(res, QSP_PTUPLE(item));
-                qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEINDEND));
+                qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEIND_ENDID));
                 break;
             case QSP_TYPE_NUM:
                 qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(item))); /* type id isn't necessary */
                 break;
             case QSP_TYPE_STR:
-                qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEINDSTRID)); /* type id to separate ['a',2] from ['a','2'] */
+                qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEIND_STRID)); /* type id to separate ['a',2] from ['a','2'] */
                 qspAddBufText(res, QSP_PSTR(item));
                 break;
         }
         if (++item == itemsEnd) break;
-        qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEINDDELIM));
+        qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEIND_DELIM));
     }
 }
