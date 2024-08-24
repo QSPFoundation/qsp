@@ -78,18 +78,26 @@
 
     INLINE QSPString qspStringFromPair(QSP_CHAR *start, QSP_CHAR *end)
     {
+    #if defined(__GNUC__)
+        return (QSPString) { start, end };
+    #else
         QSPString string;
         string.Str = start;
         string.End = end;
         return string;
+    #endif
     }
 
     INLINE QSPString qspStringFromLen(QSP_CHAR *s, int len)
     {
+    #if defined(__GNUC__)
+        return (QSPString) { s, (s + len) };
+    #else
         QSPString string;
         string.Str = s;
         string.End = s + len;
         return string;
+    #endif
     }
 
     INLINE QSPString qspStringFromString(QSPString s, int maxLen)

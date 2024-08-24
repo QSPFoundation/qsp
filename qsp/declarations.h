@@ -64,11 +64,7 @@
     #endif
 
     #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
-    #if defined(__GNUC__)
-        #define QSP_STATIC_STR(x) ((QSPString) { (x), (x) + QSP_STATIC_LEN(x) })
-    #else
-        #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
-    #endif
+    #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
 
     #define QSP_VER QSP_FMT(QSP_VER_STR)
     #define QSP_LOCALE "russian"
