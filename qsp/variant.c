@@ -384,7 +384,7 @@ void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val)
     QSP_CHAR buf[QSP_NUMTOSTRBUF];
     switch (QSP_BASETYPE(val->Type))
     {
-        case QSP_TYPE_TUPLE:
+    case QSP_TYPE_TUPLE:
         {
             int items = QSP_PTUPLE(val).Items;
             qspAddBufText(res, qspNumToStr(buf, items));
@@ -402,13 +402,13 @@ void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val)
             }
             break;
         }
-        case QSP_TYPE_NUM:
-            qspAddBufText(res, QSP_STATIC_STR(QSP_IND_NUMID)); /* type id */
-            qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(val)));
-            break;
-        case QSP_TYPE_STR:
-            qspAddBufText(res, QSP_STATIC_STR(QSP_IND_STRID)); /* type id */
-            qspAddBufText(res, QSP_PSTR(val));
-            break;
+    case QSP_TYPE_NUM:
+        qspAddBufText(res, QSP_STATIC_STR(QSP_IND_NUMID)); /* type id */
+        qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(val)));
+        break;
+    case QSP_TYPE_STR:
+        qspAddBufText(res, QSP_STATIC_STR(QSP_IND_STRID)); /* type id */
+        qspAddBufText(res, QSP_PSTR(val));
+        break;
     }
 }

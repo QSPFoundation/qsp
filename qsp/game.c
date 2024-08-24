@@ -192,7 +192,7 @@ INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count)
 QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
 {
     QSP_BOOL isOldFormat, toAddLoc, isUCS;
-    int i, j, ind, crc, count, locsCount, actsCount, start, end;
+    int i, j, ind, crc, count, locsCount, actsCount, startLoc, endLoc;
     QSPString buf, gameString, *strs;
     if (isNewGame) crc = qspCRC(data, dataSize);
     isUCS = (dataSize >= 2 && *((char *)data + 1) == 0);
@@ -210,20 +210,20 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     if (isNewGame)
     {
         qspClearAllIncludes(QSP_FALSE);
-        start = 0;
-        end = locsCount;
+        startLoc = 0;
+        endLoc = locsCount;
     }
     else
     {
-        start = qspLocsCount;
-        end = start + locsCount;
+        startLoc = qspLocsCount;
+        endLoc = startLoc + locsCount;
     }
     locsCount = qspLocsCount;
-    qspCreateWorld(start, end);
+    qspCreateWorld(startLoc, endLoc);
     qspLocsCount = locsCount;
-    locsCount = start;
+    locsCount = startLoc;
     ind = (isOldFormat ? 30 : 4);
-    for (i = start; i < end; ++i)
+    for (i = startLoc; i < endLoc; ++i)
     {
         buf = qspDecodeString(strs[ind++]);
         if (toAddLoc = (isNewGame || qspLocIndex(buf) < 0))
@@ -256,9 +256,9 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
             ind += actsCount * (isOldFormat ? 2 : 3);
     }
     qspFreeStrs(strs, count);
-    qspLocsCount = end;
-    qspCreateWorld(end, locsCount);
-    count = locsCount - start;
+    qspLocsCount = endLoc;
+    qspCreateWorld(endLoc, locsCount);
+    count = locsCount - startLoc;
     if (count) qspPrepareLocs();
     if (isNewGame)
     {
