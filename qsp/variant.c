@@ -388,10 +388,10 @@ void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val)
         {
             int items = QSP_PTUPLE(val).Items;
             qspAddBufText(res, qspNumToStr(buf, items));
-            qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));
             if (items > 0)
             {
                 QSPVariant *item = QSP_PTUPLE(val).Vals;
+                qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));
                 while (--items > 0)
                 {
                     qspAppendVariantToIndexString(res, item);
