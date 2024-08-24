@@ -90,7 +90,7 @@ QSP_CHAR *qspRegExpStrSearch(QSPRegExp *exp, QSPString str, int ind, int *foundL
         int pos = (ind >= 0 ? ind : 0);
         if (pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
         {
-            foundPos = (QSP_CHAR *)onigReg->beg[pos];
+            foundPos = (QSP_CHAR *)(tempBeg + onigReg->beg[pos]);
             if (foundLen) *foundLen = (onigReg->end[pos] - onigReg->beg[pos]) / sizeof(QSP_CHAR);
         }
     }
