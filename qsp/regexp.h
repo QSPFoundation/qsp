@@ -32,7 +32,6 @@
     void qspClearAllRegExps(QSP_BOOL toInit);
     QSPRegExp *qspRegExpGetCompiled(QSPString exp);
     QSP_BOOL qspRegExpStrMatch(QSPRegExp *exp, QSPString str);
-    QSPString qspRegExpStrFind(QSPRegExp *exp, QSPString str, int ind);
-    int qspRegExpStrPos(QSPRegExp *exp, QSPString str, int ind);
+    QSP_CHAR *qspRegExpStrSearch(QSPRegExp *exp, QSPString str, int ind, int *foundLen);
 
 #endif

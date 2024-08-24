@@ -76,54 +76,25 @@ QSPRegExp *qspRegExpGetCompiled(QSPString exp)
 
 QSP_BOOL qspRegExpStrMatch(QSPRegExp *exp, QSPString str)
 {
-    OnigUChar *tempBeg, *tempEnd;
-    tempBeg = (OnigUChar *)str.Str;
-    tempEnd = (OnigUChar *)str.End;
+    OnigUChar *tempBeg = (OnigUChar *)str.Str, *tempEnd = (OnigUChar *)str.End;
     return (onig_match(exp->CompiledExp, tempBeg, tempEnd, tempBeg, 0, ONIG_OPTION_NONE) == tempEnd - tempBeg);
 }
 
-QSPString qspRegExpStrFind(QSPRegExp *exp, QSPString str, int ind)
+QSP_CHAR *qspRegExpStrSearch(QSPRegExp *exp, QSPString str, int ind, int *foundLen)
 {
-    QSPString res;
-    int len, pos;
-    OnigUChar *tempBeg, *tempEnd;
+    QSP_CHAR *foundPos = 0;
+    OnigUChar *tempBeg = (OnigUChar *)str.Str, *tempEnd = (OnigUChar *)str.End;
     OnigRegion *onigReg = onig_region_new();
-    tempBeg = (OnigUChar *)str.Str;
-    tempEnd = (OnigUChar *)str.End;
     if (onig_search(exp->CompiledExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0)
     {
-        pos = (ind >= 0 ? ind : 0);
+        int pos = (ind >= 0 ? ind : 0);
         if (pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
         {
-            len = (onigReg->end[pos] - onigReg->beg[pos]) / sizeof(QSP_CHAR);
-            res = qspCopyToNewText(qspStringFromLen((QSP_CHAR *) (tempBeg + onigReg->beg[pos]), len));
+            foundPos = (QSP_CHAR *)onigReg->beg[pos];
+            if (foundLen) *foundLen = (onigReg->end[pos] - onigReg->beg[pos]) / sizeof(QSP_CHAR);
         }
-        else
-            res = qspNullString;
     }
-    else
-        res = qspNullString;
+    if (foundLen && !foundPos) *foundLen = 0;
     onig_region_free(onigReg, 1);
-    return res;
-}
-
-int qspRegExpStrPos(QSPRegExp *exp, QSPString str, int ind)
-{
-    int pos, res;
-    OnigUChar *tempBeg, *tempEnd;
-    OnigRegion *onigReg = onig_region_new();
-    tempBeg = (OnigUChar *)str.Str;
-    tempEnd = (OnigUChar *)str.End;
-    if (onig_search(exp->CompiledExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0)
-    {
-        pos = (ind >= 0 ? ind : 0);
-        if (pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
-            res = onigReg->beg[pos] / sizeof(QSP_CHAR) + 1;
-        else
-            res = 0;
-    }
-    else
-        res = 0;
-    onig_region_free(onigReg, 1);
-    return res;
+    return foundPos;
 }
