@@ -80,14 +80,14 @@ QSP_BOOL qspRegExpStrMatch(QSPRegExp *exp, QSPString str)
     return (onig_match(exp->CompiledExp, tempBeg, tempEnd, tempBeg, 0, ONIG_OPTION_NONE) == tempEnd - tempBeg);
 }
 
-QSP_CHAR *qspRegExpStrSearch(QSPRegExp *exp, QSPString str, int ind, int *foundLen)
+QSP_CHAR *qspRegExpStrSearch(QSPRegExp *exp, QSPString str, int groupInd, int *foundLen)
 {
     QSP_CHAR *foundPos = 0;
     OnigUChar *tempBeg = (OnigUChar *)str.Str, *tempEnd = (OnigUChar *)str.End;
     OnigRegion *onigReg = onig_region_new();
     if (onig_search(exp->CompiledExp, tempBeg, tempEnd, tempBeg, tempEnd, onigReg, ONIG_OPTION_NONE) >= 0)
     {
-        int pos = (ind >= 0 ? ind : 0);
+        int pos = (groupInd >= 0 ? groupInd : 0);
         if (pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
         {
             foundPos = (QSP_CHAR *)(tempBeg + onigReg->beg[pos]);

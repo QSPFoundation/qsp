@@ -84,6 +84,7 @@
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);
     void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
+    void qspStatementSplitStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 
     INLINE QSP_TINYINT qspGetVarType(QSPString str)

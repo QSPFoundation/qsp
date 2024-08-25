@@ -73,6 +73,7 @@
         qspStatCmdClear,
         qspStatCopyArr,
         qspStatSortArr,
+        qspStatSplitStr,
         qspStatDelAct,
         qspStatDelObj,
         qspStatDynamic,

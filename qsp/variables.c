@@ -571,7 +571,7 @@ INLINE void qspSortArray(QSPString varName, QSP_BOOL isAscending)
     QSP_TINYINT baseVarType;
     QSPVariant *curValue, *sortedValues, **valuePositions;
     int i, *indexMapping, indsCount, valsCount;
-    if (!(var = qspVarReference(varName, QSP_FALSE))) return;
+    if (!(var = qspVarReference(varName, QSP_FALSE))) return; /* we don't create a new array */
     valsCount = var->ValsCount;
     if (valsCount < 2) return;
     baseVarType = qspGetVarType(varName);
@@ -1013,6 +1013,39 @@ void qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
         qspSortArray(QSP_STR(args[0]), QSP_TRUE);
 }
 
+void qspStatementSplitStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
+{
+    QSPVar *var;
+    QSPRegExp *regExp;
+    QSP_CHAR *foundPos;
+    QSPString text;
+    QSPVariant foundString;
+    int curInd, groupInd, foundLen;
+    if (!(var = qspVarReference(QSP_STR(args[0]), QSP_TRUE))) return;
+    regExp = qspRegExpGetCompiled(QSP_STR(args[2]));
+    if (!regExp) return;
+    text = QSP_STR(args[1]);
+    groupInd = (count == 4 ? QSP_NUM(args[3]) : 0);
+    qspEmptyVar(var); /* clear the dest array anyway */
+    foundString.Type = QSP_TYPE_STR;
+    curInd = 0;
+    foundPos = qspRegExpStrSearch(regExp, text, groupInd, &foundLen);
+    while (foundPos)
+    {
+        QSP_STR(foundString) = qspStringFromLen(foundPos, foundLen);
+        if (curInd >= var->ValsBufSize)
+        {
+            var->ValsBufSize = curInd + 8;
+            var->Values = (QSPVariant *)realloc(var->Values, var->ValsBufSize * sizeof(QSPVariant));
+        }
+        qspCopyToNewVariant(var->Values + curInd, &foundString);
+        ++curInd;
+        text.Str = foundPos + foundLen;
+        foundPos = qspRegExpStrSearch(regExp, text, groupInd, &foundLen);
+    }
+    var->ValsCount = curInd;
+}
+
 void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     if (count == 0)
@@ -1020,7 +1053,7 @@ void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
     else
     {
         QSPVar *var;
-        if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return;
+        if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return; /* we don't create a new array */
         if (count == 1)
             qspEmptyVar(var);
         else

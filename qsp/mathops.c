@@ -1186,7 +1186,7 @@ INLINE void qspFunctionStrFind(QSPVariant *args, QSP_TINYINT count, QSPVariant *
     QSP_CHAR *foundPos;
     QSPRegExp *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
     if (!regExp) return;
-    if (count == 3 && QSP_NUM(args[2]) >= 0)
+    if (count == 3)
         foundPos = qspRegExpStrSearch(regExp, QSP_STR(args[0]), QSP_NUM(args[2]), &foundLen);
     else
         foundPos = qspRegExpStrSearch(regExp, QSP_STR(args[0]), 0, &foundLen);
@@ -1201,7 +1201,7 @@ INLINE void qspFunctionStrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *r
     QSP_CHAR *foundPos;
     QSPRegExp *regExp = qspRegExpGetCompiled(QSP_STR(args[1]));
     if (!regExp) return;
-    if (count == 3 && QSP_NUM(args[2]) >= 0)
+    if (count == 3)
         foundPos = qspRegExpStrSearch(regExp, QSP_STR(args[0]), QSP_NUM(args[2]), 0);
     else
         foundPos = qspRegExpStrSearch(regExp, QSP_STR(args[0]), 0, 0);
