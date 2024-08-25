@@ -1030,7 +1030,7 @@ void qspStatementSplitStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     foundString.Type = QSP_TYPE_STR;
     curInd = 0;
     foundPos = qspRegExpStrSearch(regExp, text, groupInd, &foundLen);
-    while (foundPos)
+    while (foundPos && foundLen)
     {
         QSP_STR(foundString) = qspStringFromLen(foundPos, foundLen);
         if (curInd >= var->ValsBufSize)
