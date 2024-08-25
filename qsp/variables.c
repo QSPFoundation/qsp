@@ -39,7 +39,7 @@ INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation);
 INLINE void qspResetVar(QSPString varName);
 INLINE void qspSetVar(QSPString varName, QSPVariant *val, QSP_CHAR op);
 INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count);
-INLINE void qspSortArray(QSPString varName, QSP_BOOL isAscending);
+INLINE void qspSortArray(QSPVar *var, QSP_TINYINT baseValType, QSP_BOOL isAscending);
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames);
 INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, QSP_CHAR op);
 INLINE QSPString qspGetVarNameOnly(QSPString s);
@@ -565,21 +565,17 @@ INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
     dest->IndsCount = count;
 }
 
-INLINE void qspSortArray(QSPString varName, QSP_BOOL isAscending)
+INLINE void qspSortArray(QSPVar *var, QSP_TINYINT baseValType, QSP_BOOL isAscending)
 {
-    QSPVar *var;
-    QSP_TINYINT baseVarType;
     QSPVariant *curValue, *sortedValues, **valuePositions;
     int i, *indexMapping, indsCount, valsCount;
-    if (!(var = qspVarReference(varName, QSP_FALSE))) return; /* we don't create a new array */
     valsCount = var->ValsCount;
     if (valsCount < 2) return;
-    baseVarType = qspGetVarType(varName);
     valuePositions = (QSPVariant **)malloc(valsCount * sizeof(QSPVariant *));
     curValue = var->Values;
     for (i = 0; i < valsCount; ++i, ++curValue)
     {
-        if (QSP_BASETYPE(curValue->Type) != baseVarType)
+        if (QSP_BASETYPE(curValue->Type) != baseValType)
         {
             qspSetError(QSP_ERR_TYPEMISMATCH);
             free(valuePositions);
@@ -1007,10 +1003,14 @@ void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
 
 void qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
+    QSPVar *var;
+    QSP_TINYINT baseVarType;
+    if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return; /* we don't create a new array */
+    baseVarType = qspGetVarType(QSP_STR(args[0]));
     if (count == 2)
-        qspSortArray(QSP_STR(args[0]), QSP_ISFALSE(QSP_NUM(args[1])));
+        qspSortArray(var, baseVarType, QSP_ISFALSE(QSP_NUM(args[1])));
     else
-        qspSortArray(QSP_STR(args[0]), QSP_TRUE);
+        qspSortArray(var, baseVarType, QSP_TRUE);
 }
 
 void qspStatementSplitStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
