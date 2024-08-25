@@ -1029,7 +1029,7 @@ void qspStatementSplitStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     qspEmptyVar(var); /* clear the dest array anyway */
     foundString.Type = QSP_TYPE_STR;
     curInd = 0;
-    foundPos = qspRegExpStrSearch(regExp, text, groupInd, &foundLen);
+    foundPos = qspRegExpStrSearch(regExp, text, 0, groupInd, &foundLen);
     while (foundPos && foundLen)
     {
         QSP_STR(foundString) = qspStringFromLen(foundPos, foundLen);
@@ -1040,8 +1040,7 @@ void qspStatementSplitStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
         }
         qspCopyToNewVariant(var->Values + curInd, &foundString);
         ++curInd;
-        text.Str = foundPos + foundLen;
-        foundPos = qspRegExpStrSearch(regExp, text, groupInd, &foundLen);
+        foundPos = qspRegExpStrSearch(regExp, text, foundPos + foundLen, groupInd, &foundLen);
     }
     var->ValsCount = curInd;
 }
