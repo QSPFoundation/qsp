@@ -59,18 +59,9 @@
 
     INLINE void qspInitVariant(QSPVariant *value, QSP_TINYINT type)
     {
-        switch (QSP_BASETYPE(value->Type = type))
-        {
-            case QSP_TYPE_TUPLE:
-                QSP_PTUPLE(value) = qspNullTuple;
-                break;
-            case QSP_TYPE_NUM:
-                QSP_PNUM(value) = 0;
-                break;
-            case QSP_TYPE_STR:
-                QSP_PSTR(value) = qspNullString;
-                break;
-        }
+        /* Works fine with QSP_TYPE_TUPLE, QSP_TYPE_NUM, QSP_TYPE_STR */
+        memset(&value->Val, 0, sizeof(value->Val));
+        value->Type = type;
     }
 
     INLINE QSPVariant qspGetEmptyVariant(QSP_TINYINT type)
@@ -98,8 +89,8 @@
 
     INLINE void qspMoveToNewVariant(QSPVariant *dest, QSPVariant *src)
     {
-        dest->Type = src->Type;
         dest->Val = src->Val;
+        dest->Type = src->Type;
         qspInitVariant(src, src->Type);
     }
 

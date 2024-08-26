@@ -665,7 +665,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
     if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return;
     if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE))) return;
     qspAllocateSavedVarsGroupWithArgs(varArgs, varRes);
-    qspSetArgs(varArgs, args, count);
+    qspSetArgs(varArgs, args, count, QSP_TRUE);
     linesCount = qspPreprocessData(s, &strs);
     oldLocationState = qspLocationState;
     qspExecCode(strs, 0, linesCount, codeOffset, 0);
@@ -1095,14 +1095,13 @@ INLINE void qspStatementClear(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUS
         break;
     case qspStatFreeLib:
         qspClearAllIncludes(QSP_FALSE);
-        if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
         break;
     }
 }
 
 INLINE void qspStatementGoSub(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
-    qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0);
+    qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1, QSP_TRUE, 0);
 }
 
 INLINE void qspStatementGoTo(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
@@ -1113,8 +1112,7 @@ INLINE void qspStatementGoTo(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT ex
         qspSetError(QSP_ERR_LOCNOTFOUND);
         return;
     }
-    qspCurLoc = locInd;
-    qspRefreshCurLoc(extArg == qspStatGoTo, args + 1, count - 1);
+    qspNavigateToLocation(locInd, extArg == qspStatGoTo, args + 1, count - 1);
 }
 
 INLINE void qspStatementWait(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT QSP_UNUSED(extArg))

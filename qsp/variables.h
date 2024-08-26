@@ -62,12 +62,12 @@
     void qspInitVarTypes(void);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
     void qspClearAllVars(QSP_BOOL toInit);
-    void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val);
-    void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);
+    QSP_BOOL qspGetVarValue(QSPString varName, QSPVariant *res);
+    QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
+    QSP_BOOL qspGetLastVarValue(QSPString varName, QSPVariant *res);
     QSPTuple qspGetVarTupleValue(QSPString name);
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
-    int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     void qspRestoreGlobalVars(void);
     int qspSaveLocalVarsAndRestoreGlobals(QSPVar **vars);
     void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGroups, int groupsCount);
@@ -77,7 +77,7 @@
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
     QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin);
     int qspGetVarsCount(void);
-    void qspSetArgs(QSPVar *var, QSPVariant *args, int count);
+    void qspSetArgs(QSPVar *destVar, QSPVariant *args, int count, QSP_BOOL toMove);
     void qspApplyResult(QSPVar *varRes, QSPVariant *res);
     /* Statements */
     void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat);

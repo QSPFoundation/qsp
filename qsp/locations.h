@@ -37,6 +37,7 @@
         QSPLineOfCode *OnVisitLines;
         int OnVisitLinesCount;
         QSPLocAct Actions[QSP_MAXACTIONS];
+        int ActionsCount; /* max number of actions */
     } QSPLocation;
     typedef struct
     {
@@ -55,8 +56,8 @@
     void qspCreateWorld(int start, int newLocsCount);
     void qspPrepareLocs(void);
     int qspLocIndex(QSPString name);
-    void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
-    void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT count);
-    void qspRefreshCurLoc(QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT count);
+    void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res);
+    void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount);
+    void qspNavigateToLocation(int locInd, QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT argsCount);
 
 #endif

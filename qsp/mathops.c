@@ -987,23 +987,14 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         }
         break;
     case qspOpArrItem:
-    case qspOpLastArrItem:
-    {
-        QSPVar *var;
-        int arrIndex;
-        QSPString varName = QSP_STR(args[0]);
-        var = qspVarReference(varName, QSP_FALSE);
-        if (!var) break;
-        if (opCode == qspOpLastArrItem)
-            arrIndex = var->ValsCount - 1;
-        else if (argsCount == 2)
-            arrIndex = qspGetVarIndex(var, args[1], QSP_FALSE);
+        if (argsCount == 2)
+            qspGetVarValueByIndex(QSP_STR(args[0]), args[1], &tos);
         else
-            arrIndex = 0;
-        type = qspGetVarType(varName);
-        qspGetVarValueByReference(var, arrIndex, type, &tos);
+            qspGetVarValue(QSP_STR(args[0]), &tos);
         break;
-    }
+    case qspOpLastArrItem:
+        qspGetLastVarValue(QSP_STR(args[0]), &tos);
+        break;
     case qspOpNegation:
         QSP_NUM(tos) = -QSP_NUM(args[0]);
         break;
@@ -1097,7 +1088,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         QSP_STR(tos) = (qspCurInput.Str ? qspCopyToNewText(qspCurInput) : qspNullString);
         break;
     case qspOpCurLoc:
-        QSP_STR(tos) = (qspCurLoc >= 0 ? qspCopyToNewText(qspLocs[qspCurLoc].Name) : qspNullString);
+        QSP_STR(tos) = (qspCurLoc >= 0 && qspCurLoc < qspLocsCount ? qspCopyToNewText(qspLocs[qspCurLoc].Name) : qspNullString);
         break;
     case qspOpSelObj:
         QSP_STR(tos) = (qspCurSelObject >= 0 ? qspCopyToNewText(qspCurObjects[qspCurSelObject].Desc) : qspNullString);
@@ -1389,7 +1380,7 @@ INLINE void qspFunctionIsPlay(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), Q
 
 INLINE void qspFunctionFunc(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1, res);
+    qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1, QSP_TRUE, res);
 }
 
 INLINE void qspFunctionDynEval(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)

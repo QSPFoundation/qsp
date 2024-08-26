@@ -102,6 +102,7 @@ void qspClearAllIncludes(QSP_BOOL toInit)
             int count = qspLocsCount - qspCurIncLocsCount;
             qspCreateWorld(count, count);
             qspPrepareLocs();
+            if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
         }
     }
     qspCurIncFilesCount = 0;
@@ -145,7 +146,6 @@ void qspNewGame(QSP_BOOL toReset)
         qspSetError(QSP_ERR_GAMENOTLOADED);
         return;
     }
-    qspCurLoc = 0;
     if (toReset)
     {
         qspSetSeed((unsigned int)QSP_TIME(0));
@@ -162,7 +162,7 @@ void qspNewGame(QSP_BOOL toReset)
         qspCallCloseFile(qspNullString);
         qspCallSetTimer(QSP_DEFTIMERINTERVAL);
     }
-    qspRefreshCurLoc(QSP_TRUE, 0, 0);
+    qspNavigateToLocation(0, QSP_TRUE, 0, 0);
 }
 
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count)
@@ -242,6 +242,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
         actsCount = (isOldFormat ? 20 : qspReadEncodedIntVal(strs[ind++]));
         if (toAddLoc)
         {
+            qspLocs[locsCount].ActionsCount = actsCount;
             for (j = 0; j < actsCount; ++j)
             {
                 qspLocs[locsCount].Actions[j].Image = (isOldFormat ? qspNullString : qspDecodeString(strs[ind++]));
@@ -257,7 +258,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     }
     qspFreeStrs(strs, count);
     qspLocsCount = endLoc;
-    qspCreateWorld(endLoc, locsCount);
+    qspCreateWorld(endLoc, locsCount); /* in case we skipped some locations */
     count = locsCount - startLoc;
     if (count) qspPrepareLocs();
     if (isNewGame)
@@ -291,7 +292,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     }
     bufString = qspNewBufString(1024);
     qspRefreshPlayList();
-    locName = (qspCurLoc >= 0 ? qspLocs[qspCurLoc].Name : qspNullString);
+    locName = (qspCurLoc >= 0 && qspCurLoc < qspLocsCount ? qspLocs[qspCurLoc].Name : qspNullString);
     qspAppendStrVal(&bufString, QSP_STATIC_STR(QSP_SAVEDGAMEID));
     qspAppendStrVal(&bufString, QSP_STATIC_STR(QSP_VER));
     qspAppendEncodedIntVal(&bufString, qspQstCRC);

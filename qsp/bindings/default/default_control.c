@@ -285,7 +285,7 @@ QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
-    qspExecLocByNameWithArgs(name, 0, 0, 0);
+    qspExecLocByNameWithArgs(name, 0, 0, QSP_TRUE, 0);
     if (qspErrorNum) return QSP_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
