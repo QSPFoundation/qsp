@@ -294,10 +294,14 @@
 
     INLINE QSPString qspBufTextToString(QSPBufString buf)
     {
+    #if defined(__GNUC__)
+        return (QSPString) { buf.Str, (buf.Str + buf.Len) };
+    #else
         QSPString res;
         res.Str = buf.Str;
         res.End = buf.Str + buf.Len;
         return res;
+    #endif
     }
 
     INLINE void qspFreeBufString(QSPBufString *buf)
