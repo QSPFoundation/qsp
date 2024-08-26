@@ -1063,7 +1063,7 @@ void qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
         qspSortArray(var, baseVarType, QSP_TRUE);
 }
 
-void qspStatementSplitStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     QSPVar *var;
     QSPRegExp *regExp;

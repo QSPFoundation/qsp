@@ -142,7 +142,7 @@ void qspInitStats(void)
     qspAddStatement(qspStatCmdClear, qspStatementClear, 0, 0);
     qspAddStatement(qspStatCopyArr, qspStatementCopyArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(qspStatSortArr, qspStatementSortArr, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_NUM);
-    qspAddStatement(qspStatSplitStr, qspStatementSplitStr, 3, 4, QSP_TYPE_VARREF, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
+    qspAddStatement(qspStatScanStr, qspStatementScanStr, 3, 4, QSP_TYPE_VARREF, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
     qspAddStatement(qspStatDelAct, qspStatementDelAct, 1, 1, QSP_TYPE_STR);
     qspAddStatement(qspStatDelObj, qspStatementDelObj, 1, 1, QSP_TYPE_STR);
     qspAddStatement(qspStatDynamic, qspStatementDynamic, 1, QSP_STATMAXARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, -1);
@@ -198,7 +198,7 @@ void qspInitStats(void)
     qspAddStatName(qspStatCmdClear, QSP_STATIC_STR(QSP_FMT("CMDCLR")), 2);
     qspAddStatName(qspStatCopyArr, QSP_STATIC_STR(QSP_FMT("COPYARR")), 2);
     qspAddStatName(qspStatSortArr, QSP_STATIC_STR(QSP_FMT("SORTARR")), 2);
-    qspAddStatName(qspStatSplitStr, QSP_STATIC_STR(QSP_FMT("SPLITSTR")), 2);
+    qspAddStatName(qspStatScanStr, QSP_STATIC_STR(QSP_FMT("SCANSTR")), 2);
     qspAddStatName(qspStatDelAct, QSP_STATIC_STR(QSP_FMT("DELACT")), 2);
     qspAddStatName(qspStatDelAct, QSP_STATIC_STR(QSP_FMT("DEL ACT")), 2);
     qspAddStatName(qspStatDelObj, QSP_STATIC_STR(QSP_FMT("DELOBJ")), 2);
