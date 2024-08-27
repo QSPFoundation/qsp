@@ -56,7 +56,7 @@ QSP_CHAR *qspStringToC(QSPString s)
     return string;
 }
 
-void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
+QSP_BOOL qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
 {
     int valLen = qspStrLen(val);
     if (!toCreate && dest->Str)
@@ -69,6 +69,7 @@ void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
             destPtr += destLen;
             dest->End = destPtr + valLen;
             memcpy(destPtr, val.Str, valLen * sizeof(QSP_CHAR));
+            return QSP_TRUE;
         }
     }
     else
@@ -79,15 +80,17 @@ void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
             dest->Str = destPtr;
             dest->End = destPtr + valLen;
             memcpy(destPtr, val.Str, valLen * sizeof(QSP_CHAR));
+            return QSP_TRUE;
         }
         else
         {
             dest->Str = dest->End = 0; /* assign the null string */
         }
     }
+    return QSP_FALSE;
 }
 
-void qspAddBufText(QSPBufString *dest, QSPString val)
+QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val)
 {
     int valLen = qspStrLen(val);
     if (valLen)
@@ -109,7 +112,9 @@ void qspAddBufText(QSPBufString *dest, QSPString val)
             memcpy(dest->Str, val.Str, valLen * sizeof(QSP_CHAR));
             dest->Len = valLen;
         }
+        return QSP_TRUE;
     }
+    return QSP_FALSE;
 }
 
 QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars)
@@ -416,25 +421,23 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 
 QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, QSP_BOOL canReturnSelf)
 {
-    QSPBufString res;
-    int searchLen;
+    int searchLen = qspStrLen(searchTxt);
     QSP_CHAR *pos = qspStrStr(txt, searchTxt);
-    if (!pos)
+    if (pos && searchLen)
     {
-        if (canReturnSelf) return txt;
-        return qspCopyToNewText(txt);
+        QSPBufString res = qspNewBufString(256);
+        do
+        {
+            qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
+            qspAddBufText(&res, repTxt);
+            txt.Str = pos + searchLen;
+            pos = qspStrStr(txt, searchTxt);
+        } while (pos);
+        qspAddBufText(&res, txt);
+        return qspBufTextToString(res);
     }
-    res = qspNewBufString(256);
-    searchLen = qspStrLen(searchTxt);
-    do
-    {
-        qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
-        qspAddBufText(&res, repTxt);
-        txt.Str = pos + searchLen;
-        pos = qspStrStr(txt, searchTxt);
-    } while (pos);
-    qspAddBufText(&res, txt);
-    return qspBufTextToString(res);
+    if (canReturnSelf) return txt;
+    return qspCopyToNewText(txt);
 }
 
 QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)

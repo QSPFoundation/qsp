@@ -24,8 +24,8 @@ INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos);
 INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
 INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
 INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs);
-INLINE int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **strs);
+INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
+INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 
 INLINE int qspStatStringCompare(const void *name, const void *compareTo)
 {
@@ -414,6 +414,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
 
 void qspFreeLineOfCode(QSPLineOfCode *line)
 {
+    /* We don't release the line text here */
     qspFreeString(&line->Label);
     if (line->Stats)
     {
@@ -545,14 +546,54 @@ void qspPrepareStringToExecution(QSPString *str)
     }
 }
 
-INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
+INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line)
 {
-    QSPLineOfCode *ret, *line;
+    QSPString lineStr;
+    int eolLen = QSP_STATIC_LEN(QSP_PREEOLEXT QSP_EOLEXT);
+    /* Check line ending only if we add something to the combined line */
+    if (qspAddBufText(strBuf, str) && strBuf->Len >= eolLen)
+    {
+        QSPString eol = qspStringFromLen(strBuf->Str + strBuf->Len - eolLen, eolLen);
+        if (!qspStrsComp(eol, QSP_STATIC_STR(QSP_PREEOLEXT QSP_EOLEXT)))
+        {
+            strBuf->Len -= QSP_STATIC_LEN(QSP_EOLEXT); /* keep QSP_PREEOLEXT */
+            return QSP_FALSE;
+        }
+    }
+    lineStr = qspBufTextToString(*strBuf);
+    /* Prepare the buffer to execution */
+    qspPrepareStringToExecution(&lineStr);
+    /* Transfer ownership of the buffer to QSPLineOfCode */
+    qspInitLineOfCode(line, lineStr, lineNum);
+    return QSP_TRUE;
+}
+
+INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line)
+{
+    QSPString lineStr;
+    qspAddBufText(strBuf, str);
+    lineStr = qspBufTextToString(*strBuf);
+    /* Prepare the buffer to execution */
+    qspPrepareStringToExecution(&lineStr);
+    /* Transfer ownership of the buffer to QSPLineOfCode */
+    qspInitLineOfCode(line, lineStr, lineNum);
+}
+
+int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
+{
+    QSPLineOfCode *lines;
+    QSPBufString combinedStrBuf;
     QSP_BOOL isNewLine;
     QSP_CHAR *str, *pos, quot = 0;
-    int lineNum = 0, lastLineNum = 0, count = 0, quotsCount = 0, strLen = 0, bufSize = 8, strBufSize = 256;
+    int quotsCount = 0, lineNum = 0, lastLineNum = 0, linesCount = 0, linesBufSize = 8, strLen = 0, strBufSize = 256;
+    if (qspIsEmpty(data))
+    {
+        *strs = 0;
+        return 0;
+    }
     str = (QSP_CHAR *)malloc(strBufSize * sizeof(QSP_CHAR));
-    ret = (QSPLineOfCode *)malloc(bufSize * sizeof(QSPLineOfCode));
+    lines = (QSPLineOfCode *)malloc(linesBufSize * sizeof(QSPLineOfCode));
+    combinedStrBuf = qspNewBufString(64);
     pos = data.Str;
     while (pos < data.End)
     {
@@ -560,6 +601,7 @@ INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
         if (isNewLine) ++lineNum;
         if (quotsCount || quot || !isNewLine)
         {
+            /* Keep composing the current line */
             if (strLen >= strBufSize)
             {
                 strBufSize = strLen + 256;
@@ -568,11 +610,11 @@ INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
             str[strLen++] = *pos;
             if (quot)
             {
-                if (*pos == quot)
+                if (*pos++ == quot)
                 {
-                    if (++pos < data.End && *pos == quot)
+                    if (pos < data.End && *pos == quot)
                     {
-                        /* escape code */
+                        /* Escape code */
                         if (strLen >= strBufSize)
                         {
                             strBufSize = strLen + 256;
@@ -582,12 +624,10 @@ INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
                     }
                     else
                     {
-                        /* termination of the string */
+                        /* Termination of the string */
                         quot = 0;
                     }
                 }
-                else
-                    ++pos;
             }
             else
             {
@@ -604,86 +644,28 @@ INLINE int qspProcessPreformattedStrings(QSPString data, QSPLineOfCode **strs)
         }
         else
         {
-            if (count >= bufSize)
+            /* New line has been found */
+            if (linesCount >= linesBufSize)
             {
-                bufSize = count + 16;
-                ret = (QSPLineOfCode *)realloc(ret, bufSize * sizeof(QSPLineOfCode));
+                linesBufSize = linesCount + 16;
+                lines = (QSPLineOfCode *)realloc(lines, linesBufSize * sizeof(QSPLineOfCode));
             }
-            /* Initialize the line data, the line gets updated a bit later */
-            line = ret + count++;
-            line->Str = qspCopyToNewText(qspDelSpc(qspStringFromLen(str, strLen)));
-            line->LineNum = lastLineNum;
-            line->Label = qspNullString;
-            line->LinesToElse = line->LinesToEnd = 0;
-            line->Stats = 0;
-            line->StatsCount = 0;
-            lastLineNum = lineNum;
+            if (qspAppendLineToResult(qspDelSpc(qspStringFromLen(str, strLen)), lastLineNum, &combinedStrBuf, lines + linesCount))
+            {
+                combinedStrBuf = qspNewBufString(64);
+                lastLineNum = lineNum;
+                ++linesCount;
+            }
             strLen = 0;
             pos += QSP_STATIC_LEN(QSP_STRSDELIM);
         }
         data.Str = pos;
     }
-    if (count >= bufSize)
-        ret = (QSPLineOfCode *)realloc(ret, (count + 1) * sizeof(QSPLineOfCode));
-    /* Initialize the line data, the line gets updated a bit later */
-    line = ret + count++;
-    line->Str = qspCopyToNewText(qspDelSpc(qspStringFromLen(str, strLen)));
-    line->LineNum = lastLineNum;
-    line->Label = qspNullString;
-    line->LinesToElse = line->LinesToEnd = 0;
-    line->Stats = 0;
-    line->StatsCount = 0;
+    if (linesCount >= linesBufSize)
+        lines = (QSPLineOfCode *)realloc(lines, (linesCount + 1) * sizeof(QSPLineOfCode));
+    qspAppendLastLineToResult(qspDelSpc(qspStringFromLen(str, strLen)), lastLineNum, &combinedStrBuf, lines + linesCount);
+    ++linesCount;
     free(str);
-    *strs = ret;
-    return count;
-}
-
-INLINE int qspProcessEOLExtensions(QSPLineOfCode *s, int count, QSPLineOfCode **strs)
-{
-    QSPLineOfCode *ret;
-    QSPString eol, line;
-    QSPBufString strBuf;
-    int lastNum = 0, i = 0, bufSize = 8, newCount = 0;
-    int eolLen = QSP_STATIC_LEN(QSP_PREEOLEXT QSP_EOLEXT);
-    ret = (QSPLineOfCode *)malloc(bufSize * sizeof(QSPLineOfCode));
-    while (i < count)
-    {
-        strBuf = qspNewBufString(128);
-        qspAddBufText(&strBuf, s[i].Str);
-        if (strBuf.Len >= eolLen)
-        {
-            eol = qspStringFromLen(strBuf.Str + strBuf.Len - eolLen, eolLen);
-            while (!qspStrsComp(eol, QSP_STATIC_STR(QSP_PREEOLEXT QSP_EOLEXT)))
-            {
-                if (++i >= count) break;
-                strBuf.Len -= QSP_STATIC_LEN(QSP_EOLEXT);
-                qspAddBufText(&strBuf, s[i].Str);
-                eol = qspStringFromLen(strBuf.Str + strBuf.Len - eolLen, eolLen);
-            }
-        }
-        if (newCount >= bufSize)
-        {
-            bufSize = newCount + 16;
-            ret = (QSPLineOfCode *)realloc(ret, bufSize * sizeof(QSPLineOfCode));
-        }
-        line = qspBufTextToString(strBuf);
-        /* prepare the buffer to execution */
-        qspPrepareStringToExecution(&line);
-        /* transfer ownership of the buffer to QSPLineOfCode */
-        qspInitLineOfCode(ret + newCount, line, lastNum);
-        ++newCount;
-        ++i;
-        lastNum = s[i].LineNum;
-    }
-    *strs = ret;
-    return newCount;
-}
-
-int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
-{
-    QSPLineOfCode *s;
-    int res, count = qspProcessPreformattedStrings(data, &s);
-    res = qspProcessEOLExtensions(s, count, strs);
-    qspFreePrepLines(s, count);
-    return res;
+    *strs = lines;
+    return linesCount;
 }

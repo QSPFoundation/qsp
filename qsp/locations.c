@@ -142,11 +142,8 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     }
     else
     {
-        if (!qspIsEmpty(str))
-        {
-            qspAddBufText(&qspCurDesc, str);
+        if (qspAddBufText(&qspCurDesc, str))
             qspIsMainDescChanged = QSP_TRUE;
-        }
         qspFreeString(&str);
     }
     /* Update base actions */

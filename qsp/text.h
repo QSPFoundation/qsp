@@ -50,8 +50,8 @@
     /* External functions */
     void qspInitSymbolClasses(void);
     QSP_CHAR *qspStringToC(QSPString s);
-    void qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
-    void qspAddBufText(QSPBufString *dest, QSPString val);
+    QSP_BOOL qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
+    QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val);
     QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars);
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);

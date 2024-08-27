@@ -1013,18 +1013,12 @@ INLINE void qspStatementAddText(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT
     switch (extArg)
     {
     case qspStatP:
-        if (!qspIsEmpty(QSP_STR(args[0])))
-        {
-            qspAddBufText(&qspCurVars, QSP_STR(args[0]));
+        if (qspAddBufText(&qspCurVars, QSP_STR(args[0])))
             qspIsVarsDescChanged = QSP_TRUE;
-        }
         break;
     case qspStatMP:
-        if (!qspIsEmpty(QSP_STR(args[0])))
-        {
-            qspAddBufText(&qspCurDesc, QSP_STR(args[0]));
+        if (qspAddBufText(&qspCurDesc, QSP_STR(args[0])))
             qspIsMainDescChanged = QSP_TRUE;
-        }
         break;
     case qspStatPL:
         if (count) qspAddBufText(&qspCurVars, QSP_STR(args[0]));

@@ -1245,13 +1245,10 @@ INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 
 INLINE void qspFunctionReplace(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    QSPString searchTxt = QSP_STR(args[1]);
-    if (qspIsEmpty(searchTxt))
-        QSP_PSTR(res) = qspCopyToNewText(QSP_STR(args[0]));
-    else if (count == 2)
-        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), searchTxt, qspNullString, QSP_FALSE);
+    if (count == 2)
+        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), QSP_STR(args[1]), qspNullString, QSP_FALSE);
     else
-        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), searchTxt, QSP_STR(args[2]), QSP_FALSE);
+        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), QSP_STR(args[1]), QSP_STR(args[2]), QSP_FALSE);
 }
 
 INLINE void qspFunctionArrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
