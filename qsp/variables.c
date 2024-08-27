@@ -654,7 +654,6 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
     QSPVar *var;
     QSP_TINYINT baseVarType;
     QSPVariant defaultValue, *curValue;
-    QSP_BOOL isFound;
     QSPRegExp *regExp;
     if (!(var = qspVarReference(varName, QSP_FALSE))) return -1;
     if (isRegExp)
@@ -682,19 +681,23 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
         {
             switch (baseVarType)
             {
-                case QSP_TYPE_TUPLE:
-                    isFound = !qspTuplesComp(QSP_PTUPLE(val), QSP_PTUPLE(curValue));
-                    break;
-                case QSP_TYPE_STR:
-                    isFound = isRegExp ?
-                              qspRegExpStrMatch(regExp, QSP_PSTR(curValue)) :
-                              !qspStrsComp(QSP_PSTR(val), QSP_PSTR(curValue));
-                    break;
-                case QSP_TYPE_NUM:
-                    isFound = (QSP_PNUM(val) == QSP_PNUM(curValue));
-                    break;
+            case QSP_TYPE_TUPLE:
+                if (!qspTuplesComp(QSP_PTUPLE(val), QSP_PTUPLE(curValue))) return ind;
+                break;
+            case QSP_TYPE_STR:
+                if (isRegExp)
+                {
+                    if (qspRegExpStrMatch(regExp, QSP_PSTR(curValue))) return ind;
+                }
+                else
+                {
+                    if (!qspStrsComp(QSP_PSTR(val), QSP_PSTR(curValue))) return ind;
+                }
+                break;
+            case QSP_TYPE_NUM:
+                if (QSP_PNUM(val) == QSP_PNUM(curValue)) return ind;
+                break;
             }
-            if (isFound) return ind;
         }
     }
     return -1;
@@ -722,33 +725,33 @@ QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
             {
                 switch (baseVarType)
                 {
-                    case QSP_TYPE_TUPLE:
-                        if (isMin)
-                        {
-                            if (qspTuplesComp(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) < 0)
-                                bestValue = curValue;
-                        }
-                        else if (qspTuplesComp(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) > 0)
+                case QSP_TYPE_TUPLE:
+                    if (isMin)
+                    {
+                        if (qspTuplesComp(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) < 0)
                             bestValue = curValue;
-                        break;
-                    case QSP_TYPE_STR:
-                        if (isMin)
-                        {
-                            if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(bestValue)) < 0)
-                                bestValue = curValue;
-                        }
-                        else if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(bestValue)) > 0)
+                    }
+                    else if (qspTuplesComp(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) > 0)
+                        bestValue = curValue;
+                    break;
+                case QSP_TYPE_STR:
+                    if (isMin)
+                    {
+                        if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(bestValue)) < 0)
                             bestValue = curValue;
-                        break;
-                    case QSP_TYPE_NUM:
-                        if (isMin)
-                        {
-                            if (QSP_PNUM(curValue) < QSP_PNUM(bestValue))
-                                bestValue = curValue;
-                        }
-                        else if (QSP_PNUM(curValue) > QSP_PNUM(bestValue))
+                    }
+                    else if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(bestValue)) > 0)
+                        bestValue = curValue;
+                    break;
+                case QSP_TYPE_NUM:
+                    if (isMin)
+                    {
+                        if (QSP_PNUM(curValue) < QSP_PNUM(bestValue))
                             bestValue = curValue;
-                        break;
+                    }
+                    else if (QSP_PNUM(curValue) > QSP_PNUM(bestValue))
+                        bestValue = curValue;
+                    break;
                 }
             }
             else
