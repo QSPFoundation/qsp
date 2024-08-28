@@ -276,8 +276,9 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
     void *gameData;
     QSPString locName;
     QSPBufString bufString;
-    QSPVar *savedVars;
-    int i, j, dataSize, varsCount, oldLocationState = qspLocationState;
+    QSPVarsBucket *bucket;
+    QSPVar *var, *savedVars;
+    int i, j, k, dataSize, varsCount, oldLocationState = qspLocationState;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
     if (qspLocationState != oldLocationState)
     {
@@ -335,23 +336,26 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize)
         qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Image);
         qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Desc);
     }
-    qspAppendEncodedIntVal(&bufString, qspGetVarsCount());
-    for (i = 0; i < QSP_VARSCOUNT; ++i)
+    bucket = qspVars;
+    for (i = 0; i < QSP_VARSBUCKETS; ++i)
     {
-        if (qspVars[i].Name.Str)
+        qspAppendEncodedIntVal(&bufString, bucket->VarsCount);
+        var = bucket->Vars;
+        for (j = 0; j < bucket->VarsCount; ++j)
         {
-            qspAppendEncodedIntVal(&bufString, i);
-            qspAppendEncodedStrVal(&bufString, qspVars[i].Name);
-            qspAppendEncodedIntVal(&bufString, qspVars[i].ValsCount);
-            for (j = 0; j < qspVars[i].ValsCount; ++j)
-                qspAppendEncodedVariant(&bufString, qspVars[i].Values[j]);
-            qspAppendEncodedIntVal(&bufString, qspVars[i].IndsCount);
-            for (j = 0; j < qspVars[i].IndsCount; ++j)
+            qspAppendEncodedStrVal(&bufString, var->Name);
+            qspAppendEncodedIntVal(&bufString, var->ValsCount);
+            for (k = 0; k < var->ValsCount; ++k)
+                qspAppendEncodedVariant(&bufString, var->Values[k]);
+            qspAppendEncodedIntVal(&bufString, var->IndsCount);
+            for (k = 0; k < var->IndsCount; ++k)
             {
-                qspAppendEncodedIntVal(&bufString, qspVars[i].Indices[j].Index);
-                qspAppendEncodedStrVal(&bufString, qspVars[i].Indices[j].Str);
+                qspAppendEncodedIntVal(&bufString, var->Indices[k].Index);
+                qspAppendEncodedStrVal(&bufString, var->Indices[k].Str);
             }
+            ++var;
         }
+        ++bucket;
     }
     qspRestoreLocalVars(savedVars, varsCount, qspSavedVarGroups, qspSavedVarGroupsCount);
     if (qspErrorNum)
@@ -390,7 +394,7 @@ INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, 
 INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
 {
     QSPVariant val;
-    int i, j, ind, count, groupsCount, varValuesCount, lastInd, temp, selAction, selObject;
+    int i, j, k, ind, count, groupsCount, varValuesCount, temp, selAction, selObject;
     ind = 16;
     if (ind >= strsCount) return QSP_FALSE;
     if (qspStrsComp(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
@@ -442,40 +446,38 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
     if (count < 0 || count > QSP_MAXOBJECTS || selObject >= count) return QSP_FALSE;
     /* objects: image + description */
     if (!qspSkipLines(strsCount, 2 * count, &ind)) return QSP_FALSE;
-    /* variables count */
-    if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &count)) return QSP_FALSE;
-    if (count < 0 || count > QSP_VARSCOUNT) return QSP_FALSE;
-    lastInd = -1;
-    /* variables */
-    for (i = 0; i < count; ++i)
+    for (i = 0; i < QSP_VARSBUCKETS; ++i)
     {
-        /* variable's index */
-        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &temp)) return QSP_FALSE;
-        if (temp <= lastInd || temp >= QSP_VARSCOUNT) return QSP_FALSE;
-        lastInd = temp;
-        /* variable's name */
-        if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
-        /* values count */
-        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &varValuesCount)) return QSP_FALSE;
-        if (varValuesCount < 0) return QSP_FALSE;
-        /* values */
-        for (j = 0; j < varValuesCount; ++j)
+        /* variables count */
+        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &count)) return QSP_FALSE;
+        if (count < 0 || count > QSP_VARSMAXBUCKETSIZE) return QSP_FALSE;
+        /* variables */
+        for (j = 0; j < count; ++j)
         {
-            /* var type + var value */
-            if (!qspReadEncodedVariant(strs, strsCount, &ind, &val)) return QSP_FALSE;
-            qspFreeVariant(&val);
-        }
-        /* indices count */
-        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &groupsCount)) return QSP_FALSE;
-        if (groupsCount < 0) return QSP_FALSE;
-        /* indices */
-        for (j = 0; j < groupsCount; ++j)
-        {
-            /* value index */
-            if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &temp)) return QSP_FALSE;
-            if (temp < 0 || temp >= varValuesCount) return QSP_FALSE;
-            /* text value */
+            /* variable's name */
             if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
+            /* values count */
+            if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &varValuesCount)) return QSP_FALSE;
+            if (varValuesCount < 0) return QSP_FALSE;
+            /* values */
+            for (k = 0; k < varValuesCount; ++k)
+            {
+                /* var type + var value */
+                if (!qspReadEncodedVariant(strs, strsCount, &ind, &val)) return QSP_FALSE;
+                qspFreeVariant(&val);
+            }
+            /* indices count */
+            if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &groupsCount)) return QSP_FALSE;
+            if (groupsCount < 0) return QSP_FALSE;
+            /* indices */
+            for (k = 0; k < groupsCount; ++k)
+            {
+                /* value index */
+                if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, &temp)) return QSP_FALSE;
+                if (temp < 0 || temp >= varValuesCount) return QSP_FALSE;
+                /* text value */
+                if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
+            }
         }
     }
     return (ind == strsCount - 1); /* the last line is always empty */
@@ -483,8 +485,10 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount)
 
 QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
 {
+    QSPVar *var;
+    QSPVarsBucket *bucket;
     QSPString *strs, locName, gameString;
-    int i, j, ind, count, varInd, varsCount, valsCount;
+    int i, j, k, ind, count, varsCount, valsCount;
     gameString = qspStringFromFileData(data, dataSize, QSP_TRUE);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     qspFreeString(&gameString);
@@ -543,30 +547,43 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         qspCurObjects[i].Image = qspDecodeString(strs[ind++]);
         qspCurObjects[i].Desc = qspDecodeString(strs[ind++]);
     }
-    varsCount = qspReadEncodedIntVal(strs[ind++]);
-    for (i = 0; i < varsCount; ++i)
+    bucket = qspVars;
+    for (i = 0; i < QSP_VARSBUCKETS; ++i)
     {
-        varInd = qspReadEncodedIntVal(strs[ind++]);
-        qspVars[varInd].Name = qspDecodeString(strs[ind++]);
-        valsCount = qspReadEncodedIntVal(strs[ind++]);
-        if (valsCount)
+        varsCount = qspReadEncodedIntVal(strs[ind++]);
+        bucket->Capacity = bucket->VarsCount = varsCount;
+        bucket->Vars = 0;
+        if (varsCount)
         {
-            qspVars[varInd].ValsBufSize = qspVars[varInd].ValsCount = valsCount;
-            qspVars[varInd].Values = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
-            for (j = 0; j < valsCount; ++j)
-                qspReadEncodedVariant(strs, count, &ind, qspVars[varInd].Values + j);
-        }
-        valsCount = qspReadEncodedIntVal(strs[ind++]);
-        if (valsCount)
-        {
-            qspVars[varInd].IndsBufSize = qspVars[varInd].IndsCount = valsCount;
-            qspVars[varInd].Indices = (QSPVarIndex *)malloc(valsCount * sizeof(QSPVarIndex));
-            for (j = 0; j < valsCount; ++j)
+            var = bucket->Vars = (QSPVar *)malloc(varsCount * sizeof(QSPVar));
+            for (j = 0; j < varsCount; ++j)
             {
-                qspVars[varInd].Indices[j].Index = qspReadEncodedIntVal(strs[ind++]);
-                qspVars[varInd].Indices[j].Str = qspDecodeString(strs[ind++]);
+                var->Name = qspDecodeString(strs[ind++]);
+                valsCount = qspReadEncodedIntVal(strs[ind++]);
+                var->ValsBufSize = var->ValsCount = valsCount;
+                var->Values = 0;
+                if (valsCount)
+                {
+                    var->Values = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
+                    for (k = 0; k < valsCount; ++k)
+                        qspReadEncodedVariant(strs, count, &ind, var->Values + k);
+                }
+                valsCount = qspReadEncodedIntVal(strs[ind++]);
+                var->IndsBufSize = var->IndsCount = valsCount;
+                var->Indices = 0;
+                if (valsCount)
+                {
+                    var->Indices = (QSPVarIndex *)malloc(valsCount * sizeof(QSPVarIndex));
+                    for (k = 0; k < valsCount; ++k)
+                    {
+                        var->Indices[k].Index = qspReadEncodedIntVal(strs[ind++]);
+                        var->Indices[k].Str = qspDecodeString(strs[ind++]);
+                    }
+                }
+                ++var;
             }
         }
+        ++bucket;
     }
     qspFreeStrs(strs, count);
     qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjsListChanged = qspIsActsListChanged = QSP_TRUE;

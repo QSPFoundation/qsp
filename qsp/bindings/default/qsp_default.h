@@ -125,8 +125,6 @@
     /* Variables */
     QSP_EXTERN QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count);
     QSP_EXTERN QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *res);
-    QSP_EXTERN int QSPGetMaxVarsCount(void);
-    QSP_EXTERN QSP_BOOL QSPGetVarNameByIndex(int ind, QSPString *name);
 
     #ifdef __cplusplus
     }

@@ -21,9 +21,9 @@
 #include "locations.h"
 #include "mathops.h"
 #include "regexp.h"
-#include "text.h"
 
-QSPVar qspVars[QSP_VARSCOUNT];
+QSPVar qspNullVar;
+QSPVarsBucket qspVars[QSP_VARSBUCKETS];
 QSPVarsGroup *qspSavedVarGroups = 0;
 int qspSavedVarGroupsCount = 0;
 int qspSavedVarGroupsBufSize = 0;
@@ -86,10 +86,11 @@ INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2)
 
 QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
 {
-    int i;
+    int i, varsCount;
+    QSPVarsBucket *bucket;
     QSPVar *var;
     QSP_CHAR *pos;
-    unsigned char bCode;
+    unsigned int bCode;
     if (qspIsEmpty(name))
     {
         qspSetError(QSP_ERR_INCORRECTNAME);
@@ -110,44 +111,67 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
     bCode = 7;
     for (pos = name.Str; pos < name.End; ++pos)
         bCode = bCode * 31 + (unsigned char)*pos;
-    var = qspVars + QSP_VARSSEEK * bCode;
-    for (i = 0; i < QSP_VARSSEEK; ++i)
+    bucket = qspVars + bCode % QSP_VARSBUCKETS;
+    var = bucket->Vars;
+    varsCount = bucket->VarsCount;
+    for (i = varsCount; i > 0; --i)
     {
-        if (!var->Name.Str)
-        {
-            if (toCreate) var->Name = qspCopyToNewText(name);
-            return var;
-        }
         if (!qspStrsComp(var->Name, name)) return var;
         ++var;
     }
-    qspSetError(QSP_ERR_TOOMANYVARS);
-    return 0;
+    if (toCreate)
+    {
+        if (varsCount >= QSP_VARSMAXBUCKETSIZE)
+        {
+            qspSetError(QSP_ERR_TOOMANYVARS);
+            return 0;
+        }
+        if (varsCount >= bucket->Capacity)
+        {
+            bucket->Capacity = varsCount + 16;
+            bucket->Vars = (QSPVar *)realloc(bucket->Vars, bucket->Capacity * sizeof(QSPVar));
+        }
+
+        var = bucket->Vars + varsCount;
+
+        var->Name = qspCopyToNewText(name);
+        qspInitVarData(var);
+
+        bucket->VarsCount++;
+        return var;
+    }
+    return &qspNullVar;
 }
 
 void qspClearAllVars(QSP_BOOL toInit)
 {
-    int i;
-    QSPVar *var = qspVars;
-    for (i = 0; i < QSP_VARSCOUNT; ++i)
+    int i, j;
+    QSPVar *var;
+    QSPVarsBucket *bucket = qspVars;
+    for (i = 0; i < QSP_VARSBUCKETS; ++i)
     {
-        if (toInit)
-            qspInitVarData(var);
-        else
+        if (!toInit && bucket->Vars)
         {
-            qspFreeString(&var->Name);
-            qspEmptyVar(var);
+            var = bucket->Vars;
+            for (j = bucket->VarsCount; j > 0; --j)
+            {
+                qspFreeString(&var->Name);
+                qspEmptyVar(var);
+                ++var;
+            }
+            free(bucket->Vars);
         }
-        var->Name = qspNullString;
-        ++var;
+        bucket->Capacity = bucket->VarsCount = 0;
+        bucket->Vars = 0;
+        ++bucket;
     }
 }
 
 INLINE void qspRemoveArrayItem(QSPVar *var, int index)
 {
+    int i;
     QSP_BOOL toRemove;
     QSPVarIndex *ind;
-    int i;
     if (index < 0 || index >= var->ValsCount) return;
     qspFreeVariant(var->Values + index);
     var->ValsCount--;
@@ -761,14 +785,6 @@ QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
     }
     if (bestValue) qspCopyToNewVariant(&resultValue, bestValue);
     return resultValue;
-}
-
-int qspGetVarsCount(void)
-{
-    int i, count = 0;
-    for (i = 0; i < QSP_VARSCOUNT; ++i)
-        if (qspVars[i].Name.Str) ++count;
-    return count;
 }
 
 void qspSetArgs(QSPVar *destVar, QSPVariant *args, int count, QSP_BOOL toMove)

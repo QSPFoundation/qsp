@@ -251,22 +251,6 @@ QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize)
     qspFreeString(&res);
     return QSP_TRUE;
 }
-/* Get max number of variables */
-int QSPGetMaxVarsCount(void)
-{
-    return QSP_VARSCOUNT;
-}
-/* Get name of a variable by index */
-QSP_BOOL QSPGetVarNameByIndex(int index, QSPString *name)
-{
-    if (index < 0 || index >= QSP_VARSCOUNT || qspIsEmpty(qspVars[index].Name))
-    {
-        *name = qspNullString;
-        return QSP_FALSE;
-    }
-    *name = qspVars[index].Name;
-    return QSP_TRUE;
-}
 /* ------------------------------------------------------------ */
 /* Code execution */
 

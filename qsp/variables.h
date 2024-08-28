@@ -17,14 +17,15 @@
 
 #include "declarations.h"
 #include "codetools.h"
+#include "text.h"
 #include "variant.h"
 
 #ifndef QSP_VARSDEFINES
     #define QSP_VARSDEFINES
 
+    #define QSP_VARSBUCKETS 1024
+    #define QSP_VARSMAXBUCKETSIZE 50
     #define QSP_VARGROUPSBATCHSIZE 256
-    #define QSP_VARSSEEK 64
-    #define QSP_VARSCOUNT 256 * QSP_VARSSEEK
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
 
@@ -51,7 +52,14 @@
         int VarsCount;
     } QSPVarsGroup;
 
-    extern QSPVar qspVars[QSP_VARSCOUNT];
+    typedef struct {
+        QSPVar *Vars;
+        int VarsCount;
+        int Capacity;
+    } QSPVarsBucket;
+
+    extern QSPVar qspNullVar;
+    extern QSPVarsBucket qspVars[QSP_VARSBUCKETS];
     extern QSPVarsGroup *qspSavedVarGroups;
     extern int qspSavedVarGroupsCount;
     extern int qspSavedVarGroupsBufSize;
@@ -76,7 +84,6 @@
     int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
     QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin);
-    int qspGetVarsCount(void);
     void qspSetArgs(QSPVar *destVar, QSPVariant *args, int count, QSP_BOOL toMove);
     void qspApplyResult(QSPVar *varRes, QSPVariant *res);
     /* Statements */
@@ -133,6 +140,14 @@
             free(var->Indices);
         }
         qspInitVarData(var);
+    }
+
+    INLINE QSPVar qspGetUnknownVar(void)
+    {
+        QSPVar var;
+        var.Name = qspNullString;
+        qspInitVarData(&var);
+        return var;
     }
 
     INLINE int qspAllocateSavedVarsGroup()

@@ -49,6 +49,7 @@ void qspInitRuntime(void)
 {
     qspNullString = qspStringFromPair(0, 0);
     qspNullTuple = qspCopyToNewTuple(0, 0);
+    qspNullVar = qspGetUnknownVar();
 
     qspIsDebug = QSP_FALSE;
     qspLocationState = 0;
