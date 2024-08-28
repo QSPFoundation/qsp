@@ -11,6 +11,10 @@ elseif(APPLE OR NOT UNIX)
 	message(FATAL_ERROR "Only Windows and Linux targets are supported")
 endif()
 
+if (LINUX)
+	find_package(Iconv REQUIRED)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 set(CMAKE_INCLUDE_CURRENT_DIR True)
@@ -129,6 +133,9 @@ endif()
 target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
 target_link_options(qsp PRIVATE ${PROJECT_LINKER_FLAGS})
 target_link_libraries(qsp PRIVATE oniguruma::onig)
+if(LINUX)
+	target_link_libraries(qsp PRIVATE Iconv::Iconv)
+endif()
 
 target_include_directories(qsp
 	INTERFACE
