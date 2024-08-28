@@ -19,6 +19,13 @@
 #include "text.h"
 #include "variant.h"
 
+#ifdef __linux__
+    #include <assert.h>
+    #include <errno.h>
+    #include <iconv.h>
+    #include <stdint.h>
+#endif
+
 unsigned char qspCP1251ToKOI8RTable[] =
 {
     0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20,
@@ -191,6 +198,7 @@ unsigned char qspKOI8ROrderTable[] =
     0x96, 0xA6, 0x97, 0x98, 0x99, 0x9A, 0x8D, 0x89, 0xA3, 0xA2, 0x8E, 0x9F, 0xA4, 0xA0, 0x9E, 0xA1
 };
 
+#ifndef __linux__
 INLINE char qspDirectConvertSB(char, unsigned char *);
 INLINE char qspReverseConvertSB(char, unsigned char *);
 INLINE int qspDirectConvertUC(char, int *);
@@ -226,10 +234,65 @@ INLINE char qspReverseConvertUC(int ch, int *table)
         if (table[i] == ch) return (char)(i + 0x80);
     return 0x20;
 }
+#else
+size_t usc2StrSizeInUtf8(uint16_t *str, size_t size)
+{
+    size_t res = size;
+    uint16_t *end = str + size;
+    for (uint16_t *p = str; p != end; ++p)
+    {
+        if (*p > 0x7ff)
+        {
+            res += 2;
+        }
+        else if (*p > 0x7f)
+        {
+            res += 1;
+        }
+    }
+    return res;
+}
+
+size_t utf8CodePointsCount(const char *str, const char *end)
+{
+    size_t res = 0;
+    for (; str != end; ++str)
+        res += ((*str & 0xc0) != 0x80);
+    return res;
+}
+
+size_t koi8RStrSizeInUtf8(const char *data, size_t dataSize)
+{
+    size_t res = dataSize;
+    const char *end = data + dataSize;
+    for (; data != end; ++data)
+    {
+        if (*data < 0)
+        {
+            res += 1;
+        }
+    }
+    return res;
+}
+
+#endif
 
 void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize)
 {
     char *buf;
+#ifdef __linux__
+    size_t len = qspStrLen(s);
+    size_t bufSize = utf8CodePointsCount(s.Str, s.End);
+    if (isUCS2) bufSize *= 2;
+    buf = (char *)malloc(bufSize);
+    iconv_t iconvConvDescriptor = iconv_open(isUCS2 ? "UCS−2" : "KOI8-R", "UTF−8");
+    assert(iconvConvDescriptor != (iconv_t)(-1));
+    char *inBuf = s.Str;
+    char *outBuf = buf;
+    size_t outBufSize = bufSize;
+    iconv(iconvConvDescriptor, &inBuf, &len, &outBuf, &outBufSize);
+    iconv_close(iconvConvDescriptor);
+#else
     unsigned short uCh, *uPtr;
     QSP_CHAR *origBuf = s.Str;
     int bufSize, len = qspStrLen(s);
@@ -249,12 +312,35 @@ void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize)
         while (--len >= 0)
             buf[len] = QSP_FROM_OS_CHAR(origBuf[len]);
     }
+#endif
     *dataSize = bufSize;
     return buf;
 }
 
 QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2)
 {
+#ifdef __linux__
+    size_t inbufSize;
+    iconv_t iconv_cd;
+    size_t len, bytesLeft;
+    QSP_CHAR *ret;
+    char *inData, *outData;
+
+    len = isUCS2 ? usc2StrSizeInUtf8(data, dataSize / 2) : koi8RStrSizeInUtf8(data, dataSize);
+    if (!len) return qspNullString;
+    ret = (QSP_CHAR *)malloc(len + 1);
+    errno = 0;
+    iconv_cd = iconv_open("UTF-8", isUCS2 ? "UCS-2" : "KOI8-R");
+    assert(iconv_cd != (iconv_t)(-1));
+    inbufSize = dataSize;
+    inData = data;
+    outData = ret;
+    bytesLeft = len;
+    iconv(iconv_cd, &inData, &inbufSize, &outData, &bytesLeft);
+    assert(bytesLeft == 0);
+    iconv_close(iconv_cd);
+    ret[len] = 0;
+#else
     char *ptr;
     unsigned short uCh, *uPtr;
     QSP_CHAR *ret;
@@ -277,6 +363,7 @@ QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2)
         while (--curLen >= 0)
             ret[curLen] = (QSP_CHAR)QSP_TO_OS_CHAR(ptr[curLen]);
     }
+#endif
     return qspStringFromLen(ret, len);
 }
 

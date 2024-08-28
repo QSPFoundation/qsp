@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 project(qsp VERSION 5.9.0)
 
 set(QSP_GAMEMIN_VER "5.9.0")
@@ -9,6 +9,10 @@ if(WIN32)
 	endif()
 elseif(APPLE OR NOT UNIX)
 	message(FATAL_ERROR "Only Windows and Linux targets are supported")
+endif()
+
+if (LINUX)
+	find_package(Iconv REQUIRED)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
@@ -79,35 +83,47 @@ else()
 	add_subdirectory("${CMAKE_BINARY_DIR}/oniguruma-src"
 					 "${CMAKE_BINARY_DIR}/oniguruma-build"
 	)
+	add_library(oniguruma::onig ALIAS onig)
+endif()
+
+if (CMAKE_C_BYTE_ORDER STREQUAL "LITTLE_ENDIAN")
+	set(QSP_LITTLE_ENDIAN 1)
+elseif (CMAKE_C_BYTE_ORDER STREQUAL "BIG_ENDIAN")
+	set(QSP_LITTLE_ENDIAN 0)
+else()
+	message(FATAL_ERROR "Could not recognize endianess: ${CMAKE_C_BYTE_ORDER}")
 endif()
 
 configure_file(qsp_config.h.cmakein qsp_config.h @ONLY)
 
 set(QSP_SOURCES
+	qsp/bindings/bindings_config.h
 	qsp/bindings/default/default_callbacks.c
 	qsp/bindings/default/default_control.c
-	qsp/actions.c
-	qsp/callbacks.c
-	qsp/codetools.c
-	qsp/coding.c
-	qsp/common.c
-	qsp/errors.c
-	qsp/game.c
-	qsp/locations.c
-	qsp/mathops.c
-	qsp/memwatch.c
-	qsp/menu.c
-	qsp/objects.c
-	qsp/playlist.c
-	qsp/regexp.c
-	qsp/statements.c
-	qsp/text.c
-	qsp/time.c
+	qsp/bindings/default/qsp_default.h
+	qsp/bindings/qsp.h
+	qsp/actions.c qsp/actions.h
+	qsp/callbacks.c qsp/callbacks.h
+	qsp/codetools.c qsp/codetools.h
+	qsp/coding.c qsp/coding.h
+	qsp/common.c qsp/common.h
+	qsp/errors.c qsp/errors.h
+	qsp/game.c qsp/game.h
+	qsp/locations.c qsp/locations.h
+	qsp/mathops.c qsp/mathops.h
+	qsp/memwatch.c qsp/memwatch.h
+	qsp/menu.c qsp/menu.h
+	qsp/objects.c qsp/objects.h
+	qsp/playlist.c qsp/playlist.h
+	qsp/regexp.c qsp/regexp.h
+	qsp/statements.c qsp/statements.h
+	qsp/text.c qsp/text.h
+	qsp/time.c qsp/time.h
 	qsp/towlower.c
 	qsp/towupper.c
-	qsp/tuples.c
-	qsp/variables.c
-	qsp/variant.c
+	qsp/tuples.c qsp/tuples.h
+	qsp/variables.c qsp/variables.h
+	qsp/variant.c qsp/variant.h
 )
 add_library(qsp SHARED ${QSP_SOURCES})
 target_compile_definitions(qsp PUBLIC _UNICODE)
@@ -116,37 +132,40 @@ if(WIN32)
 endif()
 target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
 target_link_options(qsp PRIVATE ${PROJECT_LINKER_FLAGS})
-if(USE_INSTALLED_ONIGURUMA)
-	target_link_libraries(qsp PRIVATE oniguruma::onig)
-else()
-	target_link_libraries(qsp PRIVATE onig)
-	install(TARGETS onig)
+target_link_libraries(qsp PRIVATE oniguruma::onig)
+if(LINUX)
+	target_link_libraries(qsp PRIVATE Iconv::Iconv)
 endif()
 
 target_include_directories(qsp
 	INTERFACE
+		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/qsp/bindings/default>"
+		"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp/default>"
 )
 
 install(TARGETS qsp EXPORT QspTargets DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime)
+if(NOT USE_INSTALLED_ONIGURUMA)
+	install(TARGETS onig DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime)
+endif()
 
 generate_export_header(qsp
   BASE_NAME Qsp
   EXPORT_MACRO_NAME QSP_EXTERN
 )
 
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/QspConfigVersion.cmake COMPATIBILITY AnyNewerVersion)
-configure_package_config_file(QspConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/QspConfig.cmake
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfigVersion.cmake COMPATIBILITY AnyNewerVersion)
+configure_package_config_file(QspConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfig.cmake
 	INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
 )
 
+export(TARGETS qsp NAMESPACE Qsp:: FILE ${CMAKE_CURRENT_BINARY_DIR}/QspConfig.cmake)
 install(EXPORT QspTargets NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp")
-install(FILES
-		${CMAKE_CURRENT_BINARY_DIR}/QspConfigVersion.cmake
-		${CMAKE_CURRENT_BINARY_DIR}/QspConfig.cmake
-	DESTINATION
-		"${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
+
+install(
+	DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake
+	DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
 
 install(FILES
@@ -287,7 +306,10 @@ if(BUILD_QSPGUI)
 	target_compile_options(qspgui PRIVATE ${PROJECT_COMPILER_FLAGS})
 	target_link_options(qspgui PRIVATE ${PROJECT_LINKER_FLAGS})
 	target_link_libraries(qspgui PRIVATE qsp fmod wxbase wxcore wxadv wxaui wxhtml)
-	install(TARGETS qspgui qsp wxbase wxcore wxadv wxaui wxhtml)
+	install(TARGETS qspgui qsp)
+	if (NOT USE_INSTALLED_WX)
+		install(TARGETS wxbase wxcore wxadv wxaui wxhtml)
+	endif()
 
 	install(DIRECTORY "${CMAKE_SOURCE_DIR}/players/classic/misc/common/langs" DESTINATION "${RESOURCES_DIR}")
 	install(DIRECTORY "${CMAKE_SOURCE_DIR}/players/classic/misc/common/sound" DESTINATION "${RESOURCES_DIR}")

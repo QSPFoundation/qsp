@@ -15,25 +15,41 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 */
 
+#include "qsp_config.h"
+
+#if defined _UNICODE && !defined __linux__
+    #include <wchar.h>
+#endif
+
 #ifndef QSP_DEFAULTDEFINES
     #define QSP_DEFAULTDEFINES
 
-    static int qspEndiannessTestValue = 1;
-
     #ifdef _UNICODE
-        typedef wchar_t QSP_CHAR;
-        #define QSP_FMT2(x) L##x
-        #define QSP_FMT(x) QSP_FMT2(x)
+        #ifdef __linux__
+            typedef char QSP_CHAR;
+            #define QSP_FMT(x) x
 
-        #define QSP_ONIG_ENC ((*(char *)&(qspEndiannessTestValue) == 1) ? \
-                    (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE) : \
-                    (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_BE : ONIG_ENCODING_UTF32_BE))
-        #define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
-        #define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
-        #define QSP_CHRLWR qspToWLower
-        #define QSP_CHRUPR qspToWUpper
-        #define QSP_WCTOB
-        #define QSP_BTOWC
+            #define QSP_ONIG_ENC ONIG_ENCODING_UTF8
+
+            #define QSP_CHRLWR tolower
+            #define QSP_CHRUPR toupper
+        #else
+            typedef wchar_t QSP_CHAR;
+            #define QSP_FMT2(x) L##x
+            #define QSP_FMT(x) QSP_FMT2(x)
+
+            #if QSP_LITTLE_ENDIAN
+                #define QSP_ONIG_ENC (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE)
+            #else
+                #define QSP_ONIG_ENC (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_BE : ONIG_ENCODING_UTF32_BE)
+            #endif
+            #define QSP_FROM_OS_CHAR(a) qspReverseConvertUC(a, qspCP1251ToUnicodeTable)
+            #define QSP_TO_OS_CHAR(a) qspDirectConvertUC(a, qspCP1251ToUnicodeTable)
+            #define QSP_CHRLWR qspToWLower
+            #define QSP_CHRUPR qspToWUpper
+            #define QSP_WCTOB
+            #define QSP_BTOWC
+        #endif
     #else
         typedef char QSP_CHAR;
         #define QSP_FMT(x) x
@@ -57,9 +73,11 @@
         #endif
     #endif
 
-    #define QSP_FIXBYTESORDER(a) ((*(char *)&(qspEndiannessTestValue) == 1) ? \
-                                 (a) : \
-                                 ((unsigned short)(((a) << 8) | ((a) >> 8))))
+    #if QSP_LITTLE_ENDIAN
+        #define QSP_FIXBYTESORDER(a) (a)
+    #else
+        #define QSP_FIXBYTESORDER(a) ((unsigned short)(((a) << 8) | ((a) >> 8))))
+    #endif
     #if defined(_MSC_VER)
         #define QSP_TIME _time64
     #else

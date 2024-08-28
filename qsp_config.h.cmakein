@@ -3,6 +3,6 @@
 
 #define QSP_VER_STR "@qsp_VERSION@"
 #define QSP_GAMEMINVER_VER_STR "@QSP_GAMEMIN_VER@"
+#define QSP_LITTLE_ENDIAN @QSP_LITTLE_ENDIAN@
 
 #endif
-
