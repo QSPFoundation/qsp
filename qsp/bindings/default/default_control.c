@@ -109,17 +109,17 @@ void QSPSetInputStrText(QSPString val)
 int QSPGetActions(QSPListItem *items, int itemsBufSize)
 {
     int i;
-    for (i = 0; i < qspCurActionsCount && i < itemsBufSize; ++i)
+    for (i = 0; i < qspCurActsCount && i < itemsBufSize; ++i)
     {
         items[i].Name = qspCurActions[i].Desc;
         items[i].Image = qspCurActions[i].Image;
     }
-    return qspCurActionsCount;
+    return qspCurActsCount;
 }
 /* Set index of the selected action */
 QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI)
 {
-    if (ind >= 0 && ind < qspCurActionsCount && ind != qspCurSelAction)
+    if (ind >= 0 && ind < qspCurActsCount && ind != qspCurSelAction)
     {
         if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution(QSP_FALSE);
@@ -151,7 +151,7 @@ int QSPGetSelActionIndex(void)
 /* Check whether the actions have been updated */
 QSP_BOOL QSPIsActionsChanged(void)
 {
-    return qspIsActionsChanged;
+    return qspIsActsListChanged;
 }
 /* ------------------------------------------------------------ */
 /* Objects */
@@ -160,17 +160,17 @@ QSP_BOOL QSPIsActionsChanged(void)
 int QSPGetObjects(QSPListItem *items, int itemsBufSize)
 {
     int i;
-    for (i = 0; i < qspCurObjectsCount && i < itemsBufSize; ++i)
+    for (i = 0; i < qspCurObjsCount && i < itemsBufSize; ++i)
     {
         items[i].Name = qspCurObjects[i].Desc;
         items[i].Image = qspCurObjects[i].Image;
     }
-    return qspCurObjectsCount;
+    return qspCurObjsCount;
 }
 /* Set index of the selected object */
 QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI)
 {
-    if (ind >= 0 && ind < qspCurObjectsCount && ind != qspCurSelObject)
+    if (ind >= 0 && ind < qspCurObjsCount && ind != qspCurSelObject)
     {
         if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution(QSP_FALSE);
@@ -189,7 +189,7 @@ int QSPGetSelObjectIndex(void)
 /* Check whether the objects have been updated */
 QSP_BOOL QSPIsObjectsChanged(void)
 {
-    return qspIsObjectsChanged;
+    return qspIsObjsListChanged;
 }
 /* ------------------------------------------------------------ */
 /* Synchronize visibility of a region of the UI */

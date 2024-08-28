@@ -23,27 +23,27 @@
 #include "text.h"
 
 QSPCurAct qspCurActions[QSP_MAXACTIONS];
-int qspCurActionsCount = 0;
+int qspCurActsCount = 0;
 int qspCurSelAction = -1;
-QSP_BOOL qspIsActionsChanged = QSP_FALSE;
+QSP_BOOL qspIsActsListChanged = QSP_FALSE;
 QSP_BOOL qspCurToShowActs = QSP_TRUE;
 
 INLINE int qspActIndex(QSPString name);
 
 void qspClearAllActions(QSP_BOOL toInit)
 {
-    if (!toInit && qspCurActionsCount)
+    if (!toInit && qspCurActsCount)
     {
         int i;
-        for (i = 0; i < qspCurActionsCount; ++i)
+        for (i = 0; i < qspCurActsCount; ++i)
         {
             qspFreeString(&qspCurActions[i].Image);
             qspFreeString(&qspCurActions[i].Desc);
             qspFreePrepLines(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount);
         }
-        qspIsActionsChanged = QSP_TRUE;
+        qspIsActsListChanged = QSP_TRUE;
     }
-    qspCurActionsCount = 0;
+    qspCurActsCount = 0;
     qspCurSelAction = -1;
 }
 
@@ -52,12 +52,12 @@ INLINE int qspActIndex(QSPString name)
     QSPString bufName;
     int i, actNameLen, bufSize;
     QSP_CHAR *buf;
-    if (!qspCurActionsCount) return -1;
+    if (!qspCurActsCount) return -1;
     name = qspCopyToNewText(name);
     qspUpperStr(&name);
     bufSize = 64;
     buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
-    for (i = 0; i < qspCurActionsCount; ++i)
+    for (i = 0; i < qspCurActsCount; ++i)
     {
         actNameLen = qspStrLen(qspCurActions[i].Desc);
         if (actNameLen)
@@ -88,7 +88,7 @@ void qspAddAction(QSPVariant *args, QSP_TINYINT count, QSPLineOfCode *code, int 
     QSPCurAct *act;
     QSPString imgPath;
     if (qspActIndex(QSP_STR(args[0])) >= 0) return;
-    if (qspCurActionsCount == QSP_MAXACTIONS)
+    if (qspCurActsCount == QSP_MAXACTIONS)
     {
         qspSetError(QSP_ERR_CANTADDACTION);
         return;
@@ -97,19 +97,19 @@ void qspAddAction(QSPVariant *args, QSP_TINYINT count, QSPLineOfCode *code, int 
         imgPath = qspCopyToNewText(QSP_STR(args[1]));
     else
         imgPath = qspNullString;
-    act = qspCurActions + qspCurActionsCount++;
+    act = qspCurActions + qspCurActsCount++;
     act->Image = imgPath;
     act->Desc = qspCopyToNewText(QSP_STR(args[0]));
     qspCopyPrepLines(&act->OnPressLines, code, start, end);
     act->OnPressLinesCount = end - start;
     act->Location = qspRealCurLoc;
     act->ActIndex = qspRealActIndex;
-    qspIsActionsChanged = QSP_TRUE;
+    qspIsActsListChanged = QSP_TRUE;
 }
 
 void qspExecAction(int ind)
 {
-    if (ind >= 0 && ind < qspCurActionsCount)
+    if (ind >= 0 && ind < qspCurActsCount)
     {
         int count;
         QSPLineOfCode *code;
@@ -129,7 +129,7 @@ QSPString qspGetAllActionsAsCode(void)
     int count, i;
     QSPString temp;
     QSPBufString res = qspNewBufString(256);
-    for (i = 0; i < qspCurActionsCount; ++i)
+    for (i = 0; i < qspCurActsCount; ++i)
     {
         qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ") QSP_DEFQUOT));
         temp = qspReplaceText(qspCurActions[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), QSP_TRUE);
@@ -218,11 +218,11 @@ void qspStatementDelAct(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TIN
     qspFreeString(&qspCurActions[actInd].Image);
     qspFreeString(&qspCurActions[actInd].Desc);
     qspFreePrepLines(qspCurActions[actInd].OnPressLines, qspCurActions[actInd].OnPressLinesCount);
-    --qspCurActionsCount;
-    while (actInd < qspCurActionsCount)
+    --qspCurActsCount;
+    while (actInd < qspCurActsCount)
     {
         qspCurActions[actInd] = qspCurActions[actInd + 1];
         ++actInd;
     }
-    qspIsActionsChanged = QSP_TRUE;
+    qspIsActsListChanged = QSP_TRUE;
 }

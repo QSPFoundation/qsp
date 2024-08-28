@@ -92,7 +92,7 @@ void qspPrepareExecution(QSP_BOOL toInit)
     qspRealLine = 0;
 
     /* Reset state of changes */
-    qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjectsChanged = qspIsActionsChanged = QSP_FALSE;
+    qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjsListChanged = qspIsActsListChanged = QSP_FALSE;
 }
 
 void qspMemClear(QSP_BOOL toInit)

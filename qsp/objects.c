@@ -24,26 +24,26 @@
 #include "variables.h"
 
 QSPObj qspCurObjects[QSP_MAXOBJECTS];
-int qspCurObjectsCount = 0;
+int qspCurObjsCount = 0;
 int qspCurSelObject = -1;
-QSP_BOOL qspIsObjectsChanged = QSP_FALSE;
+QSP_BOOL qspIsObjsListChanged = QSP_FALSE;
 QSP_BOOL qspCurToShowObjs = QSP_TRUE;
 
 INLINE void qspRemoveObject(int);
 
 void qspClearAllObjects(QSP_BOOL toInit)
 {
-    if (!toInit && qspCurObjectsCount)
+    if (!toInit && qspCurObjsCount)
     {
         int i;
-        for (i = 0; i < qspCurObjectsCount; ++i)
+        for (i = 0; i < qspCurObjsCount; ++i)
         {
             qspFreeString(&qspCurObjects[i].Image);
             qspFreeString(&qspCurObjects[i].Desc);
         }
-        qspIsObjectsChanged = QSP_TRUE;
+        qspIsObjsListChanged = QSP_TRUE;
     }
-    qspCurObjectsCount = 0;
+    qspCurObjsCount = 0;
     qspCurSelObject = -1;
 }
 
@@ -51,7 +51,7 @@ void qspClearAllObjectsWithNotify(void)
 {
     QSPVariant v;
     QSPString *objs;
-    int i, oldLocationState, oldCount = qspCurObjectsCount;
+    int i, oldLocationState, oldCount = qspCurObjsCount;
     if (oldCount)
     {
         objs = (QSPString *)malloc(oldCount * sizeof(QSPString));
@@ -73,18 +73,18 @@ void qspClearAllObjectsWithNotify(void)
 INLINE void qspRemoveObject(int index)
 {
     QSPVariant name;
-    if (index < 0 || index >= qspCurObjectsCount) return;
+    if (index < 0 || index >= qspCurObjsCount) return;
     if (qspCurSelObject >= index) qspCurSelObject = -1;
     name.Type = QSP_TYPE_STR;
     QSP_STR(name) = qspCurObjects[index].Desc;
     qspFreeString(&qspCurObjects[index].Image);
-    --qspCurObjectsCount;
-    while (index < qspCurObjectsCount)
+    --qspCurObjsCount;
+    while (index < qspCurObjsCount)
     {
         qspCurObjects[index] = qspCurObjects[index + 1];
         ++index;
     }
-    qspIsObjectsChanged = QSP_TRUE;
+    qspIsObjsListChanged = QSP_TRUE;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &name, 1);
     qspFreeString(&QSP_STR(name));
 }
@@ -94,12 +94,12 @@ int qspObjIndex(QSPString name)
     QSPString bufName;
     int i, objNameLen, bufSize;
     QSP_CHAR *buf;
-    if (!qspCurObjectsCount) return -1;
+    if (!qspCurObjsCount) return -1;
     name = qspCopyToNewText(name);
     qspUpperStr(&name);
     bufSize = 32;
     buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
-    for (i = 0; i < qspCurObjectsCount; ++i)
+    for (i = 0; i < qspCurObjsCount; ++i)
     {
         objNameLen = qspStrLen(qspCurObjects[i].Desc);
         if (objNameLen)
@@ -130,7 +130,7 @@ QSPString qspGetAllObjectsAsCode(void)
     int i;
     QSPString temp;
     QSPBufString res = qspNewBufString(256);
-    for (i = 0; i < qspCurObjectsCount; ++i)
+    for (i = 0; i < qspCurObjsCount; ++i)
     {
         qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ADDOBJ ") QSP_DEFQUOT));
         temp = qspReplaceText(qspCurObjects[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), QSP_TRUE);
@@ -156,11 +156,11 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     if (count == 3)
     {
         objInd = QSP_NUM(args[2]) - 1;
-        if (objInd < 0 || objInd > qspCurObjectsCount) return;
+        if (objInd < 0 || objInd > qspCurObjsCount) return;
     }
     else
-        objInd = qspCurObjectsCount;
-    if (qspCurObjectsCount == QSP_MAXOBJECTS)
+        objInd = qspCurObjsCount;
+    if (qspCurObjsCount == QSP_MAXOBJECTS)
     {
         qspSetError(QSP_ERR_CANTADDOBJECT);
         return;
@@ -170,13 +170,13 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
         imgPath = qspCopyToNewText(QSP_STR(args[1]));
     else
         imgPath = qspNullString;
-    for (i = qspCurObjectsCount; i > objInd; --i)
+    for (i = qspCurObjsCount; i > objInd; --i)
         qspCurObjects[i] = qspCurObjects[i - 1];
-    ++qspCurObjectsCount;
+    ++qspCurObjsCount;
     obj = qspCurObjects + objInd;
     obj->Image = imgPath;
     obj->Desc = qspCopyToNewText(QSP_STR(args[0]));
-    qspIsObjectsChanged = QSP_TRUE;
+    qspIsObjsListChanged = QSP_TRUE;
     if (count == 3) count = 2;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJADD")), args, count);
 }

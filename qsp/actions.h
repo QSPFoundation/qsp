@@ -35,9 +35,9 @@
     } QSPCurAct;
 
     extern QSPCurAct qspCurActions[QSP_MAXACTIONS];
-    extern int qspCurActionsCount;
+    extern int qspCurActsCount;
     extern int qspCurSelAction;
-    extern QSP_BOOL qspIsActionsChanged;
+    extern QSP_BOOL qspIsActsListChanged;
     extern QSP_BOOL qspCurToShowActs;
 
     /* External functions */

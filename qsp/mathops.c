@@ -1076,7 +1076,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         QSP_NUM(tos) = qspRand() % 1000 + 1;
         break;
     case qspOpCountObj:
-        QSP_NUM(tos) = qspCurObjectsCount;
+        QSP_NUM(tos) = qspCurObjsCount;
         break;
     case qspOpMsecsCount:
         QSP_NUM(tos) = qspGetTime();
@@ -1361,7 +1361,7 @@ INLINE void qspFunctionDesc(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP
 INLINE void qspFunctionGetObj(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
     int ind = QSP_NUM(args[0]) - 1;
-    if (ind >= 0 && ind < qspCurObjectsCount)
+    if (ind >= 0 && ind < qspCurObjsCount)
         QSP_PSTR(res) = qspCopyToNewText(qspCurObjects[ind].Desc);
     else
         QSP_PSTR(res) = qspNullString;

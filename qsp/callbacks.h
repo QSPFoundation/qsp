@@ -27,8 +27,8 @@
         QSP_BOOL ToDisableCodeExec;
         QSP_BOOL IsMainDescChanged;
         QSP_BOOL IsVarsDescChanged;
-        QSP_BOOL IsObjectsChanged;
-        QSP_BOOL IsActionsChanged;
+        QSP_BOOL IsObjsListChanged;
+        QSP_BOOL IsActsListChanged;
         int RealCurLoc;
         int RealActIndex;
         int RealLineNum;

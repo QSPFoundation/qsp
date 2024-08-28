@@ -30,9 +30,9 @@
     } QSPObj;
 
     extern QSPObj qspCurObjects[QSP_MAXOBJECTS];
-    extern int qspCurObjectsCount;
+    extern int qspCurObjsCount;
     extern int qspCurSelObject;
-    extern QSP_BOOL qspIsObjectsChanged;
+    extern QSP_BOOL qspIsObjsListChanged;
     extern QSP_BOOL qspCurToShowObjs;
 
     /* External functions */
