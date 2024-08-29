@@ -110,6 +110,8 @@
     QSP_EXTERN void QSPShowWindow(int type, QSP_BOOL toShow);
     /* Code execution */
     QSP_EXTERN QSP_BOOL QSPExecString(QSPString str, QSP_BOOL toRefreshUI);
+    QSP_EXTERN QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_BOOL toRefreshUI);
+    QSP_EXTERN QSP_BOOL QSPCalculateNumExpression(QSPString s, int *res, QSP_BOOL toRefreshUI);
     QSP_EXTERN QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI);
     QSP_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI);
     QSP_EXTERN QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI);

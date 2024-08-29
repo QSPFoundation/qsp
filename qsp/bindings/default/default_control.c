@@ -298,6 +298,41 @@ QSP_BOOL QSPExecString(QSPString s, QSP_BOOL toRefreshUI)
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
+/* Calculate string value of an expression (causes execution of code) */
+QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_BOOL toRefreshUI)
+{
+    int resLen;
+    QSPVariant value;
+    if (qspToDisableCodeExec) return QSP_FALSE;
+    qspPrepareExecution(QSP_FALSE);
+    value = qspExprValue(s);
+    if (qspErrorNum) return QSP_FALSE;
+    qspConvertVariantTo(&value, QSP_TYPE_STR);
+    resLen = qspStrLen(QSP_STR(value));
+    if (resLen >= bufSize) resLen = bufSize - 1;
+    memcpy(buf, QSP_STR(value).Str, resLen * sizeof(QSP_CHAR));
+    buf[resLen] = 0;
+    qspFreeString(&QSP_STR(value));
+    if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
+    return QSP_TRUE;
+}
+/* Calculate numeric value of an expression (causes execution of code) */
+QSP_BOOL QSPCalculateNumExpression(QSPString s, int *res, QSP_BOOL toRefreshUI)
+{
+    QSPVariant value;
+    if (qspToDisableCodeExec) return QSP_FALSE;
+    qspPrepareExecution(QSP_FALSE);
+    value = qspExprValue(s);
+    if (qspErrorNum) return QSP_FALSE;
+    if (!qspConvertVariantTo(&value, QSP_TYPE_NUM))
+    {
+        qspFreeVariant(&value);
+        return QSP_FALSE;
+    }
+    *res = QSP_NUM(value);
+    if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
+    return QSP_TRUE;
+}
 /* Execute code of the specified location */
 QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI)
 {
