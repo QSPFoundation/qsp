@@ -198,7 +198,7 @@ INLINE void qspRemoveArrayItem(QSPVar *var, int index)
     }
 }
 
-INLINE int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
+int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
 {
     int indsCount;
     QSPString uStr;
@@ -335,19 +335,6 @@ QSP_BOOL qspGetLastVarValue(QSPString varName, QSPVariant *res)
     arrIndex = var->ValsCount - 1;
     varType = qspGetVarType(varName);
     return qspGetVarValueByReference(var, arrIndex, varType, res);
-}
-
-QSPTuple qspGetVarTupleValue(QSPString name)
-{
-    QSPVar *var = qspVarReference(name, QSP_FALSE);
-    if (var)
-    {
-        if (var->ValsCount && QSP_ISTUPLE(var->Values[0].Type))
-            return QSP_TUPLE(var->Values[0]);
-    }
-    else
-        qspResetError(QSP_FALSE);
-    return qspNullTuple;
 }
 
 QSPString qspGetVarStrValue(QSPString name)

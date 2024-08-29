@@ -70,10 +70,10 @@
     void qspInitVarTypes(void);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
     void qspClearAllVars(QSP_BOOL toInit);
+    int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     QSP_BOOL qspGetVarValue(QSPString varName, QSPVariant *res);
     QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
     QSP_BOOL qspGetLastVarValue(QSPString varName, QSPVariant *res);
-    QSPTuple qspGetVarTupleValue(QSPString name);
     QSPString qspGetVarStrValue(QSPString name);
     int qspGetVarNumValue(QSPString name);
     void qspRestoreGlobalVars(void);

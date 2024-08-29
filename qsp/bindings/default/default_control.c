@@ -232,13 +232,33 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 {
     QSPVar *var = qspVarReference(name, QSP_FALSE);
-    if (!var)
+    if (var)
     {
-        *count = 0;
-        return QSP_FALSE;
+        *count = var->ValsCount;
+        return QSP_TRUE;
     }
-    *count = var->ValsCount;
-    return QSP_TRUE;
+    *count = 0;
+    return QSP_FALSE;
+}
+/* Get index of an item by string */
+QSP_BOOL QSPGetVarIndexByString(QSPString name, QSPString str, int *ind)
+{
+    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    if (var)
+    {
+        int arrIndex;
+        QSPVariant index;
+        index.Type = QSP_TYPE_STR;
+        QSP_STR(index) = str;
+        arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
+        if (arrIndex >= 0)
+        {
+            *ind = arrIndex;
+            return QSP_TRUE;
+        }
+    }
+    *ind = -1;
+    return QSP_FALSE;
 }
 /* Get value of the specified array item */
 QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *res)
