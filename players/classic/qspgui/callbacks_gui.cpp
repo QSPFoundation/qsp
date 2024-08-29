@@ -85,15 +85,15 @@ int QSPCallBacks::SetTimer(int msecs)
 int QSPCallBacks::RefreshInt(QSP_BOOL isForced)
 {
     static int oldFullRefreshCount = 0;
-    int i;
+    int i, numVal;
+    QSPString strVal;
     bool toScroll, canSave;
     QSPListItem items[MAX_LIST_ITEMS];
-    QSPVariant val;
     if (m_frame->ToQuit()) return 0;
     // -------------------------------
-    toScroll = !(QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("DISABLESCROLL")), 0, &val) && QSP_ISNUM(val.Type) && QSP_NUM(val));
-    canSave = !(QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("NOSAVE")), 0, &val) && QSP_ISNUM(val.Type) && QSP_NUM(val));
-    m_isHtml = QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("USEHTML")), 0, &val) && QSP_ISNUM(val.Type) && QSP_NUM(val);
+    toScroll = !(QSPGetNumVarValue(QSP_STATIC_STR(QSP_FMT("DISABLESCROLL")), 0, &numVal) && numVal);
+    canSave = !(QSPGetNumVarValue(QSP_STATIC_STR(QSP_FMT("NOSAVE")), 0, &numVal) && numVal);
+    m_isHtml = QSPGetNumVarValue(QSP_STATIC_STR(QSP_FMT("USEHTML")), 0, &numVal) && numVal;
     // -------------------------------
     m_frame->GetVars()->SetIsHtml(m_isHtml);
     if (QSPIsVarsDescChanged())
@@ -137,8 +137,8 @@ int QSPCallBacks::RefreshInt(QSP_BOOL isForced)
     }
     m_frame->GetObjects()->SetSelection(QSPGetSelObjectIndex());
     // -------------------------------
-    if (QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("BACKIMAGE")), 0, &val) && QSP_ISSTR(val.Type) && !qspIsEmpty(QSP_STR(val)))
-        m_frame->GetDesc()->LoadBackImage(qspToWxString(QSP_STR(val)));
+    if (QSPGetStrVarValue(QSP_STATIC_STR(QSP_FMT("BACKIMAGE")), 0, &strVal) && !qspIsEmpty(strVal))
+        m_frame->GetDesc()->LoadBackImage(qspToWxString(strVal));
     else
         m_frame->GetDesc()->LoadBackImage(wxEmptyString);
     // -------------------------------

@@ -346,28 +346,29 @@ void QSPFrame::ShowPane(wxWindowID id, bool toShow)
 
 void QSPFrame::ApplyParams()
 {
-    QSPVariant val;
+    int numVal;
+    QSPString strVal;
     wxColour setBackColor, setFontColor, setLinkColor;
     wxString setFontName;
     int setFontSize;
     bool toRefreshUI = false;
     // --------------
-    setBackColor = ((QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("BCOLOR")), 0, &val) && QSP_ISNUM(val.Type) && QSP_NUM(val))
-        ? wxColour(QSP_NUM(val)) : m_backColor);
+    setBackColor = ((QSPGetNumVarValue(QSP_STATIC_STR(QSP_FMT("BCOLOR")), 0, &numVal) && numVal)
+        ? wxColour(numVal) : m_backColor);
     if (setBackColor != m_desc->GetBackgroundColour())
     {
         if (ApplyBackColor(setBackColor)) toRefreshUI = true;
     }
     // --------------
-    setFontColor = ((QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("FCOLOR")), 0, &val) && QSP_ISNUM(val.Type) && QSP_NUM(val))
-        ? wxColour(QSP_NUM(val)) : m_fontColor);
+    setFontColor = ((QSPGetNumVarValue(QSP_STATIC_STR(QSP_FMT("FCOLOR")), 0, &numVal) && numVal)
+        ? wxColour(numVal) : m_fontColor);
     if (setFontColor != m_desc->GetForegroundColour())
     {
         if (ApplyFontColor(setFontColor)) toRefreshUI = true;
     }
     // --------------
-    setLinkColor = ((QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("LCOLOR")), 0, &val) && QSP_ISNUM(val.Type) && QSP_NUM(val))
-        ? wxColour(QSP_NUM(val)) : m_linkColor);
+    setLinkColor = ((QSPGetNumVarValue(QSP_STATIC_STR(QSP_FMT("LCOLOR")), 0, &numVal) && numVal)
+        ? wxColour(numVal) : m_linkColor);
     if (setLinkColor != m_desc->GetLinkColor())
     {
         if (ApplyLinkColor(setLinkColor)) toRefreshUI = true;
@@ -377,16 +378,16 @@ void QSPFrame::ApplyParams()
         setFontSize = m_fontSize;
     else
     {
-        setFontSize = ((QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("FSIZE")), 0, &val) && QSP_ISNUM(val.Type) && QSP_NUM(val))
-            ? QSP_NUM(val) : m_fontSize);
+        setFontSize = ((QSPGetNumVarValue(QSP_STATIC_STR(QSP_FMT("FSIZE")), 0, &numVal) && numVal)
+            ? numVal : m_fontSize);
     }
     if (setFontSize != m_desc->GetTextFont().GetPointSize())
     {
         if (ApplyFontSize(setFontSize)) toRefreshUI = true;
     }
     // --------------
-    setFontName = ((QSPGetVarValue(QSP_STATIC_STR(QSP_FMT("FNAME")), 0, &val) && QSP_ISSTR(val.Type) && !qspIsEmpty(QSP_STR(val)))
-        ? qspToWxString(QSP_STR(val)) : m_fontName);
+    setFontName = ((QSPGetStrVarValue(QSP_STATIC_STR(QSP_FMT("FNAME")), 0, &strVal) && !qspIsEmpty(strVal))
+        ? qspToWxString(strVal) : m_fontName);
     if (!setFontName.IsSameAs(m_desc->GetTextFont().GetFaceName(), false))
     {
         if (ApplyFontName(setFontName))

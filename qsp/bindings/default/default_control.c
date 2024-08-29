@@ -251,6 +251,40 @@ QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize)
     qspFreeString(&res);
     return QSP_TRUE;
 }
+/* Get numeric value of the specified array item */
+QSP_BOOL QSPGetNumVarValue(QSPString name, int ind, int *res)
+{
+    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    if (var && ind >= 0 && ind < var->ValsCount)
+    {
+        QSPVariant *val = var->Values + ind;
+        if (QSP_ISNUM(val->Type))
+        {
+            *res = QSP_PNUM(val);
+            return QSP_TRUE;
+        }
+    }
+
+    *res = 0;
+    return QSP_FALSE;
+}
+/* Get string value of the specified array item */
+QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSPString *res)
+{
+    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    if (var && ind >= 0 && ind < var->ValsCount)
+    {
+        QSPVariant *val = var->Values + ind;
+        if (QSP_ISSTR(val->Type))
+        {
+            *res = QSP_PSTR(val);
+            return QSP_TRUE;
+        }
+    }
+
+    *res = qspNullString;
+    return QSP_FALSE;
+}
 /* ------------------------------------------------------------ */
 /* Code execution */
 
