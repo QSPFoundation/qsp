@@ -36,6 +36,10 @@
 #include "../../variables.h"
 #include "../../variant.h"
 
+QSPString QSPStringFromC(QSP_CHAR *s)
+{
+    return qspStringFromC(s);
+}
 /* ------------------------------------------------------------ */
 /* Debugger */
 
