@@ -940,7 +940,11 @@ void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat)
     v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
     if (qspLocationState != oldLocationState) return;
     namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
-    if (!namesCount) return;
+    if (!namesCount)
+    {
+        qspFreeVariant(&v);
+        return;
+    }
     op = *(s.Str + stat->Args[1].StartPos);
     qspSetVarsValues(names, namesCount, &v, op);
     qspFreeVariant(&v);
