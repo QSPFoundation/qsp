@@ -1008,7 +1008,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             varName.Str += QSP_STATIC_LEN(QSP_TUPLECHAR);
 
         varName = qspGetVarNameOnly(varName);
-        /* Check if the var exists */
+        /* Check if the var exists, variable names are preformatted during code preprocessing */
         for (j = 0; j < varsCount; ++j)
         {
             if (!qspStrsComp(varName, curVarGroup->Vars[j].Name))
