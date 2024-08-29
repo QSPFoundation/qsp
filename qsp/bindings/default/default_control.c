@@ -36,9 +36,24 @@
 #include "../../variables.h"
 #include "../../variant.h"
 
+QSPString QSPStringFromPair(QSP_CHAR *start, QSP_CHAR *end)
+{
+    return qspStringFromPair(start, end);
+}
+
+QSPString QSPStringFromLen(QSP_CHAR *start, int length)
+{
+    return qspStringFromLen(start, length);
+}
+
 QSPString QSPStringFromC(QSP_CHAR *s)
 {
     return qspStringFromC(s);
+}
+
+QSP_CHAR *QSPStringToC(QSPString s)
+{
+    return qspStringToC(s);
 }
 /* ------------------------------------------------------------ */
 /* Debugger */

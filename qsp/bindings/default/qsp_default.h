@@ -79,7 +79,11 @@
     {
     #endif
 
+    QSP_EXTERN QSPString QSPStringFromPair(QSP_CHAR *start, QSP_CHAR *end);
+    QSP_EXTERN QSPString QSPStringFromLen(QSP_CHAR *start, int length);
     QSP_EXTERN QSPString QSPStringFromC(QSP_CHAR *s);
+    QSP_EXTERN QSP_CHAR *QSPStringToC(QSPString s);
+
     QSP_EXTERN void QSPInit(void);
     QSP_EXTERN void QSPTerminate(void);
     QSP_EXTERN void QSPSetCallback(int type, QSP_CALLBACK func);
