@@ -23,7 +23,7 @@
 
     typedef struct
     {
-        QSP_BOOL IsInCallBack;
+        QSP_BOOL IsInCallback;
         QSP_BOOL ToDisableCodeExec;
         QSP_BOOL IsMainDescChanged;
         QSP_BOOL IsVarsDescChanged;
@@ -35,16 +35,16 @@
         QSPLineOfCode *RealLine;
     } QSPCallState;
 
-    extern QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
-    extern QSP_BOOL qspIsInCallBack;
+    extern QSP_CALLBACK qspCallbacks[QSP_CALL_DUMMY];
+    extern QSP_BOOL qspIsInCallback;
     extern QSP_BOOL qspToDisableCodeExec;
 
     /* External functions */
-    void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI);
-    void qspFinalizeCallBack(QSPCallState *state);
+    void qspPrepareCallback(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI);
+    void qspFinalizeCallback(QSPCallState *state);
 
-    void qspInitCallBacks(void);
-    void qspSetCallBack(int type, QSP_CALLBACK func);
+    void qspInitCallbacks(void);
+    void qspSetCallback(int type, QSP_CALLBACK func);
 
     void qspCallDebug(QSPString str);
     void qspCallSetTimer(int msecs);

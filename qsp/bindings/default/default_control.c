@@ -346,7 +346,7 @@ QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI)
 /* Execute code of the special "COUNTER" location */
 QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI)
 {
-    if (!qspIsInCallBack)
+    if (!qspIsInCallback)
     {
         qspPrepareExecution(QSP_FALSE);
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("COUNTER")), 0, 0);
@@ -426,9 +426,9 @@ QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI)
 }
 /* ------------------------------------------------------------ */
 /* Configure callbacks */
-void QSPSetCallBack(int type, QSP_CALLBACK func)
+void QSPSetCallback(int type, QSP_CALLBACK func)
 {
-    qspSetCallBack(type, func);
+    qspSetCallback(type, func);
 }
 /* ------------------------------------------------------------ */
 /* Initialization of the engine */

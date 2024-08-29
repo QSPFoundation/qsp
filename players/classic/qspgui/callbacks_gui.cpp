@@ -18,14 +18,14 @@
 #include "callbacks_gui.h"
 #include "comtools.h"
 
-QSPFrame *QSPCallBacks::m_frame;
-bool QSPCallBacks::m_isHtml;
-FMOD_SYSTEM *QSPCallBacks::m_sys;
-QSPSounds QSPCallBacks::m_sounds;
-float QSPCallBacks::m_volumeCoeff;
-QSPVersionInfoValues QSPCallBacks::m_versionInfo;
+QSPFrame *QSPCallbacks::m_frame;
+bool QSPCallbacks::m_isHtml;
+FMOD_SYSTEM *QSPCallbacks::m_sys;
+QSPSounds QSPCallbacks::m_sounds;
+float QSPCallbacks::m_volumeCoeff;
+QSPVersionInfoValues QSPCallbacks::m_versionInfo;
 
-void QSPCallBacks::Init(QSPFrame *frame)
+void QSPCallbacks::Init(QSPFrame *frame)
 {
     m_frame = frame;
     m_volumeCoeff = 1.0;
@@ -42,37 +42,37 @@ void QSPCallBacks::Init(QSPFrame *frame)
     #endif
     FMOD_System_Init(m_sys, 32, FMOD_INIT_NORMAL, 0);
 
-    QSPSetCallBack(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
-    QSPSetCallBack(QSP_CALL_REFRESHINT, (QSP_CALLBACK)&RefreshInt);
-    QSPSetCallBack(QSP_CALL_SETINPUTSTRTEXT, (QSP_CALLBACK)&SetInputStrText);
-    QSPSetCallBack(QSP_CALL_ISPLAYINGFILE, (QSP_CALLBACK)&IsPlay);
-    QSPSetCallBack(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
-    QSPSetCallBack(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
-    QSPSetCallBack(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&Msg);
-    QSPSetCallBack(QSP_CALL_SLEEP, (QSP_CALLBACK)&Sleep);
-    QSPSetCallBack(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
-    QSPSetCallBack(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
-    QSPSetCallBack(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
-    QSPSetCallBack(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowImage);
-    QSPSetCallBack(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
-    QSPSetCallBack(QSP_CALL_OPENGAME, (QSP_CALLBACK)&OpenGame);
-    QSPSetCallBack(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
-    QSPSetCallBack(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
-    QSPSetCallBack(QSP_CALL_VERSION, (QSP_CALLBACK)&Version);
+    QSPSetCallback(QSP_CALL_SETTIMER, (QSP_CALLBACK)&SetTimer);
+    QSPSetCallback(QSP_CALL_REFRESHINT, (QSP_CALLBACK)&RefreshInt);
+    QSPSetCallback(QSP_CALL_SETINPUTSTRTEXT, (QSP_CALLBACK)&SetInputStrText);
+    QSPSetCallback(QSP_CALL_ISPLAYINGFILE, (QSP_CALLBACK)&IsPlay);
+    QSPSetCallback(QSP_CALL_PLAYFILE, (QSP_CALLBACK)&PlayFile);
+    QSPSetCallback(QSP_CALL_CLOSEFILE, (QSP_CALLBACK)&CloseFile);
+    QSPSetCallback(QSP_CALL_SHOWMSGSTR, (QSP_CALLBACK)&Msg);
+    QSPSetCallback(QSP_CALL_SLEEP, (QSP_CALLBACK)&Sleep);
+    QSPSetCallback(QSP_CALL_GETMSCOUNT, (QSP_CALLBACK)&GetMSCount);
+    QSPSetCallback(QSP_CALL_SHOWMENU, (QSP_CALLBACK)&ShowMenu);
+    QSPSetCallback(QSP_CALL_INPUTBOX, (QSP_CALLBACK)&Input);
+    QSPSetCallback(QSP_CALL_SHOWIMAGE, (QSP_CALLBACK)&ShowImage);
+    QSPSetCallback(QSP_CALL_SHOWWINDOW, (QSP_CALLBACK)&ShowPane);
+    QSPSetCallback(QSP_CALL_OPENGAME, (QSP_CALLBACK)&OpenGame);
+    QSPSetCallback(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)&OpenGameStatus);
+    QSPSetCallback(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)&SaveGameStatus);
+    QSPSetCallback(QSP_CALL_VERSION, (QSP_CALLBACK)&Version);
 
     /* Prepare version values */
     m_versionInfo["player"] = "Classic";
     m_versionInfo["platform"] = QSPTools::GetPlatform();
 }
 
-void QSPCallBacks::DeInit()
+void QSPCallbacks::DeInit()
 {
     CloseFile(qspStringFromPair(0, 0));
     FMOD_System_Close(m_sys);
     FMOD_System_Release(m_sys);
 }
 
-int QSPCallBacks::SetTimer(int msecs)
+int QSPCallbacks::SetTimer(int msecs)
 {
     if (m_frame->ToQuit()) return 0;
     if (msecs)
@@ -82,7 +82,7 @@ int QSPCallBacks::SetTimer(int msecs)
     return 0;
 }
 
-int QSPCallBacks::RefreshInt(QSP_BOOL isForced)
+int QSPCallbacks::RefreshInt(QSP_BOOL isForced)
 {
     static int oldFullRefreshCount = 0;
     int i, numVal;
@@ -155,14 +155,14 @@ int QSPCallBacks::RefreshInt(QSP_BOOL isForced)
     return 0;
 }
 
-int QSPCallBacks::SetInputStrText(QSPString text)
+int QSPCallbacks::SetInputStrText(QSPString text)
 {
     if (m_frame->ToQuit()) return 0;
     m_frame->GetInput()->SetText(wxString(text.Str, text.End));
     return 0;
 }
 
-int QSPCallBacks::IsPlay(QSPString file)
+int QSPCallbacks::IsPlay(QSPString file)
 {
     FMOD_BOOL playing = FALSE;
     wxString fileName(file.Str, file.End);
@@ -172,7 +172,7 @@ int QSPCallBacks::IsPlay(QSPString file)
     return (playing == TRUE);
 }
 
-int QSPCallBacks::CloseFile(QSPString file)
+int QSPCallbacks::CloseFile(QSPString file)
 {
     if (file.Str)
     {
@@ -193,7 +193,7 @@ int QSPCallBacks::CloseFile(QSPString file)
     return 0;
 }
 
-int QSPCallBacks::PlayFile(QSPString file, int volume)
+int QSPCallbacks::PlayFile(QSPString file, int volume)
 {
     FMOD_SOUND *newSound;
     FMOD_CHANNEL *newChannel;
@@ -225,7 +225,7 @@ int QSPCallBacks::PlayFile(QSPString file, int volume)
     return 0;
 }
 
-int QSPCallBacks::ShowPane(int type, QSP_BOOL toShow)
+int QSPCallbacks::ShowPane(int type, QSP_BOOL toShow)
 {
     if (m_frame->ToQuit()) return 0;
     switch (type)
@@ -246,7 +246,7 @@ int QSPCallBacks::ShowPane(int type, QSP_BOOL toShow)
     return 0;
 }
 
-int QSPCallBacks::Sleep(int msecs)
+int QSPCallbacks::Sleep(int msecs)
 {
     if (m_frame->ToQuit()) return 0;
     bool canSave = m_frame->GetGameMenu()->IsEnabled(ID_SAVEGAMESTAT);
@@ -276,7 +276,7 @@ int QSPCallBacks::Sleep(int msecs)
     return 0;
 }
 
-int QSPCallBacks::GetMSCount()
+int QSPCallbacks::GetMSCount()
 {
     static wxStopWatch stopWatch;
     int ret = stopWatch.Time();
@@ -284,7 +284,7 @@ int QSPCallBacks::GetMSCount()
     return ret;
 }
 
-int QSPCallBacks::Msg(QSPString str)
+int QSPCallbacks::Msg(QSPString str)
 {
     if (m_frame->ToQuit()) return 0;
     QSPMsgDlg dialog(m_frame,
@@ -303,7 +303,7 @@ int QSPCallBacks::Msg(QSPString str)
     return 0;
 }
 
-int QSPCallBacks::ShowMenu(QSPListItem *items, int count)
+int QSPCallbacks::ShowMenu(QSPListItem *items, int count)
 {
     if (m_frame->ToQuit()) return -1;
     m_frame->EnableControls(false);
@@ -315,7 +315,7 @@ int QSPCallBacks::ShowMenu(QSPListItem *items, int count)
     return index;
 }
 
-int QSPCallBacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
+int QSPCallbacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
 {
     if (m_frame->ToQuit()) return 0;
     QSPInputDlg dialog(m_frame,
@@ -339,7 +339,7 @@ int QSPCallBacks::Input(QSPString text, QSP_CHAR *buffer, int maxLen)
     return 0;
 }
 
-int QSPCallBacks::ShowImage(QSPString file)
+int QSPCallbacks::ShowImage(QSPString file)
 {
     if (m_frame->ToQuit()) return 0;
     if (file.Str)
@@ -354,7 +354,7 @@ int QSPCallBacks::ShowImage(QSPString file)
     return 0;
 }
 
-int QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
+int QSPCallbacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
 {
     if (m_frame->ToQuit()) return 0;
     wxString fullPath(m_frame->ComposeGamePath(wxString(file.Str, file.End)));
@@ -373,7 +373,7 @@ int QSPCallBacks::OpenGame(QSPString file, QSP_BOOL isNewGame)
     return 0;
 }
 
-int QSPCallBacks::OpenGameStatus(QSPString file)
+int QSPCallbacks::OpenGameStatus(QSPString file)
 {
     if (m_frame->ToQuit()) return 0;
     wxString fullPath;
@@ -403,7 +403,7 @@ int QSPCallBacks::OpenGameStatus(QSPString file)
     return 0;
 }
 
-int QSPCallBacks::SaveGameStatus(QSPString file)
+int QSPCallbacks::SaveGameStatus(QSPString file)
 {
     if (m_frame->ToQuit()) return 0;
     wxString fullPath;
@@ -443,7 +443,7 @@ int QSPCallBacks::SaveGameStatus(QSPString file)
     return 0;
 }
 
-int QSPCallBacks::Version(QSPString param, QSP_CHAR *buffer, int maxLen)
+int QSPCallbacks::Version(QSPString param, QSP_CHAR *buffer, int maxLen)
 {
     wxString result;
     wxString request(param.Str, param.End);
@@ -468,7 +468,7 @@ int QSPCallBacks::Version(QSPString param, QSP_CHAR *buffer, int maxLen)
     return 0;
 }
 
-bool QSPCallBacks::SetVolume(QSPString file, int volume)
+bool QSPCallbacks::SetVolume(QSPString file, int volume)
 {
     if (!IsPlay(file)) return false;
     wxString fileName(file.Str, file.End);
@@ -482,7 +482,7 @@ bool QSPCallBacks::SetVolume(QSPString file, int volume)
     return true;
 }
 
-void QSPCallBacks::SetOverallVolume(float coeff)
+void QSPCallbacks::SetOverallVolume(float coeff)
 {
     QSPSound *snd;
     FMOD_BOOL playing = FALSE;
@@ -500,7 +500,7 @@ void QSPCallBacks::SetOverallVolume(float coeff)
     }
 }
 
-void QSPCallBacks::UpdateSounds()
+void QSPCallbacks::UpdateSounds()
 {
     QSPSound *snd;
     FMOD_BOOL playing = FALSE;

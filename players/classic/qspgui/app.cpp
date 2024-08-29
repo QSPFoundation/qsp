@@ -35,7 +35,7 @@ bool QSPApp::OnInit()
 int QSPApp::OnExit()
 {
     QSPTerminate();
-    QSPCallBacks::DeInit();
+    QSPCallbacks::DeInit();
     delete m_transHelper;
     wxTheClipboard->Flush();
     return wxApp::OnExit();
@@ -73,7 +73,7 @@ void QSPApp::InitUI()
     QSPFrame * frame = new QSPFrame(configPath, m_transHelper);
     frame->LoadSettings();
     frame->EnableControls(false);
-    QSPCallBacks::Init(frame);
+    QSPCallbacks::Init(frame);
     // ----------------------
     wxInitEvent initEvent;
     if (GetAutoRunEvent(initEvent))

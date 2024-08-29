@@ -69,7 +69,7 @@ void qspInitRuntime(void)
     qspInitSymbolClasses();
     qspPrepareExecution(QSP_TRUE);
     qspMemClear(QSP_TRUE);
-    qspInitCallBacks();
+    qspInitCallbacks();
     qspInitStats();
     qspInitMath();
 }

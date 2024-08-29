@@ -22,13 +22,13 @@
 #include "errors.h"
 #include "objects.h"
 
-QSP_CALLBACK qspCallBacks[QSP_CALL_DUMMY];
-QSP_BOOL qspIsInCallBack = QSP_FALSE;
+QSP_CALLBACK qspCallbacks[QSP_CALL_DUMMY];
+QSP_BOOL qspIsInCallback = QSP_FALSE;
 QSP_BOOL qspToDisableCodeExec = QSP_FALSE; /* blocks major state changes, so we can skip some checks */
 
-void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI)
+void qspPrepareCallback(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI)
 {
-    state->IsInCallBack = qspIsInCallBack;
+    state->IsInCallback = qspIsInCallback;
     /* Save the state of changes */
     state->ToDisableCodeExec = qspToDisableCodeExec;
     state->IsMainDescChanged = qspIsMainDescChanged;
@@ -41,18 +41,18 @@ void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOO
     state->RealLineNum = qspRealLineNum;
     state->RealLine = qspRealLine;
     /* Switch to the callback mode */
-    qspIsInCallBack = QSP_TRUE;
+    qspIsInCallback = QSP_TRUE;
     qspToDisableCodeExec = toDisableCodeExec;
 
-    if (toRefreshUI && qspCallBacks[QSP_CALL_REFRESHINT])
-        qspCallBacks[QSP_CALL_REFRESHINT](QSP_TRUE);
+    if (toRefreshUI && qspCallbacks[QSP_CALL_REFRESHINT])
+        qspCallbacks[QSP_CALL_REFRESHINT](QSP_TRUE);
 }
 
-void qspFinalizeCallBack(QSPCallState *state)
+void qspFinalizeCallback(QSPCallState *state)
 {
     /* Restore the previous mode */
     qspToDisableCodeExec = state->ToDisableCodeExec;
-    qspIsInCallBack = state->IsInCallBack;
+    qspIsInCallback = state->IsInCallback;
     /* Restore the execution state */
     /* It's still fine to restore old values even when a new game was started
      * because we exit the old code & reset the state anyway */

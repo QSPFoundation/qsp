@@ -511,7 +511,7 @@ void QSPFrame::ShowError()
     m_toProcessEvents = false;
     dialog.ShowModal();
     m_toProcessEvents = oldToProcessEvents;
-    if (m_isGameOpened) QSPCallBacks::RefreshInt(QSP_FALSE);
+    if (m_isGameOpened) QSPCallbacks::RefreshInt(QSP_FALSE);
 }
 
 void QSPFrame::UpdateTitle()
@@ -676,7 +676,7 @@ void QSPFrame::SetOverallVolume(int percents)
     case 100: id = ID_VOLUME100; break;
     }
     if (id >= 0) m_settingsMenu->Check(id, true);
-    QSPCallBacks::SetOverallVolume((float)percents / 100);
+    QSPCallbacks::SetOverallVolume((float)percents / 100);
     m_volume = percents;
 }
 
@@ -993,7 +993,7 @@ void QSPFrame::OnToggleCaptions(wxCommandEvent& WXUNUSED(event))
 void QSPFrame::OnToggleHotkeys(wxCommandEvent& WXUNUSED(event))
 {
     m_toShowHotkeys = !m_toShowHotkeys;
-    if (m_toProcessEvents) QSPCallBacks::RefreshInt(QSP_FALSE);
+    if (m_toProcessEvents) QSPCallbacks::RefreshInt(QSP_FALSE);
 }
 
 void QSPFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
