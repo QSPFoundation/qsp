@@ -247,9 +247,7 @@ QSP_BOOL QSPGetVarIndexByString(QSPString name, QSPString str, int *ind)
     if (var)
     {
         int arrIndex;
-        QSPVariant index;
-        index.Type = QSP_TYPE_STR;
-        QSP_STR(index) = str;
+        QSPVariant index = qspStrVariant(str, QSP_TYPE_STR);
         arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
         if (arrIndex >= 0)
         {

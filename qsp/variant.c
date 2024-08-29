@@ -68,8 +68,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
             if (qspCanConvertToNum(arg1))
             {
                 qspConvertVariantTo(arg1, QSP_TYPE_NUM);
-                QSP_PNUM(res) = QSP_PNUM(arg1) + QSP_PNUM(arg2);
-                res->Type = QSP_TYPE_NUM;
+                *res = qspNumVariant(QSP_PNUM(arg1) + QSP_PNUM(arg2));
             }
             else
             {
@@ -90,8 +89,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
             if (qspCanConvertToNum(arg2))
             {
                 qspConvertVariantTo(arg2, QSP_TYPE_NUM);
-                QSP_PNUM(res) = QSP_PNUM(arg1) + QSP_PNUM(arg2);
-                res->Type = QSP_TYPE_NUM;
+                *res = qspNumVariant(QSP_PNUM(arg1) + QSP_PNUM(arg2));
             }
             else
             {
@@ -102,8 +100,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
             }
             break;
         case QSP_TYPE_NUM:
-            QSP_PNUM(res) = QSP_PNUM(arg1) + QSP_PNUM(arg2);
-            res->Type = QSP_TYPE_NUM;
+            *res = qspNumVariant(QSP_PNUM(arg1) + QSP_PNUM(arg2));
             break;
         }
         break;
