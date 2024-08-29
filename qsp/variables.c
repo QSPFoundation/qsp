@@ -35,7 +35,6 @@ INLINE int qspIndStringFloorCompare(const void *name, const void *compareTo);
 INLINE int qspValuePositionsAscCompare(const void *arg1, const void *arg2);
 INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2);
 INLINE void qspRemoveArrayItem(QSPVar *var, int index);
-INLINE int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
 INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation);
 INLINE QSP_BOOL qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);
 INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val);
