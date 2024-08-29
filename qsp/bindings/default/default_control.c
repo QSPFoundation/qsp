@@ -50,11 +50,6 @@ QSPString QSPStringFromC(QSP_CHAR *s)
 {
     return qspStringFromC(s);
 }
-
-QSP_CHAR *QSPStringToC(QSPString s)
-{
-    return qspStringToC(s);
-}
 /* ------------------------------------------------------------ */
 /* Debugger */
 
