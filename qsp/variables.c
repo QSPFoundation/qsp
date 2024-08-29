@@ -305,7 +305,7 @@ INLINE QSP_BOOL qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT base
     return QSP_TRUE;
 }
 
-QSP_BOOL qspGetVarValue(QSPString varName, QSPVariant *res)
+QSP_BOOL qspGetFirstVarValue(QSPString varName, QSPVariant *res)
 {
     QSP_TINYINT varType;
     QSPVar *var = qspVarReference(varName, QSP_FALSE);

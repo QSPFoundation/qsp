@@ -990,7 +990,7 @@ QSPVariant qspValue(QSPMathExpression *expression, int valueIndex) /* the last i
         if (argsCount == 2)
             qspGetVarValueByIndex(QSP_STR(args[0]), args[1], &tos);
         else
-            qspGetVarValue(QSP_STR(args[0]), &tos);
+            qspGetFirstVarValue(QSP_STR(args[0]), &tos);
         break;
     case qspOpLastArrItem:
         qspGetLastVarValue(QSP_STR(args[0]), &tos);
