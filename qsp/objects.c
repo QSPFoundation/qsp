@@ -75,8 +75,7 @@ INLINE void qspRemoveObject(int index)
     QSPVariant name;
     if (index < 0 || index >= qspCurObjsCount) return;
     if (qspCurSelObject >= index) qspCurSelObject = -1;
-    name.Type = QSP_TYPE_STR;
-    QSP_STR(name) = qspCurObjects[index].Desc;
+    name = qspStrVariant(qspCurObjects[index].Desc, QSP_TYPE_STR);
     qspFreeString(&qspCurObjects[index].Image);
     --qspCurObjsCount;
     while (index < qspCurObjsCount)

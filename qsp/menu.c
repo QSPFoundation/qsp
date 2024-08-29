@@ -136,9 +136,7 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
         ind = qspCallShowMenu(menuItems, itemsCount);
         if (ind >= 0 && ind < itemsCount)
         {
-            QSPVariant arg;
-            arg.Type = QSP_TYPE_NUM;
-            QSP_NUM(arg) = ind + 1;
+            QSPVariant arg = qspNumVariant(ind + 1);
             qspExecLocByNameWithArgs(menuLocs[ind], &arg, 1, QSP_FALSE, 0);
         }
         qspFreeMenuItems(menuItems, itemsCount);

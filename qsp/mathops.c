@@ -633,8 +633,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
             }
             else if (qspIsInClass(*s.Str, QSP_CHAR_DIGIT))
             {
-                v.Type = QSP_TYPE_NUM;
-                QSP_NUM(v) = qspGetNumber(&s);
+                v = qspNumVariant(qspGetNumber(&s));
                 if (opStack[opSp] == qspOpNegation)
                 {
                     QSP_NUM(v) = -QSP_NUM(v);
@@ -647,8 +646,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
             {
                 name = qspGetString(&s);
                 if (qspErrorNum) break;
-                v.Type = QSP_TYPE_STR;
-                QSP_STR(v) = name;
+                v = qspStrVariant(name, QSP_TYPE_STR);
                 opCode = qspIsEmpty(name) ? qspOpValue : qspOpValueToFormat;
                 if (!qspAppendValueToCompiled(expression, opCode, v))
                 {
@@ -661,8 +659,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
             {
                 name = qspGetQString(&s);
                 if (qspErrorNum) break;
-                v.Type = QSP_TYPE_CODE;
-                QSP_STR(v) = name;
+                v = qspStrVariant(name, QSP_TYPE_CODE);
                 if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                 {
                     qspFreeString(&QSP_STR(v));
@@ -741,8 +738,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     /* Ignore @ symbol */
                     name.Str += QSP_STATIC_LEN(QSP_USERFUNC);
                     /* Add the loc name */
-                    v.Type = QSP_TYPE_STR;
-                    QSP_STR(v) = qspCopyToNewText(name);
+                    v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_STR);
                     if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                     {
                         qspFreeString(&QSP_STR(v));
@@ -794,8 +790,7 @@ QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpressio
                     }
                     else
                     {
-                        v.Type = QSP_TYPE_VARREF;
-                        QSP_STR(v) = qspCopyToNewText(name);
+                        v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_VARREF);
                         if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                         {
                             qspFreeString(&QSP_STR(v));

@@ -260,13 +260,11 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
         switch (QSP_BASETYPE(arg2->Type))
         {
         case QSP_TYPE_TUPLE:
-            QSP_PTUPLE(res) = qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
-            res->Type = QSP_TYPE_TUPLE;
+            *res = qspTupleVariant(qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items));
             break;
         case QSP_TYPE_NUM:
         case QSP_TYPE_STR:
-            QSP_PTUPLE(res) = qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, arg2, 1);
-            res->Type = QSP_TYPE_TUPLE;
+            *res = qspTupleVariant(qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, arg2, 1));
             break;
         }
         break;
@@ -275,8 +273,7 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
         switch (QSP_BASETYPE(arg2->Type))
         {
         case QSP_TYPE_TUPLE:
-            QSP_PTUPLE(res) = qspMergeToNewTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items);
-            res->Type = QSP_TYPE_TUPLE;
+            *res = qspTupleVariant(qspMergeToNewTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items));
             break;
         case QSP_TYPE_NUM:
         case QSP_TYPE_STR:

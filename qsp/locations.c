@@ -161,13 +161,11 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
             return;
         }
         qspRealActIndex = i;
-        actionArgs[0].Type = QSP_TYPE_STR;
-        QSP_STR(actionArgs[0]) = str;
+        actionArgs[0] = qspStrVariant(str, QSP_TYPE_STR);
         str = loc->Actions[i].Image;
         if (!qspIsEmpty(str))
         {
-            actionArgs[1].Type = QSP_TYPE_STR;
-            QSP_STR(actionArgs[1]) = str;
+            actionArgs[1] = qspStrVariant(str, QSP_TYPE_STR);
             argsCount = 2;
         }
         else

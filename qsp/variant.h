@@ -71,6 +71,30 @@
         return ret;
     }
 
+    INLINE QSPVariant qspNumVariant(int value)
+    {
+        QSPVariant ret;
+        ret.Type = QSP_TYPE_NUM;
+        QSP_NUM(ret) = value;
+        return ret;
+    }
+
+    INLINE QSPVariant qspStrVariant(QSPString value, QSP_TINYINT type)
+    {
+        QSPVariant ret;
+        ret.Type = type;
+        QSP_STR(ret) = value;
+        return ret;
+    }
+
+    INLINE QSPVariant qspTupleVariant(QSPTuple value)
+    {
+        QSPVariant ret;
+        ret.Type = QSP_TYPE_TUPLE;
+        QSP_TUPLE(ret) = value;
+        return ret;
+    }
+
     INLINE void qspCopyToNewVariant(QSPVariant *dest, QSPVariant *src)
     {
         switch (QSP_BASETYPE(dest->Type = src->Type))

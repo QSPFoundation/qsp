@@ -715,19 +715,18 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
 
 QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
 {
+    int i;
     QSPVar *var;
     QSPVariant resultValue, *bestValue, *curValue;
     QSP_TINYINT baseVarType;
-    int count;
     if (!(var = qspVarReference(varName, QSP_FALSE)))
         return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     baseVarType = qspGetVarType(varName);
     resultValue = qspGetEmptyVariant(baseVarType);
     bestValue = 0;
-    curValue = var->Values;
-    count = var->ValsCount;
-    while (--count >= 0)
+    for (i = 0; i < var->ValsCount; ++i)
     {
+        curValue = var->Values + i;
         if (!QSP_ISDEF(curValue->Type)) curValue = &resultValue; /* check undefined values */
         if (QSP_BASETYPE(curValue->Type) == baseVarType)
         {
@@ -767,7 +766,6 @@ QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
             else
                 bestValue = curValue;
         }
-        ++curValue;
     }
     if (bestValue) qspCopyToNewVariant(&resultValue, bestValue);
     return resultValue;
@@ -871,8 +869,7 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
                         return;
                 }
                 /* Only 1 variable left, fill it with the tuple containing all the values left */
-                v2.Type = QSP_TYPE_TUPLE;
-                QSP_TUPLE(v2) = qspMoveToNewTuple(QSP_PTUPLE(v).Vals + i, QSP_PTUPLE(v).Items - i);
+                v2 = qspTupleVariant(qspMoveToNewTuple(QSP_PTUPLE(v).Vals + i, QSP_PTUPLE(v).Items - i));
                 qspSetVar(varNames[lastVarIndex], &v2, op);
                 qspFreeVariant(&v2);
             }
