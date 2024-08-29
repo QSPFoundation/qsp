@@ -978,8 +978,14 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
         v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
         if (qspLocationState != oldLocationState) return;
     }
+    else
+        v = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
-    if (!namesCount) return;
+    if (!namesCount)
+    {
+        qspFreeVariant(&v);
+        return;
+    }
     groupInd = qspSavedVarGroupsCount - 1;
     curVarGroup = qspSavedVarGroups + groupInd;
     varsCount = bufSize = curVarGroup->VarsCount;
@@ -990,6 +996,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
         if (qspIsEmpty(varName))
         {
             qspSetError(QSP_ERR_SYNTAX);
+            qspFreeVariant(&v);
             free(names);
             return;
         }
@@ -1001,7 +1008,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             varName.Str += QSP_STATIC_LEN(QSP_TUPLECHAR);
 
         varName = qspGetVarNameOnly(varName);
-        /* Check for the existence */
+        /* Check if the var exists */
         for (j = 0; j < varsCount; ++j)
         {
             if (!qspStrsComp(varName, curVarGroup->Vars[j].Name))
@@ -1021,6 +1028,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             /* Add variable to the local group */
             if (!(var = qspVarReference(varName, QSP_FALSE)))
             {
+                qspFreeVariant(&v);
                 free(names);
                 return;
             }
