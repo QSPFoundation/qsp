@@ -29,18 +29,18 @@ QSP_BOOL qspToDisableCodeExec = QSP_FALSE; /* blocks major state changes, so we 
 void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOOL toRefreshUI)
 {
     state->IsInCallBack = qspIsInCallBack;
-    /* save the state of changes */
+    /* Save the state of changes */
     state->ToDisableCodeExec = qspToDisableCodeExec;
     state->IsMainDescChanged = qspIsMainDescChanged;
     state->IsVarsDescChanged = qspIsVarsDescChanged;
     state->IsObjsListChanged = qspIsObjsListChanged;
     state->IsActsListChanged = qspIsActsListChanged;
-    /* save the execution state */
+    /* Save the execution state */
     state->RealCurLoc = qspRealCurLoc;
     state->RealActIndex = qspRealActIndex;
     state->RealLineNum = qspRealLineNum;
     state->RealLine = qspRealLine;
-    /* switch to the callback mode */
+    /* Switch to the callback mode */
     qspIsInCallBack = QSP_TRUE;
     qspToDisableCodeExec = toDisableCodeExec;
 
@@ -50,17 +50,17 @@ void qspPrepareCallBack(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOO
 
 void qspFinalizeCallBack(QSPCallState *state)
 {
-    /* restore the previous mode */
+    /* Restore the previous mode */
     qspToDisableCodeExec = state->ToDisableCodeExec;
     qspIsInCallBack = state->IsInCallBack;
-    /* restore the execution state */
-    /* it's still fine to restore old values even when a new game was started
+    /* Restore the execution state */
+    /* It's still fine to restore old values even when a new game was started
      * because we exit the old code & reset the state anyway */
     qspRealCurLoc = state->RealCurLoc;
     qspRealActIndex = state->RealActIndex;
     qspRealLineNum = state->RealLineNum;
     qspRealLine = state->RealLine;
-    /* restore the state of changes */
+    /* Restore the state of changes */
     if (state->IsActsListChanged) qspIsActsListChanged = QSP_TRUE;
     if (state->IsObjsListChanged) qspIsObjsListChanged = QSP_TRUE;
     if (state->IsVarsDescChanged) qspIsVarsDescChanged = QSP_TRUE;
