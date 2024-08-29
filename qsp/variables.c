@@ -684,8 +684,9 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
     }
     defaultValue = qspGetEmptyVariant(baseVarType);
     if (ind < 0) ind = 0;
-    for (curValue = var->Values + ind; ind < var->ValsCount; ++ind, ++curValue)
+    while (ind < var->ValsCount)
     {
+        curValue = var->Values + ind;
         if (!QSP_ISDEF(curValue->Type)) curValue = &defaultValue; /* check undefined values */
         if (QSP_BASETYPE(curValue->Type) == baseVarType)
         {
@@ -709,6 +710,7 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
                 break;
             }
         }
+        ++ind;
     }
     return -1;
 }
