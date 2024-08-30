@@ -180,7 +180,7 @@ void qspInitStats(void)
     qspAddStatement(qspStatXGoTo, qspStatementGoTo, 1, QSP_STATMAXARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, -1);
     /* Names */
     qspAddStatName(qspStatElse, QSP_STATIC_STR(QSP_STATELSE), 2);
-    qspAddStatName(qspStatElseIf, QSP_STATIC_STR(QSP_FMT("ELSEIF")), 1);
+    qspAddStatName(qspStatElseIf, QSP_STATIC_STR(QSP_STATELSEIF), 1);
     qspAddStatName(qspStatEnd, QSP_STATIC_STR(QSP_FMT("END")), 2);
     qspAddStatName(qspStatLocal, QSP_STATIC_STR(QSP_FMT("LOCAL")), 2);
     qspAddStatName(qspStatSet, QSP_STATIC_STR(QSP_FMT("SET")), 2);
@@ -390,12 +390,12 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
         case qspStatEnd:
             break;
         case qspStatComment:
-        case qspStatElseIf:
             return QSP_FALSE;
         case qspStatAct:
             qspStatementSinglelineAddAct(line, i, endStat);
             return QSP_FALSE;
         case qspStatIf:
+        case qspStatElseIf:
             return qspStatementIf(line, i, endStat, jumpTo);
         case qspStatLoop:
             return qspStatementSinglelineLoop(line, i, endStat, jumpTo);
@@ -707,6 +707,7 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
             ++c;
             break;
         case qspStatElse:
+        case qspStatElseIf:
             --c;
             break;
         }
@@ -718,18 +719,18 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
     }
     if (elseStat)
     {
-        if (elseStat == startStat + 1)
+        if (elseStat == startStat + 1) /* no code between IF and ELSE */
         {
             qspSetError(QSP_ERR_CODENOTFOUND);
             return QSP_FALSE;
         }
-        if (elseStat == endStat - 1)
+        if (elseStat == endStat - 1) /* no code after ELSE */
         {
             qspSetError(QSP_ERR_CODENOTFOUND);
             return QSP_FALSE;
         }
     }
-    else if (startStat == endStat - 1)
+    else if (startStat == endStat - 1) /* no code after IF */
     {
         qspSetError(QSP_ERR_CODENOTFOUND);
         return QSP_FALSE;
@@ -745,7 +746,7 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
             return qspExecStringWithLocals(line, startStat + 1, endStat, jumpTo);
     }
     else if (elseStat)
-        return qspExecStringWithLocals(line, elseStat + 1, endStat, jumpTo);
+        return qspExecStringWithLocals(line, elseStat, endStat, jumpTo);
     return QSP_FALSE;
 }
 

@@ -266,6 +266,8 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
             statDelimPos = qspDelimPos(str, QSP_STATDELIM[0]);
             if (statDelimPos) nextPos = statDelimPos + QSP_STATIC_LEN(QSP_STATDELIM);
             elsePos = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
+            temp = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSEIF), QSP_TRUE);
+            if (temp && !(elsePos && elsePos < temp)) elsePos = temp; /* keep ELSE if it goes before ELSEIF */
             if (elsePos)
             {
                 if (!statDelimPos || elsePos < statDelimPos)
@@ -342,6 +344,8 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                     if (!elsePos && toSearchElse)
                     {
                         elsePos = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
+                        temp = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSEIF), QSP_TRUE);
+                        if (temp && !(elsePos && elsePos < temp)) elsePos = temp; /* keep ELSE if it goes before ELSEIF */
                         if (!elsePos) toSearchElse = QSP_FALSE;
                     }
                     if (elsePos && (!statDelimPos || elsePos < statDelimPos))
