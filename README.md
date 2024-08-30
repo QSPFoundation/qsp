@@ -21,6 +21,7 @@ cmake --build . --target install --config Release
 
 Please consider supporting our development on:
 * Buy me a coffee: https://buymeacoffee.com/varg
+* Ethereum/EVM: 0x4537B99e27deD6C8459C1eFCdE0E7fa48357e44D
 
 ## TODO
 
