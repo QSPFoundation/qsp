@@ -1,5 +1,10 @@
 # QSP
 
+## Support us
+
+Please consider supporting our development on:
+* Buy me a coffee: https://buymeacoffee.com/varg
+
 ## Linux build
 
 ```bash
