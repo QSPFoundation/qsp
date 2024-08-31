@@ -1148,13 +1148,13 @@ INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QS
     switch (QSP_BASETYPE(args[0].Type))
     {
         case QSP_TYPE_TUPLE:
-            QSP_PNUM(res) = QSP_TOBOOL(QSP_FALSE);
+            QSP_PNUM(res) = QSP_TOBOOL(qspIsTupleNumber(QSP_TUPLE(args[0])));
             break;
         case QSP_TYPE_NUM:
             QSP_PNUM(res) = QSP_TOBOOL(QSP_TRUE);
             break;
         case QSP_TYPE_STR:
-            QSP_PNUM(res) = QSP_TOBOOL(qspIsNumber(QSP_STR(args[0])));
+            QSP_PNUM(res) = QSP_TOBOOL(qspIsStrNumber(QSP_STR(args[0])));
             break;
     }
 }

@@ -57,7 +57,7 @@
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);
     void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end);
     void qspFreeStrs(QSPString *strs, int count);
-    QSP_BOOL qspIsNumber(QSPString s);
+    QSP_BOOL qspIsStrNumber(QSPString s);
     int qspStrToNum(QSPString s, QSP_BOOL *isValid);
     QSPString qspNumToStr(QSP_CHAR *buf, int val);
     QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch);

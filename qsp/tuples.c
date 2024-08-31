@@ -43,6 +43,23 @@ void qspFreeTuple(QSPTuple *tuple)
     }
 }
 
+QSP_BOOL qspIsTupleNumber(QSPTuple tuple)
+{
+    if (tuple.Items == 1)
+    {
+        switch (QSP_BASETYPE(tuple.Vals[0].Type))
+        {
+            case QSP_TYPE_TUPLE:
+                return qspIsTupleNumber(QSP_TUPLE(tuple.Vals[0]));
+            case QSP_TYPE_NUM:
+                return QSP_TRUE;
+            case QSP_TYPE_STR:
+                return qspIsStrNumber(QSP_STR(tuple.Vals[0]));
+        }
+    }
+    return QSP_FALSE;
+}
+
 int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
 {
     switch (tuple.Items)

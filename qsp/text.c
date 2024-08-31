@@ -192,7 +192,7 @@ void qspFreeStrs(QSPString *strs, int count)
     }
 }
 
-QSP_BOOL qspIsNumber(QSPString s)
+QSP_BOOL qspIsStrNumber(QSPString s)
 {
     QSP_CHAR *pos;
     qspSkipSpaces(&s);
