@@ -286,7 +286,7 @@ QSPString qspEncodeString(QSPString str, QSP_BOOL isUCS2)
         {
             ch = QSP_TO_GAME_UC(origBuf[curLen]);
             if (ch == QSP_CODREMOV)
-                ch = (QSP_CHAR)-QSP_CODREMOV;
+                ch = (unsigned short)-QSP_CODREMOV;
             else
                 ch -= QSP_CODREMOV;
             buf[curLen] = QSP_FROM_GAME_UC(ch);
@@ -299,7 +299,7 @@ QSPString qspEncodeString(QSPString str, QSP_BOOL isUCS2)
         {
             ch = QSP_TO_GAME_SB(origBuf[curLen]);
             if (ch == QSP_CODREMOV)
-                ch = (QSP_CHAR)-QSP_CODREMOV;
+                ch = (char)-QSP_CODREMOV;
             else
                 ch -= QSP_CODREMOV;
             buf[curLen] = QSP_FROM_GAME_SB(ch);
@@ -322,7 +322,7 @@ QSPString qspDecodeString(QSPString str, QSP_BOOL isUCS2)
         while (--curLen >= 0)
         {
             ch = QSP_TO_GAME_UC(origBuf[curLen]);
-            if (ch == (QSP_CHAR)-QSP_CODREMOV)
+            if (ch == (unsigned short)-QSP_CODREMOV)
                 ch = QSP_CODREMOV;
             else
                 ch += QSP_CODREMOV;
