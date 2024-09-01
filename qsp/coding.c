@@ -230,7 +230,7 @@ INLINE char qspReverseConvertUC(int ch, int *table)
 void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize)
 {
     char *buf;
-    unsigned short uCh, *uPtr;
+    unsigned short *uPtr;
     QSP_CHAR *origBuf = s.Str;
     int bufSize, len = qspStrLen(s);
     bufSize = len * (isUCS2 ? 2 : 1);
@@ -239,15 +239,12 @@ void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize)
     {
         uPtr = (unsigned short *)buf;
         while (--len >= 0)
-        {
-            uCh = (unsigned short)QSP_BTOWC(origBuf[len]);
-            uPtr[len] = QSP_FIXBYTESORDER(uCh);
-        }
+            uPtr[len] = QSP_TO_GAME_UC(origBuf[len]);
     }
     else
     {
         while (--len >= 0)
-            buf[len] = QSP_FROM_OS_CHAR(origBuf[len]);
+            buf[len] = QSP_TO_GAME_SB(origBuf[len]);
     }
     *dataSize = bufSize;
     return buf;
@@ -256,7 +253,7 @@ void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize)
 QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2)
 {
     char *ptr;
-    unsigned short uCh, *uPtr;
+    unsigned short *uPtr;
     QSP_CHAR *ret;
     int curLen, len = (isUCS2 ? dataSize / 2 : dataSize);
     if (!len) return qspNullString;
@@ -266,16 +263,13 @@ QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2)
     {
         uPtr = (unsigned short *)data;
         while (--curLen >= 0)
-        {
-            uCh = QSP_FIXBYTESORDER(uPtr[curLen]);
-            ret[curLen] = QSP_WCTOB(uCh);
-        }
+            ret[curLen] = (QSP_CHAR)QSP_FROM_GAME_UC(uPtr[curLen]);
     }
     else
     {
         ptr = (char *)data;
         while (--curLen >= 0)
-            ret[curLen] = (QSP_CHAR)QSP_TO_OS_CHAR(ptr[curLen]);
+            ret[curLen] = (QSP_CHAR)QSP_FROM_GAME_SB(ptr[curLen]);
     }
     return qspStringFromLen(ret, len);
 }
