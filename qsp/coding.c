@@ -289,7 +289,7 @@ QSPString qspEncodeString(QSPString str, QSP_BOOL isUCS2)
                 ch = (unsigned short)-QSP_CODREMOV;
             else
                 ch -= QSP_CODREMOV;
-            buf[curLen] = QSP_FROM_GAME_UC(ch);
+            buf[curLen] = (QSP_CHAR)QSP_FROM_GAME_UC(ch);
         }
     }
     else
@@ -302,7 +302,7 @@ QSPString qspEncodeString(QSPString str, QSP_BOOL isUCS2)
                 ch = (char)-QSP_CODREMOV;
             else
                 ch -= QSP_CODREMOV;
-            buf[curLen] = QSP_FROM_GAME_SB(ch);
+            buf[curLen] = (QSP_CHAR)QSP_FROM_GAME_SB(ch);
         }
     }
     return qspStringFromLen(buf, len);
@@ -326,7 +326,7 @@ QSPString qspDecodeString(QSPString str, QSP_BOOL isUCS2)
                 ch = QSP_CODREMOV;
             else
                 ch += QSP_CODREMOV;
-            buf[curLen] = QSP_FROM_GAME_UC(ch);
+            buf[curLen] = (QSP_CHAR)QSP_FROM_GAME_UC(ch);
         }
     }
     else
@@ -339,7 +339,7 @@ QSPString qspDecodeString(QSPString str, QSP_BOOL isUCS2)
                 ch = QSP_CODREMOV;
             else
                 ch += QSP_CODREMOV;
-            buf[curLen] = QSP_FROM_GAME_SB(ch);
+            buf[curLen] = (QSP_CHAR)QSP_FROM_GAME_SB(ch);
         }
     }
     return qspStringFromLen(buf, len);
