@@ -33,13 +33,13 @@
     /* External functions */
     void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize);
     QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2);
-    QSPString qspEncodeString(QSPString str);
-    QSPString qspDecodeString(QSPString str);
-    int qspReadEncodedIntVal(QSPString val);
-    void qspAppendEncodedIntVal(QSPBufString *s, int val);
-    void qspAppendEncodedStrVal(QSPBufString *s, QSPString val);
+    QSPString qspEncodeString(QSPString str, QSP_BOOL isUCS2);
+    QSPString qspDecodeString(QSPString str, QSP_BOOL isUCS2);
+    int qspReadEncodedIntVal(QSPString val, QSP_BOOL isUCS2);
+    void qspAppendEncodedIntVal(QSPBufString *s, int val, QSP_BOOL isUCS2);
+    void qspAppendEncodedStrVal(QSPBufString *s, QSPString val, QSP_BOOL isUCS2);
     void qspAppendStrVal(QSPBufString *s, QSPString val);
-    void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val);
-    QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QSPVariant *val);
+    void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val, QSP_BOOL isUCS2);
+    QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QSP_BOOL isUCS2, QSPVariant *val);
 
 #endif

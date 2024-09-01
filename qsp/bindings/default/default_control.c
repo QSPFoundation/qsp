@@ -424,7 +424,7 @@ QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
-    if (!qspSaveGameStatus(buf, bufSize))
+    if (!qspSaveGameStatus(buf, bufSize, QSP_TRUE))
     {
         if (*bufSize)
         {
