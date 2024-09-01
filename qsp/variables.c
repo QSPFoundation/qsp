@@ -279,7 +279,7 @@ INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation)
         {
             QSPVariant ind;
             int oldLocationState = qspLocationState;
-            ind = qspExprValue(qspStringFromPair(s.Str, rPos));
+            ind = qspCalculateExprValue(qspStringFromPair(s.Str, rPos));
             if (qspLocationState != oldLocationState) return 0;
             *index = qspGetVarIndex(var, ind, isSetOperation);
             qspFreeVariant(&ind);
@@ -937,7 +937,7 @@ void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat)
         return;
     }
     oldLocationState = qspLocationState;
-    v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
+    v = qspCalculateExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
     if (qspLocationState != oldLocationState) return;
     namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), &names);
     if (!namesCount)
@@ -979,7 +979,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             return;
         }
         /* We have to evaluate expression before allocation of local vars */
-        v = qspExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
+        v = qspCalculateExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
         if (qspLocationState != oldLocationState) return;
     }
     else

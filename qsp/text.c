@@ -468,7 +468,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         expr = qspStringFromPair(txt.Str, pos);
         /* looks like it's ok to modify the original string here */
         qspPrepareStringToExecution(&expr);
-        val = qspExprValue(expr);
+        val = qspCalculateExprValue(expr);
         if (qspLocationState != oldLocationState)
         {
             qspFreeBufString(&res);

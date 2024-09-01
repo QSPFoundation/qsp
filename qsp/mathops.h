@@ -140,9 +140,9 @@
     /* External functions */
     void qspInitMath(void);
     void qspTerminateMath(void);
-    QSP_BOOL qspCompileExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression);
-    int qspFreeValue(QSPMathExpression *expression, int valueIndex);
-    QSPVariant qspValue(QSPMathExpression *expression, int valueIndex);
-    QSPVariant qspExprValue(QSPString expr);
+    QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression);
+    int qspFreeMathValue(QSPMathExpression *expression, int valueIndex);
+    QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex);
+    QSPVariant qspCalculateExprValue(QSPString expr);
 
 #endif
