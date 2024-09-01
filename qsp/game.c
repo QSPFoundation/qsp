@@ -74,7 +74,7 @@ int qspCRCTable[256] =
 
 INLINE int qspCRC(void *, int);
 INLINE void qspIncludeFile(QSPString s);
-INLINE void qspOpenIncludes(void);
+INLINE void qspRestoreCurrentIncludes(void);
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS);
 INLINE QSP_BOOL qspSkipLines(int totalLinesCount, int linesToSkip, int *index);
 INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, int *index, QSP_BOOL isUCS, int *value);
@@ -129,7 +129,7 @@ INLINE void qspIncludeFile(QSPString s)
     qspCurIncFiles[qspCurIncFilesCount++] = qspCopyToNewText(s);
 }
 
-INLINE void qspOpenIncludes(void)
+INLINE void qspRestoreCurrentIncludes(void)
 {
     int i, oldLocationState = qspLocationState;
     for (i = 0; i < qspCurIncFilesCount; ++i)
@@ -488,7 +488,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     QSPVar *var;
     QSPVarsBucket *bucket;
     QSPString *strs, locName, gameString;
-    int i, j, k, ind, count, varsCount, valsCount;
+    int i, j, k, ind, count, varsCount, valsCount, oldLocationState;
     QSP_BOOL isUCS = (dataSize >= 2 && *((char *)data + 1) == 0);
     gameString = qspStringFromFileData(data, dataSize, isUCS);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
@@ -587,11 +587,11 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         ++bucket;
     }
     qspFreeStrs(strs, count);
-    qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjsListChanged = qspIsActsListChanged = QSP_TRUE;
-    qspOpenIncludes();
     qspCurLoc = qspLocIndex(locName);
     qspFreeString(&locName);
-    if (qspErrorNum) return QSP_FALSE;
+    qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjsListChanged = qspIsActsListChanged = QSP_TRUE;
+    /* Execute callbacks to update the current state, the function has succeeded after this point */
+    oldLocationState = qspLocationState;
     qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs);
     qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs);
     qspCallShowWindow(QSP_WIN_VARS, qspCurToShowVars);
@@ -600,6 +600,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCallShowPicture(qspViewPath);
     qspPlayPLFiles();
     qspCallSetTimer(qspTimerInterval);
+    qspRestoreCurrentIncludes();
+    if (qspLocationState != oldLocationState) return QSP_TRUE; /* the state has been successfully updated */
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGLOAD")), 0, 0);
     return QSP_TRUE;
 }
