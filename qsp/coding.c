@@ -281,7 +281,7 @@ QSPString qspEncodeString(QSPString str, QSP_BOOL isUCS2)
     curLen = len;
     if (isUCS2)
     {
-        QSP_CHAR ch;
+        unsigned short ch;
         while (--curLen >= 0)
         {
             ch = QSP_TO_GAME_UC(origBuf[curLen]);
@@ -318,7 +318,7 @@ QSPString qspDecodeString(QSPString str, QSP_BOOL isUCS2)
     curLen = len;
     if (isUCS2)
     {
-        QSP_CHAR ch;
+        unsigned short ch;
         while (--curLen >= 0)
         {
             ch = QSP_TO_GAME_UC(origBuf[curLen]);
