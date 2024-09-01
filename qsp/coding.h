@@ -27,8 +27,6 @@
     extern unsigned char qspCP1251ToLowerTable[];
     extern unsigned char qspKOI8RToUpperTable[];
     extern unsigned char qspKOI8RToLowerTable[];
-    extern unsigned char qspCP1251OrderTable[];
-    extern unsigned char qspKOI8ROrderTable[];
 
     /* External functions */
     void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize);
