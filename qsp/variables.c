@@ -871,7 +871,7 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
                     if (qspLocationState != oldLocationState)
                         return;
                 }
-                /* Only 1 variable left, fill it with the tuple containing all the values left */
+                /* Only 1 variable left, fill it with a tuple containing all the values left */
                 v2 = qspTupleVariant(qspMoveToNewTuple(QSP_PTUPLE(v).Vals + i, QSP_PTUPLE(v).Items - i));
                 qspSetVar(varNames[lastVarIndex], &v2, op);
                 qspFreeVariant(&v2);
