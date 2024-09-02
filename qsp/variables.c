@@ -857,13 +857,14 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
     oldLocationState = qspLocationState;
     switch (QSP_BASETYPE(v->Type))
     {
-        case QSP_TYPE_TUPLE:
+    case QSP_TYPE_TUPLE:
         {
-            int lastVarIndex = varsCount - 1, lastValIndex = QSP_PTUPLE(v).Items - 1;
-            if (lastVarIndex < lastValIndex)
+            int valuesCount = QSP_PTUPLE(v).Items;
+            if (varsCount < valuesCount)
             {
                 /* Assign variables that contain single values */
                 QSPVariant v2;
+                int lastVarIndex = varsCount - 1;
                 for (i = 0; i < lastVarIndex; ++i)
                 {
                     qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
@@ -877,46 +878,37 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
             }
             else
             {
-                if (lastValIndex >= 0)
+                /* Assign all values to the variables */
+                for (i = 0; i < valuesCount; ++i)
                 {
-                    /* Assign variables that contain single values */
-                    for (i = 0; i < lastValIndex; ++i)
-                    {
-                        qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
-                        if (qspLocationState != oldLocationState)
-                            return;
-                    }
-                    /* Only 1 value left, fill the rest of vars with the last value */
-                    while (i < varsCount)
-                    {
-                        qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + lastValIndex, op);
-                        if (qspLocationState != oldLocationState)
-                            return;
-                        ++i;
-                    }
+                    qspSetVar(varNames[i], QSP_PTUPLE(v).Vals + i, op);
+                    if (qspLocationState != oldLocationState)
+                        return;
                 }
-                else
+                /* No values left, reset the rest of vars with default values */
+                while (i < varsCount)
                 {
-                    /* No values, update vars with default values */
-                    for (i = 0; i < varsCount; ++i)
-                    {
-                        qspResetVar(varNames[i]);
-                        if (qspLocationState != oldLocationState)
-                            return;
-                    }
+                    qspResetVar(varNames[i]);
+                    if (qspLocationState != oldLocationState)
+                        return;
+                    ++i;
                 }
             }
             break;
         }
-        case QSP_TYPE_NUM:
-        case QSP_TYPE_STR:
-            for (i = 0; i < varsCount; ++i)
-            {
-                qspSetVar(varNames[i], v, op);
-                if (qspLocationState != oldLocationState)
-                    return;
-            }
-            break;
+    case QSP_TYPE_NUM:
+    case QSP_TYPE_STR:
+        /* Consider it a tuple with 1 item */
+        qspSetVar(varNames[0], v, op);
+        if (qspLocationState != oldLocationState)
+            return;
+        for (i = 1; i < varsCount; ++i)
+        {
+            qspResetVar(varNames[i]);
+            if (qspLocationState != oldLocationState)
+                return;
+        }
+        break;
     }
 }
 
