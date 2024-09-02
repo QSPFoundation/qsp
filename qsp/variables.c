@@ -852,7 +852,7 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
      * a,b=5
      * a,b,c=4,5
      * a,b=5,6,7
-     * a,b=%empty_tuple
+     * a,b=[]
      * */
     oldLocationState = qspLocationState;
     switch (QSP_BASETYPE(v->Type))
