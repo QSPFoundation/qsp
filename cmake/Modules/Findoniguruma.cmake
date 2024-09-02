@@ -3,7 +3,7 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 
 if (NOT TARGET oniguruma::onig)
-	find_package(oniguruma CONFIG)
+	find_package(oniguruma CONFIG QUIET)
 	if (TARGET onig)
 		add_library(oniguruma::onig ALIAS onig)
 		set(oniguruma_FOUND True)
@@ -11,7 +11,8 @@ if (NOT TARGET oniguruma::onig)
 		include(FindPackageHandleStandardArgs)
 		if (NOT WIN32)
 			# use pkg-config to get the directories and then use these values
-			include(FindPkgConfig)
+			include(CMakeFindDependencyMacro)
+			find_dependency(PkgConfig)
 			message(VERBOSE "FindOnigurama: trying pkg-config")
 			pkg_check_modules(oniguruma REQUIRED IMPORTED_TARGET GLOBAL oniguruma)
 			add_library(oniguruma::onig ALIAS PkgConfig::oniguruma)
