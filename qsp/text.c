@@ -250,6 +250,7 @@ QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid)
             num = num * 10 + (*pos - QSP_FMT('0'));
             ++pos;
         } while (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT));
+        if (num < 0) num = QSP_MAX_BIGINT; /* simple overflow protection */
     }
     else
     {
