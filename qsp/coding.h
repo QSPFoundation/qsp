@@ -33,8 +33,8 @@
     QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2);
     QSPString qspEncodeString(QSPString str, QSP_BOOL isUCS2);
     QSPString qspDecodeString(QSPString str, QSP_BOOL isUCS2);
-    int qspReadEncodedIntVal(QSPString val, QSP_BOOL isUCS2);
-    void qspAppendEncodedIntVal(QSPBufString *s, int val, QSP_BOOL isUCS2);
+    QSP_BIGINT qspReadEncodedIntVal(QSPString val, QSP_BOOL isUCS2);
+    void qspAppendEncodedIntVal(QSPBufString *s, QSP_BIGINT val, QSP_BOOL isUCS2);
     void qspAppendEncodedStrVal(QSPBufString *s, QSPString val, QSP_BOOL isUCS2);
     void qspAppendStrVal(QSPBufString *s, QSPString val);
     void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val, QSP_BOOL isUCS2);

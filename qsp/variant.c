@@ -125,7 +125,7 @@ QSPString qspGetVariantAsString(QSPVariant *val)
     return qspNullString;
 }
 
-int qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
+QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
 {
     switch (QSP_BASETYPE(val->Type))
     {
@@ -156,7 +156,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                 case QSP_TYPE_NUM:
                 {
                     QSP_BOOL isValid;
-                    int result = qspGetVariantAsNum(val, &isValid);
+                    QSP_BIGINT result = qspGetVariantAsNum(val, &isValid);
                     if (!isValid) return QSP_FALSE;
                     qspFreeVariant(val);
                     QSP_PNUM(val) = result;

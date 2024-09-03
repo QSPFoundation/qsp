@@ -28,7 +28,7 @@
 
     /* External functions */
     QSPString qspGetVariantAsString(QSPVariant *val);
-    int qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid);
+    QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid);
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
     int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2);
     void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
@@ -71,7 +71,7 @@
         return ret;
     }
 
-    INLINE QSPVariant qspNumVariant(int value)
+    INLINE QSPVariant qspNumVariant(QSP_BIGINT value)
     {
         QSPVariant ret;
         ret.Type = QSP_TYPE_NUM;

@@ -349,7 +349,7 @@ QSPString qspGetVarStrValue(QSPString name)
     return qspNullString;
 }
 
-int qspGetVarNumValue(QSPString name)
+QSP_BIGINT qspGetVarNumValue(QSPString name)
 {
     QSPVar *var = qspVarReference(name, QSP_FALSE);
     if (var)

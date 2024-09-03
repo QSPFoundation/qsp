@@ -42,7 +42,7 @@ INLINE int qspMathOpsCompare(const void *opName1, const void *opName2);
 INLINE int qspMathOpStringFullCompare(const void *name, const void *compareTo);
 INLINE int qspMathOpStringCompare(const void *name, const void *compareTo);
 INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName);
-INLINE int qspGetNumber(QSPString *expr);
+INLINE QSP_BIGINT qspGetNumber(QSPString *expr);
 INLINE QSPString qspGetName(QSPString *expr);
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr);
 INLINE QSPString qspGetString(QSPString *expr);
@@ -344,9 +344,9 @@ INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName)
     return qspOpUnknown;
 }
 
-INLINE int qspGetNumber(QSPString *expr)
+INLINE QSP_BIGINT qspGetNumber(QSPString *expr)
 {
-    int num = 0;
+    QSP_BIGINT num = 0;
     QSP_CHAR *pos = expr->Str;
     while (pos < expr->End && qspIsInClass(*pos, QSP_CHAR_DIGIT))
     {

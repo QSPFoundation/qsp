@@ -58,8 +58,8 @@
     void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end);
     void qspFreeStrs(QSPString *strs, int count);
     QSP_BOOL qspIsStrNumber(QSPString s);
-    int qspStrToNum(QSPString s, QSP_BOOL *isValid);
-    QSPString qspNumToStr(QSP_CHAR *buf, int val);
+    QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid);
+    QSPString qspNumToStr(QSP_CHAR *buf, QSP_BIGINT val);
     QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch);
     QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated);
     QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, QSP_BOOL canReturnSelf);

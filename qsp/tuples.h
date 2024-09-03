@@ -30,7 +30,7 @@
     /* External functions */
     void qspFreeTuple(QSPTuple *tuple);
     QSP_BOOL qspIsTupleNumber(QSPTuple tuple);
-    int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid);
+    QSP_BIGINT qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid);
     QSPTuple qspCopyToNewTuple(QSPVariant *values, int count);
     QSPTuple qspMoveToNewTuple(QSPVariant *values, int count);
     QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);

@@ -93,6 +93,7 @@
         QSP_TYPE_DEFINED_TYPES, /* represents the number of defined values */
     };
 
+    typedef int QSP_BIGINT;
     typedef char QSP_TINYINT;
     typedef char QSP_BOOL;
 
@@ -141,7 +142,7 @@
         union
         {
             QSPString Str;
-            int Num;
+            QSP_BIGINT Num;
             QSPTuple Tuple;
         } Val;
         QSP_TINYINT Type;

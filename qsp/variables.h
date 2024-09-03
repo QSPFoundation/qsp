@@ -75,7 +75,7 @@
     QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
     QSP_BOOL qspGetLastVarValue(QSPString varName, QSPVariant *res);
     QSPString qspGetVarStrValue(QSPString name);
-    int qspGetVarNumValue(QSPString name);
+    QSP_BIGINT qspGetVarNumValue(QSPString name);
     void qspRestoreGlobalVars(void);
     int qspSaveLocalVarsAndRestoreGlobals(QSPVar **vars);
     void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGroups, int groupsCount);

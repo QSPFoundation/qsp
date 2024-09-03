@@ -18,15 +18,15 @@
 #include "time.h"
 #include "callbacks.h"
 
-int qspMSCount = 0;
+QSP_BIGINT qspMSCount = 0;
 
-void qspResetTime(int msecs)
+void qspResetTime(QSP_BIGINT msecs)
 {
     qspMSCount = msecs;
     qspCallGetMSCount();
 }
 
-int qspGetTime(void)
+QSP_BIGINT qspGetTime(void)
 {
     if ((qspMSCount += qspCallGetMSCount()) < 0) qspMSCount = 0;
     return qspMSCount;

@@ -220,9 +220,9 @@ QSP_BOOL qspIsStrNumber(QSPString s)
     return qspIsEmpty(s);
 }
 
-int qspStrToNum(QSPString s, QSP_BOOL *isValid)
+QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid)
 {
-    int num;
+    QSP_BIGINT num;
     QSP_CHAR *pos;
     QSP_BOOL isNeg = QSP_FALSE;
     qspSkipSpaces(&s);
@@ -268,7 +268,7 @@ int qspStrToNum(QSPString s, QSP_BOOL *isValid)
     return num;
 }
 
-QSPString qspNumToStr(QSP_CHAR *buf, int val)
+QSPString qspNumToStr(QSP_CHAR *buf, QSP_BIGINT val)
 {
     QSP_CHAR temp, *last, *str = buf, *first = str;
     if (val < 0)

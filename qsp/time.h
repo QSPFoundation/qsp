@@ -20,10 +20,10 @@
 #ifndef QSP_TIMEDEFINES
     #define QSP_TIMEDEFINES
 
-    extern int qspMSCount;
+    extern QSP_BIGINT qspMSCount;
 
     /* External functions */
-    void qspResetTime(int msecs);
-    int qspGetTime(void);
+    void qspResetTime(QSP_BIGINT msecs);
+    QSP_BIGINT qspGetTime(void);
 
 #endif

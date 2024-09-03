@@ -60,7 +60,7 @@ QSP_BOOL qspIsTupleNumber(QSPTuple tuple)
     return QSP_FALSE;
 }
 
-int qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
+QSP_BIGINT qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
 {
     switch (tuple.Items)
     {
@@ -152,8 +152,9 @@ int qspTuplesComp(QSPTuple first, QSPTuple second)
 {
     QSP_BOOL isValid;
     QSPString str;
+    QSP_BIGINT num;
     QSP_CHAR buf[QSP_NUMTOSTRBUF];
-    int num, delta = 0;
+    int delta = 0;
     QSPVariant *pos1 = first.Vals, *pos2 = second.Vals;
     QSPVariant *end1 = first.Vals + first.Items, *end2 = second.Vals + second.Items;
     while (pos2 < end2 && pos1 < end1)

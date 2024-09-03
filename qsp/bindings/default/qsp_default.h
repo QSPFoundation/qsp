@@ -118,7 +118,7 @@
     /* Code execution */
     QSP_EXTERN QSP_BOOL QSPExecString(QSPString str, QSP_BOOL toRefreshUI);
     QSP_EXTERN QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_BOOL toRefreshUI);
-    QSP_EXTERN QSP_BOOL QSPCalculateNumExpression(QSPString s, int *res, QSP_BOOL toRefreshUI);
+    QSP_EXTERN QSP_BOOL QSPCalculateNumExpression(QSPString s, QSP_BIGINT *res, QSP_BOOL toRefreshUI);
     QSP_EXTERN QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI);
     QSP_EXTERN QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI);
     QSP_EXTERN QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI);
@@ -136,7 +136,7 @@
     QSP_EXTERN QSP_BOOL QSPGetVarIndexByString(QSPString name, QSPString str, int *index);
     QSP_EXTERN QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *res);
     QSP_EXTERN QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize);
-    QSP_EXTERN QSP_BOOL QSPGetNumVarValue(QSPString name, int ind, int *res);
+    QSP_EXTERN QSP_BOOL QSPGetNumVarValue(QSPString name, int ind, QSP_BIGINT *res);
     QSP_EXTERN QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSPString *res);
 
     #ifdef __cplusplus

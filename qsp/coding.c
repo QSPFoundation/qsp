@@ -305,16 +305,16 @@ QSPString qspDecodeString(QSPString str, QSP_BOOL isUCS2)
     return qspStringFromLen(buf, len);
 }
 
-int qspReadEncodedIntVal(QSPString val, QSP_BOOL isUCS2)
+QSP_BIGINT qspReadEncodedIntVal(QSPString val, QSP_BOOL isUCS2)
 {
-    int num;
+    QSP_BIGINT num;
     QSPString temp = qspDecodeString(val, isUCS2);
     num = qspStrToNum(temp, 0);
     qspFreeString(&temp);
     return num;
 }
 
-void qspAppendEncodedIntVal(QSPBufString *s, int val, QSP_BOOL isUCS2)
+void qspAppendEncodedIntVal(QSPBufString *s, QSP_BIGINT val, QSP_BOOL isUCS2)
 {
     QSP_CHAR buf[QSP_NUMTOSTRBUF];
     QSPString temp, str = qspNumToStr(buf, val);
