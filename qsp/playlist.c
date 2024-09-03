@@ -17,6 +17,7 @@
 
 #include "playlist.h"
 #include "callbacks.h"
+#include "common.h"
 #include "game.h"
 #include "text.h"
 
@@ -150,8 +151,13 @@ void qspRefreshPlayList(void)
 
 void qspStatementPlayFile(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
-    int volume = (count == 2 ? QSP_NUM(args[1]) : 100);
-    qspPlayFile(QSP_STR(args[0]), volume, QSP_TRUE);
+    if (count == 2)
+    {
+        int volume = qspToInt(QSP_NUM(args[1]));
+        qspPlayFile(QSP_STR(args[0]), volume, QSP_TRUE);
+    }
+    else
+        qspPlayFile(QSP_STR(args[0]), 100, QSP_TRUE);
 }
 
 void qspStatementCloseFile(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))

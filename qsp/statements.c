@@ -1112,17 +1112,17 @@ INLINE void qspStatementGoTo(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT ex
 
 INLINE void qspStatementWait(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT QSP_UNUSED(extArg))
 {
-    int num = QSP_NUM(args[0]);
-    if (num < 0) num = 0;
-    qspCallSleep(num);
+    int delayInMsecs = qspToInt(QSP_NUM(args[0]));
+    if (delayInMsecs < 0) delayInMsecs = 0;
+    qspCallSleep(delayInMsecs);
 }
 
 INLINE void qspStatementSetTimer(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT QSP_UNUSED(extArg))
 {
-    int num = QSP_NUM(args[0]);
-    if (num < 0) num = 0;
-    qspTimerInterval = num;
-    qspCallSetTimer(num);
+    int delayInMsecs = qspToInt(QSP_NUM(args[0]));
+    if (delayInMsecs < 0) delayInMsecs = 0;
+    qspTimerInterval = delayInMsecs;
+    qspCallSetTimer(delayInMsecs);
 }
 
 INLINE void qspStatementShowWin(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT extArg)
