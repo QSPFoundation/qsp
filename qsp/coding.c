@@ -316,7 +316,7 @@ QSP_BIGINT qspReadEncodedIntVal(QSPString val, QSP_BOOL isUCS2)
 
 void qspAppendEncodedIntVal(QSPBufString *s, QSP_BIGINT val, QSP_BOOL isUCS2)
 {
-    QSP_CHAR buf[QSP_NUMTOSTRBUF];
+    QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
     QSPString temp, str = qspNumToStr(buf, val);
     temp = qspEncodeString(str, isUCS2);
     qspAddBufText(s, temp);

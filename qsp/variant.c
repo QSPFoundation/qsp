@@ -116,7 +116,7 @@ QSPString qspGetVariantAsString(QSPVariant *val)
             return qspGetTupleAsString(QSP_PTUPLE(val));
         case QSP_TYPE_NUM:
         {
-            QSP_CHAR buf[QSP_NUMTOSTRBUF];
+            QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
             return qspCopyToNewText(qspNumToStr(buf, QSP_PNUM(val)));
         }
         case QSP_TYPE_STR:
@@ -375,7 +375,7 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
 
 void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val)
 {
-    QSP_CHAR buf[QSP_NUMTOSTRBUF];
+    QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
     switch (QSP_BASETYPE(val->Type))
     {
     case QSP_TYPE_TUPLE:

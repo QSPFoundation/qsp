@@ -153,7 +153,7 @@ int qspTuplesComp(QSPTuple first, QSPTuple second)
     QSP_BOOL isValid;
     QSPString str;
     QSP_BIGINT num;
-    QSP_CHAR buf[QSP_NUMTOSTRBUF];
+    QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
     int delta = 0;
     QSPVariant *pos1 = first.Vals, *pos2 = second.Vals;
     QSPVariant *end1 = first.Vals + first.Items, *end2 = second.Vals + second.Items;
@@ -253,7 +253,7 @@ int qspTuplesComp(QSPTuple first, QSPTuple second)
 
 void qspAppendTupleToString(QSPBufString *res, QSPTuple tuple)
 {
-    QSP_CHAR buf[QSP_NUMTOSTRBUF];
+    QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
     QSPString temp;
     QSPVariant *item = tuple.Vals, *itemsEnd = item + tuple.Items;
     qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAY_START));

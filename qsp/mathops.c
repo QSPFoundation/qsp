@@ -1133,7 +1133,7 @@ INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPV
             break;
         case QSP_TYPE_NUM:
         {
-            QSP_CHAR buf[QSP_NUMTOSTRBUF];
+            QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
             QSP_PNUM(res) = qspStrLen(qspNumToStr(buf, QSP_NUM(args[0])));
             break;
         }

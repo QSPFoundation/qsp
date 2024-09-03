@@ -23,7 +23,6 @@
     #define QSP_STRSDELIM QSP_FMT("\r\n")
     #define QSP_LSUBEX QSP_FMT("<<")
     #define QSP_RSUBEX QSP_FMT(">>")
-    #define QSP_NUMTOSTRBUF 12
 
     /* Frequently used classes of characters */
     enum
