@@ -284,7 +284,7 @@ QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize)
     return QSP_TRUE;
 }
 /* Get numeric value of the specified array item */
-QSP_BOOL QSPGetNumVarValue(QSPString name, int ind, int *res)
+QSP_BOOL QSPGetNumVarValue(QSPString name, int ind, QSP_BIGINT *res)
 {
     QSPVar *var = qspVarReference(name, QSP_FALSE);
     if (var && ind >= 0 && ind < var->ValsCount)
@@ -349,7 +349,7 @@ QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_
     return QSP_TRUE;
 }
 /* Calculate numeric value of an expression (causes execution of code) */
-QSP_BOOL QSPCalculateNumExpression(QSPString s, int *res, QSP_BOOL toRefreshUI)
+QSP_BOOL QSPCalculateNumExpression(QSPString s, QSP_BIGINT *res, QSP_BOOL toRefreshUI)
 {
     QSPVariant value;
     if (qspToDisableCodeExec) return QSP_FALSE;

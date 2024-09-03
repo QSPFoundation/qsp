@@ -93,7 +93,7 @@
         QSP_TYPE_DEFINED_TYPES, /* represents the number of defined values */
     };
 
-    typedef int QSP_BIGINT;
+    typedef long long QSP_BIGINT;
     typedef char QSP_TINYINT;
     typedef char QSP_BOOL;
 

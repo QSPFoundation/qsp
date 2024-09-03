@@ -346,7 +346,7 @@ void QSPFrame::ShowPane(wxWindowID id, bool toShow)
 
 void QSPFrame::ApplyParams()
 {
-    int numVal;
+    QSP_BIGINT numVal;
     QSPString strVal;
     wxColour setBackColor, setFontColor, setLinkColor;
     wxString setFontName;

@@ -43,4 +43,13 @@
     void qspSetSeed(unsigned int seed);
     int qspRand(void);
 
+    INLINE int qspToInt(QSP_BIGINT val)
+    {
+        if (val > INT_MAX)
+            return INT_MAX;
+        if (val < INT_MIN)
+            return INT_MIN;
+        return val;
+    }
+
 #endif

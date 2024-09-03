@@ -85,7 +85,7 @@ int QSPCallbacks::SetTimer(int msecs)
 int QSPCallbacks::RefreshInt(QSP_BOOL isForced)
 {
     static int oldFullRefreshCount = 0;
-    int i, numVal;
+    QSP_BIGINT numVal;
     QSPString strVal;
     bool toScroll, canSave;
     QSPListItem items[MAX_LIST_ITEMS];
@@ -119,7 +119,7 @@ int QSPCallbacks::RefreshInt(QSP_BOOL isForced)
     m_frame->GetActions()->SetToShowNums(m_frame->ToShowHotkeys());
     if (QSPIsActionsChanged())
     {
-        int actionsCount = QSPGetActions(items, MAX_LIST_ITEMS);
+        int i, actionsCount = QSPGetActions(items, MAX_LIST_ITEMS);
         m_frame->GetActions()->BeginItems();
         for (i = 0; i < actionsCount; ++i)
             m_frame->GetActions()->AddItem(wxString(items[i].Image.Str, items[i].Image.End), wxString(items[i].Name.Str, items[i].Name.End));
@@ -129,7 +129,7 @@ int QSPCallbacks::RefreshInt(QSP_BOOL isForced)
     m_frame->GetObjects()->SetIsHtml(m_isHtml);
     if (QSPIsObjectsChanged())
     {
-        int objectsCount = QSPGetObjects(items, MAX_LIST_ITEMS);
+        int i, objectsCount = QSPGetObjects(items, MAX_LIST_ITEMS);
         m_frame->GetObjects()->BeginItems();
         for (i = 0; i < objectsCount; ++i)
             m_frame->GetObjects()->AddItem(wxString(items[i].Image.Str, items[i].Image.End), wxString(items[i].Name.Str, items[i].Name.End));
