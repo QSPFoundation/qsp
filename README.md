@@ -27,6 +27,7 @@ Please consider supporting our development on:
 ## TODO
 
 * A tool to automatically migrate older games (e.g. QSP 5.7) to the latest version of the engine
+* Extra tests
 * Update the website
 * Multi-user games (MUD-style games)
 * New documentation & document new features
