@@ -93,15 +93,21 @@
         QSP_TYPE_DEFINED_TYPES, /* represents the number of defined values */
     };
 
-    typedef int QSP_BIGINT;
+    #define QSP_TRUE 1
+    #define QSP_FALSE 0
+
     typedef char QSP_TINYINT;
     typedef char QSP_BOOL;
 
-    #define QSP_MAX_BIGINT (((unsigned int)-1) >> 1)
-    #define QSP_MAX_BIGINT_LEN 12 /* don't forget about sign */
-
-    #define QSP_TRUE 1
-    #define QSP_FALSE 0
+    #ifdef QSP_USE_BIGINT
+        typedef long long QSP_BIGINT;
+        #define QSP_MAX_BIGINT (((unsigned long long)-1) >> 1)
+        #define QSP_MAX_BIGINT_LEN 20 /* don't forget about sign */
+    #else
+        typedef int QSP_BIGINT;
+        #define QSP_MAX_BIGINT (((unsigned int)-1) >> 1)
+        #define QSP_MAX_BIGINT_LEN 12 /* don't forget about sign */
+    #endif
 
     static QSP_TINYINT qspBaseTypeTable[QSP_TYPE_DEFINED_TYPES] =
     {
