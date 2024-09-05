@@ -27,7 +27,7 @@ Please consider supporting our development on:
 ## TODO
 
 * A tool to automatically migrate older games (e.g. QSP 5.7) to the latest version of the engine
-* Extra tests
+* Extra tests (see [qsp-wasm-engine](https://github.com/QSPFoundation/qsp-wasm-engine/tree/main/tests))
 * Update the website
 * Multi-user games (MUD-style games)
 * New documentation & document new features
