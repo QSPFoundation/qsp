@@ -149,7 +149,12 @@
         return string;
     }
 
-    INLINE QSP_BOOL qspIsInList(QSP_CHAR *list, QSP_CHAR ch)
+    INLINE QSP_BOOL qspIsCharAtPos(QSPString str, QSP_CHAR *pos, QSP_CHAR ch)
+    {
+        return (pos < str.End && *pos == ch);
+    }
+
+    INLINE QSP_BOOL qspIsInList(QSP_CHAR ch, QSP_CHAR *list)
     {
         while (*list)
             if (*list++ == ch) return QSP_TRUE;
@@ -249,7 +254,7 @@
         QSP_CHAR *pos = str.Str;
         while (pos < str.End)
         {
-            if (qspIsInList(strCharSet, *pos))
+            if (qspIsInList(*pos, strCharSet))
                 return pos;
             ++pos;
         }

@@ -122,7 +122,7 @@ QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars)
     QSP_CHAR *lastPos = 0, *pos = str.Str;
     while (pos < str.End)
     {
-        if (qspIsInList(chars, *pos)) lastPos = pos;
+        if (qspIsInList(*pos, chars)) lastPos = pos;
         ++pos;
     }
     return lastPos;

@@ -369,18 +369,33 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
         }
     }
     /* Check for ELSE IF */
-    if (statInd == 1 && line->Stats[0].Stat == qspStatElse && statCode == qspStatIf &&
-        *(line->Str.Str + line->Stats[0].ParamPos) != QSP_COLONDELIM[0])
+    if (statInd == 1
+        && line->Stats[0].Stat == qspStatElse && statCode == qspStatIf
+        && !qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].ParamPos, QSP_COLONDELIM[0]))
     {
-        /* Convert a multi-line ELSE IF to ELSEIF */
+        /* Convert multiline ELSE IF to ELSEIF */
+        statCode = qspStatElseIf; /* move current IF as ELSEIF to index 0, it's safe to overwrite ELSE */
         statInd = 0;
-        statCode = qspStatElseIf;
+    }
+    else if (statInd == 2
+        && line->Stats[0].Stat == qspStatElse && line->Stats[1].Stat == qspStatIf && statCode == qspStatComment
+        && !qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].ParamPos, QSP_COLONDELIM[0]))
+    {
+        /* Convert multiline ELSE IF with a comment to ELSEIF with the comment */
+        line->Stats[0].Stat = qspStatElseIf; /* move IF as ELSEIF to index 0, it's safe to overwrite ELSE */
+        line->Stats[0].ParamPos = line->Stats[1].ParamPos;
+        line->Stats[0].EndPos = line->Stats[1].EndPos;
+        line->Stats[0].ArgsCount = line->Stats[1].ArgsCount;
+        line->Stats[0].Args = line->Stats[1].Args;
+        line->Stats[0].ErrorCode = line->Stats[1].ErrorCode;
+        statInd = 1; /* move current comment to index 1 */
     }
     else
     {
         line->StatsCount++;
         line->Stats = (QSPCachedStat *)realloc(line->Stats, line->StatsCount * sizeof(QSPCachedStat));
     }
+    /* Add the last statement */
     line->Stats[statInd].Stat = statCode;
     if (paramPos)
     {
@@ -403,13 +418,23 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     case qspStatAct:
     case qspStatLoop:
     case qspStatIf:
-        if (line->StatsCount == 1 && *(line->Str.End - 1) == QSP_COLONDELIM[0])
-            line->LinesToElse = line->LinesToEnd = 1; /* we don't have all the lines ready to find the right ones yet */
-        break;
     case qspStatElseIf:
+        if (qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].EndPos, QSP_COLONDELIM[0]))
+        {
+            /* Set LinesToEnd to 1 for multiline statements since we don't have all the lines ready to find the right ones yet */
+            if (line->StatsCount == 1)
+                line->LinesToEnd = 1;
+            else if (line->StatsCount == 2 && line->Stats[1].Stat == qspStatComment)
+                line->LinesToEnd = 1;
+        }
+        line->LinesToElse = 1; /* always search next ELSE starting next line */
+        break;
     case qspStatElse:
+        /* Set LinesToEnd to 1 for multiline statements since we don't have all the lines ready to find the right ones yet */
         if (line->StatsCount == 1)
-            line->LinesToEnd = 1; /* we don't have all the lines ready to find the right ones yet */
+            line->LinesToEnd = 1;
+        else if (line->StatsCount == 2 && line->Stats[1].Stat == qspStatComment)
+            line->LinesToEnd = 1;
         line->LinesToElse = 1; /* always search next ELSE starting next line */
         break;
     }

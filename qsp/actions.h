@@ -46,7 +46,7 @@
     void qspExecAction(int ind);
     QSPString qspGetAllActionsAsCode(void);
     /* Statements */
-    void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos);
+    void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos);
     void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine);
     void qspStatementDelAct(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 

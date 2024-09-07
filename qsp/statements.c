@@ -503,8 +503,8 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine,
         {
             int oldLocationState;
             QSP_BOOL condition;
-            QSP_CHAR *pos = line->Str.Str + line->Stats->EndPos;
-            if (pos == line->Str.End || *pos != QSP_COLONDELIM[0])
+            QSP_CHAR *endPos = line->Str.Str + line->Stats->EndPos;
+            if (!qspIsCharAtPos(line->Str, endPos, QSP_COLONDELIM[0]))
             {
                 qspSetError(QSP_ERR_COLONNOTFOUND);
                 break;
@@ -516,7 +516,7 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine,
                 break;
             }
             oldLocationState = qspLocationState;
-            condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, pos));
+            condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, endPos));
             if (qspLocationState != oldLocationState) break;
             if (condition)
             {
@@ -691,8 +691,8 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
 {
     QSP_BOOL condition;
     int i, c, elseStat, oldLocationState;
-    QSP_CHAR *pos = line->Str.Str + line->Stats[startStat].EndPos;
-    if (pos == line->Str.End || *pos != QSP_COLONDELIM[0])
+    QSP_CHAR *endPos = line->Str.Str + line->Stats[startStat].EndPos;
+    if (!qspIsCharAtPos(line->Str, endPos, QSP_COLONDELIM[0]))
     {
         qspSetError(QSP_ERR_COLONNOTFOUND);
         return QSP_FALSE;
@@ -736,7 +736,7 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
         return QSP_FALSE;
     }
     oldLocationState = qspLocationState;
-    condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats[startStat].ParamPos, pos));
+    condition = qspCheckCondition(qspStringFromPair(line->Str.Str + line->Stats[startStat].ParamPos, endPos));
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     if (condition)
     {
@@ -820,12 +820,16 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
 {
     QSP_BOOL toExit;
     int oldLocationState;
-    QSP_CHAR *endPos;
     QSPString condition, iterator;
-    endPos = line->Str.Str + line->Stats[startStat].EndPos;
-    if (endPos == line->Str.End || *endPos != QSP_COLONDELIM[0])
+    QSP_CHAR *endPos = line->Str.Str + line->Stats[startStat].EndPos;
+    if (!qspIsCharAtPos(line->Str, endPos, QSP_COLONDELIM[0]))
     {
         qspSetError(QSP_ERR_COLONNOTFOUND);
+        return QSP_FALSE;
+    }
+    if (startStat == endStat - 1)
+    {
+        qspSetError(QSP_ERR_CODENOTFOUND);
         return QSP_FALSE;
     }
     qspAllocateSavedVarsGroup();
@@ -897,15 +901,9 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
     int oldLocationState;
     QSPString condition, iterator;
     QSPLineOfCode *line = lines + lineInd;
-    QSP_CHAR *endPos = line->Str.Str + line->Stats->EndPos;
-    if (endPos == line->Str.End || *endPos != QSP_COLONDELIM[0])
-    {
-        qspSetError(QSP_ERR_COLONNOTFOUND);
-        return QSP_FALSE;
-    }
     qspAllocateSavedVarsGroup();
     oldLocationState = qspLocationState;
-    toExit = qspPrepareLoop(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, endPos), &condition, &iterator, jumpTo);
+    toExit = qspPrepareLoop(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, line->Str.Str + line->Stats->EndPos), &condition, &iterator, jumpTo);
     if (qspLocationState != oldLocationState)
     {
         qspReleaseSavedVarsGroup(QSP_TRUE);

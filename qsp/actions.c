@@ -162,14 +162,14 @@ QSPString qspGetAllActionsAsCode(void)
     return qspBufTextToString(res);
 }
 
-void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
+void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
 {
     QSPVariant args[2];
     QSP_TINYINT argsCount;
     QSPLineOfCode code;
     int oldLocationState;
-    QSP_CHAR *lastPos, *firstPos = s->Str.Str + s->Stats[statPos].EndPos;
-    if (firstPos == s->Str.End || *firstPos != QSP_COLONDELIM[0])
+    QSP_CHAR *lastPos, *firstPos = line->Str.Str + line->Stats[statPos].EndPos;
+    if (!qspIsCharAtPos(line->Str, firstPos, QSP_COLONDELIM[0]))
     {
         qspSetError(QSP_ERR_COLONNOTFOUND);
         return;
@@ -180,19 +180,19 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *s, int statPos, int endPos)
         return;
     }
     oldLocationState = qspLocationState;
-    argsCount = qspGetStatArgs(s->Str, s->Stats + statPos, args);
+    argsCount = qspGetStatArgs(line->Str, line->Stats + statPos, args);
     if (qspLocationState != oldLocationState)
         return;
-    ++statPos; /* start with the internal code */
     firstPos += QSP_STATIC_LEN(QSP_COLONDELIM);
-    lastPos = s->Str.Str + s->Stats[endPos - 1].EndPos;
-    if (lastPos != s->Str.End && *lastPos == QSP_COLONDELIM[0]) lastPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+    lastPos = line->Str.Str + line->Stats[endPos - 1].EndPos;
+    if (qspIsCharAtPos(line->Str, lastPos, QSP_COLONDELIM[0])) lastPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+    ++statPos; /* start with the internal code */
     code.Str = qspStringFromPair(firstPos, lastPos);
     code.Label = qspGetLineLabel(code.Str);
-    code.LineNum = s->LineNum;
+    code.LineNum = line->LineNum;
     code.LinesToElse = code.LinesToEnd = 0;
     code.StatsCount = endPos - statPos;
-    qspCopyPrepStatements(&code.Stats, s->Stats, statPos, endPos, (int)(firstPos - s->Str.Str));
+    qspCopyPrepStatements(&code.Stats, line->Stats, statPos, endPos, (int)(firstPos - line->Str.Str));
     qspAddAction(args, argsCount, &code, 0, 1);
     qspFreeVariants(args, argsCount);
     qspFreeLineOfCode(&code);
