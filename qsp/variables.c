@@ -202,7 +202,7 @@ int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
 {
     int indsCount;
     QSPString uStr;
-    if (QSP_ISNUM(index.Type)) return qspToInt(QSP_NUM(index));
+    if (QSP_ISNUM(index.Type)) return QSP_TOINT(QSP_NUM(index));
     uStr = qspGetVariantAsIndexString(&index);
     qspUpperStr(&uStr);
     indsCount = var->IndsCount;
@@ -1054,8 +1054,8 @@ void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
     if (!(src = qspVarReference(QSP_STR(args[1]), QSP_FALSE))) return;
     if (dest != src)
     {
-        int startInd = (count >= 3 ? qspToInt(QSP_NUM(args[2])) : 0);
-        int maxCount = (count == 4 ? qspToInt(QSP_NUM(args[3])) : src->ValsCount);
+        int startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
+        int maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->ValsCount);
         qspCopyVar(dest, src, startInd, maxCount);
     }
 }
@@ -1084,7 +1084,7 @@ void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
     regExp = qspRegExpGetCompiled(QSP_STR(args[2]));
     if (!regExp) return;
     text = QSP_STR(args[1]);
-    groupInd = (count == 4 ? qspToInt(QSP_NUM(args[3])) : 0);
+    groupInd = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : 0);
     qspEmptyVar(var); /* clear the dest array anyway */
     foundString.Type = QSP_TYPE_STR;
     curInd = 0;

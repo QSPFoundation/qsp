@@ -153,7 +153,7 @@ void qspStatementPlayFile(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
 {
     if (count == 2)
     {
-        int volume = qspToInt(QSP_NUM(args[1]));
+        int volume = QSP_TOINT(QSP_NUM(args[1]));
         qspPlayFile(QSP_STR(args[0]), volume, QSP_TRUE);
     }
     else

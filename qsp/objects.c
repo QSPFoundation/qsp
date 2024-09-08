@@ -156,7 +156,7 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     QSPString imgPath;
     if (count == 3)
     {
-        objInd = qspToInt(QSP_NUM(args[2]) - 1);
+        objInd = QSP_TOINT(QSP_NUM(args[2]) - 1);
         if (objInd < 0 || objInd > qspCurObjsCount) return;
     }
     else
@@ -192,7 +192,7 @@ void qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
     case qspStatKillObj:
         if (count)
         {
-            int objInd = qspToInt(QSP_NUM(args[0]) - 1);
+            int objInd = QSP_TOINT(QSP_NUM(args[0]) - 1);
             qspRemoveObject(objInd);
         }
         else

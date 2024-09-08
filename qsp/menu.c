@@ -56,14 +56,14 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return;
     if (count >= 2)
     {
-        ind = qspToInt(QSP_NUM(args[1]));
+        ind = QSP_TOINT(QSP_NUM(args[1]));
         if (ind < 0) ind = 0;
     }
     else
         ind = 0;
     if (count == 3)
     {
-        maxItems = qspToInt(QSP_NUM(args[2]));
+        maxItems = QSP_TOINT(QSP_NUM(args[2]));
         if (maxItems < 0) maxItems = 0;
     }
     else
