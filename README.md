@@ -1,5 +1,27 @@
 # QSP
 
+This repository contains sources of the QSP engine.
+
+## Useful links
+
+### Documentation
+
+* Docs: https://github.com/QSPFoundation/qspfoundation.github.io
+
+### Players
+
+* Classic QSP player: https://github.com/QSPFoundation/qspgui
+* QSpider: https://github.com/QSPFoundation/qspider
+
+### Dev tools
+
+* QGen: https://github.com/QSPFoundation/qgen
+* TXT2GAM: https://github.com/QSPFoundation/txt2gam
+* VSCode extension: https://github.com/QSPFoundation/Qsp.FSharp.VsCode
+* CLI tools: https://github.com/QSPFoundation/qsp-cli
+* Test engine: https://github.com/QSPFoundation/qsp-test-engine
+* Code analyzer: https://github.com/QSPFoundation/Qsp.FSharp
+
 ## Linux build
 
 ```bash
