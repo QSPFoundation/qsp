@@ -178,7 +178,8 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     obj->Image = imgPath;
     obj->Desc = qspCopyToNewText(QSP_STR(args[0]));
     qspIsObjsListChanged = QSP_TRUE;
-    if (count == 3) count = 2;
+    /* Call ONOBJADD with object name & image */
+    if (count > 2) count = 2;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJADD")), args, count);
 }
 
