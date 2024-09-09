@@ -53,12 +53,12 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
     switch (QSP_BASETYPE(arg1->Type))
     {
     case QSP_TYPE_TUPLE:
-        return QSP_FALSE;
+        return QSP_FALSE; /* tuples get processed before calling this function */
     case QSP_TYPE_STR:
         switch (QSP_BASETYPE(arg2->Type))
         {
         case QSP_TYPE_TUPLE:
-            return QSP_FALSE;
+            return QSP_FALSE; /* tuples get processed before calling this function */
         case QSP_TYPE_STR:
             qspAddText(&QSP_PSTR(res), QSP_PSTR(arg1), QSP_TRUE);
             qspAddText(&QSP_PSTR(res), QSP_PSTR(arg2), QSP_FALSE);
@@ -84,7 +84,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
         switch (QSP_BASETYPE(arg2->Type))
         {
         case QSP_TYPE_TUPLE:
-            return QSP_FALSE;
+            return QSP_FALSE; /* tuples get processed before calling this function */
         case QSP_TYPE_STR:
             if (qspCanConvertToNum(arg2))
             {
