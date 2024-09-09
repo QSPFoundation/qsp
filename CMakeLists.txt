@@ -153,7 +153,7 @@ install(
 )
 
 install(FILES
-		${CMAKE_SOURCE_DIR}/cmake/Modules/Findoniguruma.cmake
+		${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/Findoniguruma.cmake
 	DESTINATION
 		"${CMAKE_INSTALL_DATAROOTDIR}/cmake/Modules"
 )
