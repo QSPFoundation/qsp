@@ -4,7 +4,7 @@
 
 ```bash
 mkdir build && cd build
-cmake -DBUILD_QSPGUI=ON -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build . -j
 ```
 
@@ -13,7 +13,7 @@ cmake --build . -j
 ```bash
 mkdir build
 cd build
-cmake -G "Visual Studio 15 2017" -A Win32 -DBUILD_QSPGUI=ON -DCMAKE_INSTALL_PREFIX=out ..
+cmake -G "Visual Studio 15 2017" -A Win32 -DCMAKE_INSTALL_PREFIX=out ..
 cmake --build . --target install --config Release
 ```
 
@@ -34,7 +34,6 @@ Please consider supporting our development on:
 * Update bindings
 * Implement a new way to communicate with GUI (more specific callbacks)
 * Move the whole global state into a context parameter
-* Move the QSP player into a separate repository
 * ???
 
 ## Chat group
