@@ -11,13 +11,13 @@ elseif (APPLE OR NOT UNIX)
 	message(FATAL_ERROR "Only Windows and Linux targets are supported")
 endif()
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
-
-set(CMAKE_INCLUDE_CURRENT_DIR True)
-
 include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
 include(GNUInstallDirs)
+
+set(CMAKE_INCLUDE_CURRENT_DIR True)
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 if (CMAKE_COMPILER_IS_GNUCC)
 	set(PROJECT_COMPILER_FLAGS "-Wall")
