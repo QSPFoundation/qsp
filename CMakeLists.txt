@@ -16,6 +16,7 @@ include(GenerateExportHeader)
 include(GNUInstallDirs)
 
 set(CMAKE_INCLUDE_CURRENT_DIR True)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH True)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
