@@ -132,10 +132,7 @@ target_include_directories(qsp
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp/default>"
 )
 
-install(TARGETS qsp EXPORT QspTargets DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime)
-if (NOT USE_INSTALLED_ONIGURUMA)
-	install(TARGETS onig DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT runtime)
-endif()
+install(TARGETS qsp EXPORT QspTargets)
 
 generate_export_header(qsp
   BASE_NAME Qsp
