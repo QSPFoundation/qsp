@@ -60,17 +60,8 @@ else()
 	set(INSTALL_DOCUMENTATION OFF)
 	set(INSTALL_EXAMPLES OFF)
 	set(BUILD_TEST OFF)
-
-	if (WIN32)
-		set(BUILD_SHARED_LIBS OFF)
-		set(MSVC_STATIC_RUNTIME ON)
-	else()
-		set(BUILD_SHARED_LIBS ON)
-		set(MSVC_STATIC_RUNTIME OFF)
-	endif()
-
-	# For Windows: Prevent overriding the parent project's compiler/linker settings
-	set(oniguruma_force_shared_crt ON CACHE BOOL "" FORCE)
+	set(BUILD_SHARED_LIBS OFF)
+	set(MSVC_STATIC_RUNTIME ON)
 
 	# Configure the CRNL handling
 	add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR=1)
@@ -149,12 +140,6 @@ install(EXPORT QspTargets NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/c
 install(
 	DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake
 	DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
-
-install(FILES
-		${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/Findoniguruma.cmake
-	DESTINATION
-		"${CMAKE_INSTALL_DATAROOTDIR}/cmake/Modules"
 )
 
 install(FILES
