@@ -63,6 +63,9 @@ else()
 	set(BUILD_SHARED_LIBS OFF)
 	set(MSVC_STATIC_RUNTIME ON)
 
+	# For Windows: Prevent overriding the parent project's compiler/linker settings
+	set(oniguruma_force_shared_crt ON CACHE BOOL "" FORCE)
+
 	# Configure the CRNL handling
 	add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR=1)
 
