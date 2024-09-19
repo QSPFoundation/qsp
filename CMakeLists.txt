@@ -9,7 +9,6 @@ include(GNUInstallDirs)
 
 set(CMAKE_INCLUDE_CURRENT_DIR True)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH True)
-set(CMAKE_POSITION_INDEPENDENT_CODE True)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
@@ -41,9 +40,10 @@ else()
 	message(FATAL_ERROR "Compiler is not supported")
 endif()
 
-set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE True)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN True)
 
-option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" OFF)
+option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" False)
 
 if (USE_INSTALLED_ONIGURUMA)
 	find_package(oniguruma REQUIRED)
@@ -58,11 +58,11 @@ else()
 	)
 
 	# Disable oniguruma features we don't need
-	set(INSTALL_DOCUMENTATION OFF)
-	set(INSTALL_EXAMPLES OFF)
-	set(BUILD_TEST OFF)
-	set(BUILD_SHARED_LIBS OFF)
-	set(MSVC_STATIC_RUNTIME ON)
+	set(INSTALL_DOCUMENTATION False)
+	set(INSTALL_EXAMPLES False)
+	set(BUILD_TEST False)
+	set(BUILD_SHARED_LIBS False)
+	set(MSVC_STATIC_RUNTIME True)
 
 	# For Windows: Prevent overriding the parent project's compiler/linker settings
 	set(oniguruma_force_shared_crt ON CACHE BOOL "" FORCE)
