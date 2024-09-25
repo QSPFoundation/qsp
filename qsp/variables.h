@@ -77,9 +77,9 @@
     QSPString qspGetVarStrValue(QSPString name);
     QSP_BIGINT qspGetVarNumValue(QSPString name);
     void qspRestoreGlobalVars(void);
-    int qspSaveLocalVarsAndRestoreGlobals(QSPVar **vars);
-    void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGroups, int groupsCount);
-    void qspRestoreVarsList(QSPVar *vars, int count);
+    int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups);
+    void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount);
+    void qspRestoreVars(QSPVar *vars, int count);
     void qspClearVars(QSPVar *vars, int count);
     int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
@@ -185,7 +185,7 @@
             if (toKeepLocals)
                 qspClearVars(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
             else
-                qspRestoreVarsList(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
+                qspRestoreVars(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
         }
     }
 

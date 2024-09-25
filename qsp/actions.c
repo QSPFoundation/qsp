@@ -191,6 +191,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
     code.Label = qspGetLineLabel(code.Str);
     code.LineNum = line->LineNum;
     code.LinesToElse = code.LinesToEnd = 0;
+    code.IsMultiline = QSP_FALSE;
     code.StatsCount = endPos - statPos;
     qspCopyPrepStatements(&code.Stats, line->Stats, statPos, endPos, (int)(firstPos - line->Str.Str));
     qspAddAction(args, argsCount, &code, 0, 1);

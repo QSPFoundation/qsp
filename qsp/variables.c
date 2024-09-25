@@ -41,6 +41,7 @@ INLINE QSP_BOOL qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT base
 INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val);
 INLINE void qspResetVar(QSPString varName);
 INLINE void qspSetVar(QSPString varName, QSPVariant *val, QSP_CHAR op);
+INLINE void qspClearSavedVars();
 INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count);
 INLINE void qspSortArray(QSPVar *var, QSP_TINYINT baseValType, QSP_BOOL isAscending);
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames);
@@ -452,87 +453,126 @@ INLINE void qspSetVar(QSPString varName, QSPVariant *val, QSP_CHAR op)
     }
 }
 
+INLINE void qspClearSavedVars()
+{
+    if (qspSavedVarGroupsCount)
+    {
+        int i;
+        for (i = 0; i < qspSavedVarGroupsCount; ++i)
+            qspClearVars(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
+        qspSavedVarGroupsCount = 0;
+    }
+}
+
 void qspRestoreGlobalVars(void)
 {
     if (qspSavedVarGroupsCount)
     {
         int i;
-        QSPVarsGroup *curVarGroup = qspSavedVarGroups;
-        for (i = qspSavedVarGroupsCount; i > 0; --i, ++curVarGroup)
-            qspRestoreVarsList(curVarGroup->Vars, curVarGroup->VarsCount);
+        /* Iterate backwards to properly restore hierarchy of local variables */
+        for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
+            qspRestoreVars(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
         qspSavedVarGroupsCount = 0;
     }
 }
 
-int qspSaveLocalVarsAndRestoreGlobals(QSPVar **vars)
+int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
 {
-    QSPVar *var, *savedVars;
-    int i, j, ind, varsCount = 0;
-    QSPVarsGroup *curVarGroup = qspSavedVarGroups;
-    for (i = qspSavedVarGroupsCount; i > 0; --i, ++curVarGroup)
-        varsCount += curVarGroup->VarsCount;
-    if (!varsCount)
+    QSPVar *var;
+    QSPVarsGroup *curSavedVarGroup, *curVarGroup, *varGroups;
+    int i, j, groupsCount = qspSavedVarGroupsCount;
+    if (!groupsCount)
     {
-        *vars = 0;
+        *savedVarGroups = 0;
         return 0;
     }
-    savedVars = (QSPVar *)malloc(varsCount * sizeof(QSPVar));
-    ind = 0;
-    curVarGroup = qspSavedVarGroups;
-    for (i = qspSavedVarGroupsCount; i > 0; --i, ++curVarGroup)
+    varGroups = (QSPVarsGroup *)malloc(groupsCount * sizeof(QSPVarsGroup));
+    /* Iterate backwards to properly restore hierarchy of local variables */
+    curVarGroup = varGroups + groupsCount - 1;
+    curSavedVarGroup = qspSavedVarGroups + groupsCount - 1;
+    for (i = groupsCount - 1; i >= 0; --i, --curVarGroup, --curSavedVarGroup)
     {
-        for (j = curVarGroup->VarsCount - 1; j >= 0; --j)
+        --qspSavedVarGroupsCount; /* we always remove this group */
+        if (curSavedVarGroup->Vars)
         {
-            if (!(var = qspVarReference(curVarGroup->Vars[j].Name, QSP_TRUE)))
+            curVarGroup->Vars = (QSPVar *)malloc(curSavedVarGroup->VarsCount * sizeof(QSPVar));
+            curVarGroup->VarsCount = curSavedVarGroup->VarsCount;
+            for (j = 0; j < curSavedVarGroup->VarsCount; ++j)
             {
-                while (--ind >= 0)
-                    qspEmptyVar(savedVars + ind);
-                free(savedVars);
-                return 0;
-            }
-            /* We keep var names in qspSavedVarGroups, savedVars have empty names */
-            qspMoveVar(savedVars + ind, var);
-            qspMoveVar(var, &curVarGroup->Vars[j]);
-            ++ind;
-        }
-    }
-    *vars = savedVars;
-    return varsCount;
-}
-
-void qspRestoreLocalVars(QSPVar *savedVars, int varsCount, QSPVarsGroup *savedGroups, int groupsCount)
-{
-    if (savedVars)
-    {
-        QSPVar *var;
-        int i, j, ind = varsCount - 1;
-        QSPVarsGroup *curVarGroup = savedGroups;
-        for (i = 0; i < groupsCount; ++i, ++curVarGroup)
-        {
-            for (j = 0; j < curVarGroup->VarsCount; ++j)
-            {
-                if (!(var = qspVarReference(curVarGroup->Vars[j].Name, QSP_TRUE)))
+                if (!(var = qspVarReference(curSavedVarGroup->Vars[j].Name, QSP_TRUE)))
                 {
-                    while (ind >= 0)
-                    {
-                        /* savedVars don't have names here */
-                        qspEmptyVar(savedVars + ind);
-                        --ind;
-                    }
-                    free(savedVars);
-                    return;
+                    qspClearVars(curSavedVarGroup->Vars, curSavedVarGroup->VarsCount);
+                    qspClearVars(curVarGroup->Vars, j);
+                    while (++i < groupsCount)
+                        qspClearVars(varGroups[i].Vars, varGroups[i].VarsCount);
+                    free(varGroups);
+                    *savedVarGroups = 0;
+                    return 0;
                 }
-                /* savedVars don't have names here */
-                qspMoveVar(&curVarGroup->Vars[j], var);
-                qspMoveVar(var, savedVars + ind);
-                --ind;
+                curVarGroup->Vars[j].Name = qspMoveText(&curSavedVarGroup->Vars[j].Name);
+                qspMoveVar(curVarGroup->Vars + j, var);
+                qspMoveVar(var, curSavedVarGroup->Vars + j);
             }
+            free(curSavedVarGroup->Vars);
         }
-        free(savedVars);
+        else
+        {
+            curVarGroup->Vars = 0;
+            curVarGroup->VarsCount = 0;
+        }
+    }
+    *savedVarGroups = varGroups;
+    return groupsCount;
+}
+
+void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
+{
+    /* Clear current saved vars if they exist */
+    qspClearSavedVars();
+    /* Restore saved vars */
+    if (varGroups)
+    {
+        int i, j;
+        QSPVar *var;
+        QSPVarsGroup *curSavedVarGroup, *curVarGroup = varGroups;
+        qspSavedVarGroupsBufSize = groupsCount;
+        qspSavedVarGroups = (QSPVarsGroup *)realloc(qspSavedVarGroups, qspSavedVarGroupsBufSize * sizeof(QSPVarsGroup));
+        curSavedVarGroup = qspSavedVarGroups;
+        for (i = 0; i < groupsCount; ++i, ++curVarGroup, ++curSavedVarGroup)
+        {
+            if (curVarGroup->Vars)
+            {
+                curSavedVarGroup->Vars = (QSPVar *)malloc(curVarGroup->VarsCount * sizeof(QSPVar));
+                curSavedVarGroup->VarsCount = curVarGroup->VarsCount;
+                for (j = 0; j < curVarGroup->VarsCount; ++j)
+                {
+                    if (!(var = qspVarReference(curVarGroup->Vars[j].Name, QSP_TRUE)))
+                    {
+                        qspClearVars(curVarGroup->Vars, curVarGroup->VarsCount);
+                        qspClearVars(curSavedVarGroup->Vars, j);
+                        while (++i < groupsCount)
+                            qspClearVars(varGroups[i].Vars, varGroups[i].VarsCount);
+                        free(varGroups);
+                        return;
+                    }
+                    curSavedVarGroup->Vars[j].Name = qspMoveText(&curVarGroup->Vars[j].Name);
+                    qspMoveVar(curSavedVarGroup->Vars + j, var);
+                    qspMoveVar(var, curVarGroup->Vars + j);
+                }
+                free(curVarGroup->Vars);
+            }
+            else
+            {
+                curSavedVarGroup->Vars = 0;
+                curSavedVarGroup->VarsCount = 0;
+            }
+            ++qspSavedVarGroupsCount; /* add this group if everything goes well */
+        }
+        free(varGroups);
     }
 }
 
-void qspRestoreVarsList(QSPVar *vars, int count)
+void qspRestoreVars(QSPVar *vars, int count)
 {
     if (vars)
     {
@@ -1016,7 +1056,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
         }
         if (isVarFound)
         {
-            /* Already exists */
+            /* Already exists, so the previous value is saved already */
             isVarFound = QSP_FALSE;
         }
         else

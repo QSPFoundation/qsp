@@ -21,9 +21,9 @@
 
 INLINE int qspStatStringCompare(const void *name, const void *compareTo);
 INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos);
-INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
-INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode);
+INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
+INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
+INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 
@@ -58,7 +58,7 @@ INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos)
     return qspStatUnknown;
 }
 
-INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode)
 {
     *args = 0;
     *errorCode = 0;
@@ -79,7 +79,7 @@ INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QS
     }
 }
 
-INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUSED(statCode), QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUSED(statCode), QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode)
 {
     QSP_TINYINT argsCount;
     QSPCachedArg *foundArgs;
@@ -120,7 +120,7 @@ INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUSED(st
     return argsCount;
 }
 
-INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, int *errorCode)
+INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode)
 {
     QSPCachedArg *foundArgs = 0;
     QSP_TINYINT argsCount = 0;
@@ -224,6 +224,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     line->Label = qspNullString;
     line->LineNum = lineNum;
     line->LinesToElse = line->LinesToEnd = 0;
+    line->IsMultiline = QSP_FALSE;
     line->StatsCount = 0;
     line->Stats = 0;
     qspSkipSpaces(&str);
@@ -421,21 +422,21 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     case qspStatElseIf:
         if (qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].EndPos, QSP_COLONDELIM[0]))
         {
-            /* Set LinesToEnd to 1 for multiline statements since we don't have all the lines ready to find the right ones yet */
             if (line->StatsCount == 1)
-                line->LinesToEnd = 1;
+                line->IsMultiline = QSP_TRUE;
             else if (line->StatsCount == 2 && line->Stats[1].Stat == qspStatComment)
-                line->LinesToEnd = 1;
+                line->IsMultiline = QSP_TRUE;
         }
-        line->LinesToElse = 1; /* always search next ELSE starting next line */
+        /* Always search next ELSE/END starting next line since we don't have all the lines ready to find the right ones yet */
+        line->LinesToEnd = line->LinesToElse = 1;
         break;
     case qspStatElse:
-        /* Set LinesToEnd to 1 for multiline statements since we don't have all the lines ready to find the right ones yet */
         if (line->StatsCount == 1)
-            line->LinesToEnd = 1;
+            line->IsMultiline = QSP_TRUE;
         else if (line->StatsCount == 2 && line->Stats[1].Stat == qspStatComment)
-            line->LinesToEnd = 1;
-        line->LinesToElse = 1; /* always search next ELSE starting next line */
+            line->IsMultiline = QSP_TRUE;
+        /* Always search next ELSE/END starting next line since we don't have all the lines ready to find the right ones yet */
+        line->LinesToEnd = line->LinesToElse = 1;
         break;
     }
     line->Label = qspGetLineLabel(line->Str);
@@ -519,6 +520,7 @@ void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int e
             line->LineNum = src[start].LineNum;
             line->LinesToEnd = src[start].LinesToEnd;
             line->LinesToElse = src[start].LinesToElse;
+            line->IsMultiline = src[start].IsMultiline;
             line->Label = qspCopyToNewText(src[start].Label);
             line->StatsCount = src[start].StatsCount;
             qspCopyPrepStatements(&line->Stats, src[start].Stats, 0, src[start].StatsCount, 0);

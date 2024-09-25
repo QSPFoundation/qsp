@@ -36,7 +36,7 @@
         int EndPos;
         QSPCachedArg *Args;
         QSP_TINYINT ArgsCount;
-        int ErrorCode;
+        QSP_TINYINT ErrorCode;
     } QSPCachedStat;
 
     typedef struct
@@ -48,6 +48,7 @@
         int LinesToElse; /* lines to skip to reach the next ELSE branch within multiline block */
         QSPCachedStat *Stats;
         int StatsCount;
+        QSP_TINYINT IsMultiline;
     } QSPLineOfCode;
 
     /* External functions */

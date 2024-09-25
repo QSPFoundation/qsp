@@ -22,7 +22,7 @@
 
     enum
     {
-        QSP_ERR_DIVBYZERO = 100,
+        QSP_ERR_DIVBYZERO = 10,
         QSP_ERR_TYPEMISMATCH,
         QSP_ERR_STACKOVERFLOW,
         QSP_ERR_TOOMANYITEMS,

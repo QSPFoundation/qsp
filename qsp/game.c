@@ -277,17 +277,22 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     QSPString locName;
     QSPBufString bufString;
     QSPVarsBucket *bucket;
-    QSPVar *var, *savedVars;
-    int i, j, k, dataSize, varsCount, oldLocationState = qspLocationState;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
-    if (qspLocationState != oldLocationState)
+    QSPVar *var;
+    QSPVarsGroup *savedVarGroups;
+    int i, j, k, dataSize, savedVarGroupsCount, oldLocationState;
+    /* Restore global variables */
+    savedVarGroupsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVarGroups);
+    if (qspErrorNum)
     {
         *bufSize = 0;
         return QSP_FALSE;
     }
-    varsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVars);
-    if (qspErrorNum)
+    /* Call ONGSAVE without local variables */
+    oldLocationState = qspLocationState;
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
+    if (qspLocationState != oldLocationState)
     {
+        qspRestoreSavedLocalVars(savedVarGroups, savedVarGroupsCount);
         *bufSize = 0;
         return QSP_FALSE;
     }
@@ -357,7 +362,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         }
         ++bucket;
     }
-    qspRestoreLocalVars(savedVars, varsCount, qspSavedVarGroups, qspSavedVarGroupsCount);
+    qspRestoreSavedLocalVars(savedVarGroups, savedVarGroupsCount);
     if (qspErrorNum)
     {
         qspFreeBufString(&bufString);

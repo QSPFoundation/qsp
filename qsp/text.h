@@ -142,10 +142,17 @@
         qspAddText(dest, val, QSP_TRUE);
     }
 
-    INLINE QSPString qspCopyToNewText(QSPString val)
+    INLINE QSPString qspCopyToNewText(QSPString s)
     {
         QSPString string;
-        qspAddText(&string, val, QSP_TRUE);
+        qspAddText(&string, s, QSP_TRUE);
+        return string;
+    }
+
+    INLINE QSPString qspMoveText(QSPString *s)
+    {
+        QSPString string = *s;
+        s->Str = s->End = 0; /* assign the null string */
         return string;
     }
 

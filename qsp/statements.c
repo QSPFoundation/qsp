@@ -264,7 +264,7 @@ INLINE int qspSearchElse(QSPLineOfCode *lines, int start, int end)
             case qspStatAct:
             case qspStatLoop:
             case qspStatIf:
-                if (lines->LinesToEnd) /* skip internal multiline statements */
+                if (lines->IsMultiline) /* skip internal multiline statements */
                 {
                     ++c;
                     start += lines->LinesToEnd;
@@ -308,7 +308,7 @@ INLINE int qspSearchEnd(QSPLineOfCode *lines, int start, int end)
             case qspStatAct:
             case qspStatLoop:
             case qspStatIf:
-                if (lines->LinesToEnd) /* skip internal multiline statements */
+                if (lines->IsMultiline) /* skip internal multiline statements */
                 {
                     ++c;
                     start += lines->LinesToEnd;
@@ -581,7 +581,7 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
                 if (qspLocationState != oldLocationState) break;
             }
         }
-        if (line->LinesToEnd)
+        if (line->IsMultiline)
             toExit = qspExecMultilineCode(s, endLine, codeOffset, jumpTo, &i, &action);
         else
             toExit = qspExecSinglelineCode(s, endLine, jumpTo, &i, &action);
