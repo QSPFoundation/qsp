@@ -1062,7 +1062,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
         else
         {
             QSPVar *var;
-            /* Add variable to the local group */
+            /* Get variable to add it to the local group */
             if (!(var = qspVarReference(varName, QSP_FALSE)))
             {
                 qspFreeVariant(&v);
@@ -1074,6 +1074,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
                 bufSize = varsCount + 4;
                 curVarGroup->Vars = (QSPVar *)realloc(curVarGroup->Vars, bufSize * sizeof(QSPVar));
             }
+            /* Save & reset the variable */
             qspMoveVar(curVarGroup->Vars + varsCount, var);
             curVarGroup->Vars[varsCount].Name = qspCopyToNewText(varName);
             curVarGroup->VarsCount = ++varsCount;
