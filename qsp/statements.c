@@ -635,10 +635,10 @@ QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine
     toExit = qspExecCode(s, startLine, endLine, codeOffset, jumpTo);
     if (qspLocationState != oldLocationState)
     {
-        qspReleaseSavedVarsGroup(QSP_TRUE);
+        qspClearLastSavedVarsGroup();
         return QSP_FALSE;
     }
-    qspReleaseSavedVarsGroup(QSP_FALSE);
+    qspRestoreLastSavedVarsGroup();
     return toExit;
 }
 
@@ -650,10 +650,10 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int 
     toExit = qspExecString(line, startStat, endStat, jumpTo);
     if (qspLocationState != oldLocationState)
     {
-        qspReleaseSavedVarsGroup(QSP_TRUE);
+        qspClearLastSavedVarsGroup();
         return QSP_FALSE;
     }
-    qspReleaseSavedVarsGroup(QSP_FALSE);
+    qspRestoreLastSavedVarsGroup();
     return toExit;
 }
 
@@ -672,19 +672,19 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
     qspFreePrepLines(strs, linesCount);
     if (qspLocationState != oldLocationState)
     {
-        qspReleaseSavedVarsGroup(QSP_TRUE);
+        qspClearLastSavedVarsGroup();
         return;
     }
     if (res)
     {
         if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_FALSE)))
         {
-            qspReleaseSavedVarsGroup(QSP_TRUE);
+            qspClearLastSavedVarsGroup();
             return;
         }
         qspApplyResult(varRes, res);
     }
-    qspReleaseSavedVarsGroup(QSP_FALSE);
+    qspRestoreLastSavedVarsGroup();
 }
 
 INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
@@ -837,7 +837,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
     toExit = qspPrepareLoop(qspStringFromPair(line->Str.Str + line->Stats[startStat].ParamPos, endPos), &condition, &iterator, jumpTo);
     if (qspLocationState != oldLocationState)
     {
-        qspReleaseSavedVarsGroup(QSP_TRUE);
+        qspClearLastSavedVarsGroup();
         return QSP_FALSE;
     }
     if (!toExit)
@@ -847,7 +847,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
         QSPMathExpression expression;
         if (!qspCompileMathExpression(condition, QSP_TRUE, &expression))
         {
-            qspReleaseSavedVarsGroup(QSP_TRUE);
+            qspClearLastSavedVarsGroup();
             return QSP_FALSE;
         }
         qspInitLineOfCode(&iteratorLine, iterator, 0);
@@ -858,7 +858,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
             if (qspLocationState != oldLocationState)
             {
                 qspFreeMathValue(&expression, expression.ItemsCount - 1);
-                qspReleaseSavedVarsGroup(QSP_TRUE);
+                qspClearLastSavedVarsGroup();
                 qspFreeLineOfCode(&iteratorLine);
                 return QSP_FALSE;
             }
@@ -868,7 +868,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
             if (qspLocationState != oldLocationState)
             {
                 qspFreeMathValue(&expression, expression.ItemsCount - 1);
-                qspReleaseSavedVarsGroup(QSP_TRUE);
+                qspClearLastSavedVarsGroup();
                 qspFreeLineOfCode(&iteratorLine);
                 return QSP_FALSE;
             }
@@ -880,7 +880,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
                 if (qspLocationState != oldLocationState)
                 {
                     qspFreeMathValue(&expression, expression.ItemsCount - 1);
-                    qspReleaseSavedVarsGroup(QSP_TRUE);
+                    qspClearLastSavedVarsGroup();
                     qspFreeLineOfCode(&iteratorLine);
                     return QSP_FALSE;
                 }
@@ -890,7 +890,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
         qspFreeMathValue(&expression, expression.ItemsCount - 1);
         qspFreeLineOfCode(&iteratorLine);
     }
-    qspReleaseSavedVarsGroup(QSP_FALSE);
+    qspRestoreLastSavedVarsGroup();
     return toExit;
 }
 
@@ -906,7 +906,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
     toExit = qspPrepareLoop(qspStringFromPair(line->Str.Str + line->Stats->ParamPos, line->Str.Str + line->Stats->EndPos), &condition, &iterator, jumpTo);
     if (qspLocationState != oldLocationState)
     {
-        qspReleaseSavedVarsGroup(QSP_TRUE);
+        qspClearLastSavedVarsGroup();
         return QSP_FALSE;
     }
     if (!toExit)
@@ -916,7 +916,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
         QSPMathExpression expression;
         if (!qspCompileMathExpression(condition, QSP_TRUE, &expression))
         {
-            qspReleaseSavedVarsGroup(QSP_TRUE);
+            qspClearLastSavedVarsGroup();
             return QSP_FALSE;
         }
         qspInitLineOfCode(&iteratorLine, iterator, 0);
@@ -933,7 +933,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
                     if (qspLocationState != oldLocationState)
                     {
                         qspFreeMathValue(&expression, expression.ItemsCount - 1);
-                        qspReleaseSavedVarsGroup(QSP_TRUE);
+                        qspClearLastSavedVarsGroup();
                         qspFreeLineOfCode(&iteratorLine);
                         return QSP_FALSE;
                     }
@@ -944,7 +944,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
             if (qspLocationState != oldLocationState)
             {
                 qspFreeMathValue(&expression, expression.ItemsCount - 1);
-                qspReleaseSavedVarsGroup(QSP_TRUE);
+                qspClearLastSavedVarsGroup();
                 qspFreeLineOfCode(&iteratorLine);
                 return QSP_FALSE;
             }
@@ -954,7 +954,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
             if (qspLocationState != oldLocationState)
             {
                 qspFreeMathValue(&expression, expression.ItemsCount - 1);
-                qspReleaseSavedVarsGroup(QSP_TRUE);
+                qspClearLastSavedVarsGroup();
                 qspFreeLineOfCode(&iteratorLine);
                 return QSP_FALSE;
             }
@@ -972,7 +972,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
                         if (qspLocationState != oldLocationState)
                         {
                             qspFreeMathValue(&expression, expression.ItemsCount - 1);
-                            qspReleaseSavedVarsGroup(QSP_TRUE);
+                            qspClearLastSavedVarsGroup();
                             qspFreeLineOfCode(&iteratorLine);
                             return QSP_FALSE;
                         }
@@ -982,7 +982,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
                 if (qspLocationState != oldLocationState)
                 {
                     qspFreeMathValue(&expression, expression.ItemsCount - 1);
-                    qspReleaseSavedVarsGroup(QSP_TRUE);
+                    qspClearLastSavedVarsGroup();
                     qspFreeLineOfCode(&iteratorLine);
                     return QSP_FALSE;
                 }
@@ -992,7 +992,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
         qspFreeMathValue(&expression, expression.ItemsCount - 1);
         qspFreeLineOfCode(&iteratorLine);
     }
-    qspReleaseSavedVarsGroup(QSP_FALSE);
+    qspRestoreLastSavedVarsGroup();
     return toExit;
 }
 

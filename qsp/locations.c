@@ -217,39 +217,54 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT args
     qspExecLocByIndex(locInd, QSP_FALSE);
     if (qspLocationState != oldLocationState)
     {
-        qspReleaseSavedVarsGroup(QSP_TRUE);
+        qspClearLastSavedVarsGroup();
         return;
     }
     if (res)
     {
         if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_FALSE)))
         {
-            qspReleaseSavedVarsGroup(QSP_TRUE);
+            qspClearLastSavedVarsGroup();
             return;
         }
         qspApplyResult(varRes, res);
     }
-    qspReleaseSavedVarsGroup(QSP_FALSE);
+    qspRestoreLastSavedVarsGroup();
 }
 
 void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount)
 {
     QSPVar *var;
     QSPString locName;
-    int ind = 0, oldLocationState = qspLocationState;
+    QSPVarsGroup *savedVarGroups;
+    int ind, oldLocationState, savedVarGroupsCount;
+    /* Restore global variables */
+    savedVarGroupsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVarGroups);
+    if (qspErrorNum) return;
     /* We execute all locations specified in the array */
+    oldLocationState = qspLocationState;
+    ind = 0;
     while (1)
     {
         /* The variable might be updated during the previous code execution */
-        if (!(var = qspVarReference(name, QSP_FALSE))) break;
+        if (!(var = qspVarReference(name, QSP_FALSE)))
+        {
+            qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+            return;
+        }
         if (ind >= var->ValsCount) break;
         if (!QSP_ISSTR(var->Values[ind].Type)) break;
         locName = QSP_STR(var->Values[ind]);
         if (!qspIsAnyString(locName)) break;
         qspExecLocByNameWithArgs(locName, args, argsCount, QSP_FALSE, 0);
-        if (qspLocationState != oldLocationState) break;
+        if (qspLocationState != oldLocationState)
+        {
+            qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+            return;
+        }
         ++ind;
     }
+    qspRestoreSavedLocalVars(savedVarGroups, savedVarGroupsCount);
 }
 
 void qspNavigateToLocation(int locInd, QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT argsCount)
@@ -271,10 +286,10 @@ void qspNavigateToLocation(int locInd, QSP_BOOL toChangeDesc, QSPVariant *args, 
     qspExecLocByIndex(locInd, toChangeDesc);
     if (qspLocationState != oldLocationState)
     {
-        qspReleaseSavedVarsGroup(QSP_TRUE);
+        qspClearLastSavedVarsGroup();
         return;
     }
-    qspReleaseSavedVarsGroup(QSP_FALSE);
+    qspRestoreLastSavedVarsGroup();
     if (qspErrorNum) return;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONNEWLOC")), args, argsCount);
 }

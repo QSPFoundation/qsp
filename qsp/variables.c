@@ -525,6 +525,18 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
     return groupsCount;
 }
 
+void qspClearSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
+{
+    /* Restore saved vars */
+    if (varGroups)
+    {
+        int i;
+        for (i = 0; i < groupsCount; ++i)
+            qspClearVars(varGroups[i].Vars, varGroups[i].VarsCount);
+        free(varGroups);
+    }
+}
+
 void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
 {
     /* Clear current saved vars if they exist */

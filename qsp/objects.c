@@ -51,11 +51,16 @@ void qspClearAllObjects(QSP_BOOL toInit)
 
 void qspClearAllObjectsWithNotify(void)
 {
-    QSPVariant v;
-    QSPString *objs;
-    int i, oldLocationState, oldCount = qspCurObjsCount;
+    int oldCount = qspCurObjsCount;
     if (oldCount)
     {
+        QSPVariant v;
+        QSPString *objs;
+        QSPVarsGroup *savedVarGroups;
+        int i, oldLocationState, savedVarGroupsCount;
+        /* Restore global variables here to optimize internal qspExecLocByVarNameWithArgs calls */
+        savedVarGroupsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVarGroups);
+        if (qspErrorNum) return;
         objs = (QSPString *)malloc(oldCount * sizeof(QSPString));
         for (i = 0; i < oldCount; ++i)
             qspAddText(objs + i, qspCurObjects[i].Desc, QSP_TRUE);
@@ -66,9 +71,15 @@ void qspClearAllObjectsWithNotify(void)
         {
             QSP_STR(v) = objs[i];
             qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &v, 1);
-            if (qspLocationState != oldLocationState) break;
+            if (qspLocationState != oldLocationState)
+            {
+                qspFreeStrs(objs, oldCount);
+                qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+                return;
+            }
         }
         qspFreeStrs(objs, oldCount);
+        qspRestoreSavedLocalVars(savedVarGroups, savedVarGroupsCount);
     }
 }
 

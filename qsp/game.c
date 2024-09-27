@@ -292,7 +292,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
     if (qspLocationState != oldLocationState)
     {
-        qspRestoreSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+        qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
         *bufSize = 0;
         return QSP_FALSE;
     }

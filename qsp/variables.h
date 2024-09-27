@@ -78,6 +78,7 @@
     QSP_BIGINT qspGetVarNumValue(QSPString name);
     void qspRestoreGlobalVars(void);
     int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups);
+    void qspClearSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount);
     void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount);
     void qspRestoreVars(QSPVar *vars, int count);
     void qspClearVars(QSPVar *vars, int count);
@@ -177,15 +178,21 @@
         return groupInd;
     }
 
-    INLINE void qspReleaseSavedVarsGroup(QSP_BOOL toKeepLocals)
+    INLINE void qspClearLastSavedVarsGroup()
     {
         if (qspSavedVarGroupsCount)
         {
             int ind = --qspSavedVarGroupsCount;
-            if (toKeepLocals)
-                qspClearVars(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
-            else
-                qspRestoreVars(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
+            qspClearVars(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
+        }
+    }
+
+    INLINE void qspRestoreLastSavedVarsGroup()
+    {
+        if (qspSavedVarGroupsCount)
+        {
+            int ind = --qspSavedVarGroupsCount;
+            qspRestoreVars(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
         }
     }
 
