@@ -1327,30 +1327,30 @@ INLINE void qspFunctionRand(QSPVariant *args, QSP_TINYINT count, QSPVariant *res
 
 INLINE void qspFunctionRGB(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    int r, g, b, a = 255;
+    int r, g, b, a = 0xFF;
     r = QSP_TOINT(QSP_NUM(args[0]));
     g = QSP_TOINT(QSP_NUM(args[1]));
     b = QSP_TOINT(QSP_NUM(args[2]));
     if (count == 4)
     {
         a = QSP_TOINT(QSP_NUM(args[3]));
-        if (a < 0)
-            a = 0;
-        else if (a > 255)
-            a = 255;
+        if (a < 0x00)
+            a = 0x00;
+        else if (a > 0xFF)
+            a = 0xFF;
     }
-    if (r < 0)
-        r = 0;
-    else if (r > 255)
-        r = 255;
-    if (g < 0)
-        g = 0;
-    else if (g > 255)
-        g = 255;
-    if (b < 0)
-        b = 0;
-    else if (b > 255)
-        b = 255;
+    if (r < 0x00)
+        r = 0x00;
+    else if (r > 0xFF)
+        r = 0xFF;
+    if (g < 0x00)
+        g = 0x00;
+    else if (g > 0xFF)
+        g = 0xFF;
+    if (b < 0x00)
+        b = 0x00;
+    else if (b > 0xFF)
+        b = 0xFF;
     QSP_PNUM(res) = (a << 24) | (b << 16) | (g << 8) | r;
 }
 
