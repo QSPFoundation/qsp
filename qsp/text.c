@@ -420,7 +420,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
     return 0;
 }
 
-QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, QSP_BOOL canReturnSelf)
+QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, int maxReplacements, QSP_BOOL canReturnSelf)
 {
     int searchLen = qspStrLen(searchTxt);
     QSP_CHAR *pos = qspStrStr(txt, searchTxt);
@@ -432,6 +432,7 @@ QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, Q
             qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
             qspAddBufText(&res, repTxt);
             txt.Str = pos + searchLen;
+            if (maxReplacements > 0 && --maxReplacements == 0) break; /* use maxReplacements only if it's > 0 */
             pos = qspStrStr(txt, searchTxt);
         } while (pos);
         qspAddBufText(&res, txt);

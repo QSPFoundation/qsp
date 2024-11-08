@@ -269,7 +269,7 @@ void qspAppendTupleToString(QSPBufString *res, QSPTuple tuple)
                 break;
             case QSP_TYPE_STR:
                 qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
-                temp = qspReplaceText(QSP_PSTR(item), QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), QSP_TRUE);
+                temp = qspReplaceText(QSP_PSTR(item), QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), 0, QSP_TRUE);
                 qspAddBufText(res, temp);
                 qspFreeNewString(&temp, &QSP_PSTR(item));
                 qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));

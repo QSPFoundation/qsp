@@ -61,7 +61,7 @@
     QSPString qspNumToStr(QSP_CHAR *buf, QSP_BIGINT val);
     QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch);
     QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated);
-    QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, QSP_BOOL canReturnSelf);
+    QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, int maxReplacements, QSP_BOOL canReturnSelf);
     QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf);
     int qspToWLower(int);
     int qspToWUpper(int);
