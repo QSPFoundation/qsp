@@ -1252,11 +1252,11 @@ INLINE void qspFunctionReplace(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 {
     if (count >= 3)
     {
-        int maxReplacements = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : 0);
+        int maxReplacements = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : INT_MAX);
         QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), QSP_STR(args[1]), QSP_STR(args[2]), maxReplacements, QSP_FALSE);
     }
     else
-        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), QSP_STR(args[1]), qspNullString, 0, QSP_FALSE);
+        QSP_PSTR(res) = qspReplaceText(QSP_STR(args[0]), QSP_STR(args[1]), qspNullString, INT_MAX, QSP_FALSE);
 }
 
 INLINE void qspFunctionArrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)

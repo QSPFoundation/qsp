@@ -145,13 +145,13 @@ QSPString qspGetAllObjectsAsCode(void)
     for (i = 0; i < qspCurObjsCount; ++i)
     {
         qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ADDOBJ ") QSP_DEFQUOT));
-        temp = qspReplaceText(qspCurObjects[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), 0, QSP_TRUE);
+        temp = qspReplaceText(qspCurObjects[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
         qspAddBufText(&res, temp);
         qspFreeNewString(&temp, &qspCurObjects[i].Desc);
         if (qspCurObjects[i].Image.Str)
         {
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(",") QSP_DEFQUOT));
-            temp = qspReplaceText(qspCurObjects[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), 0, QSP_TRUE);
+            temp = qspReplaceText(qspCurObjects[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
             qspAddBufText(&res, temp);
             qspFreeNewString(&temp, &qspCurObjects[i].Image);
         }

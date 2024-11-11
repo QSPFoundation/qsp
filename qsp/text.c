@@ -422,21 +422,27 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 
 QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, int maxReplacements, QSP_BOOL canReturnSelf)
 {
-    int searchLen = qspStrLen(searchTxt);
-    QSP_CHAR *pos = qspStrStr(txt, searchTxt);
-    if (pos && searchLen)
+    if (maxReplacements > 0)
     {
-        QSPBufString res = qspNewBufString(256);
-        do
+        int searchLen = qspStrLen(searchTxt);
+        if (searchLen)
         {
-            qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
-            qspAddBufText(&res, repTxt);
-            txt.Str = pos + searchLen;
-            if (maxReplacements > 0 && --maxReplacements == 0) break; /* use maxReplacements only if it's > 0 */
-            pos = qspStrStr(txt, searchTxt);
-        } while (pos);
-        qspAddBufText(&res, txt);
-        return qspBufTextToString(res);
+            QSP_CHAR *pos = qspStrStr(txt, searchTxt);
+            if (pos)
+            {
+                QSPBufString res = qspNewBufString(256);
+                do
+                {
+                    qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
+                    qspAddBufText(&res, repTxt);
+                    txt.Str = pos + searchLen;
+                    if (--maxReplacements == 0) break;
+                    pos = qspStrStr(txt, searchTxt);
+                } while (pos);
+                qspAddBufText(&res, txt);
+                return qspBufTextToString(res);
+            }
+        }
     }
     if (canReturnSelf) return txt;
     return qspCopyToNewText(txt);
