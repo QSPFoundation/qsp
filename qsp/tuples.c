@@ -88,7 +88,7 @@ QSP_BIGINT qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
 QSPTuple qspCopyToNewTuple(QSPVariant *values, int count)
 {
     QSPTuple tuple;
-    if (values)
+    if (count)
     {
         QSPVariant *newItem, *srcItem;
         tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
@@ -108,7 +108,7 @@ QSPTuple qspCopyToNewTuple(QSPVariant *values, int count)
 QSPTuple qspMoveToNewTuple(QSPVariant *values, int count)
 {
     QSPTuple tuple;
-    if (values)
+    if (count)
     {
         QSPVariant *newItem, *srcItem;
         tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
@@ -129,7 +129,7 @@ QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, in
 {
     QSPTuple tuple;
     int newCount = count1 + count2;
-    if (newCount > 0)
+    if (newCount)
     {
         QSPVariant *newItem, *item;
         tuple.Vals = (QSPVariant *)malloc(newCount * sizeof(QSPVariant));

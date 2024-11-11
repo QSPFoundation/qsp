@@ -107,6 +107,7 @@
         qspOpStr,
         qspOpVal,
         qspOpArrSize,
+        qspOpArrPack,
         qspOpIsPlay,
         qspOpDesc,
         qspOpTrim,

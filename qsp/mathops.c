@@ -62,6 +62,7 @@ INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 INLINE void qspFunctionReplace(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionArrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionArrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
+INLINE void qspFunctionArrPack(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionMax(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionRand(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
@@ -225,6 +226,7 @@ void qspInitMath(void)
     qspAddOperation(qspOpStr, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpVal, 30, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpArrSize, 30, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_VARREF);
+    qspAddOperation(qspOpArrPack, 30, qspFunctionArrPack, QSP_TYPE_TUPLE, 1, 3, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpIsPlay, 30, qspFunctionIsPlay, QSP_TYPE_NUM, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpDesc, 30, qspFunctionDesc, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpTrim, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
@@ -273,7 +275,6 @@ void qspInitMath(void)
     qspAddOpName(qspOpAnd, QSP_FMT("AND"), 1, QSP_FALSE);
     qspAddOpName(qspOpOr, QSP_FMT("OR"), 1, QSP_FALSE);
     qspAddOpName(qspOpNot, QSP_FMT("NO"), 1, QSP_FALSE);
-    qspAddOpName(qspOpArrItem, QSP_FMT("ARRITEM"), 1, QSP_TRUE);
     qspAddOpName(qspOpLoc, QSP_FMT("LOC"), 1, QSP_TRUE);
     qspAddOpName(qspOpObj, QSP_FMT("OBJ"), 1, QSP_TRUE);
     qspAddOpName(qspOpMin, QSP_FMT("MIN"), 1, QSP_TRUE);
@@ -289,6 +290,10 @@ void qspInitMath(void)
     qspAddOpName(qspOpStr, QSP_FMT("STR"), 1, QSP_TRUE);
     qspAddOpName(qspOpVal, QSP_FMT("VAL"), 1, QSP_TRUE);
     qspAddOpName(qspOpArrSize, QSP_FMT("ARRSIZE"), 1, QSP_TRUE);
+    qspAddOpName(qspOpArrItem, QSP_FMT("ARRITEM"), 1, QSP_TRUE);
+    qspAddOpName(qspOpArrPack, QSP_FMT("ARRPACK"), 1, QSP_TRUE);
+    qspAddOpName(qspOpArrPos, QSP_FMT("ARRPOS"), 1, QSP_TRUE);
+    qspAddOpName(qspOpArrComp, QSP_FMT("ARRCOMP"), 1, QSP_TRUE);
     qspAddOpName(qspOpIsPlay, QSP_FMT("ISPLAY"), 1, QSP_TRUE);
     qspAddOpName(qspOpDesc, QSP_FMT("DESC"), 1, QSP_TRUE);
     qspAddOpName(qspOpTrim, QSP_FMT("TRIM"), 1, QSP_TRUE);
@@ -297,8 +302,6 @@ void qspInitMath(void)
     qspAddOpName(qspOpStrFind, QSP_FMT("STRFIND"), 1, QSP_TRUE);
     qspAddOpName(qspOpStrPos, QSP_FMT("STRPOS"), 1, QSP_TRUE);
     qspAddOpName(qspOpMid, QSP_FMT("MID"), 1, QSP_TRUE);
-    qspAddOpName(qspOpArrPos, QSP_FMT("ARRPOS"), 1, QSP_TRUE);
-    qspAddOpName(qspOpArrComp, QSP_FMT("ARRCOMP"), 1, QSP_TRUE);
     qspAddOpName(qspOpInstr, QSP_FMT("INSTR"), 1, QSP_TRUE);
     qspAddOpName(qspOpReplace, QSP_FMT("REPLACE"), 1, QSP_TRUE);
     qspAddOpName(qspOpFunc, QSP_FMT("FUNC"), 1, QSP_TRUE);
@@ -1224,24 +1227,25 @@ INLINE void qspFunctionInstr(QSPVariant *args, QSP_TINYINT count, QSPVariant *re
 
 INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    int len, beg = QSP_TOINT(QSP_NUM(args[1]) - 1);
-    if (beg < 0) beg = 0;
-    len = qspStrLen(QSP_STR(args[0]));
-    if (beg < len)
+    int len = qspStrLen(QSP_STR(args[0]));
+    if (len > 0)
     {
+        int beg = QSP_TOINT(QSP_NUM(args[1]) - 1);
+        if (beg < 0) beg = 0;
         len -= beg;
-        if (count == 3)
+        if (len > 0)
         {
-            int subLen = QSP_TOINT(QSP_NUM(args[2]));
-            if (subLen < 0)
-                len = 0;
-            else if (subLen < len)
-                len = subLen;
+            if (count == 3)
+            {
+                int subLen = QSP_TOINT(QSP_NUM(args[2]));
+                if (subLen < len)
+                    len = (subLen > 0 ? subLen : 0);
+            }
+            QSP_PSTR(res) = qspCopyToNewText(qspStringFromLen(QSP_STR(args[0]).Str + beg, len));
+            return;
         }
-        QSP_PSTR(res) = qspCopyToNewText(qspStringFromLen(QSP_STR(args[0]).Str + beg, len));
     }
-    else
-        QSP_PSTR(res) = qspNullString;
+    QSP_PSTR(res) = qspNullString;
 }
 
 INLINE void qspFunctionReplace(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
@@ -1275,6 +1279,38 @@ INLINE void qspFunctionArrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *
         int startInd = QSP_TOINT(QSP_NUM(args[2]));
         QSP_PNUM(res) = qspArrayPos(QSP_STR(args[0]), args + 1, startInd, QSP_TRUE);
     }
+}
+
+INLINE void qspFunctionArrPack(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
+{
+    QSPVar *var;
+    int itemsCount;
+    if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return;
+    itemsCount = var->ValsCount;
+    if (itemsCount > 0)
+    {
+        int startInd;
+        if (count >= 2)
+        {
+            startInd = QSP_TOINT(QSP_NUM(args[1]));
+            if (startInd < 0) startInd = 0;
+        }
+        else
+            startInd = 0;
+        itemsCount -= startInd;
+        if (itemsCount > 0)
+        {
+            if (count == 3)
+            {
+                int itemsToCopy = QSP_TOINT(QSP_NUM(args[2]));
+                if (itemsToCopy < itemsCount)
+                    itemsCount = (itemsToCopy > 0 ? itemsToCopy : 0);
+            }
+            QSP_PTUPLE(res) = qspCopyToNewTuple(var->Values + startInd, itemsCount);
+            return;
+        }
+    }
+    QSP_PTUPLE(res) = qspNullTuple;
 }
 
 INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
