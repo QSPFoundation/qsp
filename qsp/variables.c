@@ -42,6 +42,7 @@ INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val);
 INLINE void qspResetVar(QSPString varName);
 INLINE void qspSetVar(QSPString varName, QSPVariant *val, QSP_CHAR op);
 INLINE void qspClearSavedVars();
+INLINE void qspUnpackTupleToArray(QSPVar *dest, QSPTuple src, int start, int count);
 INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count);
 INLINE void qspSortArray(QSPVar *var, QSP_TINYINT baseValType, QSP_BOOL isAscending);
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames);
@@ -625,6 +626,24 @@ void qspClearVars(QSPVar *vars, int count)
     }
 }
 
+INLINE void qspUnpackTupleToArray(QSPVar *dest, QSPTuple src, int start, int count)
+{
+    int i, itemsToCopy;
+    /* Clear the dest array anyway */
+    qspEmptyVar(dest);
+    /* Validate parameters */
+    if (count <= 0) return;
+    if (start < 0) start = 0;
+    itemsToCopy = src.Items - start;
+    if (itemsToCopy <= 0) return;
+    if (count < itemsToCopy) itemsToCopy = count;
+    /* Copy tuple items */
+    dest->ValsBufSize = dest->ValsCount = itemsToCopy;
+    dest->Values = (QSPVariant *)malloc(itemsToCopy * sizeof(QSPVariant));
+    for (i = 0; i < itemsToCopy; ++i)
+        qspCopyToNewVariant(dest->Values + i, src.Vals + start + i);
+}
+
 INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
 {
     int i, itemsToCopy, newInd;
@@ -1098,6 +1117,18 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
         qspFreeVariant(&v);
     }
     free(names);
+}
+
+void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
+{
+    QSPVar *dest;
+    QSPTuple src;
+    int startInd, maxCount;
+    if (!(dest = qspVarReference(QSP_STR(args[0]), QSP_TRUE))) return;
+    src = QSP_TUPLE(args[1]);
+    startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
+    maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src.Items);
+    qspUnpackTupleToArray(dest, src, startInd, maxCount);
 }
 
 void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))

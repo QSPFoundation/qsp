@@ -140,6 +140,7 @@ void qspInitStats(void)
     qspAddStatement(qspStatClose, qspStatementCloseFile, 0, 1, QSP_TYPE_STR);
     qspAddStatement(qspStatClS, qspStatementClear, 0, 0);
     qspAddStatement(qspStatCmdClear, qspStatementClear, 0, 0);
+    qspAddStatement(qspStatUnpackArr, qspStatementUnpackArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_TUPLE, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(qspStatCopyArr, qspStatementCopyArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(qspStatSortArr, qspStatementSortArr, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_NUM);
     qspAddStatement(qspStatScanStr, qspStatementScanStr, 3, 4, QSP_TYPE_VARREF, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
@@ -196,6 +197,7 @@ void qspInitStats(void)
     qspAddStatName(qspStatClS, QSP_STATIC_STR(QSP_FMT("CLS")), 2);
     qspAddStatName(qspStatCmdClear, QSP_STATIC_STR(QSP_FMT("CMDCLEAR")), 2);
     qspAddStatName(qspStatCmdClear, QSP_STATIC_STR(QSP_FMT("CMDCLR")), 2);
+    qspAddStatName(qspStatUnpackArr, QSP_STATIC_STR(QSP_FMT("UNPACKARR")), 2);
     qspAddStatName(qspStatCopyArr, QSP_STATIC_STR(QSP_FMT("COPYARR")), 2);
     qspAddStatName(qspStatSortArr, QSP_STATIC_STR(QSP_FMT("SORTARR")), 2);
     qspAddStatName(qspStatScanStr, QSP_STATIC_STR(QSP_FMT("SCANSTR")), 2);

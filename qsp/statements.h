@@ -72,6 +72,7 @@
         qspStatClose,
         qspStatClS,
         qspStatCmdClear,
+        qspStatUnpackArr,
         qspStatCopyArr,
         qspStatSortArr,
         qspStatScanStr,

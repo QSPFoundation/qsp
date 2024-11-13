@@ -90,6 +90,7 @@
     /* Statements */
     void qspStatementSetVarValue(QSPString s, QSPCachedStat *stat);
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);
+    void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
