@@ -22,6 +22,8 @@
     #define QSP_COMMONDEFINES
 
     #define QSP_RANDMASK 0x7FFFFFFF
+    #define QSP_RANDMAX QSP_RANDMASK
+    #define QSP_NORMAL_SCALE 3.0
 
     extern QSP_BOOL qspIsDebug;
     extern int qspTimerInterval;
@@ -41,7 +43,8 @@
     void qspPrepareExecution(QSP_BOOL toInit);
     void qspMemClear(QSP_BOOL toInit);
     void qspSetSeed(unsigned int seed);
-    int qspRand(void);
+    int qspUniformRand(int min, int max);
+    int qspNormalRand(int min, int max, int mean);
 
     INLINE int qspToInt(QSP_BIGINT val)
     {

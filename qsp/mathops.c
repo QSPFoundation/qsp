@@ -215,7 +215,7 @@ void qspInitMath(void)
     qspAddOperation(qspOpNot, 8, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_NUM);
     qspAddOperation(qspOpMin, 30, qspFunctionMin, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, -1);
     qspAddOperation(qspOpMax, 30, qspFunctionMax, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, -1);
-    qspAddOperation(qspOpRand, 30, qspFunctionRand, QSP_TYPE_NUM, 1, 2, QSP_TYPE_NUM, QSP_TYPE_NUM);
+    qspAddOperation(qspOpRand, 30, qspFunctionRand, QSP_TYPE_NUM, 1, 3, QSP_TYPE_NUM, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpIIf, 30, 0, QSP_TYPE_UNDEF, 3, 3, QSP_TYPE_NUM, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpRGB, 30, qspFunctionRGB, QSP_TYPE_NUM, 3, 4, QSP_TYPE_NUM, QSP_TYPE_NUM, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpLen, 30, qspFunctionLen, QSP_TYPE_NUM, 1, 1, QSP_TYPE_UNDEF);
@@ -1071,7 +1071,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         QSP_STR(tos) = qspCallInputBox(QSP_STR(args[0]));
         break;
     case qspOpRnd:
-        QSP_NUM(tos) = qspRand() % 1000 + 1;
+        QSP_NUM(tos) = qspUniformRand(1, 1000);
         break;
     case qspOpCountObj:
         QSP_NUM(tos) = qspCurObjsCount;
@@ -1353,15 +1353,16 @@ INLINE void qspFunctionMax(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 
 INLINE void qspFunctionRand(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    QSP_BIGINT min, max;
-    min = QSP_NUM(args[0]);
-    max = (count == 2 ? QSP_NUM(args[1]) : 1);
-    if (min > max)
+    int min, max;
+    min = QSP_TOINT(QSP_NUM(args[0]));
+    max = (count >= 2 ? QSP_TOINT(QSP_NUM(args[1])) : 1);
+    if (count == 3)
     {
-        min = max;
-        max = QSP_NUM(args[0]);
+        int mean = QSP_TOINT(QSP_NUM(args[2]));
+        QSP_PNUM(res) = qspNormalRand(min, max, mean);
     }
-    QSP_PNUM(res) = qspRand() % (max - min + 1) + min;
+    else
+        QSP_PNUM(res) = qspUniformRand(min, max);
 }
 
 INLINE void qspFunctionRGB(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
