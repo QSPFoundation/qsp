@@ -1,7 +1,5 @@
 # QSP
 
-© 2001-2024 Val Argunov
-
 This repository contains sources of the QSP game engine.
 
 ## Useful links
