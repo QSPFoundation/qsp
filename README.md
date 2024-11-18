@@ -22,11 +22,11 @@ This repository contains sources of the QSP game engine.
 * Test engine: https://github.com/QSPFoundation/qsp-test-engine
 * Code analyzer: https://github.com/QSPFoundation/Qsp.FSharp
 
-## Linux build
+## Linux & MacOS build
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --parallel $(nproc)
+cmake --build build
 ```
 
 ## Windows build
