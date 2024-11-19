@@ -1,6 +1,6 @@
 # QSP
 
-This repository contains sources of the QSP game engine.
+This repository contains source code of the QSP game engine.
 
 ## Useful links
 
