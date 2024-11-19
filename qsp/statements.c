@@ -217,7 +217,7 @@ void qspInitStats(void)
     qspAddStatName(qspStatDynamic, QSP_STATIC_STR(QSP_FMT("DYNAMIC")), 2);
     qspAddStatName(qspStatExec, QSP_STATIC_STR(QSP_FMT("EXEC")), 2);
 
-    qspAddStatName(qspStatSetVar, QSP_STATIC_STR(QSP_FMT("SETVAR")), 2);
+    qspAddStatName(qspStatSetVar, QSP_STATIC_STR(QSP_FMT("SETVAR")), 1);
     qspAddStatName(qspStatUnpackArr, QSP_STATIC_STR(QSP_FMT("UNPACKARR")), 2);
     qspAddStatName(qspStatCopyArr, QSP_STATIC_STR(QSP_FMT("COPYARR")), 2);
     qspAddStatName(qspStatSortArr, QSP_STATIC_STR(QSP_FMT("SORTARR")), 2);
