@@ -72,6 +72,7 @@
         qspStatXGoTo,
         qspStatDynamic,
         qspStatExec,
+        qspStatSetVar,
         qspStatUnpackArr,
         qspStatCopyArr,
         qspStatSortArr,

@@ -142,6 +142,7 @@ void qspInitStats(void)
     qspAddStatement(qspStatDynamic, qspStatementDynamic, 1, QSP_STATMAXARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, -1);
     qspAddStatement(qspStatExec, qspStatementExec, 1, 1, QSP_TYPE_STR);
 
+    qspAddStatement(qspStatSetVar, qspStatementSetVar, 2, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddStatement(qspStatUnpackArr, qspStatementUnpackArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_TUPLE, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(qspStatCopyArr, qspStatementCopyArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(qspStatSortArr, qspStatementSortArr, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_NUM);
@@ -216,6 +217,7 @@ void qspInitStats(void)
     qspAddStatName(qspStatDynamic, QSP_STATIC_STR(QSP_FMT("DYNAMIC")), 2);
     qspAddStatName(qspStatExec, QSP_STATIC_STR(QSP_FMT("EXEC")), 2);
 
+    qspAddStatName(qspStatSetVar, QSP_STATIC_STR(QSP_FMT("SETVAR")), 2);
     qspAddStatName(qspStatUnpackArr, QSP_STATIC_STR(QSP_FMT("UNPACKARR")), 2);
     qspAddStatName(qspStatCopyArr, QSP_STATIC_STR(QSP_FMT("COPYARR")), 2);
     qspAddStatName(qspStatSortArr, QSP_STATIC_STR(QSP_FMT("SORTARR")), 2);
@@ -434,7 +436,7 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatSet:
-            qspStatementSetVarValue(line->Str, line->Stats + i);
+            qspStatementSetVarsValues(line->Str, line->Stats + i);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatExit:
