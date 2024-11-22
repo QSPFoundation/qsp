@@ -1,7 +1,7 @@
 package com.libqsp.jni;
 
 public abstract class QSPLib {
-    enum Error {
+    public enum Error {
         DIVBYZERO, /* = 10 */
         TYPEMISMATCH,
         STACKOVERFLOW,
@@ -30,14 +30,14 @@ public abstract class QSPLib {
         LOOPWHILENOTFOUND
     }
 
-    enum Window {
+    public enum Window {
         ACTS,
         OBJS,
         VARS,
         INPUT
     }
 
-    enum Callback {
+    public enum Callback {
         DEBUG,
         ISPLAYINGFILE,
         PLAYFILE,
