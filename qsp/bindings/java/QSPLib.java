@@ -59,21 +59,18 @@ public abstract class QSPLib {
         VERSION
     }
 
-    public class ListItem
-    {
+    public class ListItem {
         public String image;
         public String name;
     }
 
-    public class ExecutionState
-    {
+    public class ExecutionState {
         public String loc;
         public int actIndex;
         public int lineNum;
     }
 
-    public class ErrorInfo
-    {
+    public class ErrorInfo {
         public int errorNum; /* Error.ordinal() */
         public String errorDesc;
         public String locName; /* location name */
