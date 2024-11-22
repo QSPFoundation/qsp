@@ -153,12 +153,12 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isMainDescChanged(JNIEnv *
 /* Additional description */
 
 /* Get text of the additional description */
-JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getVarDesc(JNIEnv *env, jobject api)
+JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getVarsDesc(JNIEnv *env, jobject api)
 {
     return qspToJavaString(env, qspBufTextToString(qspCurVars));
 }
 /* Check whether the text has been updated */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isVarDescChanged(JNIEnv *env, jobject api)
+JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isVarsDescChanged(JNIEnv *env, jobject api)
 {
     return qspIsVarsDescChanged;
 }

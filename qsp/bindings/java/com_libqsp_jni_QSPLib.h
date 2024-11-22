@@ -89,18 +89,18 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isMainDescChanged
 
 /*
  * Class:     com_libqsp_jni_QSPLib
- * Method:    getVarDesc
+ * Method:    getVarsDesc
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getVarDesc
+JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getVarsDesc
   (JNIEnv *, jobject);
 
 /*
  * Class:     com_libqsp_jni_QSPLib
- * Method:    isVarDescChanged
+ * Method:    isVarsDescChanged
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isVarDescChanged
+JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isVarsDescChanged
   (JNIEnv *, jobject);
 
 /*

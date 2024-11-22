@@ -96,8 +96,8 @@ public abstract class QSPLib {
     public native int getFullRefreshCount();
     public native String getMainDesc();
     public native boolean isMainDescChanged();
-    public native String getVarDesc();
-    public native boolean isVarDescChanged();
+    public native String getVarsDesc();
+    public native boolean isVarsDescChanged();
     public native void setInputStrText(String value);
     public native ListItem[] getActions();
     public native boolean setSelActIndex(int index, boolean toRefreshUI);
