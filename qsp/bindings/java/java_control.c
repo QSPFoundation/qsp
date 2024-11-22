@@ -554,13 +554,13 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api)
     qspApiClass = (jclass)(*env)->NewGlobalRef(env, clazz);
     qspApiObject = (jobject)(*env)->NewGlobalRef(env, api);
 
-    clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib/ListItem");
+    clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ListItem");
     qspListItemClass = (jclass)(*env)->NewGlobalRef(env, clazz);
 
-    clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib/ExecutionState");
+    clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ExecutionState");
     qspExecutionStateClass = (jclass)(*env)->NewGlobalRef(env, clazz);
 
-    clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib/ErrorInfo");
+    clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ErrorInfo");
     qspErrorInfoClass = (jclass)(*env)->NewGlobalRef(env, clazz);
 
     /* Get references to callbacks */
@@ -573,7 +573,7 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api)
     qspCallbackMethods[QSP_CALL_CLOSEFILE] = (*env)->GetMethodID(env, qspApiClass, "onCloseFile", "(Ljava/lang/String;)V");
     qspCallbackMethods[QSP_CALL_SHOWIMAGE] = (*env)->GetMethodID(env, qspApiClass, "onShowImage", "(Ljava/lang/String;)V");
     qspCallbackMethods[QSP_CALL_SHOWWINDOW] = (*env)->GetMethodID(env, qspApiClass, "onShowWindow", "(IZ)V");
-    qspCallbackMethods[QSP_CALL_SHOWMENU] = (*env)->GetMethodID(env, qspApiClass, "onShowMenu", "([Lcom/example/ListItem;)I");
+    qspCallbackMethods[QSP_CALL_SHOWMENU] = (*env)->GetMethodID(env, qspApiClass, "onShowMenu", "([Lcom/libqsp/jni/QSPLib$ListItem;)I");
     qspCallbackMethods[QSP_CALL_SHOWMSGSTR] = (*env)->GetMethodID(env, qspApiClass, "onShowMessage", "(Ljava/lang/String;)V");
     qspCallbackMethods[QSP_CALL_REFRESHINT] = (*env)->GetMethodID(env, qspApiClass, "onRefreshInt", "(Z)V");
     qspCallbackMethods[QSP_CALL_SETTIMER] = (*env)->GetMethodID(env, qspApiClass, "onSetTimer", "(I)V");
