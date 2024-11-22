@@ -90,7 +90,7 @@
         QSP_TYPE_CODE = 3,
         QSP_TYPE_VARREF = 4,
         QSP_TYPE_UNDEF = 5, /* not used for values, it has to be a string-based type */
-        QSP_TYPE_DEFINED_TYPES, /* represents the number of defined values */
+        QSP_TYPE_DEFINED_TYPES /* represents the number of defined values */
     };
 
     #define QSP_TRUE 1

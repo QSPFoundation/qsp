@@ -22,9 +22,15 @@
     #define QSP_JAVADEFINES
 
     #ifdef _UNICODE
-        typedef unsigned short QSP_CHAR;
-        #define QSP_FMT2(x) L##x
-        #define QSP_FMT(x) QSP_FMT2(x)
+        #ifdef _WIN32
+            typedef wchar_t QSP_CHAR;
+            #define QSP_FMT2(x) L##x
+            #define QSP_FMT(x) QSP_FMT2(x)
+        #else
+            typedef unsigned short QSP_CHAR;
+            #define QSP_FMT2(x) u##x
+            #define QSP_FMT(x) QSP_FMT2(x)
+        #endif
 
         #define QSP_ONIG_ENC ONIG_ENCODING_UTF16_LE
         #define QSP_TO_GAME_SB(a) (char)qspReverseConvertUC((a), qspCP1251ToUnicodeTable)

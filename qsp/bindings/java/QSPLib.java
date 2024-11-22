@@ -56,7 +56,7 @@ public abstract class QSPLib {
         SLEEP,
         GETMSCOUNT,
         INPUTBOX,
-        VERSION,
+        VERSION
     }
 
     public class ListItem
