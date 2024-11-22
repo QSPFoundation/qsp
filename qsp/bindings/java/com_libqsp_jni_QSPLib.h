@@ -129,10 +129,10 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_setSelActIndex
 
 /*
  * Class:     com_libqsp_jni_QSPLib
- * Method:    executeSelAction
+ * Method:    execSelAction
  * Signature: (Z)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_executeSelAction
+JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execSelAction
   (JNIEnv *, jobject, jboolean);
 
 /*

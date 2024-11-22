@@ -201,7 +201,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_setSelActIndex(JNIEnv *env
     return JNI_TRUE;
 }
 /* Execute the selected action */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_executeSelAction(JNIEnv *env, jobject api, jboolean toRefreshUI)
+JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execSelAction(JNIEnv *env, jobject api, jboolean toRefreshUI)
 {
     if (qspCurSelAction >= 0)
     {

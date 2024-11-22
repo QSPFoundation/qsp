@@ -100,12 +100,12 @@ public abstract class QSPLib {
     public native boolean isVarDescChanged();
     public native void setInputStrText(String value);
     public native ListItem[] getActions();
-    public native boolean setSelActIndex(int index, boolean refreshUI);
-    public native boolean executeSelAction(boolean refreshUI);
+    public native boolean setSelActIndex(int index, boolean toRefreshUI);
+    public native boolean execSelAction(boolean toRefreshUI);
     public native int getSelActIndex();
     public native boolean isActsChanged();
     public native ListItem[] getObjects();
-    public native boolean setSelObjIndex(int index, boolean refreshUI);
+    public native boolean setSelObjIndex(int index, boolean toRefreshUI);
     public native int getSelObjIndex();
     public native boolean isObjsChanged();
     public native void showWindow(int type, boolean toShow); /* Window.ordinal() */
@@ -117,18 +117,18 @@ public abstract class QSPLib {
     */
     public native long getNumVarValue(String name, int index);
     public native String getStrVarValue(String name, int index);
-    public native boolean execString(String code, boolean refreshUI);
-    public native String calculateStrExpr(String expression, boolean refreshUI);
-    public native long calculateNumExpr(String expression, boolean refreshUI);
-    public native boolean execLocationCode(String name, boolean refreshUI);
-    public native boolean execCounter(boolean refreshUI);
-    public native boolean execUserInput(boolean refreshUI);
+    public native boolean execString(String code, boolean toRefreshUI);
+    public native String calculateStrExpr(String expression, boolean toRefreshUI);
+    public native long calculateNumExpr(String expression, boolean toRefreshUI);
+    public native boolean execLocationCode(String name, boolean toRefreshUI);
+    public native boolean execCounter(boolean toRefreshUI);
+    public native boolean execUserInput(boolean toRefreshUI);
     public native ErrorInfo getLastErrorData();
     public native String getErrorDesc(int errorNum);
     public native boolean loadGameWorldFromData(byte[] data, boolean isNewGame);
-    public native byte[] saveGameAsData(boolean refreshUI);
-    public native boolean openSavedGameFromData(byte[] data, boolean refreshUI);
-    public native boolean restartGame(boolean refreshUI);
+    public native byte[] saveGameAsData(boolean toRefreshUI);
+    public native boolean openSavedGameFromData(byte[] data, boolean toRefreshUI);
+    public native boolean restartGame(boolean toRefreshUI);
 
     // Callbacks
     public void onDebug(String str) {}
