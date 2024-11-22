@@ -86,6 +86,9 @@ set(QSP_SOURCES
 	qsp/bindings/default/default_callbacks.c
 	qsp/bindings/default/default_control.c
 	qsp/bindings/default/qsp_default.h
+	qsp/bindings/java/java_callbacks.c
+	qsp/bindings/java/java_control.c
+	qsp/bindings/java/qsp_java.h
 	qsp/bindings/qsp.h
 	qsp/actions.c qsp/actions.h
 	qsp/callbacks.c qsp/callbacks.h
@@ -118,6 +121,13 @@ endif()
 target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
 target_link_options(qsp PRIVATE ${PROJECT_LINKER_FLAGS})
 target_link_libraries(qsp PRIVATE oniguruma::onig)
+
+if (BUILD_JAVA)
+	find_package(JNI)
+	target_compile_definitions(qsp PRIVATE _JAVA)
+	target_include_directories(qsp PRIVATE ${JNI_INCLUDE_DIRS})
+	target_link_libraries(qsp PRIVATE ${JNI_LIBRARIES})
+endif()
 
 target_include_directories(qsp
 	INTERFACE

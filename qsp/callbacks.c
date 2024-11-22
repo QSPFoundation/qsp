@@ -44,8 +44,7 @@ void qspPrepareCallback(QSPCallState *state, QSP_BOOL toDisableCodeExec, QSP_BOO
     qspIsInCallback = QSP_TRUE;
     qspToDisableCodeExec = toDisableCodeExec;
 
-    if (toRefreshUI && qspCallbacks[QSP_CALL_REFRESHINT])
-        qspCallbacks[QSP_CALL_REFRESHINT](QSP_TRUE);
+    if (toRefreshUI) qspCallRefreshInt(QSP_TRUE);
 }
 
 void qspFinalizeCallback(QSPCallState *state)
