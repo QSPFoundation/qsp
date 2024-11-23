@@ -194,7 +194,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_setSelActIndex(JNIEnv *env
         if (qspToDisableCodeExec) return JNI_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspCurSelAction = ind;
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONACTSEL")), 0, 0);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_ACTSELECTED), 0, 0);
         if (qspErrorNum) return JNI_FALSE;
         if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
@@ -247,7 +247,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_setSelObjIndex(JNIEnv *env
         if (qspToDisableCodeExec) return JNI_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspCurSelObject = ind;
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJSEL")), 0, 0);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJSELECTED), 0, 0);
         if (qspErrorNum) return JNI_FALSE;
         if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
@@ -410,7 +410,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execCounter(JNIEnv *env, j
     if (!qspIsInCallback)
     {
         qspPrepareExecution(QSP_FALSE);
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("COUNTER")), 0, 0);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_COUNTER), 0, 0);
         if (qspErrorNum) return JNI_FALSE;
         if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
@@ -421,7 +421,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execUserInput(JNIEnv *env,
 {
     if (qspToDisableCodeExec) return JNI_FALSE;
     qspPrepareExecution(QSP_FALSE);
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("USERCOM")), 0, 0);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_USERCOMMAND), 0, 0);
     if (qspErrorNum) return JNI_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return JNI_TRUE;

@@ -138,7 +138,7 @@ QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI)
         if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspCurSelAction = ind;
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONACTSEL")), 0, 0);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_ACTSELECTED), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
         if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
@@ -189,7 +189,7 @@ QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI)
         if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspCurSelObject = ind;
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJSEL")), 0, 0);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJSELECTED), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
         if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
@@ -381,7 +381,7 @@ QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI)
     if (!qspIsInCallback)
     {
         qspPrepareExecution(QSP_FALSE);
-        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("COUNTER")), 0, 0);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_COUNTER), 0, 0);
         if (qspErrorNum) return QSP_FALSE;
         if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     }
@@ -392,7 +392,7 @@ QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI)
 {
     if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("USERCOM")), 0, 0);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_USERCOMMAND), 0, 0);
     if (qspErrorNum) return QSP_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;

@@ -291,5 +291,5 @@ void qspNavigateToLocation(int locInd, QSP_BOOL toChangeDesc, QSPVariant *args, 
     }
     qspRestoreLastSavedVarsGroup();
     if (qspErrorNum) return;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONNEWLOC")), args, argsCount);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_NEWLOC), args, argsCount);
 }

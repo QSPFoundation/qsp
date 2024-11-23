@@ -67,7 +67,7 @@
     #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
 
     #define QSP_VER QSP_FMT(QSP_VER_STR)
-    #define QSP_LOCALE "russian"
+    #define QSP_LOCALE "C"
     #define QSP_STRCHAR QSP_FMT("$")
     #define QSP_TUPLECHAR QSP_FMT("%")
     #define QSP_LABEL QSP_FMT(":")
@@ -103,5 +103,15 @@
     #define QSP_MUL QSP_FMT("*")
     #define QSP_USERFUNC QSP_FMT("@")
     #define QSP_DELIMS QSP_FMT(" \t&'\"()[]=!<>+-/*:,{}")
+
+    #define QSP_LOC_COUNTER QSP_FMT("COUNTER")
+    #define QSP_LOC_USERCOMMAND QSP_FMT("USERCOM")
+    #define QSP_LOC_ACTSELECTED QSP_FMT("ONACTSEL")
+    #define QSP_LOC_OBJADDED QSP_FMT("ONOBJADD")
+    #define QSP_LOC_OBJDELETED QSP_FMT("ONOBJDEL")
+    #define QSP_LOC_OBJSELECTED QSP_FMT("ONOBJSEL")
+    #define QSP_LOC_NEWLOC QSP_FMT("ONNEWLOC")
+    #define QSP_LOC_GAMELOADED QSP_FMT("ONGLOAD")
+    #define QSP_LOC_GAMETOBESAVED QSP_FMT("ONGSAVE")
 
 #endif

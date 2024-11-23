@@ -289,7 +289,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     }
     /* Call ONGSAVE without local variables */
     oldLocationState = qspLocationState;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGSAVE")), 0, 0);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_GAMETOBESAVED), 0, 0);
     if (qspLocationState != oldLocationState)
     {
         qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
@@ -607,7 +607,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCallSetTimer(qspTimerInterval);
     qspRestoreCurrentIncludes();
     if (qspLocationState != oldLocationState) return QSP_TRUE; /* the state has been successfully updated */
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONGLOAD")), 0, 0);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_GAMELOADED), 0, 0);
     return QSP_TRUE;
 }
 

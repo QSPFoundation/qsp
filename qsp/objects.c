@@ -70,7 +70,7 @@ void qspClearAllObjectsWithNotify(void)
         for (i = 0; i < oldCount; ++i)
         {
             QSP_STR(v) = objs[i];
-            qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &v, 1);
+            qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJDELETED), &v, 1);
             if (qspLocationState != oldLocationState)
             {
                 qspFreeStrs(objs, oldCount);
@@ -97,7 +97,7 @@ INLINE void qspRemoveObject(int index)
         ++index;
     }
     qspIsObjsListChanged = QSP_TRUE;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJDEL")), &name, 1);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJDELETED), &name, 1);
     qspFreeString(&QSP_STR(name));
 }
 
@@ -191,7 +191,7 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     qspIsObjsListChanged = QSP_TRUE;
     /* Call ONOBJADD with object name & image */
     if (count > 2) count = 2;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_FMT("ONOBJADD")), args, count);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJADDED), args, count);
 }
 
 void qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
