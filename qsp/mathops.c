@@ -120,6 +120,7 @@ INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT
         }
     }
     qspAddBufText(&buf, opName);
+    if (buf.Len > qspOpMaxLen) qspOpMaxLen = buf.Len;
 
     itemInd = qspOpsNamesCounts[level]++;
     qspOpsNames[level][itemInd].Name = qspBufTextToString(buf);
@@ -128,27 +129,30 @@ INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT
 
 INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BOOL isFunc)
 {
-    int len;
     QSPString name = qspStringFromC(opName);
     /* Add base name */
     qspAddSingleOpName(opCode, name, QSP_TYPE_UNDEF, level);
     if (isFunc)
     {
-        if (QSP_ISDEF(qspOps[opCode].ResType))
+        QSP_TINYINT type = qspOps[opCode].ResType;
+        if (QSP_ISDEF(type))
         {
-            /* Add type-specific name */
-            qspAddSingleOpName(opCode, name, qspOps[opCode].ResType, level);
+            /* Add type-specific name ignoring numeric type */
+            switch (QSP_BASETYPE(type))
+            {
+            case QSP_TYPE_TUPLE:
+            case QSP_TYPE_STR:
+                qspAddSingleOpName(opCode, name, type, level);
+                break;
+            }
         }
         else
         {
-            /* Add all possible type-specific names */
+            /* Add all possible type-specific names ignoring numeric type */
             qspAddSingleOpName(opCode, name, QSP_TYPE_TUPLE, level);
             qspAddSingleOpName(opCode, name, QSP_TYPE_STR, level);
         }
     }
-    /* Max length */
-    len = qspStrLen(name);
-    if (len > qspOpMaxLen) qspOpMaxLen = len;
 }
 
 INLINE int qspMathOpsCompare(const void *opName1, const void *opName2)
@@ -360,6 +364,7 @@ void qspTerminateMath(void)
 
 INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName)
 {
+    /* All functions are in one group because we compare full names */
     QSPMathOpName *name = (QSPMathOpName *)bsearch(
         &funName,
         qspOpsNames[QSP_OPSLEVELS - 1],
