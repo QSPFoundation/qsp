@@ -52,9 +52,9 @@ void qspSetCallback(int type, QSP_CALLBACK func)
 void qspCallDebug(QSPString str)
 {
     /* Jump into the debugger */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_DEBUG])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniStr = qspToJavaString(javaEnv, str);
 
@@ -71,9 +71,9 @@ void qspCallDebug(QSPString str)
 void qspCallSetTimer(int msecs)
 {
     /* Set timer interval */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_SETTIMER])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
 
         qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
@@ -85,9 +85,9 @@ void qspCallSetTimer(int msecs)
 void qspCallRefreshInt(QSP_BOOL isForced)
 {
     /* Refresh UI to show the latest state */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_REFRESHINT])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
 
         qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
@@ -99,9 +99,9 @@ void qspCallRefreshInt(QSP_BOOL isForced)
 void qspCallSetInputStrText(QSPString text)
 {
     /* Set value of the text input control */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_SETINPUTSTRTEXT])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniText = qspToJavaString(javaEnv, text);
 
@@ -117,9 +117,9 @@ void qspCallSetInputStrText(QSPString text)
 void qspCallSystem(QSPString cmd)
 {
     /* Execute system call */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_SYSTEM])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniCmd = qspToJavaString(javaEnv, cmd);
 
@@ -135,9 +135,9 @@ void qspCallSystem(QSPString cmd)
 void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
 {
     /* Open game file */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_OPENGAME])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniFile = qspToJavaString(javaEnv, file);
 
@@ -153,9 +153,9 @@ void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
 void qspCallOpenGameStatus(QSPString file)
 {
     /* Open game state (showing the dialog to choose a file) */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_OPENGAMESTATUS])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniFile = qspToJavaString(javaEnv, file);
 
@@ -171,9 +171,9 @@ void qspCallOpenGameStatus(QSPString file)
 void qspCallSaveGameStatus(QSPString file)
 {
     /* Save game state (showing the dialog to choose a file) */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_SAVEGAMESTATUS])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniFile = qspToJavaString(javaEnv, file);
 
@@ -189,9 +189,9 @@ void qspCallSaveGameStatus(QSPString file)
 void qspCallShowMessage(QSPString text)
 {
     /* Show a message */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_SHOWMSGSTR])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniText = qspToJavaString(javaEnv, text);
 
@@ -207,9 +207,9 @@ void qspCallShowMessage(QSPString text)
 int qspCallShowMenu(QSPListItem *items, int count)
 {
     /* Show a menu */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_SHOWMENU])
     {
+        QSPCallState state;
         int i, index;
         JNIListItem *jniItems;
         jobjectArray jniMenuArray;
@@ -244,9 +244,9 @@ int qspCallShowMenu(QSPListItem *items, int count)
 void qspCallShowPicture(QSPString file)
 {
     /* Show an image */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_SHOWIMAGE])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniFile = qspToJavaString(javaEnv, file);
 
@@ -262,9 +262,9 @@ void qspCallShowPicture(QSPString file)
 void qspCallShowWindow(int type, QSP_BOOL toShow)
 {
     /* Show (hide) a region of the UI */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_SHOWWINDOW])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
 
         qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
@@ -276,9 +276,9 @@ void qspCallShowWindow(int type, QSP_BOOL toShow)
 void qspCallPlayFile(QSPString file, int volume)
 {
     /* Start playing a music file */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_PLAYFILE])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniFile = qspToJavaString(javaEnv, file);
 
@@ -294,9 +294,9 @@ void qspCallPlayFile(QSPString file, int volume)
 QSP_BOOL qspCallIsPlayingFile(QSPString file)
 {
     /* Check whether a file is still playing */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_ISPLAYINGFILE])
     {
+        QSPCallState state;
         QSP_BOOL isPlaying;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniFile = qspToJavaString(javaEnv, file);
@@ -315,9 +315,9 @@ QSP_BOOL qspCallIsPlayingFile(QSPString file)
 void qspCallCloseFile(QSPString file)
 {
     /* Stop playing a file */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_CLOSEFILE])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniFile = qspToJavaString(javaEnv, file);
 
@@ -333,9 +333,9 @@ void qspCallCloseFile(QSPString file)
 void qspCallSleep(int msecs)
 {
     /* Wait for the specified number of milliseconds */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_SLEEP])
     {
+        QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
 
         qspPrepareCallback(&state, QSP_TRUE, QSP_TRUE);
@@ -347,9 +347,9 @@ void qspCallSleep(int msecs)
 int qspCallGetMSCount(void)
 {
     /* Get the number of milliseconds since the last call of this function */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_GETMSCOUNT])
     {
+        QSPCallState state;
         int count;
         JNIEnv *javaEnv = qspGetJniEnv();
 
@@ -364,9 +364,9 @@ int qspCallGetMSCount(void)
 QSPString qspCallInputBox(QSPString text)
 {
     /* Get input from the user */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_INPUTBOX])
     {
+        QSPCallState state;
         QSPString res;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniRes, jniText = qspToJavaString(javaEnv, text);
@@ -388,9 +388,9 @@ QSPString qspCallInputBox(QSPString text)
 QSPString qspCallVersion(QSPString param)
 {
     /* Get info from the player */
-    QSPCallState state;
     if (qspCallbacks[QSP_CALL_VERSION])
     {
+        QSPCallState state;
         QSPString res;
         JNIEnv *javaEnv = qspGetJniEnv();
         jstring jniRes, jniParam = qspToJavaString(javaEnv, param);
