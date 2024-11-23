@@ -361,6 +361,7 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_calculateStrExpr(JNIEnv *en
     if (qspToDisableCodeExec) return qspToJavaString(env, qspNullString);
     qspPrepareExecution(QSP_FALSE);
     codeStr = qspFromJavaString(env, s);
+    qspPrepareStringToExecution(&codeStr);
     value = qspCalculateExprValue(codeStr);
     qspFreeString(&codeStr);
     if (qspErrorNum) return qspToJavaString(env, qspNullString);
@@ -379,6 +380,7 @@ JNIEXPORT jlong JNICALL Java_com_libqsp_jni_QSPLib_calculateNumExpr(JNIEnv *env,
     if (qspToDisableCodeExec) return 0;
     qspPrepareExecution(QSP_FALSE);
     codeStr = qspFromJavaString(env, s);
+    qspPrepareStringToExecution(&codeStr);
     value = qspCalculateExprValue(codeStr);
     qspFreeString(&codeStr);
     if (qspErrorNum) return 0;

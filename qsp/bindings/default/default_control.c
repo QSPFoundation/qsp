@@ -337,6 +337,7 @@ QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_
     QSPVariant value;
     if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
+    qspPrepareStringToExecution(&s);
     value = qspCalculateExprValue(s);
     if (qspErrorNum) return QSP_FALSE;
     qspConvertVariantTo(&value, QSP_TYPE_STR);
@@ -354,6 +355,7 @@ QSP_BOOL QSPCalculateNumExpression(QSPString s, QSP_BIGINT *res, QSP_BOOL toRefr
     QSPVariant value;
     if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
+    qspPrepareStringToExecution(&s);
     value = qspCalculateExprValue(s);
     if (qspErrorNum) return QSP_FALSE;
     if (!qspConvertVariantTo(&value, QSP_TYPE_NUM))
