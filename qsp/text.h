@@ -252,8 +252,11 @@
     INLINE QSP_CHAR *qspStrChar(QSPString str, QSP_CHAR ch)
     {
         QSP_CHAR *pos = str.Str;
-        while (pos < str.End && *pos != ch) ++pos;
-        if (*pos == ch) return pos;
+        while (pos < str.End)
+        {
+            if (*pos == ch) return pos;
+            ++pos;
+        }
         return 0;
     }
 

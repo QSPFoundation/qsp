@@ -127,26 +127,26 @@ void qspPlayPLFiles(void)
 void qspRefreshPlayList(void)
 {
     QSP_CHAR *pos;
-    QSPString *s, curFile;
+    QSPString *files, curFile;
     int count = qspPLFilesCount;
     if (!count) return;
-    qspCopyStrs(&s, qspPLFiles, 0, count);
+    qspCopyStrs(&files, qspPLFiles, 0, count);
     qspClearPlayList(QSP_FALSE);
     while (--count >= 0)
     {
-        pos = qspStrChar(s[count], QSP_PLVOLUMEDELIM[0]);
+        pos = qspStrChar(files[count], QSP_PLVOLUMEDELIM[0]);
         if (pos)
-            curFile = qspStringFromPair(s[count].Str, pos);
+            curFile = qspStringFromPair(files[count].Str, pos);
         else
-            curFile = s[count];
+            curFile = files[count];
         if (qspIsAnyString(curFile) && qspSearchPlayList(curFile) < 0)
         {
             if (qspCallIsPlayingFile(curFile))
-                qspPLFiles[qspPLFilesCount++] = qspCopyToNewText(s[count]);
+                qspPLFiles[qspPLFilesCount++] = qspCopyToNewText(files[count]);
         }
-        qspFreeString(s + count);
+        qspFreeString(files + count);
     }
-    free(s);
+    free(files);
 }
 
 void qspStatementPlayFile(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))

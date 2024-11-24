@@ -50,6 +50,7 @@ INLINE void qspSortArray(QSPVar *var, QSP_TINYINT baseValType, QSP_BOOL isAscend
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames);
 INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, QSP_CHAR op);
 INLINE QSPString qspGetVarNameOnly(QSPString s);
+INLINE QSP_BOOL qspSaveVarToLocalGroup(QSPVarsGroup *varGroup, QSPString varName);
 
 void qspInitVarTypes(void)
 {
@@ -1041,13 +1042,53 @@ INLINE QSPString qspGetVarNameOnly(QSPString s)
     return s;
 }
 
+INLINE QSP_BOOL qspSaveVarToLocalGroup(QSPVarsGroup *varGroup, QSPString varName)
+{
+    QSPVar *var;
+    int i, varsCount;
+    QSPString plainVarName;
+    if (qspIsEmpty(varName))
+    {
+        qspSetError(QSP_ERR_INCORRECTNAME);
+        return QSP_FALSE;
+    }
+
+    /* Ignore type prefix */
+    plainVarName = varName;
+    if (qspIsInClass(*plainVarName.Str, QSP_CHAR_TYPEPREFIX))
+        plainVarName.Str++;
+
+    varsCount = varGroup->VarsCount;
+    /* Check if the var exists, variable names are preformatted during code preprocessing */
+    for (i = 0; i < varsCount; ++i)
+    {
+        if (!qspStrsComp(plainVarName, varGroup->Vars[i].Name))
+        {
+            /* Already exists, so the value is saved already */
+            return QSP_TRUE;
+        }
+    }
+    /* Get variable to add it to the local group */
+    var = qspVarReference(varName, QSP_FALSE); /* use initial name */
+    if (!var) return QSP_FALSE;
+    if (varsCount >= varGroup->Capacity)
+    {
+        varGroup->Capacity += 4;
+        varGroup->Vars = (QSPVar *)realloc(varGroup->Vars, varGroup->Capacity * sizeof(QSPVar));
+    }
+    /* Save & reset the variable */
+    qspMoveVar(varGroup->Vars + varsCount, var);
+    varGroup->Vars[varsCount].Name = qspCopyToNewText(plainVarName);
+    varGroup->VarsCount = varsCount + 1;
+    return QSP_TRUE;
+}
+
 void qspStatementLocal(QSPString s, QSPCachedStat *stat)
 {
-    QSP_BOOL isVarFound;
-    QSPString *names, varName, plainVarName;
-    QSPVarsGroup *curVarGroup;
     QSPVariant v;
-    int i, j, namesCount, groupInd, varsCount;
+    QSPString *names, varName;
+    QSPVarsGroup *curVarGroup;
+    int i, namesCount, groupInd;
     if (stat->ErrorCode)
     {
         qspSetError(stat->ErrorCode);
@@ -1075,58 +1116,14 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     }
     groupInd = qspSavedVarGroupsCount - 1;
     curVarGroup = qspSavedVarGroups + groupInd;
-    varsCount = curVarGroup->VarsCount;
-    isVarFound = QSP_FALSE;
     for (i = 0; i < namesCount; ++i)
     {
-        varName = names[i];
-        if (qspIsEmpty(varName))
+        varName = qspGetVarNameOnly(names[i]);
+        if (!qspSaveVarToLocalGroup(curVarGroup, varName))
         {
-            qspSetError(QSP_ERR_SYNTAX);
             qspFreeVariant(&v);
             free(names);
             return;
-        }
-
-        plainVarName = varName = qspGetVarNameOnly(varName);
-
-        /* Ignore type prefix */
-        if (qspIsInClass(*plainVarName.Str, QSP_CHAR_TYPEPREFIX))
-            plainVarName.Str++;
-
-        /* Check if the var exists, variable names are preformatted during code preprocessing */
-        for (j = 0; j < varsCount; ++j)
-        {
-            if (!qspStrsComp(plainVarName, curVarGroup->Vars[j].Name))
-            {
-                isVarFound = QSP_TRUE;
-                break;
-            }
-        }
-        if (isVarFound)
-        {
-            /* Already exists, so the previous value is saved already */
-            isVarFound = QSP_FALSE;
-        }
-        else
-        {
-            /* Get variable to add it to the local group */
-            QSPVar *var = qspVarReference(varName, QSP_FALSE);
-            if (!var)
-            {
-                qspFreeVariant(&v);
-                free(names);
-                return;
-            }
-            if (varsCount >= curVarGroup->Capacity)
-            {
-                curVarGroup->Capacity += 4;
-                curVarGroup->Vars = (QSPVar *)realloc(curVarGroup->Vars, curVarGroup->Capacity * sizeof(QSPVar));
-            }
-            /* Save & reset the variable */
-            qspMoveVar(curVarGroup->Vars + varsCount, var);
-            curVarGroup->Vars[varsCount].Name = qspCopyToNewText(plainVarName);
-            curVarGroup->VarsCount = ++varsCount;
         }
     }
     if (stat->ArgsCount > 1)
