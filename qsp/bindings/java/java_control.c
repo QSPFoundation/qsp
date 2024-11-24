@@ -104,7 +104,7 @@ JNIEXPORT jobject JNICALL Java_com_libqsp_jni_QSPLib_getCurrentState(JNIEnv *env
     QSPString locName;
     jobject jniExecutionState = (*env)->AllocObject(env, qspExecutionStateClass);
 
-    locName = (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount ? qspLocs[qspRealCurLoc].Name : qspNullString);
+    locName = ((qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount) ? qspLocs[qspRealCurLoc].Name : qspNullString);
 
     fieldId = (*env)->GetFieldID(env, qspExecutionStateClass , "loc", "Ljava/lang/String;");
     (*env)->SetObjectField(env, jniExecutionState, fieldId, qspToJavaString(env, locName));

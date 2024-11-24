@@ -45,7 +45,7 @@ INLINE void qspSetFirstVarValue(QSPString varName, QSPVariant *val);
 INLINE void qspSetVarValue(QSPString varName, QSPVariant *val, QSP_CHAR op);
 INLINE void qspClearSavedVars();
 INLINE void qspUnpackTupleToArray(QSPVar *dest, QSPTuple src, int start, int count);
-INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count);
+INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count);
 INLINE void qspSortArray(QSPVar *var, QSP_TINYINT baseValType, QSP_BOOL isAscending);
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames);
 INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, QSP_CHAR op);
@@ -665,7 +665,7 @@ INLINE void qspUnpackTupleToArray(QSPVar *dest, QSPTuple src, int start, int cou
         qspCopyToNewVariant(dest->Values + i, src.Vals + start + i);
 }
 
-INLINE void qspCopyVar(QSPVar *dest, QSPVar *src, int start, int count)
+INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count)
 {
     int i, itemsToCopy, newInd;
     /* Clear the dest array anyway */
@@ -1168,7 +1168,7 @@ void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
     {
         int startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
         int maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->ValsCount);
-        qspCopyVar(dest, src, startInd, maxCount);
+        qspCopyArray(dest, src, startInd, maxCount);
     }
 }
 

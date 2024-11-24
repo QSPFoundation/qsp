@@ -61,7 +61,7 @@ void QSPEnableDebugMode(QSP_BOOL isDebug)
 /* Get current execution state */
 void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum)
 {
-    *loc = (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount ? qspLocs[qspRealCurLoc].Name : qspNullString);
+    *loc = ((qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount) ? qspLocs[qspRealCurLoc].Name : qspNullString);
     *actIndex = qspRealActIndex;
     *lineNum = qspRealLineNum;
 }

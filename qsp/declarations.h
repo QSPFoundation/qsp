@@ -68,6 +68,7 @@
 
     #define QSP_VER QSP_FMT(QSP_VER_STR)
     #define QSP_LOCALE "C"
+    #define QSP_NUMCHAR QSP_FMT("#")
     #define QSP_STRCHAR QSP_FMT("$")
     #define QSP_TUPLECHAR QSP_FMT("%")
     #define QSP_LABEL QSP_FMT(":")

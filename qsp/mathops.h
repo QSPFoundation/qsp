@@ -96,6 +96,7 @@
         qspOpRand,
         qspOpRnd,
         qspOpArrSize,
+        qspOpArrType,
         qspOpArrItem,
         qspOpLastArrItem,
         qspOpArrPack,
