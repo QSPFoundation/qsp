@@ -1163,18 +1163,18 @@ INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPV
 {
     switch (QSP_BASETYPE(args[0].Type))
     {
-        case QSP_TYPE_TUPLE:
-            QSP_PNUM(res) = QSP_TUPLE(args[0]).Items;
-            break;
-        case QSP_TYPE_NUM:
+    case QSP_TYPE_TUPLE:
+        QSP_PNUM(res) = QSP_TUPLE(args[0]).Items;
+        break;
+    case QSP_TYPE_NUM:
         {
             QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
             QSP_PNUM(res) = qspStrLen(qspNumToStr(buf, QSP_NUM(args[0])));
             break;
         }
-        case QSP_TYPE_STR:
-            QSP_PNUM(res) = qspStrLen(QSP_STR(args[0]));
-            break;
+    case QSP_TYPE_STR:
+        QSP_PNUM(res) = qspStrLen(QSP_STR(args[0]));
+        break;
     }
 }
 
@@ -1182,15 +1182,15 @@ INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QS
 {
     switch (QSP_BASETYPE(args[0].Type))
     {
-        case QSP_TYPE_TUPLE:
-            QSP_PNUM(res) = QSP_TOBOOL(qspIsTupleNumber(QSP_TUPLE(args[0])));
-            break;
-        case QSP_TYPE_NUM:
-            QSP_PNUM(res) = QSP_TOBOOL(QSP_TRUE);
-            break;
-        case QSP_TYPE_STR:
-            QSP_PNUM(res) = QSP_TOBOOL(qspIsStrNumber(QSP_STR(args[0])));
-            break;
+    case QSP_TYPE_TUPLE:
+        QSP_PNUM(res) = QSP_TOBOOL(qspIsTupleNumber(QSP_TUPLE(args[0])));
+        break;
+    case QSP_TYPE_NUM:
+        QSP_PNUM(res) = QSP_TOBOOL(QSP_TRUE);
+        break;
+    case QSP_TYPE_STR:
+        QSP_PNUM(res) = QSP_TOBOOL(qspIsStrNumber(QSP_STR(args[0])));
+        break;
     }
 }
 
