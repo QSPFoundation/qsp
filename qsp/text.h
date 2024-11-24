@@ -32,7 +32,8 @@
         QSP_CHAR_DIGIT = 1 << 2, /* digits */
         QSP_CHAR_DELIM = 1 << 3, /* delimiters */
         QSP_CHAR_SIMPLEOP = 1 << 4, /* simple math operations */
-        QSP_CHAR_EXPSTART = 1 << 5 /* beginning of an expression */
+        QSP_CHAR_EXPSTART = 1 << 5, /* beginning of an expression */
+        QSP_CHAR_TYPEPREFIX = 1 << 6 /* type prefix */
     };
 
     typedef struct

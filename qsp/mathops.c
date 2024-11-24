@@ -115,6 +115,9 @@ INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT
         case QSP_TYPE_TUPLE:
             qspAddBufText(&buf, QSP_STATIC_STR(QSP_TUPLECHAR));
             break;
+        case QSP_TYPE_NUM:
+            qspAddBufText(&buf, QSP_STATIC_STR(QSP_NUMCHAR));
+            break;
         case QSP_TYPE_STR:
             qspAddBufText(&buf, QSP_STATIC_STR(QSP_STRCHAR));
             break;
@@ -131,26 +134,21 @@ INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT
 INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BOOL isFunc)
 {
     QSPString name = qspStringFromC(opName);
-    /* Add base name */
+    /* Add the base name */
     qspAddSingleOpName(opCode, name, QSP_TYPE_UNDEF, level);
     if (isFunc)
     {
         QSP_TINYINT type = qspOps[opCode].ResType;
         if (QSP_ISDEF(type))
         {
-            /* Add type-specific name ignoring numeric type */
-            switch (QSP_BASETYPE(type))
-            {
-            case QSP_TYPE_TUPLE:
-            case QSP_TYPE_STR:
-                qspAddSingleOpName(opCode, name, type, level);
-                break;
-            }
+            /* Add type-specific name */
+            qspAddSingleOpName(opCode, name, type, level);
         }
         else
         {
-            /* Add all possible type-specific names ignoring numeric type */
+            /* Add all possible type-specific names */
             qspAddSingleOpName(opCode, name, QSP_TYPE_TUPLE, level);
+            qspAddSingleOpName(opCode, name, QSP_TYPE_NUM, level);
             qspAddSingleOpName(opCode, name, QSP_TYPE_STR, level);
         }
     }

@@ -57,6 +57,7 @@ void qspInitVarTypes(void)
     for (i = 0; i < sizeof(qspSpecToBaseTypeTable); ++i)
         qspSpecToBaseTypeTable[i] = QSP_TYPE_NUM;
 
+    qspSpecToBaseTypeTable[QSP_NUMCHAR[0]] = QSP_TYPE_NUM;
     qspSpecToBaseTypeTable[QSP_STRCHAR[0]] = QSP_TYPE_STR;
     qspSpecToBaseTypeTable[QSP_TUPLECHAR[0]] = QSP_TYPE_TUPLE;
 }
@@ -101,11 +102,9 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
         return 0;
     }
 
-    /* Ignore type specification */
-    if (*name.Str == QSP_STRCHAR[0])
-        name.Str += QSP_STATIC_LEN(QSP_STRCHAR);
-    else if (*name.Str == QSP_TUPLECHAR[0])
-        name.Str += QSP_STATIC_LEN(QSP_TUPLECHAR);
+    /* Ignore type prefix */
+    if (qspIsInClass(*name.Str, QSP_CHAR_TYPEPREFIX))
+        name.Str++;
 
     if (qspIsEmpty(name) || qspIsInClass(*name.Str, QSP_CHAR_DIGIT) || qspIsAnyInClass(name, QSP_CHAR_DELIM))
     {
@@ -1089,11 +1088,9 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             return;
         }
 
-        /* Ignore type specification */
-        if (*varName.Str == QSP_STRCHAR[0])
-            varName.Str += QSP_STATIC_LEN(QSP_STRCHAR);
-        else if (*varName.Str == QSP_TUPLECHAR[0])
-            varName.Str += QSP_STATIC_LEN(QSP_TUPLECHAR);
+        /* Ignore type prefix */
+        if (qspIsInClass(*varName.Str, QSP_CHAR_TYPEPREFIX))
+            varName.Str++;
 
         varName = qspGetVarNameOnly(varName);
         /* Check if the var exists, variable names are preformatted during code preprocessing */

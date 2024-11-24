@@ -44,6 +44,7 @@ void qspInitSymbolClasses(void)
     qspFillSymbolClass(QSP_CHAR_DELIM, QSP_DELIMS);
     qspFillSymbolClass(QSP_CHAR_SIMPLEOP, QSP_ADD QSP_SUB QSP_DIV QSP_MUL);
     qspFillSymbolClass(QSP_CHAR_EXPSTART, QSP_LQUOT QSP_LRBRACK QSP_LSBRACK);
+    qspFillSymbolClass(QSP_CHAR_TYPEPREFIX, QSP_TUPLECHAR QSP_NUMCHAR QSP_STRCHAR);
 }
 
 QSP_CHAR *qspStringToC(QSPString s)
