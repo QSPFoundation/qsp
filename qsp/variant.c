@@ -397,11 +397,11 @@ void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val)
             break;
         }
     case QSP_TYPE_NUM:
-        qspAddBufText(res, QSP_STATIC_STR(QSP_IND_NUMID)); /* type id */
+        qspAddBufText(res, QSP_STATIC_STR(QSP_NUMCHAR)); /* type id */
         qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(val)));
         break;
     case QSP_TYPE_STR:
-        qspAddBufText(res, QSP_STATIC_STR(QSP_IND_STRID)); /* type id */
+        qspAddBufText(res, QSP_STATIC_STR(QSP_STRCHAR)); /* type id */
         qspAddBufText(res, QSP_PSTR(val));
         break;
     }

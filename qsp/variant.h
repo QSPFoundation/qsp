@@ -22,8 +22,6 @@
 #ifndef QSP_VARIANTDEFINES
     #define QSP_VARIANTDEFINES
 
-    #define QSP_IND_STRID QSP_FMT("$")
-    #define QSP_IND_NUMID QSP_FMT("#")
     #define QSP_IND_DELIM QSP_FMT("\0")
 
     /* External functions */
