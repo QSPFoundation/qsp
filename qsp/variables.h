@@ -50,16 +50,11 @@
     {
         QSPVar *Vars;
         int VarsCount;
+        int Capacity;
     } QSPVarsGroup;
 
-    typedef struct {
-        QSPVar *Vars;
-        int VarsCount;
-        int Capacity;
-    } QSPVarsBucket;
-
     extern QSPVar qspNullVar;
-    extern QSPVarsBucket qspVars[QSP_VARSBUCKETS];
+    extern QSPVarsGroup qspVars[QSP_VARSBUCKETS];
     extern QSPVarsGroup *qspSavedVarGroups;
     extern int qspSavedVarGroupsCount;
     extern int qspSavedVarGroupsBufSize;
@@ -162,7 +157,7 @@
             qspSavedVarGroups = (QSPVarsGroup *)realloc(qspSavedVarGroups, qspSavedVarGroupsBufSize * sizeof(QSPVarsGroup));
         }
         qspSavedVarGroups[ind].Vars = 0;
-        qspSavedVarGroups[ind].VarsCount = 0;
+        qspSavedVarGroups[ind].Capacity = qspSavedVarGroups[ind].VarsCount = 0;
         return ind;
     }
 
@@ -176,7 +171,7 @@
         varsList[1].Name = qspCopyToNewText(varRes->Name);
         qspMoveVar(&varsList[1], varRes);
         qspSavedVarGroups[groupInd].Vars = varsList;
-        qspSavedVarGroups[groupInd].VarsCount = 2;
+        qspSavedVarGroups[groupInd].Capacity = qspSavedVarGroups[groupInd].VarsCount = 2;
         return groupInd;
     }
 

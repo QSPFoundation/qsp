@@ -276,9 +276,8 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     void *gameData;
     QSPString locName;
     QSPBufString bufString;
-    QSPVarsBucket *bucket;
     QSPVar *var;
-    QSPVarsGroup *savedVarGroups;
+    QSPVarsGroup *bucket, *savedVarGroups;
     int i, j, k, dataSize, savedVarGroupsCount, oldLocationState;
     /* Restore global variables */
     savedVarGroupsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVarGroups);
@@ -491,7 +490,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
 QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
 {
     QSPVar *var;
-    QSPVarsBucket *bucket;
+    QSPVarsGroup *bucket;
     QSPString *strs, locName, gameString;
     int i, j, k, ind, count, varsCount, valsCount, oldLocationState;
     QSP_BOOL isUCS = (dataSize >= 2 && *((char *)data + 1) == 0);

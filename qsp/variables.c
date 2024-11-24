@@ -24,7 +24,7 @@
 #include "regexp.h"
 
 QSPVar qspNullVar;
-QSPVarsBucket qspVars[QSP_VARSBUCKETS];
+QSPVarsGroup qspVars[QSP_VARSBUCKETS];
 QSPVarsGroup *qspSavedVarGroups = 0;
 int qspSavedVarGroupsCount = 0;
 int qspSavedVarGroupsBufSize = 0;
@@ -92,7 +92,7 @@ INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2)
 QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
 {
     int i, varsCount;
-    QSPVarsBucket *bucket;
+    QSPVarsGroup *bucket;
     QSPVar *var;
     QSP_CHAR *pos;
     unsigned int bCode;
@@ -150,7 +150,7 @@ void qspClearAllVars(QSP_BOOL toInit)
 {
     int i, j;
     QSPVar *var;
-    QSPVarsBucket *bucket = qspVars;
+    QSPVarsGroup *bucket = qspVars;
     for (i = 0; i < QSP_VARSBUCKETS; ++i)
     {
         if (!toInit && bucket->Vars)
@@ -517,7 +517,7 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
         if (curSavedVarGroup->Vars)
         {
             curVarGroup->Vars = (QSPVar *)malloc(curSavedVarGroup->VarsCount * sizeof(QSPVar));
-            curVarGroup->VarsCount = curSavedVarGroup->VarsCount;
+            curVarGroup->Capacity = curVarGroup->VarsCount = curSavedVarGroup->VarsCount;
             for (j = 0; j < curSavedVarGroup->VarsCount; ++j)
             {
                 if (!(var = qspVarReference(curSavedVarGroup->Vars[j].Name, QSP_TRUE)))
@@ -539,7 +539,7 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
         else
         {
             curVarGroup->Vars = 0;
-            curVarGroup->VarsCount = 0;
+            curVarGroup->Capacity = curVarGroup->VarsCount = 0;
         }
     }
     *savedVarGroups = varGroups;
@@ -548,7 +548,7 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
 
 void qspClearSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
 {
-    /* Restore saved vars */
+    /* Clear saved vars */
     if (varGroups)
     {
         int i;
@@ -576,7 +576,7 @@ void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
             if (curVarGroup->Vars)
             {
                 curSavedVarGroup->Vars = (QSPVar *)malloc(curVarGroup->VarsCount * sizeof(QSPVar));
-                curSavedVarGroup->VarsCount = curVarGroup->VarsCount;
+                curSavedVarGroup->Capacity = curSavedVarGroup->VarsCount = curVarGroup->VarsCount;
                 for (j = 0; j < curVarGroup->VarsCount; ++j)
                 {
                     if (!(var = qspVarReference(curVarGroup->Vars[j].Name, QSP_TRUE)))
@@ -597,7 +597,7 @@ void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
             else
             {
                 curSavedVarGroup->Vars = 0;
-                curSavedVarGroup->VarsCount = 0;
+                curSavedVarGroup->Capacity = curSavedVarGroup->VarsCount = 0;
             }
             ++qspSavedVarGroupsCount; /* add this group if everything goes well */
         }
@@ -1044,10 +1044,10 @@ INLINE QSPString qspGetVarNameOnly(QSPString s)
 void qspStatementLocal(QSPString s, QSPCachedStat *stat)
 {
     QSP_BOOL isVarFound;
-    QSPString *names, varName;
+    QSPString *names, varName, plainVarName;
     QSPVarsGroup *curVarGroup;
     QSPVariant v;
-    int i, j, namesCount, groupInd, varsCount, bufSize;
+    int i, j, namesCount, groupInd, varsCount;
     if (stat->ErrorCode)
     {
         qspSetError(stat->ErrorCode);
@@ -1075,7 +1075,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     }
     groupInd = qspSavedVarGroupsCount - 1;
     curVarGroup = qspSavedVarGroups + groupInd;
-    varsCount = bufSize = curVarGroup->VarsCount;
+    varsCount = curVarGroup->VarsCount;
     isVarFound = QSP_FALSE;
     for (i = 0; i < namesCount; ++i)
     {
@@ -1088,15 +1088,16 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
             return;
         }
 
-        /* Ignore type prefix */
-        if (qspIsInClass(*varName.Str, QSP_CHAR_TYPEPREFIX))
-            varName.Str++;
+        plainVarName = varName = qspGetVarNameOnly(varName);
 
-        varName = qspGetVarNameOnly(varName);
+        /* Ignore type prefix */
+        if (qspIsInClass(*plainVarName.Str, QSP_CHAR_TYPEPREFIX))
+            plainVarName.Str++;
+
         /* Check if the var exists, variable names are preformatted during code preprocessing */
         for (j = 0; j < varsCount; ++j)
         {
-            if (!qspStrsComp(varName, curVarGroup->Vars[j].Name))
+            if (!qspStrsComp(plainVarName, curVarGroup->Vars[j].Name))
             {
                 isVarFound = QSP_TRUE;
                 break;
@@ -1117,14 +1118,14 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
                 free(names);
                 return;
             }
-            if (varsCount >= bufSize)
+            if (varsCount >= curVarGroup->Capacity)
             {
-                bufSize = varsCount + 4;
-                curVarGroup->Vars = (QSPVar *)realloc(curVarGroup->Vars, bufSize * sizeof(QSPVar));
+                curVarGroup->Capacity += 4;
+                curVarGroup->Vars = (QSPVar *)realloc(curVarGroup->Vars, curVarGroup->Capacity * sizeof(QSPVar));
             }
             /* Save & reset the variable */
             qspMoveVar(curVarGroup->Vars + varsCount, var);
-            curVarGroup->Vars[varsCount].Name = qspCopyToNewText(varName);
+            curVarGroup->Vars[varsCount].Name = qspCopyToNewText(plainVarName);
             curVarGroup->VarsCount = ++varsCount;
         }
     }

@@ -111,7 +111,6 @@ void qspMemClear(QSP_BOOL toInit)
     qspClearAllRegExps(toInit);
     if (!toInit)
     {
-        int i;
         if (qspCurDesc.Len > 0)
         {
             qspFreeBufString(&qspCurDesc);
@@ -126,9 +125,13 @@ void qspMemClear(QSP_BOOL toInit)
         qspFreeString(&qspCurInput);
         qspFreeString(&qspViewPath);
 
-        for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
-            qspClearVars(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
-        if (qspSavedVarGroups) free(qspSavedVarGroups);
+        if (qspSavedVarGroups)
+        {
+            int i;
+            for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
+                qspClearVars(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
+            free(qspSavedVarGroups);
+        }
     }
     qspCurDesc = qspNewBufString(512);
     qspCurVars = qspNewBufString(512);
