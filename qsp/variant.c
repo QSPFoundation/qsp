@@ -144,6 +144,7 @@ QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
 
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
 {
+    /* NB: val->Type can be QSP_TYPE_UNDEF */
     if (val->Type != type && qspTypeConversionTable[val->Type][type])
     {
         QSP_TINYINT toBaseType = QSP_BASETYPE(type);
