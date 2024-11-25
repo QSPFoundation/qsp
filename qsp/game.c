@@ -565,7 +565,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
             {
                 var->Name = qspDecodeString(strs[ind++], isUCS);
                 valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
-                var->ValsBufSize = var->ValsCount = valsCount;
+                var->ValsCapacity = var->ValsCount = valsCount;
                 var->Values = 0;
                 if (valsCount)
                 {
@@ -574,7 +574,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
                         qspReadEncodedVariant(strs, count, &ind, isUCS, var->Values + k);
                 }
                 valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
-                var->IndsBufSize = var->IndsCount = valsCount;
+                var->IndsCapacity = var->IndsCount = valsCount;
                 var->Indices = 0;
                 if (valsCount)
                 {

@@ -233,10 +233,10 @@ int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
             }
         }
         /* Prepare buffer & shift existing items to allocate extra space */
-        if (indsCount >= var->IndsBufSize)
+        if (indsCount >= var->IndsCapacity)
         {
-            var->IndsBufSize = indsCount + 8;
-            var->Indices = (QSPVarIndex *)realloc(var->Indices, var->IndsBufSize * sizeof(QSPVarIndex));
+            var->IndsCapacity = indsCount + 8;
+            var->Indices = (QSPVarIndex *)realloc(var->Indices, var->IndsCapacity * sizeof(QSPVarIndex));
         }
         ++floorItem;
         while (indsCount > floorItem)
@@ -395,13 +395,13 @@ INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType
             qspSetError(QSP_ERR_TYPEMISMATCH);
             return;
         }
-        if (ind >= var->ValsBufSize)
+        if (ind >= var->ValsCapacity)
         {
             if (ind > 0)
-                var->ValsBufSize = ind + 4;
+                var->ValsCapacity = ind + 4;
             else
-                var->ValsBufSize = 1; /* allocate only 1 item for the first value */
-            var->Values = (QSPVariant *)realloc(var->Values, var->ValsBufSize * sizeof(QSPVariant));
+                var->ValsCapacity = 1; /* allocate only 1 item for the first value */
+            var->Values = (QSPVariant *)realloc(var->Values, var->ValsCapacity * sizeof(QSPVariant));
         }
         var->ValsCount = ind + 1;
         /* Init new values */
@@ -655,7 +655,7 @@ INLINE void qspUnpackTupleToArray(QSPVar *dest, QSPTuple src, int start, int cou
     if (itemsToCopy <= 0) return;
     if (count < itemsToCopy) itemsToCopy = count;
     /* Copy tuple items */
-    dest->ValsBufSize = dest->ValsCount = itemsToCopy;
+    dest->ValsCapacity = dest->ValsCount = itemsToCopy;
     dest->Values = (QSPVariant *)malloc(itemsToCopy * sizeof(QSPVariant));
     for (i = 0; i < itemsToCopy; ++i)
         qspCopyToNewVariant(dest->Values + i, src.Vals + start + i);
@@ -673,12 +673,12 @@ INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count)
     if (itemsToCopy <= 0) return;
     if (count < itemsToCopy) itemsToCopy = count;
     /* Copy array values */
-    dest->ValsBufSize = dest->ValsCount = itemsToCopy;
+    dest->ValsCapacity = dest->ValsCount = itemsToCopy;
     dest->Values = (QSPVariant *)malloc(itemsToCopy * sizeof(QSPVariant));
     for (i = 0; i < itemsToCopy; ++i)
         qspCopyToNewVariant(dest->Values + i, src->Values + start + i);
     /* Copy array indices */
-    dest->IndsBufSize = 0;
+    dest->IndsCapacity = 0;
     dest->Indices = 0;
     count = 0;
     for (i = 0; i < src->IndsCount; ++i)
@@ -686,10 +686,10 @@ INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count)
         newInd = src->Indices[i].Index - start;
         if (newInd >= 0 && newInd < itemsToCopy)
         {
-            if (count >= dest->IndsBufSize)
+            if (count >= dest->IndsCapacity)
             {
-                dest->IndsBufSize = count + 16;
-                dest->Indices = (QSPVarIndex *)realloc(dest->Indices, dest->IndsBufSize * sizeof(QSPVarIndex));
+                dest->IndsCapacity = count + 16;
+                dest->Indices = (QSPVarIndex *)realloc(dest->Indices, dest->IndsCapacity * sizeof(QSPVarIndex));
             }
             dest->Indices[count].Index = newInd;
             dest->Indices[count].Str = qspCopyToNewText(src->Indices[i].Str);
@@ -867,7 +867,7 @@ void qspSetArgs(QSPVar *destVar, QSPVariant *args, int count, QSP_BOOL toMove)
     if (count)
     {
         int i;
-        destVar->ValsBufSize = destVar->ValsCount = count;
+        destVar->ValsCapacity = destVar->ValsCount = count;
         destVar->Values = (QSPVariant *)malloc(count * sizeof(QSPVariant));
         if (toMove)
         {
@@ -1195,10 +1195,10 @@ void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
     while (foundPos && foundLen)
     {
         QSP_STR(foundString) = qspStringFromLen(foundPos, foundLen);
-        if (curInd >= var->ValsBufSize)
+        if (curInd >= var->ValsCapacity)
         {
-            var->ValsBufSize = curInd + 8;
-            var->Values = (QSPVariant *)realloc(var->Values, var->ValsBufSize * sizeof(QSPVariant));
+            var->ValsCapacity = curInd + 8;
+            var->Values = (QSPVariant *)realloc(var->Values, var->ValsCapacity * sizeof(QSPVariant));
         }
         qspCopyToNewVariant(var->Values + curInd, &foundString);
         ++curInd;

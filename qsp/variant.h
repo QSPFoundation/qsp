@@ -57,7 +57,7 @@
 
     INLINE void qspInitVariant(QSPVariant *value, QSP_TINYINT type)
     {
-        /* Works fine with all types */
+        /* Works fine with all types including QSP_TYPE_UNDEF */
         memset(&value->Val, 0, sizeof(value->Val));
         value->Type = type;
     }

@@ -40,10 +40,10 @@
         QSPString Name;
         QSPVariant *Values;
         int ValsCount;
-        int ValsBufSize;
+        int ValsCapacity;
         QSPVarIndex *Indices;
         int IndsCount;
-        int IndsBufSize;
+        int IndsCapacity;
     } QSPVar;
 
     typedef struct
@@ -105,20 +105,20 @@
     {
         var->Values = 0;
         var->ValsCount = 0;
-        var->ValsBufSize = 0;
+        var->ValsCapacity = 0;
         var->Indices = 0;
         var->IndsCount = 0;
-        var->IndsBufSize = 0;
+        var->IndsCapacity = 0;
     }
 
     INLINE void qspMoveVar(QSPVar *dest, QSPVar *src)
     {
         dest->Values = src->Values;
         dest->ValsCount = src->ValsCount;
-        dest->ValsBufSize = src->ValsBufSize;
+        dest->ValsCapacity = src->ValsCapacity;
         dest->Indices = src->Indices;
         dest->IndsCount = src->IndsCount;
-        dest->IndsBufSize = src->IndsBufSize;
+        dest->IndsCapacity = src->IndsCapacity;
         qspInitVarData(src);
     }
 
