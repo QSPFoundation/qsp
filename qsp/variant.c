@@ -28,6 +28,7 @@ static QSP_BOOL qspTypeConversionTable[QSP_TYPE_DEFINED_TYPES][QSP_TYPE_DEFINED_
     /* STRING */ { QSP_TRUE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
     /* CODE */   { QSP_TRUE, QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE },
     /* VARREF */ { QSP_TRUE, QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE },
+    /* UNDEF */  { QSP_TRUE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
 };
 
 INLINE void qspFormatVariant(QSPVariant *val);
@@ -189,7 +190,7 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
             {
             case QSP_TYPE_NUM:
                 if (qspCanConvertToNum(v1))
-                    qspConvertVariantTo(v1, v2->Type);
+                    qspConvertVariantTo(v1, QSP_TYPE_NUM);
                 else
                 {
                     qspConvertVariantTo(v1, QSP_TYPE_STR);
@@ -197,7 +198,7 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
                 }
                 break;
             case QSP_TYPE_STR:
-                qspConvertVariantTo(v1, v2->Type);
+                qspConvertVariantTo(v1, QSP_TYPE_STR);
                 break;
             }
             break;
@@ -206,7 +207,7 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
             {
             case QSP_TYPE_TUPLE:
                 if (qspCanConvertToNum(v2))
-                    qspConvertVariantTo(v2, v1->Type);
+                    qspConvertVariantTo(v2, QSP_TYPE_NUM);
                 else
                 {
                     qspConvertVariantTo(v1, QSP_TYPE_STR);
@@ -215,9 +216,9 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
                 break;
             case QSP_TYPE_STR:
                 if (qspCanConvertToNum(v2))
-                    qspConvertVariantTo(v2, v1->Type);
+                    qspConvertVariantTo(v2, QSP_TYPE_NUM);
                 else
-                    qspConvertVariantTo(v1, v2->Type);
+                    qspConvertVariantTo(v1, QSP_TYPE_STR);
                 break;
             }
             break;
@@ -225,13 +226,13 @@ int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
             switch (secondBaseType)
             {
             case QSP_TYPE_TUPLE:
-                qspConvertVariantTo(v2, v1->Type);
+                qspConvertVariantTo(v2, QSP_TYPE_STR);
                 break;
             case QSP_TYPE_NUM:
                 if (qspCanConvertToNum(v1))
-                    qspConvertVariantTo(v1, v2->Type);
+                    qspConvertVariantTo(v1, QSP_TYPE_NUM);
                 else
-                    qspConvertVariantTo(v2, v1->Type);
+                    qspConvertVariantTo(v2, QSP_TYPE_STR);
                 break;
             }
             break;

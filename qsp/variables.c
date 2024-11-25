@@ -388,14 +388,12 @@ INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType
     int oldCount = var->ValsCount;
     if (ind >= oldCount)
     {
+        /* A new item */
         QSPVariant *curValue;
-        if (baseType != QSP_BASETYPE(val->Type))
+        if (!qspConvertVariantTo(val, baseType))
         {
-            if (!qspConvertVariantTo(val, baseType))
-            {
-                qspSetError(QSP_ERR_TYPEMISMATCH);
-                return;
-            }
+            qspSetError(QSP_ERR_TYPEMISMATCH);
+            return;
         }
         if (ind >= var->ValsBufSize)
         {
@@ -413,13 +411,11 @@ INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType
     }
     else if (ind >= 0)
     {
-        if (baseType != QSP_BASETYPE(val->Type))
+        /* Replace an existing item */
+        if (!qspConvertVariantTo(val, baseType))
         {
-            if (!qspConvertVariantTo(val, baseType))
-            {
-                qspSetError(QSP_ERR_TYPEMISMATCH);
-                return;
-            }
+            qspSetError(QSP_ERR_TYPEMISMATCH);
+            return;
         }
         qspFreeVariant(var->Values + ind);
         qspMoveToNewVariant(var->Values + ind, val);
