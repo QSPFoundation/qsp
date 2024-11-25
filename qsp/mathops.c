@@ -1299,18 +1299,20 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
     arrType = ((arrIndex >= 0 && arrIndex < var->ValsCount) ? var->Values[arrIndex].Type : QSP_TYPE_UNDEF);
     if (QSP_ISDEF(arrType))
     {
+        QSPString typePrefix;
         switch (QSP_BASETYPE(arrType))
         {
         case QSP_TYPE_TUPLE:
-            QSP_PSTR(res) = QSP_STATIC_STR(QSP_TUPLECHAR);
+            typePrefix = QSP_STATIC_STR(QSP_TUPLECHAR);
             break;
         case QSP_TYPE_NUM:
-            QSP_PSTR(res) = QSP_STATIC_STR(QSP_NUMCHAR);
+            typePrefix = QSP_STATIC_STR(QSP_NUMCHAR);
             break;
         case QSP_TYPE_STR:
-            QSP_PSTR(res) = QSP_STATIC_STR(QSP_STRCHAR);
+            typePrefix = QSP_STATIC_STR(QSP_STRCHAR);
             break;
         }
+        QSP_PSTR(res) = qspCopyToNewText(typePrefix);
         return;
     }
     QSP_PSTR(res) = qspNullString;
