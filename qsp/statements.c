@@ -448,7 +448,7 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
                 if (qspLocationState != oldLocationState) return QSP_FALSE;
                 qspUpdateText(jumpTo, qspDelSpc(QSP_STR(arg)));
                 qspUpperStr(jumpTo);
-                qspFreeVariant(&arg);
+                qspFreeString(&QSP_STR(arg));
                 return QSP_TRUE;
             }
         default:

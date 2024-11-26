@@ -986,7 +986,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
                 args[i] = qspCalculateArgumentValue(expression, argIndices[i], qspOps[opCode].ArgsTypes[i]);
                 if (qspLocationState != oldLocationState)
                 {
-                    /* We have to cleanup collected arguments */
+                    /* We have to clean up collected arguments */
                     qspFreeVariants(args, i);
                     return qspGetEmptyVariant(QSP_TYPE_UNDEF);
                 }
