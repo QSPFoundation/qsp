@@ -399,7 +399,7 @@ QSP_TINYINT qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
             if (QSP_ISDEF(type) && !qspConvertVariantTo(args + argIndex, type))
             {
                 qspSetError(QSP_ERR_TYPEMISMATCH);
-                qspFreeVariants(args, argIndex);
+                qspFreeVariants(args, argIndex + 1); /* include the current item */
                 return 0;
             }
         }
