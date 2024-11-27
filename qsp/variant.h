@@ -37,12 +37,12 @@
     {
         switch (QSP_BASETYPE(val->Type))
         {
-            case QSP_TYPE_TUPLE:
-                qspFreeTuple(&QSP_PTUPLE(val));
-                break;
-            case QSP_TYPE_STR:
-                qspFreeString(&QSP_PSTR(val));
-                break;
+        case QSP_TYPE_TUPLE:
+            qspFreeTuple(&QSP_PTUPLE(val));
+            break;
+        case QSP_TYPE_STR:
+            qspFreeString(&QSP_PSTR(val));
+            break;
         }
     }
 
@@ -97,15 +97,15 @@
     {
         switch (QSP_BASETYPE(dest->Type = src->Type))
         {
-            case QSP_TYPE_TUPLE:
-                QSP_PTUPLE(dest) = qspCopyToNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).Items);
-                break;
-            case QSP_TYPE_NUM:
-                QSP_PNUM(dest) = QSP_PNUM(src);
-                break;
-            case QSP_TYPE_STR:
-                QSP_PSTR(dest) = qspCopyToNewText(QSP_PSTR(src));
-                break;
+        case QSP_TYPE_TUPLE:
+            QSP_PTUPLE(dest) = qspCopyToNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).Items);
+            break;
+        case QSP_TYPE_NUM:
+            QSP_PNUM(dest) = QSP_PNUM(src);
+            break;
+        case QSP_TYPE_STR:
+            QSP_PSTR(dest) = qspCopyToNewText(QSP_PSTR(src));
+            break;
         }
     }
 
@@ -120,14 +120,14 @@
     {
         switch (QSP_BASETYPE(val->Type))
         {
-            case QSP_TYPE_TUPLE:
+        case QSP_TYPE_TUPLE:
             {
                 QSP_BOOL isValid;
                 qspTupleToNum(QSP_PTUPLE(val), &isValid);
                 if (!isValid) return QSP_FALSE;
                 break;
             }
-            case QSP_TYPE_STR:
+        case QSP_TYPE_STR:
             {
                 QSP_BOOL isValid;
                 qspStrToNum(QSP_PSTR(val), &isValid);
