@@ -179,7 +179,7 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     }
     if (qspCurSelObject >= objInd) qspCurSelObject = -1;
     if (count >= 2 && qspIsAnyString(QSP_STR(args[1])))
-        imgPath = qspCopyToNewText(QSP_STR(args[1]));
+        imgPath = qspMoveText(&QSP_STR(args[1]));
     else
         imgPath = qspNullString;
     for (i = qspCurObjsCount; i > objInd; --i)
@@ -187,10 +187,8 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     ++qspCurObjsCount;
     obj = qspCurObjects + objInd;
     obj->Image = imgPath;
-    obj->Desc = qspCopyToNewText(QSP_STR(args[0]));
+    obj->Desc = qspMoveText(&QSP_STR(args[0]));
     qspIsObjsListChanged = QSP_TRUE;
-    /* Call ONOBJADD with object name & image */
-    if (count > 2) count = 2;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJADDED), args, count);
 }
 
