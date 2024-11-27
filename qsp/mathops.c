@@ -458,7 +458,7 @@ INLINE QSPString qspGetQString(QSPString *expr)
         return qspNullString;
     }
     expr->Str = pos + QSP_STATIC_LEN(QSP_RQUOT);
-    return qspCopyToNewText(qspStringFromPair(buf + QSP_STATIC_LEN(QSP_LQUOT), pos));
+    return qspStringFromPair(buf + QSP_STATIC_LEN(QSP_LQUOT), pos);
 }
 
 INLINE int qspSkipMathValue(QSPMathExpression *expression, int valueIndex)
@@ -692,7 +692,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpre
             {
                 name = qspGetQString(&s);
                 if (qspErrorNum) break;
-                v = qspStrVariant(name, QSP_TYPE_CODE);
+                v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_CODE);
                 if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                 {
                     qspFreeString(&QSP_STR(v));
