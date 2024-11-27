@@ -142,7 +142,7 @@ void qspRefreshPlayList(void)
         if (qspIsAnyString(curFile) && qspSearchPlayList(curFile) < 0)
         {
             if (qspCallIsPlayingFile(curFile))
-                qspPLFiles[qspPLFilesCount++] = qspCopyToNewText(files[count]);
+                qspPLFiles[qspPLFilesCount++] = qspMoveText(files + count);
         }
         qspFreeString(files + count);
     }

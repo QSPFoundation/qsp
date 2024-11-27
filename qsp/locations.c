@@ -108,9 +108,7 @@ int qspLocIndex(QSPString name)
 
 INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
 {
-    QSPVariant actionArgs[2];
-    QSP_TINYINT argsCount;
-    QSPString str;
+    QSPString str, actionName;
     QSPLineOfCode *oldLine;
     int i, oldLoc, oldActIndex, oldLineNum, oldLocationState = qspLocationState;
     QSPLocation *loc = qspLocs + locInd;
@@ -149,9 +147,9 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     /* Update base actions */
     for (i = 0; i < loc->ActionsCount; ++i)
     {
-        str = loc->Actions[i].Desc;
-        if (qspIsEmpty(str)) break;
-        str = qspFormatText(str, QSP_FALSE);
+        actionName = loc->Actions[i].Desc;
+        if (qspIsEmpty(actionName)) break;
+        actionName = qspFormatText(actionName, QSP_FALSE);
         if (qspLocationState != oldLocationState)
         {
             qspRealLine = oldLine;
@@ -161,17 +159,12 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
             return;
         }
         qspRealActIndex = i;
-        actionArgs[0] = qspStrVariant(str, QSP_TYPE_STR);
         str = loc->Actions[i].Image;
         if (!qspIsEmpty(str))
-        {
-            actionArgs[1] = qspStrVariant(str, QSP_TYPE_STR);
-            argsCount = 2;
-        }
+            qspAddAction(actionName, str, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount);
         else
-            argsCount = 1;
-        qspAddAction(actionArgs, argsCount, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount);
-        qspFreeString(&QSP_STR(actionArgs[0]));
+            qspAddAction(actionName, qspNullString, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount);
+        qspFreeString(&actionName);
         if (qspErrorNum)
         {
             qspRealLine = oldLine;

@@ -83,23 +83,18 @@ INLINE int qspActIndex(QSPString name)
     return -1;
 }
 
-void qspAddAction(QSPVariant *args, QSP_TINYINT count, QSPLineOfCode *code, int start, int end)
+void qspAddAction(QSPString name, QSPString imgPath, QSPLineOfCode *code, int start, int end)
 {
     QSPCurAct *act;
-    QSPString imgPath;
-    if (qspActIndex(QSP_STR(args[0])) >= 0) return;
+    if (qspActIndex(name) >= 0) return;
     if (qspCurActsCount == QSP_MAXACTIONS)
     {
         qspSetError(QSP_ERR_CANTADDACTION);
         return;
     }
-    if (count == 2 && qspIsAnyString(QSP_STR(args[1])))
-        imgPath = qspCopyToNewText(QSP_STR(args[1]));
-    else
-        imgPath = qspNullString;
     act = qspCurActions + qspCurActsCount++;
-    act->Image = imgPath;
-    act->Desc = qspCopyToNewText(QSP_STR(args[0]));
+    act->Image = (qspIsAnyString(imgPath) ? qspCopyToNewText(imgPath) : qspNullString);
+    act->Desc = qspCopyToNewText(name);
     qspCopyPrepLines(&act->OnPressLines, code, start, end);
     act->OnPressLinesCount = end - start;
     act->Location = qspRealCurLoc;
@@ -194,7 +189,10 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
     code.IsMultiline = QSP_FALSE;
     code.StatsCount = endPos - statPos;
     qspCopyPrepStatements(&code.Stats, line->Stats, statPos, endPos, (int)(firstPos - line->Str.Str));
-    qspAddAction(args, argsCount, &code, 0, 1);
+    if (argsCount == 2)
+        qspAddAction(QSP_STR(args[0]), QSP_STR(args[1]), &code, 0, 1);
+    else
+        qspAddAction(QSP_STR(args[0]), qspNullString, &code, 0, 1);
     qspFreeVariants(args, argsCount);
     qspFreeLineOfCode(&code);
 }
@@ -207,7 +205,10 @@ void qspStatementMultilineAddAct(QSPLineOfCode *s, int lineInd, int endLine)
     QSPLineOfCode *line = s + lineInd;
     argsCount = qspGetStatArgs(line->Str, line->Stats, args);
     if (qspLocationState != oldLocationState) return;
-    qspAddAction(args, argsCount, s, lineInd + 1, endLine);
+    if (argsCount == 2)
+        qspAddAction(QSP_STR(args[0]), QSP_STR(args[1]), s, lineInd + 1, endLine);
+    else
+        qspAddAction(QSP_STR(args[0]), qspNullString, s, lineInd + 1, endLine);
     qspFreeVariants(args, argsCount);
 }
 
