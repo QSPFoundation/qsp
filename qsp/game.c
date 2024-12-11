@@ -120,7 +120,7 @@ INLINE void qspIncludeFile(QSPString s)
     }
     for (i = 0; i < qspCurIncFilesCount; ++i)
     {
-        if (!qspStrsComp(qspCurIncFiles[i], s))
+        if (!qspStrsCompare(qspCurIncFiles[i], s))
             return;
     }
     oldLocationState = qspLocationState;
@@ -168,7 +168,7 @@ void qspNewGame(QSP_BOOL toReset)
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS)
 {
     int i, ind, locsCount, actsCount;
-    QSP_BOOL isOldFormat = qspStrsComp(strs[0], QSP_STATIC_STR(QSP_GAMEID)) != 0;
+    QSP_BOOL isOldFormat = qspStrsCompare(strs[0], QSP_STATIC_STR(QSP_GAMEID)) != 0;
     ind = (isOldFormat ? 30 : 4);
     if (ind >= count) return QSP_FALSE;
     locsCount = (isOldFormat ? qspStrToNum(strs[0], 0) : qspReadEncodedIntVal(strs[3], isUCS));
@@ -205,7 +205,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
         qspFreeStrs(strs, count);
         return QSP_FALSE;
     }
-    isOldFormat = qspStrsComp(strs[0], QSP_STATIC_STR(QSP_GAMEID)) != 0;
+    isOldFormat = qspStrsCompare(strs[0], QSP_STATIC_STR(QSP_GAMEID)) != 0;
     locsCount = (isOldFormat ? qspStrToNum(strs[0], 0) : qspReadEncodedIntVal(strs[3], isUCS));
     if (isNewGame)
     {
@@ -401,9 +401,9 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     int i, j, k, ind, count, groupsCount, varValuesCount, temp, selAction, selObject;
     ind = 16;
     if (ind >= strsCount) return QSP_FALSE;
-    if (qspStrsComp(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
-        qspStrsComp(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
-        qspStrsComp(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
+    if (qspStrsCompare(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
+        qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
+        qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
     if (!qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DEBUG"))) &&
         qspReadEncodedIntVal(strs[2], isUCS) != qspQstCRC) return QSP_FALSE;
     selAction = qspReadEncodedIntVal(strs[4], isUCS); /* qspCurSelAction */

@@ -34,7 +34,8 @@
     QSPTuple qspCopyToNewTuple(QSPVariant *values, int count);
     QSPTuple qspMoveToNewTuple(QSPVariant *values, int count);
     QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);
-    int qspTuplesComp(QSPTuple first, QSPTuple second);
+    int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value);
+    int qspTuplesCompare(QSPTuple first, QSPTuple second);
     void qspAppendTupleToString(QSPBufString *res, QSPTuple tuple);
 
     INLINE QSPString qspGetTupleAsString(QSPTuple tuple)

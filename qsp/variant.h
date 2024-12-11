@@ -28,10 +28,10 @@
     QSPString qspGetVariantAsString(QSPVariant *val);
     QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid);
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
-    int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2);
+    int qspVariantsCompare(QSPVariant *first, QSPVariant *second);
     void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
     QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, QSPVariant *res);
-    void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val);
+    void qspAppendVariantToIndexString(QSPVariant *val, QSPBufString *res);
 
     INLINE void qspFreeVariant(QSPVariant *val)
     {
@@ -141,7 +141,7 @@
     INLINE QSPString qspGetVariantAsIndexString(QSPVariant *val)
     {
         QSPBufString buf = qspNewBufString(16);
-        qspAppendVariantToIndexString(&buf, val);
+        qspAppendVariantToIndexString(val, &buf);
         return qspBufTextToString(buf);
     }
 

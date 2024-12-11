@@ -404,7 +404,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
                     if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
                     {
                         txt.Str = pos;
-                        if (!qspStrsNComp(txt, str, strLen)) return pos;
+                        if (!qspStrsPartCompare(txt, str, strLen)) return pos;
                     }
                     isPrevDelim = QSP_FALSE;
                 }
@@ -413,7 +413,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
             {
                 /* It must support searching for delimiters */
                 txt.Str = pos;
-                if (!qspStrsNComp(txt, str, strLen)) return pos;
+                if (!qspStrsPartCompare(txt, str, strLen)) return pos;
             }
         }
         ++pos;

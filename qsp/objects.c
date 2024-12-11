@@ -125,7 +125,7 @@ int qspObjIndex(QSPString name)
         }
         bufName = qspStringFromLen(buf, objNameLen);
         qspUpperStr(&bufName);
-        if (!qspStrsComp(bufName, name))
+        if (!qspStrsCompare(bufName, name))
         {
             qspFreeString(&name);
             free(buf);

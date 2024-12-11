@@ -65,7 +65,7 @@ void qspInitVarTypes(void)
 
 INLINE int qspIndStringCompare(const void *name, const void *compareTo)
 {
-    return qspStrsComp(*(QSPString *)name, ((QSPVarIndex *)compareTo)->Str);
+    return qspStrsCompare(*(QSPString *)name, ((QSPVarIndex *)compareTo)->Str);
 }
 
 INLINE int qspIndStringFloorCompare(const void *name, const void *compareTo)
@@ -74,20 +74,20 @@ INLINE int qspIndStringFloorCompare(const void *name, const void *compareTo)
     QSPVarIndex *item = (QSPVarIndex *)compareTo;
 
     /* It's safe to check (item + 1) because the item never points to the last array item */
-    if (qspStrsComp(key, (item + 1)->Str) < 0 && qspStrsComp(key, item->Str) >= 0)
+    if (qspStrsCompare(key, (item + 1)->Str) < 0 && qspStrsCompare(key, item->Str) >= 0)
         return 0;
 
-    return qspStrsComp(key, item->Str);
+    return qspStrsCompare(key, item->Str);
 }
 
 INLINE int qspValuePositionsAscCompare(const void *arg1, const void *arg2)
 {
-    return qspAutoConvertCompare(*(QSPVariant **)arg1, *(QSPVariant **)arg2); /* base types of values should be the same */
+    return qspVariantsCompare(*(QSPVariant **)arg1, *(QSPVariant **)arg2); /* base types of values should be the same */
 }
 
 INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2)
 {
-    return qspAutoConvertCompare(*(QSPVariant **)arg2, *(QSPVariant **)arg1); /* base types of values should be the same */
+    return qspVariantsCompare(*(QSPVariant **)arg2, *(QSPVariant **)arg1); /* base types of values should be the same */
 }
 
 QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
@@ -120,7 +120,7 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
     varsCount = bucket->VarsCount;
     for (i = varsCount; i > 0; --i)
     {
-        if (!qspStrsComp(var->Name, name)) return var;
+        if (!qspStrsCompare(var->Name, name)) return var;
         ++var;
     }
     if (toCreate)
@@ -226,7 +226,7 @@ int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
         if (indsCount > 0)
         {
             QSPVarIndex *lastItem = var->Indices + floorItem;
-            if (qspStrsComp(uStr, lastItem->Str) < 0)
+            if (qspStrsCompare(uStr, lastItem->Str) < 0)
             {
                 QSPVarIndex *ind = (QSPVarIndex *)bsearch(&uStr, var->Indices, floorItem, sizeof(QSPVarIndex), qspIndStringFloorCompare);
                 floorItem = (ind ? (int)(ind - var->Indices) : -1);
@@ -782,7 +782,7 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
             switch (varType)
             {
             case QSP_TYPE_TUPLE:
-                if (!qspTuplesComp(QSP_PTUPLE(val), QSP_PTUPLE(curValue))) return ind;
+                if (!qspTuplesCompare(QSP_PTUPLE(val), QSP_PTUPLE(curValue))) return ind;
                 break;
             case QSP_TYPE_STR:
                 if (isRegExp)
@@ -791,7 +791,7 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
                 }
                 else
                 {
-                    if (!qspStrsComp(QSP_PSTR(val), QSP_PSTR(curValue))) return ind;
+                    if (!qspStrsCompare(QSP_PSTR(val), QSP_PSTR(curValue))) return ind;
                 }
                 break;
             case QSP_TYPE_NUM:
@@ -827,19 +827,19 @@ QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
                 case QSP_TYPE_TUPLE:
                     if (isMin)
                     {
-                        if (qspTuplesComp(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) < 0)
+                        if (qspTuplesCompare(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) < 0)
                             bestValue = curValue;
                     }
-                    else if (qspTuplesComp(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) > 0)
+                    else if (qspTuplesCompare(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) > 0)
                         bestValue = curValue;
                     break;
                 case QSP_TYPE_STR:
                     if (isMin)
                     {
-                        if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(bestValue)) < 0)
+                        if (qspStrsCompare(QSP_PSTR(curValue), QSP_PSTR(bestValue)) < 0)
                             bestValue = curValue;
                     }
-                    else if (qspStrsComp(QSP_PSTR(curValue), QSP_PSTR(bestValue)) > 0)
+                    else if (qspStrsCompare(QSP_PSTR(curValue), QSP_PSTR(bestValue)) > 0)
                         bestValue = curValue;
                     break;
                 case QSP_TYPE_NUM:
@@ -1058,7 +1058,7 @@ INLINE QSP_BOOL qspSaveVarToLocalGroup(QSPVarsGroup *varGroup, QSPString varName
     /* Check if the var exists, variable names are preformatted during code preprocessing */
     for (i = 0; i < varsCount; ++i)
     {
-        if (!qspStrsComp(plainVarName, varGroup->Vars[i].Name))
+        if (!qspStrsCompare(plainVarName, varGroup->Vars[i].Name))
         {
             /* Already exists, so the value is saved already */
             return QSP_TRUE;

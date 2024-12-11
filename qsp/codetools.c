@@ -30,7 +30,7 @@ INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *
 INLINE int qspStatStringCompare(const void *name, const void *compareTo)
 {
     QSPStatName *statName = (QSPStatName *)compareTo;
-    return qspStrsNComp(*(QSPString *)name, statName->Name, qspStrLen(statName->Name));
+    return qspStrsPartCompare(*(QSPString *)name, statName->Name, qspStrLen(statName->Name));
 }
 
 INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos)
@@ -585,7 +585,7 @@ INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *
     if (qspAddBufText(strBuf, str) && strBuf->Len >= eolLen)
     {
         QSPString eol = qspStringFromLen(strBuf->Str + strBuf->Len - eolLen, eolLen);
-        if (!qspStrsComp(eol, QSP_STATIC_STR(QSP_PREEOLEXT QSP_EOLEXT)))
+        if (!qspStrsCompare(eol, QSP_STATIC_STR(QSP_PREEOLEXT QSP_EOLEXT)))
         {
             strBuf->Len -= QSP_STATIC_LEN(QSP_EOLEXT); /* keep QSP_PREEOLEXT */
             return QSP_FALSE;
@@ -628,7 +628,7 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
     pos = data.Str;
     while (pos < data.End)
     {
-        isNewLine = (qspStrsNComp(data, QSP_STATIC_STR(QSP_STRSDELIM), QSP_STATIC_LEN(QSP_STRSDELIM)) == 0);
+        isNewLine = (qspStrsPartCompare(data, QSP_STATIC_STR(QSP_STRSDELIM), QSP_STATIC_LEN(QSP_STRSDELIM)) == 0);
         if (isNewLine) ++lineNum;
         if (quotsCount || quot || !isNewLine)
         {

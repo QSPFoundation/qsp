@@ -230,7 +230,7 @@
         }
     }
 
-    INLINE int qspStrsNComp(QSPString str1, QSPString str2, int maxLen)
+    INLINE int qspStrsPartCompare(QSPString str1, QSPString str2, int maxLen)
     {
         int delta = 0;
         QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;
@@ -239,7 +239,7 @@
         return delta;
     }
 
-    INLINE int qspStrsComp(QSPString str1, QSPString str2)
+    INLINE int qspStrsCompare(QSPString str1, QSPString str2)
     {
         int delta = 0;
         QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;

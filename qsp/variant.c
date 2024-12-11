@@ -179,74 +179,52 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
     return QSP_TRUE;
 }
 
-int qspAutoConvertCompare(QSPVariant *v1, QSPVariant *v2)
+int qspVariantsCompare(QSPVariant *first, QSPVariant *second)
 {
-    QSP_TINYINT firstBaseType = QSP_BASETYPE(v1->Type), secondBaseType = QSP_BASETYPE(v2->Type);
-    if (firstBaseType != secondBaseType)
-    {
-        switch (firstBaseType)
-        {
-        case QSP_TYPE_TUPLE:
-            switch (secondBaseType)
-            {
-            case QSP_TYPE_NUM:
-                if (qspCanConvertToNum(v1))
-                    qspConvertVariantTo(v1, QSP_TYPE_NUM);
-                else
-                {
-                    qspConvertVariantTo(v1, QSP_TYPE_STR);
-                    qspConvertVariantTo(v2, QSP_TYPE_STR);
-                }
-                break;
-            case QSP_TYPE_STR:
-                qspConvertVariantTo(v1, QSP_TYPE_STR);
-                break;
-            }
-            break;
-        case QSP_TYPE_NUM:
-            switch (secondBaseType)
-            {
-            case QSP_TYPE_TUPLE:
-                if (qspCanConvertToNum(v2))
-                    qspConvertVariantTo(v2, QSP_TYPE_NUM);
-                else
-                {
-                    qspConvertVariantTo(v1, QSP_TYPE_STR);
-                    qspConvertVariantTo(v2, QSP_TYPE_STR);
-                }
-                break;
-            case QSP_TYPE_STR:
-                if (qspCanConvertToNum(v2))
-                    qspConvertVariantTo(v2, QSP_TYPE_NUM);
-                else
-                    qspConvertVariantTo(v1, QSP_TYPE_STR);
-                break;
-            }
-            break;
-        case QSP_TYPE_STR:
-            switch (secondBaseType)
-            {
-            case QSP_TYPE_TUPLE:
-                qspConvertVariantTo(v2, QSP_TYPE_STR);
-                break;
-            case QSP_TYPE_NUM:
-                if (qspCanConvertToNum(v1))
-                    qspConvertVariantTo(v1, QSP_TYPE_NUM);
-                else
-                    qspConvertVariantTo(v2, QSP_TYPE_STR);
-                break;
-            }
-            break;
-        }
-    }
-    switch (QSP_BASETYPE(v1->Type))
+    switch (QSP_BASETYPE(first->Type))
     {
     case QSP_TYPE_TUPLE:
-        return qspTuplesComp(QSP_PTUPLE(v1), QSP_PTUPLE(v2));
+        return qspTupleValueCompare(QSP_PTUPLE(first), second);
     case QSP_TYPE_NUM:
-        return (QSP_PNUM(v1) > QSP_PNUM(v2) ? 1 : (QSP_PNUM(v1) < QSP_PNUM(v2) ? -1 : 0));
+        switch (QSP_BASETYPE(second->Type))
+        {
+        case QSP_TYPE_TUPLE:
+            return -qspTupleValueCompare(QSP_PTUPLE(second), first);
+        case QSP_TYPE_NUM:
+            return (QSP_PNUM(first) > QSP_PNUM(second) ? 1 : (QSP_PNUM(first) < QSP_PNUM(second) ? -1 : 0));
+        case QSP_TYPE_STR:
+            {
+                QSP_BOOL isValid;
+                QSP_BIGINT num = qspStrToNum(QSP_PSTR(second), &isValid);
+                if (!isValid)
+                {
+                    QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
+                    return qspStrsCompare(qspNumToStr(buf, QSP_PNUM(first)), QSP_PSTR(second));
+                }
+                return (QSP_PNUM(first) > num ? 1 : (QSP_PNUM(first) < num ? -1 : 0));
+            }
+        }
+        break;
     case QSP_TYPE_STR:
-        return qspStrsComp(QSP_PSTR(v1), QSP_PSTR(v2));
+        switch (QSP_BASETYPE(second->Type))
+        {
+        case QSP_TYPE_TUPLE:
+            return -qspTupleValueCompare(QSP_PTUPLE(second), first);
+        case QSP_TYPE_NUM:
+            {
+                QSP_BOOL isValid;
+                QSP_BIGINT num = qspStrToNum(QSP_PSTR(first), &isValid);
+                if (!isValid)
+                {
+                    QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
+                    return qspStrsCompare(QSP_PSTR(first), qspNumToStr(buf, QSP_PNUM(second)));
+                }
+                return (num > QSP_PNUM(second) ? 1 : (num < QSP_PNUM(second) ? -1 : 0));
+            }
+        case QSP_TYPE_STR:
+            return qspStrsCompare(QSP_PSTR(first), QSP_PSTR(second));
+        }
+        break;
     }
     return 0;
 }
@@ -375,7 +353,7 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
     return QSP_TRUE;
 }
 
-void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val)
+void qspAppendVariantToIndexString(QSPVariant *val, QSPBufString *res)
 {
     QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
     switch (QSP_BASETYPE(val->Type))
@@ -390,11 +368,11 @@ void qspAppendVariantToIndexString(QSPBufString *res, QSPVariant *val)
                 qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));
                 while (--items > 0)
                 {
-                    qspAppendVariantToIndexString(res, item);
+                    qspAppendVariantToIndexString(item, res);
                     qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));
                     ++item;
                 }
-                qspAppendVariantToIndexString(res, item);
+                qspAppendVariantToIndexString(item, res);
             }
             break;
         }

@@ -50,7 +50,7 @@ QSPRegExp *qspRegExpGetCompiled(QSPString exp)
     for (i = 0; i < QSP_MAXCACHEDREGEXPS; ++i)
     {
         if (!compExp->CompiledExp) break;
-        if (!qspStrsComp(exp, compExp->Text))
+        if (!qspStrsCompare(exp, compExp->Text))
             return compExp;
         ++compExp;
     }

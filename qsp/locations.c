@@ -36,12 +36,12 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc);
 
 INLINE int qspLocsCompare(const void *locName1, const void *locName2)
 {
-    return qspStrsComp(((QSPLocName *)locName1)->Name, ((QSPLocName *)locName2)->Name);
+    return qspStrsCompare(((QSPLocName *)locName1)->Name, ((QSPLocName *)locName2)->Name);
 }
 
 INLINE int qspLocStringCompare(const void *name, const void *compareTo)
 {
-    return qspStrsComp(*(QSPString *)name, ((QSPLocName *)compareTo)->Name);
+    return qspStrsCompare(*(QSPString *)name, ((QSPLocName *)compareTo)->Name);
 }
 
 void qspCreateWorld(int start, int newLocsCount)

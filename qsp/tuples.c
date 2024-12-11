@@ -135,102 +135,36 @@ QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, in
     return tuple;
 }
 
-int qspTuplesComp(QSPTuple first, QSPTuple second)
+int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value)
 {
-    QSP_BOOL isValid;
-    QSPString str;
-    QSP_BIGINT num;
-    QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
+    switch (QSP_BASETYPE(value->Type))
+    {
+    case QSP_TYPE_TUPLE:
+        return qspTuplesCompare(tuple, QSP_PTUPLE(value));
+    case QSP_TYPE_NUM:
+    case QSP_TYPE_STR:
+        {
+            int delta;
+            if (tuple.Items == 0)
+                return -1; /* an empty tuple is always smaller than any value */
+            delta = qspVariantsCompare(tuple.Vals, value); /* compare the first tuple item with the value */
+            if (delta) return delta;
+            if (tuple.Items > 1)
+                return 1; /* the tuple is bigger if it contains more than 1 item */
+            break;
+        }
+    }
+    return 0;
+}
+
+int qspTuplesCompare(QSPTuple first, QSPTuple second)
+{
     int delta = 0;
     QSPVariant *pos1 = first.Vals, *pos2 = second.Vals;
     QSPVariant *end1 = first.Vals + first.Items, *end2 = second.Vals + second.Items;
     while (pos2 < end2 && pos1 < end1)
     {
-        switch (QSP_BASETYPE(pos1->Type))
-        {
-        case QSP_TYPE_TUPLE:
-            switch (QSP_BASETYPE(pos2->Type))
-            {
-            case QSP_TYPE_TUPLE:
-                delta = qspTuplesComp(QSP_PTUPLE(pos1), QSP_PTUPLE(pos2));
-                break;
-            case QSP_TYPE_NUM:
-                num = qspTupleToNum(QSP_PTUPLE(pos1), &isValid);
-                if (isValid)
-                {
-                    delta = (num > QSP_PNUM(pos2) ? 1 : (num < QSP_PNUM(pos2) ? -1 : 0));
-                }
-                else
-                {
-                    str = qspGetTupleAsString(QSP_PTUPLE(pos1));
-                    delta = qspStrsComp(str, qspNumToStr(buf, QSP_PNUM(pos2)));
-                    qspFreeString(&str);
-                }
-                break;
-            case QSP_TYPE_STR:
-                str = qspGetTupleAsString(QSP_PTUPLE(pos1));
-                delta = qspStrsComp(str, QSP_PSTR(pos2));
-                qspFreeString(&str);
-                break;
-            }
-            break;
-        case QSP_TYPE_NUM:
-            switch (QSP_BASETYPE(pos2->Type))
-            {
-            case QSP_TYPE_TUPLE:
-                num = qspTupleToNum(QSP_PTUPLE(pos2), &isValid);
-                if (isValid)
-                {
-                    delta = (QSP_PNUM(pos1) > num ? 1 : (QSP_PNUM(pos1) < num ? -1 : 0));
-                }
-                else
-                {
-                    str = qspGetTupleAsString(QSP_PTUPLE(pos2));
-                    delta = qspStrsComp(qspNumToStr(buf, QSP_PNUM(pos1)), str);
-                    qspFreeString(&str);
-                }
-                break;
-            case QSP_TYPE_NUM:
-                delta = (QSP_PNUM(pos1) > QSP_PNUM(pos2) ? 1 : (QSP_PNUM(pos1) < QSP_PNUM(pos2) ? -1 : 0));
-                break;
-            case QSP_TYPE_STR:
-                num = qspStrToNum(QSP_PSTR(pos2), &isValid);
-                if (isValid)
-                {
-                    delta = (QSP_PNUM(pos1) > num ? 1 : (QSP_PNUM(pos1) < num ? -1 : 0));
-                }
-                else
-                {
-                    delta = qspStrsComp(qspNumToStr(buf, QSP_PNUM(pos1)), QSP_PSTR(pos2));
-                }
-                break;
-            }
-            break;
-        case QSP_TYPE_STR:
-            switch (QSP_BASETYPE(pos2->Type))
-            {
-            case QSP_TYPE_TUPLE:
-                str = qspGetTupleAsString(QSP_PTUPLE(pos2));
-                delta = qspStrsComp(QSP_PSTR(pos1), str);
-                qspFreeString(&str);
-                break;
-            case QSP_TYPE_NUM:
-                num = qspStrToNum(QSP_PSTR(pos1), &isValid);
-                if (isValid)
-                {
-                    delta = (num > QSP_PNUM(pos2) ? 1 : (num < QSP_PNUM(pos2) ? -1 : 0));
-                }
-                else
-                {
-                    delta = qspStrsComp(QSP_PSTR(pos1), qspNumToStr(buf, QSP_PNUM(pos2)));
-                }
-                break;
-            case QSP_TYPE_STR:
-                delta = qspStrsComp(QSP_PSTR(pos1), QSP_PSTR(pos2));
-                break;
-            }
-            break;
-        }
+        delta = qspVariantsCompare(pos1, pos2);
         if (delta) break;
         ++pos1, ++pos2;
     }

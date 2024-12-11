@@ -91,7 +91,7 @@ INLINE int qspSearchPlayList(QSPString file)
         }
         bufName = qspStringFromLen(buf, itemLen);
         qspUpperStr(&bufName);
-        if (!qspStrsNComp(bufName, uName, fileLen))
+        if (!qspStrsPartCompare(bufName, uName, fileLen))
         {
             if (itemLen == fileLen || qspIsInList(bufName.Str[fileLen], QSP_PLVOLUMEDELIM))
             {

@@ -71,7 +71,7 @@ INLINE int qspActIndex(QSPString name)
         }
         bufName = qspStringFromLen(buf, actNameLen);
         qspUpperStr(&bufName);
-        if (!qspStrsComp(bufName, name))
+        if (!qspStrsCompare(bufName, name))
         {
             qspFreeString(&name);
             free(buf);

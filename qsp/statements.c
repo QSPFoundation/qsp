@@ -105,7 +105,7 @@ INLINE void qspAddStatName(QSP_TINYINT statCode, QSPString statName, int level)
 
 INLINE int qspStatsCompare(const void *statName1, const void *statName2)
 {
-    return qspStrsComp(((QSPStatName *)statName1)->Name, ((QSPStatName *)statName2)->Name);
+    return qspStrsCompare(((QSPStatName *)statName1)->Name, ((QSPStatName *)statName2)->Name);
 }
 
 void qspInitStats(void)
@@ -369,7 +369,7 @@ INLINE int qspSearchLabel(QSPLineOfCode *lines, int start, int end, QSPString st
     lines += start;
     while (start < end)
     {
-        if (lines->Label.Str && !qspStrsComp(lines->Label, str)) return start;
+        if (lines->Label.Str && !qspStrsCompare(lines->Label, str)) return start;
         ++start;
         ++lines;
     }

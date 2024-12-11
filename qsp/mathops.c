@@ -156,18 +156,18 @@ INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BO
 
 INLINE int qspMathOpsCompare(const void *opName1, const void *opName2)
 {
-    return qspStrsComp(((QSPMathOpName *)opName1)->Name, ((QSPMathOpName *)opName2)->Name);
+    return qspStrsCompare(((QSPMathOpName *)opName1)->Name, ((QSPMathOpName *)opName2)->Name);
 }
 
 INLINE int qspMathOpStringFullCompare(const void *name, const void *compareTo)
 {
-    return qspStrsComp(*(QSPString *)name, ((QSPMathOpName *)compareTo)->Name);
+    return qspStrsCompare(*(QSPString *)name, ((QSPMathOpName *)compareTo)->Name);
 }
 
 INLINE int qspMathOpStringCompare(const void *name, const void *compareTo)
 {
     QSPMathOpName *opName = (QSPMathOpName *)compareTo;
-    return qspStrsNComp(*(QSPString *)name, opName->Name, qspStrLen(opName->Name));
+    return qspStrsPartCompare(*(QSPString *)name, opName->Name, qspStrLen(opName->Name));
 }
 
 void qspInitMath(void)
@@ -1053,22 +1053,22 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         QSP_TUPLE(tos) = qspMoveToNewTuple(args, argsCount);
         break;
     case qspOpEq:
-        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) == 0);
+        QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) == 0);
         break;
     case qspOpLt:
-        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) < 0);
+        QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) < 0);
         break;
     case qspOpGt:
-        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) > 0);
+        QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) > 0);
         break;
     case qspOpLeq:
-        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) <= 0);
+        QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) <= 0);
         break;
     case qspOpGeq:
-        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) >= 0);
+        QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) >= 0);
         break;
     case qspOpNe:
-        QSP_NUM(tos) = QSP_TOBOOL(qspAutoConvertCompare(args, args + 1) != 0);
+        QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) != 0);
         break;
     /* Embedded functions -------------------------------------------------------------- */
     case qspOpLoc:
@@ -1384,7 +1384,7 @@ INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
         int i, minInd = 0;
         for (i = 1; i < count; ++i)
         {
-            if (qspAutoConvertCompare(args + i, args + minInd) < 0)
+            if (qspVariantsCompare(args + i, args + minInd) < 0)
                 minInd = i;
         }
         qspMoveToNewVariant(res, args + minInd);
@@ -1403,7 +1403,7 @@ INLINE void qspFunctionMax(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
         int i, maxInd = 0;
         for (i = 1; i < count; ++i)
         {
-            if (qspAutoConvertCompare(args + i, args + maxInd) > 0)
+            if (qspVariantsCompare(args + i, args + maxInd) > 0)
                 maxInd = i;
         }
         qspMoveToNewVariant(res, args + maxInd);
