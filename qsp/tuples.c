@@ -172,7 +172,7 @@ int qspTuplesCompare(QSPTuple first, QSPTuple second)
     return (pos1 == end1) ? ((pos2 == end2) ? 0 : -1) : 1;
 }
 
-void qspAppendTupleToString(QSPBufString *res, QSPTuple tuple)
+void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
 {
     QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
     QSPString temp;
@@ -183,7 +183,7 @@ void qspAppendTupleToString(QSPBufString *res, QSPTuple tuple)
         switch (QSP_BASETYPE(item->Type))
         {
         case QSP_TYPE_TUPLE:
-            qspAppendTupleToString(res, QSP_PTUPLE(item));
+            qspAppendTupleToString(QSP_PTUPLE(item), res);
             break;
         case QSP_TYPE_NUM:
             qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(item)));

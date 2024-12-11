@@ -36,12 +36,12 @@
     QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);
     int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value);
     int qspTuplesCompare(QSPTuple first, QSPTuple second);
-    void qspAppendTupleToString(QSPBufString *res, QSPTuple tuple);
+    void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res);
 
     INLINE QSPString qspGetTupleAsString(QSPTuple tuple)
     {
         QSPBufString buf = qspNewBufString(16);
-        qspAppendTupleToString(&buf, tuple);
+        qspAppendTupleToString(tuple, &buf);
         return qspBufTextToString(buf);
     }
 
