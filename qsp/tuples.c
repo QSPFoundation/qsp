@@ -159,16 +159,15 @@ int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value)
 
 int qspTuplesCompare(QSPTuple first, QSPTuple second)
 {
-    int delta = 0;
+    int delta;
     QSPVariant *pos1 = first.Vals, *pos2 = second.Vals;
     QSPVariant *end1 = first.Vals + first.Items, *end2 = second.Vals + second.Items;
     while (pos2 < end2 && pos1 < end1)
     {
         delta = qspVariantsCompare(pos1, pos2);
-        if (delta) break;
+        if (delta) return delta;
         ++pos1, ++pos2;
     }
-    if (delta) return delta;
     return (pos1 == end1) ? ((pos2 == end2) ? 0 : -1) : 1;
 }
 
