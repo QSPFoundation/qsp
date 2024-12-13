@@ -136,7 +136,7 @@ void qspRefreshPlayList(void)
     QSP_BOOL isPlaying;
     QSP_CHAR *pos;
     QSPString *files, curFile;
-    int oldLocationState, i, count = qspPLFilesCount;
+    int i, oldLocationState, count = qspPLFilesCount;
     if (!count) return;
     qspCopyStrs(&files, qspPLFiles, 0, count);
     qspClearPlayList(QSP_FALSE);
