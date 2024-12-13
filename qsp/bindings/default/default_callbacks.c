@@ -31,7 +31,6 @@ void qspInitCallbacks(void)
 {
     int i;
     qspIsInCallback = QSP_FALSE;
-    qspToDisableCodeExec = QSP_FALSE;
     for (i = 0; i < QSP_CALL_DUMMY; ++i)
         qspCallbacks[i] = 0;
 }
@@ -47,7 +46,7 @@ void qspCallDebug(QSPString str)
     if (qspCallbacks[QSP_CALL_DEBUG])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_FALSE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_DEBUG](str);
         qspFinalizeCallback(&state);
         qspResetError(QSP_FALSE);
@@ -60,7 +59,7 @@ void qspCallSetTimer(int msecs)
     if (qspCallbacks[QSP_CALL_SETTIMER])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_SETTIMER](msecs);
         qspFinalizeCallback(&state);
     }
@@ -72,7 +71,7 @@ void qspCallRefreshInt(QSP_BOOL isForced)
     if (qspCallbacks[QSP_CALL_REFRESHINT])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_REFRESHINT](isForced);
         qspFinalizeCallback(&state);
     }
@@ -84,7 +83,7 @@ void qspCallSetInputStrText(QSPString text)
     if (qspCallbacks[QSP_CALL_SETINPUTSTRTEXT])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_SETINPUTSTRTEXT](text);
         qspFinalizeCallback(&state);
     }
@@ -96,7 +95,7 @@ void qspCallSystem(QSPString cmd)
     if (qspCallbacks[QSP_CALL_SYSTEM])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_FALSE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_SYSTEM](cmd);
         qspFinalizeCallback(&state);
     }
@@ -108,7 +107,7 @@ void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
     if (qspCallbacks[QSP_CALL_OPENGAME])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_FALSE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_OPENGAME](file, isNewGame);
         qspFinalizeCallback(&state);
     }
@@ -120,7 +119,7 @@ void qspCallOpenGameStatus(QSPString file)
     if (qspCallbacks[QSP_CALL_OPENGAMESTATUS])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_FALSE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_OPENGAMESTATUS](file);
         qspFinalizeCallback(&state);
     }
@@ -132,7 +131,7 @@ void qspCallSaveGameStatus(QSPString file)
     if (qspCallbacks[QSP_CALL_SAVEGAMESTATUS])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_FALSE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_SAVEGAMESTATUS](file);
         qspFinalizeCallback(&state);
     }
@@ -144,7 +143,7 @@ void qspCallShowMessage(QSPString text)
     if (qspCallbacks[QSP_CALL_SHOWMSGSTR])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_TRUE);
+        qspPrepareCallback(&state, QSP_TRUE);
         qspCallbacks[QSP_CALL_SHOWMSGSTR](text);
         qspFinalizeCallback(&state);
     }
@@ -157,7 +156,7 @@ int qspCallShowMenu(QSPListItem *items, int count)
     {
         QSPCallState state;
         int index;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_TRUE);
+        qspPrepareCallback(&state, QSP_TRUE);
         index = qspCallbacks[QSP_CALL_SHOWMENU](items, count);
         qspFinalizeCallback(&state);
         return index;
@@ -171,7 +170,7 @@ void qspCallShowPicture(QSPString file)
     if (qspCallbacks[QSP_CALL_SHOWIMAGE])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_SHOWIMAGE](file);
         qspFinalizeCallback(&state);
     }
@@ -183,7 +182,7 @@ void qspCallShowWindow(int type, QSP_BOOL toShow)
     if (qspCallbacks[QSP_CALL_SHOWWINDOW])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_SHOWWINDOW](type, toShow);
         qspFinalizeCallback(&state);
     }
@@ -195,7 +194,7 @@ void qspCallPlayFile(QSPString file, int volume)
     if (qspCallbacks[QSP_CALL_PLAYFILE])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_PLAYFILE](file, volume);
         qspFinalizeCallback(&state);
     }
@@ -208,7 +207,7 @@ QSP_BOOL qspCallIsPlayingFile(QSPString file)
     {
         QSPCallState state;
         QSP_BOOL isPlaying;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         isPlaying = (QSP_BOOL)qspCallbacks[QSP_CALL_ISPLAYINGFILE](file);
         qspFinalizeCallback(&state);
         return isPlaying;
@@ -222,7 +221,7 @@ void qspCallCloseFile(QSPString file)
     if (qspCallbacks[QSP_CALL_CLOSEFILE])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         qspCallbacks[QSP_CALL_CLOSEFILE](file);
         qspFinalizeCallback(&state);
     }
@@ -234,7 +233,7 @@ void qspCallSleep(int msecs)
     if (qspCallbacks[QSP_CALL_SLEEP])
     {
         QSPCallState state;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_TRUE);
+        qspPrepareCallback(&state, QSP_TRUE);
         qspCallbacks[QSP_CALL_SLEEP](msecs);
         qspFinalizeCallback(&state);
     }
@@ -247,7 +246,7 @@ int qspCallGetMSCount(void)
     {
         QSPCallState state;
         int count;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         count = qspCallbacks[QSP_CALL_GETMSCOUNT]();
         qspFinalizeCallback(&state);
         return count;
@@ -263,7 +262,7 @@ QSPString qspCallInputBox(QSPString text)
         QSPCallState state;
         QSP_CHAR *buffer;
         const int maxLen = 511;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_TRUE);
+        qspPrepareCallback(&state, QSP_TRUE);
         /* Prepare input buffer */
         buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
         *buffer = 0;
@@ -271,7 +270,11 @@ QSPString qspCallInputBox(QSPString text)
         qspCallbacks[QSP_CALL_INPUTBOX](text, buffer, maxLen);
         buffer[maxLen] = 0;
         /* Clean up */
-        qspFinalizeCallback(&state);
+        if (!qspFinalizeCallback(&state))
+        {
+            free(buffer);
+            return qspNullString;
+        }
         return qspStringFromC(buffer);
     }
     return qspNullString;
@@ -285,7 +288,7 @@ QSPString qspCallVersion(QSPString param)
         QSPCallState state;
         QSP_CHAR *buffer;
         const int maxLen = 511;
-        qspPrepareCallback(&state, QSP_TRUE, QSP_FALSE);
+        qspPrepareCallback(&state, QSP_FALSE);
         /* Prepare buffer for the response */
         buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
         *buffer = 0;
@@ -293,7 +296,11 @@ QSPString qspCallVersion(QSPString param)
         qspCallbacks[QSP_CALL_VERSION](param, buffer, maxLen);
         buffer[maxLen] = 0;
         /* Clean up */
-        qspFinalizeCallback(&state);
+        if (!qspFinalizeCallback(&state))
+        {
+            free(buffer);
+            return qspNullString;
+        }
         return qspStringFromC(buffer);
     }
     return qspCopyToNewText(QSP_STATIC_STR(QSP_VER));

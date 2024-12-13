@@ -191,7 +191,6 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_setSelActIndex(JNIEnv *env
 {
     if (ind >= 0 && ind < qspCurActsCount && ind != qspCurSelAction)
     {
-        if (qspToDisableCodeExec) return JNI_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspCurSelAction = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_ACTSELECTED), 0, 0);
@@ -205,7 +204,6 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execSelAction(JNIEnv *env,
 {
     if (qspCurSelAction >= 0)
     {
-        if (qspToDisableCodeExec) return JNI_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspExecAction(qspCurSelAction);
         if (qspErrorNum) return JNI_FALSE;
@@ -244,7 +242,6 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_setSelObjIndex(JNIEnv *env
 {
     if (ind >= 0 && ind < qspCurObjsCount && ind != qspCurSelObject)
     {
-        if (qspToDisableCodeExec) return JNI_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspCurSelObject = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJSELECTED), 0, 0);
@@ -343,7 +340,6 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getStrVarValue(JNIEnv *env,
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execString(JNIEnv *env, jobject api, jstring s, jboolean toRefreshUI)
 {
     QSPString codeStr;
-    if (qspToDisableCodeExec) return JNI_FALSE;
     qspPrepareExecution(QSP_FALSE);
     codeStr = qspFromJavaString(env, s);
     qspExecStringAsCodeWithArgs(codeStr, 0, 0, 1, 0);
@@ -358,7 +354,6 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_calculateStrExpr(JNIEnv *en
     jstring res;
     QSPString codeStr;
     QSPVariant value;
-    if (qspToDisableCodeExec) return qspToJavaString(env, qspNullString);
     qspPrepareExecution(QSP_FALSE);
     codeStr = qspFromJavaString(env, s);
     qspPrepareStringToExecution(&codeStr);
@@ -377,7 +372,6 @@ JNIEXPORT jlong JNICALL Java_com_libqsp_jni_QSPLib_calculateNumExpr(JNIEnv *env,
     QSP_BIGINT res;
     QSPString codeStr;
     QSPVariant value;
-    if (qspToDisableCodeExec) return 0;
     qspPrepareExecution(QSP_FALSE);
     codeStr = qspFromJavaString(env, s);
     qspPrepareStringToExecution(&codeStr);
@@ -397,7 +391,6 @@ JNIEXPORT jlong JNICALL Java_com_libqsp_jni_QSPLib_calculateNumExpr(JNIEnv *env,
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execLocationCode(JNIEnv *env, jobject api, jstring name, jboolean toRefreshUI)
 {
     QSPString locName;
-    if (qspToDisableCodeExec) return JNI_FALSE;
     qspPrepareExecution(QSP_FALSE);
     locName = qspFromJavaString(env, name);
     qspExecLocByNameWithArgs(locName, 0, 0, QSP_TRUE, 0);
@@ -421,7 +414,6 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execCounter(JNIEnv *env, j
 /* Execute code of the special "USERCOM" location */
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execUserInput(JNIEnv *env, jobject api, jboolean toRefreshUI)
 {
-    if (qspToDisableCodeExec) return JNI_FALSE;
     qspPrepareExecution(QSP_FALSE);
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_USERCOMMAND), 0, 0);
     if (qspErrorNum) return JNI_FALSE;
@@ -484,7 +476,6 @@ JNIEXPORT jbyteArray JNICALL Java_com_libqsp_jni_QSPLib_saveGameAsData(JNIEnv *e
     jbyteArray res;
     void *dataBuf;
     int dataBufSize = 64 * 1024;
-    if (qspToDisableCodeExec) return 0;
     qspPrepareExecution(QSP_FALSE);
     dataBuf = malloc(dataBufSize);
     while (1)
@@ -513,7 +504,6 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_openSavedGameFromData(JNIE
     QSP_BOOL res;
     jint dataSize;
     jbyte *arrayData;
-    if (qspToDisableCodeExec) return JNI_FALSE;
     qspPrepareExecution(QSP_FALSE);
     dataSize = (*env)->GetArrayLength(env, data);
     arrayData = (*env)->GetByteArrayElements(env, data, 0);
@@ -527,7 +517,6 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_openSavedGameFromData(JNIE
 /* Restart current game */
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_restartGame(JNIEnv *env, jobject api, jboolean toRefreshUI)
 {
-    if (qspToDisableCodeExec) return JNI_FALSE;
     qspPrepareExecution(QSP_FALSE);
     qspNewGame(QSP_TRUE);
     if (qspErrorNum) return JNI_FALSE;

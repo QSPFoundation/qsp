@@ -1209,9 +1209,7 @@ void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
 
 void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
-    if (count == 0)
-        qspClearAllVars(QSP_FALSE);
-    else
+    if (count)
     {
         QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_FALSE); /* we don't create a new array */
         if (!var) return;
@@ -1223,4 +1221,6 @@ void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
             qspRemoveArrayItem(var, arrIndex);
         }
     }
+    else
+        qspClearAllVars(QSP_FALSE);
 }

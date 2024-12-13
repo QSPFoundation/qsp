@@ -135,7 +135,6 @@ QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI)
 {
     if (ind >= 0 && ind < qspCurActsCount && ind != qspCurSelAction)
     {
-        if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspCurSelAction = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_ACTSELECTED), 0, 0);
@@ -149,7 +148,6 @@ QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI)
 {
     if (qspCurSelAction >= 0)
     {
-        if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspExecAction(qspCurSelAction);
         if (qspErrorNum) return QSP_FALSE;
@@ -186,7 +184,6 @@ QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI)
 {
     if (ind >= 0 && ind < qspCurObjsCount && ind != qspCurSelObject)
     {
-        if (qspToDisableCodeExec) return QSP_FALSE;
         qspPrepareExecution(QSP_FALSE);
         qspCurSelObject = ind;
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJSELECTED), 0, 0);
@@ -323,7 +320,6 @@ QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSPString *res)
 /* Execute a line of code */
 QSP_BOOL QSPExecString(QSPString s, QSP_BOOL toRefreshUI)
 {
-    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
     qspExecStringAsCodeWithArgs(s, 0, 0, 1, 0);
     if (qspErrorNum) return QSP_FALSE;
@@ -335,7 +331,6 @@ QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_
 {
     int resLen;
     QSPVariant value;
-    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
     qspPrepareStringToExecution(&s);
     value = qspCalculateExprValue(s);
@@ -353,7 +348,6 @@ QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_
 QSP_BOOL QSPCalculateNumExpression(QSPString s, QSP_BIGINT *res, QSP_BOOL toRefreshUI)
 {
     QSPVariant value;
-    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
     qspPrepareStringToExecution(&s);
     value = qspCalculateExprValue(s);
@@ -370,7 +364,6 @@ QSP_BOOL QSPCalculateNumExpression(QSPString s, QSP_BIGINT *res, QSP_BOOL toRefr
 /* Execute code of the specified location */
 QSP_BOOL QSPExecLocationCode(QSPString name, QSP_BOOL toRefreshUI)
 {
-    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
     qspExecLocByNameWithArgs(name, 0, 0, QSP_TRUE, 0);
     if (qspErrorNum) return QSP_FALSE;
@@ -392,7 +385,6 @@ QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI)
 /* Execute code of the special "USERCOM" location */
 QSP_BOOL QSPExecUserInput(QSP_BOOL toRefreshUI)
 {
-    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_USERCOMMAND), 0, 0);
     if (qspErrorNum) return QSP_FALSE;
@@ -424,7 +416,6 @@ QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNew
 /* Save game state to a buffer */
 QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI)
 {
-    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
     if (!qspSaveGameStatus(buf, bufSize, QSP_TRUE))
     {
@@ -442,7 +433,6 @@ QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI)
 /* Load game state from data */
 QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRefreshUI)
 {
-    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
     if (!qspOpenGameStatus((void *)data, dataSize)) return QSP_FALSE;
     if (qspErrorNum) return QSP_FALSE;
@@ -452,7 +442,6 @@ QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRef
 /* Restart current game */
 QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI)
 {
-    if (qspToDisableCodeExec) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
     qspNewGame(QSP_TRUE);
     if (qspErrorNum) return QSP_FALSE;

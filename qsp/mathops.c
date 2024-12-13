@@ -1476,7 +1476,7 @@ INLINE void qspFunctionGetObj(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), Q
 INLINE void qspFunctionIsPlay(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
     if (qspIsAnyString(QSP_STR(args[0])))
-        QSP_PNUM(res) = QSP_TOBOOL(qspCallIsPlayingFile(QSP_STR(args[0])) != 0);
+        QSP_PNUM(res) = QSP_TOBOOL(qspCallIsPlayingFile(QSP_STR(args[0])));
     else
         QSP_PNUM(res) = QSP_TOBOOL(QSP_FALSE);
 }

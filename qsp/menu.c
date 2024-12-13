@@ -134,7 +134,9 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     }
     if (itemsCount)
     {
+        int oldLocationState = qspLocationState;
         ind = qspCallShowMenu(menuItems, itemsCount);
+        if (qspLocationState != oldLocationState) return;
         if (ind >= 0 && ind < itemsCount)
         {
             QSPVariant arg = qspNumVariant(ind + 1);
