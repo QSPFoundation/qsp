@@ -139,12 +139,12 @@ INLINE void qspRestoreCurrentIncludes(void)
     }
 }
 
-void qspNewGame(QSP_BOOL toReset)
+QSP_BOOL qspNewGame(QSP_BOOL toReset)
 {
     if (!qspLocsCount)
     {
         qspSetError(QSP_ERR_GAMENOTLOADED);
-        return;
+        return QSP_FALSE;
     }
     if (toReset)
     {
@@ -154,25 +154,26 @@ void qspNewGame(QSP_BOOL toReset)
         qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
         qspMemClear(QSP_FALSE);
         qspResetTime(0);
-        if (qspLocationState != oldLocationState) return;
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowWindow(QSP_WIN_ACTS, QSP_TRUE);
-        if (qspLocationState != oldLocationState) return;
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowWindow(QSP_WIN_OBJS, QSP_TRUE);
-        if (qspLocationState != oldLocationState) return;
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowWindow(QSP_WIN_VARS, QSP_TRUE);
-        if (qspLocationState != oldLocationState) return;
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowWindow(QSP_WIN_INPUT, QSP_TRUE);
-        if (qspLocationState != oldLocationState) return;
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallSetInputStrText(qspNullString);
-        if (qspLocationState != oldLocationState) return;
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowPicture(qspNullString);
-        if (qspLocationState != oldLocationState) return;
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallCloseFile(qspNullString);
-        if (qspLocationState != oldLocationState) return;
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallSetTimer(QSP_DEFTIMERINTERVAL);
-        if (qspLocationState != oldLocationState) return;
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
     }
     qspNavigateToLocation(0, QSP_TRUE, 0, 0);
+    return QSP_TRUE;
 }
 
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS)
