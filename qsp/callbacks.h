@@ -40,7 +40,7 @@
 
     /* External functions */
     void qspPrepareCallback(QSPCallState *state, QSP_BOOL toRefreshUI);
-    QSP_BOOL qspFinalizeCallback(QSPCallState *state);
+    QSP_BOOL qspFinalizeCallback(QSPCallState *state, QSP_BOOL toResetLocationState);
 
     void qspInitCallbacks(void);
     void qspSetCallback(int type, QSP_CALLBACK func);

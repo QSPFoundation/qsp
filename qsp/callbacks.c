@@ -46,7 +46,7 @@ void qspPrepareCallback(QSPCallState *state, QSP_BOOL toRefreshUI)
     if (toRefreshUI) qspCallRefreshInt(QSP_TRUE);
 }
 
-QSP_BOOL qspFinalizeCallback(QSPCallState *state)
+QSP_BOOL qspFinalizeCallback(QSPCallState *state, QSP_BOOL toResetLocationState)
 {
     /* Restore the previous mode */
     qspIsInCallback = state->IsInCallback;
@@ -63,6 +63,15 @@ QSP_BOOL qspFinalizeCallback(QSPCallState *state)
     if (state->IsVarsDescChanged) qspIsVarsDescChanged = QSP_TRUE;
     if (state->IsMainDescChanged) qspIsMainDescChanged = QSP_TRUE;
 
-    if (qspLocationState != state->LocationState) return QSP_FALSE;
+    if (qspLocationState != state->LocationState)
+    {
+        if (toResetLocationState)
+        {
+            /* Reset the location state */
+            qspLocationState = state->LocationState;
+            qspResetError(QSP_FALSE);
+        }
+        return QSP_FALSE;
+    }
     return QSP_TRUE;
 }

@@ -62,8 +62,7 @@ void qspCallDebug(QSPString str)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_DEBUG], jniStr);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniStr);
 
-        qspFinalizeCallback(&state);
-        qspResetError(QSP_FALSE);
+        qspFinalizeCallback(&state, QSP_TRUE);
     }
 }
 
@@ -77,7 +76,7 @@ void qspCallSetTimer(int msecs)
 
         qspPrepareCallback(&state, QSP_FALSE);
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_SETTIMER], msecs);
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -91,7 +90,7 @@ void qspCallRefreshInt(QSP_BOOL isForced)
 
         qspPrepareCallback(&state, QSP_FALSE);
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_REFRESHINT], isForced);
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -109,7 +108,7 @@ void qspCallSetInputStrText(QSPString text)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_SETINPUTSTRTEXT], jniText);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniText);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -127,7 +126,7 @@ void qspCallSystem(QSPString cmd)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_SYSTEM], jniCmd);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniCmd);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -145,7 +144,7 @@ void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_OPENGAME], jniFile, isNewGame);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniFile);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -163,7 +162,7 @@ void qspCallOpenGameStatus(QSPString file)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_OPENGAMESTATUS], jniFile);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniFile);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -181,7 +180,7 @@ void qspCallSaveGameStatus(QSPString file)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_SAVEGAMESTATUS], jniFile);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniFile);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -199,7 +198,7 @@ void qspCallShowMessage(QSPString text)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_SHOWMSGSTR], jniText);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniText);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -234,7 +233,7 @@ int qspCallShowMenu(QSPListItem *items, int count)
         (*javaEnv)->DeleteLocalRef(javaEnv, jniMenuArray);
         free(jniItems);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
         return index;
     }
     return -1;
@@ -254,7 +253,7 @@ void qspCallShowPicture(QSPString file)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_SHOWIMAGE], jniFile);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniFile);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -268,7 +267,7 @@ void qspCallShowWindow(int type, QSP_BOOL toShow)
 
         qspPrepareCallback(&state, QSP_FALSE);
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_SHOWWINDOW], type, toShow);
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -286,7 +285,7 @@ void qspCallPlayFile(QSPString file, int volume)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_PLAYFILE], jniFile, volume);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniFile);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -305,7 +304,7 @@ QSP_BOOL qspCallIsPlayingFile(QSPString file)
         isPlaying = (QSP_BOOL)(*javaEnv)->CallBooleanMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_ISPLAYINGFILE], jniFile);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniFile);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
         return isPlaying;
     }
     return QSP_FALSE;
@@ -325,7 +324,7 @@ void qspCallCloseFile(QSPString file)
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_CLOSEFILE], jniFile);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniFile);
 
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -339,7 +338,7 @@ void qspCallSleep(int msecs)
 
         qspPrepareCallback(&state, QSP_TRUE);
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_SLEEP], msecs);
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
     }
 }
 
@@ -354,7 +353,7 @@ int qspCallGetMSCount(void)
 
         qspPrepareCallback(&state, QSP_FALSE);
         count = (*javaEnv)->CallIntMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_GETMSCOUNT]);
-        qspFinalizeCallback(&state);
+        qspFinalizeCallback(&state, QSP_FALSE);
         return count;
     }
     return 0;
@@ -378,7 +377,7 @@ QSPString qspCallInputBox(QSPString text)
         (*javaEnv)->DeleteLocalRef(javaEnv, jniText);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniRes);
 
-        if (!qspFinalizeCallback(&state))
+        if (!qspFinalizeCallback(&state, QSP_FALSE))
         {
             qspFreeString(&res);
             return qspNullString;
@@ -406,7 +405,7 @@ QSPString qspCallVersion(QSPString param)
         (*javaEnv)->DeleteLocalRef(javaEnv, jniParam);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniRes);
 
-        if (!qspFinalizeCallback(&state))
+        if (!qspFinalizeCallback(&state, QSP_FALSE))
         {
             qspFreeString(&res);
             return qspNullString;

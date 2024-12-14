@@ -343,6 +343,7 @@ QSP_BOOL qspGetLastVarValue(QSPString varName, QSPVariant *res)
 
 QSPString qspGetVarStrValue(QSPString name)
 {
+    int oldLocationState = qspLocationState;
     QSPVar *var = qspVarReference(name, QSP_FALSE);
     if (var)
     {
@@ -350,12 +351,17 @@ QSPString qspGetVarStrValue(QSPString name)
             return QSP_STR(var->Values[0]);
     }
     else
+    {
+        /* Reset the location state */
+        qspLocationState = oldLocationState;
         qspResetError(QSP_FALSE);
+    }
     return qspNullString;
 }
 
 QSP_BIGINT qspGetVarNumValue(QSPString name)
 {
+    int oldLocationState = qspLocationState;
     QSPVar *var = qspVarReference(name, QSP_FALSE);
     if (var)
     {
@@ -363,7 +369,11 @@ QSP_BIGINT qspGetVarNumValue(QSPString name)
             return QSP_NUM(var->Values[0]);
     }
     else
+    {
+        /* Reset the location state */
+        qspLocationState = oldLocationState;
         qspResetError(QSP_FALSE);
+    }
     return 0;
 }
 
