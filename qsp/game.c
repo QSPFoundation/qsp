@@ -539,10 +539,10 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurDesc = qspStringToBufString(qspDecodeString(strs[8], isUCS), 512);
     qspCurVars = qspStringToBufString(qspDecodeString(strs[9], isUCS), 512);
     locName = qspDecodeString(strs[10], isUCS);
-    qspCurToShowActs = QSP_TOBOOL(qspReadEncodedIntVal(strs[11], isUCS));
-    qspCurToShowObjs = QSP_TOBOOL(qspReadEncodedIntVal(strs[12], isUCS));
-    qspCurToShowVars = QSP_TOBOOL(qspReadEncodedIntVal(strs[13], isUCS));
-    qspCurToShowInput = QSP_TOBOOL(qspReadEncodedIntVal(strs[14], isUCS));
+    qspCurToShowActs = (qspReadEncodedIntVal(strs[11], isUCS) != 0);
+    qspCurToShowObjs = (qspReadEncodedIntVal(strs[12], isUCS) != 0);
+    qspCurToShowVars = (qspReadEncodedIntVal(strs[13], isUCS) != 0);
+    qspCurToShowInput = (qspReadEncodedIntVal(strs[14], isUCS) != 0);
     qspTimerInterval = qspReadEncodedIntVal(strs[15], isUCS);
     qspPLFilesCount = qspReadEncodedIntVal(strs[16], isUCS);
     ind = 17;
