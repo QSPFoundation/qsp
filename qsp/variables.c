@@ -107,14 +107,21 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
     if (qspIsInClass(*name.Str, QSP_CHAR_TYPEPREFIX))
         name.Str++;
 
-    if (qspIsEmpty(name) || qspIsInClass(*name.Str, QSP_CHAR_DIGIT) || qspIsAnyInClass(name, QSP_CHAR_DELIM))
+    if (qspIsEmpty(name) || qspIsInClass(*name.Str, QSP_CHAR_DIGIT))
     {
         qspSetError(QSP_ERR_INCORRECTNAME);
         return 0;
     }
     bCode = 7;
     for (pos = name.Str; pos < name.End; ++pos)
+    {
+        if (qspIsInClass(*pos, QSP_CHAR_DELIM))
+        {
+            qspSetError(QSP_ERR_INCORRECTNAME);
+            return 0;
+        }
         bCode = bCode * 31 + (unsigned char)*pos;
+    }
     bucket = qspVars + bCode % QSP_VARSBUCKETS;
     var = bucket->Vars;
     varsCount = bucket->VarsCount;
