@@ -30,10 +30,6 @@
 #include "time.h"
 #include "variables.h"
 
-#ifndef M_SQRT2
-    #define M_SQRT2 1.41421356237309504880 /* sqrt(2) */
-#endif
-
 static unsigned int qspRandX[55], qspRandY[256], qspRandZ;
 static int qspRandI, qspRandJ;
 QSP_BOOL qspIsDebug = QSP_FALSE;
@@ -203,7 +199,7 @@ INLINE double qspRandN(void)
 
 INLINE double qspNormalCdf(double x)
 {
-    return erfc(-x / M_SQRT2) / 2.0;
+    return erfc(-x / 1.41421356237309504880) / 2.0;
 }
 
 INLINE double qspPoly8Value(const double c[], double x)
