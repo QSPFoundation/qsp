@@ -30,6 +30,10 @@
 #include "time.h"
 #include "variables.h"
 
+#ifndef M_SQRT2
+    #define M_SQRT2 1.41421356237309504880 /* sqrt(2) */
+#endif
+
 static unsigned int qspRandX[55], qspRandY[256], qspRandZ;
 static int qspRandI, qspRandJ;
 QSP_BOOL qspIsDebug = QSP_FALSE;
