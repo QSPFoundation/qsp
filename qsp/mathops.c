@@ -881,7 +881,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpre
     return QSP_FALSE;
 }
 
-int qspFreeMathValue(QSPMathExpression *expression, int valueIndex) /* the last item represents the whole expression */
+int qspFreeMathExpression(QSPMathExpression *expression, int valueIndex) /* the last item represents the whole expression */
 {
     QSP_TINYINT argsCount;
     if (valueIndex < 0) return -1;
@@ -891,7 +891,7 @@ int qspFreeMathValue(QSPMathExpression *expression, int valueIndex) /* the last 
         int i;
         --valueIndex;
         for (i = 0; i < argsCount; ++i)
-            valueIndex = qspFreeMathValue(expression, valueIndex);
+            valueIndex = qspFreeMathExpression(expression, valueIndex);
     }
     else
     {
@@ -925,7 +925,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
     if (argsCount)
     {
         int i, argIndices[QSP_OPMAXARGS];
-        /* Find positions of arguments */
+        /* Find positions of the arguments */
         --valueIndex; /* move to the last argument */
         for (i = argsCount - 1; i >= 0; --i)
         {
@@ -1153,7 +1153,7 @@ QSPVariant qspCalculateExprValue(QSPString expr)
     if (!qspCompileMathExpression(expr, QSP_FALSE, &expression))
         return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     res = qspCalculateValue(&expression, expression.ItemsCount - 1);
-    qspFreeMathValue(&expression, expression.ItemsCount - 1);
+    qspFreeMathExpression(&expression, expression.ItemsCount - 1);
     return res;
 }
 

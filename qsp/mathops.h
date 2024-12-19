@@ -143,7 +143,7 @@
     void qspInitMath(void);
     void qspTerminateMath(void);
     QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression);
-    int qspFreeMathValue(QSPMathExpression *expression, int valueIndex);
+    int qspFreeMathExpression(QSPMathExpression *expression, int valueIndex);
     QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex);
     QSPVariant qspCalculateExprValue(QSPString expr);
 
