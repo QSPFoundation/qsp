@@ -153,6 +153,9 @@ QSP_BOOL qspNewGame(QSP_BOOL toReset)
         qspTimerInterval = QSP_DEFTIMERINTERVAL;
         qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
         qspMemClear(QSP_FALSE);
+        /* Init ARGS & RESULT */
+        qspInitSpecialVars();
+        /* Execute callbacks to update the current state */
         qspResetTime(0);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowWindow(QSP_WIN_ACTS, QSP_TRUE);
@@ -288,7 +291,8 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     QSPString locName;
     QSPBufString bufString;
     QSPVar *var;
-    QSPVarsGroup *bucket, *savedVarGroups;
+    QSPVarsBucket *bucket;
+    QSPVarsGroup *savedVarGroups;
     QSP_BIGINT msecsCount;
     int i, j, k, dataSize, savedVarGroupsCount, oldLocationState;
     /* Restore global variables */
@@ -515,7 +519,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
 QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
 {
     QSPVar *var;
-    QSPVarsGroup *bucket;
+    QSPVarsBucket *bucket;
     QSPString *strs, locName, gameString;
     QSP_BIGINT msecsCount;
     int i, j, k, ind, count, varsCount, valsCount, oldLocationState;
@@ -620,6 +624,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurLoc = qspLocIndex(locName);
     qspFreeString(&locName);
     qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjsListChanged = qspIsActsListChanged = QSP_TRUE;
+    /* Init ARGS & RESULT */
+    qspInitSpecialVars();
     /* Execute callbacks to update the current state */
     oldLocationState = qspLocationState;
     qspResetTime(msecsCount);

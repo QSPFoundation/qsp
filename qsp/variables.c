@@ -24,10 +24,12 @@
 #include "regexp.h"
 
 QSPVar qspNullVar;
-QSPVarsGroup qspVars[QSP_VARSBUCKETS];
+QSPVarsBucket qspVars[QSP_VARSBUCKETS];
 QSPVarsGroup *qspSavedVarGroups = 0;
 int qspSavedVarGroupsCount = 0;
 int qspSavedVarGroupsBufSize = 0;
+QSPVar *qspArgsVar = 0;
+QSPVar *qspResultVar = 0;
 
 QSP_TINYINT qspSpecToBaseTypeTable[128];
 
@@ -93,7 +95,7 @@ INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2)
 QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
 {
     int i, varsCount;
-    QSPVarsGroup *bucket;
+    QSPVarsBucket *bucket;
     QSPVar *var;
     QSP_CHAR *pos;
     unsigned int bCode;
@@ -151,7 +153,7 @@ void qspClearAllVars(QSP_BOOL toInit)
 {
     int i, j;
     QSPVar *var;
-    QSPVarsGroup *bucket = qspVars;
+    QSPVarsBucket *bucket = qspVars;
     for (i = 0; i < QSP_VARSBUCKETS; ++i)
     {
         if (!toInit && bucket->Vars)
@@ -169,6 +171,16 @@ void qspClearAllVars(QSP_BOOL toInit)
         bucket->Vars = 0;
         ++bucket;
     }
+}
+
+QSP_BOOL qspInitSpecialVars(void)
+{
+    QSPVar *varArgs, *varRes;
+    if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return QSP_FALSE;
+    if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE))) return QSP_FALSE;
+    qspArgsVar = varArgs;
+    qspResultVar = varRes;
+    return QSP_TRUE;
 }
 
 INLINE void qspRemoveArrayItem(QSPVar *var, int index)
@@ -487,7 +499,10 @@ INLINE void qspClearSavedVars()
     {
         int i;
         for (i = 0; i < qspSavedVarGroupsCount; ++i)
+        {
+            qspClearSpecialVars(qspSavedVarGroups + i);
             qspClearVars(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
+        }
         qspSavedVarGroupsCount = 0;
     }
 }
@@ -499,7 +514,10 @@ void qspRestoreGlobalVars(void)
         int i;
         /* Iterate backwards to properly restore hierarchy of local variables */
         for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
+        {
             qspRestoreVars(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
+            qspRestoreSpecialVars(qspSavedVarGroups + i);
+        }
         qspSavedVarGroupsCount = 0;
     }
 }
@@ -521,6 +539,16 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
     for (i = groupsCount - 1; i >= 0; --i, --curVarGroup, --curSavedVarGroup)
     {
         --qspSavedVarGroupsCount; /* we always remove this group */
+
+        if (curVarGroup->HasSpecialVars = curSavedVarGroup->HasSpecialVars)
+        {
+            qspMoveVar(&curVarGroup->ArgsVar, qspArgsVar);
+            qspMoveVar(qspArgsVar, &curSavedVarGroup->ArgsVar);
+
+            qspMoveVar(&curVarGroup->ResultVar, qspResultVar);
+            qspMoveVar(qspResultVar, &curSavedVarGroup->ResultVar);
+        }
+
         if (curSavedVarGroup->Vars)
         {
             curVarGroup->Vars = (QSPVar *)malloc(curSavedVarGroup->VarsCount * sizeof(QSPVar));
@@ -529,10 +557,16 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
             {
                 if (!(var = qspVarReference(curSavedVarGroup->Vars[j].Name, QSP_TRUE)))
                 {
+                    qspClearSpecialVars(curSavedVarGroup);
                     qspClearVars(curSavedVarGroup->Vars, curSavedVarGroup->VarsCount);
+                    qspClearSpecialVars(curVarGroup);
                     qspClearVars(curVarGroup->Vars, j);
                     while (++i < groupsCount)
-                        qspClearVars(varGroups[i].Vars, varGroups[i].VarsCount);
+                    {
+                        ++curVarGroup;
+                        qspClearSpecialVars(curVarGroup);
+                        qspClearVars(curVarGroup->Vars, curVarGroup->VarsCount);
+                    }
                     free(varGroups);
                     *savedVarGroups = 0;
                     return 0;
@@ -560,7 +594,10 @@ void qspClearSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
     {
         int i;
         for (i = 0; i < groupsCount; ++i)
+        {
+            qspClearSpecialVars(varGroups + i);
             qspClearVars(varGroups[i].Vars, varGroups[i].VarsCount);
+        }
         free(varGroups);
     }
 }
@@ -580,6 +617,15 @@ void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
         curSavedVarGroup = qspSavedVarGroups;
         for (i = 0; i < groupsCount; ++i, ++curVarGroup, ++curSavedVarGroup)
         {
+            if (curSavedVarGroup->HasSpecialVars = curVarGroup->HasSpecialVars)
+            {
+                qspMoveVar(&curSavedVarGroup->ArgsVar, qspArgsVar);
+                qspMoveVar(qspArgsVar, &curVarGroup->ArgsVar);
+
+                qspMoveVar(&curSavedVarGroup->ResultVar, qspResultVar);
+                qspMoveVar(qspResultVar, &curVarGroup->ResultVar);
+            }
+
             if (curVarGroup->Vars)
             {
                 curSavedVarGroup->Vars = (QSPVar *)malloc(curVarGroup->VarsCount * sizeof(QSPVar));
@@ -588,10 +634,14 @@ void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
                 {
                     if (!(var = qspVarReference(curVarGroup->Vars[j].Name, QSP_TRUE)))
                     {
-                        qspClearVars(curVarGroup->Vars, curVarGroup->VarsCount);
+                        qspClearSpecialVars(curSavedVarGroup);
                         qspClearVars(curSavedVarGroup->Vars, j);
-                        while (++i < groupsCount)
-                            qspClearVars(varGroups[i].Vars, varGroups[i].VarsCount);
+                        while (i < groupsCount) /* include the current var group */
+                        {
+                            qspClearSpecialVars(curVarGroup);
+                            qspClearVars(curVarGroup->Vars, curVarGroup->VarsCount);
+                            ++i, ++curVarGroup;
+                        }
                         free(varGroups);
                         return;
                     }
@@ -650,6 +700,27 @@ void qspClearVars(QSPVar *vars, int count)
             qspEmptyVar(vars + i);
         }
         free(vars);
+    }
+}
+
+void qspRestoreSpecialVars(QSPVarsGroup *varGroup)
+{
+    if (varGroup->HasSpecialVars)
+    {
+        qspEmptyVar(qspArgsVar);
+        qspMoveVar(qspArgsVar, &varGroup->ArgsVar);
+
+        qspEmptyVar(qspResultVar);
+        qspMoveVar(qspArgsVar, &varGroup->ResultVar);
+    }
+}
+
+void qspClearSpecialVars(QSPVarsGroup *varGroup)
+{
+    if (varGroup->HasSpecialVars)
+    {
+        qspEmptyVar(&varGroup->ArgsVar);
+        qspEmptyVar(&varGroup->ResultVar);
     }
 }
 
@@ -871,31 +942,31 @@ QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
     return resultValue;
 }
 
-void qspSetArgs(QSPVar *destVar, QSPVariant *args, int count, QSP_BOOL toMove)
+void qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove)
 {
-    qspEmptyVar(destVar);
+    qspEmptyVar(qspArgsVar);
     if (count)
     {
         int i;
-        destVar->ValsCapacity = destVar->ValsCount = count;
-        destVar->Values = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+        qspArgsVar->ValsCapacity = qspArgsVar->ValsCount = count;
+        qspArgsVar->Values = (QSPVariant *)malloc(count * sizeof(QSPVariant));
         if (toMove)
         {
             for (i = 0; i < count; ++i)
-                qspMoveToNewVariant(destVar->Values + i, args + i);
+                qspMoveToNewVariant(qspArgsVar->Values + i, args + i);
         }
         else
         {
             for (i = 0; i < count; ++i)
-                qspCopyToNewVariant(destVar->Values + i, args + i);
+                qspCopyToNewVariant(qspArgsVar->Values + i, args + i);
         }
     }
 }
 
-void qspApplyResult(QSPVar *varRes, QSPVariant *res)
+void qspApplyResult(QSPVariant *res)
 {
-    if (varRes->ValsCount)
-        qspCopyToNewVariant(res, varRes->Values);
+    if (qspResultVar->ValsCount)
+        qspCopyToNewVariant(res, qspResultVar->Values);
     else
         qspInitVariant(res, QSP_TYPE_UNDEF);
 }
@@ -1232,5 +1303,8 @@ void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
         }
     }
     else
+    {
         qspClearAllVars(QSP_FALSE);
+        qspInitSpecialVars();
+    }
 }

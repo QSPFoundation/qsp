@@ -77,6 +77,8 @@ void qspInitRuntime(void)
     qspInitCallbacks();
     qspInitStats();
     qspInitMath();
+    /* Init ARGS & RESULT */
+    qspInitSpecialVars();
 }
 
 void qspTerminateRuntime(void)
@@ -129,7 +131,10 @@ void qspMemClear(QSP_BOOL toInit)
         {
             int i;
             for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
+            {
+                qspClearSpecialVars(qspSavedVarGroups + i);
                 qspClearVars(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
+            }
             free(qspSavedVarGroups);
         }
     }

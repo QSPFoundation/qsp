@@ -195,17 +195,14 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
 
 void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res)
 {
-    QSPVar *varArgs, *varRes;
     int oldLocationState, locInd = qspLocIndex(name);
     if (locInd < 0)
     {
         qspSetError(QSP_ERR_LOCNOTFOUND);
         return;
     }
-    if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return;
-    if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE))) return;
-    qspAllocateSavedVarsGroupWithArgs(varArgs, varRes);
-    qspSetArgs(varArgs, args, argsCount, toMoveArgs);
+    qspAllocateSavedVarsGroupWithArgs();
+    qspSetArgs(args, argsCount, toMoveArgs);
     oldLocationState = qspLocationState;
     qspExecLocByIndex(locInd, QSP_FALSE);
     if (qspLocationState != oldLocationState)
@@ -213,15 +210,7 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT args
         qspClearLastSavedVarsGroup();
         return;
     }
-    if (res)
-    {
-        if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_FALSE)))
-        {
-            qspClearLastSavedVarsGroup();
-            return;
-        }
-        qspApplyResult(varRes, res);
-    }
+    if (res) qspApplyResult(res);
     qspRestoreLastSavedVarsGroup();
 }
 
@@ -262,15 +251,13 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
 
 void qspNavigateToLocation(int locInd, QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT argsCount)
 {
-    QSPVar *varArgs;
     int oldLocationState;
     if (locInd < 0 || locInd >= qspLocsCount) return;
     qspCurLoc = locInd;
     qspRestoreGlobalVars(); /* clean all local variables */
     if (qspErrorNum) return;
     /* We assign global ARGS here */
-    if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return;
-    qspSetArgs(varArgs, args, argsCount, QSP_FALSE);
+    qspSetArgs(args, argsCount, QSP_FALSE);
     qspClearAllActions(QSP_FALSE);
     ++qspLocationState;
     if (toChangeDesc) ++qspFullRefreshCount;

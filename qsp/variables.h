@@ -51,13 +51,25 @@
         QSPVar *Vars;
         int VarsCount;
         int Capacity;
+    } QSPVarsBucket;
+
+    typedef struct
+    {
+        QSP_BOOL HasSpecialVars;
+        QSPVar ArgsVar;
+        QSPVar ResultVar;
+        QSPVar *Vars;
+        int VarsCount;
+        int Capacity;
     } QSPVarsGroup;
 
     extern QSPVar qspNullVar;
-    extern QSPVarsGroup qspVars[QSP_VARSBUCKETS];
+    extern QSPVarsBucket qspVars[QSP_VARSBUCKETS];
     extern QSPVarsGroup *qspSavedVarGroups;
     extern int qspSavedVarGroupsCount;
     extern int qspSavedVarGroupsBufSize;
+    extern QSPVar *qspArgsVar;
+    extern QSPVar *qspResultVar;
 
     extern QSP_TINYINT qspSpecToBaseTypeTable[128];
 
@@ -65,6 +77,7 @@
     void qspInitVarTypes(void);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
     void qspClearAllVars(QSP_BOOL toInit);
+    QSP_BOOL qspInitSpecialVars(void);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
     QSP_BOOL qspGetFirstVarValue(QSPString varName, QSPVariant *res);
@@ -77,11 +90,13 @@
     void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount);
     void qspRestoreVars(QSPVar *vars, int count);
     void qspClearVars(QSPVar *vars, int count);
+    void qspRestoreSpecialVars(QSPVarsGroup *varGroup);
+    void qspClearSpecialVars(QSPVarsGroup *varGroup);
     int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
     QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin);
-    void qspSetArgs(QSPVar *destVar, QSPVariant *args, int count, QSP_BOOL toMove);
-    void qspApplyResult(QSPVar *varRes, QSPVariant *res);
+    void qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
+    void qspApplyResult(QSPVariant *res);
     /* Statements */
     void qspStatementSetVarsValues(QSPString s, QSPCachedStat *stat);
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);
@@ -158,20 +173,17 @@
         }
         qspSavedVarGroups[ind].Vars = 0;
         qspSavedVarGroups[ind].Capacity = qspSavedVarGroups[ind].VarsCount = 0;
+        qspSavedVarGroups[ind].HasSpecialVars = QSP_FALSE;
         return ind;
     }
 
-    INLINE int qspAllocateSavedVarsGroupWithArgs(QSPVar *varArgs, QSPVar *varRes)
+    INLINE int qspAllocateSavedVarsGroupWithArgs()
     {
-        QSPVar *varsList;
         int groupInd = qspAllocateSavedVarsGroup();
-        varsList = (QSPVar *)malloc(2 * sizeof(QSPVar)); /* ARGS & RESULT */
-        varsList[0].Name = qspCopyToNewText(varArgs->Name);
-        qspMoveVar(&varsList[0], varArgs);
-        varsList[1].Name = qspCopyToNewText(varRes->Name);
-        qspMoveVar(&varsList[1], varRes);
-        qspSavedVarGroups[groupInd].Vars = varsList;
-        qspSavedVarGroups[groupInd].Capacity = qspSavedVarGroups[groupInd].VarsCount = 2;
+
+        qspMoveVar(&qspSavedVarGroups[groupInd].ArgsVar, qspArgsVar);
+        qspMoveVar(&qspSavedVarGroups[groupInd].ResultVar, qspResultVar);
+        qspSavedVarGroups[groupInd].HasSpecialVars = QSP_TRUE;
         return groupInd;
     }
 
@@ -180,6 +192,7 @@
         if (qspSavedVarGroupsCount)
         {
             int ind = --qspSavedVarGroupsCount;
+            qspClearSpecialVars(qspSavedVarGroups + ind);
             qspClearVars(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
         }
     }
@@ -190,6 +203,7 @@
         {
             int ind = --qspSavedVarGroupsCount;
             qspRestoreVars(qspSavedVarGroups[ind].Vars, qspSavedVarGroups[ind].VarsCount);
+            qspRestoreSpecialVars(qspSavedVarGroups + ind);
         }
     }
 

@@ -692,12 +692,9 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int 
 void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, int codeOffset, QSPVariant *res)
 {
     QSPLineOfCode *strs;
-    QSPVar *varArgs, *varRes;
     int oldLocationState, linesCount;
-    if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return;
-    if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE))) return;
-    qspAllocateSavedVarsGroupWithArgs(varArgs, varRes);
-    qspSetArgs(varArgs, args, count, QSP_TRUE);
+    qspAllocateSavedVarsGroupWithArgs();
+    qspSetArgs(args, count, QSP_TRUE);
     linesCount = qspPreprocessData(s, &strs);
     oldLocationState = qspLocationState;
     qspExecCode(strs, 0, linesCount, codeOffset, 0);
@@ -707,15 +704,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
         qspClearLastSavedVarsGroup();
         return;
     }
-    if (res)
-    {
-        if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_FALSE)))
-        {
-            qspClearLastSavedVarsGroup();
-            return;
-        }
-        qspApplyResult(varRes, res);
-    }
+    if (res) qspApplyResult(res);
     qspRestoreLastSavedVarsGroup();
 }
 
@@ -1116,6 +1105,7 @@ INLINE void qspStatementClear(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUS
         break;
     case qspStatKillAll:
         qspClearAllVars(QSP_FALSE);
+        qspInitSpecialVars();
         qspClearAllObjectsWithNotify();
         break;
     case qspStatFreeLib:
