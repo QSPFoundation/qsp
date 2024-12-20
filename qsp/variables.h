@@ -118,6 +118,7 @@
 
     INLINE void qspInitVarData(QSPVar *var)
     {
+        /* We deliberately don't touch var's name here */
         var->Values = 0;
         var->ValsCount = 0;
         var->ValsCapacity = 0;
@@ -128,6 +129,7 @@
 
     INLINE void qspMoveVar(QSPVar *dest, QSPVar *src)
     {
+        /* We deliberately don't touch var's name here */
         dest->Values = src->Values;
         dest->ValsCount = src->ValsCount;
         dest->ValsCapacity = src->ValsCapacity;
@@ -139,6 +141,7 @@
 
     INLINE void qspEmptyVar(QSPVar *var)
     {
+        /* We deliberately don't touch var's name here */
         if (var->Values)
         {
             qspFreeVariants(var->Values, var->ValsCount);
