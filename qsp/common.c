@@ -67,6 +67,7 @@ void qspInitRuntime(void)
     qspCurLoc = -1;
     qspTimerInterval = 0;
     qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
+    qspArgsVar = qspResultVar = 0;
 
     setlocale(LC_ALL, QSP_LOCALE);
     qspSetSeed(0);
