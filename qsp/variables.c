@@ -540,7 +540,7 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
     {
         --qspSavedVarGroupsCount; /* we always remove this group */
 
-        if (curVarGroup->HasSpecialVars = curSavedVarGroup->HasSpecialVars)
+        if ((curVarGroup->HasSpecialVars = curSavedVarGroup->HasSpecialVars))
         {
             qspMoveVar(&curVarGroup->ArgsVar, qspArgsVar);
             qspMoveVar(qspArgsVar, &curSavedVarGroup->ArgsVar);
@@ -617,7 +617,7 @@ void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
         curSavedVarGroup = qspSavedVarGroups;
         for (i = 0; i < groupsCount; ++i, ++curVarGroup, ++curSavedVarGroup)
         {
-            if (curSavedVarGroup->HasSpecialVars = curVarGroup->HasSpecialVars)
+            if ((curSavedVarGroup->HasSpecialVars = curVarGroup->HasSpecialVars))
             {
                 qspMoveVar(&curSavedVarGroup->ArgsVar, qspArgsVar);
                 qspMoveVar(qspArgsVar, &curVarGroup->ArgsVar);
