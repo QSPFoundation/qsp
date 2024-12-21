@@ -166,36 +166,38 @@
         return var;
     }
 
-    INLINE int qspAllocateSavedVarsGroup()
+    INLINE QSPVarsGroup *qspAllocateSavedVarsGroup()
     {
+        QSPVarsGroup *varsGroup;
         int groupInd = qspSavedVarGroupsCount++;
         if (groupInd >= qspSavedVarGroupsBufSize)
         {
             qspSavedVarGroupsBufSize += QSP_VARGROUPSBATCHSIZE;
             qspSavedVarGroups = (QSPVarsGroup *)realloc(qspSavedVarGroups, qspSavedVarGroupsBufSize * sizeof(QSPVarsGroup));
         }
-        qspSavedVarGroups[groupInd].Vars = 0;
-        qspSavedVarGroups[groupInd].Capacity = qspSavedVarGroups[groupInd].VarsCount = 0;
-        qspSavedVarGroups[groupInd].HasSpecialVars = QSP_FALSE;
-        return groupInd;
+        varsGroup = qspSavedVarGroups + groupInd;
+        varsGroup->Vars = 0;
+        varsGroup->Capacity = varsGroup->VarsCount = 0;
+        varsGroup->HasSpecialVars = QSP_FALSE;
+        return varsGroup;
     }
 
-    INLINE int qspAllocateSavedVarsGroupWithArgs()
+    INLINE QSPVarsGroup *qspAllocateSavedVarsGroupWithArgs()
     {
-        int groupInd = qspAllocateSavedVarsGroup();
-        qspMoveVar(&qspSavedVarGroups[groupInd].ArgsVar, qspArgsVar);
-        qspMoveVar(&qspSavedVarGroups[groupInd].ResultVar, qspResultVar);
-        qspSavedVarGroups[groupInd].HasSpecialVars = QSP_TRUE;
-        return groupInd;
+        QSPVarsGroup *varsGroup = qspAllocateSavedVarsGroup();
+        qspMoveVar(&varsGroup->ArgsVar, qspArgsVar);
+        qspMoveVar(&varsGroup->ResultVar, qspResultVar);
+        varsGroup->HasSpecialVars = QSP_TRUE;
+        return varsGroup;
     }
 
     INLINE void qspClearLastSavedVarsGroup()
     {
         if (qspSavedVarGroupsCount)
         {
-            int groupInd = --qspSavedVarGroupsCount;
-            qspClearSpecialVars(qspSavedVarGroups + groupInd);
-            qspClearVars(qspSavedVarGroups[groupInd].Vars, qspSavedVarGroups[groupInd].VarsCount);
+            QSPVarsGroup *varsGroup = &qspSavedVarGroups[--qspSavedVarGroupsCount];
+            qspClearSpecialVars(varsGroup);
+            qspClearVars(varsGroup->Vars, varsGroup->VarsCount);
         }
     }
 
@@ -203,9 +205,9 @@
     {
         if (qspSavedVarGroupsCount)
         {
-            int groupInd = --qspSavedVarGroupsCount;
-            qspRestoreVars(qspSavedVarGroups[groupInd].Vars, qspSavedVarGroups[groupInd].VarsCount);
-            qspRestoreSpecialVars(qspSavedVarGroups + groupInd);
+            QSPVarsGroup *varsGroup = &qspSavedVarGroups[--qspSavedVarGroupsCount];
+            qspRestoreVars(varsGroup->Vars, varsGroup->VarsCount);
+            qspRestoreSpecialVars(varsGroup); /* special vars can override regular vars */
         }
     }
 
