@@ -711,7 +711,7 @@ void qspRestoreSpecialVars(QSPVarsGroup *varGroup)
         qspMoveVar(qspArgsVar, &varGroup->ArgsVar);
 
         qspEmptyVar(qspResultVar);
-        qspMoveVar(qspArgsVar, &varGroup->ResultVar);
+        qspMoveVar(qspResultVar, &varGroup->ResultVar);
     }
 }
 
