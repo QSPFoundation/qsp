@@ -176,8 +176,8 @@ void qspClearAllVars(QSP_BOOL toInit)
 QSP_BOOL qspInitSpecialVars(void)
 {
     QSPVar *varArgs, *varRes;
-    if (!(varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE))) return QSP_FALSE;
-    if (!(varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE))) return QSP_FALSE;
+    if (!((varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE)))) return QSP_FALSE;
+    if (!((varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_TRUE)))) return QSP_FALSE;
     qspArgsVar = varArgs;
     qspResultVar = varRes;
     return QSP_TRUE;
@@ -555,7 +555,7 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
             curVarGroup->Capacity = curVarGroup->VarsCount = curSavedVarGroup->VarsCount;
             for (j = 0; j < curSavedVarGroup->VarsCount; ++j)
             {
-                if (!(var = qspVarReference(curSavedVarGroup->Vars[j].Name, QSP_TRUE)))
+                if (!((var = qspVarReference(curSavedVarGroup->Vars[j].Name, QSP_TRUE))))
                 {
                     qspClearSpecialVars(curSavedVarGroup);
                     qspClearVars(curSavedVarGroup->Vars, curSavedVarGroup->VarsCount);
@@ -632,7 +632,7 @@ void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
                 curSavedVarGroup->Capacity = curSavedVarGroup->VarsCount = curVarGroup->VarsCount;
                 for (j = 0; j < curVarGroup->VarsCount; ++j)
                 {
-                    if (!(var = qspVarReference(curVarGroup->Vars[j].Name, QSP_TRUE)))
+                    if (!((var = qspVarReference(curVarGroup->Vars[j].Name, QSP_TRUE))))
                     {
                         qspClearSpecialVars(curSavedVarGroup);
                         qspClearVars(curSavedVarGroup->Vars, j);
@@ -670,7 +670,7 @@ void qspRestoreVars(QSPVar *vars, int count)
         QSPVar *destVar;
         for (i = 0; i < count; ++i)
         {
-            if (!(destVar = qspVarReference(vars[i].Name, QSP_TRUE)))
+            if (!((destVar = qspVarReference(vars[i].Name, QSP_TRUE))))
             {
                 while (i < count)
                 {
@@ -1221,10 +1221,10 @@ void qspStatementSetVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNU
 
 void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
-    QSPVar *dest;
-    QSPTuple *src;
     int startInd, maxCount;
-    if (!(dest = qspVarReference(QSP_STR(args[0]), QSP_TRUE))) return;
+    QSPTuple *src;
+    QSPVar *dest = qspVarReference(QSP_STR(args[0]), QSP_TRUE);
+    if (!dest) return;
     src = &QSP_TUPLE(args[1]);
     startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
     maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->Items);
@@ -1234,8 +1234,8 @@ void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
 void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
     QSPVar *dest, *src;
-    if (!(dest = qspVarReference(QSP_STR(args[0]), QSP_TRUE))) return;
-    if (!(src = qspVarReference(QSP_STR(args[1]), QSP_FALSE))) return;
+    if (!((dest = qspVarReference(QSP_STR(args[0]), QSP_TRUE)))) return;
+    if (!((src = qspVarReference(QSP_STR(args[1]), QSP_FALSE)))) return;
     if (dest != src)
     {
         int startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);

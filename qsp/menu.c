@@ -53,7 +53,7 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     QSPString menuLocs[QSP_MAXMENUITEMS], itemName, itemLocation, itemImage, str;
     QSPTuple tuple;
     QSP_CHAR *pos, *pos2;
-    if (!(var = qspVarReference(QSP_STR(args[0]), QSP_FALSE))) return;
+    if (!((var = qspVarReference(QSP_STR(args[0]), QSP_FALSE)))) return;
     if (count >= 2)
     {
         ind = QSP_TOINT(QSP_NUM(args[1]));
