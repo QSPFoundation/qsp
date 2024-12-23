@@ -52,6 +52,7 @@ INLINE QSPVariant qspCalculateArgumentValue(QSPMathExpression *expression, int v
 INLINE QSP_BOOL qspPushOperationToStack(QSP_TINYINT *opStack, QSP_TINYINT *argStack, int *opSp, QSP_TINYINT opCode);
 INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINYINT opCode, QSPVariant v);
 INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression* expression, QSP_TINYINT opCode, QSP_TINYINT argsCount);
+INLINE int qspFreeMathExpressionValue(QSPMathExpression *expression, int valueIndex);
 INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionStrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
@@ -512,6 +513,13 @@ INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINY
         qspSetError(QSP_ERR_TOOMANYITEMS);
         return QSP_FALSE;
     }
+    if (opIndex >= expression->Capacity)
+    {
+        expression->Capacity = opIndex + 32;
+        expression->CompOpCodes = (QSP_TINYINT *)realloc(expression->CompOpCodes, expression->Capacity * sizeof(QSP_TINYINT));
+        expression->CompArgsCounts = (QSP_TINYINT *)realloc(expression->CompArgsCounts, expression->Capacity * sizeof(QSP_TINYINT));
+        expression->CompValues = (QSPVariant *)realloc(expression->CompValues, expression->Capacity * sizeof(QSPVariant));
+    }
     expression->CompOpCodes[opIndex] = opCode;
     expression->CompArgsCounts[opIndex] = 0;
     expression->CompValues[opIndex] = v;
@@ -528,6 +536,13 @@ INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression *expression, QSP_
         qspSetError(QSP_ERR_TOOMANYITEMS);
         return QSP_FALSE;
     }
+    if (opIndex >= expression->Capacity)
+    {
+        expression->Capacity = opIndex + 32;
+        expression->CompOpCodes = (QSP_TINYINT *)realloc(expression->CompOpCodes, expression->Capacity * sizeof(QSP_TINYINT));
+        expression->CompArgsCounts = (QSP_TINYINT *)realloc(expression->CompArgsCounts, expression->Capacity * sizeof(QSP_TINYINT));
+        expression->CompValues = (QSPVariant *)realloc(expression->CompValues, expression->Capacity * sizeof(QSPVariant));
+    }
     expression->CompOpCodes[opIndex] = opCode;
     expression->CompArgsCounts[opIndex] = argsCount;
     ++expression->ItemsCount;
@@ -541,9 +556,13 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpre
     QSP_TINYINT opCode, opStack[QSP_STACKSIZE], argStack[QSP_STACKSIZE];
     QSP_BOOL waitForOperator = QSP_FALSE;
     int opSp = -1;
-    expression->ItemsCount = 0;
-    expression->IsReusable = isReusable;
     if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpStart)) return QSP_FALSE;
+    expression->IsReusable = isReusable;
+    expression->ItemsCount = 0;
+    expression->Capacity = 4;
+    expression->CompOpCodes = (QSP_TINYINT *)malloc(expression->Capacity * sizeof(QSP_TINYINT));
+    expression->CompArgsCounts = (QSP_TINYINT *)malloc(expression->Capacity * sizeof(QSP_TINYINT));
+    expression->CompValues = (QSPVariant *)malloc(expression->Capacity * sizeof(QSPVariant));
     while (1)
     {
         qspSkipSpaces(&s);
@@ -876,12 +895,14 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpre
                     break;
             }
         }
-        expression->ItemsCount = 0;
     }
+    free(expression->CompOpCodes);
+    free(expression->CompArgsCounts);
+    free(expression->CompValues);
     return QSP_FALSE;
 }
 
-int qspFreeMathExpression(QSPMathExpression *expression, int valueIndex) /* the last item represents the whole expression */
+INLINE int qspFreeMathExpressionValue(QSPMathExpression *expression, int valueIndex) /* the last item represents the whole expression */
 {
     QSP_TINYINT argsCount;
     if (valueIndex < 0) return -1;
@@ -891,7 +912,7 @@ int qspFreeMathExpression(QSPMathExpression *expression, int valueIndex) /* the 
         int i;
         --valueIndex;
         for (i = 0; i < argsCount; ++i)
-            valueIndex = qspFreeMathExpression(expression, valueIndex);
+            valueIndex = qspFreeMathExpressionValue(expression, valueIndex);
     }
     else
     {
@@ -905,6 +926,14 @@ int qspFreeMathExpression(QSPMathExpression *expression, int valueIndex) /* the 
         --valueIndex;
     }
     return valueIndex;
+}
+
+void qspFreeMathExpression(QSPMathExpression *expression)
+{
+    qspFreeMathExpressionValue(expression, expression->ItemsCount - 1);
+    free(expression->CompOpCodes);
+    free(expression->CompArgsCounts);
+    free(expression->CompValues);
 }
 
 QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* the last item represents the whole expression */
@@ -1153,7 +1182,7 @@ QSPVariant qspCalculateExprValue(QSPString expr)
     if (!qspCompileMathExpression(expr, QSP_FALSE, &expression))
         return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     res = qspCalculateValue(&expression, expression.ItemsCount - 1);
-    qspFreeMathExpression(&expression, expression.ItemsCount - 1);
+    qspFreeMathExpression(&expression);
     return res;
 }
 

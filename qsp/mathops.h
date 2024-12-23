@@ -52,10 +52,11 @@
 
     typedef struct
     {
-        QSPVariant CompValues[QSP_MAXITEMS];
-        QSP_TINYINT CompOpCodes[QSP_MAXITEMS];
-        QSP_TINYINT CompArgsCounts[QSP_MAXITEMS];
+        QSPVariant *CompValues;
+        QSP_TINYINT *CompOpCodes;
+        QSP_TINYINT *CompArgsCounts;
         int ItemsCount;
+        int Capacity;
         QSP_BOOL IsReusable;
     } QSPMathExpression;
 
@@ -143,7 +144,7 @@
     void qspInitMath(void);
     void qspTerminateMath(void);
     QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression);
-    int qspFreeMathExpression(QSPMathExpression *expression, int valueIndex);
+    void qspFreeMathExpression(QSPMathExpression *expression);
     QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex);
     QSPVariant qspCalculateExprValue(QSPString expr);
 
