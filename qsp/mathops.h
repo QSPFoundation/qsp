@@ -52,9 +52,14 @@
 
     typedef struct
     {
-        QSPVariant *CompValues;
-        QSP_TINYINT *CompOpCodes;
-        QSP_TINYINT *CompArgsCounts;
+        QSP_TINYINT OpCode;
+        QSP_TINYINT ArgsCount;
+        QSPVariant Value;
+    } QSPMathCompiledOp;
+
+    typedef struct
+    {
+        QSPMathCompiledOp *CompItems;
         int ItemsCount;
         int Capacity;
         QSP_BOOL IsReusable;

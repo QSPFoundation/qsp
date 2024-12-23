@@ -466,7 +466,7 @@ INLINE int qspSkipMathValue(QSPMathExpression *expression, int valueIndex)
 {
     QSP_TINYINT argsCount;
     if (valueIndex < 0) return -1;
-    argsCount = expression->CompArgsCounts[valueIndex];
+    argsCount = expression->CompItems[valueIndex].ArgsCount;
     --valueIndex;
     if (argsCount)
     {
@@ -516,13 +516,11 @@ INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINY
     if (opIndex >= expression->Capacity)
     {
         expression->Capacity = opIndex + 32;
-        expression->CompOpCodes = (QSP_TINYINT *)realloc(expression->CompOpCodes, expression->Capacity * sizeof(QSP_TINYINT));
-        expression->CompArgsCounts = (QSP_TINYINT *)realloc(expression->CompArgsCounts, expression->Capacity * sizeof(QSP_TINYINT));
-        expression->CompValues = (QSPVariant *)realloc(expression->CompValues, expression->Capacity * sizeof(QSPVariant));
+        expression->CompItems = (QSPMathCompiledOp *)realloc(expression->CompItems, expression->Capacity * sizeof(QSPMathCompiledOp));
     }
-    expression->CompOpCodes[opIndex] = opCode;
-    expression->CompArgsCounts[opIndex] = 0;
-    expression->CompValues[opIndex] = v;
+    expression->CompItems[opIndex].OpCode = opCode;
+    expression->CompItems[opIndex].ArgsCount = 0;
+    expression->CompItems[opIndex].Value = v;
     ++expression->ItemsCount;
     return QSP_TRUE;
 }
@@ -539,12 +537,10 @@ INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression *expression, QSP_
     if (opIndex >= expression->Capacity)
     {
         expression->Capacity = opIndex + 32;
-        expression->CompOpCodes = (QSP_TINYINT *)realloc(expression->CompOpCodes, expression->Capacity * sizeof(QSP_TINYINT));
-        expression->CompArgsCounts = (QSP_TINYINT *)realloc(expression->CompArgsCounts, expression->Capacity * sizeof(QSP_TINYINT));
-        expression->CompValues = (QSPVariant *)realloc(expression->CompValues, expression->Capacity * sizeof(QSPVariant));
+        expression->CompItems = (QSPMathCompiledOp *)realloc(expression->CompItems, expression->Capacity * sizeof(QSPMathCompiledOp));
     }
-    expression->CompOpCodes[opIndex] = opCode;
-    expression->CompArgsCounts[opIndex] = argsCount;
+    expression->CompItems[opIndex].OpCode = opCode;
+    expression->CompItems[opIndex].ArgsCount = argsCount;
     ++expression->ItemsCount;
     return QSP_TRUE;
 }
@@ -560,9 +556,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpre
     expression->IsReusable = isReusable;
     expression->ItemsCount = 0;
     expression->Capacity = 4;
-    expression->CompOpCodes = (QSP_TINYINT *)malloc(expression->Capacity * sizeof(QSP_TINYINT));
-    expression->CompArgsCounts = (QSP_TINYINT *)malloc(expression->Capacity * sizeof(QSP_TINYINT));
-    expression->CompValues = (QSPVariant *)malloc(expression->Capacity * sizeof(QSPVariant));
+    expression->CompItems = (QSPMathCompiledOp *)malloc(expression->Capacity * sizeof(QSPMathCompiledOp));
     while (1)
     {
         qspSkipSpaces(&s);
@@ -887,18 +881,16 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpre
         int i;
         for (i = expression->ItemsCount - 1; i >= 0; --i)
         {
-            switch (expression->CompOpCodes[i])
+            switch (expression->CompItems[i].OpCode)
             {
                 case qspOpValue:
                 case qspOpValueToFormat:
-                    qspFreeVariant(expression->CompValues + i);
+                    qspFreeVariant(&expression->CompItems[i].Value);
                     break;
             }
         }
     }
-    free(expression->CompOpCodes);
-    free(expression->CompArgsCounts);
-    free(expression->CompValues);
+    free(expression->CompItems);
     return QSP_FALSE;
 }
 
@@ -906,7 +898,7 @@ INLINE int qspFreeMathExpressionValue(QSPMathExpression *expression, int valueIn
 {
     QSP_TINYINT argsCount;
     if (valueIndex < 0) return -1;
-    argsCount = expression->CompArgsCounts[valueIndex];
+    argsCount = expression->CompItems[valueIndex].ArgsCount;
     if (argsCount)
     {
         int i;
@@ -916,11 +908,11 @@ INLINE int qspFreeMathExpressionValue(QSPMathExpression *expression, int valueIn
     }
     else
     {
-        switch (expression->CompOpCodes[valueIndex])
+        switch (expression->CompItems[valueIndex].OpCode)
         {
         case qspOpValue:
         case qspOpValueToFormat:
-            qspFreeVariant(expression->CompValues + valueIndex);
+            qspFreeVariant(&expression->CompItems[valueIndex].Value);
             break;
         }
         --valueIndex;
@@ -931,9 +923,7 @@ INLINE int qspFreeMathExpressionValue(QSPMathExpression *expression, int valueIn
 void qspFreeMathExpression(QSPMathExpression *expression)
 {
     qspFreeMathExpressionValue(expression, expression->ItemsCount - 1);
-    free(expression->CompOpCodes);
-    free(expression->CompArgsCounts);
-    free(expression->CompValues);
+    free(expression->CompItems);
 }
 
 QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* the last item represents the whole expression */
@@ -947,8 +937,8 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     }
     oldLocationState = qspLocationState;
-    opCode = expression->CompOpCodes[valueIndex];
-    argsCount = expression->CompArgsCounts[valueIndex];
+    opCode = expression->CompItems[valueIndex].OpCode;
+    argsCount = expression->CompItems[valueIndex].ArgsCount;
     type = qspOps[opCode].ResType;
     if (QSP_ISDEF(type)) tos.Type = type;
     if (argsCount)
@@ -1027,15 +1017,15 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
     {
     case qspOpValue:
         if (expression->IsReusable)
-            qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
+            qspCopyToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
         else
-            qspMoveToNewVariant(&tos, expression->CompValues + valueIndex);
+            qspMoveToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
         break;
     case qspOpValueToFormat:
         if (expression->IsReusable)
-            qspCopyToNewVariant(&tos, expression->CompValues + valueIndex);
+            qspCopyToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
         else
-            qspMoveToNewVariant(&tos, expression->CompValues + valueIndex);
+            qspMoveToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
         if (QSP_ISSTR(tos.Type))
         {
             QSPString textToFormat = QSP_STR(tos);
