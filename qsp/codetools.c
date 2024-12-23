@@ -23,6 +23,7 @@ INLINE int qspStatStringCompare(const void *name, const void *compareTo);
 INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos);
 INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
+INLINE QSP_TINYINT qspInitSingleArg(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
@@ -74,6 +75,10 @@ INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QS
         case qspStatSet:
         case qspStatLocal:
             return qspInitSetArgs(args, statCode, s, origStart, errorCode);
+        case qspStatImplicitStatement:
+        case qspStatIf:
+        case qspStatElseIf:
+            return qspInitSingleArg(args, statCode, s, origStart, errorCode);
         default:
             return qspInitRegularArgs(args, statCode, s, origStart, errorCode);
     }
@@ -120,6 +125,30 @@ INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUSED(st
     return argsCount;
 }
 
+INLINE QSP_TINYINT qspInitSingleArg(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode)
+{
+    QSPCachedArg *foundArgs = 0;
+    QSP_TINYINT argsCount = 0;
+    qspSkipSpaces(&s);
+    if (!qspIsEmpty(s))
+    {
+        /* Consider the whole string as 1 argument */
+        if (qspStats[statCode].MaxArgsCount)
+        {
+            argsCount = 1;
+            foundArgs = (QSPCachedArg *)malloc(sizeof(QSPCachedArg));
+            foundArgs[0].StartPos = (int)(s.Str - origStart);
+            foundArgs[0].EndPos = (int)(s.End - origStart);
+        }
+        else
+            *errorCode = QSP_ERR_ARGSCOUNT;
+    }
+    if (argsCount < qspStats[statCode].MinArgsCount)
+        *errorCode = QSP_ERR_ARGSCOUNT;
+    *args = foundArgs;
+    return argsCount;
+}
+
 INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode)
 {
     QSPCachedArg *foundArgs = 0;
@@ -127,66 +156,55 @@ INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode,
     qspSkipSpaces(&s);
     if (!qspIsEmpty(s))
     {
-        if (statCode == qspStatImplicitStatement)
+        QSP_CHAR *pos;
+        int bufSize = 0;
+        if (*s.Str == QSP_LRBRACK[0]) /* arguments might be specified using parentheses */
         {
-            /* It's always 1 argument only */
-            argsCount = 1;
-            foundArgs = (QSPCachedArg *)malloc(argsCount * sizeof(QSPCachedArg));
-            foundArgs[0].StartPos = (int)(s.Str - origStart);
-            foundArgs[0].EndPos = (int)(s.End - origStart);
-        }
-        else
-        {
-            QSP_CHAR *pos;
-            int bufSize = 0;
-            if (*s.Str == QSP_LRBRACK[0]) /* arguments might be specified using parentheses */
+            QSP_CHAR *bracket;
+            if (!(bracket = qspDelimPos(s, QSP_RRBRACK[0])))
             {
-                QSP_CHAR *bracket;
-                if (!(bracket = qspDelimPos(s, QSP_RRBRACK[0])))
-                {
-                    *errorCode = QSP_ERR_BRACKNOTFOUND;
-                    return 0;
-                }
-                if (!qspIsAnyString(qspStringFromPair(bracket + QSP_STATIC_LEN(QSP_RRBRACK), s.End)))
-                {
-                    /* We'll parse arguments between parentheses */
-                    s = qspStringFromPair(s.Str + QSP_STATIC_LEN(QSP_LRBRACK), bracket);
-                    qspSkipSpaces(&s);
-                }
+                *errorCode = QSP_ERR_BRACKNOTFOUND;
+                return 0;
             }
-            while (1)
+            if (!qspIsAnyString(qspStringFromPair(bracket + QSP_STATIC_LEN(QSP_RRBRACK), s.End)))
             {
-                if (argsCount >= qspStats[statCode].MaxArgsCount)
-                {
-                    *errorCode = QSP_ERR_ARGSCOUNT;
-                    break;
-                }
-                if (argsCount >= bufSize)
-                {
-                    bufSize = argsCount + 4;
-                    foundArgs = (QSPCachedArg *)realloc(foundArgs, bufSize * sizeof(QSPCachedArg));
-                }
-                pos = qspDelimPos(s, QSP_COMMA[0]);
-                if (pos)
-                {
-                    foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
-                    foundArgs[argsCount].EndPos = (int)(pos - origStart);
-                    ++argsCount;
-                }
-                else
-                {
-                    foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
-                    foundArgs[argsCount].EndPos = (int)(s.End - origStart);
-                    ++argsCount;
-                    break;
-                }
-                s.Str = pos + QSP_STATIC_LEN(QSP_COMMA);
+                /* We'll parse arguments between parentheses */
+                s = qspStringFromPair(s.Str + QSP_STATIC_LEN(QSP_LRBRACK), bracket);
                 qspSkipSpaces(&s);
-                if (qspIsEmpty(s))
-                {
-                    *errorCode = QSP_ERR_SYNTAX;
-                    break;
-                }
+            }
+        }
+        while (1)
+        {
+            if (argsCount >= qspStats[statCode].MaxArgsCount)
+            {
+                *errorCode = QSP_ERR_ARGSCOUNT;
+                break;
+            }
+            if (argsCount >= bufSize)
+            {
+                bufSize = argsCount + 4;
+                foundArgs = (QSPCachedArg *)realloc(foundArgs, bufSize * sizeof(QSPCachedArg));
+            }
+            pos = qspDelimPos(s, QSP_COMMA[0]);
+            if (pos)
+            {
+                foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
+                foundArgs[argsCount].EndPos = (int)(pos - origStart);
+                ++argsCount;
+            }
+            else
+            {
+                foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
+                foundArgs[argsCount].EndPos = (int)(s.End - origStart);
+                ++argsCount;
+                break;
+            }
+            s.Str = pos + QSP_STATIC_LEN(QSP_COMMA);
+            qspSkipSpaces(&s);
+            if (qspIsEmpty(s))
+            {
+                *errorCode = QSP_ERR_SYNTAX;
+                break;
             }
         }
     }
