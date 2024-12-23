@@ -555,7 +555,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpre
     if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpStart)) return QSP_FALSE;
     expression->IsReusable = isReusable;
     expression->ItemsCount = 0;
-    expression->Capacity = 4;
+    expression->Capacity = 8;
     expression->CompItems = (QSPMathCompiledOp *)malloc(expression->Capacity * sizeof(QSPMathCompiledOp));
     while (1)
     {
