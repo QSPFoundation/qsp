@@ -240,7 +240,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     for (i = startLoc; i < endLoc; ++i)
     {
         buf = qspDecodeString(strs[ind++], isUCS);
-        if (toAddLoc = (isNewGame || qspLocIndex(buf) < 0))
+        if ((toAddLoc = (isNewGame || qspLocIndex(buf) < 0)))
             qspLocs[locsCount].Name = buf;
         else
             qspFreeString(&buf);

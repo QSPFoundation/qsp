@@ -96,7 +96,7 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
                 qspFreeMenuLocs(menuLocs, itemsCount);
                 return;
             }
-            if (pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM))
+            if ((pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM)))
             {
                 itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos));
                 itemLocation = qspCopyToNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
