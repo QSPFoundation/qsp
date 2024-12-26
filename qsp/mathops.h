@@ -27,7 +27,7 @@
     #define QSP_STACKSIZE 30
     #define QSP_MAXITEMS 200
     #define QSP_CACHEDEXPSMAXBUCKETSIZE 5
-    #define QSP_CACHEDEXPSBUCKETS 1024
+    #define QSP_CACHEDEXPSBUCKETS 512
 
     /* Helpers */
     #define QSP_TOBOOL(x) ((x) != 0) /* converts a number to a QSP boolean value */
