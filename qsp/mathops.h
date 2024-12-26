@@ -164,7 +164,6 @@
     void qspInitMath(void);
     void qspTerminateMath(void);
     void qspClearAllMathExps(QSP_BOOL toInit);
-    QSPMathExpression *qspMathExpGetCompiled(QSPString expStr);
     QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression);
     void qspFreeMathExpression(QSPMathExpression *expression);
     QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex);

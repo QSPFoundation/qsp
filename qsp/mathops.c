@@ -42,6 +42,7 @@ INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BO
 INLINE int qspMathOpsCompare(const void *opName1, const void *opName2);
 INLINE int qspMathOpStringFullCompare(const void *name, const void *compareTo);
 INLINE int qspMathOpStringCompare(const void *name, const void *compareTo);
+INLINE QSPMathExpression *qspMathExpGetCompiled(QSPString expStr);
 INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName);
 INLINE QSP_BIGINT qspGetNumber(QSPString *expr);
 INLINE QSPString qspGetName(QSPString *expr);
@@ -195,7 +196,7 @@ void qspClearAllMathExps(QSP_BOOL toInit)
     }
 }
 
-QSPMathExpression *qspMathExpGetCompiled(QSPString expStr)
+INLINE QSPMathExpression *qspMathExpGetCompiled(QSPString expStr)
 {
     QSPMathExpression compiledExp;
     QSPCachedMathExp *exp;
