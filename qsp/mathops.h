@@ -26,6 +26,8 @@
     #define QSP_OPMAXARGS 20
     #define QSP_STACKSIZE 30
     #define QSP_MAXITEMS 200
+    #define QSP_CACHEDEXPSMAXBUCKETSIZE 5
+    #define QSP_CACHEDEXPSBUCKETS 1024
 
     /* Helpers */
     #define QSP_TOBOOL(x) ((x) != 0) /* converts a number to a QSP boolean value */
@@ -64,6 +66,19 @@
         int Capacity;
         QSP_BOOL IsReusable;
     } QSPMathExpression;
+
+    typedef struct
+    {
+        QSPString Text;
+        QSPMathExpression CompiledExp;
+    } QSPCachedMathExp;
+
+    typedef struct
+    {
+        QSPCachedMathExp Exps[QSP_CACHEDEXPSMAXBUCKETSIZE];
+        int ExpsCount;
+        int ExpToEvict;
+    } QSPCachedMathExpsBucket;
 
     enum
     {
@@ -148,6 +163,8 @@
     /* External functions */
     void qspInitMath(void);
     void qspTerminateMath(void);
+    void qspClearAllMathExps(QSP_BOOL toInit);
+    QSPMathExpression *qspMathExpGetCompiled(QSPString expStr);
     QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression);
     void qspFreeMathExpression(QSPMathExpression *expression);
     QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex);

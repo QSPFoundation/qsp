@@ -585,7 +585,7 @@ QSP_BOOL qspExecCode(QSPLineOfCode *s, int startLine, int endLine, int codeOffse
     QSP_BOOL uLevel, toExit = QSP_FALSE;
     int i, oldLocationState = qspLocationState, action = qspFlowExecute;
     /* Prepare temporary data */
-    if (uLevel = !jumpTo)
+    if ((uLevel = !jumpTo))
     {
         jumpToFake = qspNullString;
         jumpTo = &jumpToFake;

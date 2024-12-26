@@ -34,6 +34,7 @@ QSPMathOperation qspOps[qspOpLast_Operation];
 QSPMathOpName qspOpsNames[QSP_OPSLEVELS][QSP_MAXOPSNAMES];
 int qspOpsNamesCounts[QSP_OPSLEVELS];
 int qspOpMaxLen = 0;
+QSPCachedMathExpsBucket qspCachedMathExps[QSP_CACHEDEXPSBUCKETS];
 
 INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...);
 INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT type, int level);
@@ -169,6 +170,75 @@ INLINE int qspMathOpStringCompare(const void *name, const void *compareTo)
 {
     QSPMathOpName *opName = (QSPMathOpName *)compareTo;
     return qspStrsPartCompare(*(QSPString *)name, opName->Name, qspStrLen(opName->Name));
+}
+
+void qspClearAllMathExps(QSP_BOOL toInit)
+{
+    int i, j;
+    QSPCachedMathExp *exp;
+    QSPCachedMathExpsBucket *bucket = qspCachedMathExps;
+    for (i = 0; i < QSP_CACHEDEXPSBUCKETS; ++i)
+    {
+        if (!toInit && bucket->ExpsCount)
+        {
+            exp = bucket->Exps;
+            for (j = bucket->ExpsCount; j > 0; --j)
+            {
+                qspFreeString(&exp->Text);
+                qspFreeMathExpression(&exp->CompiledExp);
+                ++exp;
+            }
+        }
+        bucket->ExpsCount = 0;
+        bucket->ExpToEvict = 0;
+        ++bucket;
+    }
+}
+
+QSPMathExpression *qspMathExpGetCompiled(QSPString expStr)
+{
+    QSPMathExpression compiledExp;
+    QSPCachedMathExp *exp;
+    QSPCachedMathExpsBucket *bucket;
+    QSP_CHAR *pos;
+    int i, expsCount;
+    unsigned int bCode = 7;
+    /* Find a correct bucket by hash value */
+    for (pos = expStr.Str; pos < expStr.End; ++pos)
+        bCode = bCode * 31 + (unsigned char)*pos;
+    bucket = qspCachedMathExps + bCode % QSP_CACHEDEXPSBUCKETS;
+    /* Search for existing item in the bucket */
+    exp = bucket->Exps;
+    expsCount = bucket->ExpsCount;
+    for (i = expsCount; i > 0; --i)
+    {
+        if (!qspStrsCompare(exp->Text, expStr)) return &exp->CompiledExp;
+        ++exp;
+    }
+    /* Compile the new expression */
+    if (!qspCompileMathExpression(expStr, QSP_TRUE, &compiledExp)) return 0;
+    if (expsCount < QSP_CACHEDEXPSMAXBUCKETSIZE)
+    {
+        /* Add a new entry */
+        exp = bucket->Exps + expsCount;
+        exp->Text = qspCopyToNewText(expStr);
+        exp->CompiledExp = compiledExp;
+        bucket->ExpsCount++;
+        return &exp->CompiledExp;
+    }
+    else
+    {
+        /* Clear the old expression */
+        exp = bucket->Exps + bucket->ExpToEvict;
+        qspFreeString(&exp->Text);
+        qspFreeMathExpression(&exp->CompiledExp);
+        /* Replace it with the new one */
+        exp->Text = qspCopyToNewText(expStr);
+        exp->CompiledExp = compiledExp;
+        /* Update the next item to be evicted */
+        bucket->ExpToEvict = (bucket->ExpToEvict + 1) % QSP_CACHEDEXPSMAXBUCKETSIZE;
+        return &exp->CompiledExp;
+    }
 }
 
 void qspInitMath(void)
@@ -1167,13 +1237,9 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
 
 QSPVariant qspCalculateExprValue(QSPString expr)
 {
-    QSPVariant res;
-    QSPMathExpression expression;
-    if (!qspCompileMathExpression(expr, QSP_FALSE, &expression))
-        return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-    res = qspCalculateValue(&expression, expression.ItemsCount - 1);
-    qspFreeMathExpression(&expression);
-    return res;
+    QSPMathExpression *expression = qspMathExpGetCompiled(expr);
+    if (!expression) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+    return qspCalculateValue(expression, expression->ItemsCount - 1);
 }
 
 INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)

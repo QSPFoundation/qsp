@@ -112,6 +112,7 @@ void qspMemClear(QSP_BOOL toInit)
     qspClearAllActions(toInit);
     qspClearPlayList(toInit);
     qspClearAllRegExps(toInit);
+    qspClearAllMathExps(toInit);
     if (!toInit)
     {
         if (qspCurDesc.Len > 0)

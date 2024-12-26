@@ -69,8 +69,7 @@ QSPRegExp *qspRegExpGetCompiled(QSPString exp)
     }
     compExp->Text = qspCopyToNewText(exp);
     compExp->CompiledExp = onigExp;
-    if (++qspCompiledRegExpsCurInd == QSP_MAXCACHEDREGEXPS)
-        qspCompiledRegExpsCurInd = 0;
+    qspCompiledRegExpsCurInd = (qspCompiledRegExpsCurInd + 1) % QSP_MAXCACHEDREGEXPS;
     return compExp;
 }
 
