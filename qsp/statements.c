@@ -866,7 +866,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
         QSP_BOOL conditionValue;
         QSPLineOfCode iteratorLine;
         QSPMathExpression expression;
-        if (!qspCompileMathExpression(condition, QSP_TRUE, &expression))
+        if (!qspCompileMathExpression(condition, &expression))
         {
             qspClearLastSavedVarsGroup();
             return QSP_FALSE;
@@ -935,7 +935,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
         QSP_BOOL conditionValue;
         QSPLineOfCode iteratorLine;
         QSPMathExpression expression;
-        if (!qspCompileMathExpression(condition, QSP_TRUE, &expression))
+        if (!qspCompileMathExpression(condition, &expression))
         {
             qspClearLastSavedVarsGroup();
             return QSP_FALSE;

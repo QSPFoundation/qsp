@@ -217,7 +217,7 @@ INLINE QSPMathExpression *qspMathExpGetCompiled(QSPString expStr)
         ++exp;
     }
     /* Compile the new expression */
-    if (!qspCompileMathExpression(expStr, QSP_TRUE, &compiledExp)) return 0;
+    if (!qspCompileMathExpression(expStr, &compiledExp)) return 0;
     if (expsCount < QSP_CACHEDEXPSMAXBUCKETSIZE)
     {
         /* Add a new entry */
@@ -616,7 +616,7 @@ INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression *expression, QSP_
     return QSP_TRUE;
 }
 
-QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression)
+QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
 {
     QSPVariant v;
     QSPString name;
@@ -624,7 +624,6 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpre
     QSP_BOOL waitForOperator = QSP_FALSE;
     int opSp = -1;
     if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpStart)) return QSP_FALSE;
-    expression->IsReusable = isReusable;
     expression->ItemsCount = 0;
     expression->Capacity = 8;
     expression->CompItems = (QSPMathCompiledOp *)malloc(expression->Capacity * sizeof(QSPMathCompiledOp));
@@ -1087,16 +1086,10 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
     switch (opCode)
     {
     case qspOpValue:
-        if (expression->IsReusable)
-            qspCopyToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
-        else
-            qspMoveToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
+        qspCopyToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
         break;
     case qspOpValueToFormat:
-        if (expression->IsReusable)
-            qspCopyToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
-        else
-            qspMoveToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
+        qspCopyToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
         if (QSP_ISSTR(tos.Type))
         {
             QSPString textToFormat = QSP_STR(tos);

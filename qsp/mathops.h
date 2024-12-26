@@ -64,7 +64,6 @@
         QSPMathCompiledOp *CompItems;
         int ItemsCount;
         int Capacity;
-        QSP_BOOL IsReusable;
     } QSPMathExpression;
 
     typedef struct
@@ -164,7 +163,7 @@
     void qspInitMath(void);
     void qspTerminateMath(void);
     void qspClearAllMathExps(QSP_BOOL toInit);
-    QSP_BOOL qspCompileMathExpression(QSPString s, QSP_BOOL isReusable, QSPMathExpression *expression);
+    QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression);
     void qspFreeMathExpression(QSPMathExpression *expression);
     QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex);
     QSPVariant qspCalculateExprValue(QSPString expr);
