@@ -123,9 +123,9 @@
         if (s->Str) free(s->Str);
     }
 
-    INLINE void qspFreeNewString(QSPString *s, QSPString *old)
+    INLINE void qspFreeNewString(QSPString *strToRelease, QSPString *strToKeep)
     {
-        if (s->Str && s->Str != old->Str) free(s->Str);
+        if (strToRelease->Str && strToRelease->Str != strToKeep->Str) free(strToRelease->Str);
     }
 
     INLINE void qspClearText(QSPString *s)

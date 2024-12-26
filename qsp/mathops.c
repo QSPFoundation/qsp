@@ -1086,9 +1086,11 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
     switch (opCode)
     {
     case qspOpValue:
+        /* Copy the value instead of moving it because it has to be possible to reuse the compiled expression */
         qspCopyToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
         break;
     case qspOpValueToFormat:
+        /* Copy the value instead of moving it because it has to be possible to reuse the compiled expression */
         qspCopyToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
         if (QSP_ISSTR(tos.Type))
         {
