@@ -1,57 +1,57 @@
-Описание формата файлов игр QSP.
--------------------------------------------------------------------------------------------
+Specification of the QSP game file format.
+---------------------------------------------
 
-1) Для всех строк используются разделители "\r\n" (0x0D,0x0A).
-2) Кодирование строк осуществляется смещением кодов символов строки на -5 (как для Unicode версии, так и для ANSI). Позволяет сохранить в одной строке несколько, разделённых "\r\n" (т.к. для "\r\n" также происходит кодирование).
-3) Unicode поддерживается как для "старого", так и для "нового" форматов. В Unicode-версиях каждый символ файла представлен 2мя байтами (UCS-2 LE) - тип данных uint16_t / unsigned short.
+1) All lines use the delimiter "\r\n" (0x0D, 0x0A).
+2) String encoding is performed by shifting the character codes of the string by -5 (for both Unicode and ANSI versions). This allows multiple game strings to be stored in one line (since "\r\n" is also encoded).
+3) Unicode is supported for both "old" and "new" formats. In the Unicode versions, each file character is represented by 2 bytes (UCS-2 LE) — the data type is uint16_t / unsigned short.
 
-В описании используются обозначения:
-[строка] - строка, записанная без изменений
-[$строка] - обычная строка
-[$$кодированная строка] - кодированная строка
-[#число] - переведенное в строку число
-[##кодированное число] - кодированная строка с числом
+The following notation is used:
+[text] - a string written without changes
+[$text] - a regular string
+[$$encoded text] - an encoded string
+[#number] - a number converted to a string
+[##encoded number] - an encoded string with a number
 
--------------------------------------------------------------------------------------------
-Новый формат файлов игр:
+New game file format:
+---------------------------
 
-Заголовок:
+Header:
 
 [QSPGAME]
-[$версия редактора / утилиты, которой сохраняется файл]
-[$$пароль к файлу игры]
-[##количество локаций игры]
+[$version of the game and utility used to save the file]
+[$$password of the game file]
+[##number of game locations]
 
-Локации сохраняются последовательно, в следующем формате:
+Locations are saved sequentially in the following format:
 
-[$$название локации]
-[$$базовое описание локации]
-[$$код локации]
-[##количество действий на локации]
+[$$location name]
+[$$base description of the location]
+[$$location code]
+[##number of base actions at the location]
 
-Базовые действия на локации сохраняются последовательно, в следующем формате:
+Base actions at the location are saved sequentially in the following format:
 
-[$$изображение для действия - относительный путь к файлу]
-[$$название действия]
-[$$код действия]
+[$$image of the action - relative file path]
+[$$action name]
+[$$action code]
 
--------------------------------------------------------------------------------------------
-Старый формат файлов игр:
+Old game file format:
+---------------------------
 
-Заголовок:
+Header:
 
-[#количество локаций игры]
-[$$пароль к файлу игры]
-[$версия редактора / утилиты, которой сохраняется файл]
-27 зарезервированных пустых строк
+[#number of game locations]
+[$$password of the game file]
+[$version of the game and utility used to save the file]
+27 reserved empty lines
 
-Локации сохраняются последовательно, в следующем формате:
+Locations are saved sequentially in the following format:
 
-[$$название локации]
-[$$базовое описание локации]
-[$$код локации]
+[$$location name]
+[$$base description of the location]
+[$$location code]
 
-Сохраняется ровно 20 базовых действий (для отсутствующих действий записываются пустые строки), в следующем формате:
+Exactly 20 base actions are saved (for missing actions, empty lines are recorded), in the following format:
 
-[$$название действия]
-[$$код действия]
+[$$action name]
+[$$action code]
