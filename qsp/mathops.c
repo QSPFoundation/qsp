@@ -578,6 +578,7 @@ INLINE QSP_BOOL qspPushOperationToStack(QSP_TINYINT *opStack, QSP_TINYINT *argSt
 
 INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINYINT opCode, QSPVariant v)
 {
+    QSPMathCompiledOp *compiledOp;
     int opIndex = expression->ItemsCount;
     if (opIndex == QSP_MAXITEMS)
     {
@@ -589,9 +590,10 @@ INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINY
         expression->Capacity = opIndex + 32;
         expression->CompItems = (QSPMathCompiledOp *)realloc(expression->CompItems, expression->Capacity * sizeof(QSPMathCompiledOp));
     }
-    expression->CompItems[opIndex].OpCode = opCode;
-    expression->CompItems[opIndex].ArgsCount = 0;
-    expression->CompItems[opIndex].Value = v;
+    compiledOp = expression->CompItems + opIndex;
+    compiledOp->OpCode = opCode;
+    compiledOp->ArgsCount = 0;
+    compiledOp->Value = v;
     ++expression->ItemsCount;
     return QSP_TRUE;
 }
@@ -599,6 +601,7 @@ INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINY
 /* N.B. We can safely add operations with the highest priority directly to the output w/o intermediate stack */
 INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSP_TINYINT argsCount)
 {
+    QSPMathCompiledOp *compiledOp;
     int opIndex = expression->ItemsCount;
     if (opIndex == QSP_MAXITEMS)
     {
@@ -610,8 +613,9 @@ INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression *expression, QSP_
         expression->Capacity = opIndex + 32;
         expression->CompItems = (QSPMathCompiledOp *)realloc(expression->CompItems, expression->Capacity * sizeof(QSPMathCompiledOp));
     }
-    expression->CompItems[opIndex].OpCode = opCode;
-    expression->CompItems[opIndex].ArgsCount = argsCount;
+    compiledOp = expression->CompItems + opIndex;
+    compiledOp->OpCode = opCode;
+    compiledOp->ArgsCount = argsCount;
     ++expression->ItemsCount;
     return QSP_TRUE;
 }
