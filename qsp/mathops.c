@@ -767,7 +767,8 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 name = qspGetString(&s);
                 if (qspErrorNum) break;
                 v = qspStrVariant(name, QSP_TYPE_STR);
-                opCode = qspIsEmpty(name) ? qspOpValue : qspOpValueToFormat;
+                /* Format strings if they contain subexpressions */
+                opCode = qspStrStr(name, QSP_STATIC_STR(QSP_LSUBEX)) ? qspOpValueToFormat : qspOpValue;
                 if (!qspAppendValueToCompiled(expression, opCode, v))
                 {
                     qspFreeString(&QSP_STR(v));
