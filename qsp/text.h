@@ -238,12 +238,15 @@
 
     INLINE int qspStrsCompare(QSPString str1, QSPString str2)
     {
-        int delta = 0;
+        int delta;
         QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;
-        while (pos2 < str2.End && pos1 < str1.End && !(delta = (int)*pos1 - *pos2))
+        QSP_CHAR *end1 = str1.End, *end2 = str2.End;
+        while (pos2 < end2 && pos1 < end1)
+        {
+            if ((delta = (int)*pos1 - *pos2)) return delta;
             ++pos1, ++pos2;
-        if (delta) return delta;
-        return (pos1 == str1.End) ? ((pos2 == str2.End) ? 0 : -1) : 1;
+        }
+        return (pos1 == end1) ? ((pos2 == end2) ? 0 : -1) : 1;
     }
 
     INLINE QSP_CHAR *qspStrChar(QSPString str, QSP_CHAR ch)
