@@ -452,8 +452,8 @@ INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName)
 INLINE QSP_BIGINT qspGetNumber(QSPString *expr)
 {
     QSP_BIGINT num = 0;
-    QSP_CHAR *pos = expr->Str;
-    while (pos < expr->End && qspIsInClass(*pos, QSP_CHAR_DIGIT))
+    QSP_CHAR *pos = expr->Str, *endPos = expr->End;
+    while (pos < endPos && qspIsInClass(*pos, QSP_CHAR_DIGIT))
     {
         num = num * 10 + (*pos - QSP_FMT('0'));
         ++pos;
@@ -465,8 +465,8 @@ INLINE QSP_BIGINT qspGetNumber(QSPString *expr)
 
 INLINE QSPString qspGetName(QSPString *expr)
 {
-    QSP_CHAR *startPos = expr->Str, *pos = startPos;
-    while (++pos < expr->End)
+    QSP_CHAR *startPos = expr->Str, *endPos = expr->End, *pos = startPos;
+    while (++pos < endPos)
     {
         if (qspIsInClass(*pos, QSP_CHAR_DELIM)) break;
     }
@@ -494,11 +494,11 @@ INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr)
 INLINE QSPString qspGetString(QSPString *expr)
 {
     int strLen = 0, bufSize = 16;
-    QSP_CHAR *buf, *pos = expr->Str, quot = *pos;
+    QSP_CHAR *buf, *pos = expr->Str, *endPos = expr->End, quot = *pos;
     buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
     while (1)
     {
-        if (++pos >= expr->End)
+        if (++pos >= endPos)
         {
             qspSetError(QSP_ERR_QUOTNOTFOUND);
             free(buf);
@@ -507,7 +507,7 @@ INLINE QSPString qspGetString(QSPString *expr)
         if (*pos == quot)
         {
             ++pos;
-            if (pos >= expr->End || *pos != quot) break;
+            if (pos >= endPos || *pos != quot) break;
         }
         if (strLen >= bufSize)
         {
