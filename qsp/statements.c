@@ -378,24 +378,29 @@ INLINE int qspSearchLabel(QSPLineOfCode *lines, int start, int end, QSPString st
 
 QSP_TINYINT qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
 {
+    QSP_TINYINT argsCount;
     if (stat->ErrorCode)
     {
         qspSetError(stat->ErrorCode);
         return 0;
     }
-    if (stat->ArgsCount > 0)
+    argsCount = stat->ArgsCount;
+    if (argsCount > 0)
     {
-        QSP_TINYINT argIndex, type;
+        QSPCachedArg *statArgs;
+        QSP_TINYINT argIndex, type, *statArgsTypes;
         int oldLocationState = qspLocationState;
-        for (argIndex = 0; argIndex < stat->ArgsCount; ++argIndex)
+        statArgs = stat->Args;
+        statArgsTypes = qspStats[stat->Stat].ArgsTypes;
+        for (argIndex = 0; argIndex < argsCount; ++argIndex)
         {
-            args[argIndex] = qspCalculateExprValue(qspStringFromPair(s.Str + stat->Args[argIndex].StartPos, s.Str + stat->Args[argIndex].EndPos));
+            args[argIndex] = qspCalculateExprValue(qspStringFromPair(s.Str + statArgs[argIndex].StartPos, s.Str + statArgs[argIndex].EndPos));
             if (qspLocationState != oldLocationState)
             {
                 qspFreeVariants(args, argIndex);
                 return 0;
             }
-            type = qspStats[stat->Stat].ArgsTypes[argIndex];
+            type = statArgsTypes[argIndex];
             if (QSP_ISDEF(type) && !qspConvertVariantTo(args + argIndex, type))
             {
                 qspSetError(QSP_ERR_TYPEMISMATCH);
@@ -404,7 +409,7 @@ QSP_TINYINT qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
             }
         }
     }
-    return stat->ArgsCount;
+    return argsCount;
 }
 
 INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
