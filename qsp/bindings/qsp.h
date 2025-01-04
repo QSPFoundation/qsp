@@ -111,7 +111,7 @@
         #define QSP_TOINT(x) (x)
     #endif
 
-    static QSP_TINYINT qspBaseTypeTable[QSP_TYPE_DEFINED_TYPES] =
+    static const QSP_TINYINT qspBaseTypeTable[QSP_TYPE_DEFINED_TYPES] =
     {
         /* TUPLE */  QSP_TYPE_TUPLE,
         /* NUMBER */ QSP_TYPE_NUM,

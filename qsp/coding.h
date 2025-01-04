@@ -23,10 +23,10 @@
 
     #define QSP_CODREMOV 5
 
-    extern unsigned char qspCP1251ToUpperTable[];
-    extern unsigned char qspCP1251ToLowerTable[];
-    extern unsigned char qspKOI8RToUpperTable[];
-    extern unsigned char qspKOI8RToLowerTable[];
+    extern const unsigned char qspCP1251ToUpperTable[];
+    extern const unsigned char qspCP1251ToLowerTable[];
+    extern const unsigned char qspKOI8RToUpperTable[];
+    extern const unsigned char qspKOI8RToLowerTable[];
 
     /* External functions */
     void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize);
