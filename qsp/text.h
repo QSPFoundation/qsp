@@ -188,8 +188,8 @@
 
     INLINE void qspSkipSpaces(QSPString *s)
     {
-        QSP_CHAR *pos = s->Str;
-        while (pos < s->End && qspIsInClass(*pos, QSP_CHAR_SPACE)) ++pos;
+        QSP_CHAR *pos = s->Str, *end = s->End;
+        while (pos < end && qspIsInClass(*pos, QSP_CHAR_SPACE)) ++pos;
         s->Str = pos;
     }
 
@@ -209,8 +209,8 @@
 
     INLINE void qspLowerStr(QSPString *str)
     {
-        QSP_CHAR *pos = str->Str;
-        while (pos < str->End)
+        QSP_CHAR *pos = str->Str, *end = str->End;
+        while (pos < end)
         {
             *pos = (QSP_CHAR)QSP_CHRLWR(*pos);
             ++pos;
@@ -219,8 +219,8 @@
 
     INLINE void qspUpperStr(QSPString *str)
     {
-        QSP_CHAR *pos = str->Str;
-        while (pos < str->End)
+        QSP_CHAR *pos = str->Str, *end = str->End;
+        while (pos < end)
         {
             *pos = (QSP_CHAR)QSP_CHRUPR(*pos);
             ++pos;
