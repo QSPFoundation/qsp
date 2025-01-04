@@ -176,4 +176,10 @@
         QSPString IntLine; /* line of the actual code */
     } QSPErrorInfo;
 
+    typedef struct
+    {
+        int LineNum;
+        QSPString Line;
+    } QSPCodeLine;
+
 #endif

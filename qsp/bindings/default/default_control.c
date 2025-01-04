@@ -65,6 +65,88 @@ void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum)
     *actIndex = qspRealActIndex;
     *lineNum = qspRealLineNum;
 }
+/* Get names of all locations */
+int QSPGetLocationNames(QSPString *locNames, int namesBufSize)
+{
+    int i;
+    for (i = 0; i < qspLocsCount && i < namesBufSize; ++i)
+        locNames[i] = qspLocs[i].Name;
+    return qspLocsCount;
+}
+/* Get base description of the specified location */
+QSPString QSPGetLocationDesc(QSPString locName)
+{
+    int locIndex = qspLocIndex(locName);
+    if (locIndex >= 0) return qspLocs[locIndex].Desc;
+    return qspNullString;
+}
+/* Get base actions of the specified location */
+int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBufSize)
+{
+    int locIndex = qspLocIndex(locName);
+    if (locIndex >= 0)
+    {
+        int i;
+        QSPLocation *loc = qspLocs + locIndex;
+        for (i = 0; i < loc->ActionsCount && i < actionsBufSize; ++i)
+        {
+            actions[i].Name = loc->Actions[i].Desc;
+            actions[i].Image = loc->Actions[i].Image;
+        }
+        return loc->ActionsCount;
+    }
+    return -1;
+}
+/* Get code of the base action of the specified location */
+int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPCodeLine *lines, int linesBufSize)
+{
+    int locIndex = qspLocIndex(locName);
+    if (locIndex >= 0 && actionIndex >= 0 && actionIndex < qspLocs[locIndex].ActionsCount)
+    {
+        int i;
+        QSPLocAct *action = qspLocs[locIndex].Actions + actionIndex;
+        for (i = 0; i < action->OnPressLinesCount && i < linesBufSize; ++i)
+        {
+            lines[i].Line = action->OnPressLines[i].Str;
+            lines[i].LineNum = action->OnPressLines[i].LineNum;
+        }
+        return action->OnPressLinesCount;
+    }
+    return -1;
+}
+/* Get code of the specified location */
+int QSPGetLocationCode(QSPString locName, QSPCodeLine *lines, int linesBufSize)
+{
+    int locIndex = qspLocIndex(locName);
+    if (locIndex >= 0)
+    {
+        int i;
+        QSPLocation *loc = qspLocs + locIndex;
+        for (i = 0; i < loc->OnVisitLinesCount && i < linesBufSize; ++i)
+        {
+            lines[i].Line = loc->OnVisitLines[i].Str;
+            lines[i].LineNum = loc->OnVisitLines[i].LineNum;
+        }
+        return loc->OnVisitLinesCount;
+    }
+    return -1;
+}
+/* Get code of the current action */
+int QSPGetActionCode(int actionIndex, QSPCodeLine *lines, int linesBufSize)
+{
+    if (actionIndex >= 0 && actionIndex < qspCurActsCount)
+    {
+        int i;
+        QSPCurAct *action = qspCurActions + actionIndex;
+        for (i = 0; i < action->OnPressLinesCount && i < linesBufSize; ++i)
+        {
+            lines[i].Line = action->OnPressLines[i].Str;
+            lines[i].LineNum = action->OnPressLines[i].LineNum;
+        }
+        return action->OnPressLinesCount;
+    }
+    return -1;
+}
 /* ------------------------------------------------------------ */
 /* Version details */
 

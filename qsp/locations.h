@@ -37,7 +37,7 @@
         QSPLineOfCode *OnVisitLines;
         int OnVisitLinesCount;
         QSPLocAct Actions[QSP_MAXACTIONS];
-        int ActionsCount; /* max number of actions */
+        int ActionsCount; /* number of base actions, some of them can be empty */
     } QSPLocation;
     typedef struct
     {
