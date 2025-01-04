@@ -98,9 +98,9 @@
     QSP_EXTERN int QSPGetLocationNames(QSPString *locNames, int namesBufSize);
     QSP_EXTERN QSPString QSPGetLocationDesc(QSPString locName);
     QSP_EXTERN int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBufSize);
-    QSP_EXTERN int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPCodeLine *lines, int linesBufSize);
-    QSP_EXTERN int QSPGetLocationCode(QSPString locName, QSPCodeLine *lines, int linesBufSize);
-    QSP_EXTERN int QSPGetActionCode(int actionIndex, QSPCodeLine *lines, int linesBufSize);
+    QSP_EXTERN int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPLineInfo *lines, int linesBufSize);
+    QSP_EXTERN int QSPGetLocationCode(QSPString locName, QSPLineInfo *lines, int linesBufSize);
+    QSP_EXTERN int QSPGetActionCode(int actionIndex, QSPLineInfo *lines, int linesBufSize);
     /* Main desc */
     QSP_EXTERN QSPString QSPGetMainDesc(void);
     QSP_EXTERN QSP_BOOL QSPIsMainDescChanged(void);

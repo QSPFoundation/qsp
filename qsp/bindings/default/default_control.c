@@ -98,7 +98,7 @@ int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBu
     return -1;
 }
 /* Get code of the base action of the specified location */
-int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPCodeLine *lines, int linesBufSize)
+int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPLineInfo *lines, int linesBufSize)
 {
     int locIndex = qspLocIndex(locName);
     if (locIndex >= 0 && actionIndex >= 0 && actionIndex < qspLocs[locIndex].ActionsCount)
@@ -115,7 +115,7 @@ int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPCodeLine *li
     return -1;
 }
 /* Get code of the specified location */
-int QSPGetLocationCode(QSPString locName, QSPCodeLine *lines, int linesBufSize)
+int QSPGetLocationCode(QSPString locName, QSPLineInfo *lines, int linesBufSize)
 {
     int locIndex = qspLocIndex(locName);
     if (locIndex >= 0)
@@ -132,7 +132,7 @@ int QSPGetLocationCode(QSPString locName, QSPCodeLine *lines, int linesBufSize)
     return -1;
 }
 /* Get code of the current action */
-int QSPGetActionCode(int actionIndex, QSPCodeLine *lines, int linesBufSize)
+int QSPGetActionCode(int actionIndex, QSPLineInfo *lines, int linesBufSize)
 {
     if (actionIndex >= 0 && actionIndex < qspCurActsCount)
     {

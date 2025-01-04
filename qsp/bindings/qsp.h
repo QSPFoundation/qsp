@@ -180,6 +180,6 @@
     {
         int LineNum;
         QSPString Line;
-    } QSPCodeLine;
+    } QSPLineInfo;
 
 #endif
