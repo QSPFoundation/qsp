@@ -429,20 +429,17 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
             break;
         case qspStatComment:
             return QSP_FALSE;
-        case qspStatAct:
-            qspStatementSinglelineAddAct(line, i, endStat);
-            return QSP_FALSE;
         case qspStatIf:
         case qspStatElseIf:
             return qspStatementIf(line, i, endStat, jumpTo);
         case qspStatLoop:
             return qspStatementSinglelineLoop(line, i, endStat, jumpTo);
-        case qspStatLocal:
-            qspStatementLocal(line->Str, statements + i);
-            if (qspLocationState != oldLocationState) return QSP_FALSE;
-            break;
         case qspStatSet:
             qspStatementSetVarsValues(line->Str, statements + i);
+            if (qspLocationState != oldLocationState) return QSP_FALSE;
+            break;
+        case qspStatLocal:
+            qspStatementLocal(line->Str, statements + i);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatExit:
@@ -457,6 +454,9 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
                 qspFreeString(&QSP_STR(arg));
                 return QSP_TRUE;
             }
+        case qspStatAct:
+            qspStatementSinglelineAddAct(line, i, endStat);
+            return QSP_FALSE;
         default:
             {
                 QSPVariant args[QSP_STATMAXARGS];
@@ -517,15 +517,15 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPLineOfCode *lines, int endLine, int code
                 return qspExecCodeBlockWithLocals(lines, ind + 1, elsePos, codeOffset, jumpTo);
             return qspExecCodeBlockWithLocals(lines, ind + 1, endLine, codeOffset, jumpTo);
         }
+    case qspStatLoop:
+        *lineInd = endLine;
+        *action = qspFlowJumpToSpecified;
+        return qspStatementMultilineLoop(lines, ind, endLine, codeOffset, jumpTo);
     case qspStatAct:
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
         qspStatementMultilineAddAct(lines, ind, endLine);
         break;
-    case qspStatLoop:
-        *lineInd = endLine;
-        *action = qspFlowJumpToSpecified;
-        return qspStatementMultilineLoop(lines, ind, endLine, codeOffset, jumpTo);
     }
     return QSP_FALSE;
 }
