@@ -38,7 +38,7 @@ INLINE void qspFormatVariant(QSPVariant *val)
 {
     switch (val->Type)
     {
-        case QSP_TYPE_VARREF:
+    case QSP_TYPE_VARREF:
         {
             QSPString temp = qspCopyToNewText(qspDelSpc(QSP_PSTR(val)));
             qspUpperStr(&temp);
@@ -113,15 +113,15 @@ QSPString qspGetVariantAsString(QSPVariant *val)
 {
     switch (QSP_BASETYPE(val->Type))
     {
-        case QSP_TYPE_TUPLE:
-            return qspGetTupleAsString(QSP_PTUPLE(val));
-        case QSP_TYPE_NUM:
+    case QSP_TYPE_TUPLE:
+        return qspGetTupleAsString(QSP_PTUPLE(val));
+    case QSP_TYPE_NUM:
         {
             QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
             return qspCopyToNewText(qspNumToStr(buf, QSP_PNUM(val)));
         }
-        case QSP_TYPE_STR:
-            return qspCopyToNewText(QSP_PSTR(val));
+    case QSP_TYPE_STR:
+        return qspCopyToNewText(QSP_PSTR(val));
     }
     return qspNullString;
 }
