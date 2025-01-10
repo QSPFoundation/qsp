@@ -81,7 +81,8 @@ public abstract class QSPLib {
     }
 
     static {
-        System.loadLibrary("libqsp");
+        System.loadLibrary("qsp");
+        // System.load("libqsp.so");
     }
 
     // Main API
