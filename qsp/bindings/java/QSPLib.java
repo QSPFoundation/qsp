@@ -88,7 +88,7 @@ public abstract class QSPLib {
     // Main API
     public native void init();
     public native void terminate();
-    public native void useCallback(int type); /* Callback.ordinal() */
+    public native void useCallback(int type /* Callback.ordinal() */);
 
     public native void enableDebugMode(boolean isDebug);
     public native ExecutionState getCurrentState();
@@ -109,7 +109,7 @@ public abstract class QSPLib {
     public native boolean setSelObjIndex(int index, boolean toRefreshUI);
     public native int getSelObjIndex();
     public native boolean isObjsChanged();
-    public native void showWindow(int type, boolean toShow); /* Window.ordinal() */
+    public native void showWindow(int type /* Window.ordinal() */, boolean toShow);
     public native int getVarValuesCount(String name);
     public native int getVarIndexByString(String name, String str);
     /*
@@ -137,7 +137,7 @@ public abstract class QSPLib {
     public void onPlayFile(String file, int volume) {}
     public void onCloseFile(String file) {}
     public void onShowImage(String file) {}
-    public void onShowWindow(int type, boolean toShow) {} /* Window.ordinal() */
+    public void onShowWindow(int type /* Window.ordinal() */, boolean toShow) {}
     public int onShowMenu(ListItem[] items) { return -1; }
     public void onShowMessage(String text) {}
     public void onRefreshInt(boolean isForced) {}
