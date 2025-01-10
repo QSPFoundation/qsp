@@ -128,7 +128,7 @@ if (BUILD_JAVA)
 		find_package(JNI)
 		target_include_directories(qsp PRIVATE ${JNI_INCLUDE_DIRS})
 		target_link_libraries(qsp PRIVATE ${JNI_LIBRARIES})
-	elseif()
+	endif()
 endif()
 
 target_include_directories(qsp
