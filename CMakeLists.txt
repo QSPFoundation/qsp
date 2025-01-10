@@ -123,10 +123,12 @@ target_link_options(qsp PRIVATE ${PROJECT_LINKER_FLAGS})
 target_link_libraries(qsp PRIVATE oniguruma::onig)
 
 if (BUILD_JAVA)
-	find_package(JNI)
 	target_compile_definitions(qsp PRIVATE _JAVA)
-	target_include_directories(qsp PRIVATE ${JNI_INCLUDE_DIRS})
-	target_link_libraries(qsp PRIVATE ${JNI_LIBRARIES})
+	if (NOT ANDROID)
+		find_package(JNI)
+		target_include_directories(qsp PRIVATE ${JNI_INCLUDE_DIRS})
+		target_link_libraries(qsp PRIVATE ${JNI_LIBRARIES})
+	elseif()
 endif()
 
 target_include_directories(qsp
