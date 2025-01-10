@@ -289,7 +289,7 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarValuesCount(JNIEnv *env,
     QSPString varName = qspFromJavaString(env, name);
     QSPVar *var = qspVarReference(varName, QSP_FALSE);
     qspFreeString(&varName);
-    if (var) var->ValsCount;
+    if (var) return var->ValsCount;
     return 0;
 }
 /* Get index of an item by string */
