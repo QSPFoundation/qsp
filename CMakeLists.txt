@@ -51,7 +51,7 @@ else()
 	# Download and unpack oniguruma at configure time
 	configure_file(CMakeLists-oniguruma.txt.in "${CMAKE_BINARY_DIR}/oniguruma-download/CMakeLists.txt")
 	if (USE_CUSTOM_MAKE_PROGRAM)
-		execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" -DCMAKE_MAKE_PROGRAM:FILEPATH="${CMAKE_MAKE_PROGRAM}" .
+		execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" -DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM} .
 			WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
 		)
 	else()
