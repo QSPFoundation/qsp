@@ -25,14 +25,6 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_terminate
 
 /*
  * Class:     com_libqsp_jni_QSPLib
- * Method:    useCallback
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_useCallback
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_libqsp_jni_QSPLib
  * Method:    enableDebugMode
  * Signature: (Z)V
  */

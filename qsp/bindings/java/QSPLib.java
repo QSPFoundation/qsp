@@ -37,28 +37,6 @@ public abstract class QSPLib {
         INPUT
     }
 
-    public enum Callback {
-        DEBUG,
-        ISPLAYINGFILE,
-        PLAYFILE,
-        CLOSEFILE,
-        SHOWIMAGE,
-        SHOWWINDOW,
-        SHOWMENU,
-        SHOWMSGSTR,
-        REFRESHINT,
-        SETTIMER,
-        SETINPUTSTRTEXT,
-        SYSTEM,
-        OPENGAME,
-        OPENGAMESTATUS,
-        SAVEGAMESTATUS,
-        SLEEP,
-        GETMSCOUNT,
-        INPUTBOX,
-        VERSION
-    }
-
     public class ListItem {
         public String image;
         public String name;
@@ -88,7 +66,6 @@ public abstract class QSPLib {
     // Main API
     public native void init();
     public native void terminate();
-    public native void useCallback(int type /* Callback.ordinal() */);
 
     public native void enableDebugMode(boolean isDebug);
     public native ExecutionState getCurrentState();
