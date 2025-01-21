@@ -303,7 +303,7 @@ QSPString qspCallVersion(QSPString param)
             return qspNullString;
         }
 
-        if (!qspIsEmpty(res)) return res;
+        if (!(qspIsEmpty(res) && qspIsEmpty(param))) return res;
         qspFreeString(&res);
     }
     return qspCopyToNewText(QSP_STATIC_STR(QSP_VER));
