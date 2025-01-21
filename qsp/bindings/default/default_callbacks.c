@@ -258,23 +258,24 @@ QSPString qspCallInputBox(QSPString text)
     /* Get input from the user */
     if (qspCallbacks[QSP_CALL_INPUTBOX])
     {
-        QSPCallState state;
-        QSP_CHAR *buffer;
         const int maxLen = 511;
+        QSPCallState state;
+        QSPString res;
+        QSP_CHAR *buffer;
         qspPrepareCallback(&state, QSP_TRUE);
-        /* Prepare input buffer */
+
         buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
         *buffer = 0;
-        /* Process input */
         qspCallbacks[QSP_CALL_INPUTBOX](text, buffer, maxLen);
         buffer[maxLen] = 0;
-        /* Clean up */
+        res = qspStringFromC(buffer);
+
         if (!qspFinalizeCallback(&state, QSP_FALSE))
         {
-            free(buffer);
+            qspFreeString(&res);
             return qspNullString;
         }
-        return qspStringFromC(buffer);
+        return res;
     }
     return qspNullString;
 }
@@ -284,23 +285,26 @@ QSPString qspCallVersion(QSPString param)
     /* Get info from the player */
     if (qspCallbacks[QSP_CALL_VERSION])
     {
-        QSPCallState state;
-        QSP_CHAR *buffer;
         const int maxLen = 511;
+        QSPCallState state;
+        QSPString res;
+        QSP_CHAR *buffer;
         qspPrepareCallback(&state, QSP_FALSE);
-        /* Prepare buffer for the response */
+
         buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
         *buffer = 0;
-        /* Process request */
         qspCallbacks[QSP_CALL_VERSION](param, buffer, maxLen);
         buffer[maxLen] = 0;
-        /* Clean up */
+        res = qspStringFromC(buffer);
+
         if (!qspFinalizeCallback(&state, QSP_FALSE))
         {
-            free(buffer);
+            qspFreeString(&res);
             return qspNullString;
         }
-        return qspStringFromC(buffer);
+
+        if (!qspIsEmpty(res)) return res;
+        qspFreeString(&res);
     }
     return qspCopyToNewText(QSP_STATIC_STR(QSP_VER));
 }

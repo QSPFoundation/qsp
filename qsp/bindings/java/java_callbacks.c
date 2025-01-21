@@ -410,7 +410,9 @@ QSPString qspCallVersion(QSPString param)
             qspFreeString(&res);
             return qspNullString;
         }
-        return res;
+
+        if (!qspIsEmpty(res)) return res;
+        qspFreeString(&res);
     }
     return qspCopyToNewText(QSP_STATIC_STR(QSP_VER));
 }
