@@ -229,11 +229,17 @@
 
     INLINE int qspStrsPartCompare(QSPString str1, QSPString str2, int maxLen)
     {
-        int delta = 0;
+        int delta;
         QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;
-        while (maxLen-- && pos2 < str2.End && pos1 < str1.End && !(delta = (int)*pos1 - *pos2))
+        QSP_CHAR *end1 = str1.End, *end2 = str2.End;
+        while (maxLen && pos2 < end2 && pos1 < end1)
+        {
+            if ((delta = (int)*pos1 - *pos2)) return delta;
             ++pos1, ++pos2;
-        return delta;
+            --maxLen;
+        }
+        if (maxLen) return (pos1 == end1) ? ((pos2 == end2) ? 0 : -1) : 1;
+        return 0;
     }
 
     INLINE int qspStrsCompare(QSPString str1, QSPString str2)
@@ -274,15 +280,14 @@
 
     INLINE QSP_CHAR *qspStrStr(QSPString str, QSPString strSearch)
     {
-        QSP_CHAR *s1, *s2, *pos = str.Str;
-        while (pos < str.End)
+        int searchLen = qspStrLen(strSearch);
+        if (!searchLen) return str.Str;
+        if (searchLen <= qspStrLen(str))
         {
-            s1 = pos;
-            s2 = strSearch.Str;
-            while (s1 < str.End && s2 < strSearch.End && !((int)*s1 - *s2))
-                ++s1, ++s2;
-            if (s2 == strSearch.End) return pos;
-            ++pos;
+            size_t bytesToCompare = searchLen * sizeof(QSP_CHAR);
+            QSP_CHAR *pos, *lastPos = str.End - searchLen;
+            for (pos = str.Str; pos <= lastPos; ++pos)
+                if (!memcmp(pos, strSearch.Str, bytesToCompare)) return pos;
         }
         return 0;
     }
