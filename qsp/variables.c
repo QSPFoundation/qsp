@@ -137,7 +137,10 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
             var = bucket->Vars + varsCount;
         }
         else
+        {
+            /* The fixed buffer without memory reallocation helps to cache specific variables */
             var = bucket->Vars = (QSPVar *)malloc(QSP_VARSBUCKETSIZE * sizeof(QSPVar));
+        }
 
         var->Name = qspCopyToNewText(name);
         qspInitVarData(var);
