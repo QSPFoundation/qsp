@@ -483,7 +483,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     {
         /* variables count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
-        if (count < 0 || count > QSP_VARSMAXBUCKETSIZE) return QSP_FALSE;
+        if (count < 0 || count > QSP_VARSBUCKETSIZE) return QSP_FALSE;
         /* variables */
         for (j = 0; j < count; ++j)
         {
@@ -586,11 +586,11 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     for (i = 0; i < QSP_VARSBUCKETS; ++i)
     {
         varsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
-        bucket->Capacity = bucket->VarsCount = varsCount;
+        bucket->VarsCount = varsCount;
         bucket->Vars = 0;
         if (varsCount)
         {
-            var = bucket->Vars = (QSPVar *)malloc(varsCount * sizeof(QSPVar));
+            var = bucket->Vars = (QSPVar *)malloc(QSP_VARSBUCKETSIZE * sizeof(QSPVar));
             for (j = 0; j < varsCount; ++j)
             {
                 var->Name = qspDecodeString(strs[ind++], isUCS);

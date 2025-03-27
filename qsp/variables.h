@@ -24,7 +24,7 @@
     #define QSP_VARSDEFINES
 
     #define QSP_VARSBUCKETS 1024
-    #define QSP_VARSMAXBUCKETSIZE 50
+    #define QSP_VARSBUCKETSIZE 50
     #define QSP_VARGROUPSBATCHSIZE 256
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
@@ -50,7 +50,6 @@
     {
         QSPVar *Vars;
         int VarsCount;
-        int Capacity;
     } QSPVarsBucket;
 
     typedef struct
