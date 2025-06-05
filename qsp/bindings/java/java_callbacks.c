@@ -24,6 +24,7 @@
 #include "../../coding.h"
 #include "../../common.h"
 #include "../../errors.h"
+#include "../../locations.h"
 #include "../../objects.h"
 #include "../../text.h"
 
@@ -85,11 +86,18 @@ void qspCallRefreshInt(QSP_BOOL isForced)
     /* Refresh UI to show the latest state */
     if (qspCallbacks[QSP_CALL_REFRESHINT])
     {
+        static int oldFullRefreshCount = 0;
         QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
 
         qspPrepareCallback(&state, QSP_FALSE);
-        (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_REFRESHINT], isForced);
+        if (qspFullRefreshCount != oldFullRefreshCount)
+        {
+            oldFullRefreshCount = qspFullRefreshCount;
+            (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_REFRESHINT], isForced, JNI_TRUE);
+        }
+        else
+            (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_REFRESHINT], isForced, JNI_FALSE);
         qspFinalizeCallback(&state, QSP_FALSE);
     }
 }

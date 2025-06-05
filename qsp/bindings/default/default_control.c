@@ -161,12 +161,6 @@ QSPString QSPGetCompiledDateTime(void)
     return QSP_STATIC_STR(QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__));
 }
 /* ------------------------------------------------------------ */
-/* Get number of the full location updates */
-int QSPGetFullRefreshCount(void)
-{
-    return qspFullRefreshCount;
-}
-/* ------------------------------------------------------------ */
 /* Main description */
 
 /* Get text of the main description */

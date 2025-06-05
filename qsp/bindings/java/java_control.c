@@ -129,12 +129,6 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getCompiledDateTime(JNIEnv 
     return qspToJavaString(env, QSP_STATIC_STR(QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__)));
 }
 /* ------------------------------------------------------------ */
-/* Get number of the full location updates */
-JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getFullRefreshCount(JNIEnv *env, jobject api)
-{
-    return qspFullRefreshCount;
-}
-/* ------------------------------------------------------------ */
 /* Main description */
 
 /* Get text of the main description */
@@ -554,7 +548,7 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api)
     qspSetCallback(QSP_CALL_SHOWWINDOW, (*env)->GetMethodID(env, qspApiClass, "onShowWindow", "(IZ)V"));
     qspSetCallback(QSP_CALL_SHOWMENU, (*env)->GetMethodID(env, qspApiClass, "onShowMenu", "([Lcom/libqsp/jni/QSPLib$ListItem;)I"));
     qspSetCallback(QSP_CALL_SHOWMSGSTR, (*env)->GetMethodID(env, qspApiClass, "onShowMessage", "(Ljava/lang/String;)V"));
-    qspSetCallback(QSP_CALL_REFRESHINT, (*env)->GetMethodID(env, qspApiClass, "onRefreshInt", "(Z)V"));
+    qspSetCallback(QSP_CALL_REFRESHINT, (*env)->GetMethodID(env, qspApiClass, "onRefreshInt", "(ZZ)V"));
     qspSetCallback(QSP_CALL_SETTIMER, (*env)->GetMethodID(env, qspApiClass, "onSetTimer", "(I)V"));
     qspSetCallback(QSP_CALL_SETINPUTSTRTEXT, (*env)->GetMethodID(env, qspApiClass, "onSetInputStrText", "(Ljava/lang/String;)V"));
     qspSetCallback(QSP_CALL_SYSTEM, (*env)->GetMethodID(env, qspApiClass, "onSystem", "(Ljava/lang/String;)V"));

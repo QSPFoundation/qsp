@@ -57,14 +57,6 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getCompiledDateTime
 
 /*
  * Class:     com_libqsp_jni_QSPLib
- * Method:    getFullRefreshCount
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getFullRefreshCount
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_libqsp_jni_QSPLib
  * Method:    getMainDesc
  * Signature: ()Ljava/lang/String;
  */

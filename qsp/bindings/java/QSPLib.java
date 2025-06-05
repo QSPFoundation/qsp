@@ -71,7 +71,6 @@ public abstract class QSPLib {
     public native ExecutionState getCurrentState();
     public native String getVersion();
     public native String getCompiledDateTime();
-    public native int getFullRefreshCount();
     public native String getMainDesc();
     public native boolean isMainDescChanged();
     public native String getVarsDesc();
@@ -117,7 +116,7 @@ public abstract class QSPLib {
     public void onShowWindow(int type /* Window.ordinal() */, boolean toShow) {}
     public int onShowMenu(ListItem[] items) { return -1; }
     public void onShowMessage(String text) {}
-    public void onRefreshInt(boolean isForced) {}
+    public void onRefreshInt(boolean isForced, boolean isNewDesc) {}
     public void onSetTimer(int msecs) {}
     public void onSetInputStrText(String text) {}
     public void onSystem(String cmd) {}

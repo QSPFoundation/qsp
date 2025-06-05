@@ -91,7 +91,6 @@
     QSP_EXTERN void QSPSetCallback(int type, QSP_CALLBACK func);
     QSP_EXTERN QSPString QSPGetVersion(void);
     QSP_EXTERN QSPString QSPGetCompiledDateTime(void);
-    QSP_EXTERN int QSPGetFullRefreshCount(void);
     /* Debugging */
     QSP_EXTERN void QSPEnableDebugMode(QSP_BOOL isDebug);
     QSP_EXTERN void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum);
