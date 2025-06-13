@@ -55,6 +55,7 @@ INLINE QSP_BOOL qspPushOperationToStack(QSP_TINYINT *opStack, QSP_TINYINT *argSt
 INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINYINT opCode, QSPVariant v);
 INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression* expression, QSP_TINYINT opCode, QSP_TINYINT argsCount);
 INLINE int qspFreeMathExpressionValue(QSPMathExpression *expression, int valueIndex);
+INLINE void qspNegateValue(QSPVariant *val, QSPVariant *res);
 INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionStrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
@@ -269,7 +270,7 @@ void qspInitMath(void)
     qspAddOperation(qspOpValue, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpValueToFormat, 0, 0, QSP_TYPE_UNDEF, 0, 0);
 
-    qspAddOperation(qspOpNegation, 18, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_NUM);
+    qspAddOperation(qspOpNegation, 18, 0, QSP_TYPE_UNDEF, 1, 1, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpAppend, 12, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpAdd, 14, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpSub, 14, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
@@ -1114,7 +1115,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         qspGetLastVarValue(QSP_STR(args[0]), &tos);
         break;
     case qspOpNegation:
-        QSP_NUM(tos) = -QSP_NUM(args[0]);
+        qspNegateValue(args, &tos);
         break;
     case qspOpMul:
         qspAutoConvertCombine(args, args + 1, QSP_MUL[0], &tos);
@@ -1241,6 +1242,29 @@ QSPVariant qspCalculateExprValue(QSPString expr)
     QSPMathExpression *expression = qspMathExpGetCompiled(expr);
     if (!expression) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     return qspCalculateValue(expression, expression->ItemsCount - 1);
+}
+
+INLINE void qspNegateValue(QSPVariant *val, QSPVariant *res)
+{
+    switch (QSP_BASETYPE(val->Type))
+    {
+    case QSP_TYPE_TUPLE:
+        {
+            QSPVariant negativeOne = qspNumVariant(-1);
+            qspAutoConvertCombine(&negativeOne, val, QSP_MUL[0], res);
+        }
+        break;
+    case QSP_TYPE_NUM:
+    case QSP_TYPE_STR:
+        if (!qspConvertVariantTo(val, QSP_TYPE_NUM))
+        {
+            qspSetError(QSP_ERR_TYPEMISMATCH);
+            return;
+        }
+        QSP_PNUM(res) = -QSP_PNUM(val);
+        res->Type = QSP_TYPE_NUM;
+        break;
+    }
 }
 
 INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
