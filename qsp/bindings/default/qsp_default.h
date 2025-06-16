@@ -71,6 +71,8 @@
 
     #ifdef __cplusplus
         typedef int (*QSP_CALLBACK)(...);
+    #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
+        typedef int (*QSP_CALLBACK)(...);
     #else
         typedef int (*QSP_CALLBACK)();
     #endif
