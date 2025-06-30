@@ -17,6 +17,7 @@ This repository contains source code of the QSP game engine.
 
 * QGen: https://github.com/QSPFoundation/qgen
 * TXT2GAM: https://github.com/QSPFoundation/txt2gam
+* Sublime Text package: https://github.com/QSPFoundation/sublime_text_qsp_package
 * VSCode extension: https://github.com/QSPFoundation/Qsp.FSharp.VsCode
 * CLI tools: https://github.com/QSPFoundation/qsp-cli
 * Test engine: https://github.com/QSPFoundation/qsp-test-engine
