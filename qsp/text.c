@@ -44,7 +44,7 @@ void qspInitSymbolClasses(void)
     qspFillSymbolClass(QSP_CHAR_DELIM, QSP_DELIMS);
     qspFillSymbolClass(QSP_CHAR_SIMPLEOP, QSP_ADD QSP_SUB QSP_DIV QSP_MUL);
     qspFillSymbolClass(QSP_CHAR_EXPSTART, QSP_LQUOT QSP_LRBRACK QSP_LSBRACK);
-    qspFillSymbolClass(QSP_CHAR_TYPEPREFIX, QSP_TUPLECHAR QSP_NUMCHAR QSP_STRCHAR);
+    qspFillSymbolClass(QSP_CHAR_TYPEPREFIX, QSP_TUPLETYPE QSP_NUMTYPE QSP_STRTYPE);
 }
 
 QSP_CHAR *qspStringToC(QSPString s)
@@ -316,23 +316,14 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
             }
             continue;
         }
-        else if (*pos == QSP_LRBRACK[0])
-            ++c1;
-        else if (*pos == QSP_RRBRACK[0])
+        switch (*pos)
         {
-            if (c1) --c1;
-        }
-        else if (*pos == QSP_LSBRACK[0])
-            ++c2;
-        else if (*pos == QSP_RSBRACK[0])
-        {
-            if (c2) --c2;
-        }
-        else if (*pos == QSP_LQUOT[0])
-            ++c3;
-        else if (*pos == QSP_RQUOT[0])
-        {
-            if (c3) --c3;
+        case QSP_LRBRACK_CHAR: ++c1; break;
+        case QSP_RRBRACK_CHAR: if (c1) --c1; break;
+        case QSP_LSBRACK_CHAR: ++c2; break;
+        case QSP_RSBRACK_CHAR: if (c2) --c2; break;
+        case QSP_LQUOT_CHAR: ++c3; break;
+        case QSP_RQUOT_CHAR: if (c3) --c3; break;
         }
         if (!(c1 || c2 || c3) && *pos == ch) /* include brackets */
             return pos;
@@ -375,23 +366,14 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
             isPrevDelim = QSP_TRUE;
             continue;
         }
-        else if (*pos == QSP_LRBRACK[0])
-            ++c1;
-        else if (*pos == QSP_RRBRACK[0])
+        switch (*pos)
         {
-            if (c1) --c1;
-        }
-        else if (*pos == QSP_LSBRACK[0])
-            ++c2;
-        else if (*pos == QSP_RSBRACK[0])
-        {
-            if (c2) --c2;
-        }
-        else if (*pos == QSP_LQUOT[0])
-            ++c3;
-        else if (*pos == QSP_RQUOT[0])
-        {
-            if (c3) --c3;
+        case QSP_LRBRACK_CHAR: ++c1; break;
+        case QSP_RRBRACK_CHAR: if (c1) --c1; break;
+        case QSP_LSBRACK_CHAR: ++c2; break;
+        case QSP_RSBRACK_CHAR: if (c2) --c2; break;
+        case QSP_LQUOT_CHAR: ++c3; break;
+        case QSP_RQUOT_CHAR: if (c3) --c3; break;
         }
         if (!(c1 || c2 || c3)) /* include brackets */
         {

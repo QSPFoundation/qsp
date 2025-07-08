@@ -164,7 +164,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
     QSPLineOfCode code;
     int oldLocationState;
     QSP_CHAR *lastPos, *firstPos = line->Str.Str + line->Stats[statPos].EndPos;
-    if (!qspIsCharAtPos(line->Str, firstPos, QSP_COLONDELIM[0]))
+    if (!qspIsCharAtPos(line->Str, firstPos, QSP_COLONDELIM_CHAR))
     {
         qspSetError(QSP_ERR_COLONNOTFOUND);
         return;
@@ -178,9 +178,9 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
     argsCount = qspGetStatArgs(line->Str, line->Stats + statPos, args);
     if (qspLocationState != oldLocationState)
         return;
-    firstPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+    firstPos += QSP_CHAR_LEN;
     lastPos = line->Str.Str + line->Stats[endPos - 1].EndPos;
-    if (qspIsCharAtPos(line->Str, lastPos, QSP_COLONDELIM[0])) lastPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+    if (qspIsCharAtPos(line->Str, lastPos, QSP_COLONDELIM_CHAR)) lastPos += QSP_CHAR_LEN;
     ++statPos; /* start with the internal code */
     code.Str = qspStringFromPair(firstPos, lastPos);
     code.Label = qspGetLineLabel(code.Str);

@@ -323,7 +323,7 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
         return QSP_TRUE;
     }
 
-    if (op == QSP_ADD[0])
+    if (op == QSP_ADD_CHAR)
         return qspSumSimpleVariants(arg1, arg2, res);
 
     if (!qspConvertVariantTo(arg1, QSP_TYPE_NUM) || !qspConvertVariantTo(arg2, QSP_TYPE_NUM))
@@ -332,22 +332,25 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
         return QSP_FALSE;
     }
 
-    if (op == QSP_SUB[0])
+    switch (op)
     {
+    case QSP_SUB_CHAR:
         QSP_PNUM(res) = QSP_PNUM(arg1) - QSP_PNUM(arg2);
-    }
-    else if (op == QSP_MUL[0])
-    {
+        break;
+    case QSP_MUL_CHAR:
         QSP_PNUM(res) = QSP_PNUM(arg1) * QSP_PNUM(arg2);
-    }
-    else /* QSP_DIV */
-    {
+        break;
+    case QSP_DIV_CHAR:
         if (QSP_PNUM(arg2) == 0)
         {
             qspSetError(QSP_ERR_DIVBYZERO);
             return QSP_FALSE;
         }
         QSP_PNUM(res) = QSP_PNUM(arg1) / QSP_PNUM(arg2);
+        break;
+    default:
+        qspSetError(QSP_ERR_UNKNOWNACTION);
+        return QSP_FALSE;
     }
     res->Type = QSP_TYPE_NUM;
     return QSP_TRUE;
@@ -377,11 +380,11 @@ void qspAppendVariantToIndexString(QSPVariant *val, QSPBufString *res)
             break;
         }
     case QSP_TYPE_NUM:
-        qspAddBufText(res, QSP_STATIC_STR(QSP_NUMCHAR)); /* type id */
+        qspAddBufText(res, QSP_STATIC_STR(QSP_NUMTYPE)); /* type id */
         qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(val)));
         break;
     case QSP_TYPE_STR:
-        qspAddBufText(res, QSP_STATIC_STR(QSP_STRCHAR)); /* type id */
+        qspAddBufText(res, QSP_STATIC_STR(QSP_STRTYPE)); /* type id */
         qspAddBufText(res, QSP_PSTR(val));
         break;
     }

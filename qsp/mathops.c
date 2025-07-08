@@ -117,13 +117,13 @@ INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT
         switch (QSP_BASETYPE(type))
         {
         case QSP_TYPE_TUPLE:
-            qspAddBufText(&buf, QSP_STATIC_STR(QSP_TUPLECHAR));
+            qspAddBufText(&buf, QSP_STATIC_STR(QSP_TUPLETYPE));
             break;
         case QSP_TYPE_NUM:
-            qspAddBufText(&buf, QSP_STATIC_STR(QSP_NUMCHAR));
+            qspAddBufText(&buf, QSP_STATIC_STR(QSP_NUMTYPE));
             break;
         case QSP_TYPE_STR:
-            qspAddBufText(&buf, QSP_STATIC_STR(QSP_STRCHAR));
+            qspAddBufText(&buf, QSP_STATIC_STR(QSP_STRTYPE));
             break;
         }
     }
@@ -524,14 +524,14 @@ INLINE QSPString qspGetString(QSPString *expr)
 INLINE QSPString qspGetQString(QSPString *expr)
 {
     QSP_CHAR *pos, *buf = expr->Str;
-    pos = qspDelimPos(*expr, QSP_RQUOT[0]);
+    pos = qspDelimPos(*expr, QSP_RQUOT_CHAR);
     if (!pos)
     {
         qspSetError(QSP_ERR_QUOTNOTFOUND);
         return qspNullString;
     }
-    expr->Str = pos + QSP_STATIC_LEN(QSP_RQUOT);
-    return qspStringFromPair(buf + QSP_STATIC_LEN(QSP_LQUOT), pos);
+    expr->Str = pos + QSP_CHAR_LEN;
+    return qspStringFromPair(buf + QSP_CHAR_LEN, pos);
 }
 
 INLINE int qspSkipMathValue(QSPMathExpression *expression, int valueIndex)
@@ -777,7 +777,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 }
                 waitForOperator = QSP_TRUE;
             }
-            else if (*s.Str == QSP_LQUOT[0])
+            else if (*s.Str == QSP_LQUOT_CHAR)
             {
                 name = qspGetQString(&s);
                 if (qspErrorNum) break;
@@ -789,17 +789,17 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 }
                 waitForOperator = QSP_TRUE;
             }
-            else if (*s.Str == QSP_NEGATION[0])
+            else if (*s.Str == QSP_NEGATION_CHAR)
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpNegation)) break;
-                s.Str += QSP_STATIC_LEN(QSP_NEGATION);
+                s.Str += QSP_CHAR_LEN;
             }
-            else if (*s.Str == QSP_LRBRACK[0]) /* a subexpression OR a tuple */
+            else if (*s.Str == QSP_LRBRACK_CHAR) /* a subexpression OR a tuple */
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
-                s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
+                s.Str += QSP_CHAR_LEN;
             }
-            else if (*s.Str == QSP_RRBRACK[0]) /* happens when "(" gets closed with ")" without any values */
+            else if (*s.Str == QSP_RRBRACK_CHAR) /* happens when "(" gets closed with ")" without any values */
             {
                 opCode = opStack[opSp];
                 if (opCode != qspOpOpenRoundBracket)
@@ -823,16 +823,16 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 {
                     if (!qspAppendOperationToCompiled(expression, qspOpTuple, 0)) break;
                 }
-                s.Str += QSP_STATIC_LEN(QSP_RRBRACK);
+                s.Str += QSP_CHAR_LEN;
                 waitForOperator = QSP_TRUE;
             }
-            else if (*s.Str == QSP_LSBRACK[0]) /* a tuple */
+            else if (*s.Str == QSP_LSBRACK_CHAR) /* a tuple */
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenSquareBracket)) break;
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpTuple)) break;
-                s.Str += QSP_STATIC_LEN(QSP_LSBRACK);
+                s.Str += QSP_CHAR_LEN;
             }
-            else if (*s.Str == QSP_RSBRACK[0]) /* happens when "[" gets closed with "]" without any values */
+            else if (*s.Str == QSP_RSBRACK_CHAR) /* happens when "[" gets closed with "]" without any values */
             {
                 if (opStack[opSp] != qspOpTuple)
                 {
@@ -847,7 +847,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                     break;
                 }
                 --opSp; /* it's always positive */
-                s.Str += QSP_STATIC_LEN(QSP_RSBRACK);
+                s.Str += QSP_CHAR_LEN;
                 waitForOperator = QSP_TRUE;
             }
             else if (!qspIsInClass(*s.Str, QSP_CHAR_DELIM))
@@ -855,10 +855,10 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 name = qspGetName(&s);
                 if (qspErrorNum) break;
                 qspSkipSpaces(&s);
-                if (*name.Str == QSP_USERFUNC[0])
+                if (*name.Str == QSP_USERFUNC_CHAR)
                 {
-                    /* Ignore @ symbol */
-                    name.Str += QSP_STATIC_LEN(QSP_USERFUNC);
+                    /* Ignore the @ symbol */
+                    name.Str += QSP_CHAR_LEN;
                     /* Add the loc name */
                     v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_STR);
                     if (!qspAppendValueToCompiled(expression, qspOpValue, v))
@@ -869,10 +869,10 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                     /* Add a function call */
                     if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpFunc)) break;
                     ++argStack[opSp]; /* added the function name already */
-                    if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK[0])
+                    if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK_CHAR)
                     {
                         if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
-                        s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
+                        s.Str += QSP_CHAR_LEN;
                     }
                     else
                     {
@@ -884,11 +884,11 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                     opCode = qspFunctionOpCode(name);
                     if (opCode >= qspOpFirst_Function)
                     {
-                        if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK[0])
+                        if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK_CHAR)
                         {
                             if (!qspPushOperationToStack(opStack, argStack, &opSp, opCode)) break;
                             if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
-                            s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
+                            s.Str += QSP_CHAR_LEN;
                         }
                         else if (qspOps[opCode].MinArgsCount < 2)
                         {
@@ -918,13 +918,13 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                             qspFreeString(&QSP_STR(v));
                             break;
                         }
-                        if (!qspIsEmpty(s) && *s.Str == QSP_LSBRACK[0])
+                        if (!qspIsEmpty(s) && *s.Str == QSP_LSBRACK_CHAR)
                         {
-                            s.Str += QSP_STATIC_LEN(QSP_LSBRACK);
+                            s.Str += QSP_CHAR_LEN;
                             qspSkipSpaces(&s);
-                            if (!qspIsEmpty(s) && *s.Str == QSP_RSBRACK[0])
+                            if (!qspIsEmpty(s) && *s.Str == QSP_RSBRACK_CHAR)
                             {
-                                s.Str += QSP_STATIC_LEN(QSP_RSBRACK);
+                                s.Str += QSP_CHAR_LEN;
                                 if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpLastArrItem)) break;
                                 ++argStack[opSp]; /* added the var name already */
                                 waitForOperator = QSP_TRUE;
@@ -1118,16 +1118,16 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         qspNegateValue(args, &tos);
         break;
     case qspOpMul:
-        qspAutoConvertCombine(args, args + 1, QSP_MUL[0], &tos);
+        qspAutoConvertCombine(args, args + 1, QSP_MUL_CHAR, &tos);
         break;
     case qspOpDiv:
-        qspAutoConvertCombine(args, args + 1, QSP_DIV[0], &tos);
+        qspAutoConvertCombine(args, args + 1, QSP_DIV_CHAR, &tos);
         break;
     case qspOpAdd:
-        qspAutoConvertCombine(args, args + 1, QSP_ADD[0], &tos);
+        qspAutoConvertCombine(args, args + 1, QSP_ADD_CHAR, &tos);
         break;
     case qspOpSub:
-        qspAutoConvertCombine(args, args + 1, QSP_SUB[0], &tos);
+        qspAutoConvertCombine(args, args + 1, QSP_SUB_CHAR, &tos);
         break;
     case qspOpMod:
         if (QSP_NUM(args[1]) == 0)
@@ -1251,7 +1251,7 @@ INLINE void qspNegateValue(QSPVariant *val, QSPVariant *res)
     case QSP_TYPE_TUPLE:
         {
             QSPVariant negativeOne = qspNumVariant(-1);
-            qspAutoConvertCombine(&negativeOne, val, QSP_MUL[0], res);
+            qspAutoConvertCombine(&negativeOne, val, QSP_MUL_CHAR, res);
         }
         break;
     case QSP_TYPE_NUM:
@@ -1413,13 +1413,13 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
         switch (QSP_BASETYPE(arrType))
         {
         case QSP_TYPE_TUPLE:
-            typePrefix = QSP_STATIC_STR(QSP_TUPLECHAR);
+            typePrefix = QSP_STATIC_STR(QSP_TUPLETYPE);
             break;
         case QSP_TYPE_NUM:
-            typePrefix = QSP_STATIC_STR(QSP_NUMCHAR);
+            typePrefix = QSP_STATIC_STR(QSP_NUMTYPE);
             break;
         case QSP_TYPE_STR:
-            typePrefix = QSP_STATIC_STR(QSP_STRCHAR);
+            typePrefix = QSP_STATIC_STR(QSP_STRTYPE);
             break;
         }
         QSP_PSTR(res) = qspCopyToNewText(typePrefix);

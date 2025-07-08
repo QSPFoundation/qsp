@@ -325,7 +325,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         *bufSize = 0;
         return QSP_FALSE;
     }
-    bufString = qspNewBufString(1024);
+    bufString = qspNewBufString(2048);
     locName = (qspCurLoc >= 0 && qspCurLoc < qspLocsCount ? qspLocs[qspCurLoc].Name : qspNullString);
     qspAppendStrVal(&bufString, QSP_STATIC_STR(QSP_SAVEDGAMEID));
     qspAppendStrVal(&bufString, QSP_STATIC_STR(QSP_VER));

@@ -542,7 +542,7 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPLineOfCode *lines, int endLine,
             int oldLocationState;
             QSP_BOOL condition;
             QSP_CHAR *endPos = line->Str.Str + line->Stats->EndPos;
-            if (!qspIsCharAtPos(line->Str, endPos, QSP_COLONDELIM[0]))
+            if (!qspIsCharAtPos(line->Str, endPos, QSP_COLONDELIM_CHAR))
             {
                 qspSetError(QSP_ERR_COLONNOTFOUND);
                 break;
@@ -720,7 +720,7 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
     int i, c, elseStat, oldLocationState;
     QSPCachedStat *statements = line->Stats;
     QSP_CHAR *endPos = line->Str.Str + statements[startStat].EndPos;
-    if (!qspIsCharAtPos(line->Str, endPos, QSP_COLONDELIM[0]))
+    if (!qspIsCharAtPos(line->Str, endPos, QSP_COLONDELIM_CHAR))
     {
         qspSetError(QSP_ERR_COLONNOTFOUND);
         return QSP_FALSE;
@@ -850,7 +850,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
     int oldLocationState;
     QSPString condition, iterator;
     QSP_CHAR *endPos = line->Str.Str + line->Stats[startStat].EndPos;
-    if (!qspIsCharAtPos(line->Str, endPos, QSP_COLONDELIM[0]))
+    if (!qspIsCharAtPos(line->Str, endPos, QSP_COLONDELIM_CHAR))
     {
         qspSetError(QSP_ERR_COLONNOTFOUND);
         return QSP_FALSE;

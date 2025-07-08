@@ -39,9 +39,11 @@ INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos)
     int i, strLen, nameLen;
     QSPStatName *name;
     if (qspIsEmpty(s)) return qspStatUnknown;
-    if (*s.Str == QSP_LABEL[0]) return qspStatLabel;
-    if (*s.Str == QSP_COMMENT[0]) return qspStatComment;
-    /* ------------------------------------------------------------------ */
+    switch (*s.Str)
+    {
+    case QSP_LABEL_CHAR: return qspStatLabel;
+    case QSP_COMMENT_CHAR: return qspStatComment;
+    }
     strLen = qspStrLen(s);
     for (i = 0; i < QSP_STATSLEVELS; ++i)
     {
@@ -90,11 +92,11 @@ INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUSED(st
     QSPCachedArg *foundArgs;
     QSP_CHAR *pos;
     qspSkipSpaces(&s);
-    pos = qspDelimPos(s, QSP_EQUAL[0]);
+    pos = qspDelimPos(s, QSP_EQUAL_CHAR);
     if (pos)
     {
         QSPString names, values, op;
-        op = qspStringFromPair(pos, pos + QSP_STATIC_LEN(QSP_EQUAL));
+        op = qspStringFromPair(pos, pos + QSP_CHAR_LEN);
         values = qspDelSpc(qspStringFromPair(op.End, s.End));
         if (op.Str != s.Str && qspIsInClass(*(op.Str - 1), QSP_CHAR_SIMPLEOP)) --op.Str;
         names = qspDelSpc(qspStringFromPair(s.Str, op.Str));
@@ -158,18 +160,18 @@ INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode,
     {
         QSP_CHAR *pos;
         int bufSize = 0;
-        if (*s.Str == QSP_LRBRACK[0]) /* arguments might be specified using parentheses */
+        if (*s.Str == QSP_LRBRACK_CHAR) /* arguments might be specified using parentheses */
         {
             QSP_CHAR *bracket;
-            if (!(bracket = qspDelimPos(s, QSP_RRBRACK[0])))
+            if (!(bracket = qspDelimPos(s, QSP_RRBRACK_CHAR)))
             {
                 *errorCode = QSP_ERR_BRACKNOTFOUND;
                 return 0;
             }
-            if (!qspIsAnyString(qspStringFromPair(bracket + QSP_STATIC_LEN(QSP_RRBRACK), s.End)))
+            if (!qspIsAnyString(qspStringFromPair(bracket + QSP_CHAR_LEN, s.End)))
             {
                 /* We'll parse arguments between parentheses */
-                s = qspStringFromPair(s.Str + QSP_STATIC_LEN(QSP_LRBRACK), bracket);
+                s = qspStringFromPair(s.Str + QSP_CHAR_LEN, bracket);
                 qspSkipSpaces(&s);
             }
         }
@@ -185,7 +187,7 @@ INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode,
                 bufSize = argsCount + 4;
                 foundArgs = (QSPCachedArg *)realloc(foundArgs, bufSize * sizeof(QSPCachedArg));
             }
-            pos = qspDelimPos(s, QSP_COMMA[0]);
+            pos = qspDelimPos(s, QSP_COMMA_CHAR);
             if (pos)
             {
                 foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
@@ -199,7 +201,7 @@ INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode,
                 ++argsCount;
                 break;
             }
-            s.Str = pos + QSP_STATIC_LEN(QSP_COMMA);
+            s.Str = pos + QSP_CHAR_LEN;
             qspSkipSpaces(&s);
             if (qspIsEmpty(s))
             {
@@ -217,13 +219,13 @@ INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode,
 QSPString qspGetLineLabel(QSPString str)
 {
     qspSkipSpaces(&str);
-    if (!qspIsEmpty(str) && *str.Str == QSP_LABEL[0])
+    if (!qspIsEmpty(str) && *str.Str == QSP_LABEL_CHAR)
     {
-        QSP_CHAR *delimPos = qspStrChar(str, QSP_STATDELIM[0]);
+        QSP_CHAR *delimPos = qspStrChar(str, QSP_STATDELIM_CHAR);
         if (delimPos)
-            str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_LABEL), delimPos);
+            str = qspStringFromPair(str.Str + QSP_CHAR_LEN, delimPos);
         else
-            str = qspStringFromPair(str.Str + QSP_STATIC_LEN(QSP_LABEL), str.End);
+            str = qspStringFromPair(str.Str + QSP_CHAR_LEN, str.End);
         str = qspCopyToNewText(qspDelSpc(str));
         qspUpperStr(&str);
         return str;
@@ -260,10 +262,10 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
         case qspStatLoop:
         case qspStatIf:
         case qspStatElseIf:
-            statDelimPos = qspDelimPos(str, QSP_COLONDELIM[0]);
+            statDelimPos = qspDelimPos(str, QSP_COLONDELIM_CHAR);
             if (statDelimPos)
             {
-                nextPos = statDelimPos + QSP_STATIC_LEN(QSP_COLONDELIM);
+                nextPos = statDelimPos + QSP_CHAR_LEN;
                 if (nextPos == str.End) nextPos = 0;
             }
             break;
@@ -274,16 +276,16 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
             if (nextPos < str.End)
             {
                 statDelimPos = nextPos;
-                if (*nextPos == QSP_COLONDELIM[0])
+                if (*nextPos == QSP_COLONDELIM_CHAR)
                 {
-                    nextPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+                    nextPos += QSP_CHAR_LEN;
                     if (nextPos == str.End) nextPos = 0;
                 }
             }
             break;
         default:
-            statDelimPos = qspDelimPos(str, QSP_STATDELIM[0]);
-            if (statDelimPos) nextPos = statDelimPos + QSP_STATIC_LEN(QSP_STATDELIM);
+            statDelimPos = qspDelimPos(str, QSP_STATDELIM_CHAR);
+            if (statDelimPos) nextPos = statDelimPos + QSP_CHAR_LEN;
             elsePos = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
             temp = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSEIF), QSP_TRUE);
             if (temp && !(elsePos && elsePos < temp)) elsePos = temp; /* keep ELSE if it goes before ELSEIF */
@@ -300,9 +302,9 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
             if (statCode == qspStatUnknown && str.Str != statDelimPos)
             {
                 if (statDelimPos)
-                    temp = qspDelimPos(qspStringFromPair(str.Str, statDelimPos), QSP_EQUAL[0]);
+                    temp = qspDelimPos(qspStringFromPair(str.Str, statDelimPos), QSP_EQUAL_CHAR);
                 else
-                    temp = qspDelimPos(str, QSP_EQUAL[0]);
+                    temp = qspDelimPos(str, QSP_EQUAL_CHAR);
                 statCode = (temp ? qspStatSet : qspStatImplicitStatement);
             }
             break;
@@ -333,10 +335,10 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                 case qspStatLoop:
                 case qspStatIf:
                 case qspStatElseIf:
-                    statDelimPos = qspDelimPos(str, QSP_COLONDELIM[0]);
+                    statDelimPos = qspDelimPos(str, QSP_COLONDELIM_CHAR);
                     if (statDelimPos)
                     {
-                        nextPos = statDelimPos + QSP_STATIC_LEN(QSP_COLONDELIM);
+                        nextPos = statDelimPos + QSP_CHAR_LEN;
                         if (nextPos == str.End) nextPos = 0;
                     }
                     break;
@@ -347,9 +349,9 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                     if (nextPos < str.End)
                     {
                         statDelimPos = nextPos;
-                        if (*nextPos == QSP_COLONDELIM[0])
+                        if (*nextPos == QSP_COLONDELIM_CHAR)
                         {
-                            nextPos += QSP_STATIC_LEN(QSP_COLONDELIM);
+                            nextPos += QSP_CHAR_LEN;
                             if (nextPos == str.End) nextPos = 0;
                         }
                     }
@@ -357,8 +359,8 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                         statDelimPos = 0;
                     break;
                 default:
-                    statDelimPos = qspDelimPos(str, QSP_STATDELIM[0]);
-                    if (statDelimPos) nextPos = statDelimPos + QSP_STATIC_LEN(QSP_STATDELIM);
+                    statDelimPos = qspDelimPos(str, QSP_STATDELIM_CHAR);
+                    if (statDelimPos) nextPos = statDelimPos + QSP_CHAR_LEN;
                     if (elsePos && str.Str >= elsePos) elsePos = 0;
                     if (!elsePos && toSearchElse)
                     {
@@ -375,9 +377,9 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                     if (statCode == qspStatUnknown && str.Str != statDelimPos)
                     {
                         if (statDelimPos)
-                            temp = qspDelimPos(qspStringFromPair(str.Str, statDelimPos), QSP_EQUAL[0]);
+                            temp = qspDelimPos(qspStringFromPair(str.Str, statDelimPos), QSP_EQUAL_CHAR);
                         else
-                            temp = qspDelimPos(str, QSP_EQUAL[0]);
+                            temp = qspDelimPos(str, QSP_EQUAL_CHAR);
                         statCode = (temp ? qspStatSet : qspStatImplicitStatement);
                     }
                     break;
@@ -390,7 +392,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     /* Check for ELSE IF */
     if (statInd == 1
         && line->Stats[0].Stat == qspStatElse && statCode == qspStatIf
-        && !qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].ParamPos, QSP_COLONDELIM[0]))
+        && !qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].ParamPos, QSP_COLONDELIM_CHAR))
     {
         /* Convert multiline ELSE IF to ELSEIF */
         statCode = qspStatElseIf; /* move current IF as ELSEIF to index 0, it's safe to overwrite ELSE */
@@ -398,7 +400,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     }
     else if (statInd == 2
         && line->Stats[0].Stat == qspStatElse && line->Stats[1].Stat == qspStatIf && statCode == qspStatComment
-        && !qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].ParamPos, QSP_COLONDELIM[0]))
+        && !qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].ParamPos, QSP_COLONDELIM_CHAR))
     {
         /* Convert multiline ELSE IF with a comment to ELSEIF with the comment */
         line->Stats[0].Stat = qspStatElseIf; /* move IF as ELSEIF to index 0, it's safe to overwrite ELSE */
@@ -438,7 +440,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     case qspStatLoop:
     case qspStatIf:
     case qspStatElseIf:
-        if (qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].EndPos, QSP_COLONDELIM[0]))
+        if (qspIsCharAtPos(line->Str, line->Str.Str + line->Stats[0].EndPos, QSP_COLONDELIM_CHAR))
         {
             if (line->StatsCount == 1)
                 line->IsMultiline = QSP_TRUE;
@@ -569,9 +571,9 @@ void qspPrepareStringToExecution(QSPString *str)
     QSP_CHAR *pos = str->Str;
     while (pos < str->End)
     {
-        if (*pos == QSP_LQUOT[0])
+        if (*pos == QSP_LQUOT_CHAR)
             ++quotsCount;
-        else if (*pos == QSP_RQUOT[0])
+        else if (*pos == QSP_RQUOT_CHAR)
         {
             if (quotsCount) --quotsCount;
         }
@@ -680,9 +682,9 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
             }
             else
             {
-                if (*pos == QSP_LQUOT[0])
+                if (*pos == QSP_LQUOT_CHAR)
                     ++quotsCount;
-                else if (*pos == QSP_RQUOT[0])
+                else if (*pos == QSP_RQUOT_CHAR)
                 {
                     if (quotsCount) --quotsCount;
                 }

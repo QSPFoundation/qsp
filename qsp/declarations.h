@@ -65,45 +65,94 @@
 
     #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
     #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
+    #define QSP_CHAR_LEN 1
+
+    #define QSP_DEFINE_SPECIAL_CHAR(name, ch) enum { name##_CHAR = ch }; /* use enum to make it compile-time constant */
 
     #define QSP_VER QSP_FMT(QSP_VER_STR)
     #define QSP_LOCALE "C"
-    #define QSP_NUMCHAR QSP_FMT("#")
-    #define QSP_STRCHAR QSP_FMT("$")
-    #define QSP_TUPLECHAR QSP_FMT("%")
-    #define QSP_LABEL QSP_FMT(":")
-    #define QSP_COMMENT QSP_FMT("!")
-    #define QSP_DIGITS QSP_FMT("0123456789")
-    #define QSP_QUOTS QSP_FMT("'\"")
-    #define QSP_DEFQUOT QSP_FMT("'")
-    #define QSP_ESCDEFQUOT QSP_FMT("''")
-    #define QSP_LQUOT QSP_FMT("{")
-    #define QSP_RQUOT QSP_FMT("}")
-    #define QSP_STATDELIM QSP_FMT("&")
-    #define QSP_COLONDELIM QSP_FMT(":")
-    #define QSP_SPACES QSP_FMT(" \t")
-    #define QSP_COMMA QSP_FMT(",")
-    #define QSP_EQUAL QSP_FMT("=")
-    #define QSP_NOTEQUAL1 QSP_FMT("!")
-    #define QSP_NOTEQUAL2 QSP_FMT("<>")
-    #define QSP_LESS QSP_FMT("<")
-    #define QSP_GREAT QSP_FMT(">")
-    #define QSP_LESSEQ1 QSP_FMT("<=")
-    #define QSP_LESSEQ2 QSP_FMT("=<")
-    #define QSP_GREATEQ1 QSP_FMT(">=")
-    #define QSP_GREATEQ2 QSP_FMT("=>")
-    #define QSP_LSBRACK QSP_FMT("[")
-    #define QSP_RSBRACK QSP_FMT("]")
-    #define QSP_LRBRACK QSP_FMT("(")
-    #define QSP_RRBRACK QSP_FMT(")")
-    #define QSP_APPEND QSP_FMT("&")
-    #define QSP_NEGATION QSP_FMT("-")
-    #define QSP_ADD QSP_FMT("+")
-    #define QSP_SUB QSP_FMT("-")
-    #define QSP_DIV QSP_FMT("/")
-    #define QSP_MUL QSP_FMT("*")
-    #define QSP_USERFUNC QSP_FMT("@")
-    #define QSP_DELIMS QSP_FMT(" \t&'\"()[]=!<>+-/*:,{}")
+
+    #define QSP_NUMTYPE      QSP_FMT("#")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_NUMTYPE,    QSP_FMT('#'))
+
+    #define QSP_STRTYPE      QSP_FMT("$")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_STRTYPE,    QSP_FMT('$'))
+
+    #define QSP_TUPLETYPE    QSP_FMT("%")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_TUPLETYPE,  QSP_FMT('%'))
+
+    #define QSP_LABEL        QSP_FMT(":")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_LABEL,      QSP_FMT(':'))
+
+    #define QSP_COMMENT      QSP_FMT("!")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_COMMENT,    QSP_FMT('!'))
+
+    #define QSP_USERFUNC     QSP_FMT("@")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_USERFUNC,   QSP_FMT('@'))
+
+    #define QSP_DIGITS       QSP_FMT("0123456789")
+    #define QSP_QUOTS        QSP_FMT("'\"")
+    #define QSP_DEFQUOT      QSP_FMT("'")
+    #define QSP_ESCDEFQUOT   QSP_FMT("''")
+    #define QSP_SPACES       QSP_FMT(" \t")
+
+    #define QSP_STATDELIM    QSP_FMT("&")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_STATDELIM,  QSP_FMT('&'))
+
+    #define QSP_COLONDELIM   QSP_FMT(":")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_COLONDELIM, QSP_FMT(':'))
+
+    #define QSP_COMMA        QSP_FMT(",")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_COMMA,      QSP_FMT(','))
+
+    #define QSP_EQUAL        QSP_FMT("=")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_EQUAL,      QSP_FMT('='))
+
+    #define QSP_NOTEQUAL1    QSP_FMT("!")
+    #define QSP_NOTEQUAL2    QSP_FMT("<>")
+
+    #define QSP_LESS         QSP_FMT("<")
+    #define QSP_GREAT        QSP_FMT(">")
+    #define QSP_LESSEQ1      QSP_FMT("<=")
+    #define QSP_LESSEQ2      QSP_FMT("=<")
+    #define QSP_GREATEQ1     QSP_FMT(">=")
+    #define QSP_GREATEQ2     QSP_FMT("=>")
+    #define QSP_APPEND       QSP_FMT("&")
+
+    #define QSP_NEGATION     QSP_FMT("-")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_NEGATION,   QSP_FMT('-'))
+
+    #define QSP_ADD          QSP_FMT("+")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_ADD,        QSP_FMT('+'))
+
+    #define QSP_SUB          QSP_FMT("-")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_SUB,        QSP_FMT('-'))
+
+    #define QSP_DIV          QSP_FMT("/")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_DIV,        QSP_FMT('/'))
+
+    #define QSP_MUL          QSP_FMT("*")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_MUL,        QSP_FMT('*'))
+
+    #define QSP_LSBRACK      QSP_FMT("[")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_LSBRACK,    QSP_FMT('['))
+
+    #define QSP_RSBRACK      QSP_FMT("]")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_RSBRACK,    QSP_FMT(']'))
+
+    #define QSP_LRBRACK      QSP_FMT("(")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_LRBRACK,    QSP_FMT('('))
+
+    #define QSP_RRBRACK      QSP_FMT(")")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_RRBRACK,    QSP_FMT(')'))
+
+    #define QSP_LQUOT        QSP_FMT("{")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_LQUOT,      QSP_FMT('{'))
+
+    #define QSP_RQUOT        QSP_FMT("}")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_RQUOT,      QSP_FMT('}'))
+
+    #define QSP_DELIMS       QSP_FMT(" \t&'\"()[]=!<>+-/*:,{}")
 
     #define QSP_LOC_COUNTER QSP_FMT("COUNTER")
     #define QSP_LOC_USERCOMMAND QSP_FMT("USERCOM")
