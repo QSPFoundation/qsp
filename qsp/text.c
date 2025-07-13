@@ -33,7 +33,7 @@ void qspInitSymbolClasses(void)
     qspFillSymbolClass(QSP_CHAR_DIGIT, QSP_DIGITS);
     qspFillSymbolClass(QSP_CHAR_DELIM, QSP_DELIMS);
     qspFillSymbolClass(QSP_CHAR_SIMPLEOP, QSP_ADD QSP_SUB QSP_DIV QSP_MUL);
-    qspFillSymbolClass(QSP_CHAR_EXPSTART, QSP_LQUOT QSP_LRBRACK QSP_LSBRACK);
+    qspFillSymbolClass(QSP_CHAR_BRACKET, QSP_LQUOT QSP_LRBRACK QSP_LSBRACK);
     qspFillSymbolClass(QSP_CHAR_TYPEPREFIX, QSP_TUPLETYPE QSP_NUMTYPE QSP_STRTYPE);
 }
 
@@ -333,7 +333,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
     if (!isIsolated)
     {
         QSPString prefix = qspStringFromPair(txt.Str, pos);
-        if (!qspStrCharClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_EXPSTART)) return pos;
+        if (!qspStrCharClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_BRACKET)) return pos;
     }
     c1 = c2 = c3 = 0;
     isPrevDelim = QSP_TRUE;
