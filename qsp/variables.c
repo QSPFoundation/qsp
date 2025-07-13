@@ -99,7 +99,7 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
     if (qspIsInClass(*name.Str, QSP_CHAR_TYPEPREFIX))
         name.Str++;
 
-    if (qspIsEmpty(name) || qspIsInClass(*name.Str, QSP_CHAR_DIGIT) || qspIsAnyInClass(name, QSP_CHAR_DELIM))
+    if (qspIsEmpty(name) || qspIsInClass(*name.Str, QSP_CHAR_DIGIT) || qspStrCharClass(name, QSP_CHAR_DELIM))
     {
         qspSetError(QSP_ERR_INCORRECTNAME);
         return 0;
@@ -261,39 +261,48 @@ int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
 
 INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation)
 {
-    QSP_CHAR *lPos = qspStrChar(s, QSP_LSBRACK_CHAR);
-    if (lPos)
+    QSP_CHAR *nameEnd = qspStrCharClass(s, QSP_CHAR_DELIM);
+    if (nameEnd)
     {
-        QSPVar *var;
-        QSP_CHAR *rPos, *startPos = s.Str;
-        s.Str = lPos;
-        rPos = qspDelimPos(s, QSP_RSBRACK_CHAR);
-        if (!rPos)
-        {
-            qspSetError(QSP_ERR_BRACKNOTFOUND);
-            return 0;
-        }
-        var = qspVarReference(qspStringFromPair(startPos, lPos), isSetOperation);
-        if (!var) return 0;
-        s.Str = lPos + QSP_CHAR_LEN;
+        QSP_CHAR *startPos = s.Str;
+        s.Str = nameEnd;
         qspSkipSpaces(&s);
-        if (s.Str == rPos)
+        if (!qspIsEmpty(s) && *s.Str == QSP_LSBRACK_CHAR)
         {
-            if (isSetOperation)
-                *index = var->ValsCount; /* new item */
+            QSPVar *var;
+            QSP_CHAR *rPos = qspDelimPos(s, QSP_RSBRACK_CHAR);
+            if (!rPos)
+            {
+                qspSetError(QSP_ERR_BRACKNOTFOUND);
+                return 0;
+            }
+            var = qspVarReference(qspStringFromPair(startPos, nameEnd), isSetOperation);
+            if (!var) return 0;
+            s.Str += QSP_CHAR_LEN;
+            qspSkipSpaces(&s);
+            if (s.Str == rPos)
+            {
+                if (isSetOperation)
+                    *index = var->ValsCount; /* new item */
+                else
+                    *index = (var->ValsCount ? var->ValsCount - 1 : 0); /* last item */
+            }
             else
-                *index = (var->ValsCount ? var->ValsCount - 1 : 0); /* last item */
+            {
+                QSPVariant ind;
+                int oldLocationState = qspLocationState;
+                ind = qspCalculateExprValue(qspStringFromPair(s.Str, rPos));
+                if (qspLocationState != oldLocationState) return 0;
+                *index = qspGetVarIndex(var, ind, isSetOperation);
+                qspFreeVariant(&ind);
+            }
+            return var;
         }
         else
         {
-            QSPVariant ind;
-            int oldLocationState = qspLocationState;
-            ind = qspCalculateExprValue(qspStringFromPair(s.Str, rPos));
-            if (qspLocationState != oldLocationState) return 0;
-            *index = qspGetVarIndex(var, ind, isSetOperation);
-            qspFreeVariant(&ind);
+            qspSetError(QSP_ERR_INCORRECTNAME);
+            return 0;
         }
-        return var;
     }
     *index = 0;
     return qspVarReference(s, isSetOperation);

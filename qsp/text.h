@@ -164,18 +164,6 @@
         return (ch < sizeof(qspAsciiClasses)) && ((qspAsciiClasses[ch] & charClass) != 0);
     }
 
-    INLINE QSP_BOOL qspIsAnyInClass(QSPString str, int charClass)
-    {
-        QSP_CHAR *pos = str.Str;
-        while (pos < str.End)
-        {
-            if (qspIsInClass(*pos, charClass))
-                return QSP_TRUE;
-            ++pos;
-        }
-        return QSP_FALSE;
-    }
-
     INLINE void qspSkipSpaces(QSPString *s)
     {
         QSP_CHAR *pos = s->Str, *end = s->End;
@@ -262,6 +250,18 @@
         while (pos < str.End)
         {
             if (qspIsInList(*pos, strCharSet))
+                return pos;
+            ++pos;
+        }
+        return 0;
+    }
+
+    INLINE QSP_CHAR *qspStrCharClass(QSPString str, int charClass)
+    {
+        QSP_CHAR *pos = str.Str;
+        while (pos < str.End)
+        {
+            if (qspIsInClass(*pos, charClass))
                 return pos;
             ++pos;
         }

@@ -333,7 +333,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
     if (!isIsolated)
     {
         QSPString prefix = qspStringFromPair(txt.Str, pos);
-        if (!qspIsAnyInClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_EXPSTART)) return pos;
+        if (!qspStrCharClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_EXPSTART)) return pos;
     }
     c1 = c2 = c3 = 0;
     isPrevDelim = QSP_TRUE;

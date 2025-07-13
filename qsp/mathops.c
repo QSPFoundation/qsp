@@ -457,7 +457,7 @@ INLINE QSP_BIGINT qspGetNumber(QSPString *expr)
 INLINE QSPString qspGetName(QSPString *expr)
 {
     QSP_CHAR *startPos = expr->Str, *endPos = expr->End, *pos = startPos;
-    while (++pos < endPos)
+    while (++pos < endPos) /* the first character is not a delimiter */
     {
         if (qspIsInClass(*pos, QSP_CHAR_DELIM)) break;
     }
