@@ -1,0 +1,421 @@
+QSP {
+    space := lineContinuation | " " | "\t"
+
+    /* ====================
+       TOP-LEVEL STRUCTURE
+       ====================
+
+       1. The grammar is case-insensitive;
+       2. Rules beginning with CAPITAL letters automatically include spaces;
+       3. Operator precedence is not defined here;
+       4. Statements and functions don't define the number of arguments;
+       5. You can use https://ohmjs.org/editor/ to test the grammar;
+    */
+
+    Start              = StatementGroup* end
+
+    StatementGroup     = newline | SingleLineBlock | MultiLineBlock
+
+    SingleLineBlock    = SingleLineGroup (&newline | &end)
+    SingleLineGroup    = StatementUnitSingleLine (statementSeparator StatementUnitSingleLine)*
+
+    MultiLineBlock     = StatementUnitMultiLine (statementSeparator SingleLineGroup)? (&newline | &end)
+
+    /* ====================
+       STATEMENT UNITS
+       ====================
+    */
+
+    StatementUnitSingleLine = CommentStatement
+                            | LabelStatement
+                            | IfSingleLine
+                            | ActSingleLine
+                            | LoopSingleLine
+                            | AssignmentStatement
+                            | Statement
+                            | ImplicitStatement
+
+    StatementUnitMultiLine  = IfMultiLine
+                            | ActMultiLine
+                            | LoopMultiLine
+
+    /* ====================
+       COMMENTS
+       ====================
+    */
+
+    CommentStatement        = "!" CommentText
+    CommentText             = (RawCodeBlock | rawStringLiteral | commentChar)*
+    commentChar             = ~newline any
+
+    /* ====================
+       ASSIGNMENTS & LOCALS
+       ====================
+    */
+
+    AssignmentStatement     = ("set" | "let")? VariableList assignmentOperator NonAmpersandExpression
+    LocalStatement          = "local" VariableList ("=" NonAmpersandExpression)?
+
+    VariableList            = VariableRef ("," VariableRef)*
+    assignmentOperator      = "=" | "+=" | "-=" | "*=" | "/="
+
+    /* ====================
+       IF STATEMENTS
+       ====================
+    */
+
+    IfSingleLine            = ifMarker Expression ":" SingleLineGroup (elseIfMarker Expression ":" SingleLineGroup)* (elseMarker ":"? SingleLineGroup)?
+    IfMultiLine             = ifMarker Expression ":" CommentStatement? newline
+                              StatementGroup*
+                              ElseifClause*
+                              ElseClause?
+                              endIfMarker NoteString
+
+    ElseifClause            = ElseifSingleLine | ElseifMultiLine
+    ElseifSingleLine        = elseIfMarker Expression ":" SingleLineGroup newline
+    ElseifMultiLine         = elseIfMarker Expression ":" CommentStatement? newline
+                              StatementGroup*
+
+    ElseClause              = ElseSingleLine | ElseMultiLine
+    ElseSingleLine          = elseMarker ":"? SingleLineGroup newline
+    ElseMultiLine           = elseMarker (":" CommentStatement?)? newline
+                              StatementGroup*
+
+    /* ====================
+       ACT STATEMENTS
+       ====================
+    */
+
+    ActSingleLine           = actMarker ( ParenthesizedArgument1plusList | Argument1plusList ) ":" SingleLineGroup
+    ActMultiLine            = actMarker ( ParenthesizedArgument1plusList | Argument1plusList ) ":" CommentStatement? newline
+                              StatementGroup*
+                              endActMarker NoteString
+
+    /* ====================
+       LOOP STATEMENTS
+       ====================
+    */
+
+    LoopSingleLine          = loopMarker SingleLineGroup? whileMarker Expression (stepMarker SingleLineGroup)? ":" SingleLineGroup
+    LoopMultiLine           = loopMarker SingleLineGroup? whileMarker Expression (stepMarker SingleLineGroup)? ":" CommentStatement? newline
+                              StatementGroup*
+                              endLoopMarker NoteString
+
+    /* ====================
+       REGULAR STATEMENTS
+       ====================
+    */
+
+    Statement                       = StatementWithArgs | StatementNoArgs
+    StatementNoArgs                 = statementName ("(" ")")?
+    StatementWithArgs               = statementName ( ParenthesizedArgument1plusList | NonAmpersandArgument1plusList )
+
+    /* ====================
+       FUNCTION CALLS
+       ====================
+    */
+
+    FunctionCall                    = FunctionCallMultiArgs
+                                    | FunctionCallSingleArg
+                                    | FunctionCallNoArgs
+
+    NonAmpersandFunctionCall        = FunctionCallMultiArgs
+                                    | NonAmpersandFunctionCallSingleArg
+                                    | FunctionCallNoArgs
+
+    UserFunctionCall                = UserFunctionCallWithArgs
+                                    | UserFunctionCallNoArgs
+
+    FunctionCallNoArgs              = funcNameWithPrefix ("(" ")")?
+    FunctionCallSingleArg           = funcNameWithPrefix ( ParenthesizedExpression | Expression )
+    FunctionCallMultiArgs           = funcNameWithPrefix ParenthesizedArgument2plusList
+
+    NonAmpersandFunctionCallSingleArg = funcNameWithPrefix ( ParenthesizedExpression | NonAmpersandExpression )
+
+    UserFunctionCallNoArgs          = "@" userFunctionName ("(" ")")?
+    UserFunctionCallWithArgs        = "@" userFunctionName ParenthesizedArgument1plusList
+
+    /* ====================
+       OTHER STATEMENTS
+       ====================
+    */
+
+    LabelStatement                  = ":" LabelName
+    ImplicitStatement               = NonAmpersandExpression
+
+    LabelName                       = NoteString
+
+    NoteString                      = (RawCodeBlock | rawStringLiteral | noteChar)*
+    noteChar                        = ~(statementSeparator | newline) any
+
+    /* ====================
+       EXPRESSIONS (WITH AMPERSAND)
+       ====================
+       Two expression types: one that can contain & (for parenthesized contexts and control headers)
+       and one that cannot (for statement contexts where & is a separator)
+    */
+
+    Expression                      = BinaryExpression
+    BinaryExpression                = UnaryExpression (extendedBinaryOperator UnaryExpression)*
+    UnaryExpression                 = standardUnaryOperator* PrimaryExpression
+
+    /* ====================
+       EXPRESSIONS (WITHOUT AMPERSAND)
+       ====================
+       NonAmpersandExpression is like Expression but stops at & to avoid conflicts with statement separators
+    */
+
+    NonAmpersandExpression          = NonAmpersandBinaryExpression
+    NonAmpersandBinaryExpression    = NonAmpersandUnaryExpression (standardBinaryOperator NonAmpersandUnaryExpression)*
+    NonAmpersandUnaryExpression     = standardUnaryOperator* NonAmpersandPrimaryExpression
+
+    /* ====================
+       PRIMARY EXPRESSIONS
+       ====================
+    */
+
+    PrimaryExpression               = ParenthesizedExpression
+                                    | numberLiteral
+                                    | CodeBlock
+                                    | StringLiteralWithSubex /* Try to parse it as a string with subexpressions */
+                                    | rawStringLiteral
+                                    | EmptyPseudoTuple
+                                    | Tuple
+                                    | UserFunctionCall
+                                    | FunctionCall
+                                    | VariableRef
+
+    NonAmpersandPrimaryExpression   = ParenthesizedExpression
+                                    | numberLiteral
+                                    | CodeBlock
+                                    | StringLiteralWithSubex
+                                    | rawStringLiteral
+                                    | EmptyPseudoTuple
+                                    | Tuple
+                                    | UserFunctionCall
+                                    | NonAmpersandFunctionCall /* Functions with a single argument can't contain & */
+                                    | VariableRef
+
+    ParenthesizedExpression         = "(" Expression ")" /* Inside parentheses, & is always allowed */
+
+    Argument1plusList               = Expression ("," Expression)*
+    NonAmpersandArgument1plusList   = NonAmpersandExpression ("," NonAmpersandExpression)*
+    ParenthesizedArgument1plusList  = "(" Argument1plusList ")" /* Inside parentheses, & is always an operator */
+
+    Argument2plusList               = Expression "," Expression ("," Expression)*
+    ParenthesizedArgument2plusList  = "(" Argument2plusList ")" /* Inside parentheses, & is always an operator */
+
+    /* ====================
+       TUPLES
+       ====================
+    */
+
+    EmptyPseudoTuple    = "(" ")"
+    Tuple               = EmptyTuple | NonEmptyTuple
+    EmptyTuple          = "[" "]"
+    NonEmptyTuple       = "[" Argument1plusList "]"
+
+    /* ====================
+       VARIABLES
+       ====================
+    */
+
+    VariableRef         = varNameWithPrefix (ArrayIndex | EmptyArrayIndex)?
+    ArrayIndex          = "[" Expression "]"  /* Array indices can contain & */
+    EmptyArrayIndex     = "[" "]"
+
+    /* ====================
+       LITERALS
+       ====================
+    */
+
+    rawStringLiteral             = rawSingleQuotedString | rawDoubleQuotedString
+
+    rawSingleQuotedString        = "'" (apostropheEscape | rawSingleQuotedChar)* "'"
+    rawDoubleQuotedString        = "\"" (quoteEscape | rawDoubleQuotedChar)* "\""
+
+    rawSingleQuotedChar          = ~("'") any
+    rawDoubleQuotedChar          = ~("\"") any
+
+    apostropheEscape             = "''"
+    quoteEscape                  = "\"\""
+
+    numberLiteral                = digit+
+
+    /* ====================
+       STRINGS WITH SUBEXPRESSIONS
+       ====================
+    */
+
+    StringLiteralWithSubex       = SingleQuotedStringWithSubEx | DoubleQuotedStringWithSubEx
+    SingleQuotedStringWithSubEx  = "'" (StringSubexpression | apostropheEscape | singleQuotedChar)* "'"
+    DoubleQuotedStringWithSubEx  = "\"" (StringSubexpression | quoteEscape | doubleQuotedChar)* "\""
+
+    /* The subexpression shouldn't contain strings with the same type of quotes as the parent string */
+    StringSubexpression          = "<<" Expression ">>" /* & is always allowed in subexpressions */
+
+    singleQuotedChar             = ~("'" | "<<") any
+    doubleQuotedChar             = ~("\"" | "<<") any
+
+    /* ====================
+       CODE BLOCKS
+       ====================
+    */
+
+    CodeBlock                  = SyntacticCodeBlock | RawCodeBlock /* Try to parse it as proper code */
+    SyntacticCodeBlock         = "{" StatementGroupInCodeBlock* "}"
+
+    StatementGroupInCodeBlock  = newline | SingleLineCodeBlock | MultiLineCodeBlock
+
+    SingleLineCodeBlock        = SingleLineGroup (&newline | &("}"))
+    MultiLineCodeBlock         = StatementUnitMultiLine (statementSeparator SingleLineGroup)? (&newline | &("}"))
+
+    RawCodeBlock               = "{" RawCodeBlockContent* "}"
+    RawCodeBlockContent        = RawCodeBlock
+                               | rawStringLiteral
+                               | RawCodeParentheses
+                               | RawCodeBrackets
+                               | rawCodeBlockChar
+
+    RawCodeParentheses         = "(" RawCodeBlockContent* ")"
+    RawCodeBrackets            = "[" RawCodeBlockContent* "]"
+
+    rawCodeBlockChar = ~("{" | "}" | "'" | "\"" | "(" | ")" | "[" | "]") any
+
+    /* ====================
+       IDENTIFIERS
+       ====================
+    */
+
+    userFunctionName    = nonDelimiterChar+
+    funcNameWithPrefix  = typePrefix? functionName
+    varName             = ~(functionName | statementName | standardMarker) ~digit nonDelimiterChar+
+    varNameWithPrefix   = typePrefix? varName
+
+    delimiterChar       = " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | ":" | "," | "{" | "}"
+    nonDelimiterChar    = ~(delimiterChar | newline) any
+
+    typePrefix          = "#" | "$" | "%"
+    newline             = "\n" | "\r\n"
+    lineContinuation    = " _" newline
+    statementSeparator  = "&"
+
+    /* ====================
+       KEYWORDS
+       ====================
+    */
+
+    actMarker           = "act"
+    endActMarker        = "end"
+
+    ifMarker            = "if"
+    elseIfMarker        = "else" space* "if"
+    elseMarker          = "else"
+    endIfMarker         = "end"
+
+    loopMarker          = "loop"
+    whileMarker         = "while"
+    stepMarker          = "step"
+    endLoopMarker       = "end"
+
+    standardMarker      = actMarker | endActMarker
+                        | ifMarker | elseIfMarker | elseMarker | endIfMarker
+                        | loopMarker | whileMarker | stepMarker | endLoopMarker
+
+    standardBinaryOperator  = "," | "and" | "or" | "<>" | "<=" | ">=" | "!" | "=" | "<" | ">" | "+" | "-" | "*" | "/" | "mod"
+    extendedBinaryOperator  = standardBinaryOperator | "&"
+    standardUnaryOperator   = "-" | "no" | "obj" | "loc"
+
+    /* END, ELSEIF, ELSE are pseudo-statements, but we don't include them here to help with identifying suspicious code */
+    statementName           = "exit"
+                            | "jump"
+                            | "gosub" | "gs"
+                            | "goto" | "gt"
+                            | "xgoto" | "xgt"
+                            | "pl"
+                            | "p"
+                            | "nl"
+                            | "clear" | "clr"
+                            | "*pl"
+                            | "*p"
+                            | "*nl"
+                            | "*clear" | "*clr"
+                            | "msg"
+                            | "wait"
+                            | "addobj"
+                            | "delobj"
+                            | "killobj"
+                            | "unselect" | "unsel"
+                            | "killall"
+                            | "cla"
+                            | "delact"
+                            | "cls"
+                            | "cmdclear" | "cmdclr"
+                            | "menu"
+                            | "settimer"
+                            | "dynamic"
+                            | "setvar"
+                            | "killvar"
+                            | "copyarr"
+                            | "sortarr"
+                            | "scanstr"
+                            | "unpackarr"
+                            | "opengame"
+                            | "savegame"
+                            | "openqst"
+                            | "inclib"
+                            | "freelib"
+                            | "refint"
+                            | "showacts"
+                            | "showinput"
+                            | "showobjs"
+                            | "showstat"
+                            | "play"
+                            | "close"
+                            | "view"
+
+    functionName            = "desc"
+                            | "mod"
+                            | "max"
+                            | "min"
+                            | "rand"
+                            | "rnd"
+                            | "val"
+                            | "iif"
+                            | "dyneval"
+                            | "func"
+                            | "input"
+                            | "user_text"
+                            | "usrtxt"
+                            | "maintxt"
+                            | "stattxt"
+                            | "getobj"
+                            | "countobj"
+                            | "selobj"
+                            | "curloc"
+                            | "curobjs"
+                            | "selact"
+                            | "curacts"
+                            | "arrsize"
+                            | "arrtype"
+                            | "arritem"
+                            | "arrpack"
+                            | "arrpos"
+                            | "arrcomp"
+                            | "instr"
+                            | "isnum"
+                            | "trim"
+                            | "ucase"
+                            | "lcase"
+                            | "len"
+                            | "mid"
+                            | "replace"
+                            | "str"
+                            | "strcomp"
+                            | "strfind"
+                            | "strpos"
+                            | "isplay"
+                            | "rgb"
+                            | "msecscount"
+                            | "qspver"
+}
