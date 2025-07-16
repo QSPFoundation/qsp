@@ -322,9 +322,26 @@ QSP {
                         | ifMarker | elseIfMarker | elseMarker | endIfMarker
                         | loopMarker | whileMarker | stepMarker | endLoopMarker
 
-    standardBinaryOperator  = "," | "and" | "or" | "<>" | "<=" | ">=" | "!" | "=" | "<" | ">" | "+" | "-" | "*" | "/" | "mod"
+    standardBinaryOperator  = "," | "and" | "or" | "<>" | "!" | "<=" | "=<" | ">=" | "=>" | "=" | "<" | ">" | "+" | "-" | "*" | "/" | "mod"
     extendedBinaryOperator  = standardBinaryOperator | "&"
     standardUnaryOperator   = "-" | "no" | "obj" | "loc"
+
+    /* Priority | Operations
+       ---------|--------------------------------
+       1        | , (comma, used to define pseudo-tuples in expressions)
+       6        | or
+       7        | and
+       8        | no
+       10       | !, <>, <=, =<, >=, =>, =, <, >
+       11       | loc, obj
+       12       | & (value concatenation)
+       14       | +, -
+       16       | mod
+       17       | *, /
+       18       | - (unary negation)
+       30       | ALL REGULAR FUNCTIONS
+       127      | ( ) PARENTHESES
+    */
 
     /* END, ELSEIF, ELSE are pseudo-statements, but we don't include them here to help with identifying suspicious code */
     statementName           = "exit"
@@ -385,8 +402,7 @@ QSP {
                             | "dyneval"
                             | "func"
                             | "input"
-                            | "user_text"
-                            | "usrtxt"
+                            | "usrtxt" | "user_text"
                             | "maintxt"
                             | "stattxt"
                             | "getobj"
