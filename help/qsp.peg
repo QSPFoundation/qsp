@@ -177,7 +177,7 @@ QSP {
     PrimaryExpression               = ParenthesizedExpression
                                     | numberLiteral
                                     | CodeBlock
-                                    | StringLiteralWithSubex /* Try to parse it as a string with subexpressions */
+                                    | InterpolatedString /* Try to parse it as a string with subexpressions */
                                     | rawStringLiteral
                                     | EmptyPseudoTuple
                                     | Tuple
@@ -188,7 +188,7 @@ QSP {
     NonAmpersandPrimaryExpression   = ParenthesizedExpression
                                     | numberLiteral
                                     | CodeBlock
-                                    | StringLiteralWithSubex
+                                    | InterpolatedString
                                     | rawStringLiteral
                                     | EmptyPseudoTuple
                                     | Tuple
@@ -243,19 +243,19 @@ QSP {
     numberLiteral                = digit+
 
     /* ====================
-       STRINGS WITH SUBEXPRESSIONS
+       INTERPOLATED STRINGS
        ====================
     */
 
-    StringLiteralWithSubex       = SingleQuotedStringWithSubEx | DoubleQuotedStringWithSubEx
-    SingleQuotedStringWithSubEx  = "'" (StringSubexpression | apostropheEscape | singleQuotedChar)* "'"
-    DoubleQuotedStringWithSubEx  = "\"" (StringSubexpression | quoteEscape | doubleQuotedChar)* "\""
+    InterpolatedString              = SingleQuotedInterpolatedString | DoubleQuotedInterpolatedString
+    SingleQuotedInterpolatedString  = "'" (StringSubexpression | apostropheEscape | singleQuotedChar)* "'"
+    DoubleQuotedInterpolatedString  = "\"" (StringSubexpression | quoteEscape | doubleQuotedChar)* "\""
 
     /* The subexpression shouldn't contain strings with the same type of quotes as the parent string */
-    StringSubexpression          = "<<" Expression ">>" /* & is always allowed in subexpressions */
+    StringSubexpression             = "<<" Expression ">>" /* & is always allowed in subexpressions */
 
-    singleQuotedChar             = ~("'" | "<<") any
-    doubleQuotedChar             = ~("\"" | "<<") any
+    singleQuotedChar                = ~("'" | "<<") any
+    doubleQuotedChar                = ~("\"" | "<<") any
 
     /* ====================
        CODE BLOCKS
