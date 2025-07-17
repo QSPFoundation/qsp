@@ -387,7 +387,7 @@ QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSPString *res)
 QSP_BOOL QSPExecString(QSPString s, QSP_BOOL toRefreshUI)
 {
     qspPrepareExecution(QSP_FALSE);
-    qspExecStringAsCodeWithArgs(s, 0, 0, 1, 0);
+    qspExecStringAsCode(s);
     if (qspErrorNum) return QSP_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;

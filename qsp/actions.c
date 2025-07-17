@@ -96,10 +96,11 @@ void qspExecAction(int ind)
 {
     if (ind >= 0 && ind < qspCurActsCount)
     {
+        /* Keep the current location context here (don't reset special vars) */
         int count;
         QSPLineOfCode *code;
         QSPCurAct *act = qspCurActions + ind;
-        /* switch the current state */
+        /* Switch the current state */
         qspRealCurLoc = act->Location;
         qspRealActIndex = act->ActIndex;
         count = act->OnPressLinesCount;

@@ -324,7 +324,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_execString(JNIEnv *env, jo
     QSPString codeStr;
     qspPrepareExecution(QSP_FALSE);
     codeStr = qspFromJavaString(env, s);
-    qspExecStringAsCodeWithArgs(codeStr, 0, 0, 1, 0);
+    qspExecStringAsCode(codeStr);
     qspFreeString(&codeStr);
     if (qspErrorNum) return JNI_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);

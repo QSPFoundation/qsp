@@ -1588,5 +1588,5 @@ INLINE void qspFunctionFunc(QSPVariant *args, QSP_TINYINT count, QSPVariant *res
 
 INLINE void qspFunctionDynEval(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0, res);
+    qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, res);
 }

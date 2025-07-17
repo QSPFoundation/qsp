@@ -685,7 +685,7 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int 
     return toExit;
 }
 
-void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, int codeOffset, QSPVariant *res)
+void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     QSPLineOfCode *strs;
     int oldLocationState, linesCount;
@@ -693,7 +693,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
     qspSetArgs(args, count, QSP_TRUE);
     linesCount = qspPreprocessData(s, &strs);
     oldLocationState = qspLocationState;
-    qspExecCode(strs, 0, linesCount, codeOffset, 0);
+    qspExecCode(strs, 0, linesCount, 0, 0);
     qspFreePrepLines(strs, linesCount);
     if (qspLocationState != oldLocationState)
     {
@@ -702,6 +702,15 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
     }
     if (res) qspApplyResult(res);
     qspRestoreLastSavedVarsGroup();
+}
+
+void qspExecStringAsCode(QSPString s)
+{
+    /* Keep the current location context here (don't reset special vars) */
+    QSPLineOfCode *strs;
+    int linesCount = qspPreprocessData(s, &strs);
+    qspExecCodeBlockWithLocals(strs, 0, linesCount, 0, 0);
+    qspFreePrepLines(strs, linesCount);
 }
 
 INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
@@ -1193,5 +1202,5 @@ INLINE void qspStatementExec(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QS
 
 INLINE void qspStatementDynamic(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
-    qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0, 0);
+    qspExecStringAsCodeWithArgs(QSP_STR(args[0]), args + 1, count - 1, 0);
 }
