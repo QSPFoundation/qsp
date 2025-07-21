@@ -39,37 +39,27 @@ void qspClearAllActions(QSP_BOOL toInit)
 
 INLINE int qspActIndex(QSPString name)
 {
+    int i;
     QSPString bufName;
-    int i, actNameLen, bufSize;
-    QSP_CHAR *buf;
+    QSPBufString buf;
     if (!qspCurActsCount) return -1;
     name = qspCopyToNewText(name);
     qspUpperStr(&name);
-    bufSize = 64;
-    buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+    buf = qspNewBufString(16);
     for (i = 0; i < qspCurActsCount; ++i)
     {
-        actNameLen = qspStrLen(qspCurActions[i].Desc);
-        if (actNameLen)
-        {
-            if (actNameLen > bufSize)
-            {
-                bufSize = actNameLen + 16;
-                buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
-            }
-            memcpy(buf, qspCurActions[i].Desc.Str, actNameLen * sizeof(QSP_CHAR));
-        }
-        bufName = qspStringFromLen(buf, actNameLen);
+        qspUpdateBufString(&buf, qspCurActions[i].Desc);
+        bufName = qspBufTextToString(buf);
         qspUpperStr(&bufName);
         if (!qspStrsCompare(bufName, name))
         {
             qspFreeString(&name);
-            free(buf);
+            qspFreeBufString(&buf);
             return i;
         }
     }
     qspFreeString(&name);
-    free(buf);
+    qspFreeBufString(&buf);
     return -1;
 }
 

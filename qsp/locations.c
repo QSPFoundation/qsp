@@ -84,15 +84,19 @@ void qspPrepareLocs(void)
 
 int qspLocIndex(QSPString name)
 {
-    QSPLocName *loc;
-    if (!qspLocsCount) return -1;
-    name = qspDelSpc(name);
-    if (qspIsEmpty(name)) return -1;
-    name = qspCopyToNewText(name);
-    qspUpperStr(&name);
-    loc = (QSPLocName *)bsearch(&name, qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocStringCompare);
-    qspFreeString(&name);
-    if (loc) return loc->Index;
+    if (qspLocsCount)
+    {
+        name = qspDelSpc(name);
+        if (!qspIsEmpty(name))
+        {
+            QSPLocName *loc;
+            name = qspCopyToNewText(name);
+            qspUpperStr(&name);
+            loc = (QSPLocName *)bsearch(&name, qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocStringCompare);
+            qspFreeString(&name);
+            if (loc) return loc->Index;
+        }
+    }
     return -1;
 }
 

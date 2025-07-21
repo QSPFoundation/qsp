@@ -21,7 +21,10 @@ int qspCurSelObject = -1;
 QSP_BOOL qspIsObjsListChanged = QSP_FALSE;
 QSP_BOOL qspCurToShowObjs = QSP_TRUE;
 
-INLINE void qspRemoveObject(int);
+INLINE void qspRemoveObjectByIndex(int index);
+INLINE void qspSendRemovalNotifications(QSPString *objNames, int count);
+INLINE void qspRemoveObjectByIndexWithEvent(int index);
+INLINE void qspClearObjectsByNameWithEvents(QSPString name, int maxObjects);
 
 void qspClearAllObjects(QSP_BOOL toInit)
 {
@@ -39,92 +42,148 @@ void qspClearAllObjects(QSP_BOOL toInit)
     qspCurSelObject = -1;
 }
 
-void qspClearAllObjectsWithNotify(void)
+INLINE void qspRemoveObjectByIndex(int index)
 {
-    int oldCount = qspCurObjsCount;
-    if (oldCount)
+    if (index >= 0 && index < qspCurObjsCount)
     {
-        QSPVariant v;
-        QSPString *objs;
-        QSPVarsGroup *savedVarGroups;
+        if (qspCurSelObject >= index) qspCurSelObject = -1;
+        qspFreeString(&qspCurObjects[index].Image);
+        qspFreeString(&qspCurObjects[index].Desc);
+        --qspCurObjsCount;
+        while (index < qspCurObjsCount)
+        {
+            qspCurObjects[index] = qspCurObjects[index + 1];
+            ++index;
+        }
+        qspIsObjsListChanged = QSP_TRUE;
+    }
+}
+
+INLINE void qspSendRemovalNotifications(QSPString *objNames, int count)
+{
+    if (count >= 2)
+    {
+        QSPVariant objName;
         int i, oldLocationState, savedVarGroupsCount;
+        QSPVarsGroup *savedVarGroups;
         /* Restore global variables here to optimize internal qspExecLocByVarNameWithArgs calls */
         savedVarGroupsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVarGroups);
         if (qspErrorNum) return;
-        objs = (QSPString *)malloc(oldCount * sizeof(QSPString));
-        for (i = 0; i < oldCount; ++i)
-            qspAddText(objs + i, qspCurObjects[i].Desc, QSP_TRUE);
-        qspClearAllObjects(QSP_FALSE);
-        v.Type = QSP_TYPE_STR;
+        objName.Type = QSP_TYPE_STR;
         oldLocationState = qspLocationState;
-        for (i = 0; i < oldCount; ++i)
+        for (i = 0; i < count; ++i)
         {
-            QSP_STR(v) = objs[i];
-            qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJDELETED), &v, 1);
+            QSP_STR(objName) = objNames[i];
+            qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJDELETED), &objName, 1);
             if (qspLocationState != oldLocationState)
             {
-                qspFreeStrs(objs, oldCount);
                 qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
                 return;
             }
         }
-        qspFreeStrs(objs, oldCount);
         qspRestoreSavedLocalVars(savedVarGroups, savedVarGroupsCount);
     }
-}
-
-INLINE void qspRemoveObject(int index)
-{
-    QSPVariant name;
-    if (index < 0 || index >= qspCurObjsCount) return;
-    if (qspCurSelObject >= index) qspCurSelObject = -1;
-    name = qspStrVariant(qspCurObjects[index].Desc, QSP_TYPE_STR);
-    qspFreeString(&qspCurObjects[index].Image);
-    --qspCurObjsCount;
-    while (index < qspCurObjsCount)
+    else if (count == 1)
     {
-        qspCurObjects[index] = qspCurObjects[index + 1];
-        ++index;
+        QSPVariant objName = qspStrVariant(objNames[0], QSP_TYPE_STR);
+        qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJDELETED), &objName, 1);
     }
-    qspIsObjsListChanged = QSP_TRUE;
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJDELETED), &name, 1);
-    qspFreeString(&QSP_STR(name));
 }
 
-int qspObjIndex(QSPString name)
+INLINE void qspRemoveObjectByIndexWithEvent(int index)
 {
-    QSPString bufName;
-    int i, objNameLen, bufSize;
-    QSP_CHAR *buf;
-    if (!qspCurObjsCount) return -1;
-    name = qspCopyToNewText(name);
-    qspUpperStr(&name);
-    bufSize = 32;
-    buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
-    for (i = 0; i < qspCurObjsCount; ++i)
+    if (index >= 0 && index < qspCurObjsCount)
     {
-        objNameLen = qspStrLen(qspCurObjects[i].Desc);
-        if (objNameLen)
+        QSPString objName = qspCopyToNewText(qspCurObjects[index].Desc);
+        qspRemoveObjectByIndex(index);
+        qspSendRemovalNotifications(&objName, 1);
+        qspFreeString(&objName);
+    }
+}
+
+void qspClearAllObjectsWithEvents(void)
+{
+    int objsCount = qspCurObjsCount;
+    if (objsCount)
+    {
+        int i;
+        QSPString *objNames = (QSPString *)malloc(objsCount * sizeof(QSPString));
+        /* Add objects to the notification list */
+        for (i = 0; i < objsCount; ++i)
+            qspAddText(objNames + i, qspCurObjects[i].Desc, QSP_TRUE);
+        /* Remove all objects */
+        qspClearAllObjects(QSP_FALSE);
+        qspSendRemovalNotifications(objNames, objsCount);
+        qspFreeStrs(objNames, objsCount);
+    }
+}
+
+INLINE void qspClearObjectsByNameWithEvents(QSPString name, int maxObjects)
+{
+    if (maxObjects > 0 && qspCurObjsCount)
+    {
+        QSPBufString buf;
+        QSPString bufName;
+        int i, objsCount = 0, objsBufSize = 4;
+        QSPString *objNames = (QSPString *)malloc(objsBufSize * sizeof(QSPString));
+        /* Prepare the name */
+        name = qspCopyToNewText(name);
+        qspUpperStr(&name);
+        /* Fill the list with objects to remove */
+        buf = qspNewBufString(16);
+        i = 0;
+        while (i < qspCurObjsCount && objsCount < maxObjects)
         {
-            if (objNameLen > bufSize)
+            qspUpdateBufString(&buf, qspCurObjects[i].Desc);
+            bufName = qspBufTextToString(buf);
+            qspUpperStr(&bufName);
+            if (!qspStrsCompare(bufName, name))
             {
-                bufSize = objNameLen + 8;
-                buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
+                /* Add object to the notification list */
+                if (objsCount >= objsBufSize)
+                {
+                    objsBufSize += 8;
+                    objNames = (QSPString *)realloc(objNames, objsBufSize * sizeof(QSPString));
+                }
+                qspAddText(objNames + objsCount, qspCurObjects[i].Desc, QSP_TRUE);
+                ++objsCount;
+                /* Remove the object & don't update the current index as the array shifts */
+                qspRemoveObjectByIndex(i);
+                continue;
             }
-            memcpy(buf, qspCurObjects[i].Desc.Str, objNameLen * sizeof(QSP_CHAR));
+            ++i;
         }
-        bufName = qspStringFromLen(buf, objNameLen);
-        qspUpperStr(&bufName);
-        if (!qspStrsCompare(bufName, name))
-        {
-            qspFreeString(&name);
-            free(buf);
-            return i;
-        }
+        qspFreeString(&name);
+        qspFreeBufString(&buf);
+        qspSendRemovalNotifications(objNames, objsCount);
+        qspFreeStrs(objNames, objsCount);
     }
-    qspFreeString(&name);
-    free(buf);
-    return -1;
+}
+
+int qspObjsCountByName(QSPString name)
+{
+    if (qspCurObjsCount)
+    {
+        int i, objsCount;
+        QSPString bufName;
+        QSPBufString buf;
+        name = qspCopyToNewText(name);
+        qspUpperStr(&name);
+        buf = qspNewBufString(16);
+        objsCount = 0;
+        for (i = 0; i < qspCurObjsCount; ++i)
+        {
+            qspUpdateBufString(&buf, qspCurObjects[i].Desc);
+            bufName = qspBufTextToString(buf);
+            qspUpperStr(&bufName);
+            if (!qspStrsCompare(bufName, name))
+                ++objsCount;
+        }
+        qspFreeString(&name);
+        qspFreeBufString(&buf);
+        return objsCount;
+    }
+    return 0;
 }
 
 QSPString qspGetAllObjectsAsCode(void)
@@ -172,6 +231,7 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
         imgPath = qspCopyToNewText(QSP_STR(args[1]));
     else
         imgPath = qspNullString;
+    /* Place the object at the specified position */
     for (i = qspCurObjsCount; i > objInd; --i)
         qspCurObjects[i] = qspCurObjects[i - 1];
     ++qspCurObjsCount;
@@ -179,6 +239,7 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     obj->Image = imgPath;
     obj->Desc = qspCopyToNewText(QSP_STR(args[0]));
     qspIsObjsListChanged = QSP_TRUE;
+    /* Send notification */
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJADDED), args, count);
 }
 
@@ -187,16 +248,19 @@ void qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
     switch (extArg)
     {
     case qspStatDelObj:
-        qspRemoveObject(qspObjIndex(QSP_STR(args[0])));
-        break;
+        {
+            int maxObjects = (count == 2 ? QSP_TOINT(QSP_NUM(args[1])) : 1);
+            qspClearObjectsByNameWithEvents(QSP_STR(args[0]), maxObjects);
+            break;
+        }
     case qspStatKillObj:
         if (count)
         {
             int objInd = QSP_TOINT(QSP_NUM(args[0]) - 1);
-            qspRemoveObject(objInd);
+            qspRemoveObjectByIndexWithEvent(objInd);
         }
         else
-            qspClearAllObjectsWithNotify();
+            qspClearAllObjectsWithEvents();
         break;
     }
 }

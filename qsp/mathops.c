@@ -1156,7 +1156,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         QSP_NUM(tos) = QSP_TOBOOL(qspLocIndex(QSP_STR(args[0])) >= 0);
         break;
     case qspOpObj:
-        QSP_NUM(tos) = QSP_TOBOOL(qspObjIndex(QSP_STR(args[0])) >= 0);
+        QSP_NUM(tos) = qspObjsCountByName(QSP_STR(args[0]));
         break;
     case qspOpLCase:
         qspMoveToNewVariant(&tos, args);

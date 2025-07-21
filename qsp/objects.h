@@ -27,8 +27,8 @@
 
     /* External functions */
     void qspClearAllObjects(QSP_BOOL toInit);
-    void qspClearAllObjectsWithNotify(void);
-    int qspObjIndex(QSPString name);
+    void qspClearAllObjectsWithEvents(void);
+    int qspObjsCountByName(QSPString name);
     QSPString qspGetAllObjectsAsCode(void);
     /* Statements */
     void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);

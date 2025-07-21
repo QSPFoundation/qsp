@@ -314,6 +314,12 @@
     #endif
     }
 
+    INLINE void qspUpdateBufString(QSPBufString *buf, QSPString val)
+    {
+        buf->Len = 0; /* assign the whole string */
+        qspAddBufText(buf, val);
+    }
+
     INLINE void qspFreeBufString(QSPBufString *buf)
     {
         if (buf->Str) free(buf->Str);

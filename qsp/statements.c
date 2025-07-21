@@ -141,7 +141,7 @@ void qspInitStats(void)
     qspAddStatement(qspStatKillAll, qspStatementClear, 0, 0);
 
     qspAddStatement(qspStatAddObj, qspStatementAddObject, 1, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
-    qspAddStatement(qspStatDelObj, qspStatementDelObj, 1, 1, QSP_TYPE_STR);
+    qspAddStatement(qspStatDelObj, qspStatementDelObj, 1, 2, QSP_TYPE_STR, QSP_TYPE_NUM);
     qspAddStatement(qspStatKillObj, qspStatementDelObj, 0, 1, QSP_TYPE_NUM);
     qspAddStatement(qspStatUnSelect, qspStatementUnSelect, 0, 0);
 
@@ -1112,7 +1112,7 @@ INLINE void qspStatementClear(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUS
     case qspStatKillAll:
         qspClearAllVars(QSP_FALSE);
         qspInitSpecialVars();
-        qspClearAllObjectsWithNotify();
+        qspClearAllObjectsWithEvents();
         break;
     case qspStatFreeLib:
         qspClearAllIncludes(QSP_FALSE);
