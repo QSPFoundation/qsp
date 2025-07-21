@@ -161,7 +161,7 @@
         int groupInd = qspSavedVarGroupsCount++;
         if (groupInd >= qspSavedVarGroupsBufSize)
         {
-            qspSavedVarGroupsBufSize += QSP_VARGROUPSBATCHSIZE;
+            qspSavedVarGroupsBufSize = groupInd + QSP_VARGROUPSBATCHSIZE;
             qspSavedVarGroups = (QSPVarsGroup *)realloc(qspSavedVarGroups, qspSavedVarGroupsBufSize * sizeof(QSPVarsGroup));
         }
         varsGroup = qspSavedVarGroups + groupInd;

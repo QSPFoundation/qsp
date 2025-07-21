@@ -142,7 +142,7 @@ INLINE void qspClearObjectsByNameWithEvents(QSPString name, int maxObjects)
                 /* Add object to the notification list */
                 if (objsCount >= objsBufSize)
                 {
-                    objsBufSize += 8;
+                    objsBufSize = objsCount + 8;
                     objNames = (QSPString *)realloc(objNames, objsBufSize * sizeof(QSPString));
                 }
                 qspAddText(objNames + objsCount, qspCurObjects[i].Desc, QSP_TRUE);

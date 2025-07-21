@@ -1151,7 +1151,7 @@ INLINE QSP_BOOL qspSaveVarToLocalGroup(QSPVarsGroup *varGroup, QSPString varName
     if (!var) return QSP_FALSE;
     if (varsCount >= varGroup->Capacity)
     {
-        varGroup->Capacity += 4;
+        varGroup->Capacity = varsCount + 4;
         varGroup->Vars = (QSPVar *)realloc(varGroup->Vars, varGroup->Capacity * sizeof(QSPVar));
     }
     /* Save & reset the variable */
