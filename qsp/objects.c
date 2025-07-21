@@ -130,7 +130,7 @@ INLINE void qspClearObjectsByNameWithEvents(QSPString name, int maxObjects)
         name = qspCopyToNewText(name);
         qspUpperStr(&name);
         /* Fill the list with objects to remove */
-        buf = qspNewBufString(16);
+        buf = qspNewBufString(32);
         i = 0;
         while (i < qspCurObjsCount && objsCount < maxObjects)
         {
@@ -169,7 +169,7 @@ int qspObjsCountByName(QSPString name)
         QSPBufString buf;
         name = qspCopyToNewText(name);
         qspUpperStr(&name);
-        buf = qspNewBufString(16);
+        buf = qspNewBufString(32);
         objsCount = 0;
         for (i = 0; i < qspCurObjsCount; ++i)
         {

@@ -45,7 +45,7 @@ INLINE int qspActIndex(QSPString name)
     if (!qspCurActsCount) return -1;
     name = qspCopyToNewText(name);
     qspUpperStr(&name);
-    buf = qspNewBufString(16);
+    buf = qspNewBufString(64);
     for (i = 0; i < qspCurActsCount; ++i)
     {
         qspUpdateBufString(&buf, qspCurActions[i].Desc);
