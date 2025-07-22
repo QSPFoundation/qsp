@@ -1115,8 +1115,8 @@ void qspStatementSetVarsValues(QSPString s, QSPCachedStat *stat)
 
 INLINE QSPString qspGetVarNameOnly(QSPString s)
 {
-    QSP_CHAR *brackPos = qspStrChar(s, QSP_LSBRACK_CHAR);
-    if (brackPos) s.End = brackPos;
+    QSP_CHAR *nameEnd = qspStrCharClass(s, QSP_CHAR_DELIM);
+    if (nameEnd) s.End = nameEnd;
     return s;
 }
 

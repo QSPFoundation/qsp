@@ -42,7 +42,6 @@
     QSP_CHAR *qspStringToC(QSPString s);
     QSP_BOOL qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
     QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val);
-    QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars);
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);
     void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end);
@@ -244,16 +243,15 @@
         return 0;
     }
 
-    INLINE QSP_CHAR *qspStrPBrk(QSPString str, QSP_CHAR *strCharSet)
+    INLINE QSP_CHAR *qspStrRChar(QSPString str, QSP_CHAR ch)
     {
-        QSP_CHAR *pos = str.Str;
+        QSP_CHAR *lastPos = 0, *pos = str.Str;
         while (pos < str.End)
         {
-            if (qspIsInList(*pos, strCharSet))
-                return pos;
+            if (*pos == ch) lastPos = pos;
             ++pos;
         }
-        return 0;
+        return lastPos;
     }
 
     INLINE QSP_CHAR *qspStrCharClass(QSPString str, int charClass)

@@ -79,24 +79,24 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
         case QSP_TYPE_STR:
             str = QSP_PSTR(curItem);
             if (!qspIsAnyString(str)) break;
-            if (!(pos2 = qspInStrRChars(str, QSP_MENUDELIM)))
+            if (!(pos2 = qspStrRChar(str, QSP_MENUDELIM_CHAR)))
             {
                 qspSetError(QSP_ERR_COLONNOTFOUND);
                 qspFreeMenuItems(menuItems, itemsCount);
                 qspFreeMenuLocs(menuLocs, itemsCount);
                 return;
             }
-            if ((pos = qspInStrRChars(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM)))
+            if ((pos = qspStrRChar(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM_CHAR)))
             {
                 itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos));
-                itemLocation = qspCopyToNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
-                itemImage = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
+                itemLocation = qspCopyToNewText(qspStringFromPair(pos + QSP_CHAR_LEN, pos2));
+                itemImage = qspStringFromPair(pos2 + QSP_CHAR_LEN, str.End);
                 itemImage = (qspIsAnyString(itemImage) ? qspCopyToNewText(itemImage) : qspNullString);
             }
             else
             {
                 itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos2));
-                itemLocation = qspCopyToNewText(qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End));
+                itemLocation = qspCopyToNewText(qspStringFromPair(pos2 + QSP_CHAR_LEN, str.End));
             }
             break;
         }

@@ -108,17 +108,6 @@ QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val)
     return QSP_FALSE;
 }
 
-QSP_CHAR *qspInStrRChars(QSPString str, QSP_CHAR *chars)
-{
-    QSP_CHAR *lastPos = 0, *pos = str.Str;
-    while (pos < str.End)
-    {
-        if (qspIsInList(*pos, chars)) lastPos = pos;
-        ++pos;
-    }
-    return lastPos;
-}
-
 QSPString qspJoinStrs(QSPString *s, int count, QSPString delim)
 {
     int i;

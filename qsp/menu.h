@@ -11,8 +11,10 @@
 #ifndef QSP_MENUDEFINES
     #define QSP_MENUDEFINES
 
+    #define QSP_MENUDELIM      QSP_FMT(":")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_MENUDELIM,    QSP_FMT(':'))
+
     #define QSP_MAXMENUITEMS 100
-    #define QSP_MENUDELIM QSP_FMT(":")
 
     /* Statements */
     void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);

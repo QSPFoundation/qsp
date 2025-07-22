@@ -80,7 +80,7 @@ INLINE int qspSearchPlayList(QSPString file)
             if (!qspStrsPartCompare(bufName, file, fileLen))
             {
                 /* The current item is prefixed with the file */
-                if (qspStrLen(bufName) == fileLen || qspIsInList(bufName.Str[fileLen], QSP_PLVOLUMEDELIM))
+                if (qspStrLen(bufName) == fileLen || qspIsCharAtPos(bufName, bufName.Str + fileLen, QSP_PLVOLUMEDELIM_CHAR))
                 {
                     qspFreeString(&file);
                     qspFreeBufString(&buf);
@@ -102,10 +102,10 @@ void qspPlayPLFiles(void)
     if (qspLocationState != oldLocationState) return;
     for (i = 0; i < qspPLFilesCount; ++i)
     {
-        pos = qspStrChar(qspPLFiles[i], QSP_PLVOLUMEDELIM[0]);
+        pos = qspStrRChar(qspPLFiles[i], QSP_PLVOLUMEDELIM_CHAR);
         if (pos)
         {
-            volume = qspStrToNum(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_PLVOLUMEDELIM), qspPLFiles[i].End), 0);
+            volume = qspStrToNum(qspStringFromPair(pos + QSP_CHAR_LEN, qspPLFiles[i].End), 0);
             qspPlayFile(qspStringFromPair(qspPLFiles[i].Str, pos), volume, QSP_FALSE);
         }
         else
@@ -128,7 +128,7 @@ void qspRefreshPlayList(void)
         oldLocationState = qspLocationState;
         for (i = 0; i < count; ++i)
         {
-            pos = qspStrChar(files[i], QSP_PLVOLUMEDELIM[0]);
+            pos = qspStrRChar(files[i], QSP_PLVOLUMEDELIM_CHAR);
             if (pos)
                 curFile = qspStringFromPair(files[i].Str, pos);
             else
