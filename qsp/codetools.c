@@ -211,7 +211,7 @@ QSPString qspGetLineLabel(QSPString str)
     qspSkipSpaces(&str);
     if (!qspIsEmpty(str) && *str.Str == QSP_LABEL_CHAR)
     {
-        QSP_CHAR *delimPos = qspStrChar(str, QSP_STATDELIM_CHAR);
+        QSP_CHAR *delimPos = qspDelimPos(str, QSP_STATDELIM_CHAR);
         if (delimPos)
             str = qspStringFromPair(str.Str + QSP_CHAR_LEN, delimPos);
         else
