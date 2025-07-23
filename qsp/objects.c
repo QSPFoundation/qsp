@@ -217,7 +217,10 @@ void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     if (count == 3)
     {
         objInd = QSP_TOINT(QSP_NUM(args[2]) - 1);
-        if (objInd < 0 || objInd > qspCurObjsCount) return;
+        if (objInd < 0)
+            objInd = 0;
+        else if (objInd > qspCurObjsCount)
+            objInd = qspCurObjsCount;
     }
     else
         objInd = qspCurObjsCount;
