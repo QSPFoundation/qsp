@@ -1,51 +1,51 @@
 QSP {
-    space := lineContinuation | " " | "\t"
+    space := " " | "\t"
 
     /* ====================
        TOP-LEVEL STRUCTURE
        ====================
 
        1. The grammar is case-insensitive;
-       2. Rules beginning with CAPITAL letters automatically include spaces;
-       3. Operator precedence is not defined here;
-       4. Statements and functions don't define the number of arguments;
-       5. You can use https://ohmjs.org/editor/ to test the grammar;
+       2. Operator precedence is defined in comments below;
+       3. Statements and functions don't define the number of arguments;
+       4. You can use https://ohmjs.org/editor/ to test the grammar;
     */
 
-    Start              = StatementGroup* end
+    start              = statementGroup* ws end
 
-    StatementGroup     = newline | SingleLineBlock | MultiLineBlock
+    statementGroup     = ws (singleLineBlock | multiLineBlock | newline)
 
-    SingleLineBlock    = SingleLineGroup (&newline | &end)
-    SingleLineGroup    = StatementUnitSingleLine (statementSeparator StatementUnitSingleLine)*
+    singleLineBlock    = singleLineGroup ws (&newline | &end)
+    singleLineGroup    = statementUnitSingleLine (ws statementSeparator ws statementUnitSingleLine)*
 
-    MultiLineBlock     = StatementUnitMultiLine (statementSeparator SingleLineGroup)? (&newline | &end)
+    multiLineBlock     = statementUnitMultiLine (ws statementSeparator ws singleLineGroup)? ws (&newline | &end)
 
     /* ====================
        STATEMENT UNITS
        ====================
     */
 
-    StatementUnitSingleLine = CommentStatement
-                            | LabelStatement
-                            | IfSingleLine
-                            | ActSingleLine
-                            | LoopSingleLine
-                            | AssignmentStatement
-                            | Statement
-                            | ImplicitStatement
+    statementUnitSingleLine = commentStatement
+                            | labelStatement
+                            | ifSingleLine
+                            | actSingleLine
+                            | loopSingleLine
+                            | localStatement
+                            | assignmentStatement
+                            | statement
+                            | implicitStatement
 
-    StatementUnitMultiLine  = IfMultiLine
-                            | ActMultiLine
-                            | LoopMultiLine
+    statementUnitMultiLine  = ifMultiLine
+                            | actMultiLine
+                            | loopMultiLine
 
     /* ====================
        COMMENTS
        ====================
     */
 
-    CommentStatement        = "!" CommentText
-    CommentText             = (RawCodeBlock | rawStringLiteral | commentChar)*
+    commentStatement        = "!" commentText
+    commentText             = (rawCodeBlock | rawStringLiteral | commentChar)*
     commentChar             = ~newline any
 
     /* ====================
@@ -53,10 +53,10 @@ QSP {
        ====================
     */
 
-    AssignmentStatement     = ("set" | "let")? VariableList assignmentOperator NonAmpersandExpression
-    LocalStatement          = "local" VariableList ("=" NonAmpersandExpression)?
+    assignmentStatement     = (("set" | "let") &delimiterChar ws)? variableList ws assignmentOperator ws nonAmpersandExpression
+    localStatement          = "local" &delimiterChar ws variableList (ws "=" ws nonAmpersandExpression)?
 
-    VariableList            = VariableRef ("," VariableRef)*
+    variableList            = variableRef (ws "," ws variableRef)*
     assignmentOperator      = "=" | "+=" | "-=" | "*=" | "/="
 
     /* ====================
@@ -64,165 +64,196 @@ QSP {
        ====================
     */
 
-    IfSingleLine            = ifMarker Expression ":" SingleLineGroup (elseIfMarker Expression ":" SingleLineGroup)* (elseMarker ":"? SingleLineGroup)?
-    IfMultiLine             = ifMarker Expression ":" CommentStatement? newline
-                              StatementGroup*
-                              ElseifClause*
-                              ElseClause?
-                              endIfMarker NoteString
+    ifSingleLine            = ifMarker &delimiterChar ws expression ws ":" ws singleLineGroup (ws elseIfMarker &delimiterChar ws expression ws ":" ws singleLineGroup)* (ws elseMarker &delimiterChar (ws ":")? ws singleLineGroup)?
+    ifMultiLine             = ifMarker &delimiterChar ws expression ws ":" ws commentStatement? newline
+                              statementGroup*
+                              elseifClause*
+                              elseClause?
+                              ws endIfMarker &delimiterChar (ws noteString)?
 
-    ElseifClause            = ElseifSingleLine | ElseifMultiLine
-    ElseifSingleLine        = elseIfMarker Expression ":" SingleLineGroup newline
-    ElseifMultiLine         = elseIfMarker Expression ":" CommentStatement? newline
-                              StatementGroup*
+    elseifClause            = ws (elseifSingleLine | elseifMultiLine)
+    elseifSingleLine        = elseIfMarker &delimiterChar ws expression ws ":" ws singleLineGroup ws newline
+    elseifMultiLine         = elseIfMarker &delimiterChar ws expression ws ":" ws commentStatement? newline
+                              statementGroup*
 
-    ElseClause              = ElseSingleLine | ElseMultiLine
-    ElseSingleLine          = elseMarker ":"? SingleLineGroup newline
-    ElseMultiLine           = elseMarker (":" CommentStatement?)? newline
-                              StatementGroup*
+    elseClause              = ws (elseSingleLine | elseMultiLine)
+    elseSingleLine          = elseMarker &delimiterChar ws (":" ws)? singleLineGroup ws newline
+    elseMultiLine           = elseMarker &delimiterChar ws (":" ws commentStatement?)? newline
+                              statementGroup*
 
     /* ====================
        ACT STATEMENTS
        ====================
     */
 
-    ActSingleLine           = actMarker ( ParenthesizedArgument1plusList | Argument1plusList ) ":" SingleLineGroup
-    ActMultiLine            = actMarker ( ParenthesizedArgument1plusList | Argument1plusList ) ":" CommentStatement? newline
-                              StatementGroup*
-                              endActMarker NoteString
+    actSingleLine           = actMarker &delimiterChar ws ( parenthesizedArgument1plusList | argument1plusList ) ws ":" ws singleLineGroup
+    actMultiLine            = actMarker &delimiterChar ws ( parenthesizedArgument1plusList | argument1plusList ) ws ":" ws commentStatement? newline
+                              statementGroup*
+                              ws endActMarker &delimiterChar (ws noteString)?
 
     /* ====================
        LOOP STATEMENTS
        ====================
     */
 
-    LoopSingleLine          = loopMarker SingleLineGroup? whileMarker Expression (stepMarker SingleLineGroup)? ":" SingleLineGroup
-    LoopMultiLine           = loopMarker SingleLineGroup? whileMarker Expression (stepMarker SingleLineGroup)? ":" CommentStatement? newline
-                              StatementGroup*
-                              endLoopMarker NoteString
+    loopSingleLine          = loopMarker &delimiterChar (ws singleLineGroup)? ws whileMarker &delimiterChar ws expression (ws stepMarker &delimiterChar ws singleLineGroup)? ws ":" ws singleLineGroup
+    loopMultiLine           = loopMarker &delimiterChar (ws singleLineGroup)? ws whileMarker &delimiterChar ws expression (ws stepMarker &delimiterChar ws singleLineGroup)? ws ":" ws commentStatement? newline
+                              statementGroup*
+                              ws endLoopMarker &delimiterChar (ws noteString)?
 
     /* ====================
        REGULAR STATEMENTS
        ====================
     */
 
-    Statement                       = StatementWithArgs | StatementNoArgs
-    StatementNoArgs                 = statementName ("(" ")")?
-    StatementWithArgs               = statementName ( ParenthesizedArgument1plusList | NonAmpersandArgument1plusList )
+    statement                       = statementWithArgs | statementNoArgs
+    statementNoArgs                 = statementName &delimiterChar (ws "(" mws ")")?
+    statementWithArgs               = statementName &delimiterChar ws ( parenthesizedArgument1plusList | nonAmpersandArgument1plusList )
 
     /* ====================
        FUNCTION CALLS
        ====================
     */
 
-    FunctionCall                    = FunctionCallMultiArgs
-                                    | FunctionCallSingleArg
-                                    | FunctionCallNoArgs
+    functionCall                    = functionCallMultiArgs
+                                    | functionCallSingleArg
+                                    | functionCallNoArgs
 
-    NonAmpersandFunctionCall        = FunctionCallMultiArgs
-                                    | NonAmpersandFunctionCallSingleArg
-                                    | FunctionCallNoArgs
+    multilineFunctionCall           = multilineFunctionCallMultiArgs
+                                    | multilineFunctionCallSingleArg
+                                    | multilineFunctionCallNoArgs
 
-    UserFunctionCall                = UserFunctionCallWithArgs
-                                    | UserFunctionCallNoArgs
+    nonAmpersandFunctionCall        = functionCallMultiArgs
+                                    | nonAmpersandFunctionCallSingleArg
+                                    | functionCallNoArgs
 
-    FunctionCallNoArgs              = funcNameWithPrefix ("(" ")")?
-    FunctionCallSingleArg           = funcNameWithPrefix ( ParenthesizedExpression | Expression )
-    FunctionCallMultiArgs           = funcNameWithPrefix ParenthesizedArgument2plusList
+    userFunctionCall                = userFunctionCallWithArgs
+                                    | userFunctionCallNoArgs
 
-    NonAmpersandFunctionCallSingleArg = funcNameWithPrefix ( ParenthesizedExpression | NonAmpersandExpression )
+    multilineUserFunctionCall       = multilineUserFunctionCallWithArgs
+                                    | multilineUserFunctionCallNoArgs
 
-    UserFunctionCallNoArgs          = "@" userFunctionName ("(" ")")?
-    UserFunctionCallWithArgs        = "@" userFunctionName ParenthesizedArgument1plusList
+    functionCallNoArgs              = funcNameWithPrefix &delimiterChar ws ("(" mws ")")?
+    functionCallSingleArg           = funcNameWithPrefix &delimiterChar ws ( parenthesizedExpression | expression )
+    functionCallMultiArgs           = funcNameWithPrefix &delimiterChar ws parenthesizedArgument2plusList
+
+    multilineFunctionCallNoArgs     = funcNameWithPrefix &delimiterChar mws ("(" mws ")")?
+    multilineFunctionCallSingleArg  = funcNameWithPrefix &delimiterChar mws ( parenthesizedExpression | multilineExpression )
+    multilineFunctionCallMultiArgs  = funcNameWithPrefix &delimiterChar mws parenthesizedArgument2plusList
+
+    nonAmpersandFunctionCallSingleArg = funcNameWithPrefix &delimiterChar ws ( parenthesizedExpression | nonAmpersandExpression )
+
+    userFunctionCallNoArgs          = "@" userFunctionName ws ("(" mws ")")?
+    userFunctionCallWithArgs        = "@" userFunctionName ws parenthesizedArgument1plusList
+
+    multilineUserFunctionCallNoArgs    = "@" userFunctionName mws ("(" mws ")")?
+    multilineUserFunctionCallWithArgs  = "@" userFunctionName mws parenthesizedArgument1plusList
 
     /* ====================
        OTHER STATEMENTS
        ====================
     */
 
-    LabelStatement                  = ":" LabelName
-    ImplicitStatement               = NonAmpersandExpression
+    labelStatement                  = ":" ws labelName
+    implicitStatement               = nonAmpersandExpression
 
-    LabelName                       = NoteString
+    labelName                       = noteString
 
-    NoteString                      = (RawCodeBlock | rawStringLiteral | noteChar)*
+    noteString                      = (rawCodeBlock | rawStringLiteral | noteChar)*
     noteChar                        = ~(statementSeparator | newline) any
 
     /* ====================
-       EXPRESSIONS (WITH AMPERSAND)
+       EXPRESSIONS
        ====================
-       Two expression types: one that can contain & (for parenthesized contexts and control headers)
-       and one that cannot (for statement contexts where & is a separator)
     */
 
-    Expression                      = BinaryExpression
-    BinaryExpression                = UnaryExpression (extendedBinaryOperator UnaryExpression)*
-    UnaryExpression                 = standardUnaryOperator* PrimaryExpression
+    /* Single-line expression for control headers - they can contain & */
 
-    /* ====================
-       EXPRESSIONS (WITHOUT AMPERSAND)
-       ====================
-       NonAmpersandExpression is like Expression but stops at & to avoid conflicts with statement separators
-    */
+    expression                      = binaryExpression
+    binaryExpression                = unaryExpression (ws extendedBinaryOperator ws unaryExpression)*
+    unaryExpression                 = (standardUnaryOperator ws)* primaryExpression
 
-    NonAmpersandExpression          = NonAmpersandBinaryExpression
-    NonAmpersandBinaryExpression    = NonAmpersandUnaryExpression (standardBinaryOperator NonAmpersandUnaryExpression)*
-    NonAmpersandUnaryExpression     = standardUnaryOperator* NonAmpersandPrimaryExpression
+    /* Multiline expression for parenthesized contexts - they can contain & */
+
+    multilineExpression             = multilineBinaryExpression
+    multilineBinaryExpression       = multilineUnaryExpression (mws extendedBinaryOperator mws multilineUnaryExpression)*
+    multilineUnaryExpression        = (standardUnaryOperator mws)* multilinePrimaryExpression
+
+    /* Single-line expression for statement contexts where & is a separator */
+    /* nonAmpersandExpression is like expression but stops at & to avoid conflicts with statement separators */
+
+    nonAmpersandExpression          = nonAmpersandBinaryExpression
+    nonAmpersandBinaryExpression    = nonAmpersandUnaryExpression (ws standardBinaryOperator ws nonAmpersandUnaryExpression)*
+    nonAmpersandUnaryExpression     = (standardUnaryOperator ws)* nonAmpersandPrimaryExpression
 
     /* ====================
        PRIMARY EXPRESSIONS
        ====================
     */
 
-    PrimaryExpression               = ParenthesizedExpression
+    primaryExpression               = parenthesizedExpression
                                     | numberLiteral
-                                    | CodeBlock
-                                    | InterpolatedString /* Try to parse it as a string with subexpressions */
+                                    | codeBlock
+                                    | interpolatedString /* Try to parse it as a string with subexpressions */
                                     | rawStringLiteral
-                                    | EmptyPseudoTuple
-                                    | Tuple
-                                    | UserFunctionCall
-                                    | FunctionCall
-                                    | VariableRef
+                                    | emptyPseudoTuple
+                                    | tuple
+                                    | userFunctionCall
+                                    | functionCall
+                                    | variableRef
 
-    NonAmpersandPrimaryExpression   = ParenthesizedExpression
+    multilinePrimaryExpression      = parenthesizedExpression
                                     | numberLiteral
-                                    | CodeBlock
-                                    | InterpolatedString
+                                    | codeBlock
+                                    | interpolatedString /* Try to parse it as a string with subexpressions */
                                     | rawStringLiteral
-                                    | EmptyPseudoTuple
-                                    | Tuple
-                                    | UserFunctionCall
-                                    | NonAmpersandFunctionCall /* Functions with a single argument can't contain & */
-                                    | VariableRef
+                                    | emptyPseudoTuple
+                                    | tuple
+                                    | multilineUserFunctionCall
+                                    | multilineFunctionCall
+                                    | multilineVariableRef
 
-    ParenthesizedExpression         = "(" Expression ")" /* Inside parentheses, & is always allowed */
+    nonAmpersandPrimaryExpression   = parenthesizedExpression
+                                    | numberLiteral
+                                    | codeBlock
+                                    | interpolatedString
+                                    | rawStringLiteral
+                                    | emptyPseudoTuple
+                                    | tuple
+                                    | userFunctionCall
+                                    | nonAmpersandFunctionCall /* Functions with a single argument can't contain & */
+                                    | variableRef
 
-    Argument1plusList               = Expression ("," Expression)*
-    NonAmpersandArgument1plusList   = NonAmpersandExpression ("," NonAmpersandExpression)*
-    ParenthesizedArgument1plusList  = "(" Argument1plusList ")" /* Inside parentheses, & is always an operator */
+    parenthesizedExpression         = "(" mws multilineExpression mws ")" /* Inside parentheses, & is always allowed */
 
-    Argument2plusList               = Expression "," Expression ("," Expression)*
-    ParenthesizedArgument2plusList  = "(" Argument2plusList ")" /* Inside parentheses, & is always an operator */
+    argument1plusList               = expression (ws "," ws expression)*
+    multilineArgument1plusList      = multilineExpression (mws "," mws multilineExpression)*
+    nonAmpersandArgument1plusList   = nonAmpersandExpression (ws "," ws nonAmpersandExpression)*
+    parenthesizedArgument1plusList  = "(" mws multilineArgument1plusList mws ")" /* Inside parentheses, & is always an operator */
+
+    multilineArgument2plusList      = multilineExpression mws "," mws multilineExpression (mws "," mws multilineExpression)*
+    parenthesizedArgument2plusList  = "(" mws multilineArgument2plusList mws ")" /* Inside parentheses, & is always an operator */
 
     /* ====================
        TUPLES
        ====================
     */
 
-    EmptyPseudoTuple    = "(" ")"
-    Tuple               = EmptyTuple | NonEmptyTuple
-    EmptyTuple          = "[" "]"
-    NonEmptyTuple       = "[" Argument1plusList "]"
+    emptyPseudoTuple    = "(" mws ")"
+    tuple               = emptyTuple | nonEmptyTuple
+    emptyTuple          = "[" mws "]"
+    nonEmptyTuple       = "[" mws multilineArgument1plusList mws "]"
 
     /* ====================
        VARIABLES
        ====================
     */
 
-    VariableRef         = varNameWithPrefix (ArrayIndex | EmptyArrayIndex)?
-    ArrayIndex          = "[" Expression "]"  /* Array indices can contain & */
-    EmptyArrayIndex     = "[" "]"
+    variableRef         = varNameWithPrefix ws (arrayIndex | emptyArrayIndex)?
+    arrayIndex          = "[" mws multilineExpression mws "]"  /* Array indices can contain & */
+    emptyArrayIndex     = "[" mws "]"
+
+    multilineVariableRef = varNameWithPrefix mws (arrayIndex | emptyArrayIndex)?
 
     /* ====================
        LITERALS
@@ -247,12 +278,12 @@ QSP {
        ====================
     */
 
-    InterpolatedString              = SingleQuotedInterpolatedString | DoubleQuotedInterpolatedString
-    SingleQuotedInterpolatedString  = "'" (StringSubexpression | apostropheEscape | singleQuotedChar)* "'"
-    DoubleQuotedInterpolatedString  = "\"" (StringSubexpression | quoteEscape | doubleQuotedChar)* "\""
+    interpolatedString              = singleQuotedInterpolatedString | doubleQuotedInterpolatedString
+    singleQuotedInterpolatedString  = "'" (stringSubexpression | apostropheEscape | singleQuotedChar)* "'"
+    doubleQuotedInterpolatedString  = "\"" (stringSubexpression | quoteEscape | doubleQuotedChar)* "\""
 
     /* The subexpression shouldn't contain strings with the same type of quotes as the parent string */
-    StringSubexpression             = "<<" Expression ">>" /* & is always allowed in subexpressions */
+    stringSubexpression             = "<<" mws multilineExpression mws ">>" /* & is always allowed in subexpressions */
 
     singleQuotedChar                = ~("'" | "<<") any
     doubleQuotedChar                = ~("\"" | "<<") any
@@ -262,23 +293,23 @@ QSP {
        ====================
     */
 
-    CodeBlock                  = SyntacticCodeBlock | RawCodeBlock /* Try to parse it as proper code */
-    SyntacticCodeBlock         = "{" StatementGroupInCodeBlock* "}"
+    codeBlock                  = syntacticCodeBlock | rawCodeBlock /* Try to parse it as proper code */
+    syntacticCodeBlock         = "{" statementGroupInCodeBlock* "}"
 
-    StatementGroupInCodeBlock  = newline | SingleLineCodeBlock | MultiLineCodeBlock
+    statementGroupInCodeBlock  = ws (singleLineCodeBlock | multiLineCodeBlock | newline)
 
-    SingleLineCodeBlock        = SingleLineGroup (&newline | &("}"))
-    MultiLineCodeBlock         = StatementUnitMultiLine (statementSeparator SingleLineGroup)? (&newline | &("}"))
+    singleLineCodeBlock        = singleLineGroup ws (&newline | &("}"))
+    multiLineCodeBlock         = statementUnitMultiLine (ws statementSeparator ws singleLineGroup)? ws (&newline | &("}"))
 
-    RawCodeBlock               = "{" RawCodeBlockContent* "}"
-    RawCodeBlockContent        = RawCodeBlock
+    rawCodeBlock               = "{" rawCodeBlockContent* "}"
+    rawCodeBlockContent        = rawCodeBlock
                                | rawStringLiteral
-                               | RawCodeParentheses
-                               | RawCodeBrackets
+                               | rawCodeParentheses
+                               | rawCodeBrackets
                                | rawCodeBlockChar
 
-    RawCodeParentheses         = "(" RawCodeBlockContent* ")"
-    RawCodeBrackets            = "[" RawCodeBlockContent* "]"
+    rawCodeParentheses         = "(" rawCodeBlockContent* ")"
+    rawCodeBrackets            = "[" rawCodeBlockContent* "]"
 
     rawCodeBlockChar = ~("{" | "}" | "'" | "\"" | "(" | ")" | "[" | "]") any
 
@@ -292,13 +323,15 @@ QSP {
     varName             = ~(functionName | statementName | standardMarker) ~digit nonDelimiterChar+
     varNameWithPrefix   = typePrefix? varName
 
-    delimiterChar       = " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | ":" | "," | "{" | "}"
-    nonDelimiterChar    = ~(delimiterChar | newline) any
+    delimiterChar       = newline | " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | ":" | "," | "{" | "}"
+    nonDelimiterChar    = ~delimiterChar any
 
     typePrefix          = "#" | "$" | "%"
     newline             = "\n" | "\r\n"
     lineContinuation    = " _" newline
     statementSeparator  = "&"
+    ws = (lineContinuation | " " | "\t")*
+    mws = (" " | "\t" | newline)*
 
     /* ====================
        KEYWORDS
