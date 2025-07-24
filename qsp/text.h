@@ -22,7 +22,7 @@
         QSP_CHAR_DIGIT = 1 << 2, /* digits */
         QSP_CHAR_DELIM = 1 << 3, /* delimiters */
         QSP_CHAR_SIMPLEOP = 1 << 4, /* simple math operations */
-        QSP_CHAR_BRACKET = 1 << 5, /* brackets of an expression */
+        QSP_CHAR_LBRACKET = 1 << 5, /* opening brackets of an expression */
         QSP_CHAR_TYPEPREFIX = 1 << 6 /* type prefix */
     };
 

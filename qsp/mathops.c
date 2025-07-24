@@ -639,7 +639,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
             case qspOpAnd:
             case qspOpOr:
             case qspOpMod:
-                if (qspIsEmpty(s) || !qspIsInClass(*s.Str, QSP_CHAR_SPACE | QSP_CHAR_QUOT | QSP_CHAR_BRACKET))
+                if (qspIsEmpty(s) || !qspIsInClass(*s.Str, QSP_CHAR_DELIM))
                     qspSetError(QSP_ERR_SYNTAX);
                 break;
             }
