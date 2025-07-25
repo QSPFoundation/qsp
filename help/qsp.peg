@@ -53,8 +53,8 @@ QSP {
        ====================
     */
 
-    assignmentStatement     = (("set" | "let") &delimiterChar ws)? variableList ws assignmentOperator ws nonAmpersandExpression
-    localStatement          = "local" &delimiterChar ws variableList (ws "=" ws nonAmpersandExpression)?
+    assignmentStatement     = (setMarker &delimiterChar ws)? variableList ws assignmentOperator ws nonAmpersandExpression
+    localStatement          = localMarker &delimiterChar ws variableList (ws "=" ws nonAmpersandExpression)?
 
     variableList            = variableRef (ws "," ws variableRef)*
     assignmentOperator      = "=" | "+=" | "-=" | "*=" | "/="
@@ -341,13 +341,16 @@ QSP {
     newline             = "\n" | "\r\n"
     lineContinuation    = " _" newline
     statementSeparator  = "&"
-    ws = (lineContinuation | " " | "\t")*
-    mws = (" " | "\t" | newline)*
+    ws                  = (lineContinuation | " " | "\t")*
+    mws                 = (" " | "\t" | newline)*
 
     /* ====================
        KEYWORDS
        ====================
     */
+
+    setMarker           = "set" | "let"
+    localMarker         = "local"
 
     actMarker           = "act"
     endActMarker        = "end"
@@ -364,7 +367,8 @@ QSP {
     stepMarker          = "step"
     endLoopMarker       = "end"
 
-    standardMarker      = actMarker | endActMarker
+    standardMarker      = setMarker | localMarker
+                        | actMarker | endActMarker
                         | ifMarker | elseIfNoSpaceMarker | elseMarker | endIfMarker
                         | loopMarker | whileMarker | stepMarker | endLoopMarker
 
