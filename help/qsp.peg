@@ -169,22 +169,27 @@ QSP {
 
     /* Single-line expression for control headers - they can contain & */
 
-    expression                      = binaryExpression
-    binaryExpression                = unaryExpression (ws extendedBinaryOperator ws unaryExpression)*
+    expression                      = unaryExpression (ws extendedBinaryOperator ws unaryExpression)*
     unaryExpression                 = (standardUnaryOperator ws)* primaryExpression
 
     /* Multiline expression for parenthesized contexts - they can contain & */
 
-    multilineExpression             = multilineBinaryExpression
-    multilineBinaryExpression       = multilineUnaryExpression (mws extendedBinaryOperator mws multilineUnaryExpression)*
+    multilineExpression             = multilineUnaryExpression (mws extendedBinaryOperator mws multilineUnaryExpression)*
     multilineUnaryExpression        = (standardUnaryOperator mws)* multilinePrimaryExpression
 
-    /* Single-line expression for statement contexts where & is a separator */
-    /* nonAmpersandExpression is like expression but stops at & to avoid conflicts with statement separators */
+    /* Single-line expression for statement contexts is like expression but stops at & to avoid conflicts with statement separators */
 
-    nonAmpersandExpression          = nonAmpersandBinaryExpression
-    nonAmpersandBinaryExpression    = nonAmpersandUnaryExpression (ws standardBinaryOperator ws nonAmpersandUnaryExpression)*
+    nonAmpersandExpression          = nonAmpersandUnaryExpression (ws standardBinaryOperator ws nonAmpersandUnaryExpression)*
     nonAmpersandUnaryExpression     = (standardUnaryOperator ws)* nonAmpersandPrimaryExpression
+
+    /* Expression operators */
+
+    standardBinaryOperator          = separatedBinaryKeywordOperator | binaryStandardOperator
+    extendedBinaryOperator          = separatedBinaryKeywordOperator | binaryExtendedOperator
+    standardUnaryOperator           = separatedUnaryKeywordOperator | unaryStandardOperator
+
+    separatedBinaryKeywordOperator  = binaryKeywordOperator &delimiterChar
+    separatedUnaryKeywordOperator   = unaryKeywordOperator &delimiterChar
 
     /* ====================
        PRIMARY EXPRESSIONS
@@ -318,10 +323,16 @@ QSP {
        ====================
     */
 
-    userFunctionName    = nonDelimiterChar+
-    funcNameWithPrefix  = typePrefix? functionName
-    varName             = ~(functionName | statementName | standardMarker) ~digit nonDelimiterChar+
-    varNameWithPrefix   = typePrefix? varName
+    userFunctionName      = nonDelimiterChar+
+    funcNameWithPrefix    = typePrefix? functionName
+    varName               = ~(keyword delimiterChar) ~digit nonDelimiterChar+
+    varNameWithPrefix     = typePrefix? varName
+
+    keyword               = functionName
+                          | statementName
+                          | standardMarker
+                          | binaryKeywordOperator
+                          | unaryKeywordOperator
 
     delimiterChar       = newline | " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | ":" | "," | "{" | "}"
     nonDelimiterChar    = ~delimiterChar any
@@ -342,7 +353,9 @@ QSP {
     endActMarker        = "end"
 
     ifMarker            = "if"
-    elseIfMarker        = "else" space* "if"
+    elseIfMarker        = elseIfNoSpaceMarker | elseIfSpaceMarker
+    elseIfNoSpaceMarker = "elseif"
+    elseIfSpaceMarker   = "else" ws "if"
     elseMarker          = "else"
     endIfMarker         = "end"
 
@@ -352,12 +365,15 @@ QSP {
     endLoopMarker       = "end"
 
     standardMarker      = actMarker | endActMarker
-                        | ifMarker | elseIfMarker | elseMarker | endIfMarker
+                        | ifMarker | elseIfNoSpaceMarker | elseMarker | endIfMarker
                         | loopMarker | whileMarker | stepMarker | endLoopMarker
 
-    standardBinaryOperator  = "," | "and" | "or" | "<>" | "!" | "<=" | "=<" | ">=" | "=>" | "=" | "<" | ">" | "+" | "-" | "*" | "/" | "mod"
-    extendedBinaryOperator  = standardBinaryOperator | "&"
-    standardUnaryOperator   = "-" | "no" | "obj" | "loc"
+    binaryKeywordOperator   = "and" | "or" | "mod"
+    binaryStandardOperator  = "," | "<>" | "!" | "<=" | "=<" | ">=" | "=>" | "=" | "<" | ">" | "+" | "-" | "*" | "/"
+    binaryExtendedOperator  = binaryStandardOperator | "&"
+
+    unaryKeywordOperator    = "no" | "obj" | "loc"
+    unaryStandardOperator   = "-"
 
     /* Priority | Operations
        ---------|--------------------------------
