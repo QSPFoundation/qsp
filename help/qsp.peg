@@ -159,7 +159,7 @@ QSP {
 
     labelName                       = noteString
 
-    noteString                      = (rawCodeBlock | rawStringLiteral | noteChar)*
+    noteString                      = (rawCodeBlock | rawStringLiteral | noteChar)+
     noteChar                        = ~(statementSeparator | newline) any
 
     /* ====================
