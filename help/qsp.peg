@@ -334,7 +334,7 @@ QSP {
                           | binaryKeywordOperator
                           | unaryKeywordOperator
 
-    delimiterChar       = newline | " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | ":" | "," | "{" | "}"
+    delimiterChar       = end | newline | " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | ":" | "," | "{" | "}"
     nonDelimiterChar    = ~delimiterChar any
 
     typePrefix          = "#" | "$" | "%"
