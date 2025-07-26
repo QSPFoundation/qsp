@@ -6,7 +6,6 @@
  */
 
 #include "codetools.h"
-#include "common.h"
 #include "statements.h"
 #include "text.h"
 

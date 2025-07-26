@@ -101,6 +101,9 @@
         #define QSP_TOINT(x) (x)
     #endif
 
+    #define QSP_INC_POSITIVE(x) (++(x))
+    #define QSP_DEC_POSITIVE(x) ((x) -= ((x) > 0))
+
     static const QSP_TINYINT qspBaseTypeTable[QSP_TYPE_DEFINED_TYPES] =
     {
         /* TUPLE */  QSP_TYPE_TUPLE,

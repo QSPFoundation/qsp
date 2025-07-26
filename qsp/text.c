@@ -6,7 +6,6 @@
  */
 
 #include "text.h"
-#include "common.h"
 #include "errors.h"
 #include "locations.h"
 #include "mathops.h"
