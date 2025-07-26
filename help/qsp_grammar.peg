@@ -133,20 +133,20 @@ QSP {
     multilineUserFunctionCall       = multilineUserFunctionCallWithArgs
                                     | multilineUserFunctionCallNoArgs
 
-    functionCallNoArgs              = funcNameWithPrefix &delimiterChar ws ("(" mws ")")?
+    functionCallNoArgs              = funcNameWithPrefix &delimiterChar (ws "(" mws ")")?
     functionCallSingleArg           = funcNameWithPrefix &delimiterChar ws ( parenthesizedExpression | expression )
     functionCallMultiArgs           = funcNameWithPrefix &delimiterChar ws parenthesizedArgument2plusList
 
-    multilineFunctionCallNoArgs     = funcNameWithPrefix &delimiterChar mws ("(" mws ")")?
+    multilineFunctionCallNoArgs     = funcNameWithPrefix &delimiterChar (mws "(" mws ")")?
     multilineFunctionCallSingleArg  = funcNameWithPrefix &delimiterChar mws ( parenthesizedExpression | multilineExpression )
     multilineFunctionCallMultiArgs  = funcNameWithPrefix &delimiterChar mws parenthesizedArgument2plusList
 
     nonAmpersandFunctionCallSingleArg = funcNameWithPrefix &delimiterChar ws ( parenthesizedExpression | nonAmpersandExpression )
 
-    userFunctionCallNoArgs          = "@" userFunctionName ws ("(" mws ")")?
+    userFunctionCallNoArgs          = "@" userFunctionName (ws "(" mws ")")?
     userFunctionCallWithArgs        = "@" userFunctionName ws parenthesizedArgument1plusList
 
-    multilineUserFunctionCallNoArgs    = "@" userFunctionName mws ("(" mws ")")?
+    multilineUserFunctionCallNoArgs    = "@" userFunctionName (mws "(" mws ")")?
     multilineUserFunctionCallWithArgs  = "@" userFunctionName mws parenthesizedArgument1plusList
 
     /* ====================
@@ -254,11 +254,11 @@ QSP {
        ====================
     */
 
-    variableRef         = varNameWithPrefix ws (arrayIndex | emptyArrayIndex)?
+    variableRef         = varNameWithPrefix (ws (arrayIndex | emptyArrayIndex))?
     arrayIndex          = "[" mws multilineExpression mws "]"  /* Array indices can contain & */
     emptyArrayIndex     = "[" mws "]"
 
-    multilineVariableRef = varNameWithPrefix mws (arrayIndex | emptyArrayIndex)?
+    multilineVariableRef = varNameWithPrefix (mws (arrayIndex | emptyArrayIndex))?
 
     /* ====================
        LITERALS
