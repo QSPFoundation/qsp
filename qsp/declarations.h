@@ -5,27 +5,21 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdarg.h>
 #include <locale.h>
 #include <time.h>
 #include <math.h>
 #include <limits.h>
 #include <string.h>
-#include <wchar.h>
 #include <wctype.h>
 
-/* MEMWATCH */
-
 #ifdef _DEBUG
+    /* MEMWATCH => debug builds include GPL code */
     #define MEMWATCH
     #define MEMWATCH_STDIO
 
     #include "memwatch.h"
 #endif
-
-/* -------- */
 
 #include "qsp_config.h"
 #include "bindings/bindings_config.h"
