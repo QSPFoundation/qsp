@@ -558,18 +558,18 @@ QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim)
 void qspPrepareStringToExecution(QSPString *str)
 {
     int quotsCount = 0;
-    QSP_CHAR *pos = str->Str, *end = str->End;
-    while (pos < end)
+    QSP_CHAR *pos = str->Str, *endPos = str->End;
+    while (pos < endPos)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
             QSP_CHAR quot = *pos;
-            while (++pos < end)
+            while (++pos < endPos)
             {
                 if (*pos == quot)
                 {
                     ++pos;
-                    if (pos >= end) break;
+                    if (pos >= endPos) break;
                     if (*pos != quot) break;
                 }
             }
@@ -580,7 +580,7 @@ void qspPrepareStringToExecution(QSPString *str)
         case QSP_LQUOT_CHAR: ++quotsCount; break;
         case QSP_RQUOT_CHAR: if (quotsCount) --quotsCount; break;
         default:
-            if (!quotsCount) /* we have to keep q-strings untouched */
+            if (!quotsCount) /* we have to keep code blocks untouched */
                 *pos = QSP_CHRUPR(*pos);
             break;
         }

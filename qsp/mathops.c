@@ -38,7 +38,7 @@ INLINE QSP_BIGINT qspGetNumber(QSPString *expr);
 INLINE QSPString qspGetName(QSPString *expr);
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr);
 INLINE QSPString qspGetString(QSPString *expr);
-INLINE QSPString qspGetQString(QSPString *expr);
+INLINE QSPString qspGetCodeBlock(QSPString *expr);
 INLINE int qspSkipMathValue(QSPMathExpression *expression, int valueIndex);
 INLINE QSPVariant qspCalculateArgumentValue(QSPMathExpression *expression, int valueIndex, QSP_TINYINT type);
 INLINE QSP_BOOL qspPushOperationToStack(QSP_TINYINT *opStack, QSP_TINYINT *argStack, int *opSp, QSP_TINYINT opCode);
@@ -511,7 +511,7 @@ INLINE QSPString qspGetString(QSPString *expr)
     return qspStringFromLen(buf, strLen);
 }
 
-INLINE QSPString qspGetQString(QSPString *expr)
+INLINE QSPString qspGetCodeBlock(QSPString *expr)
 {
     QSP_CHAR *pos, *buf = expr->Str;
     pos = qspDelimPos(*expr, QSP_RQUOT_CHAR);
@@ -769,7 +769,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
             }
             else if (*s.Str == QSP_LQUOT_CHAR)
             {
-                name = qspGetQString(&s);
+                name = qspGetCodeBlock(&s);
                 if (qspErrorNum) break;
                 v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_CODE);
                 if (!qspAppendValueToCompiled(expression, qspOpValue, v))
