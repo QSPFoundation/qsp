@@ -558,31 +558,32 @@ QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim)
 void qspPrepareStringToExecution(QSPString *str)
 {
     int quotsCount = 0;
-    QSP_CHAR *pos = str->Str;
-    while (pos < str->End)
+    QSP_CHAR *pos = str->Str, *end = str->End;
+    while (pos < end)
     {
-        if (*pos == QSP_LQUOT_CHAR)
-            ++quotsCount;
-        else if (*pos == QSP_RQUOT_CHAR)
-        {
-            if (quotsCount) --quotsCount;
-        }
-        else if (qspIsInClass(*pos, QSP_CHAR_QUOT))
+        if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
             QSP_CHAR quot = *pos;
-            while (++pos < str->End)
+            while (++pos < end)
             {
                 if (*pos == quot)
                 {
                     ++pos;
-                    if (pos >= str->End) break;
+                    if (pos >= end) break;
                     if (*pos != quot) break;
                 }
             }
             continue;
         }
-        else if (!quotsCount) /* we have to keep q-strings untouched */
-            *pos = QSP_CHRUPR(*pos);
+        switch (*pos)
+        {
+        case QSP_LQUOT_CHAR: ++quotsCount; break;
+        case QSP_RQUOT_CHAR: if (quotsCount) --quotsCount; break;
+        default:
+            if (!quotsCount) /* we have to keep q-strings untouched */
+                *pos = QSP_CHRUPR(*pos);
+            break;
+        }
         ++pos;
     }
 }
@@ -626,7 +627,7 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
     QSPBufString combinedStrBuf;
     QSP_BOOL isNewLine;
     QSP_CHAR *str, *pos, quot = 0;
-    int quotsCount = 0, lineNum = 0, lastLineNum = 0, linesCount = 0, linesBufSize = 8, strLen = 0, strBufSize = 256;
+    int c1 = 0, c2 = 0, c3 = 0, lineNum = 0, lastLineNum = 0, linesCount = 0, linesBufSize = 8, strLen = 0, strBufSize = 256;
     if (qspIsEmpty(data))
     {
         *strs = 0;
@@ -640,9 +641,9 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
     {
         isNewLine = (qspStrsPartCompare(data, QSP_STATIC_STR(QSP_STRSDELIM), QSP_STATIC_LEN(QSP_STRSDELIM)) == 0);
         if (isNewLine) ++lineNum;
-        if (quotsCount || quot || !isNewLine)
+        if (c1 || c2 || c3 || quot || !isNewLine)
         {
-            /* Keep composing the current line */
+            /* Inside quotes or brackets, keep composing the current line */
             if (strLen >= strBufSize)
             {
                 strBufSize = strLen + 256;
@@ -672,14 +673,20 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
             }
             else
             {
-                if (*pos == QSP_LQUOT_CHAR)
-                    ++quotsCount;
-                else if (*pos == QSP_RQUOT_CHAR)
-                {
-                    if (quotsCount) --quotsCount;
-                }
-                else if (qspIsInClass(*pos, QSP_CHAR_QUOT))
+                if (qspIsInClass(*pos, QSP_CHAR_QUOT))
                     quot = *pos;
+                else
+                {
+                    switch (*pos)
+                    {
+                        case QSP_LRBRACK_CHAR: ++c1; break;
+                        case QSP_RRBRACK_CHAR: if (c1) --c1; break;
+                        case QSP_LSBRACK_CHAR: ++c2; break;
+                        case QSP_RSBRACK_CHAR: if (c2) --c2; break;
+                        case QSP_LQUOT_CHAR: ++c3; break;
+                        case QSP_RQUOT_CHAR: if (c3) --c3; break;
+                    }
+                }
                 ++pos;
             }
         }

@@ -84,7 +84,7 @@
     #define QSP_QUOTS        QSP_FMT("'\"")
     #define QSP_DEFQUOT      QSP_FMT("'")
     #define QSP_ESCDEFQUOT   QSP_FMT("''")
-    #define QSP_SPACES       QSP_FMT(" \t")
+    #define QSP_SPACES       QSP_FMT(" \t\r\n")
 
     #define QSP_STATDELIM    QSP_FMT("&")
     QSP_DEFINE_SPECIAL_CHAR(QSP_STATDELIM,  QSP_FMT('&'))
@@ -142,7 +142,7 @@
     #define QSP_RQUOT        QSP_FMT("}")
     QSP_DEFINE_SPECIAL_CHAR(QSP_RQUOT,      QSP_FMT('}'))
 
-    #define QSP_DELIMS       QSP_FMT(" \t&'\"()[]=!<>+-/*:,{}")
+    #define QSP_DELIMS       QSP_FMT(" \t&'\"()[]=!<>+-/*:,{}\r\n")
 
     #define QSP_LOC_COUNTER QSP_FMT("COUNTER")
     #define QSP_LOC_USERCOMMAND QSP_FMT("USERCOM")
