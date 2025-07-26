@@ -784,6 +784,11 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpNegation)) break;
                 s.Str += QSP_CHAR_LEN;
             }
+            else if (*s.Str == QSP_ADD_CHAR)
+            {
+                // Skip unary plus
+                s.Str += QSP_CHAR_LEN;
+            }
             else if (*s.Str == QSP_LRBRACK_CHAR) /* a subexpression OR a tuple */
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
