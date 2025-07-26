@@ -11,7 +11,7 @@ QSP {
        4. You can use https://ohmjs.org/editor/ to test the grammar;
     */
 
-    start              = statementGroup* ws end
+    start              = statementGroup* end
 
     statementGroup     = ws (singleLineBlock | multiLineBlock | newline)
 
