@@ -6,6 +6,7 @@
  */
 
 #include "text.h"
+#include "common.h"
 #include "errors.h"
 #include "locations.h"
 #include "mathops.h"
@@ -297,12 +298,12 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
         }
         switch (*pos)
         {
-        case QSP_LRBRACK_CHAR: ++c1; break;
-        case QSP_RRBRACK_CHAR: if (c1) --c1; break;
-        case QSP_LSBRACK_CHAR: ++c2; break;
-        case QSP_RSBRACK_CHAR: if (c2) --c2; break;
-        case QSP_LQUOT_CHAR: ++c3; break;
-        case QSP_RQUOT_CHAR: if (c3) --c3; break;
+        case QSP_LRBRACK_CHAR: QSP_INC_POSITIVE(c1); break;
+        case QSP_RRBRACK_CHAR: QSP_DEC_POSITIVE(c1); break;
+        case QSP_LSBRACK_CHAR: QSP_INC_POSITIVE(c2); break;
+        case QSP_RSBRACK_CHAR: QSP_DEC_POSITIVE(c2); break;
+        case QSP_LQUOT_CHAR: QSP_INC_POSITIVE(c3); break;
+        case QSP_RQUOT_CHAR: QSP_DEC_POSITIVE(c3); break;
         }
         if (!(c1 || c2 || c3) && *pos == ch) /* include brackets */
             return pos;
@@ -347,12 +348,12 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
         }
         switch (*pos)
         {
-        case QSP_LRBRACK_CHAR: ++c1; break;
-        case QSP_RRBRACK_CHAR: if (c1) --c1; break;
-        case QSP_LSBRACK_CHAR: ++c2; break;
-        case QSP_RSBRACK_CHAR: if (c2) --c2; break;
-        case QSP_LQUOT_CHAR: ++c3; break;
-        case QSP_RQUOT_CHAR: if (c3) --c3; break;
+        case QSP_LRBRACK_CHAR: QSP_INC_POSITIVE(c1); break;
+        case QSP_RRBRACK_CHAR: QSP_DEC_POSITIVE(c1); break;
+        case QSP_LSBRACK_CHAR: QSP_INC_POSITIVE(c2); break;
+        case QSP_RSBRACK_CHAR: QSP_DEC_POSITIVE(c2); break;
+        case QSP_LQUOT_CHAR: QSP_INC_POSITIVE(c3); break;
+        case QSP_RQUOT_CHAR: QSP_DEC_POSITIVE(c3); break;
         }
         if (!(c1 || c2 || c3)) /* include brackets */
         {

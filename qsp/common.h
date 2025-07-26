@@ -15,6 +15,9 @@
     #define QSP_RANDMAX QSP_RANDMASK
     #define QSP_NORMAL_SCALE 3.0
 
+    #define QSP_INC_POSITIVE(x) (++(x))
+    #define QSP_DEC_POSITIVE(x) ((x) -= ((x) > 0))
+
     extern QSP_BOOL qspIsDebug;
     extern int qspTimerInterval;
 

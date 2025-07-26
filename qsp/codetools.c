@@ -6,6 +6,7 @@
  */
 
 #include "codetools.h"
+#include "common.h"
 #include "statements.h"
 #include "text.h"
 
@@ -577,8 +578,8 @@ void qspPrepareStringToExecution(QSPString *str)
         }
         switch (*pos)
         {
-        case QSP_LQUOT_CHAR: ++quotsCount; break;
-        case QSP_RQUOT_CHAR: if (quotsCount) --quotsCount; break;
+        case QSP_LQUOT_CHAR: QSP_INC_POSITIVE(quotsCount); break;
+        case QSP_RQUOT_CHAR: QSP_DEC_POSITIVE(quotsCount); break;
         default:
             if (!quotsCount) /* we have to keep code blocks untouched */
                 *pos = QSP_CHRUPR(*pos);
@@ -679,12 +680,12 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
                 {
                     switch (*pos)
                     {
-                        case QSP_LRBRACK_CHAR: ++c1; break;
-                        case QSP_RRBRACK_CHAR: if (c1) --c1; break;
-                        case QSP_LSBRACK_CHAR: ++c2; break;
-                        case QSP_RSBRACK_CHAR: if (c2) --c2; break;
-                        case QSP_LQUOT_CHAR: ++c3; break;
-                        case QSP_RQUOT_CHAR: if (c3) --c3; break;
+                    case QSP_LRBRACK_CHAR: QSP_INC_POSITIVE(c1); break;
+                    case QSP_RRBRACK_CHAR: QSP_DEC_POSITIVE(c1); break;
+                    case QSP_LSBRACK_CHAR: QSP_INC_POSITIVE(c2); break;
+                    case QSP_RSBRACK_CHAR: QSP_DEC_POSITIVE(c2); break;
+                    case QSP_LQUOT_CHAR: QSP_INC_POSITIVE(c3); break;
+                    case QSP_RQUOT_CHAR: QSP_DEC_POSITIVE(c3); break;
                     }
                 }
                 ++pos;
