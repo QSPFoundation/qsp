@@ -142,7 +142,7 @@ void qspRefreshPlayList(void)
                     return;
                 }
                 if (isPlaying)
-                    qspPLFiles[qspPLFilesCount++] = qspMoveText(files + i);
+                    qspPLFiles[qspPLFilesCount++] = qspMoveToNewText(files + i);
             }
         }
         qspFreeStrs(files, count);

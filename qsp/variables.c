@@ -572,7 +572,7 @@ int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups)
                     *savedVarGroups = 0;
                     return 0;
                 }
-                curVarGroup->Vars[j].Name = qspMoveText(&curSavedVarGroup->Vars[j].Name);
+                curVarGroup->Vars[j].Name = qspMoveToNewText(&curSavedVarGroup->Vars[j].Name);
                 qspMoveVar(curVarGroup->Vars + j, var);
                 qspMoveVar(var, curSavedVarGroup->Vars + j);
             }
@@ -646,7 +646,7 @@ void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount)
                         free(varGroups);
                         return;
                     }
-                    curSavedVarGroup->Vars[j].Name = qspMoveText(&curVarGroup->Vars[j].Name);
+                    curSavedVarGroup->Vars[j].Name = qspMoveToNewText(&curVarGroup->Vars[j].Name);
                     qspMoveVar(curSavedVarGroup->Vars + j, var);
                     qspMoveVar(var, curVarGroup->Vars + j);
                 }

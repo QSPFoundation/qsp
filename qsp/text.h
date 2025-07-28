@@ -139,7 +139,7 @@
         return string;
     }
 
-    INLINE QSPString qspMoveText(QSPString *s)
+    INLINE QSPString qspMoveToNewText(QSPString *s)
     {
         QSPString string = *s;
         s->Str = s->End = 0; /* assign the null string */
