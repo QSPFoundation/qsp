@@ -41,6 +41,7 @@ INLINE QSP_BOOL qspCheckCondition(QSPString expr);
 INLINE QSP_BOOL qspCheckCompiledCondition(QSPMathExpression *expression);
 INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int endLine, int lineInd, int codeOffset, QSPString *jumpTo);
+INLINE void qspStatementUserCall(QSPString s, QSPCachedStat *stat);
 INLINE void qspStatementImplicitStatement(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 INLINE void qspStatementAddText(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 INLINE void qspStatementClear(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
@@ -461,19 +462,13 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
                 qspFreeString(&QSP_STR(arg));
                 return QSP_TRUE;
             }
+        case qspStatUserCall:
+            qspStatementUserCall(line->Str, statements + i);
+            if (qspLocationState != oldLocationState) return QSP_FALSE;
+            break;
         case qspStatAct:
             qspStatementSinglelineAddAct(line, i, endStat);
             return QSP_FALSE;
-        case qspStatUserCall:
-            {
-                QSPVariant args[QSP_STATMAXARGS];
-                QSP_TINYINT argsCount = qspGetStatArgs(line->Str, statements + i, args);
-                if (qspLocationState != oldLocationState) return QSP_FALSE;
-                qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, argsCount - 1, QSP_TRUE, 0);
-                qspFreeVariants(args, argsCount);
-                if (qspLocationState != oldLocationState) return QSP_FALSE;
-                break;
-            }
         default:
             {
                 QSPVariant args[QSP_STATMAXARGS];
@@ -1048,6 +1043,16 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
     }
     qspRestoreLastSavedVarsGroup();
     return toExit;
+}
+
+INLINE void qspStatementUserCall(QSPString s, QSPCachedStat *stat)
+{
+    QSPVariant args[QSP_STATMAXARGS];
+    int oldLocationState = qspLocationState;
+    QSP_TINYINT argsCount = qspGetStatArgs(s, stat, args);
+    if (qspLocationState != oldLocationState) return;
+    qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, argsCount - 1, QSP_TRUE, 0);
+    qspFreeVariants(args, argsCount);
 }
 
 INLINE void qspStatementImplicitStatement(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT QSP_UNUSED(extArg))
