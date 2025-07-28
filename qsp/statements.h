@@ -26,6 +26,7 @@
     {
         QSP_TINYINT Code;
         QSPString Name;
+        QSP_BOOL IsIsolated; /* indicates whether the statement name has to be separated from arguments */
     } QSPStatName;
 
     typedef struct
@@ -48,6 +49,7 @@
         qspStatLabel,
         qspStatComment,
         qspStatImplicitStatement,
+        qspStatUserCall,
         qspStatEnd,
         qspStatLoop,
         qspStatIf,

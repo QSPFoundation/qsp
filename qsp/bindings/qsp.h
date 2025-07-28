@@ -74,6 +74,8 @@
 
     enum
     {
+        QSP_TYPE_TERM = -50, /* not used for values */
+        QSP_TYPE_INLINESTR = -1, /* not used for values */
         QSP_TYPE_TUPLE = 0,
         QSP_TYPE_NUM = 1,
         QSP_TYPE_STR = 2,

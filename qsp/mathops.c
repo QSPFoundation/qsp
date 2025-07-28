@@ -87,10 +87,10 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
             if (!isFinished)
             {
                 QSP_TINYINT curType = (QSP_TINYINT)va_arg(marker, int);
-                if (curType >= 0)
-                    lastType = curType;
-                else
+                if (curType == QSP_TYPE_TERM)
                     isFinished = QSP_TRUE; /* use lastType for the rest of arguments */
+                else
+                    lastType = curType;
             }
             qspOps[opCode].ArgsTypes[i] = lastType;
         }
@@ -244,7 +244,7 @@ void qspInitMath(void)
             Result type,
             Minimum arguments' count,
             Maximum arguments' count,
-            Arguments' types [optional, -1 to use the last known type for the rest of arguments]
+            Arguments' types [optional, QSP_TYPE_TERM to use the last known type for the rest of arguments]
         );
     */
     int i;
@@ -256,7 +256,7 @@ void qspInitMath(void)
     qspAddOperation(qspOpCloseRoundBracket, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpOpenSquareBracket, 127, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpCloseSquareBracket, 0, 0, QSP_TYPE_UNDEF, 0, 0);
-    qspAddOperation(qspOpTuple, 127, 0, QSP_TYPE_TUPLE, 0, QSP_OPMAXARGS, QSP_TYPE_UNDEF, -1);
+    qspAddOperation(qspOpTuple, 127, 0, QSP_TYPE_TUPLE, 0, QSP_OPMAXARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddOperation(qspOpValue, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpValueToFormat, 0, 0, QSP_TYPE_UNDEF, 0, 0);
 
@@ -279,8 +279,8 @@ void qspInitMath(void)
     qspAddOperation(qspOpGt, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpIIf, 30, 0, QSP_TYPE_UNDEF, 3, 3, QSP_TYPE_NUM, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
 
-    qspAddOperation(qspOpMin, 30, qspFunctionMin, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, -1);
-    qspAddOperation(qspOpMax, 30, qspFunctionMax, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, -1);
+    qspAddOperation(qspOpMin, 30, qspFunctionMin, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddOperation(qspOpMax, 30, qspFunctionMax, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddOperation(qspOpRand, 30, qspFunctionRand, QSP_TYPE_NUM, 1, 3, QSP_TYPE_NUM, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpRnd, 30, 0, QSP_TYPE_NUM, 0, 0);
 
@@ -306,8 +306,8 @@ void qspInitMath(void)
     qspAddOperation(qspOpStrFind, 30, qspFunctionStrFind, QSP_TYPE_STR, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
     qspAddOperation(qspOpStrPos, 30, qspFunctionStrPos, QSP_TYPE_NUM, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
 
-    qspAddOperation(qspOpFunc, 30, qspFunctionFunc, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, -1);
-    qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, -1);
+    qspAddOperation(qspOpFunc, 30, qspFunctionFunc, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
 
     qspAddOperation(qspOpLoc, 11, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpCurLoc, 30, 0, QSP_TYPE_STR, 0, 0);

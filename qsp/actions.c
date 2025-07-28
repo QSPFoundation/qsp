@@ -159,8 +159,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
     }
     oldLocationState = qspLocationState;
     argsCount = qspGetStatArgs(line->Str, line->Stats + statPos, args);
-    if (qspLocationState != oldLocationState)
-        return;
+    if (qspLocationState != oldLocationState) return;
     firstPos += QSP_CHAR_LEN;
     lastPos = line->Str.Str + line->Stats[endPos - 1].EndPos;
     if (qspIsCharAtPos(line->Str, lastPos, QSP_COLONDELIM_CHAR)) lastPos += QSP_CHAR_LEN;

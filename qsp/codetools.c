@@ -13,6 +13,8 @@ INLINE int qspStatStringCompare(const void *name, const void *compareTo);
 INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos);
 INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
+INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg **args, QSP_TINYINT argsCount, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
+INLINE QSP_TINYINT qspInitUserCallArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUSED(statCode), QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_TINYINT qspInitSingleArg(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
@@ -29,11 +31,6 @@ INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos)
     int i, strLen, nameLen;
     QSPStatName *name;
     if (qspIsEmpty(s)) return qspStatUnknown;
-    switch (*s.Str)
-    {
-    case QSP_LABEL_CHAR: return qspStatLabel;
-    case QSP_COMMENT_CHAR: return qspStatComment;
-    }
     strLen = qspStrLen(s);
     for (i = 0; i < QSP_STATSLEVELS; ++i)
     {
@@ -41,7 +38,15 @@ INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos)
         if (name)
         {
             nameLen = qspStrLen(name->Name);
-            if (nameLen == strLen || (nameLen < strLen && qspIsInClass(s.Str[nameLen], QSP_CHAR_DELIM)))
+            if (name->IsIsolated)
+            {
+                if (nameLen == strLen || (nameLen < strLen && qspIsInClass(s.Str[nameLen], QSP_CHAR_DELIM)))
+                {
+                    *pos = s.Str + nameLen;
+                    return name->Code;
+                }
+            }
+            else
             {
                 *pos = s.Str + nameLen;
                 return name->Code;
@@ -67,6 +72,8 @@ INLINE QSP_TINYINT qspInitStatArgs(QSPCachedArg **args, QSP_TINYINT statCode, QS
         case qspStatSet:
         case qspStatLocal:
             return qspInitSetArgs(args, statCode, s, origStart, errorCode);
+        case qspStatUserCall:
+            return qspInitUserCallArgs(args, statCode, s, origStart, errorCode);
         case qspStatImplicitStatement:
         case qspStatIf:
         case qspStatElseIf:
@@ -117,6 +124,97 @@ INLINE QSP_TINYINT qspInitSetArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUSED(st
     return argsCount;
 }
 
+INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg **args, QSP_TINYINT argsCount, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode)
+{
+    qspSkipSpaces(&s);
+    if (!qspIsEmpty(s))
+    {
+        if (*s.Str == QSP_LRBRACK_CHAR) /* arguments might be specified using parentheses */
+        {
+            QSP_CHAR *bracket = qspDelimPos(s, QSP_RRBRACK_CHAR);
+            if (!bracket)
+            {
+                *errorCode = QSP_ERR_BRACKNOTFOUND;
+                return argsCount;
+            }
+            if (!qspIsAnyString(qspStringFromPair(bracket + QSP_CHAR_LEN, s.End)))
+            {
+                /* We'll parse arguments between parentheses */
+                s = qspStringFromPair(s.Str + QSP_CHAR_LEN, bracket);
+                qspSkipSpaces(&s);
+            }
+        }
+        if (!qspIsEmpty(s))
+        {
+            QSP_CHAR *pos;
+            int bufSize = argsCount;
+            QSPCachedArg *foundArgs = *args;
+            while (1)
+            {
+                if (argsCount >= maxArgs)
+                {
+                    *errorCode = QSP_ERR_ARGSCOUNT;
+                    break;
+                }
+                if (argsCount >= bufSize)
+                {
+                    bufSize = argsCount + 4;
+                    foundArgs = (QSPCachedArg *)realloc(foundArgs, bufSize * sizeof(QSPCachedArg));
+                }
+                pos = qspDelimPos(s, QSP_COMMA_CHAR);
+                if (pos)
+                {
+                    foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
+                    foundArgs[argsCount].EndPos = (int)(pos - origStart);
+                    ++argsCount;
+                }
+                else
+                {
+                    foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
+                    foundArgs[argsCount].EndPos = (int)(s.End - origStart);
+                    ++argsCount;
+                    break;
+                }
+                s.Str = pos + QSP_CHAR_LEN;
+                qspSkipSpaces(&s);
+                if (qspIsEmpty(s))
+                {
+                    *errorCode = QSP_ERR_SYNTAX;
+                    break;
+                }
+            }
+            *args = foundArgs;
+        }
+    }
+    if (argsCount < minArgs)
+        *errorCode = QSP_ERR_ARGSCOUNT;
+    return argsCount;
+}
+
+INLINE QSP_TINYINT qspInitUserCallArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUSED(statCode), QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode)
+{
+    QSPCachedArg *foundArgs;
+    QSP_TINYINT argsCount;
+    QSP_CHAR *nameEnd = qspStrCharClass(s, QSP_CHAR_DELIM);
+    foundArgs = (QSPCachedArg *)malloc(sizeof(QSPCachedArg));
+    if (nameEnd)
+    {
+        foundArgs[0].StartPos = (int)(s.Str - origStart);
+        foundArgs[0].EndPos = (int)(nameEnd - origStart);
+        s.Str = nameEnd;
+        argsCount = qspAppendRegularArgs(&foundArgs, 1, 1, QSP_STATMAXARGS, s, origStart, errorCode);
+    }
+    else
+    {
+        /* No extra arguments */
+        foundArgs[0].StartPos = (int)(s.Str - origStart);
+        foundArgs[0].EndPos = (int)(s.End - origStart);
+        argsCount = 1;
+    }
+    *args = foundArgs;
+    return argsCount;
+}
+
 INLINE QSP_TINYINT qspInitSingleArg(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode)
 {
     QSPCachedArg *foundArgs = 0;
@@ -127,10 +225,10 @@ INLINE QSP_TINYINT qspInitSingleArg(QSPCachedArg **args, QSP_TINYINT statCode, Q
         /* Consider the whole string as 1 argument */
         if (qspStats[statCode].MaxArgsCount)
         {
-            argsCount = 1;
             foundArgs = (QSPCachedArg *)malloc(sizeof(QSPCachedArg));
             foundArgs[0].StartPos = (int)(s.Str - origStart);
             foundArgs[0].EndPos = (int)(s.End - origStart);
+            argsCount = 1;
         }
         else
             *errorCode = QSP_ERR_ARGSCOUNT;
@@ -143,67 +241,7 @@ INLINE QSP_TINYINT qspInitSingleArg(QSPCachedArg **args, QSP_TINYINT statCode, Q
 
 INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode)
 {
-    QSPCachedArg *foundArgs = 0;
-    QSP_TINYINT argsCount = 0;
-    qspSkipSpaces(&s);
-    if (!qspIsEmpty(s))
-    {
-        QSP_CHAR *pos;
-        int bufSize = 0;
-        if (*s.Str == QSP_LRBRACK_CHAR) /* arguments might be specified using parentheses */
-        {
-            QSP_CHAR *bracket;
-            if (!(bracket = qspDelimPos(s, QSP_RRBRACK_CHAR)))
-            {
-                *errorCode = QSP_ERR_BRACKNOTFOUND;
-                return 0;
-            }
-            if (!qspIsAnyString(qspStringFromPair(bracket + QSP_CHAR_LEN, s.End)))
-            {
-                /* We'll parse arguments between parentheses */
-                s = qspStringFromPair(s.Str + QSP_CHAR_LEN, bracket);
-                qspSkipSpaces(&s);
-            }
-        }
-        while (1)
-        {
-            if (argsCount >= qspStats[statCode].MaxArgsCount)
-            {
-                *errorCode = QSP_ERR_ARGSCOUNT;
-                break;
-            }
-            if (argsCount >= bufSize)
-            {
-                bufSize = argsCount + 4;
-                foundArgs = (QSPCachedArg *)realloc(foundArgs, bufSize * sizeof(QSPCachedArg));
-            }
-            pos = qspDelimPos(s, QSP_COMMA_CHAR);
-            if (pos)
-            {
-                foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
-                foundArgs[argsCount].EndPos = (int)(pos - origStart);
-                ++argsCount;
-            }
-            else
-            {
-                foundArgs[argsCount].StartPos = (int)(s.Str - origStart);
-                foundArgs[argsCount].EndPos = (int)(s.End - origStart);
-                ++argsCount;
-                break;
-            }
-            s.Str = pos + QSP_CHAR_LEN;
-            qspSkipSpaces(&s);
-            if (qspIsEmpty(s))
-            {
-                *errorCode = QSP_ERR_SYNTAX;
-                break;
-            }
-        }
-    }
-    if (argsCount < qspStats[statCode].MinArgsCount)
-        *errorCode = QSP_ERR_ARGSCOUNT;
-    *args = foundArgs;
-    return argsCount;
+    return qspAppendRegularArgs(args, 0, qspStats[statCode].MinArgsCount, qspStats[statCode].MaxArgsCount, s, origStart, errorCode);
 }
 
 QSPString qspGetLineLabel(QSPString str)
