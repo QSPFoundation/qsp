@@ -42,6 +42,7 @@
     QSP_CHAR *qspStringToC(QSPString s);
     QSP_BOOL qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
     QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val);
+    QSPString qspConcatText(QSPString val1, QSPString val2);
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);
     void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end);

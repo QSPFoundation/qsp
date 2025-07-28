@@ -108,6 +108,27 @@ QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val)
     return QSP_FALSE;
 }
 
+QSPString qspConcatText(QSPString val1, QSPString val2)
+{
+    QSPString res;
+    int firstLen = qspStrLen(val1), secondLen = qspStrLen(val2), destLen = firstLen + secondLen;
+    if (destLen)
+    {
+        QSP_CHAR *dest = (QSP_CHAR *)malloc(destLen * sizeof(QSP_CHAR));
+        if (firstLen)
+            memcpy(dest, val1.Str, firstLen * sizeof(QSP_CHAR));
+        if (secondLen)
+            memcpy(dest + firstLen, val2.Str, secondLen * sizeof(QSP_CHAR));
+        res.Str = dest;
+        res.End = dest + destLen;
+    }
+    else
+    {
+        res.Str = res.End = 0; /* assign the null string */
+    }
+    return res;
+}
+
 QSPString qspJoinStrs(QSPString *s, int count, QSPString delim)
 {
     int i;
@@ -152,10 +173,10 @@ void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end)
     int count = end - start;
     if (src && count)
     {
-        int i = 0;
+        int i;
         *dest = (QSPString *)malloc(count * sizeof(QSPString));
-        while (start < end)
-            qspAddText(*dest + i++, src[start++], QSP_TRUE);
+        for (i = 0; start < end; ++i, ++start)
+            qspAddText(*dest + i, src[start], QSP_TRUE);
     }
     else
         *dest = 0;

@@ -51,8 +51,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
         case QSP_TYPE_TUPLE:
             return QSP_FALSE; /* tuples get processed before calling this function */
         case QSP_TYPE_STR:
-            qspAddText(&QSP_PSTR(res), QSP_PSTR(arg1), QSP_TRUE);
-            qspAddText(&QSP_PSTR(res), QSP_PSTR(arg2), QSP_FALSE);
+            QSP_PSTR(res) = qspConcatText(QSP_PSTR(arg1), QSP_PSTR(arg2));
             res->Type = QSP_TYPE_STR;
             break;
         case QSP_TYPE_NUM:
@@ -64,8 +63,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
             else
             {
                 qspConvertVariantTo(arg2, QSP_TYPE_STR);
-                qspAddText(&QSP_PSTR(res), QSP_PSTR(arg1), QSP_TRUE);
-                qspAddText(&QSP_PSTR(res), QSP_PSTR(arg2), QSP_FALSE);
+                QSP_PSTR(res) = qspConcatText(QSP_PSTR(arg1), QSP_PSTR(arg2));
                 res->Type = QSP_TYPE_STR;
             }
             break;
@@ -85,8 +83,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
             else
             {
                 qspConvertVariantTo(arg1, QSP_TYPE_STR);
-                qspAddText(&QSP_PSTR(res), QSP_PSTR(arg1), QSP_TRUE);
-                qspAddText(&QSP_PSTR(res), QSP_PSTR(arg2), QSP_FALSE);
+                QSP_PSTR(res) = qspConcatText(QSP_PSTR(arg1), QSP_PSTR(arg2));
                 res->Type = QSP_TYPE_STR;
             }
             break;
@@ -247,8 +244,7 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
             qspConvertVariantTo(arg1, QSP_TYPE_STR);
             qspConvertVariantTo(arg2, QSP_TYPE_STR);
 
-            qspAddText(&QSP_PSTR(res), QSP_PSTR(arg1), QSP_TRUE);
-            qspAddText(&QSP_PSTR(res), QSP_PSTR(arg2), QSP_FALSE);
+            QSP_PSTR(res) = qspConcatText(QSP_PSTR(arg1), QSP_PSTR(arg2));
             res->Type = QSP_TYPE_STR;
             break;
         }
