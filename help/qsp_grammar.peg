@@ -393,7 +393,7 @@ QSP {
                         | loopMarker | whileMarker | stepMarker | endLoopMarker
 
     binaryKeywordOperator   = "and" | "or" | "mod"
-    binaryStandardOperator  = "," | "<>" | "!" | "<=" | "=<" | ">=" | "=>" | "=" | "<" | ">" | "+" | "-" | "*" | "/"
+    binaryStandardOperator  = "<>" | "!" | "<=" | "=<" | ">=" | "=>" | "=" | "<" | ">" | "+" | "-" | "*" | "/"
     binaryExtendedOperator  = binaryStandardOperator | "&"
 
     unaryKeywordOperator    = "no" | "obj" | "loc"
