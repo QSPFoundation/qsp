@@ -107,8 +107,9 @@ QSP {
        ====================
     */
 
-    statement                  = statementNoArgs | statementWithArgs
-    statementNoArgs            = statementName &delimiterChar (ws "(" mws ")")?
+    statement                  = statementEmptyArgs | statementWithArgs | statementNoArgs
+    statementNoArgs            = statementName &delimiterChar
+    statementEmptyArgs         = statementName &delimiterChar ws "(" mws ")"
     statementWithArgs          = statementName &delimiterChar ws ( parenthesizedArgument1plusList | nonAmpersandArgument1plusList )
 
     /* ====================
@@ -116,8 +117,9 @@ QSP {
        ====================
     */
 
-    userCallStatement          = userCallStatementNoArgs | userCallStatementWithArgs
-    userCallStatementNoArgs    = "@@" userStatementName (ws "(" mws ")")?
+    userCallStatement          = userCallStatementEmptyArgs | userCallStatementWithArgs | userCallStatementNoArgs
+    userCallStatementNoArgs    = "@@" userStatementName
+    userCallStatementEmptyArgs = "@@" userStatementName ws "(" mws ")"
     userCallStatementWithArgs  = "@@" userStatementName ws ( parenthesizedArgument1plusList | nonAmpersandArgument1plusList )
 
     /* ====================
@@ -125,35 +127,45 @@ QSP {
        ====================
     */
 
-    functionCall                    = functionCallNoArgs
+    functionCall                    = functionCallEmptyArgs
                                     | functionCallMultiArgs
                                     | functionCallSingleArg
+                                    | functionCallNoArgs
 
-    multilineFunctionCall           = multilineFunctionCallNoArgs
+    multilineFunctionCall           = multilineFunctionCallEmptyArgs
                                     | multilineFunctionCallMultiArgs
                                     | multilineFunctionCallSingleArg
+                                    | functionCallNoArgs
 
-    nonAmpersandFunctionCall        = functionCallNoArgs
+    nonAmpersandFunctionCall        = functionCallEmptyArgs
                                     | functionCallMultiArgs
                                     | nonAmpersandFunctionCallSingleArg
+                                    | functionCallNoArgs
 
-    userFunctionCall                = userFunctionCallNoArgs | userFunctionCallWithArgs
-    multilineUserFunctionCall       = multilineUserFunctionCallNoArgs | multilineUserFunctionCallWithArgs
+    userFunctionCall                = userFunctionCallEmptyArgs
+                                    | userFunctionCallWithArgs
+                                    | userFunctionCallNoArgs
 
-    functionCallNoArgs              = funcNameWithPrefix &delimiterChar (ws "(" mws ")")?
+    multilineUserFunctionCall       = multilineUserFunctionCallEmptyArgs
+                                    | multilineUserFunctionCallWithArgs
+                                    | userFunctionCallNoArgs
+
+    functionCallNoArgs              = funcNameWithPrefix &delimiterChar
+    functionCallEmptyArgs           = funcNameWithPrefix &delimiterChar ws "(" mws ")"
     functionCallSingleArg           = funcNameWithPrefix &delimiterChar ws ( parenthesizedExpression | expression )
     functionCallMultiArgs           = funcNameWithPrefix &delimiterChar ws parenthesizedArgument2plusList
 
-    multilineFunctionCallNoArgs     = funcNameWithPrefix &delimiterChar (mws "(" mws ")")?
+    multilineFunctionCallEmptyArgs  = funcNameWithPrefix &delimiterChar mws "(" mws ")"
     multilineFunctionCallSingleArg  = funcNameWithPrefix &delimiterChar mws ( parenthesizedExpression | multilineExpression )
     multilineFunctionCallMultiArgs  = funcNameWithPrefix &delimiterChar mws parenthesizedArgument2plusList
 
     nonAmpersandFunctionCallSingleArg = funcNameWithPrefix &delimiterChar ws ( parenthesizedExpression | nonAmpersandExpression )
 
-    userFunctionCallNoArgs          = "@" userFunctionName (ws "(" mws ")")?
+    userFunctionCallNoArgs          = "@" userFunctionName
+    userFunctionCallEmptyArgs       = "@" userFunctionName ws "(" mws ")"
     userFunctionCallWithArgs        = "@" userFunctionName ws parenthesizedArgument1plusList
 
-    multilineUserFunctionCallNoArgs    = "@" userFunctionName (mws "(" mws ")")?
+    multilineUserFunctionCallEmptyArgs = "@" userFunctionName mws "(" mws ")"
     multilineUserFunctionCallWithArgs  = "@" userFunctionName mws parenthesizedArgument1plusList
 
     /* ====================
