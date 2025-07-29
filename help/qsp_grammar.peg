@@ -54,8 +54,8 @@ QSP {
        ====================
     */
 
-    assignmentStatement     = (setMarker &delimiterChar ws)? variableList ws assignmentOperator ws nonAmpersandExpression
-    localStatement          = localMarker &delimiterChar ws variableList (ws "=" ws nonAmpersandExpression)?
+    assignmentStatement     = (setMarker &delimiterChar ws)? variableList ws assignmentOperator ws nonAmpersandArgument1plusList
+    localStatement          = localMarker &delimiterChar ws variableList (ws "=" ws nonAmpersandArgument1plusList)?
 
     variableList            = variableRef (ws "," ws variableRef)*
     assignmentOperator      = "=" | "+=" | "-=" | "*=" | "/="
