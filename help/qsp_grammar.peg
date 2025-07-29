@@ -220,7 +220,6 @@ QSP {
                                     | codeBlock
                                     | interpolatedString /* Try to parse it as a string with subexpressions */
                                     | rawStringLiteral
-                                    | emptyPseudoTuple
                                     | tuple
                                     | userFunctionCall
                                     | functionCall
@@ -231,7 +230,6 @@ QSP {
                                     | codeBlock
                                     | interpolatedString /* Try to parse it as a string with subexpressions */
                                     | rawStringLiteral
-                                    | emptyPseudoTuple
                                     | tuple
                                     | multilineUserFunctionCall
                                     | multilineFunctionCall
@@ -242,7 +240,6 @@ QSP {
                                     | codeBlock
                                     | interpolatedString
                                     | rawStringLiteral
-                                    | emptyPseudoTuple
                                     | tuple
                                     | userFunctionCall
                                     | nonAmpersandFunctionCall /* Functions with a single argument can't contain & */
@@ -263,21 +260,26 @@ QSP {
        ====================
     */
 
-    emptyPseudoTuple    = "(" mws ")"
-    tuple               = emptyTuple | nonEmptyTuple
+    tuple               = emptyTuple
+                        | nonEmptyTuple
+                        | emptyPseudoTuple
+                        | nonEmptyPseudoTuple
+
     emptyTuple          = "[" mws "]"
     nonEmptyTuple       = "[" mws multilineArgument1plusList mws "]"
+    emptyPseudoTuple    = "(" mws ")"
+    nonEmptyPseudoTuple = "(" mws multilineArgument1plusList mws ")"
 
     /* ====================
        VARIABLES
        ====================
     */
 
-    variableRef         = varNameWithPrefix (ws (arrayIndex | emptyArrayIndex))?
-    arrayIndex          = "[" mws multilineExpression mws "]"  /* Array indices can contain & */
+    variableRef         = varNameWithPrefix (ws (emptyArrayIndex | arrayIndex))?
     emptyArrayIndex     = "[" mws "]"
+    arrayIndex          = "[" mws multilineArgument1plusList mws "]"
 
-    multilineVariableRef = varNameWithPrefix (mws (arrayIndex | emptyArrayIndex))?
+    multilineVariableRef = varNameWithPrefix (mws (emptyArrayIndex | arrayIndex))?
 
     /* ====================
        LITERALS
