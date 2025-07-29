@@ -32,6 +32,7 @@ QSP {
                             | loopSingleLine
                             | localStatement
                             | assignmentStatement
+                            | userCallStatement
                             | statement
                             | implicitStatement
 
@@ -106,32 +107,38 @@ QSP {
        ====================
     */
 
-    statement                       = statementWithArgs | statementNoArgs
-    statementNoArgs                 = statementName &delimiterChar (ws "(" mws ")")?
-    statementWithArgs               = statementName &delimiterChar ws ( parenthesizedArgument1plusList | nonAmpersandArgument1plusList )
+    statement                  = statementNoArgs | statementWithArgs
+    statementNoArgs            = statementName &delimiterChar (ws "(" mws ")")?
+    statementWithArgs          = statementName &delimiterChar ws ( parenthesizedArgument1plusList | nonAmpersandArgument1plusList )
+
+    /* ====================
+       USER CALLS
+       ====================
+    */
+
+    userCallStatement          = userCallStatementNoArgs | userCallStatementWithArgs
+    userCallStatementNoArgs    = "@@" userStatementName (ws "(" mws ")")?
+    userCallStatementWithArgs  = "@@" userStatementName ws ( parenthesizedArgument1plusList | nonAmpersandArgument1plusList )
 
     /* ====================
        FUNCTION CALLS
        ====================
     */
 
-    functionCall                    = functionCallMultiArgs
+    functionCall                    = functionCallNoArgs
+                                    | functionCallMultiArgs
                                     | functionCallSingleArg
-                                    | functionCallNoArgs
 
-    multilineFunctionCall           = multilineFunctionCallMultiArgs
+    multilineFunctionCall           = multilineFunctionCallNoArgs
+                                    | multilineFunctionCallMultiArgs
                                     | multilineFunctionCallSingleArg
-                                    | multilineFunctionCallNoArgs
 
-    nonAmpersandFunctionCall        = functionCallMultiArgs
+    nonAmpersandFunctionCall        = functionCallNoArgs
+                                    | functionCallMultiArgs
                                     | nonAmpersandFunctionCallSingleArg
-                                    | functionCallNoArgs
 
-    userFunctionCall                = userFunctionCallWithArgs
-                                    | userFunctionCallNoArgs
-
-    multilineUserFunctionCall       = multilineUserFunctionCallWithArgs
-                                    | multilineUserFunctionCallNoArgs
+    userFunctionCall                = userFunctionCallNoArgs | userFunctionCallWithArgs
+    multilineUserFunctionCall       = multilineUserFunctionCallNoArgs | multilineUserFunctionCallWithArgs
 
     functionCallNoArgs              = funcNameWithPrefix &delimiterChar (ws "(" mws ")")?
     functionCallSingleArg           = funcNameWithPrefix &delimiterChar ws ( parenthesizedExpression | expression )
@@ -323,6 +330,7 @@ QSP {
        ====================
     */
 
+    userStatementName     = nonDelimiterChar+
     userFunctionName      = nonDelimiterChar+
     funcNameWithPrefix    = typePrefix? functionName
     varName               = ~(keyword delimiterChar) ~digit nonDelimiterChar+
