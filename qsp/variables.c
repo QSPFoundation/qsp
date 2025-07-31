@@ -222,11 +222,6 @@ QSPVarsScope *qspSaveLocalVarsAndRestoreGlobals(void)
     return previousVarsScope;
 }
 
-void qspClearSavedLocalVars(QSPVarsScope *scope)
-{
-    qspClearLocalVarsScopes(scope);
-}
-
 void qspRestoreSavedLocalVars(QSPVarsScope *scope)
 {
     qspClearLocalVarsScopes(qspCurrentLocalVars);

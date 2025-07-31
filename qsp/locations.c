@@ -222,7 +222,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
         /* The variable might be updated during the previous code execution */
         if (!((var = qspVarReference(name, QSP_FALSE))))
         {
-            qspClearSavedLocalVars(savedLocalVars);
+            qspClearLocalVarsScopes(savedLocalVars);
             return;
         }
         if (ind >= var->ValsCount) break;
@@ -232,11 +232,12 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
         qspExecLocByNameWithArgs(locName, args, argsCount, QSP_FALSE, 0);
         if (qspLocationState != oldLocationState)
         {
-            qspClearSavedLocalVars(savedLocalVars);
+            qspClearLocalVarsScopes(savedLocalVars);
             return;
         }
         ++ind;
     }
+    /* Restore the local scope */
     qspRestoreSavedLocalVars(savedLocalVars);
 }
 

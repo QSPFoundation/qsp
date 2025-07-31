@@ -281,30 +281,23 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     QSPVar *var;
     QSPVarsBucket *bucket;
     QSP_BIGINT msecsCount;
-    QSPVarsScope *savedLocalVars;
-    int i, j, k, dataSize, oldLocationState;
-    /* Restore global variables */
-    savedLocalVars = qspSaveLocalVarsAndRestoreGlobals();
-    oldLocationState = qspLocationState;
+    int i, j, k, dataSize, oldLocationState = qspLocationState;
     /* Call ONGSAVE without local variables */
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_GAMETOBESAVED), 0, 0);
     if (qspLocationState != oldLocationState)
     {
-        qspClearSavedLocalVars(savedLocalVars);
         *bufSize = 0;
         return QSP_FALSE;
     }
     qspRefreshPlayList();
     if (qspLocationState != oldLocationState)
     {
-        qspClearSavedLocalVars(savedLocalVars);
         *bufSize = 0;
         return QSP_FALSE;
     }
     msecsCount = qspGetTime();
     if (qspLocationState != oldLocationState)
     {
-        qspClearSavedLocalVars(savedLocalVars);
         *bufSize = 0;
         return QSP_FALSE;
     }
@@ -373,7 +366,6 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         }
         ++bucket;
     }
-    qspRestoreSavedLocalVars(savedLocalVars);
     gameData = qspStringToFileData(qspBufTextToString(bufString), isUCS, &dataSize);
     qspFreeBufString(&bufString);
     if (dataSize > *bufSize)

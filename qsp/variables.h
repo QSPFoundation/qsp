@@ -66,7 +66,6 @@
     void qspClearGlobalVarsScope();
     void qspClearAllVars(QSP_BOOL toInit);
     QSPVarsScope *qspSaveLocalVarsAndRestoreGlobals(void);
-    void qspClearSavedLocalVars(QSPVarsScope *scope);
     void qspRestoreSavedLocalVars(QSPVarsScope *scope);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
