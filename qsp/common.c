@@ -73,8 +73,8 @@ void qspInitRuntime(void)
 void qspTerminateRuntime(void)
 {
     qspMemClear(QSP_FALSE);
-    qspClearGlobalVarsScope();
     qspCreateWorld(0, 0);
+    qspClearGlobalVarsScope();
     qspTerminateMath();
     qspResetError(QSP_FALSE);
 }
@@ -82,6 +82,10 @@ void qspTerminateRuntime(void)
 void qspPrepareExecution(QSP_BOOL toInit)
 {
     qspResetError(toInit);
+
+    /* Reset local variables & switch to the global scope */
+    qspClearLocalVarsScopes(qspCurrentLocalVars);
+    qspCurrentLocalVars = qspGlobalVars;
 
     /* Reset execution state */
     qspRealCurLoc = -1;
