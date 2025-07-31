@@ -5,6 +5,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+#include <stdlib.h>
 #include <stdarg.h>
 #include <locale.h>
 #include <time.h>

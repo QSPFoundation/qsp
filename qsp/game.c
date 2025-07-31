@@ -143,8 +143,6 @@ QSP_BOOL qspNewGame(QSP_BOOL toReset)
         qspTimerInterval = QSP_DEFTIMERINTERVAL;
         qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
         qspMemClear(QSP_FALSE);
-        /* Init ARGS & RESULT */
-        qspInitSpecialVars();
         /* Execute callbacks to update the current state */
         qspResetTime(0);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
@@ -282,36 +280,31 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     QSPBufString bufString;
     QSPVar *var;
     QSPVarsBucket *bucket;
-    QSPVarsGroup *savedVarGroups;
     QSP_BIGINT msecsCount;
-    int i, j, k, dataSize, savedVarGroupsCount, oldLocationState;
+    QSPVarsScope *savedLocalVars;
+    int i, j, k, dataSize, oldLocationState;
     /* Restore global variables */
-    savedVarGroupsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVarGroups);
-    if (qspErrorNum)
-    {
-        *bufSize = 0;
-        return QSP_FALSE;
-    }
+    savedLocalVars = qspSaveLocalVarsAndRestoreGlobals();
     oldLocationState = qspLocationState;
     /* Call ONGSAVE without local variables */
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_GAMETOBESAVED), 0, 0);
     if (qspLocationState != oldLocationState)
     {
-        qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+        qspClearSavedLocalVars(savedLocalVars);
         *bufSize = 0;
         return QSP_FALSE;
     }
     qspRefreshPlayList();
     if (qspLocationState != oldLocationState)
     {
-        qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+        qspClearSavedLocalVars(savedLocalVars);
         *bufSize = 0;
         return QSP_FALSE;
     }
     msecsCount = qspGetTime();
     if (qspLocationState != oldLocationState)
     {
-        qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+        qspClearSavedLocalVars(savedLocalVars);
         *bufSize = 0;
         return QSP_FALSE;
     }
@@ -359,8 +352,8 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Image, isUCS);
         qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Desc, isUCS);
     }
-    bucket = qspVars;
-    for (i = 0; i < QSP_VARSBUCKETS; ++i)
+    bucket = qspGlobalVars->Buckets; /* use the global scope */
+    for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i)
     {
         qspAppendEncodedIntVal(&bufString, bucket->VarsCount, isUCS);
         var = bucket->Vars;
@@ -380,13 +373,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         }
         ++bucket;
     }
-    qspRestoreSavedLocalVars(savedVarGroups, savedVarGroupsCount);
-    if (qspErrorNum)
-    {
-        qspFreeBufString(&bufString);
-        *bufSize = 0;
-        return QSP_FALSE;
-    }
+    qspRestoreSavedLocalVars(savedLocalVars);
     gameData = qspStringToFileData(qspBufTextToString(bufString), isUCS, &dataSize);
     qspFreeBufString(&bufString);
     if (dataSize > *bufSize)
@@ -469,11 +456,11 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     if (count < 0 || count > QSP_MAXOBJECTS || selObject >= count) return QSP_FALSE;
     /* objects: image + description */
     if (!qspSkipLines(strsCount, 2 * count, &ind)) return QSP_FALSE;
-    for (i = 0; i < QSP_VARSBUCKETS; ++i)
+    for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i)
     {
         /* variables count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
-        if (count < 0 || count > QSP_VARSBUCKETSIZE) return QSP_FALSE;
+        if (count < 0 || count > QSP_VARSMAXBUCKETSIZE) return QSP_FALSE;
         /* variables */
         for (j = 0; j < count; ++j)
         {
@@ -572,15 +559,15 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         qspCurObjects[i].Image = qspDecodeString(strs[ind++], isUCS);
         qspCurObjects[i].Desc = qspDecodeString(strs[ind++], isUCS);
     }
-    bucket = qspVars;
-    for (i = 0; i < QSP_VARSBUCKETS; ++i)
+    bucket = qspGlobalVars->Buckets; /* use the global scope */
+    for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i)
     {
         varsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
-        bucket->VarsCount = varsCount;
+        bucket->Capacity = bucket->VarsCount = varsCount;
         bucket->Vars = 0;
         if (varsCount)
         {
-            var = bucket->Vars = (QSPVar *)malloc(QSP_VARSBUCKETSIZE * sizeof(QSPVar));
+            var = bucket->Vars = (QSPVar *)malloc(varsCount * sizeof(QSPVar));
             for (j = 0; j < varsCount; ++j)
             {
                 var->Name = qspDecodeString(strs[ind++], isUCS);
@@ -614,8 +601,6 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurLoc = qspLocIndex(locName);
     qspFreeString(&locName);
     qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjsListChanged = qspIsActsListChanged = QSP_TRUE;
-    /* Init ARGS & RESULT */
-    qspInitSpecialVars();
     /* Execute callbacks to update the current state */
     oldLocationState = qspLocationState;
     qspResetTime(msecsCount);
