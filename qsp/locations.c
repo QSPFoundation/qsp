@@ -203,7 +203,7 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT args
     if (qspLocationState != oldLocationState) return;
 
     if (res && !qspApplyResult(res)) return;
-    qspRemoveLocalScope();
+    qspRemoveLastLocalScope();
 }
 
 void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount)
@@ -261,6 +261,6 @@ void qspNavigateToLocation(int locInd, QSP_BOOL toChangeDesc, QSPVariant *args, 
     qspExecLocByIndex(locInd, toChangeDesc);
     if (qspLocationState != oldLocationState) return;
 
-    qspRemoveLocalScope();
+    qspRemoveLastLocalScope();
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_NEWLOC), args, argsCount);
 }

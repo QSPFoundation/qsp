@@ -184,7 +184,7 @@
         return scope;
     }
 
-    INLINE void qspRemoveLocalScope(void)
+    INLINE void qspRemoveLastLocalScope(void)
     {
         QSPVarsScope *scope = qspCurrentLocalVars;
         if (scope && scope->ParentScope)
