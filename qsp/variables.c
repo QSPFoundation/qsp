@@ -24,7 +24,10 @@ INLINE int qspIndStringFloorCompare(const void *name, const void *compareTo);
 INLINE int qspValuePositionsAscCompare(const void *arg1, const void *arg2);
 INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2);
 INLINE unsigned int qspGetNameHash(QSPString name);
+INLINE QSPVar *qspCreateNewVar(QSPVarsBucket *bucket, QSPString name, int capacityIncrement);
 INLINE QSPVar *qspAddVarToLocals(QSPString name);
+INLINE QSPVar *qspAddSpecialVarToScope(QSPVarsScope *scope, QSPString name);
+INLINE void qspSetVarValuesByReference(QSPVar *var, QSPVariant *vals, int count, QSP_BOOL toMove);
 INLINE void qspRemoveArrayItem(QSPVar *var, int index);
 INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation);
 INLINE QSP_BOOL qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);
@@ -158,9 +161,25 @@ void qspClearAllVars(QSP_BOOL toInit)
     qspCurrentLocalVars = globalScope;
 }
 
+INLINE QSPVar *qspCreateNewVar(QSPVarsBucket *bucket, QSPString name, int capacityIncrement)
+{
+    QSPVar *var;
+    if (bucket->VarsCount >= bucket->Capacity)
+    {
+        bucket->Capacity = bucket->VarsCount + capacityIncrement;
+        bucket->Vars = (QSPVar *)realloc(bucket->Vars, bucket->Capacity * sizeof(QSPVar));
+    }
+    var = bucket->Vars + bucket->VarsCount;
+    var->Name = qspCopyToNewText(name);
+    qspInitVarData(var);
+
+    bucket->VarsCount++;
+    return var;
+}
+
 INLINE QSPVar *qspAddVarToLocals(QSPString name)
 {
-    int i, varsCount;
+    int i;
     unsigned int nameHash;
     QSPVarsScope *scope;
     QSPVarsBucket *bucket;
@@ -184,35 +203,88 @@ INLINE QSPVar *qspAddVarToLocals(QSPString name)
     nameHash = qspGetNameHash(name);
     scope = qspCurrentLocalVars;
     if (!scope->Buckets)
-        qspInitVarsScope(scope); /* init the scope only if it's used */
+        qspInitVarsScope(scope); /* init the scope the first time it's used */
 
     /* Check if the variable already exists in the current scope */
     bucket = scope->Buckets + (nameHash % scope->BucketsCount);
     var = bucket->Vars;
-    varsCount = bucket->VarsCount;
-    for (i = varsCount; i > 0; --i)
+    for (i = bucket->VarsCount; i > 0; --i)
     {
         if (!qspStrsCompare(var->Name, name)) return var;
         ++var;
     }
 
     /* It doesn't exist yet, so we have to add it */
-    if (varsCount >= QSP_VARSMAXBUCKETSIZE)
+    if (bucket->VarsCount >= QSP_VARSMAXBUCKETSIZE)
     {
         qspSetError(QSP_ERR_TOOMANYVARS);
         return 0;
     }
-    if (varsCount >= bucket->Capacity)
-    {
-        bucket->Capacity = varsCount + 8;
-        bucket->Vars = (QSPVar *)realloc(bucket->Vars, bucket->Capacity * sizeof(QSPVar));
-    }
-    var = bucket->Vars + varsCount;
-    var->Name = qspCopyToNewText(name);
-    qspInitVarData(var);
+    return qspCreateNewVar(bucket, name, 8);
+}
 
-    bucket->VarsCount++;
-    return var;
+INLINE QSPVar *qspAddSpecialVarToScope(QSPVarsScope *scope, QSPString name)
+{
+    unsigned int nameHash = qspGetNameHash(name); /* we don't validate the name */
+    QSPVarsBucket *bucket = scope->Buckets + (nameHash % scope->BucketsCount);
+
+    return qspCreateNewVar(bucket, name, 2); /* small increment for special vars */
+}
+
+INLINE void qspSetVarValuesByReference(QSPVar *var, QSPVariant *vals, int count, QSP_BOOL toMove)
+{
+    if (count)
+    {
+        int i;
+        var->ValsCapacity = var->ValsCount = count;
+        var->Values = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+        if (toMove)
+        {
+            for (i = 0; i < count; ++i)
+                qspMoveToNewVariant(var->Values + i, vals + i);
+        }
+        else
+        {
+            for (i = 0; i < count; ++i)
+                qspCopyToNewVariant(var->Values + i, vals + i);
+        }
+    }
+}
+
+QSPVarsScope *qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove)
+{
+    QSPVar *varArgs;
+    QSPVarsScope *scope = qspAllocateLocalScope();
+    qspInitVarsScope(scope); /* immediately init the scope */
+
+    varArgs = qspAddSpecialVarToScope(scope, QSP_STATIC_STR(QSP_VARARGS));
+    qspSetVarValuesByReference(varArgs, args, count, toMove);
+
+    qspAddSpecialVarToScope(scope, QSP_STATIC_STR(QSP_VARRES));
+
+    return scope;
+}
+
+QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove)
+{
+    QSPVar *varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE);
+    if (!varArgs) return QSP_FALSE;
+
+    qspEmptyVar(varArgs);
+    qspSetVarValuesByReference(varArgs, args, count, toMove);
+    return QSP_TRUE;
+}
+
+QSP_BOOL qspApplyResult(QSPVariant *res)
+{
+    QSPVar *varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_FALSE);
+    if (!varRes) return QSP_FALSE;
+
+    if (varRes->ValsCount)
+        qspCopyToNewVariant(res, varRes->Values);
+    else
+        qspInitVariant(res, QSP_TYPE_UNDEF);
+    return QSP_TRUE;
 }
 
 QSPVarsScope *qspSaveLocalVarsAndRestoreGlobals(void)
@@ -272,26 +344,14 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
 
     if (toCreate)
     {
-        int varsCount;
         /* Create it in the global scope */
         bucket = qspGlobalVars->Buckets + (nameHash % qspGlobalVars->BucketsCount);
-        varsCount = bucket->VarsCount;
-        if (varsCount >= QSP_VARSMAXBUCKETSIZE)
+        if (bucket->VarsCount >= QSP_VARSMAXBUCKETSIZE)
         {
             qspSetError(QSP_ERR_TOOMANYVARS);
             return 0;
         }
-        if (varsCount >= bucket->Capacity)
-        {
-            bucket->Capacity = varsCount + 8;
-            bucket->Vars = (QSPVar *)realloc(bucket->Vars, bucket->Capacity * sizeof(QSPVar));
-        }
-        var = bucket->Vars + varsCount;
-        var->Name = qspCopyToNewText(name);
-        qspInitVarData(var);
-
-        bucket->VarsCount++;
-        return var;
+        return qspCreateNewVar(bucket, name, 8);
     }
     return &qspNullVar;
 }
@@ -831,43 +891,6 @@ QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
     }
     if (bestValue) qspCopyToNewVariant(&resultValue, bestValue);
     return resultValue;
-}
-
-QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove)
-{
-    QSPVar *varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_TRUE);
-    if (!varArgs) return QSP_FALSE;
-
-    qspEmptyVar(varArgs);
-    if (count)
-    {
-        int i;
-        varArgs->ValsCapacity = varArgs->ValsCount = count;
-        varArgs->Values = (QSPVariant *)malloc(count * sizeof(QSPVariant));
-        if (toMove)
-        {
-            for (i = 0; i < count; ++i)
-                qspMoveToNewVariant(varArgs->Values + i, args + i);
-        }
-        else
-        {
-            for (i = 0; i < count; ++i)
-                qspCopyToNewVariant(varArgs->Values + i, args + i);
-        }
-    }
-    return QSP_TRUE;
-}
-
-QSP_BOOL qspApplyResult(QSPVariant *res)
-{
-    QSPVar *varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_FALSE);
-    if (!varRes) return QSP_FALSE;
-
-    if (varRes->ValsCount)
-        qspCopyToNewVariant(res, varRes->Values);
-    else
-        qspInitVariant(res, QSP_TYPE_UNDEF);
-    return QSP_TRUE;
 }
 
 INLINE int qspGetVarsNames(QSPString names, QSPString **varNames)

@@ -65,6 +65,9 @@
     void qspInitGlobalVarsScope();
     void qspClearGlobalVarsScope();
     void qspClearAllVars(QSP_BOOL toInit);
+    QSPVarsScope *qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove);
+    QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
+    QSP_BOOL qspApplyResult(QSPVariant *res);
     QSPVarsScope *qspSaveLocalVarsAndRestoreGlobals(void);
     void qspRestoreSavedLocalVars(QSPVarsScope *scope);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
@@ -77,8 +80,6 @@
     int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
     QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin);
-    QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
-    QSP_BOOL qspApplyResult(QSPVariant *res);
     /* Statements */
     void qspStatementSetVarsValues(QSPString s, QSPCachedStat *stat);
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);

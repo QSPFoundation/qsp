@@ -195,8 +195,7 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT args
         qspSetError(QSP_ERR_LOCNOTFOUND);
         return;
     }
-    qspAllocateLocalScope();
-    if (!qspSetArgs(args, argsCount, toMoveArgs)) return;
+    qspAllocateLocalScopeWithArgs(args, argsCount, toMoveArgs);
 
     oldLocationState = qspLocationState;
     qspExecLocByIndex(locInd, QSP_FALSE);

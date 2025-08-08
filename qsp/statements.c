@@ -707,8 +707,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
 {
     QSPLineOfCode *strs;
     int oldLocationState, linesCount;
-    qspAllocateLocalScope();
-    if (!qspSetArgs(args, count, QSP_TRUE)) return;
+    qspAllocateLocalScopeWithArgs(args, count, QSP_TRUE);
 
     linesCount = qspPreprocessData(s, &strs);
     oldLocationState = qspLocationState;
