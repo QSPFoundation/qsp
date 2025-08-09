@@ -42,6 +42,8 @@ INLINE double qspNormalInvCdf(double p);
 
 void qspInitRuntime(void)
 {
+    setlocale(LC_ALL, QSP_LOCALE);
+
     qspNullString = qspStringFromPair(0, 0);
     qspNullTuple = qspCopyToNewTuple(0, 0);
     qspNullVar = qspGetUnknownVar();
@@ -57,24 +59,22 @@ void qspInitRuntime(void)
     qspCurLoc = -1;
     qspTimerInterval = 0;
     qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
-    qspArgsVar = qspResultVar = 0;
 
-    setlocale(LC_ALL, QSP_LOCALE);
     qspSetSeed(0);
     qspInitVarTypes();
     qspInitSymbolClasses();
+    qspInitVarsScope(&qspGlobalVars, QSP_VARSGLOBALBUCKETS);
     qspPrepareExecution(QSP_TRUE);
     qspMemClear(QSP_TRUE);
     qspInitCallbacks();
     qspInitStats();
     qspInitMath();
-    /* Init ARGS & RESULT */
-    qspInitSpecialVars();
 }
 
 void qspTerminateRuntime(void)
 {
     qspMemClear(QSP_FALSE);
+    qspClearVarsScope(&qspGlobalVars); /* completely destroy the global scope */
     qspCreateWorld(0, 0);
     qspTerminateMath();
     qspResetError(QSP_FALSE);
@@ -83,6 +83,10 @@ void qspTerminateRuntime(void)
 void qspPrepareExecution(QSP_BOOL toInit)
 {
     qspResetError(toInit);
+
+    /* Reset local variables & switch to the global scope */
+    qspClearLocalVarsScopes(qspCurrentLocalVars);
+    qspCurrentLocalVars = 0;
 
     /* Reset execution state */
     qspRealCurLoc = -1;
@@ -118,25 +122,11 @@ void qspMemClear(QSP_BOOL toInit)
 
         qspFreeString(&qspCurInput);
         qspFreeString(&qspViewPath);
-
-        if (qspSavedVarGroups)
-        {
-            int i;
-            for (i = qspSavedVarGroupsCount - 1; i >= 0; --i)
-            {
-                qspClearSpecialVars(qspSavedVarGroups + i);
-                qspClearVars(qspSavedVarGroups[i].Vars, qspSavedVarGroups[i].VarsCount);
-            }
-            free(qspSavedVarGroups);
-        }
     }
     qspCurDesc = qspNewBufString(512);
     qspCurVars = qspNewBufString(512);
     qspCurInput = qspNullString;
     qspViewPath = qspNullString;
-    qspSavedVarGroups = 0;
-    qspSavedVarGroupsCount = 0;
-    qspSavedVarGroupsBufSize = 0;
 }
 
 void qspSetSeed(unsigned int seed)

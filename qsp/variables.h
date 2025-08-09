@@ -13,9 +13,10 @@
 #ifndef QSP_VARSDEFINES
     #define QSP_VARSDEFINES
 
-    #define QSP_VARSBUCKETS 1024
-    #define QSP_VARSBUCKETSIZE 32
-    #define QSP_VARGROUPSBATCHSIZE 256
+    #define QSP_VARSGLOBALBUCKETS 512
+    #define QSP_VARSLOCALBUCKETS 16
+    #define QSP_VARSMAXBUCKETSIZE 32
+    #define QSP_VARSSCOPECHUNKSIZE 128
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
 
@@ -40,52 +41,50 @@
     {
         QSPVar *Vars;
         int VarsCount;
+        int Capacity;
     } QSPVarsBucket;
 
     typedef struct
     {
-        QSP_BOOL HasSpecialVars;
-        QSPVar ArgsVar;
-        QSPVar ResultVar;
-        QSPVar *Vars;
-        int VarsCount;
-        int Capacity;
-    } QSPVarsGroup;
+        QSPVarsBucket *Buckets;
+        int BucketsCount;
+    } QSPVarsScope;
+
+    typedef struct QSPVarsScopeChunk_s QSPVarsScopeChunk;
+
+    typedef struct QSPVarsScopeChunk_s
+    {
+        QSPVarsScope Slots[QSP_VARSSCOPECHUNKSIZE];
+        int SlotsCount;
+        QSPVarsScopeChunk *ParentChunk;
+    } QSPVarsScopeChunk;
 
     extern QSPVar qspNullVar;
-    extern QSPVarsBucket qspVars[QSP_VARSBUCKETS];
-    extern QSPVarsGroup *qspSavedVarGroups;
-    extern int qspSavedVarGroupsCount;
-    extern int qspSavedVarGroupsBufSize;
-    extern QSPVar *qspArgsVar;
-    extern QSPVar *qspResultVar;
+    extern QSPVarsScope qspGlobalVars; /* there's only one global scope, we don't recreate it */
+    extern QSPVarsScopeChunk *qspCurrentLocalVars; /* local scopes can be recreated */
 
     extern QSP_TINYINT qspSpecToBaseTypeTable[128];
 
     /* External functions */
     void qspInitVarTypes(void);
-    QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
+    void qspClearVars(QSPVarsScope *scope);
+    void qspClearLocalVarsScopes(QSPVarsScopeChunk *chunk);
     void qspClearAllVars(QSP_BOOL toInit);
-    QSP_BOOL qspInitSpecialVars(void);
+    QSPVarsScope *qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove);
+    QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
+    QSP_BOOL qspApplyResult(QSPVariant *res);
+    QSPVarsScopeChunk *qspSaveLocalVarsAndRestoreGlobals(void);
+    void qspRestoreSavedLocalVars(QSPVarsScopeChunk *chunk);
+    QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
     QSP_BOOL qspGetFirstVarValue(QSPString varName, QSPVariant *res);
     QSP_BOOL qspGetLastVarValue(QSPString varName, QSPVariant *res);
     QSPString qspGetVarStrValue(QSPString name);
     QSP_BIGINT qspGetVarNumValue(QSPString name);
-    void qspRestoreGlobalVars(void);
-    int qspSaveLocalVarsAndRestoreGlobals(QSPVarsGroup **savedVarGroups);
-    void qspClearSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount);
-    void qspRestoreSavedLocalVars(QSPVarsGroup *varGroups, int groupsCount);
-    void qspRestoreVars(QSPVar *vars, int count);
-    void qspClearVars(QSPVar *vars, int count);
-    void qspRestoreSpecialVars(QSPVarsGroup *varGroup);
-    void qspClearSpecialVars(QSPVarsGroup *varGroup);
     int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp);
     QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin);
-    void qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
-    void qspApplyResult(QSPVariant *res);
     /* Statements */
     void qspStatementSetVarsValues(QSPString s, QSPCachedStat *stat);
     void qspStatementLocal(QSPString s, QSPCachedStat *stat);
@@ -155,48 +154,64 @@
         return var;
     }
 
-    INLINE QSPVarsGroup *qspAllocateSavedVarsGroup()
+    INLINE void qspInitVarsScope(QSPVarsScope *scope, int buckets)
     {
-        QSPVarsGroup *varsGroup;
-        int groupInd = qspSavedVarGroupsCount++;
-        if (groupInd >= qspSavedVarGroupsBufSize)
+        int i;
+        QSPVarsBucket *bucket;
+        scope->BucketsCount = buckets;
+        bucket = scope->Buckets = (QSPVarsBucket *)malloc(scope->BucketsCount * sizeof(QSPVarsBucket));
+        for (i = scope->BucketsCount; i > 0; --i, ++bucket)
         {
-            qspSavedVarGroupsBufSize = groupInd + QSP_VARGROUPSBATCHSIZE;
-            qspSavedVarGroups = (QSPVarsGroup *)realloc(qspSavedVarGroups, qspSavedVarGroupsBufSize * sizeof(QSPVarsGroup));
-        }
-        varsGroup = qspSavedVarGroups + groupInd;
-        varsGroup->Vars = 0;
-        varsGroup->Capacity = varsGroup->VarsCount = 0;
-        varsGroup->HasSpecialVars = QSP_FALSE;
-        return varsGroup;
-    }
-
-    INLINE QSPVarsGroup *qspAllocateSavedVarsGroupWithArgs()
-    {
-        QSPVarsGroup *varsGroup = qspAllocateSavedVarsGroup();
-        qspMoveVar(&varsGroup->ArgsVar, qspArgsVar);
-        qspMoveVar(&varsGroup->ResultVar, qspResultVar);
-        varsGroup->HasSpecialVars = QSP_TRUE;
-        return varsGroup;
-    }
-
-    INLINE void qspClearLastSavedVarsGroup()
-    {
-        if (qspSavedVarGroupsCount)
-        {
-            QSPVarsGroup *varsGroup = &qspSavedVarGroups[--qspSavedVarGroupsCount];
-            qspClearSpecialVars(varsGroup);
-            qspClearVars(varsGroup->Vars, varsGroup->VarsCount);
+            bucket->Vars = 0;
+            bucket->Capacity = bucket->VarsCount = 0;
         }
     }
 
-    INLINE void qspRestoreLastSavedVarsGroup()
+    INLINE void qspClearVarsScope(QSPVarsScope *scope)
     {
-        if (qspSavedVarGroupsCount)
+        if (scope->Buckets)
         {
-            QSPVarsGroup *varsGroup = &qspSavedVarGroups[--qspSavedVarGroupsCount];
-            qspRestoreVars(varsGroup->Vars, varsGroup->VarsCount);
-            qspRestoreSpecialVars(varsGroup); /* special vars can override regular vars */
+            qspClearVars(scope);
+            free(scope->Buckets);
+        }
+    }
+
+    INLINE QSPVarsScope *qspAllocateLocalScope(void)
+    {
+        QSPVarsScope *scope;
+        QSPVarsScopeChunk *chunk = qspCurrentLocalVars;
+
+        if (chunk && chunk->SlotsCount < QSP_VARSSCOPECHUNKSIZE)
+            scope = &chunk->Slots[chunk->SlotsCount++];
+        else
+        {
+            /* Allocate a new chunk */
+            chunk = (QSPVarsScopeChunk *)malloc(sizeof(QSPVarsScopeChunk));
+            chunk->ParentChunk = qspCurrentLocalVars;
+            chunk->SlotsCount = 1;
+            qspCurrentLocalVars = chunk;
+
+            scope = chunk->Slots;
+        }
+
+        /* We allocate the scope, but don't initialize it */
+        scope->Buckets = 0;
+        scope->BucketsCount = 0;
+        return scope;
+    }
+
+    INLINE void qspRemoveLastLocalScope(void)
+    {
+        QSPVarsScopeChunk *chunk = qspCurrentLocalVars;
+        if (chunk)
+        {
+            qspClearVarsScope(&chunk->Slots[--chunk->SlotsCount]);
+
+            if (!chunk->SlotsCount)
+            {
+                qspCurrentLocalVars = chunk->ParentChunk;
+                free(chunk);
+            }
         }
     }
 

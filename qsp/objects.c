@@ -64,24 +64,15 @@ INLINE void qspSendRemovalNotifications(QSPString *objNames, int count)
     if (count >= 2)
     {
         QSPVariant objName;
-        int i, oldLocationState, savedVarGroupsCount;
-        QSPVarsGroup *savedVarGroups;
-        /* Restore global variables here to optimize internal qspExecLocByVarNameWithArgs calls */
-        savedVarGroupsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVarGroups);
-        if (qspErrorNum) return;
+        int i, oldLocationState;
         objName.Type = QSP_TYPE_STR;
         oldLocationState = qspLocationState;
         for (i = 0; i < count; ++i)
         {
             QSP_STR(objName) = objNames[i];
             qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJDELETED), &objName, 1);
-            if (qspLocationState != oldLocationState)
-            {
-                qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
-                return;
-            }
+            if (qspLocationState != oldLocationState) return;
         }
-        qspRestoreSavedLocalVars(savedVarGroups, savedVarGroupsCount);
     }
     else if (count == 1)
     {

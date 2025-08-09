@@ -159,7 +159,7 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         else
             qspAddAction(actionName, qspNullString, loc->Actions[i].OnPressLines, 0, loc->Actions[i].OnPressLinesCount);
         qspFreeString(&actionName);
-        if (qspErrorNum)
+        if (qspLocationState != oldLocationState)
         {
             qspRealLine = oldLine;
             qspRealLineNum = oldLineNum;
@@ -195,28 +195,24 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT args
         qspSetError(QSP_ERR_LOCNOTFOUND);
         return;
     }
-    qspAllocateSavedVarsGroupWithArgs();
-    qspSetArgs(args, argsCount, toMoveArgs);
+    qspAllocateLocalScopeWithArgs(args, argsCount, toMoveArgs);
+
     oldLocationState = qspLocationState;
     qspExecLocByIndex(locInd, QSP_FALSE);
-    if (qspLocationState != oldLocationState)
-    {
-        qspClearLastSavedVarsGroup();
-        return;
-    }
-    if (res) qspApplyResult(res);
-    qspRestoreLastSavedVarsGroup();
+    if (qspLocationState != oldLocationState) return;
+
+    if (res && !qspApplyResult(res)) return;
+    qspRemoveLastLocalScope();
 }
 
 void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount)
 {
     QSPVar *var;
     QSPString locName;
-    QSPVarsGroup *savedVarGroups;
-    int ind, oldLocationState, savedVarGroupsCount;
+    QSPVarsScopeChunk *savedLocalVars;
+    int ind, oldLocationState;
     /* Restore global variables */
-    savedVarGroupsCount = qspSaveLocalVarsAndRestoreGlobals(&savedVarGroups);
-    if (qspErrorNum) return;
+    savedLocalVars = qspSaveLocalVarsAndRestoreGlobals();
     /* We execute all locations specified in the array */
     oldLocationState = qspLocationState;
     ind = 0;
@@ -225,7 +221,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
         /* The variable might be updated during the previous code execution */
         if (!((var = qspVarReference(name, QSP_FALSE))))
         {
-            qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+            qspClearLocalVarsScopes(savedLocalVars);
             return;
         }
         if (ind >= var->ValsCount) break;
@@ -235,12 +231,13 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
         qspExecLocByNameWithArgs(locName, args, argsCount, QSP_FALSE, 0);
         if (qspLocationState != oldLocationState)
         {
-            qspClearSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+            qspClearLocalVarsScopes(savedLocalVars);
             return;
         }
         ++ind;
     }
-    qspRestoreSavedLocalVars(savedVarGroups, savedVarGroupsCount);
+    /* Restore the local scope */
+    qspRestoreSavedLocalVars(savedLocalVars);
 }
 
 void qspNavigateToLocation(int locInd, QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT argsCount)
@@ -248,22 +245,21 @@ void qspNavigateToLocation(int locInd, QSP_BOOL toChangeDesc, QSPVariant *args, 
     int oldLocationState;
     if (locInd < 0 || locInd >= qspLocsCount) return;
     qspCurLoc = locInd;
-    qspRestoreGlobalVars(); /* clean all local variables */
-    if (qspErrorNum) return;
+    /* Restore global variables */
+    qspClearLocalVarsScopes(qspCurrentLocalVars);
+    qspCurrentLocalVars = 0;
     /* We assign global ARGS here */
-    qspSetArgs(args, argsCount, QSP_FALSE);
+    if (!qspSetArgs(args, argsCount, QSP_FALSE)) return;
+
     qspClearAllActions(QSP_FALSE);
     ++qspLocationState;
     if (toChangeDesc) ++qspFullRefreshCount;
-    qspAllocateSavedVarsGroup();
+    qspAllocateLocalScope();
+
     oldLocationState = qspLocationState;
     qspExecLocByIndex(locInd, toChangeDesc);
-    if (qspLocationState != oldLocationState)
-    {
-        qspClearLastSavedVarsGroup();
-        return;
-    }
-    qspRestoreLastSavedVarsGroup();
-    if (qspErrorNum) return;
+    if (qspLocationState != oldLocationState) return;
+
+    qspRemoveLastLocalScope();
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_NEWLOC), args, argsCount);
 }
