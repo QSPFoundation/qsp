@@ -42,6 +42,8 @@ INLINE double qspNormalInvCdf(double p);
 
 void qspInitRuntime(void)
 {
+    setlocale(LC_ALL, QSP_LOCALE);
+
     qspNullString = qspStringFromPair(0, 0);
     qspNullTuple = qspCopyToNewTuple(0, 0);
     qspNullVar = qspGetUnknownVar();
@@ -58,11 +60,10 @@ void qspInitRuntime(void)
     qspTimerInterval = 0;
     qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
 
-    setlocale(LC_ALL, QSP_LOCALE);
     qspSetSeed(0);
     qspInitVarTypes();
     qspInitSymbolClasses();
-    qspInitGlobalVarsScope();
+    qspInitVarsScope(&qspGlobalVars, QSP_VARSGLOBALBUCKETS);
     qspPrepareExecution(QSP_TRUE);
     qspMemClear(QSP_TRUE);
     qspInitCallbacks();
@@ -73,8 +74,8 @@ void qspInitRuntime(void)
 void qspTerminateRuntime(void)
 {
     qspMemClear(QSP_FALSE);
+    qspClearVarsScope(&qspGlobalVars); /* completely destroy the global scope */
     qspCreateWorld(0, 0);
-    qspClearGlobalVarsScope();
     qspTerminateMath();
     qspResetError(QSP_FALSE);
 }
@@ -85,7 +86,7 @@ void qspPrepareExecution(QSP_BOOL toInit)
 
     /* Reset local variables & switch to the global scope */
     qspClearLocalVarsScopes(qspCurrentLocalVars);
-    qspCurrentLocalVars = qspGlobalVars;
+    qspCurrentLocalVars = 0;
 
     /* Reset execution state */
     qspRealCurLoc = -1;

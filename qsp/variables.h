@@ -16,6 +16,7 @@
     #define QSP_VARSGLOBALBUCKETS 512
     #define QSP_VARSLOCALBUCKETS 16
     #define QSP_VARSMAXBUCKETSIZE 32
+    #define QSP_VARSSCOPECHUNKSIZE 128
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
 
@@ -43,33 +44,37 @@
         int Capacity;
     } QSPVarsBucket;
 
-    typedef struct QSPVarsScope_s QSPVarsScope;
-
-    typedef struct QSPVarsScope_s
+    typedef struct
     {
-        QSPVarsScope *ParentScope;
         QSPVarsBucket *Buckets;
         int BucketsCount;
     } QSPVarsScope;
 
+    typedef struct QSPVarsScopeChunk_s QSPVarsScopeChunk;
+
+    typedef struct QSPVarsScopeChunk_s
+    {
+        QSPVarsScope Slots[QSP_VARSSCOPECHUNKSIZE];
+        int SlotsCount;
+        QSPVarsScopeChunk *ParentChunk;
+    } QSPVarsScopeChunk;
+
     extern QSPVar qspNullVar;
-    extern QSPVarsScope *qspGlobalVars; /* there's only one global scope, we don't recreate it */
-    extern QSPVarsScope *qspCurrentLocalVars; /* local scopes can be recreated */
+    extern QSPVarsScope qspGlobalVars; /* there's only one global scope, we don't recreate it */
+    extern QSPVarsScopeChunk *qspCurrentLocalVars; /* local scopes can be recreated */
 
     extern QSP_TINYINT qspSpecToBaseTypeTable[128];
 
     /* External functions */
     void qspInitVarTypes(void);
     void qspClearVars(QSPVarsScope *scope);
-    void qspClearLocalVarsScopes(QSPVarsScope *scope);
-    void qspInitGlobalVarsScope();
-    void qspClearGlobalVarsScope();
+    void qspClearLocalVarsScopes(QSPVarsScopeChunk *chunk);
     void qspClearAllVars(QSP_BOOL toInit);
     QSPVarsScope *qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspApplyResult(QSPVariant *res);
-    QSPVarsScope *qspSaveLocalVarsAndRestoreGlobals(void);
-    void qspRestoreSavedLocalVars(QSPVarsScope *scope);
+    QSPVarsScopeChunk *qspSaveLocalVarsAndRestoreGlobals(void);
+    void qspRestoreSavedLocalVars(QSPVarsScopeChunk *chunk);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
@@ -149,12 +154,11 @@
         return var;
     }
 
-    INLINE void qspInitVarsScope(QSPVarsScope *scope)
+    INLINE void qspInitVarsScope(QSPVarsScope *scope, int buckets)
     {
         int i;
         QSPVarsBucket *bucket;
-        /* The parent scope had to be set already */
-        scope->BucketsCount = (scope->ParentScope ? QSP_VARSLOCALBUCKETS : QSP_VARSGLOBALBUCKETS);
+        scope->BucketsCount = buckets;
         bucket = scope->Buckets = (QSPVarsBucket *)malloc(scope->BucketsCount * sizeof(QSPVarsBucket));
         for (i = scope->BucketsCount; i > 0; --i, ++bucket)
         {
@@ -170,29 +174,44 @@
             qspClearVars(scope);
             free(scope->Buckets);
         }
-        free(scope);
     }
 
     INLINE QSPVarsScope *qspAllocateLocalScope(void)
     {
+        QSPVarsScope *scope;
+        QSPVarsScopeChunk *chunk = qspCurrentLocalVars;
+
+        if (chunk && chunk->SlotsCount < QSP_VARSSCOPECHUNKSIZE)
+            scope = &chunk->Slots[chunk->SlotsCount++];
+        else
+        {
+            /* Allocate a new chunk */
+            chunk = (QSPVarsScopeChunk *)malloc(sizeof(QSPVarsScopeChunk));
+            chunk->ParentChunk = qspCurrentLocalVars;
+            chunk->SlotsCount = 1;
+            qspCurrentLocalVars = chunk;
+
+            scope = chunk->Slots;
+        }
+
         /* We allocate the scope, but don't initialize it */
-        QSPVarsScope *scope = (QSPVarsScope *)malloc(sizeof(QSPVarsScope));
-        scope->ParentScope = qspCurrentLocalVars;
         scope->Buckets = 0;
         scope->BucketsCount = 0;
-
-        qspCurrentLocalVars = scope;
         return scope;
     }
 
     INLINE void qspRemoveLastLocalScope(void)
     {
-        QSPVarsScope *scope = qspCurrentLocalVars;
-        if (scope && scope->ParentScope)
+        QSPVarsScopeChunk *chunk = qspCurrentLocalVars;
+        if (chunk)
         {
-            qspCurrentLocalVars = scope->ParentScope;
+            qspClearVarsScope(&chunk->Slots[--chunk->SlotsCount]);
 
-            qspClearVarsScope(scope);
+            if (!chunk->SlotsCount)
+            {
+                qspCurrentLocalVars = chunk->ParentChunk;
+                free(chunk);
+            }
         }
     }
 

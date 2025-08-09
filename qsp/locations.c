@@ -209,7 +209,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
 {
     QSPVar *var;
     QSPString locName;
-    QSPVarsScope *savedLocalVars;
+    QSPVarsScopeChunk *savedLocalVars;
     int ind, oldLocationState;
     /* Restore global variables */
     savedLocalVars = qspSaveLocalVarsAndRestoreGlobals();
@@ -247,7 +247,7 @@ void qspNavigateToLocation(int locInd, QSP_BOOL toChangeDesc, QSPVariant *args, 
     qspCurLoc = locInd;
     /* Restore global variables */
     qspClearLocalVarsScopes(qspCurrentLocalVars);
-    qspCurrentLocalVars = qspGlobalVars;
+    qspCurrentLocalVars = 0;
     /* We assign global ARGS here */
     if (!qspSetArgs(args, argsCount, QSP_FALSE)) return;
 

@@ -345,7 +345,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Image, isUCS);
         qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Desc, isUCS);
     }
-    bucket = qspGlobalVars->Buckets; /* use the global scope */
+    bucket = qspGlobalVars.Buckets; /* use the global scope */
     for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i)
     {
         qspAppendEncodedIntVal(&bufString, bucket->VarsCount, isUCS);
@@ -551,7 +551,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         qspCurObjects[i].Image = qspDecodeString(strs[ind++], isUCS);
         qspCurObjects[i].Desc = qspDecodeString(strs[ind++], isUCS);
     }
-    bucket = qspGlobalVars->Buckets; /* use the global scope */
+    bucket = qspGlobalVars.Buckets; /* use the global scope */
     for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i)
     {
         varsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
