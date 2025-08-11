@@ -1121,6 +1121,7 @@ INLINE void qspStatementClear(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUS
         qspCallSetInputStrText(qspNullString);
         break;
     case qspStatKillAll:
+        /* The order is important here */
         qspClearAllVars(QSP_FALSE);
         qspClearAllObjectsWithEvents();
         break;
