@@ -40,7 +40,6 @@
     /* External functions */
     void qspInitSymbolClasses(void);
     QSP_CHAR *qspStringToC(QSPString s);
-    QSP_BOOL qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate);
     QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val);
     QSPString qspConcatText(QSPString val1, QSPString val2);
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
@@ -127,17 +126,25 @@
         }
     }
 
+    INLINE QSPString qspCopyToNewText(QSPString s)
+    {
+        int strLen = qspStrLen(s);
+        if (strLen)
+        {
+            QSPString string;
+            QSP_CHAR *destPtr = (QSP_CHAR *)malloc(strLen * sizeof(QSP_CHAR));
+            memcpy(destPtr, s.Str, strLen * sizeof(QSP_CHAR));
+            string.Str = destPtr;
+            string.End = destPtr + strLen;
+            return string;
+        }
+        return qspNullString;
+    }
+
     INLINE void qspUpdateText(QSPString *dest, QSPString val)
     {
         qspFreeString(dest);
-        qspAddText(dest, val, QSP_TRUE);
-    }
-
-    INLINE QSPString qspCopyToNewText(QSPString s)
-    {
-        QSPString string;
-        qspAddText(&string, s, QSP_TRUE);
-        return string;
+        *dest = qspCopyToNewText(val);
     }
 
     INLINE QSPString qspMoveToNewText(QSPString *s)
@@ -271,6 +278,7 @@
     {
         int searchLen = qspStrLen(strSearch);
         if (!searchLen) return str.Str;
+
         if (searchLen <= qspStrLen(str))
         {
             size_t bytesToCompare = searchLen * sizeof(QSP_CHAR);

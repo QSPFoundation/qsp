@@ -101,7 +101,7 @@ void qspClearAllObjectsWithEvents(void)
         QSPString *objNames = (QSPString *)malloc(objsCount * sizeof(QSPString));
         /* Add objects to the notification list */
         for (i = 0; i < objsCount; ++i)
-            qspAddText(objNames + i, qspCurObjects[i].Desc, QSP_TRUE);
+            objNames[i] = qspCopyToNewText(qspCurObjects[i].Desc);
         /* Remove all objects */
         qspClearAllObjects(QSP_FALSE);
         qspSendRemovalNotifications(objNames, objsCount);
@@ -136,8 +136,7 @@ INLINE void qspClearObjectsByNameWithEvents(QSPString name, int maxObjects)
                     objsBufSize = objsCount + 8;
                     objNames = (QSPString *)realloc(objNames, objsBufSize * sizeof(QSPString));
                 }
-                qspAddText(objNames + objsCount, qspCurObjects[i].Desc, QSP_TRUE);
-                ++objsCount;
+                objNames[objsCount++] = qspCopyToNewText(qspCurObjects[i].Desc);
                 /* Remove the object & don't update the current index as the array shifts */
                 qspRemoveObjectByIndex(i);
                 continue;

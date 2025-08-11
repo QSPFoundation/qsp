@@ -47,40 +47,6 @@ QSP_CHAR *qspStringToC(QSPString s)
     return string;
 }
 
-QSP_BOOL qspAddText(QSPString *dest, QSPString val, QSP_BOOL toCreate)
-{
-    int valLen = qspStrLen(val);
-    if (!toCreate && dest->Str)
-    {
-        if (valLen)
-        {
-            int destLen = qspStrLen(*dest);
-            QSP_CHAR *destPtr = (QSP_CHAR *)realloc(dest->Str, (destLen + valLen) * sizeof(QSP_CHAR));
-            dest->Str = destPtr;
-            destPtr += destLen;
-            dest->End = destPtr + valLen;
-            memcpy(destPtr, val.Str, valLen * sizeof(QSP_CHAR));
-            return QSP_TRUE;
-        }
-    }
-    else
-    {
-        if (valLen)
-        {
-            QSP_CHAR *destPtr = (QSP_CHAR *)malloc(valLen * sizeof(QSP_CHAR));
-            dest->Str = destPtr;
-            dest->End = destPtr + valLen;
-            memcpy(destPtr, val.Str, valLen * sizeof(QSP_CHAR));
-            return QSP_TRUE;
-        }
-        else
-        {
-            dest->Str = dest->End = 0; /* assign the null string */
-        }
-    }
-    return QSP_FALSE;
-}
-
 QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val)
 {
     int valLen = qspStrLen(val);
@@ -150,7 +116,7 @@ int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
     ret = (QSPString *)malloc(bufSize * sizeof(QSPString));
     while (delimPos)
     {
-        qspAddText(&newStr, qspStringFromPair(str.Str, delimPos), QSP_TRUE);
+        newStr = qspCopyToNewText(qspStringFromPair(str.Str, delimPos));
         if (count >= bufSize)
         {
             bufSize = count + 16;
@@ -160,7 +126,7 @@ int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
         str.Str = delimPos + delimLen;
         delimPos = qspStrStr(str, delim);
     }
-    qspAddText(&newStr, str, QSP_TRUE);
+    newStr = qspCopyToNewText(str);
     if (count >= bufSize)
         ret = (QSPString *)realloc(ret, (count + 1) * sizeof(QSPString));
     ret[count++] = newStr;
@@ -174,9 +140,10 @@ void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end)
     if (src && count)
     {
         int i;
-        *dest = (QSPString *)malloc(count * sizeof(QSPString));
+        QSPString *destStrs = (QSPString *)malloc(count * sizeof(QSPString));
         for (i = 0; start < end; ++i, ++start)
-            qspAddText(*dest + i, src[start], QSP_TRUE);
+            destStrs[i] = qspCopyToNewText(src[start]);
+        *dest = destStrs;
     }
     else
         *dest = 0;
