@@ -406,7 +406,7 @@ QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_
     if (resLen >= bufSize) resLen = bufSize - 1;
     memcpy(buf, QSP_STR(value).Str, resLen * sizeof(QSP_CHAR));
     buf[resLen] = 0;
-    qspFreeString(&QSP_STR(value));
+    qspFreeVariant(&value);
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }

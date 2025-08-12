@@ -400,6 +400,7 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
             break;
     }
     val->Type = (QSP_TINYINT)type;
+    val->IsRef = QSP_FALSE;
     *curIndex = ind;
     return QSP_TRUE;
 }

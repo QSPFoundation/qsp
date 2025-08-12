@@ -344,7 +344,7 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_calculateStrExpr(JNIEnv *en
     if (qspErrorNum) return qspToJavaString(env, qspNullString);
     qspConvertVariantTo(&value, QSP_TYPE_STR);
     res = qspToJavaString(env, QSP_STR(value));
-    qspFreeString(&QSP_STR(value));
+    qspFreeVariant(&value);
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return res;
 }

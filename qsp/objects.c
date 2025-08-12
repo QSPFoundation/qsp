@@ -66,6 +66,7 @@ INLINE void qspSendRemovalNotifications(QSPString *objNames, int count)
         QSPVariant objName;
         int i, oldLocationState;
         objName.Type = QSP_TYPE_STR;
+        objName.IsRef = QSP_FALSE;
         oldLocationState = qspLocationState;
         for (i = 0; i < count; ++i)
         {

@@ -1137,6 +1137,7 @@ void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
     groupInd = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : 0);
     qspEmptyVar(var); /* clear the dest array anyway */
     foundString.Type = QSP_TYPE_STR;
+    foundString.IsRef = QSP_FALSE;
     curInd = 0;
     foundPos = qspRegExpStrSearch(regExp, text, 0, groupInd, &foundLen);
     while (foundPos && foundLen)

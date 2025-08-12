@@ -434,7 +434,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         }
         qspConvertVariantTo(&val, QSP_TYPE_STR);
         qspAddBufText(&res, QSP_STR(val));
-        qspFreeString(&QSP_STR(val));
+        qspFreeVariant(&val);
         txt.Str = pos + QSP_STATIC_LEN(QSP_RSUBEX);
         pos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
     } while (pos);

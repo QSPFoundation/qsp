@@ -25,6 +25,8 @@
 
     INLINE void qspFreeVariant(QSPVariant *val)
     {
+        if (val->IsRef) return;
+
         switch (QSP_BASETYPE(val->Type))
         {
         case QSP_TYPE_TUPLE:
@@ -50,6 +52,7 @@
         /* Works fine with all types including QSP_TYPE_UNDEF */
         memset(&value->Val, 0, sizeof(value->Val));
         value->Type = type;
+        value->IsRef = QSP_FALSE;
     }
 
     INLINE QSPVariant qspGetEmptyVariant(QSP_TINYINT type)
@@ -63,6 +66,7 @@
     {
         QSPVariant ret;
         ret.Type = QSP_TYPE_NUM;
+        ret.IsRef = QSP_FALSE;
         QSP_NUM(ret) = value;
         return ret;
     }
@@ -71,6 +75,7 @@
     {
         QSPVariant ret;
         ret.Type = type;
+        ret.IsRef = QSP_FALSE;
         QSP_STR(ret) = value;
         return ret;
     }
@@ -79,8 +84,15 @@
     {
         QSPVariant ret;
         ret.Type = QSP_TYPE_TUPLE;
+        ret.IsRef = QSP_FALSE;
         QSP_TUPLE(ret) = value;
         return ret;
+    }
+
+    INLINE QSPVariant qspRefVariant(QSPVariant val)
+    {
+        val.IsRef = QSP_TRUE; /* a reference references all the original data */
+        return val;
     }
 
     INLINE void qspCopyToNewVariant(QSPVariant *dest, QSPVariant *src)
@@ -97,12 +109,14 @@
             QSP_PSTR(dest) = qspCopyToNewText(QSP_PSTR(src));
             break;
         }
+        dest->IsRef = QSP_FALSE; /* we always create a new value, it's never a reference */
     }
 
     INLINE void qspMoveToNewVariant(QSPVariant *dest, QSPVariant *src)
     {
         dest->Val = src->Val;
         dest->Type = src->Type;
+        dest->IsRef = src->IsRef; /* move the reference if it's a reference */
         qspInitVariant(src, src->Type);
     }
 

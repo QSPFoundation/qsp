@@ -762,7 +762,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 opCode = qspStrStr(name, QSP_STATIC_STR(QSP_LSUBEX)) ? qspOpValueToFormat : qspOpValue;
                 if (!qspAppendValueToCompiled(expression, opCode, v))
                 {
-                    qspFreeString(&QSP_STR(v));
+                    qspFreeVariant(&v);
                     break;
                 }
                 waitForOperator = QSP_TRUE;
@@ -774,7 +774,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_CODE);
                 if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                 {
-                    qspFreeString(&QSP_STR(v));
+                    qspFreeVariant(&v);
                     break;
                 }
                 waitForOperator = QSP_TRUE;
@@ -853,7 +853,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                     v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_STR);
                     if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                     {
-                        qspFreeString(&QSP_STR(v));
+                        qspFreeVariant(&v);
                         break;
                     }
                     /* Add a function call */
@@ -905,7 +905,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                         v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_VARREF);
                         if (!qspAppendValueToCompiled(expression, qspOpValue, v))
                         {
-                            qspFreeString(&QSP_STR(v));
+                            qspFreeVariant(&v);
                             break;
                         }
                         if (!qspIsEmpty(s) && *s.Str == QSP_LSBRACK_CHAR)
@@ -1006,7 +1006,11 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
     opCode = expression->CompItems[valueIndex].OpCode;
     argsCount = expression->CompItems[valueIndex].ArgsCount;
     type = qspOps[opCode].ResType;
-    if (QSP_ISDEF(type)) tos.Type = type;
+    if (QSP_ISDEF(type))
+    {
+        tos.Type = type;
+        tos.IsRef = QSP_FALSE;
+    }
     if (argsCount)
     {
         int i, argIndices[QSP_OPMAXARGS];
@@ -1253,6 +1257,7 @@ INLINE void qspNegateValue(QSPVariant *val, QSPVariant *res)
         }
         QSP_PNUM(res) = -QSP_PNUM(val);
         res->Type = QSP_TYPE_NUM;
+        res->IsRef = QSP_FALSE;
         break;
     }
 }
