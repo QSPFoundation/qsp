@@ -89,6 +89,15 @@
         return ret;
     }
 
+    INLINE QSPVariant qspRefStrVariant(QSPString value, QSP_TINYINT type)
+    {
+        QSPVariant ret;
+        ret.Type = type;
+        ret.IsRef = QSP_TRUE;
+        QSP_STR(ret) = value;
+        return ret;
+    }
+
     INLINE QSPVariant qspRefVariant(QSPVariant val)
     {
         val.IsRef = QSP_TRUE; /* a reference references all the original data */

@@ -77,7 +77,7 @@ INLINE void qspSendRemovalNotifications(QSPString *objNames, int count)
     }
     else if (count == 1)
     {
-        QSPVariant objName = qspStrVariant(objNames[0], QSP_TYPE_STR);
+        QSPVariant objName = qspRefStrVariant(objNames[0], QSP_TYPE_STR);
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJDELETED), &objName, 1);
     }
 }
