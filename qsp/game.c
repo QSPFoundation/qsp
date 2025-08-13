@@ -553,10 +553,9 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i, ++bucket)
     {
         varsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
-        bucket->VarsCount = varsCount;
         if (varsCount)
         {
-            bucket->Capacity = varsCount;
+            bucket->Capacity = bucket->VarsCount = varsCount;
             var = bucket->Vars = (QSPVar *)realloc(bucket->Vars, varsCount * sizeof(QSPVar));
             for (j = 0; j < varsCount; ++j, ++var)
             {
