@@ -118,7 +118,7 @@
             QSP_PSTR(dest) = qspCopyToNewText(QSP_PSTR(src));
             break;
         }
-        dest->IsRef = QSP_FALSE; /* we always create a new value, it's never a reference */
+        dest->IsRef = QSP_FALSE; /* we always create a new value, so it's never a reference */
     }
 
     INLINE void qspMoveToNewVariant(QSPVariant *dest, QSPVariant *src)

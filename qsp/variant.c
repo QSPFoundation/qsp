@@ -34,7 +34,7 @@ INLINE void qspFormatVariant(QSPVariant *val)
             qspUpperStr(&temp);
             qspFreeVariant(val);
             QSP_PSTR(val) = temp;
-            val->IsRef = QSP_FALSE; /* it's never a reference */
+            val->IsRef = QSP_FALSE; /* it's never a reference when it gets converted */
             break;
         }
     }
@@ -163,7 +163,7 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                     break;
                 }
             }
-            val->IsRef = QSP_FALSE; /* it's never a reference */
+            val->IsRef = QSP_FALSE; /* it's never a reference when it gets converted */
         }
         val->Type = type;
         qspFormatVariant(val);
