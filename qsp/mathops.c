@@ -169,7 +169,7 @@ void qspClearAllMathExps(QSP_BOOL toInit)
     int i, j;
     QSPCachedMathExp *exp;
     QSPCachedMathExpsBucket *bucket = qspCachedMathExps;
-    for (i = 0; i < QSP_CACHEDEXPSBUCKETS; ++i)
+    for (i = 0; i < QSP_CACHEDEXPSBUCKETS; ++i, ++bucket)
     {
         if (!toInit && bucket->ExpsCount)
         {
@@ -183,7 +183,6 @@ void qspClearAllMathExps(QSP_BOOL toInit)
         }
         bucket->ExpsCount = 0;
         bucket->ExpToEvict = 0;
-        ++bucket;
     }
 }
 
