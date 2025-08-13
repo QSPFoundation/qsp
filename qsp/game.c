@@ -552,15 +552,15 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         qspCurObjects[i].Desc = qspDecodeString(strs[ind++], isUCS);
     }
     bucket = qspGlobalVars.Buckets; /* use the global scope */
-    for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i)
+    for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i, ++bucket)
     {
         varsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
-        bucket->Capacity = bucket->VarsCount = varsCount;
-        bucket->Vars = 0;
+        bucket->VarsCount = varsCount;
         if (varsCount)
         {
-            var = bucket->Vars = (QSPVar *)malloc(varsCount * sizeof(QSPVar));
-            for (j = 0; j < varsCount; ++j)
+            bucket->Capacity = varsCount;
+            var = bucket->Vars = (QSPVar *)realloc(bucket->Vars, varsCount * sizeof(QSPVar));
+            for (j = 0; j < varsCount; ++j, ++var)
             {
                 var->Name = qspDecodeString(strs[ind++], isUCS);
                 valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
@@ -584,10 +584,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
                         var->Indices[k].Str = qspDecodeString(strs[ind++], isUCS);
                     }
                 }
-                ++var;
             }
         }
-        ++bucket;
     }
     qspFreeStrs(strs, count);
     qspCurLoc = qspLocIndex(locName);

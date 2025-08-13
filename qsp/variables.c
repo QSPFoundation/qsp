@@ -92,6 +92,61 @@ INLINE unsigned int qspGetNameHash(QSPString name)
     return nameHash;
 }
 
+QSPVarsScopeChunk *qspAllocateVarsScopeChunk(QSPVarsScopeChunk *parentChunk)
+{
+    int i;
+    QSPVarsScope *scope;
+    QSPVarsScopeChunk *chunk = (QSPVarsScopeChunk *)malloc(sizeof(QSPVarsScopeChunk));
+    chunk->ParentChunk = parentChunk;
+    chunk->SlotsCount = 0;
+
+    scope = chunk->Slots;
+    for (i = 0; i < QSP_VARSSCOPECHUNKSIZE; ++i, ++scope)
+    {
+        /* We don't initialize the allocated scopes */
+        scope->Buckets = 0;
+        scope->BucketsCount = 0;
+    }
+
+    return chunk;
+}
+
+void qspClearVarsScopeChunk(QSPVarsScopeChunk *chunk)
+{
+    int i;
+    QSPVarsScope *scope = chunk->Slots;
+    for (i = 0; i < QSP_VARSSCOPECHUNKSIZE; ++i, ++scope)
+        qspClearVarsScope(scope);
+    free(chunk);
+}
+
+void qspInitVarsScope(QSPVarsScope *scope, int buckets)
+{
+    int i;
+    QSPVarsBucket *bucket;
+    scope->BucketsCount = buckets;
+    bucket = scope->Buckets = (QSPVarsBucket *)malloc(scope->BucketsCount * sizeof(QSPVarsBucket));
+    for (i = scope->BucketsCount; i > 0; --i, ++bucket)
+    {
+        bucket->Vars = 0;
+        bucket->Capacity = bucket->VarsCount = 0;
+    }
+}
+
+void qspClearVarsScope(QSPVarsScope *scope)
+{
+    int i;
+    QSPVarsBucket *bucket = scope->Buckets;
+    if (bucket)
+    {
+        for (i = scope->BucketsCount; i > 0; --i, ++bucket)
+        {
+            if (bucket->Vars) free(bucket->Vars);
+        }
+        free(scope->Buckets);
+    }
+}
+
 void qspClearVars(QSPVarsScope *scope)
 {
     /* Remove all variables & keep the buckets */
@@ -100,17 +155,16 @@ void qspClearVars(QSPVarsScope *scope)
     QSPVarsBucket *bucket = scope->Buckets;
     for (i = scope->BucketsCount; i > 0; --i, ++bucket)
     {
-        if (bucket->Vars)
+        var = bucket->Vars;
+        if (var)
         {
-            var = bucket->Vars;
+            /* Remove vars & keep the allocated vars buffer */
             for (j = bucket->VarsCount; j > 0; --j, ++var)
             {
                 qspFreeString(&var->Name);
                 qspEmptyVar(var);
             }
-            free(bucket->Vars);
-            bucket->Vars = 0;
-            bucket->Capacity = bucket->VarsCount = 0;
+            bucket->VarsCount = 0;
         }
     }
 }
@@ -124,10 +178,10 @@ void qspClearLocalVarsScopes(QSPVarsScopeChunk *chunk)
     {
         scope = chunk->Slots;
         for (i = chunk->SlotsCount; i > 0; --i, ++scope)
-            qspClearVarsScope(scope);
+            qspClearVars(scope);
 
         parentChunk = chunk->ParentChunk;
-        free(chunk);
+        qspClearVarsScopeChunk(chunk);
         chunk = parentChunk;
     }
 }
@@ -245,7 +299,8 @@ QSPVarsScope *qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOO
 {
     QSPVar *varArgs;
     QSPVarsScope *scope = qspAllocateLocalScope();
-    qspInitVarsScope(scope, QSP_VARSLOCALBUCKETS); /* immediately init the scope */
+    if (!scope->Buckets)
+        qspInitVarsScope(scope, QSP_VARSLOCALBUCKETS); /* init the uninitialized scope */
 
     varArgs = qspAddSpecialVarToScope(scope, QSP_STATIC_STR(QSP_VARARGS));
     qspSetVarValuesByReference(varArgs, args, count, toMove);
