@@ -161,20 +161,14 @@
 
     INLINE QSPVarsScope *qspAllocateLocalScope(void)
     {
-        QSPVarsScope *scope;
         QSPVarsScopeChunk *chunk = qspCurrentLocalVars;
-
         if (chunk && chunk->SlotsCount < QSP_VARSSCOPECHUNKSIZE)
-            scope = &chunk->Slots[chunk->SlotsCount++];
-        else
-        {
-            chunk = qspAllocateVarsScopeChunk(chunk);
-            chunk->SlotsCount = 1;
-            qspCurrentLocalVars = chunk;
+            return &chunk->Slots[chunk->SlotsCount++];
 
-            scope = chunk->Slots;
-        }
-        return scope;
+        chunk = qspAllocateVarsScopeChunk(chunk);
+        chunk->SlotsCount = 1;
+        qspCurrentLocalVars = chunk;
+        return chunk->Slots;
     }
 
     INLINE void qspRemoveLastLocalScope(void)
