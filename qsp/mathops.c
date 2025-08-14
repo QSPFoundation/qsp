@@ -917,13 +917,13 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
 INLINE int qspSkipMathValue(QSPMathExpression *expression, int valueIndex)
 {
     int skipItems = 1;
-    QSPMathCompiledOp *item = expression->CompItems + valueIndex;
+    QSPMathCompiledOp *expItems = expression->CompItems;
     do
     {
-        skipItems += item->ArgsCount - 1;
-        --item;
+        skipItems += expItems[valueIndex].ArgsCount - 1;
+        --valueIndex;
     } while (skipItems > 0);
-    return (int)(item - expression->CompItems);
+    return valueIndex;
 }
 
 void qspFreeMathExpression(QSPMathExpression *expression)
@@ -979,11 +979,12 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         int i, argIndices[QSP_OPMAXARGS];
         /* Find positions of the arguments */
         --valueIndex; /* move to the last argument */
-        for (i = argsCount - 1; i >= 0; --i)
+        for (i = argsCount - 1; i > 0; --i)
         {
             argIndices[i] = valueIndex;
             valueIndex = qspSkipMathValue(expression, valueIndex);
         }
+        argIndices[0] = valueIndex;
         switch (opCode)
         {
         case qspOpAnd: /* logical AND operator, we don't pre-evaluate arguments */
