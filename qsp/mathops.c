@@ -555,7 +555,7 @@ INLINE QSPVariant qspCalculateArgumentValue(QSPMathExpression *expression, int v
 
 INLINE QSP_BOOL qspPushOperationToStack(QSP_TINYINT *opStack, QSP_TINYINT *argStack, int *opSp, QSP_TINYINT opCode)
 {
-    if (*opSp == QSP_STACKSIZE - 1)
+    if (*opSp >= QSP_STACKSIZE - 1)
     {
         qspSetError(QSP_ERR_STACKOVERFLOW);
         return QSP_FALSE;
@@ -570,7 +570,7 @@ INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINY
 {
     QSPMathCompiledOp *compiledOp;
     int opIndex = expression->ItemsCount;
-    if (opIndex == QSP_MAXITEMS)
+    if (opIndex >= QSP_MAXITEMS)
     {
         qspSetError(QSP_ERR_TOOMANYITEMS);
         return QSP_FALSE;
@@ -593,7 +593,7 @@ INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression *expression, QSP_
 {
     QSPMathCompiledOp *compiledOp;
     int opIndex = expression->ItemsCount;
-    if (opIndex == QSP_MAXITEMS)
+    if (opIndex >= QSP_MAXITEMS)
     {
         qspSetError(QSP_ERR_TOOMANYITEMS);
         return QSP_FALSE;
