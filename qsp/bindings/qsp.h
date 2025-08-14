@@ -152,7 +152,6 @@
             QSPTuple Tuple;
         } Val;
         QSP_TINYINT Type;
-        QSP_BOOL IsRef;
     } QSPVariant;
 
     typedef struct

@@ -398,7 +398,7 @@ QSP_TINYINT qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
             switch (type)
             {
             case QSP_TYPE_INLINESTR:
-                args[argIndex] = qspRefStrVariant(argExpression, QSP_TYPE_STR);
+                args[argIndex] = qspStrVariant(qspCopyToNewText(argExpression), QSP_TYPE_STR);
                 break;
             default:
                 args[argIndex] = qspCalculateExprValue(argExpression);

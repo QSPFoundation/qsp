@@ -34,7 +34,6 @@ INLINE void qspFormatVariant(QSPVariant *val)
             qspUpperStr(&temp);
             qspFreeVariant(val);
             QSP_PSTR(val) = temp;
-            val->IsRef = QSP_FALSE; /* it's never a reference when it gets converted */
             break;
         }
     }
@@ -54,7 +53,6 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
         case QSP_TYPE_STR:
             QSP_PSTR(res) = qspConcatText(QSP_PSTR(arg1), QSP_PSTR(arg2));
             res->Type = QSP_TYPE_STR;
-            res->IsRef = QSP_FALSE;
             break;
         case QSP_TYPE_NUM:
             if (qspCanConvertToNum(arg1))
@@ -67,7 +65,6 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
                 qspConvertVariantTo(arg2, QSP_TYPE_STR);
                 QSP_PSTR(res) = qspConcatText(QSP_PSTR(arg1), QSP_PSTR(arg2));
                 res->Type = QSP_TYPE_STR;
-                res->IsRef = QSP_FALSE;
             }
             break;
         }
@@ -88,7 +85,6 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
                 qspConvertVariantTo(arg1, QSP_TYPE_STR);
                 QSP_PSTR(res) = qspConcatText(QSP_PSTR(arg1), QSP_PSTR(arg2));
                 res->Type = QSP_TYPE_STR;
-                res->IsRef = QSP_FALSE;
             }
             break;
         case QSP_TYPE_NUM:
@@ -163,7 +159,6 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                     break;
                 }
             }
-            val->IsRef = QSP_FALSE; /* it's never a reference when it gets converted */
         }
         val->Type = type;
         qspFormatVariant(val);
@@ -251,7 +246,6 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
 
             QSP_PSTR(res) = qspConcatText(QSP_PSTR(arg1), QSP_PSTR(arg2));
             res->Type = QSP_TYPE_STR;
-            res->IsRef = QSP_FALSE;
             break;
         }
         break;
@@ -285,7 +279,6 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
             QSP_PTUPLE(res).Items = 0;
         }
         res->Type = QSP_TYPE_TUPLE;
-        res->IsRef = QSP_FALSE;
         return QSP_TRUE;
     }
     if (QSP_BASETYPE(arg2->Type) == QSP_TYPE_TUPLE)
@@ -313,7 +306,6 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
             QSP_PTUPLE(res).Items = 0;
         }
         res->Type = QSP_TYPE_TUPLE;
-        res->IsRef = QSP_FALSE;
         return QSP_TRUE;
     }
 
@@ -347,7 +339,6 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
         return QSP_FALSE;
     }
     res->Type = QSP_TYPE_NUM;
-    res->IsRef = QSP_FALSE;
     return QSP_TRUE;
 }
 

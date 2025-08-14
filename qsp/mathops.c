@@ -1005,11 +1005,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
     opCode = expression->CompItems[valueIndex].OpCode;
     argsCount = expression->CompItems[valueIndex].ArgsCount;
     type = qspOps[opCode].ResType;
-    if (QSP_ISDEF(type))
-    {
-        tos.Type = type;
-        tos.IsRef = QSP_FALSE;
-    }
+    if (QSP_ISDEF(type)) tos.Type = type;
     if (argsCount)
     {
         int i, argIndices[QSP_OPMAXARGS];
@@ -1085,8 +1081,8 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
     switch (opCode)
     {
     case qspOpValue:
-        /* Reference the value */
-        tos = qspRefVariant(expression->CompItems[valueIndex].Value);
+        /* Copy the value instead of moving it because it has to be possible to reuse the compiled expression */
+        qspCopyToNewVariant(&tos, &expression->CompItems[valueIndex].Value);
         break;
     case qspOpValueToFormat:
         /* Copy the value instead of moving it because it has to be possible to reuse the compiled expression */
@@ -1256,7 +1252,6 @@ INLINE void qspNegateValue(QSPVariant *val, QSPVariant *res)
         }
         QSP_PNUM(res) = -QSP_PNUM(val);
         res->Type = QSP_TYPE_NUM;
-        res->IsRef = QSP_FALSE;
         break;
     }
 }

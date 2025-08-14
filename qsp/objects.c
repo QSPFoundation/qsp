@@ -66,7 +66,6 @@ INLINE void qspSendRemovalNotifications(QSPString *objNames, int count)
         QSPVariant objName;
         int i, oldLocationState;
         objName.Type = QSP_TYPE_STR;
-        objName.IsRef = QSP_FALSE;
         oldLocationState = qspLocationState;
         for (i = 0; i < count; ++i)
         {
@@ -77,7 +76,7 @@ INLINE void qspSendRemovalNotifications(QSPString *objNames, int count)
     }
     else if (count == 1)
     {
-        QSPVariant objName = qspRefStrVariant(objNames[0], QSP_TYPE_STR);
+        QSPVariant objName = qspStrVariant(objNames[0], QSP_TYPE_STR);
         qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJDELETED), &objName, 1);
     }
 }

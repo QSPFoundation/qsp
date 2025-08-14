@@ -282,10 +282,12 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByString(JNIEnv *en
     qspFreeString(&varName);
     if (var)
     {
+        int arrIndex;
         QSPString indexStr = qspFromJavaString(env, str);
-        QSPVariant index = qspRefStrVariant(indexStr, QSP_TYPE_STR);
+        QSPVariant index = qspStrVariant(indexStr, QSP_TYPE_STR);
+        arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
         qspFreeString(&indexStr);
-        return qspGetVarIndex(var, index, QSP_FALSE);
+        return arrIndex;
     }
     return -1;
 }
