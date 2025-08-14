@@ -920,7 +920,7 @@ INLINE int qspSkipMathValue(QSPMathExpression *expression, int valueIndex)
     QSPMathCompiledOp *expItems = expression->CompItems;
     do
     {
-        skipItems += expItems[valueIndex].ArgsCount - 1;
+        skipItems += expItems[valueIndex].ArgsCount - 1; /* reduces the number of items to skip */
         --valueIndex;
     } while (skipItems > 0);
     return valueIndex;
