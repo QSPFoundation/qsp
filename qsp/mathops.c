@@ -1072,20 +1072,17 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
     case qspOpLastArrItem:
         qspGetLastVarValue(QSP_STR(args[0]), &tos);
         break;
-    case qspOpNegation:
-        qspNegateValue(args, &tos);
+    case qspOpAdd:
+        qspAutoConvertCombine(args, args + 1, QSP_ADD_CHAR, &tos);
+        break;
+    case qspOpSub:
+        qspAutoConvertCombine(args, args + 1, QSP_SUB_CHAR, &tos);
         break;
     case qspOpMul:
         qspAutoConvertCombine(args, args + 1, QSP_MUL_CHAR, &tos);
         break;
     case qspOpDiv:
         qspAutoConvertCombine(args, args + 1, QSP_DIV_CHAR, &tos);
-        break;
-    case qspOpAdd:
-        qspAutoConvertCombine(args, args + 1, QSP_ADD_CHAR, &tos);
-        break;
-    case qspOpSub:
-        qspAutoConvertCombine(args, args + 1, QSP_SUB_CHAR, &tos);
         break;
     case qspOpMod:
         if (QSP_NUM(args[1]) == 0)
@@ -1095,14 +1092,20 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         }
         QSP_NUM(tos) = QSP_NUM(args[0]) % QSP_NUM(args[1]);
         break;
-    case qspOpAppend:
-        qspAutoConvertAppend(args, args + 1, &tos);
+    case qspOpNegation:
+        qspNegateValue(args, &tos);
         break;
     case qspOpTuple:
         QSP_TUPLE(tos) = qspMoveToNewTuple(args, argsCount);
         break;
+    case qspOpAppend:
+        qspAutoConvertAppend(args, args + 1, &tos);
+        break;
     case qspOpEq:
         QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) == 0);
+        break;
+    case qspOpNe:
+        QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) != 0);
         break;
     case qspOpLt:
         QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) < 0);
@@ -1115,9 +1118,6 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         break;
     case qspOpGeq:
         QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) >= 0);
-        break;
-    case qspOpNe:
-        QSP_NUM(tos) = QSP_TOBOOL(qspVariantsCompare(args, args + 1) != 0);
         break;
     /* Embedded functions -------------------------------------------------------------- */
     case qspOpLoc:
