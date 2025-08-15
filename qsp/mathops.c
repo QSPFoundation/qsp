@@ -285,6 +285,7 @@ void qspInitMath(void)
     qspAddOperation(qspOpArrSize, 30, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_VARREF);
     qspAddOperation(qspOpArrType, 30, qspFunctionArrType, QSP_TYPE_STR, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpArrItem, 30, 0, QSP_TYPE_UNDEF, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpFirstArrItem, 30, 0, QSP_TYPE_UNDEF, 1, 1, QSP_TYPE_VARREF);
     qspAddOperation(qspOpLastArrItem, 30, 0, QSP_TYPE_UNDEF, 1, 1, QSP_TYPE_VARREF);
     qspAddOperation(qspOpArrPack, 30, qspFunctionArrPack, QSP_TYPE_TUPLE, 1, 3, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpArrPos, 30, qspFunctionArrPos, QSP_TYPE_NUM, 2, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_NUM);
@@ -896,7 +897,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                         }
                         else
                         {
-                            if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpArrItem)) break;
+                            if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpFirstArrItem)) break;
                             ++argStack[opSp]; /* added the var name already */
                             waitForOperator = QSP_TRUE;
                         }
@@ -1064,10 +1065,10 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         }
         break;
     case qspOpArrItem:
-        if (argsCount == 2)
-            qspGetVarValueByIndex(QSP_STR(args[0]), args[1], &tos);
-        else
-            qspGetFirstVarValue(QSP_STR(args[0]), &tos);
+        qspGetVarValueByIndex(QSP_STR(args[0]), args[1], &tos);
+        break;
+    case qspOpFirstArrItem:
+        qspGetFirstVarValue(QSP_STR(args[0]), &tos);
         break;
     case qspOpLastArrItem:
         qspGetLastVarValue(QSP_STR(args[0]), &tos);

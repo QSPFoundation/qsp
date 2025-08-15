@@ -108,6 +108,7 @@
         qspOpArrSize,
         qspOpArrType,
         qspOpArrItem,
+        qspOpFirstArrItem,
         qspOpLastArrItem,
         qspOpArrPack,
         qspOpArrPos,
