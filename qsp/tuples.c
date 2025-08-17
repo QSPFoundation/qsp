@@ -15,14 +15,14 @@ void qspFreeTuple(QSPTuple *tuple)
 {
     if (tuple->Vals)
     {
-        qspFreeVariants(tuple->Vals, tuple->Items);
+        qspFreeVariants(tuple->Vals, tuple->ValsCount);
         free(tuple->Vals);
     }
 }
 
 QSP_BOOL qspIsTupleNumber(QSPTuple tuple)
 {
-    if (tuple.Items == 1)
+    if (tuple.ValsCount == 1)
     {
         switch (QSP_BASETYPE(tuple.Vals[0].Type))
         {
@@ -39,7 +39,7 @@ QSP_BOOL qspIsTupleNumber(QSPTuple tuple)
 
 QSP_BIGINT qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
 {
-    switch (tuple.Items)
+    switch (tuple.ValsCount)
     {
     case 0: /* a special case, i.e. an empty tuple must be convertible to 0 */
         if (isValid) *isValid = QSP_TRUE;
@@ -69,7 +69,7 @@ QSPTuple qspCopyToNewTuple(QSPVariant *values, int count)
     {
         QSPVariant *newItem, *srcItem;
         tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
-        tuple.Items = count;
+        tuple.ValsCount = count;
         newItem = tuple.Vals;
         for (srcItem = values; count > 0; --count, ++srcItem, ++newItem)
             qspCopyToNewVariant(newItem, srcItem);
@@ -77,7 +77,7 @@ QSPTuple qspCopyToNewTuple(QSPVariant *values, int count)
     else
     {
         tuple.Vals = 0;
-        tuple.Items = 0;
+        tuple.ValsCount = 0;
     }
     return tuple;
 }
@@ -89,7 +89,7 @@ QSPTuple qspMoveToNewTuple(QSPVariant *values, int count)
     {
         QSPVariant *newItem, *srcItem;
         tuple.Vals = (QSPVariant *)malloc(count * sizeof(QSPVariant));
-        tuple.Items = count;
+        tuple.ValsCount = count;
         newItem = tuple.Vals;
         for (srcItem = values; count > 0; --count, ++srcItem, ++newItem)
             qspMoveToNewVariant(newItem, srcItem);
@@ -97,7 +97,7 @@ QSPTuple qspMoveToNewTuple(QSPVariant *values, int count)
     else
     {
         tuple.Vals = 0;
-        tuple.Items = 0;
+        tuple.ValsCount = 0;
     }
     return tuple;
 }
@@ -110,7 +110,7 @@ QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, in
     {
         QSPVariant *newItem, *item;
         tuple.Vals = (QSPVariant *)malloc(newCount * sizeof(QSPVariant));
-        tuple.Items = newCount;
+        tuple.ValsCount = newCount;
         newItem = tuple.Vals;
         for (item = list1; count1 > 0; --count1, ++item, ++newItem)
             qspMoveToNewVariant(newItem, item);
@@ -120,7 +120,7 @@ QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, in
     else
     {
         tuple.Vals = 0;
-        tuple.Items = 0;
+        tuple.ValsCount = 0;
     }
     return tuple;
 }
@@ -135,11 +135,11 @@ int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value)
     case QSP_TYPE_STR:
         {
             int delta;
-            if (tuple.Items == 0)
+            if (tuple.ValsCount == 0)
                 return -1; /* an empty tuple is always smaller than any value */
             delta = qspVariantsCompare(tuple.Vals, value); /* compare the first tuple item with the value */
             if (delta) return delta;
-            if (tuple.Items > 1)
+            if (tuple.ValsCount > 1)
                 return 1; /* the tuple is bigger if it contains more than 1 item */
             break;
         }
@@ -151,7 +151,7 @@ int qspTuplesCompare(QSPTuple first, QSPTuple second)
 {
     int delta;
     QSPVariant *pos1 = first.Vals, *pos2 = second.Vals;
-    QSPVariant *end1 = first.Vals + first.Items, *end2 = second.Vals + second.Items;
+    QSPVariant *end1 = first.Vals + first.ValsCount, *end2 = second.Vals + second.ValsCount;
     while (pos2 < end2 && pos1 < end1)
     {
         delta = qspVariantsCompare(pos1, pos2);
@@ -165,7 +165,7 @@ void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
 {
     QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
     QSPString temp;
-    QSPVariant *item = tuple.Vals, *itemsEnd = item + tuple.Items;
+    QSPVariant *item = tuple.Vals, *itemsEnd = item + tuple.ValsCount;
     qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAY_START));
     while (item < itemsEnd)
     {

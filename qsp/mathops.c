@@ -1231,7 +1231,7 @@ INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPV
     switch (QSP_BASETYPE(args[0].Type))
     {
     case QSP_TYPE_TUPLE:
-        QSP_PNUM(res) = QSP_TUPLE(args[0]).Items;
+        QSP_PNUM(res) = QSP_TUPLE(args[0]).ValsCount;
         break;
     case QSP_TYPE_NUM:
         {

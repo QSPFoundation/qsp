@@ -134,7 +134,7 @@
     typedef struct
     {
         QSPVariant *Vals;
-        int Items;
+        int ValsCount;
     } QSPTuple;
 
     typedef struct

@@ -732,7 +732,7 @@ INLINE void qspMoveTupleToArray(QSPVar *dest, QSPTuple *src, int start, int coun
     /* Validate parameters */
     if (count <= 0) return;
     if (start < 0) start = 0;
-    itemsToMove = src->Items - start;
+    itemsToMove = src->ValsCount - start;
     if (itemsToMove <= 0) return;
     if (count < itemsToMove) itemsToMove = count;
     /* Move tuple items */
@@ -996,7 +996,7 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
     {
     case QSP_TYPE_TUPLE:
         {
-            int valuesCount = QSP_PTUPLE(v).Items;
+            int valuesCount = QSP_PTUPLE(v).ValsCount;
             if (varsCount < valuesCount)
             {
                 /* Assign variables that contain single values */
@@ -1009,7 +1009,7 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
                         return;
                 }
                 /* Only 1 variable left, fill it with a tuple containing all the values left */
-                v2 = qspTupleVariant(qspMoveToNewTuple(QSP_PTUPLE(v).Vals + i, QSP_PTUPLE(v).Items - i));
+                v2 = qspTupleVariant(qspMoveToNewTuple(QSP_PTUPLE(v).Vals + i, QSP_PTUPLE(v).ValsCount - i));
                 qspSetVarValue(varNames[lastVarIndex], &v2, op);
                 qspFreeVariant(&v2);
             }
@@ -1148,7 +1148,7 @@ void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     if (!dest) return;
     src = &QSP_TUPLE(args[1]);
     startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
-    maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->Items);
+    maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->ValsCount);
     qspMoveTupleToArray(dest, src, startInd, maxCount);
 }
 

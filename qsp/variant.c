@@ -224,11 +224,11 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
         switch (QSP_BASETYPE(arg2->Type))
         {
         case QSP_TYPE_TUPLE:
-            *res = qspTupleVariant(qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items));
+            *res = qspTupleVariant(qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).ValsCount, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).ValsCount));
             break;
         case QSP_TYPE_NUM:
         case QSP_TYPE_STR:
-            *res = qspTupleVariant(qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).Items, arg2, 1));
+            *res = qspTupleVariant(qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).ValsCount, arg2, 1));
             break;
         }
         break;
@@ -237,7 +237,7 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
         switch (QSP_BASETYPE(arg2->Type))
         {
         case QSP_TYPE_TUPLE:
-            *res = qspTupleVariant(qspMergeToNewTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).Items));
+            *res = qspTupleVariant(qspMergeToNewTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).ValsCount));
             break;
         case QSP_TYPE_NUM:
         case QSP_TYPE_STR:
@@ -260,8 +260,8 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
         if (tuple->Vals)
         {
             int i;
-            QSPVariant *vals = (QSPVariant *)malloc(tuple->Items * sizeof(QSPVariant));
-            for (i = 0; i < tuple->Items; ++i)
+            QSPVariant *vals = (QSPVariant *)malloc(tuple->ValsCount * sizeof(QSPVariant));
+            for (i = 0; i < tuple->ValsCount; ++i)
             {
                 if (!qspAutoConvertCombine(tuple->Vals + i, arg2, op, vals + i))
                 {
@@ -271,12 +271,12 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
                 }
             }
             QSP_PTUPLE(res).Vals = vals;
-            QSP_PTUPLE(res).Items = tuple->Items;
+            QSP_PTUPLE(res).ValsCount = tuple->ValsCount;
         }
         else
         {
             QSP_PTUPLE(res).Vals = 0;
-            QSP_PTUPLE(res).Items = 0;
+            QSP_PTUPLE(res).ValsCount = 0;
         }
         res->Type = QSP_TYPE_TUPLE;
         return QSP_TRUE;
@@ -287,8 +287,8 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
         if (tuple->Vals)
         {
             int i;
-            QSPVariant *vals = (QSPVariant *)malloc(tuple->Items * sizeof(QSPVariant));
-            for (i = 0; i < tuple->Items; ++i)
+            QSPVariant *vals = (QSPVariant *)malloc(tuple->ValsCount * sizeof(QSPVariant));
+            for (i = 0; i < tuple->ValsCount; ++i)
             {
                 if (!qspAutoConvertCombine(arg1, tuple->Vals + i, op, vals + i))
                 {
@@ -298,12 +298,12 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
                 }
             }
             QSP_PTUPLE(res).Vals = vals;
-            QSP_PTUPLE(res).Items = tuple->Items;
+            QSP_PTUPLE(res).ValsCount = tuple->ValsCount;
         }
         else
         {
             QSP_PTUPLE(res).Vals = 0;
-            QSP_PTUPLE(res).Items = 0;
+            QSP_PTUPLE(res).ValsCount = 0;
         }
         res->Type = QSP_TYPE_TUPLE;
         return QSP_TRUE;
@@ -349,13 +349,13 @@ void qspAppendVariantToIndexString(QSPVariant *val, QSPBufString *res)
     {
     case QSP_TYPE_TUPLE:
         {
-            int items = QSP_PTUPLE(val).Items;
-            qspAddBufText(res, qspNumToStr(buf, items));
-            if (items > 0)
+            int count = QSP_PTUPLE(val).ValsCount;
+            qspAddBufText(res, qspNumToStr(buf, count));
+            if (count > 0)
             {
                 QSPVariant *item = QSP_PTUPLE(val).Vals;
                 qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));
-                while (--items > 0)
+                while (--count > 0)
                 {
                     qspAppendVariantToIndexString(item, res);
                     qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));

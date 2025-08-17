@@ -67,8 +67,8 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
         {
         case QSP_TYPE_TUPLE:
             tuple = QSP_PTUPLE(curItem);
-            if (tuple.Items < 2) break;
-            if (tuple.Items >= 3)
+            if (tuple.ValsCount < 2) break;
+            if (tuple.ValsCount >= 3)
             {
                 itemImage = qspGetVariantAsString(&tuple.Vals[2]);
                 if (!qspIsAnyString(itemImage)) qspClearText(&itemImage);

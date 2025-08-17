@@ -88,7 +88,7 @@
         switch (QSP_BASETYPE(dest->Type = src->Type))
         {
         case QSP_TYPE_TUPLE:
-            QSP_PTUPLE(dest) = qspCopyToNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).Items);
+            QSP_PTUPLE(dest) = qspCopyToNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).ValsCount);
             break;
         case QSP_TYPE_NUM:
             QSP_PNUM(dest) = QSP_PNUM(src);
