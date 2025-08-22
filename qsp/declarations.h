@@ -72,10 +72,10 @@
     #define QSP_COMMENT      QSP_FMT("!")
     QSP_DEFINE_SPECIAL_CHAR(QSP_COMMENT,    QSP_FMT('!'))
 
-    #define QSP_USERSTAT     QSP_FMT("@@")
-
     #define QSP_USERFUNC     QSP_FMT("@")
     QSP_DEFINE_SPECIAL_CHAR(QSP_USERFUNC,   QSP_FMT('@'))
+
+    #define QSP_USERSTAT     QSP_FMT("@@")
 
     #define QSP_DIGITS       QSP_FMT("0123456789")
     #define QSP_QUOTS        QSP_FMT("'\"")
