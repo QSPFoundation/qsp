@@ -1193,16 +1193,16 @@ INLINE void qspStatementView(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QS
     if (count && qspIsAnyString(QSP_STR(args[0])))
     {
         qspUpdateText(&qspViewPath, QSP_STR(args[0]));
-        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView = QSP_TRUE);
-        if (qspLocationState != oldLocationState) return;
         qspCallShowPicture(qspViewPath);
+        if (qspLocationState != oldLocationState) return;
+        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView = QSP_TRUE);
     }
     else
     {
         qspClearText(&qspViewPath);
-        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView = QSP_FALSE);
-        if (qspLocationState != oldLocationState) return;
         qspCallShowPicture(qspNullString);
+        if (qspLocationState != oldLocationState) return;
+        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView = QSP_FALSE);
     }
 }
 

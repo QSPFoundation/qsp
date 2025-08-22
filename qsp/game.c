@@ -147,6 +147,14 @@ QSP_BOOL qspNewGame(QSP_BOOL toReset)
         /* Execute callbacks to update the current state */
         qspResetTime(0);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
+        qspCallSetInputStrText(qspNullString);
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
+        qspCallShowPicture(qspNullString);
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
+        qspCallCloseFile(qspNullString);
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
+        qspCallSetTimer(QSP_DEFTIMERINTERVAL);
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs);
@@ -156,14 +164,6 @@ QSP_BOOL qspNewGame(QSP_BOOL toReset)
         qspCallShowWindow(QSP_WIN_INPUT, qspCurToShowInput);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView);
-        if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallSetInputStrText(qspNullString);
-        if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowPicture(qspNullString);
-        if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallCloseFile(qspNullString);
-        if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallSetTimer(QSP_DEFTIMERINTERVAL);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
     }
     qspNavigateToLocation(0, QSP_TRUE, 0, 0);
@@ -599,16 +599,6 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     oldLocationState = qspLocationState;
     qspResetTime(msecsCount);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_VARS, qspCurToShowVars);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_INPUT, qspCurToShowInput);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspCallSetInputStrText(qspCurInput);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspCallShowPicture(qspViewPath);
@@ -618,6 +608,16 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCallSetTimer(qspTimerInterval);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspRestoreCurrentIncludes();
+    if (qspLocationState != oldLocationState) return QSP_FALSE;
+    qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs);
+    if (qspLocationState != oldLocationState) return QSP_FALSE;
+    qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs);
+    if (qspLocationState != oldLocationState) return QSP_FALSE;
+    qspCallShowWindow(QSP_WIN_VARS, qspCurToShowVars);
+    if (qspLocationState != oldLocationState) return QSP_FALSE;
+    qspCallShowWindow(QSP_WIN_INPUT, qspCurToShowInput);
+    if (qspLocationState != oldLocationState) return QSP_FALSE;
+    qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_GAMELOADED), 0, 0);
     return QSP_TRUE;
