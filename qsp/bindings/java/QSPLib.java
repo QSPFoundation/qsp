@@ -34,7 +34,8 @@ public abstract class QSPLib {
         ACTS,
         OBJS,
         VARS,
-        INPUT
+        INPUT,
+        VIEW
     }
 
     public class ListItem {

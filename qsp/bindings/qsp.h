@@ -45,7 +45,8 @@
         QSP_WIN_ACTS,
         QSP_WIN_OBJS,
         QSP_WIN_VARS,
-        QSP_WIN_INPUT
+        QSP_WIN_INPUT,
+        QSP_WIN_VIEW
     };
 
     enum

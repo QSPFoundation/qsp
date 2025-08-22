@@ -26,6 +26,7 @@
     extern QSP_BOOL qspIsVarsDescChanged;
     extern QSP_BOOL qspCurToShowVars;
     extern QSP_BOOL qspCurToShowInput;
+    extern QSP_BOOL qspCurToShowView;
 
     /* External functions */
     void qspInitRuntime(void);

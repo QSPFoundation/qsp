@@ -142,17 +142,20 @@ QSP_BOOL qspNewGame(QSP_BOOL toReset)
         qspSetSeed((unsigned int)QSP_TIME(0));
         qspTimerInterval = QSP_DEFTIMERINTERVAL;
         qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
+        qspCurToShowView = QSP_FALSE;
         qspMemClear(QSP_FALSE);
         /* Execute callbacks to update the current state */
         qspResetTime(0);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowWindow(QSP_WIN_ACTS, QSP_TRUE);
+        qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowWindow(QSP_WIN_OBJS, QSP_TRUE);
+        qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowWindow(QSP_WIN_VARS, QSP_TRUE);
+        qspCallShowWindow(QSP_WIN_VARS, qspCurToShowVars);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowWindow(QSP_WIN_INPUT, QSP_TRUE);
+        qspCallShowWindow(QSP_WIN_INPUT, qspCurToShowInput);
+        if (qspLocationState != oldLocationState) return QSP_FALSE;
+        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallSetInputStrText(qspNullString);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
@@ -318,6 +321,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     qspAppendEncodedIntVal(&bufString, (int)qspCurToShowObjs, isUCS);
     qspAppendEncodedIntVal(&bufString, (int)qspCurToShowVars, isUCS);
     qspAppendEncodedIntVal(&bufString, (int)qspCurToShowInput, isUCS);
+    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowView, isUCS);
     qspAppendEncodedIntVal(&bufString, qspTimerInterval, isUCS);
     qspAppendEncodedIntVal(&bufString, qspPLFilesCount, isUCS);
     for (i = 0; i < qspPLFilesCount; ++i)
@@ -404,7 +408,9 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
         qspReadEncodedIntVal(strs[2], isUCS) != qspQstCRC) return QSP_FALSE;
     selAction = qspReadEncodedIntVal(strs[4], isUCS); /* qspCurSelAction */
     selObject = qspReadEncodedIntVal(strs[5], isUCS); /* qspCurSelObject */
-    if (qspReadEncodedIntVal(strs[15], isUCS) < 0) return QSP_FALSE; /* qspTimerInterval */
+    /* qspTimerInterval */
+    if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &temp)) return QSP_FALSE;
+    if (temp < 0) return QSP_FALSE;
     /* qspPLFilesCount */
     if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
     if (count < 0 || count > QSP_MAXPLFILES) return QSP_FALSE;
@@ -515,9 +521,10 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurToShowObjs = (qspReadEncodedIntVal(strs[12], isUCS) != 0);
     qspCurToShowVars = (qspReadEncodedIntVal(strs[13], isUCS) != 0);
     qspCurToShowInput = (qspReadEncodedIntVal(strs[14], isUCS) != 0);
-    qspTimerInterval = qspReadEncodedIntVal(strs[15], isUCS);
-    qspPLFilesCount = qspReadEncodedIntVal(strs[16], isUCS);
-    ind = 17;
+    qspCurToShowView = (qspReadEncodedIntVal(strs[15], isUCS) != 0);
+    qspTimerInterval = qspReadEncodedIntVal(strs[16], isUCS);
+    qspPLFilesCount = qspReadEncodedIntVal(strs[17], isUCS);
+    ind = 18;
     for (i = 0; i < qspPLFilesCount; ++i)
         qspPLFiles[i] = qspDecodeString(strs[ind++], isUCS);
     qspCurIncFilesCount = qspReadEncodedIntVal(strs[ind++], isUCS);
@@ -599,6 +606,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCallShowWindow(QSP_WIN_VARS, qspCurToShowVars);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspCallShowWindow(QSP_WIN_INPUT, qspCurToShowInput);
+    if (qspLocationState != oldLocationState) return QSP_FALSE;
+    qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspCallSetInputStrText(qspCurInput);
     if (qspLocationState != oldLocationState) return QSP_FALSE;

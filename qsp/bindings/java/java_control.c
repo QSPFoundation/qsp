@@ -260,6 +260,9 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_showWindow(JNIEnv *env, jobjec
     case QSP_WIN_INPUT:
         qspCurToShowInput = toShow;
         break;
+    case QSP_WIN_VIEW:
+        qspCurToShowView = toShow;
+        break;
     }
 }
 /* ------------------------------------------------------------ */

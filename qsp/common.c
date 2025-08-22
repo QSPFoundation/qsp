@@ -32,6 +32,7 @@ QSP_BOOL qspIsMainDescChanged = QSP_FALSE;
 QSP_BOOL qspIsVarsDescChanged = QSP_FALSE;
 QSP_BOOL qspCurToShowVars = QSP_TRUE;
 QSP_BOOL qspCurToShowInput = QSP_TRUE;
+QSP_BOOL qspCurToShowView = QSP_FALSE;
 
 INLINE unsigned int qspURand(void);
 INLINE int qspRand(void);
@@ -59,6 +60,7 @@ void qspInitRuntime(void)
     qspCurLoc = -1;
     qspTimerInterval = 0;
     qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
+    qspCurToShowView = QSP_FALSE;
 
     qspSetSeed(0);
     qspInitVarTypes();

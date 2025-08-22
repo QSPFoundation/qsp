@@ -286,6 +286,9 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
     case QSP_WIN_INPUT:
         qspCurToShowInput = toShow;
         break;
+    case QSP_WIN_VIEW:
+        qspCurToShowView = toShow;
+        break;
     }
 }
 /* ------------------------------------------------------------ */

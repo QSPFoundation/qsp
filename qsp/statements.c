@@ -1189,14 +1189,19 @@ INLINE void qspStatementRefInt(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNU
 
 INLINE void qspStatementView(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
+    int oldLocationState = qspLocationState;
     if (count && qspIsAnyString(QSP_STR(args[0])))
     {
         qspUpdateText(&qspViewPath, QSP_STR(args[0]));
+        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView = QSP_TRUE);
+        if (qspLocationState != oldLocationState) return;
         qspCallShowPicture(qspViewPath);
     }
     else
     {
         qspClearText(&qspViewPath);
+        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView = QSP_FALSE);
+        if (qspLocationState != oldLocationState) return;
         qspCallShowPicture(qspNullString);
     }
 }
