@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
-project(qsp VERSION 5.9.3)
+project(qsp VERSION 5.9.4)
 
-set(QSP_GAMEMIN_VER "5.9.0")
+set(QSP_GAMEMIN_VER "5.9.4")
 
 include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
@@ -124,6 +124,7 @@ target_link_options(qsp PRIVATE ${PROJECT_LINKER_FLAGS})
 target_link_libraries(qsp PRIVATE oniguruma::onig)
 
 if (BUILD_JAVA)
+	set_property(TARGET qsp PROPERTY C_STANDARD 11)
 	target_compile_definitions(qsp PRIVATE _JAVA)
 	if (NOT ANDROID)
 		find_package(JNI)

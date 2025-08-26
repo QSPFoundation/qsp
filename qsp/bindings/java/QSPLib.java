@@ -39,8 +39,14 @@ public abstract class QSPLib {
     }
 
     public class ListItem {
-        public String image;
         public String name;
+        public String image;
+    }
+
+    public class ObjectItem {
+        public String name;
+        public String title;
+        public String image;
     }
 
     public class ExecutionState {
@@ -82,7 +88,7 @@ public abstract class QSPLib {
     public native boolean execSelAction(boolean toRefreshUI);
     public native int getSelActIndex();
     public native boolean isActsChanged();
-    public native ListItem[] getObjects();
+    public native ObjectItem[] getObjects();
     public native boolean setSelObjIndex(int index, boolean toRefreshUI);
     public native int getSelObjIndex();
     public native boolean isObjsChanged();

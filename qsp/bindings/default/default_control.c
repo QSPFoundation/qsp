@@ -235,12 +235,13 @@ QSP_BOOL QSPIsActionsChanged(void)
 /* Objects */
 
 /* Get current objects */
-int QSPGetObjects(QSPListItem *items, int itemsBufSize)
+int QSPGetObjects(QSPObjectItem *items, int itemsBufSize)
 {
     int i;
     for (i = 0; i < qspCurObjsCount && i < itemsBufSize; ++i)
     {
-        items[i].Name = qspCurObjects[i].Desc;
+        items[i].Name = qspCurObjects[i].Name;
+        items[i].Title = qspCurObjects[i].Desc;
         items[i].Image = qspCurObjects[i].Image;
     }
     return qspCurObjsCount;

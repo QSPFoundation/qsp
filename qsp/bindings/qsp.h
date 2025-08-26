@@ -114,7 +114,7 @@
         /* STRING */ QSP_TYPE_STR,
         /* CODE */   QSP_TYPE_STR,
         /* VARREF */ QSP_TYPE_STR,
-        /* UNDEFINED */ QSP_TYPE_STR
+        /* UNDEF */  QSP_TYPE_STR
     };
 
     #define QSP_ISDEF(a) ((a) != QSP_TYPE_UNDEF)
@@ -157,9 +157,16 @@
 
     typedef struct
     {
-        QSPString Image;
         QSPString Name;
+        QSPString Image;
     } QSPListItem;
+
+    typedef struct
+    {
+        QSPString Name;
+        QSPString Title;
+        QSPString Image;
+    } QSPObjectItem;
 
     typedef struct
     {

@@ -332,8 +332,8 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     qspAppendEncodedIntVal(&bufString, qspCurActsCount, isUCS);
     for (i = 0; i < qspCurActsCount; ++i)
     {
-        qspAppendEncodedStrVal(&bufString, qspCurActions[i].Image, isUCS);
         qspAppendEncodedStrVal(&bufString, qspCurActions[i].Desc, isUCS);
+        qspAppendEncodedStrVal(&bufString, qspCurActions[i].Image, isUCS);
         qspAppendEncodedIntVal(&bufString, qspCurActions[i].OnPressLinesCount, isUCS);
         for (j = 0; j < qspCurActions[i].OnPressLinesCount; ++j)
         {
@@ -346,8 +346,9 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     qspAppendEncodedIntVal(&bufString, qspCurObjsCount, isUCS);
     for (i = 0; i < qspCurObjsCount; ++i)
     {
-        qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Image, isUCS);
+        qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Name, isUCS);
         qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Desc, isUCS);
+        qspAppendEncodedStrVal(&bufString, qspCurObjects[i].Image, isUCS);
     }
     bucket = qspGlobalVars.Buckets; /* use the global scope */
     for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i, ++bucket)
@@ -427,7 +428,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     /* actions */
     for (i = 0; i < count; ++i)
     {
-        /* image + description */
+        /* description + image */
         if (!qspSkipLines(strsCount, 2, &ind)) return QSP_FALSE;
         /* lines of code count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &groupsCount)) return QSP_FALSE;
@@ -450,8 +451,8 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     /* qspCurObjsCount */
     if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
     if (count < 0 || count > QSP_MAXOBJECTS || selObject >= count) return QSP_FALSE;
-    /* objects: image + description */
-    if (!qspSkipLines(strsCount, 2 * count, &ind)) return QSP_FALSE;
+    /* objects: name + description + image */
+    if (!qspSkipLines(strsCount, 3 * count, &ind)) return QSP_FALSE;
     for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i)
     {
         /* variables count */
@@ -533,8 +534,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurActsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
     for (i = 0; i < qspCurActsCount; ++i)
     {
-        qspCurActions[i].Image = qspDecodeString(strs[ind++], isUCS);
         qspCurActions[i].Desc = qspDecodeString(strs[ind++], isUCS);
+        qspCurActions[i].Image = qspDecodeString(strs[ind++], isUCS);
         valsCount = qspCurActions[i].OnPressLinesCount = qspReadEncodedIntVal(strs[ind++], isUCS);
         if (valsCount)
         {
@@ -553,8 +554,9 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurObjsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
     for (i = 0; i < qspCurObjsCount; ++i)
     {
-        qspCurObjects[i].Image = qspDecodeString(strs[ind++], isUCS);
+        qspCurObjects[i].Name = qspDecodeString(strs[ind++], isUCS);
         qspCurObjects[i].Desc = qspDecodeString(strs[ind++], isUCS);
+        qspCurObjects[i].Image = qspDecodeString(strs[ind++], isUCS);
     }
     bucket = qspGlobalVars.Buckets; /* use the global scope */
     for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i, ++bucket)

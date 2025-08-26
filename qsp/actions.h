@@ -16,8 +16,8 @@
 
     typedef struct
     {
-        QSPString Image;
         QSPString Desc;
+        QSPString Image;
         QSPLineOfCode *OnPressLines;
         int OnPressLinesCount;
         int Location;

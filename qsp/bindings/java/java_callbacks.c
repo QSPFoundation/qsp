@@ -218,7 +218,7 @@ int qspCallShowMenu(QSPListItem *items, int count)
         jniMenuArray = (*javaEnv)->NewObjectArray(javaEnv, count, qspListItemClass, 0);
         for (i = 0; i < count; ++i)
         {
-            jniItems[i] = qspToJavaListItem(javaEnv, items[i].Image, items[i].Name);
+            jniItems[i] = qspToJavaListItem(javaEnv, items[i].Name, items[i].Image);
             (*javaEnv)->SetObjectArrayElement(javaEnv, jniMenuArray, i, jniItems[i].ListItem);
         }
 

@@ -49,19 +49,22 @@
     extern jobject qspApiObject;
 
     extern jclass qspListItemClass;
+    extern jclass qspObjectItemClass;
     extern jclass qspExecutionStateClass;
     extern jclass qspErrorInfoClass;
 
     typedef struct
     {
-        jstring Image;
         jstring Name;
+        jstring Title;
+        jstring Image;
         jobject ListItem;
     } JNIListItem;
 
     jstring qspToJavaString(JNIEnv *env, QSPString str);
     QSPString qspFromJavaString(JNIEnv *env, jstring str);
-    JNIListItem qspToJavaListItem(JNIEnv *env, QSPString image, QSPString name);
+    JNIListItem qspToJavaListItem(JNIEnv *env, QSPString name, QSPString image);
+    JNIListItem qspToJavaObjectItem(JNIEnv *env, QSPString name, QSPString title, QSPString image);
     void qspReleaseJavaListItem(JNIEnv *env, JNIListItem *listItem);
 
 #endif

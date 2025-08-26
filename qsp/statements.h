@@ -73,6 +73,7 @@
         qspStatKillAll,
         qspStatAddObj,
         qspStatDelObj,
+        qspStatModObj,
         qspStatKillObj,
         qspStatUnSelect,
         qspStatAct,

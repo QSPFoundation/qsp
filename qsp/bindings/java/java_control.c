@@ -31,6 +31,7 @@ jclass qspApiClass;
 jobject qspApiObject;
 
 jclass qspListItemClass;
+jclass qspObjectItemClass;
 jclass qspExecutionStateClass;
 jclass qspErrorInfoClass;
 
@@ -51,30 +52,55 @@ QSPString qspFromJavaString(JNIEnv *env, jstring str)
     return res;
 }
 
-JNIListItem qspToJavaListItem(JNIEnv *env, QSPString image, QSPString name)
+JNIListItem qspToJavaListItem(JNIEnv *env, QSPString name, QSPString image)
 {
     JNIListItem res;
     jfieldID fieldId;
     jobject jniListItem = (*env)->AllocObject(env, qspListItemClass);
 
     res.ListItem = jniListItem;
-    res.Image = qspToJavaString(env, image);
     res.Name = qspToJavaString(env, name);
+    res.Title = 0;
+    res.Image = qspToJavaString(env, image);
+
+    fieldId = (*env)->GetFieldID(env, qspListItemClass , "name", "Ljava/lang/String;");
+    (*env)->SetObjectField(env, jniListItem, fieldId, res.Name);
 
     fieldId = (*env)->GetFieldID(env, qspListItemClass , "image", "Ljava/lang/String;");
     (*env)->SetObjectField(env, jniListItem, fieldId, res.Image);
 
-    fieldId = (*env)->GetFieldID(env, qspListItemClass , "name", "Ljava/lang/String;");
+    return res;
+}
+
+JNIListItem qspToJavaObjectItem(JNIEnv *env, QSPString name, QSPString title, QSPString image)
+{
+    JNIListItem res;
+    jfieldID fieldId;
+    jobject jniListItem = (*env)->AllocObject(env, qspObjectItemClass);
+
+    res.ListItem = jniListItem;
+    res.Name = qspToJavaString(env, name);
+    res.Title = qspToJavaString(env, title);
+    res.Image = qspToJavaString(env, image);
+
+    fieldId = (*env)->GetFieldID(env, qspObjectItemClass , "name", "Ljava/lang/String;");
     (*env)->SetObjectField(env, jniListItem, fieldId, res.Name);
+
+    fieldId = (*env)->GetFieldID(env, qspObjectItemClass , "title", "Ljava/lang/String;");
+    (*env)->SetObjectField(env, jniListItem, fieldId, res.Title);
+
+    fieldId = (*env)->GetFieldID(env, qspObjectItemClass , "image", "Ljava/lang/String;");
+    (*env)->SetObjectField(env, jniListItem, fieldId, res.Image);
 
     return res;
 }
 
 void qspReleaseJavaListItem(JNIEnv *env, JNIListItem *listItem)
 {
-    (*env)->DeleteLocalRef(env, listItem->ListItem);
-    (*env)->DeleteLocalRef(env, listItem->Image);
     (*env)->DeleteLocalRef(env, listItem->Name);
+    (*env)->DeleteLocalRef(env, listItem->Title);
+    (*env)->DeleteLocalRef(env, listItem->Image);
+    (*env)->DeleteLocalRef(env, listItem->ListItem);
 }
 
 /* ------------------------------------------------------------ */
@@ -163,7 +189,7 @@ JNIEXPORT jobjectArray JNICALL Java_com_libqsp_jni_QSPLib_getActions(JNIEnv *env
     jobjectArray res = (*env)->NewObjectArray(env, qspCurActsCount, qspListItemClass, 0);
     for (i = 0; i < qspCurActsCount; ++i)
     {
-        item = qspToJavaListItem(env, qspCurActions[i].Image, qspCurActions[i].Desc);
+        item = qspToJavaListItem(env, qspCurActions[i].Desc, qspCurActions[i].Image);
         (*env)->SetObjectArrayElement(env, res, i, item.ListItem);
     }
     return res;
@@ -211,10 +237,10 @@ JNIEXPORT jobjectArray JNICALL Java_com_libqsp_jni_QSPLib_getObjects(JNIEnv *env
 {
     int i;
     JNIListItem item;
-    jobjectArray res = (*env)->NewObjectArray(env, qspCurObjsCount, qspListItemClass, 0);
+    jobjectArray res = (*env)->NewObjectArray(env, qspCurObjsCount, qspObjectItemClass, 0);
     for (i = 0; i < qspCurObjsCount; ++i)
     {
-        item = qspToJavaListItem(env, qspCurObjects[i].Image, qspCurObjects[i].Desc);
+        item = qspToJavaObjectItem(env, qspCurObjects[i].Name, qspCurObjects[i].Desc, qspCurObjects[i].Image);
         (*env)->SetObjectArrayElement(env, res, i, item.ListItem);
     }
     return res;
@@ -528,6 +554,9 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api)
     clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ListItem");
     qspListItemClass = (jclass)(*env)->NewGlobalRef(env, clazz);
 
+    clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ObjectItem");
+    qspObjectItemClass = (jclass)(*env)->NewGlobalRef(env, clazz);
+
     clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ExecutionState");
     qspExecutionStateClass = (jclass)(*env)->NewGlobalRef(env, clazz);
 
@@ -564,6 +593,7 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_terminate(JNIEnv *env, jobject
     (*env)->DeleteGlobalRef(env, qspApiObject);
     (*env)->DeleteGlobalRef(env, qspApiClass);
     (*env)->DeleteGlobalRef(env, qspListItemClass);
+    (*env)->DeleteGlobalRef(env, qspObjectItemClass);
     (*env)->DeleteGlobalRef(env, qspExecutionStateClass);
     (*env)->DeleteGlobalRef(env, qspErrorInfoClass);
 }

@@ -107,7 +107,7 @@
     QSP_EXTERN QSP_BOOL QSPIsActionsChanged(void);
     QSP_EXTERN QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI);
     /* Objects */
-    QSP_EXTERN int QSPGetObjects(QSPListItem *items, int itemsBufSize);
+    QSP_EXTERN int QSPGetObjects(QSPObjectItem *items, int itemsBufSize);
     QSP_EXTERN QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI);
     QSP_EXTERN int QSPGetSelObjectIndex(void);
     QSP_EXTERN QSP_BOOL QSPIsObjectsChanged(void);

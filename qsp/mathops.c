@@ -1169,7 +1169,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         QSP_STR(tos) = (qspCurLoc >= 0 && qspCurLoc < qspLocsCount ? qspCopyToNewText(qspLocs[qspCurLoc].Name) : qspNullString);
         break;
     case qspOpSelObj:
-        QSP_STR(tos) = (qspCurSelObject >= 0 ? qspCopyToNewText(qspCurObjects[qspCurSelObject].Desc) : qspNullString);
+        QSP_STR(tos) = (qspCurSelObject >= 0 ? qspCopyToNewText(qspCurObjects[qspCurSelObject].Name) : qspNullString);
         break;
     case qspOpSelAct:
         QSP_STR(tos) = (qspCurSelAction >= 0 ? qspCopyToNewText(qspCurActions[qspCurSelAction].Desc) : qspNullString);
@@ -1537,7 +1537,7 @@ INLINE void qspFunctionGetObj(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), Q
 {
     int index = QSP_TOINT(QSP_NUM(args[0]) - 1);
     if (index >= 0 && index < qspCurObjsCount)
-        QSP_PSTR(res) = qspCopyToNewText(qspCurObjects[index].Desc);
+        QSP_PSTR(res) = qspCopyToNewText(qspCurObjects[index].Name);
     else
         QSP_PSTR(res) = qspNullString;
 }

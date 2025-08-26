@@ -138,7 +138,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isActsChanged
 /*
  * Class:     com_libqsp_jni_QSPLib
  * Method:    getObjects
- * Signature: ()[Lcom/libqsp/jni/QSPLib/ListItem;
+ * Signature: ()[Lcom/libqsp/jni/QSPLib/ObjectItem;
  */
 JNIEXPORT jobjectArray JNICALL Java_com_libqsp_jni_QSPLib_getObjects
   (JNIEnv *, jobject);
