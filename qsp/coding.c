@@ -336,7 +336,7 @@ void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val, QSP_BOOL isUCS2)
     qspAppendEncodedIntVal(s, val.Type, isUCS2);
     switch (QSP_BASETYPE(val.Type))
     {
-        case QSP_TYPE_TUPLE:
+    case QSP_TYPE_TUPLE:
         {
             int i;
             QSPTuple tuple = QSP_TUPLE(val);
@@ -345,12 +345,12 @@ void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val, QSP_BOOL isUCS2)
                 qspAppendEncodedVariant(s, tuple.Vals[i], isUCS2);
             break;
         }
-        case QSP_TYPE_STR:
-            qspAppendEncodedStrVal(s, QSP_STR(val), isUCS2);
-            break;
-        case QSP_TYPE_NUM:
-            qspAppendEncodedIntVal(s, QSP_NUM(val), isUCS2);
-            break;
+    case QSP_TYPE_STR:
+        qspAppendEncodedStrVal(s, QSP_STR(val), isUCS2);
+        break;
+    case QSP_TYPE_NUM:
+        qspAppendEncodedIntVal(s, QSP_NUM(val), isUCS2);
+        break;
     }
 }
 
@@ -362,7 +362,7 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
     if (type < 0 || type >= QSP_TYPE_DEFINED_TYPES) return QSP_FALSE; /* unsupported value type */
     switch (QSP_BASETYPE(type))
     {
-        case QSP_TYPE_TUPLE:
+    case QSP_TYPE_TUPLE:
         {
             int itemsCount;
             if (ind >= strsCount) return QSP_FALSE;
@@ -390,14 +390,14 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
             }
             break;
         }
-        case QSP_TYPE_STR:
-            if (ind >= strsCount) return QSP_FALSE;
-            QSP_PSTR(val) = qspDecodeString(strs[ind++], isUCS2);
-            break;
-        case QSP_TYPE_NUM:
-            if (ind >= strsCount) return QSP_FALSE;
-            QSP_PNUM(val) = qspReadEncodedIntVal(strs[ind++], isUCS2);
-            break;
+    case QSP_TYPE_STR:
+        if (ind >= strsCount) return QSP_FALSE;
+        QSP_PSTR(val) = qspDecodeString(strs[ind++], isUCS2);
+        break;
+    case QSP_TYPE_NUM:
+        if (ind >= strsCount) return QSP_FALSE;
+        QSP_PNUM(val) = qspReadEncodedIntVal(strs[ind++], isUCS2);
+        break;
     }
     val->Type = (QSP_TINYINT)type;
     *curIndex = ind;

@@ -25,11 +25,12 @@ void qspClearAllActions(QSP_BOOL toInit)
     if (!toInit && qspCurActsCount)
     {
         int i;
-        for (i = 0; i < qspCurActsCount; ++i)
+        QSPCurAct *curAct = qspCurActions;
+        for (i = qspCurActsCount; i > 0; --i, ++curAct)
         {
-            qspFreeString(&qspCurActions[i].Image);
-            qspFreeString(&qspCurActions[i].Desc);
-            qspFreePrepLines(qspCurActions[i].OnPressLines, qspCurActions[i].OnPressLinesCount);
+            qspFreeString(&curAct->Image);
+            qspFreeString(&curAct->Desc);
+            qspFreePrepLines(curAct->OnPressLines, curAct->OnPressLinesCount);
         }
         qspIsActsListChanged = QSP_TRUE;
     }
@@ -105,31 +106,33 @@ void qspExecAction(int ind)
 QSPString qspGetAllActionsAsCode(void)
 {
     int count, i;
+    QSPCurAct *curAct;
     QSPString temp;
     QSPBufString res = qspNewBufString(256);
-    for (i = 0; i < qspCurActsCount; ++i)
+    curAct = qspCurActions;
+    for (i = qspCurActsCount; i > 0; --i, ++curAct)
     {
         qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ") QSP_DEFQUOT));
-        temp = qspReplaceText(qspCurActions[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+        temp = qspReplaceText(curAct->Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
         qspAddBufText(&res, temp);
-        qspFreeNewString(&temp, &qspCurActions[i].Desc);
-        if (qspCurActions[i].Image.Str)
+        qspFreeNewString(&temp, &curAct->Desc);
+        if (curAct->Image.Str)
         {
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(",") QSP_DEFQUOT));
-            temp = qspReplaceText(qspCurActions[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+            temp = qspReplaceText(curAct->Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
             qspAddBufText(&res, temp);
-            qspFreeNewString(&temp, &qspCurActions[i].Image);
+            qspFreeNewString(&temp, &curAct->Image);
         }
         qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(":")));
-        count = qspCurActions[i].OnPressLinesCount;
-        if (count == 1 && qspIsAnyString(qspCurActions[i].OnPressLines->Str))
-            qspAddBufText(&res, qspCurActions[i].OnPressLines->Str);
+        count = curAct->OnPressLinesCount;
+        if (count == 1 && qspIsAnyString(curAct->OnPressLines->Str))
+            qspAddBufText(&res, curAct->OnPressLines->Str);
         else
         {
             if (count >= 2)
             {
                 qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM));
-                temp = qspJoinPrepLines(qspCurActions[i].OnPressLines, count, QSP_STATIC_STR(QSP_STRSDELIM));
+                temp = qspJoinPrepLines(curAct->OnPressLines, count, QSP_STATIC_STR(QSP_STRSDELIM));
                 qspAddBufText(&res, temp);
                 qspFreeString(&temp);
             }

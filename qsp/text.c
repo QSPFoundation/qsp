@@ -149,6 +149,24 @@ void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end)
         *dest = 0;
 }
 
+void qspReverseStrs(QSPString *strs, int count)
+{
+    if (count > 1)
+    {
+        QSPString temp;
+        int start = 0;
+        int end = count - 1;
+        while (start < end)
+        {
+            temp = strs[start];
+            strs[start] = strs[end];
+            strs[end] = temp;
+            ++start;
+            --end;
+        }
+    }
+}
+
 void qspFreeStrs(QSPString *strs, int count)
 {
     if (strs)

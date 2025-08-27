@@ -33,11 +33,12 @@ void qspClearAllObjects(QSP_BOOL toInit)
     if (!toInit && qspCurObjsCount)
     {
         int i;
-        for (i = 0; i < qspCurObjsCount; ++i)
+        QSPObj *curObj = qspCurObjects;
+        for (i = qspCurObjsCount; i > 0; --i, ++curObj)
         {
-            qspFreeString(&qspCurObjects[i].Name);
-            qspFreeString(&qspCurObjects[i].Desc);
-            qspFreeString(&qspCurObjects[i].Image);
+            qspFreeString(&curObj->Name);
+            qspFreeString(&curObj->Desc);
+            qspFreeString(&curObj->Image);
         }
         qspIsObjsListChanged = QSP_TRUE;
     }
@@ -214,28 +215,28 @@ INLINE void qspUpdateObjectsByName(QSPString objName, QSPString objDesc, QSPStri
     if (qspCurObjsCount)
     {
         int i;
-        QSPObj *obj;
+        QSPObj *curObj;
         QSPString bufName;
         QSPBufString buf;
         objName = qspCopyToNewText(objName);
         qspUpperStr(&objName);
         buf = qspNewBufString(32);
-        obj = qspCurObjects;
-        for (i = qspCurObjsCount; i > 0; --i, ++obj)
+        curObj = qspCurObjects;
+        for (i = qspCurObjsCount; i > 0; --i, ++curObj)
         {
-            qspUpdateBufString(&buf, obj->Name);
+            qspUpdateBufString(&buf, curObj->Name);
             bufName = qspBufTextToString(buf);
             qspUpperStr(&bufName);
             if (!qspStrsCompare(bufName, objName))
             {
-                if (qspStrsCompare(obj->Desc, objDesc))
+                if (qspStrsCompare(curObj->Desc, objDesc))
                 {
-                    qspUpdateText(&obj->Desc, objDesc);
+                    qspUpdateText(&curObj->Desc, objDesc);
                     qspIsObjsListChanged = QSP_TRUE;
                 }
-                if (toUpdateImage && qspStrsCompare(obj->Image, objImage))
+                if (toUpdateImage && qspStrsCompare(curObj->Image, objImage))
                 {
-                    qspUpdateText(&obj->Image, objImage);
+                    qspUpdateText(&curObj->Image, objImage);
                     qspIsObjsListChanged = QSP_TRUE;
                 }
             }
@@ -248,34 +249,36 @@ INLINE void qspUpdateObjectsByName(QSPString objName, QSPString objDesc, QSPStri
 QSPString qspGetAllObjectsAsCode(void)
 {
     int i;
+    QSPObj *curObj;
     QSPString objName, temp;
     QSPBufString res = qspNewBufString(256);
-    for (i = 0; i < qspCurObjsCount; ++i)
+    curObj = qspCurObjects;
+    for (i = qspCurObjsCount; i > 0; --i, ++curObj)
     {
         /* Add the object */
-        objName = qspReplaceText(qspCurObjects[i].Name, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+        objName = qspReplaceText(curObj->Name, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
         qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ADDOBJ ") QSP_DEFQUOT));
         qspAddBufText(&res, objName);
-        if (qspCurObjects[i].Image.Str)
+        if (curObj->Image.Str)
         {
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(", ") QSP_DEFQUOT));
-            temp = qspReplaceText(qspCurObjects[i].Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+            temp = qspReplaceText(curObj->Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
             qspAddBufText(&res, temp);
-            qspFreeNewString(&temp, &qspCurObjects[i].Image);
+            qspFreeNewString(&temp, &curObj->Image);
         }
         qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_STRSDELIM));
         /* Assign the description if it's not the same as the name */
-        if (qspStrsCompare(qspCurObjects[i].Name, qspCurObjects[i].Desc))
+        if (qspStrsCompare(curObj->Name, curObj->Desc))
         {
             qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("MODOBJ ") QSP_DEFQUOT));
             qspAddBufText(&res, objName);
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(", ") QSP_DEFQUOT));
-            temp = qspReplaceText(qspCurObjects[i].Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+            temp = qspReplaceText(curObj->Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
             qspAddBufText(&res, temp);
-            qspFreeNewString(&temp, &qspCurObjects[i].Desc);
+            qspFreeNewString(&temp, &curObj->Desc);
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_STRSDELIM));
         }
-        qspFreeNewString(&objName, &qspCurObjects[i].Name);
+        qspFreeNewString(&objName, &curObj->Name);
     }
     return qspBufTextToString(res);
 }

@@ -45,6 +45,7 @@
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);
     void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end);
+    void qspReverseStrs(QSPString *strs, int count);
     void qspFreeStrs(QSPString *strs, int count);
     QSP_BOOL qspIsStrNumber(QSPString s);
     QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid);
@@ -251,7 +252,7 @@
         return 0;
     }
 
-    INLINE QSP_CHAR *qspStrRChar(QSPString str, QSP_CHAR ch)
+    INLINE QSP_CHAR *qspStrLastChar(QSPString str, QSP_CHAR ch)
     {
         QSP_CHAR *lastPos = 0, *pos = str.Str;
         while (pos < str.End)

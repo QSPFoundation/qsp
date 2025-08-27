@@ -79,14 +79,14 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
         case QSP_TYPE_STR:
             str = QSP_PSTR(curItem);
             if (!qspIsAnyString(str)) break;
-            if (!(pos2 = qspStrRChar(str, QSP_MENUDELIM_CHAR)))
+            if (!(pos2 = qspStrLastChar(str, QSP_MENUDELIM_CHAR)))
             {
                 qspSetError(QSP_ERR_COLONNOTFOUND);
                 qspFreeMenuItems(menuItems, itemsCount);
                 qspFreeMenuLocs(menuLocs, itemsCount);
                 return;
             }
-            if ((pos = qspStrRChar(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM_CHAR)))
+            if ((pos = qspStrLastChar(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM_CHAR)))
             {
                 itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos));
                 itemLocation = qspCopyToNewText(qspStringFromPair(pos + QSP_CHAR_LEN, pos2));
