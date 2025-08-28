@@ -1,0 +1,65 @@
+name: Bug Report
+description: Report a bug or problem
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Give a short, clear description of what's going wrong.
+      placeholder: Briefly describe the bug or issue you're experiencing...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Feel free to share game files, code snippets, or links where the bug shows up, and let us know the steps to make it happen.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See the error.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: Explain what you expected to happen.
+      placeholder: Describe what you expected to happen instead...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: QSP Library Version
+      description: What version of the QSP library are you using?
+      placeholder: "e.g. 5.9.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating_system
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - Other (please specify in Additional Information)
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional Information
+      description: Add any additional information that might help us understand or reproduce the issue (screenshots, links to similar issues, config files, log files, etc).
+      placeholder: Any other context about the problem...
+    validations:
+      required: false

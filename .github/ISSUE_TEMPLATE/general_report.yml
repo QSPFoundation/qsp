@@ -1,0 +1,22 @@
+name: General Report
+description: Provide general feedback or inquiries
+title: "[General]: "
+labels: ["general"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Feedback or Inquiry
+      description: Share your feedback or questions with us.
+      placeholder: Tell us what's on your mind...
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional Information
+      description: Add any other relevant details here.
+      placeholder: Any additional context, screenshots, or information that might be helpful...
+    validations:
+      required: false
