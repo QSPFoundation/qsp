@@ -436,6 +436,7 @@ QSP {
                             | "wait"
                             | "addobj"
                             | "delobj"
+                            | "modobj"
                             | "killobj"
                             | "unselect" | "unsel"
                             | "killall"
