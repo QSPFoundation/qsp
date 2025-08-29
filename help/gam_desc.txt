@@ -6,7 +6,7 @@ Specification of the QSP game file format.
 3) Unicode is supported for both "old" and "new" formats. In the Unicode versions, each file character is represented by 2 bytes (UCS-2 LE) — the data type is uint16_t / unsigned short.
 
 The following notation is used:
-[text] - a string written without changes
+[data] - a value written without changes
 [$text] - a regular string
 [$$encoded text] - an encoded string
 [#number] - a number converted to a string
@@ -18,7 +18,7 @@ New game file format:
 Header:
 
 [QSPGAME]
-[$version of the game and utility used to save the file]
+[$version of the game and the tool used to save the file]
 [$$password of the game file]
 [##number of game locations]
 
@@ -42,7 +42,7 @@ Header:
 
 [#number of game locations]
 [$$password of the game file]
-[$version of the game and utility used to save the file]
+[$version of the game and the tool used to save the file]
 27 reserved empty lines
 
 Locations are saved sequentially in the following format:
