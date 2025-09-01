@@ -6,7 +6,6 @@
  */
 
 #include "declarations.h"
-#include "variant.h"
 
 #ifndef QSP_OBJSDEFINES
     #define QSP_OBJSDEFINES

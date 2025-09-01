@@ -7,8 +7,6 @@
 
 #include "declarations.h"
 #include "actions.h"
-#include "codetools.h"
-#include "variant.h"
 
 #ifndef QSP_LOCSDEFINES
     #define QSP_LOCSDEFINES
@@ -20,6 +18,7 @@
         QSPLineOfCode *OnPressLines;
         int OnPressLinesCount;
     } QSPLocAct;
+
     typedef struct
     {
         QSPString Name;
@@ -29,6 +28,7 @@
         QSPLocAct Actions[QSP_MAXACTIONS];
         int ActionsCount; /* number of base actions, some of them can be empty */
     } QSPLocation;
+
     typedef struct
     {
         int Index;

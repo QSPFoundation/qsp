@@ -9,6 +9,7 @@
 #include "errors.h"
 #include "locations.h"
 #include "mathops.h"
+#include "variant.h"
 
 QSPString qspNullString;
 unsigned char qspAsciiClasses[128];

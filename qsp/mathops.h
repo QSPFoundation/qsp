@@ -6,7 +6,6 @@
  */
 
 #include "declarations.h"
-#include "variant.h"
 
 #ifndef QSP_MATHDEFINES
     #define QSP_MATHDEFINES

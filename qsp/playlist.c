@@ -8,9 +8,7 @@
 #include "playlist.h"
 #include "callbacks.h"
 #include "common.h"
-#include "game.h"
 #include "locations.h"
-#include "statements.h"
 #include "text.h"
 
 QSPString qspPLFiles[QSP_MAXPLFILES];

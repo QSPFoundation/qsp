@@ -11,7 +11,6 @@
 
 #include "../../callbacks.h"
 #include "../../actions.h"
-#include "../../coding.h"
 #include "../../common.h"
 #include "../../errors.h"
 #include "../../locations.h"

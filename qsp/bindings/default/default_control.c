@@ -11,7 +11,6 @@
 
 #include "../../actions.h"
 #include "../../callbacks.h"
-#include "../../coding.h"
 #include "../../common.h"
 #include "../../errors.h"
 #include "../../game.h"

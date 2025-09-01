@@ -7,7 +7,6 @@
 
 #include "declarations.h"
 #include "codetools.h"
-#include "variant.h"
 
 #ifndef QSP_STATSDEFINES
     #define QSP_STATSDEFINES
