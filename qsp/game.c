@@ -13,6 +13,7 @@
 #include "common.h"
 #include "errors.h"
 #include "locations.h"
+#include "mathops.h"
 #include "objects.h"
 #include "playlist.h"
 #include "statements.h"
@@ -26,7 +27,7 @@ QSPString qspCurIncFiles[QSP_MAXINCFILES];
 int qspCurIncFilesCount = 0;
 int qspCurIncLocsCount = 0;
 
-int qspCRCTable[256] =
+static const unsigned int qspCRCTable[256] =
 {
     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
     0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91,
@@ -72,12 +73,12 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
 
 INLINE int qspCRC(void *data, int len)
 {
-    unsigned char *ptr;
-    int crc = 0;
-    ptr = (unsigned char *)data;
+    /* CRC-32B */
+    unsigned int crc = ~0;
+    unsigned char *ptr = (unsigned char *)data;
     while (len--)
-        crc = (qspCRCTable[(crc & 0xFF) ^ *ptr++] ^ crc >> 8) ^ 0xD202EF8D;
-    return crc;
+        crc = qspCRCTable[(crc & 0xFF) ^ *ptr++] ^ (crc >> 8);
+    return (int)~crc;
 }
 
 void qspClearAllIncludes(QSP_BOOL toInit)
@@ -180,6 +181,7 @@ INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS)
     if (locsCount <= 0) return QSP_FALSE;
     for (i = 0; i < locsCount; ++i)
     {
+        /* Location data: name, desc, code */
         if ((ind += 3) >= count) return QSP_FALSE;
         if (isOldFormat)
             actsCount = 20;
@@ -189,6 +191,7 @@ INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS)
             actsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
             if (actsCount < 0 || actsCount > QSP_MAXACTIONS) return QSP_FALSE;
         }
+        /* Actions: image, description, code */
         if ((ind += (actsCount * (isOldFormat ? 2 : 3))) >= count) return QSP_FALSE;
     }
     return QSP_TRUE;
@@ -405,8 +408,11 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     if (qspStrsCompare(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
-    if (!qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DEBUG"))) &&
-        qspReadEncodedIntVal(strs[2], isUCS) != qspQstCRC) return QSP_FALSE;
+    if (QSP_ISFALSE(qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DEBUG")))))
+    {
+        temp = qspReadEncodedIntVal(strs[2], isUCS);
+        if (temp != qspQstCRC) return QSP_FALSE;
+    }
     selAction = qspReadEncodedIntVal(strs[4], isUCS); /* qspCurSelAction */
     selObject = qspReadEncodedIntVal(strs[5], isUCS); /* qspCurSelObject */
     /* qspTimerInterval */
