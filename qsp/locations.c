@@ -6,6 +6,7 @@
  */
 
 #include "locations.h"
+#include "codetools.h"
 #include "common.h"
 #include "errors.h"
 #include "game.h"
