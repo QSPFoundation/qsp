@@ -199,7 +199,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     QSP_BOOL isOldFormat, toAddLoc, isUCS;
     int i, j, ind, crc, count, locsCount, actsCount, startLoc, endLoc;
     QSPString buf, gameString, *strs;
-    if (isNewGame) crc = qspCRC(data, dataSize);
+    crc = (isNewGame ? qspCRC(data, dataSize) : 0);
     isUCS = (dataSize >= 2 && *((char *)data + 1) == 0);
     gameString = qspStringFromFileData(data, dataSize, isUCS);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);

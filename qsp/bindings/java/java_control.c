@@ -46,7 +46,7 @@ QSPString qspFromJavaString(JNIEnv *env, jstring str)
     jchar *chars;
     QSPString res;
     length = (*env)->GetStringLength(env, str);
-    chars = (*env)->GetStringChars(env, str, 0);
+    chars = (jchar *)(*env)->GetStringChars(env, str, 0);
     res = qspCopyToNewText(qspStringFromLen(chars, length));
     (*env)->ReleaseStringChars(env, str, chars);
     return res;
