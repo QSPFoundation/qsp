@@ -6,7 +6,6 @@
  */
 
 #include "declarations.h"
-#include "qsp_config.h"
 
 #ifndef QSP_GAMEDEFINES
     #define QSP_GAMEDEFINES
