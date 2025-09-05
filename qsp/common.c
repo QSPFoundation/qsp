@@ -30,9 +30,7 @@ QSPString qspViewPath;
 int qspTimerInterval = 0;
 QSP_BOOL qspIsMainDescChanged = QSP_FALSE;
 QSP_BOOL qspIsVarsDescChanged = QSP_FALSE;
-QSP_BOOL qspCurToShowVars = QSP_TRUE;
-QSP_BOOL qspCurToShowInput = QSP_TRUE;
-QSP_BOOL qspCurToShowView = QSP_FALSE;
+QSP_TINYINT qspCurWindowsState = 0;
 
 INLINE unsigned int qspURand(void);
 INLINE int qspRand(void);
@@ -59,8 +57,7 @@ void qspInitRuntime(void)
     qspLocsCount = 0;
     qspCurLoc = -1;
     qspTimerInterval = 0;
-    qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
-    qspCurToShowView = QSP_FALSE;
+    qspCurWindowsState = QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_VARS | QSP_WIN_INPUT;
 
     qspSetSeed(0);
     qspInitVarTypes();
@@ -322,4 +319,22 @@ int qspNormalRand(int min, int max, int mean)
     if (res > max)
         return max;
     return (int)res;
+}
+
+void qspSetWindowState(int type, QSP_BOOL toShow)
+{
+    if (toShow)
+        qspCurWindowsState = (QSP_TINYINT)(qspCurWindowsState | type);
+    else
+        qspCurWindowsState = (QSP_TINYINT)(qspCurWindowsState & ~type);
+}
+
+QSP_TINYINT qspGetEnabledWindows(void)
+{
+    return (QSP_TINYINT)(qspCurWindowsState & QSP_WIN_ALL);
+}
+
+QSP_TINYINT qspGetDisabledWindows(void)
+{
+    return (QSP_TINYINT)(~qspCurWindowsState & QSP_WIN_ALL);
 }

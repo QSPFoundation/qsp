@@ -1171,16 +1171,20 @@ INLINE void qspStatementShowWin(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count),
     switch (extArg)
     {
     case qspStatShowActs:
-        qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs = val);
+        qspSetWindowState(QSP_WIN_ACTS, val);
+        qspCallShowWindow(QSP_WIN_ACTS, val);
         break;
     case qspStatShowObjs:
-        qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs = val);
+        qspSetWindowState(QSP_WIN_OBJS, val);
+        qspCallShowWindow(QSP_WIN_OBJS, val);
         break;
     case qspStatShowVars:
-        qspCallShowWindow(QSP_WIN_VARS, qspCurToShowVars = val);
+        qspSetWindowState(QSP_WIN_VARS, val);
+        qspCallShowWindow(QSP_WIN_VARS, val);
         break;
     case qspStatShowInput:
-        qspCallShowWindow(QSP_WIN_INPUT, qspCurToShowInput = val);
+        qspSetWindowState(QSP_WIN_INPUT, val);
+        qspCallShowWindow(QSP_WIN_INPUT, val);
         break;
     }
 }
@@ -1198,14 +1202,16 @@ INLINE void qspStatementView(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QS
         qspUpdateText(&qspViewPath, QSP_STR(args[0]));
         qspCallShowPicture(qspViewPath);
         if (qspLocationState != oldLocationState) return;
-        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView = QSP_TRUE);
+        qspSetWindowState(QSP_WIN_VIEW, QSP_TRUE);
+        qspCallShowWindow(QSP_WIN_VIEW, QSP_TRUE);
     }
     else
     {
         qspClearText(&qspViewPath);
         qspCallShowPicture(qspNullString);
         if (qspLocationState != oldLocationState) return;
-        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView = QSP_FALSE);
+        qspSetWindowState(QSP_WIN_VIEW, QSP_FALSE);
+        qspCallShowWindow(QSP_WIN_VIEW, QSP_FALSE);
     }
 }
 

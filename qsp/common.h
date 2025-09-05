@@ -24,9 +24,7 @@
     extern QSPString qspViewPath;
     extern QSP_BOOL qspIsMainDescChanged;
     extern QSP_BOOL qspIsVarsDescChanged;
-    extern QSP_BOOL qspCurToShowVars;
-    extern QSP_BOOL qspCurToShowInput;
-    extern QSP_BOOL qspCurToShowView;
+    extern QSP_TINYINT qspCurWindowsState;
 
     /* External functions */
     void qspInitRuntime(void);
@@ -36,6 +34,9 @@
     void qspSetSeed(unsigned int seed);
     int qspUniformRand(int min, int max);
     int qspNormalRand(int min, int max, int mean);
+    void qspSetWindowState(int type, QSP_BOOL toShow);
+    QSP_TINYINT qspGetEnabledWindows(void);
+    QSP_TINYINT qspGetDisabledWindows(void);
 
     INLINE int qspToInt(QSP_BIGINT val)
     {

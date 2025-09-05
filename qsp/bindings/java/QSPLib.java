@@ -31,11 +31,21 @@ public abstract class QSPLib {
     }
 
     public enum Window {
-        ACTS,
-        OBJS,
-        VARS,
-        INPUT,
-        VIEW
+        ACTS(1 << 0),
+        OBJS(1 << 1),
+        VARS(1 << 2),
+        INPUT(1 << 3),
+        VIEW(1 << 4);
+
+        private final int value;
+
+        Window(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
     }
 
     public class ListItem {
@@ -92,7 +102,7 @@ public abstract class QSPLib {
     public native boolean setSelObjIndex(int index, boolean toRefreshUI);
     public native int getSelObjIndex();
     public native boolean isObjsChanged();
-    public native void showWindow(int type /* Window.ordinal() */, boolean toShow);
+    public native void showWindow(int type /* Window bit flags */, boolean toShow);
     public native int getVarValuesCount(String name);
     public native int getVarIndexByString(String name, String str);
     /*
@@ -120,7 +130,7 @@ public abstract class QSPLib {
     public void onPlayFile(String file, int volume) {}
     public void onCloseFile(String file) {}
     public void onShowImage(String file) {}
-    public void onShowWindow(int type /* Window.ordinal() */, boolean toShow) {}
+    public void onShowWindow(int type /* Window bit flags */, boolean toShow) {}
     public int onShowMenu(ListItem[] items) { return -1; }
     public void onShowMessage(String text) {}
     public void onRefreshInt(boolean isForced, boolean isNewDesc) {}

@@ -142,8 +142,7 @@ QSP_BOOL qspNewGame(QSP_BOOL toReset)
         int oldLocationState = qspLocationState;
         qspSetSeed((unsigned int)QSP_TIME(0));
         qspTimerInterval = QSP_DEFTIMERINTERVAL;
-        qspCurToShowObjs = qspCurToShowActs = qspCurToShowVars = qspCurToShowInput = QSP_TRUE;
-        qspCurToShowView = QSP_FALSE;
+        qspCurWindowsState = QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_VARS | QSP_WIN_INPUT;
         qspMemClear(QSP_FALSE);
         /* Execute callbacks to update the current state */
         qspResetTime(0);
@@ -156,15 +155,9 @@ QSP_BOOL qspNewGame(QSP_BOOL toReset)
         if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallSetTimer(QSP_DEFTIMERINTERVAL);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs);
+        qspCallShowWindow(qspGetDisabledWindows(), QSP_FALSE);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs);
-        if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowWindow(QSP_WIN_VARS, qspCurToShowVars);
-        if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowWindow(QSP_WIN_INPUT, qspCurToShowInput);
-        if (qspLocationState != oldLocationState) return QSP_FALSE;
-        qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView);
+        qspCallShowWindow(qspGetEnabledWindows(), QSP_TRUE);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
     }
     qspNavigateToLocation(0, QSP_TRUE, 0, 0);
@@ -320,11 +313,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     qspAppendEncodedStrVal(&bufString, qspBufTextToString(qspCurDesc), isUCS);
     qspAppendEncodedStrVal(&bufString, qspBufTextToString(qspCurVars), isUCS);
     qspAppendEncodedStrVal(&bufString, locName, isUCS);
-    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowActs, isUCS);
-    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowObjs, isUCS);
-    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowVars, isUCS);
-    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowInput, isUCS);
-    qspAppendEncodedIntVal(&bufString, (int)qspCurToShowView, isUCS);
+    qspAppendEncodedIntVal(&bufString, qspCurWindowsState, isUCS);
     qspAppendEncodedIntVal(&bufString, qspTimerInterval, isUCS);
     qspAppendEncodedIntVal(&bufString, qspPLFilesCount, isUCS);
     for (i = 0; i < qspPLFilesCount; ++i)
@@ -411,7 +400,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
 {
     QSPVariant val;
     int i, j, k, ind, count, groupsCount, varValuesCount, temp, selAction, selObject;
-    ind = 16;
+    ind = 12;
     if (ind >= strsCount) return QSP_FALSE;
     if (qspStrsCompare(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
@@ -547,14 +536,10 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurDesc = qspStringToBufString(qspDecodeString(strs[8], isUCS), 512);
     qspCurVars = qspStringToBufString(qspDecodeString(strs[9], isUCS), 512);
     locName = qspDecodeString(strs[10], isUCS);
-    qspCurToShowActs = (qspReadEncodedIntVal(strs[11], isUCS) != 0);
-    qspCurToShowObjs = (qspReadEncodedIntVal(strs[12], isUCS) != 0);
-    qspCurToShowVars = (qspReadEncodedIntVal(strs[13], isUCS) != 0);
-    qspCurToShowInput = (qspReadEncodedIntVal(strs[14], isUCS) != 0);
-    qspCurToShowView = (qspReadEncodedIntVal(strs[15], isUCS) != 0);
-    qspTimerInterval = qspReadEncodedIntVal(strs[16], isUCS);
-    qspPLFilesCount = qspReadEncodedIntVal(strs[17], isUCS);
-    ind = 18;
+    qspCurWindowsState = (QSP_TINYINT)qspReadEncodedIntVal(strs[11], isUCS);
+    qspTimerInterval = qspReadEncodedIntVal(strs[12], isUCS);
+    qspPLFilesCount = qspReadEncodedIntVal(strs[13], isUCS);
+    ind = 14;
     for (i = 0; i < qspPLFilesCount; ++i)
         qspPLFiles[i] = qspDecodeString(strs[ind++], isUCS);
     qspCurIncFilesCount = qspReadEncodedIntVal(strs[ind++], isUCS);
@@ -648,15 +633,9 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspRestoreCurrentIncludes();
     if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_ACTS, qspCurToShowActs);
+    qspCallShowWindow(qspGetDisabledWindows(), QSP_FALSE);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_OBJS, qspCurToShowObjs);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_VARS, qspCurToShowVars);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_INPUT, qspCurToShowInput);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspCallShowWindow(QSP_WIN_VIEW, qspCurToShowView);
+    qspCallShowWindow(qspGetEnabledWindows(), QSP_TRUE);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_GAMELOADED), 0, 0);
     return QSP_TRUE;

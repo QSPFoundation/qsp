@@ -275,24 +275,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isObjsChanged(JNIEnv *env,
 /* Synchronize visibility of a region of the UI */
 JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_showWindow(JNIEnv *env, jobject api, jint type, jboolean toShow)
 {
-    switch (type)
-    {
-    case QSP_WIN_ACTS:
-        qspCurToShowActs = toShow;
-        break;
-    case QSP_WIN_OBJS:
-        qspCurToShowObjs = toShow;
-        break;
-    case QSP_WIN_VARS:
-        qspCurToShowVars = toShow;
-        break;
-    case QSP_WIN_INPUT:
-        qspCurToShowInput = toShow;
-        break;
-    case QSP_WIN_VIEW:
-        qspCurToShowView = toShow;
-        break;
-    }
+    qspSetWindowState(type, toShow);
 }
 /* ------------------------------------------------------------ */
 /* Variables */

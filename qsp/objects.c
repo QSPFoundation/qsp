@@ -21,7 +21,6 @@ int qspCurObjsCount = 0;
 int qspCurObjsGroupsCount = 0;
 int qspCurSelObject = -1;
 QSP_BOOL qspIsObjsListChanged = QSP_FALSE;
-QSP_BOOL qspCurToShowObjs = QSP_TRUE;
 
 INLINE int qspObjsGroupCompare(const void *name, const void *compareTo);
 INLINE int qspObjsGroupFloorCompare(const void *name, const void *compareTo);

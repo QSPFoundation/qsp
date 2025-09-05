@@ -16,7 +16,6 @@ QSPCurAct qspCurActions[QSP_MAXACTIONS];
 int qspCurActsCount = 0;
 int qspCurSelAction = -1;
 QSP_BOOL qspIsActsListChanged = QSP_FALSE;
-QSP_BOOL qspCurToShowActs = QSP_TRUE;
 
 INLINE int qspActIndex(QSPString name);
 

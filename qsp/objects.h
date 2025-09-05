@@ -39,7 +39,6 @@
     extern int qspCurObjsGroupsCount;
     extern int qspCurSelObject;
     extern QSP_BOOL qspIsObjsListChanged;
-    extern QSP_BOOL qspCurToShowObjs;
 
     /* External functions */
     void qspClearAllObjects(QSP_BOOL toInit);

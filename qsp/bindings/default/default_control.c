@@ -268,24 +268,7 @@ QSP_BOOL QSPIsObjectsChanged(void)
 /* Synchronize visibility of a region of the UI */
 void QSPShowWindow(int type, QSP_BOOL toShow)
 {
-    switch (type)
-    {
-    case QSP_WIN_ACTS:
-        qspCurToShowActs = toShow;
-        break;
-    case QSP_WIN_OBJS:
-        qspCurToShowObjs = toShow;
-        break;
-    case QSP_WIN_VARS:
-        qspCurToShowVars = toShow;
-        break;
-    case QSP_WIN_INPUT:
-        qspCurToShowInput = toShow;
-        break;
-    case QSP_WIN_VIEW:
-        qspCurToShowView = toShow;
-        break;
-    }
+    qspSetWindowState(type, toShow);
 }
 /* ------------------------------------------------------------ */
 /* Variables */
