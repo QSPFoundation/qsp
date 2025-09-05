@@ -15,10 +15,7 @@
     {
         int LocationState;
         QSP_BOOL IsInCallback;
-        QSP_BOOL IsMainDescChanged;
-        QSP_BOOL IsVarsDescChanged;
-        QSP_BOOL IsObjsListChanged;
-        QSP_BOOL IsActsListChanged;
+        QSP_TINYINT WindowsChangedState;
         int RealCurLoc;
         int RealActIndex;
         int RealLineNum;

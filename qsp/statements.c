@@ -1044,7 +1044,7 @@ INLINE void qspStatementImplicitStatement(QSPVariant *args, QSP_TINYINT QSP_UNUS
         qspConvertVariantTo(args, QSP_TYPE_STR);
         qspAddBufText(&qspCurDesc, QSP_STR(args[0]));
         qspAddBufText(&qspCurDesc, QSP_STATIC_STR(QSP_STRSDELIM));
-        qspIsMainDescChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_MAIN;
     }
 }
 
@@ -1054,31 +1054,31 @@ INLINE void qspStatementAddText(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT
     {
     case qspStatP:
         if (qspAddBufText(&qspCurVars, QSP_STR(args[0])))
-            qspIsVarsDescChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_VARS;
         break;
     case qspStatMP:
         if (qspAddBufText(&qspCurDesc, QSP_STR(args[0])))
-            qspIsMainDescChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_MAIN;
         break;
     case qspStatPL:
         if (count) qspAddBufText(&qspCurVars, QSP_STR(args[0]));
         qspAddBufText(&qspCurVars, QSP_STATIC_STR(QSP_STRSDELIM));
-        qspIsVarsDescChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_VARS;
         break;
     case qspStatMPL:
         if (count) qspAddBufText(&qspCurDesc, QSP_STR(args[0]));
         qspAddBufText(&qspCurDesc, QSP_STATIC_STR(QSP_STRSDELIM));
-        qspIsMainDescChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_MAIN;
         break;
     case qspStatNL:
         qspAddBufText(&qspCurVars, QSP_STATIC_STR(QSP_STRSDELIM));
         if (count) qspAddBufText(&qspCurVars, QSP_STR(args[0]));
-        qspIsVarsDescChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_VARS;
         break;
     case qspStatMNL:
         qspAddBufText(&qspCurDesc, QSP_STATIC_STR(QSP_STRSDELIM));
         if (count) qspAddBufText(&qspCurDesc, QSP_STR(args[0]));
-        qspIsMainDescChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_MAIN;
         break;
     }
 }
@@ -1091,14 +1091,14 @@ INLINE void qspStatementClear(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUS
         if (qspCurVars.Len > 0)
         {
             qspClearBufString(&qspCurVars);
-            qspIsVarsDescChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_VARS;
         }
         break;
     case qspStatMClear:
         if (qspCurDesc.Len > 0)
         {
             qspClearBufString(&qspCurDesc);
-            qspIsMainDescChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_MAIN;
         }
         break;
     case qspStatCmdClear:
@@ -1112,12 +1112,12 @@ INLINE void qspStatementClear(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUS
         if (qspCurVars.Len > 0)
         {
             qspClearBufString(&qspCurVars);
-            qspIsVarsDescChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_VARS;
         }
         if (qspCurDesc.Len > 0)
         {
             qspClearBufString(&qspCurDesc);
-            qspIsMainDescChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_MAIN;
         }
         qspClearText(&qspCurInput);
         qspClearAllActions(QSP_FALSE);
@@ -1170,6 +1170,10 @@ INLINE void qspStatementShowWin(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count),
     QSP_BOOL val = QSP_ISTRUE(QSP_NUM(args[0]));
     switch (extArg)
     {
+    case qspStatShowVars:
+        qspSetWindowState(QSP_WIN_VARS, val);
+        qspCallShowWindow(QSP_WIN_VARS, val);
+        break;
     case qspStatShowActs:
         qspSetWindowState(QSP_WIN_ACTS, val);
         qspCallShowWindow(QSP_WIN_ACTS, val);
@@ -1177,10 +1181,6 @@ INLINE void qspStatementShowWin(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count),
     case qspStatShowObjs:
         qspSetWindowState(QSP_WIN_OBJS, val);
         qspCallShowWindow(QSP_WIN_OBJS, val);
-        break;
-    case qspStatShowVars:
-        qspSetWindowState(QSP_WIN_VARS, val);
-        qspCallShowWindow(QSP_WIN_VARS, val);
         break;
     case qspStatShowInput:
         qspSetWindowState(QSP_WIN_INPUT, val);

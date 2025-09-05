@@ -31,11 +31,12 @@ public abstract class QSPLib {
     }
 
     public enum Window {
-        ACTS(1 << 0),
-        OBJS(1 << 1),
-        VARS(1 << 2),
-        INPUT(1 << 3),
-        VIEW(1 << 4);
+        MAIN(1 << 0),
+        VARS(1 << 1),
+        ACTS(1 << 2),
+        OBJS(1 << 3),
+        INPUT(1 << 4),
+        VIEW(1 << 5);
 
         private final int value;
 
@@ -89,19 +90,16 @@ public abstract class QSPLib {
     public native String getVersion();
     public native String getCompiledDateTime();
     public native String getMainDesc();
-    public native boolean isMainDescChanged();
     public native String getVarsDesc();
-    public native boolean isVarsDescChanged();
     public native void setInputStrText(String value);
     public native ListItem[] getActions();
     public native boolean setSelActIndex(int index, boolean toRefreshUI);
     public native boolean execSelAction(boolean toRefreshUI);
     public native int getSelActIndex();
-    public native boolean isActsChanged();
     public native ObjectItem[] getObjects();
     public native boolean setSelObjIndex(int index, boolean toRefreshUI);
     public native int getSelObjIndex();
-    public native boolean isObjsChanged();
+    public native int getWindowsChangedState(); /* Window bit flags */
     public native void showWindow(int type /* Window bit flags */, boolean toShow);
     public native int getVarValuesCount(String name);
     public native int getVarIndexByString(String name, String str);

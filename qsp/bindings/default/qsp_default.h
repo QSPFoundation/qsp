@@ -94,24 +94,21 @@
     QSP_EXTERN int QSPGetActionCode(int actionIndex, QSPLineInfo *lines, int linesBufSize);
     /* Main desc */
     QSP_EXTERN QSPString QSPGetMainDesc(void);
-    QSP_EXTERN QSP_BOOL QSPIsMainDescChanged(void);
     /* Vars desc */
     QSP_EXTERN QSPString QSPGetVarsDesc(void);
-    QSP_EXTERN QSP_BOOL QSPIsVarsDescChanged(void);
     /* Input string */
     QSP_EXTERN void QSPSetInputStrText(QSPString str);
     /* Actions */
     QSP_EXTERN int QSPGetActions(QSPListItem *items, int itemsBufSize);
     QSP_EXTERN QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI);
     QSP_EXTERN int QSPGetSelActionIndex(void);
-    QSP_EXTERN QSP_BOOL QSPIsActionsChanged(void);
     QSP_EXTERN QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI);
     /* Objects */
     QSP_EXTERN int QSPGetObjects(QSPObjectItem *items, int itemsBufSize);
     QSP_EXTERN QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI);
     QSP_EXTERN int QSPGetSelObjectIndex(void);
-    QSP_EXTERN QSP_BOOL QSPIsObjectsChanged(void);
     /* Windows */
+    QSP_EXTERN int QSPGetWindowsChangedState(void);
     QSP_EXTERN void QSPShowWindow(int type, QSP_BOOL toShow);
     /* Code execution */
     QSP_EXTERN QSP_BOOL QSPExecString(QSPString str, QSP_BOOL toRefreshUI);

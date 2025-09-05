@@ -6,6 +6,7 @@
  */
 
 #include "actions.h"
+#include "common.h"
 #include "errors.h"
 #include "game.h"
 #include "locations.h"
@@ -15,7 +16,6 @@
 QSPCurAct qspCurActions[QSP_MAXACTIONS];
 int qspCurActsCount = 0;
 int qspCurSelAction = -1;
-QSP_BOOL qspIsActsListChanged = QSP_FALSE;
 
 INLINE int qspActIndex(QSPString name);
 
@@ -31,7 +31,7 @@ void qspClearAllActions(QSP_BOOL toInit)
             qspFreeString(&curAct->Desc);
             qspFreePrepLines(curAct->OnPressLines, curAct->OnPressLinesCount);
         }
-        qspIsActsListChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_ACTS;
     }
     qspCurActsCount = 0;
     qspCurSelAction = -1;
@@ -81,7 +81,7 @@ void qspAddAction(QSPString name, QSPString imgPath, QSPLineOfCode *code, int st
     act->OnPressLinesCount = end - start;
     act->Location = qspRealCurLoc;
     act->ActIndex = qspRealActIndex;
-    qspIsActsListChanged = QSP_TRUE;
+    qspCurWindowsChangedState |= QSP_WIN_ACTS;
 }
 
 void qspExecAction(int ind)
@@ -210,5 +210,5 @@ void qspStatementDelAct(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TIN
         qspCurActions[actInd] = qspCurActions[actInd + 1];
         ++actInd;
     }
-    qspIsActsListChanged = QSP_TRUE;
+    qspCurWindowsChangedState |= QSP_WIN_ACTS;
 }

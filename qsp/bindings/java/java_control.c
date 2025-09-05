@@ -151,11 +151,6 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getMainDesc(JNIEnv *env, jo
 {
     return qspToJavaString(env, qspBufTextToString(qspCurDesc));
 }
-/* Check whether the text has been updated */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isMainDescChanged(JNIEnv *env, jobject api)
-{
-    return qspIsMainDescChanged;
-}
 /* ------------------------------------------------------------ */
 /* Additional description */
 
@@ -163,11 +158,6 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isMainDescChanged(JNIEnv *
 JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getVarsDesc(JNIEnv *env, jobject api)
 {
     return qspToJavaString(env, qspBufTextToString(qspCurVars));
-}
-/* Check whether the text has been updated */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isVarsDescChanged(JNIEnv *env, jobject api)
-{
-    return qspIsVarsDescChanged;
 }
 /* ------------------------------------------------------------ */
 /* Synchronize the value of the text input control */
@@ -223,11 +213,6 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getSelActIndex(JNIEnv *env, jo
 {
     return qspCurSelAction;
 }
-/* Check whether the actions have been updated */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isActsChanged(JNIEnv *env, jobject api)
-{
-    return qspIsActsListChanged;
-}
 /* ------------------------------------------------------------ */
 /* Objects */
 
@@ -266,12 +251,12 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getSelObjIndex(JNIEnv *env, jo
 {
     return qspCurSelObject;
 }
-/* Check whether the objects have been updated */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isObjsChanged(JNIEnv *env, jobject api)
-{
-    return qspIsObjsListChanged;
-}
 /* ------------------------------------------------------------ */
+/* Get the state of changes per window */
+JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getWindowsChangedState(JNIEnv *env, jobject api)
+{
+    return qspCurWindowsChangedState;
+}
 /* Synchronize visibility of a region of the UI */
 JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_showWindow(JNIEnv *env, jobject api, jint type, jboolean toShow)
 {

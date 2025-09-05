@@ -65,26 +65,10 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getMainDesc
 
 /*
  * Class:     com_libqsp_jni_QSPLib
- * Method:    isMainDescChanged
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isMainDescChanged
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_libqsp_jni_QSPLib
  * Method:    getVarsDesc
  * Signature: ()Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getVarsDesc
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_libqsp_jni_QSPLib
- * Method:    isVarsDescChanged
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isVarsDescChanged
   (JNIEnv *, jobject);
 
 /*
@@ -129,14 +113,6 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getSelActIndex
 
 /*
  * Class:     com_libqsp_jni_QSPLib
- * Method:    isActsChanged
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isActsChanged
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_libqsp_jni_QSPLib
  * Method:    getObjects
  * Signature: ()[Lcom/libqsp/jni/QSPLib/ObjectItem;
  */
@@ -161,10 +137,10 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getSelObjIndex
 
 /*
  * Class:     com_libqsp_jni_QSPLib
- * Method:    isObjsChanged
- * Signature: ()Z
+ * Method:    getWindowsChangedState
+ * Signature: ()I
  */
-JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_isObjsChanged
+JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getWindowsChangedState
   (JNIEnv *, jobject);
 
 /*

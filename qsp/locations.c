@@ -131,12 +131,12 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     {
         qspFreeBufString(&qspCurDesc);
         qspCurDesc = qspStringToBufString(str, 512);
-        qspIsMainDescChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_MAIN;
     }
     else
     {
         if (qspAddBufText(&qspCurDesc, str))
-            qspIsMainDescChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_MAIN;
         qspFreeString(&str);
     }
     /* Update base actions */

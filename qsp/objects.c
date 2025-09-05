@@ -6,7 +6,6 @@
  */
 
 #include "objects.h"
-
 #include "common.h"
 #include "errors.h"
 #include "game.h"
@@ -20,7 +19,6 @@ QSPObjsGroup qspCurObjsGroups[QSP_MAXOBJECTS];
 int qspCurObjsCount = 0;
 int qspCurObjsGroupsCount = 0;
 int qspCurSelObject = -1;
-QSP_BOOL qspIsObjsListChanged = QSP_FALSE;
 
 INLINE int qspObjsGroupCompare(const void *name, const void *compareTo);
 INLINE int qspObjsGroupFloorCompare(const void *name, const void *compareTo);
@@ -69,7 +67,7 @@ void qspClearAllObjects(QSP_BOOL toInit)
             qspFreeString(&curObjsGroup->Desc);
             qspFreeString(&curObjsGroup->Image);
         }
-        qspIsObjsListChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_OBJS;
     }
     qspCurObjsCount = 0;
     qspCurObjsGroupsCount = 0;
@@ -144,7 +142,7 @@ INLINE void qspRemoveObjsGroupByIndex(int index)
             qspCurObjsGroups[index] = qspCurObjsGroups[index + 1];
             ++index;
         }
-        qspIsObjsListChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_OBJS;
     }
 }
 
@@ -169,7 +167,7 @@ INLINE void qspRemoveObjectByIndex(int index)
             qspCurObjects[index] = qspCurObjects[index + 1];
             ++index;
         }
-        qspIsObjsListChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_OBJS;
     }
 }
 
@@ -306,7 +304,7 @@ INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int obj
     obj = qspCurObjects + objInd;
     obj->Name = qspCopyToNewText(objName);
     obj->Image = qspCopyToNewText(objImage);
-    qspIsObjsListChanged = QSP_TRUE;
+    qspCurWindowsChangedState |= QSP_WIN_OBJS;
     /* Send notification */
     addedObjName = qspStrVariant(objName, QSP_TYPE_STR);
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJADDED), &addedObjName, 1);
@@ -323,14 +321,14 @@ INLINE void qspUpdateObjsGroup(QSPString objName, QSPString objDesc, QSPString o
         if (qspStrsCompare(objsGroup->Desc, objDesc))
         {
             qspUpdateText(&objsGroup->Desc, objDesc);
-            qspIsObjsListChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_OBJS;
         }
     }
     else
     {
         objsGroup->UpdatedFields |= QSP_OBJUPDATED_DESC;
         qspUpdateText(&objsGroup->Desc, objDesc);
-        qspIsObjsListChanged = QSP_TRUE;
+        qspCurWindowsChangedState |= QSP_WIN_OBJS;
     }
     if (toUpdateImage)
     {
@@ -339,14 +337,14 @@ INLINE void qspUpdateObjsGroup(QSPString objName, QSPString objDesc, QSPString o
             if (qspStrsCompare(objsGroup->Image, objImage))
             {
                 qspUpdateText(&objsGroup->Image, objImage);
-                qspIsObjsListChanged = QSP_TRUE;
+                qspCurWindowsChangedState |= QSP_WIN_OBJS;
             }
         }
         else
         {
             objsGroup->UpdatedFields |= QSP_OBJUPDATED_IMAGE;
             qspUpdateText(&objsGroup->Image, objImage);
-            qspIsObjsListChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_OBJS;
         }
     }
 }

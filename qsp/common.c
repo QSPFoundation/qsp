@@ -28,9 +28,8 @@ QSPBufString qspCurVars;
 QSPString qspCurInput;
 QSPString qspViewPath;
 int qspTimerInterval = 0;
-QSP_BOOL qspIsMainDescChanged = QSP_FALSE;
-QSP_BOOL qspIsVarsDescChanged = QSP_FALSE;
-QSP_TINYINT qspCurWindowsState = 0;
+QSP_TINYINT qspCurWindowsChangedState = 0;
+QSP_TINYINT qspCurWindowsDisplayState = 0;
 
 INLINE unsigned int qspURand(void);
 INLINE int qspRand(void);
@@ -57,7 +56,7 @@ void qspInitRuntime(void)
     qspLocsCount = 0;
     qspCurLoc = -1;
     qspTimerInterval = 0;
-    qspCurWindowsState = QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_VARS | QSP_WIN_INPUT;
+    qspCurWindowsDisplayState = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT;
 
     qspSetSeed(0);
     qspInitVarTypes();
@@ -87,14 +86,14 @@ void qspPrepareExecution(QSP_BOOL toInit)
     qspClearLocalVarsScopes(qspCurrentLocalVars);
     qspCurrentLocalVars = 0;
 
-    /* Reset execution state */
+    /* Reset the execution state */
     qspRealCurLoc = -1;
     qspRealActIndex = -1;
     qspRealLineNum = 0;
     qspRealLine = 0;
 
-    /* Reset state of changes */
-    qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjsListChanged = qspIsActsListChanged = QSP_FALSE;
+    /* Reset the state of changes */
+    qspCurWindowsChangedState = 0;
 }
 
 void qspMemClear(QSP_BOOL toInit)
@@ -111,12 +110,12 @@ void qspMemClear(QSP_BOOL toInit)
         if (qspCurDesc.Len > 0)
         {
             qspFreeBufString(&qspCurDesc);
-            qspIsMainDescChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_MAIN;
         }
         if (qspCurVars.Len > 0)
         {
             qspFreeBufString(&qspCurVars);
-            qspIsVarsDescChanged = QSP_TRUE;
+            qspCurWindowsChangedState |= QSP_WIN_VARS;
         }
 
         qspFreeString(&qspCurInput);
@@ -324,17 +323,17 @@ int qspNormalRand(int min, int max, int mean)
 void qspSetWindowState(int type, QSP_BOOL toShow)
 {
     if (toShow)
-        qspCurWindowsState = (QSP_TINYINT)(qspCurWindowsState | type);
+        qspCurWindowsDisplayState = (QSP_TINYINT)(qspCurWindowsDisplayState | type);
     else
-        qspCurWindowsState = (QSP_TINYINT)(qspCurWindowsState & ~type);
+        qspCurWindowsDisplayState = (QSP_TINYINT)(qspCurWindowsDisplayState & ~type);
 }
 
 QSP_TINYINT qspGetEnabledWindows(void)
 {
-    return (QSP_TINYINT)(qspCurWindowsState & QSP_WIN_ALL);
+    return (QSP_TINYINT)(qspCurWindowsDisplayState & QSP_WIN_ALL);
 }
 
 QSP_TINYINT qspGetDisabledWindows(void)
 {
-    return (QSP_TINYINT)(~qspCurWindowsState & QSP_WIN_ALL);
+    return (QSP_TINYINT)(~qspCurWindowsDisplayState & QSP_WIN_ALL);
 }

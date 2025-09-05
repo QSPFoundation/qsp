@@ -157,11 +157,6 @@ QSPString QSPGetMainDesc(void)
 {
     return qspBufTextToString(qspCurDesc);
 }
-/* Check whether the text has been updated */
-QSP_BOOL QSPIsMainDescChanged(void)
-{
-    return qspIsMainDescChanged;
-}
 /* ------------------------------------------------------------ */
 /* Additional description */
 
@@ -169,11 +164,6 @@ QSP_BOOL QSPIsMainDescChanged(void)
 QSPString QSPGetVarsDesc(void)
 {
     return qspBufTextToString(qspCurVars);
-}
-/* Check whether the text has been updated */
-QSP_BOOL QSPIsVarsDescChanged(void)
-{
-    return qspIsVarsDescChanged;
 }
 /* ------------------------------------------------------------ */
 /* Synchronize the value of the text input control */
@@ -225,11 +215,6 @@ int QSPGetSelActionIndex(void)
 {
     return qspCurSelAction;
 }
-/* Check whether the actions have been updated */
-QSP_BOOL QSPIsActionsChanged(void)
-{
-    return qspIsActsListChanged;
-}
 /* ------------------------------------------------------------ */
 /* Objects */
 
@@ -259,12 +244,12 @@ int QSPGetSelObjectIndex(void)
 {
     return qspCurSelObject;
 }
-/* Check whether the objects have been updated */
-QSP_BOOL QSPIsObjectsChanged(void)
-{
-    return qspIsObjsListChanged;
-}
 /* ------------------------------------------------------------ */
+/* Get the state of changes per window */
+int QSPGetWindowsChangedState(void)
+{
+    return qspCurWindowsChangedState;
+}
 /* Synchronize visibility of a region of the UI */
 void QSPShowWindow(int type, QSP_BOOL toShow)
 {

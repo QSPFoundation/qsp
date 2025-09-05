@@ -27,7 +27,6 @@
     extern QSPCurAct qspCurActions[QSP_MAXACTIONS];
     extern int qspCurActsCount;
     extern int qspCurSelAction;
-    extern QSP_BOOL qspIsActsListChanged;
 
     /* External functions */
     void qspClearAllActions(QSP_BOOL toInit);

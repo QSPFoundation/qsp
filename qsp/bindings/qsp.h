@@ -42,12 +42,13 @@
 
     enum
     {
-        QSP_WIN_ACTS = 1 << 0,
-        QSP_WIN_OBJS = 1 << 1,
-        QSP_WIN_VARS = 1 << 2,
-        QSP_WIN_INPUT = 1 << 3,
-        QSP_WIN_VIEW = 1 << 4,
-        QSP_WIN_ALL = QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_VARS | QSP_WIN_INPUT | QSP_WIN_VIEW
+        QSP_WIN_MAIN = 1 << 0,
+        QSP_WIN_VARS = 1 << 1,
+        QSP_WIN_ACTS = 1 << 2,
+        QSP_WIN_OBJS = 1 << 3,
+        QSP_WIN_INPUT = 1 << 4,
+        QSP_WIN_VIEW = 1 << 5,
+        QSP_WIN_ALL = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT | QSP_WIN_VIEW
     };
 
     enum

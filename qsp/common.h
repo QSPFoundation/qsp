@@ -22,9 +22,8 @@
     extern QSPBufString qspCurVars;
     extern QSPString qspCurInput;
     extern QSPString qspViewPath;
-    extern QSP_BOOL qspIsMainDescChanged;
-    extern QSP_BOOL qspIsVarsDescChanged;
-    extern QSP_TINYINT qspCurWindowsState;
+    extern QSP_TINYINT qspCurWindowsChangedState;
+    extern QSP_TINYINT qspCurWindowsDisplayState;
 
     /* External functions */
     void qspInitRuntime(void);

@@ -142,7 +142,7 @@ QSP_BOOL qspNewGame(QSP_BOOL toReset)
         int oldLocationState = qspLocationState;
         qspSetSeed((unsigned int)QSP_TIME(0));
         qspTimerInterval = QSP_DEFTIMERINTERVAL;
-        qspCurWindowsState = QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_VARS | QSP_WIN_INPUT;
+        qspCurWindowsDisplayState = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT;
         qspMemClear(QSP_FALSE);
         /* Execute callbacks to update the current state */
         qspResetTime(0);
@@ -313,7 +313,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     qspAppendEncodedStrVal(&bufString, qspBufTextToString(qspCurDesc), isUCS);
     qspAppendEncodedStrVal(&bufString, qspBufTextToString(qspCurVars), isUCS);
     qspAppendEncodedStrVal(&bufString, locName, isUCS);
-    qspAppendEncodedIntVal(&bufString, qspCurWindowsState, isUCS);
+    qspAppendEncodedIntVal(&bufString, qspCurWindowsDisplayState, isUCS);
     qspAppendEncodedIntVal(&bufString, qspTimerInterval, isUCS);
     qspAppendEncodedIntVal(&bufString, qspPLFilesCount, isUCS);
     for (i = 0; i < qspPLFilesCount; ++i)
@@ -536,7 +536,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurDesc = qspStringToBufString(qspDecodeString(strs[8], isUCS), 512);
     qspCurVars = qspStringToBufString(qspDecodeString(strs[9], isUCS), 512);
     locName = qspDecodeString(strs[10], isUCS);
-    qspCurWindowsState = (QSP_TINYINT)qspReadEncodedIntVal(strs[11], isUCS);
+    qspCurWindowsDisplayState = (QSP_TINYINT)qspReadEncodedIntVal(strs[11], isUCS);
     qspTimerInterval = qspReadEncodedIntVal(strs[12], isUCS);
     qspPLFilesCount = qspReadEncodedIntVal(strs[13], isUCS);
     ind = 14;
@@ -618,7 +618,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspFreeStrs(strs, count);
     qspCurLoc = qspLocIndex(locName);
     qspFreeString(&locName);
-    qspIsMainDescChanged = qspIsVarsDescChanged = qspIsObjsListChanged = qspIsActsListChanged = QSP_TRUE;
+    qspCurWindowsChangedState = QSP_WIN_ALL;
     /* Execute callbacks to update the current state */
     oldLocationState = qspLocationState;
     qspResetTime(msecsCount);

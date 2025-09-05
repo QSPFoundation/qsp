@@ -21,10 +21,7 @@ void qspPrepareCallback(QSPCallState *state, QSP_BOOL toRefreshUI)
     state->LocationState = qspLocationState;
     state->IsInCallback = qspIsInCallback;
     /* Save the state of changes */
-    state->IsMainDescChanged = qspIsMainDescChanged;
-    state->IsVarsDescChanged = qspIsVarsDescChanged;
-    state->IsObjsListChanged = qspIsObjsListChanged;
-    state->IsActsListChanged = qspIsActsListChanged;
+    state->WindowsChangedState = qspCurWindowsChangedState;
     /* Save the execution state */
     state->RealCurLoc = qspRealCurLoc;
     state->RealActIndex = qspRealActIndex;
@@ -47,11 +44,8 @@ QSP_BOOL qspFinalizeCallback(QSPCallState *state, QSP_BOOL toResetLocationState)
     qspRealActIndex = state->RealActIndex;
     qspRealLineNum = state->RealLineNum;
     qspRealLine = state->RealLine;
-    /* Restore the state of changes */
-    if (state->IsActsListChanged) qspIsActsListChanged = QSP_TRUE;
-    if (state->IsObjsListChanged) qspIsObjsListChanged = QSP_TRUE;
-    if (state->IsVarsDescChanged) qspIsVarsDescChanged = QSP_TRUE;
-    if (state->IsMainDescChanged) qspIsMainDescChanged = QSP_TRUE;
+    /* Restore the state of changes without resetting the current state */
+    qspCurWindowsChangedState = (QSP_TINYINT)(qspCurWindowsChangedState | state->WindowsChangedState);
 
     if (qspLocationState != state->LocationState)
     {
