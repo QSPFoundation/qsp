@@ -49,10 +49,8 @@ Please consider supporting our development on:
 * A tool to automatically migrate older games (e.g. QSP 5.7) to the latest version of the engine
 * Extra tests (see [qsp-wasm-engine](https://github.com/QSPFoundation/qsp-wasm-engine/tree/main/tests))
 * Update the website
-* Multi-user games (MUD-style games)
 * New documentation & document new features
-* Update bindings
-* Implement a new way to communicate with GUI (more specific callbacks)
+* Multi-user games (MUD-style games)
 * Move the whole global state into a context parameter
 * ???
 
