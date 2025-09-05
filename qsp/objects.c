@@ -16,44 +16,154 @@
 #include "variables.h"
 
 QSPObj qspCurObjects[QSP_MAXOBJECTS];
+QSPObjsGroup qspCurObjsGroups[QSP_MAXOBJECTS];
 int qspCurObjsCount = 0;
+int qspCurObjsGroupsCount = 0;
 int qspCurSelObject = -1;
 QSP_BOOL qspIsObjsListChanged = QSP_FALSE;
 QSP_BOOL qspCurToShowObjs = QSP_TRUE;
 
+INLINE int qspObjsGroupCompare(const void *name, const void *compareTo);
+INLINE int qspObjsGroupFloorCompare(const void *name, const void *compareTo);
+INLINE int qspGetObjsGroupIndex(QSPString objName);
+INLINE int qspAddObjsGroup(QSPString objName);
+INLINE void qspRemoveObjsGroupByIndex(int index);
 INLINE void qspRemoveObjectByIndex(int index);
 INLINE void qspSendObjectsRemovalNotifications(QSPString *objNames, int count);
 INLINE void qspRemoveObjectByIndexWithEvent(int index);
 INLINE void qspClearObjectsByNameWithEvents(QSPString objName, int maxObjects);
 INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int objInd);
-INLINE void qspUpdateObjectsByName(QSPString objName, QSPString objDesc, QSPString objImage, QSP_BOOL toUpdateImage);
+INLINE void qspUpdateObjsGroup(QSPString objName, QSPString objDesc, QSPString objImage, QSP_BOOL toUpdateImage);
+
+INLINE int qspObjsGroupCompare(const void *name, const void *compareTo)
+{
+    return qspStrsCompare(*(QSPString *)name, ((QSPObjsGroup *)compareTo)->Name);
+}
+
+INLINE int qspObjsGroupFloorCompare(const void *name, const void *compareTo)
+{
+    QSPString key = *(QSPString *)name;
+    QSPObjsGroup *objsGroup = (QSPObjsGroup *)compareTo;
+
+    /* It's safe to check (item + 1) because the item never points to the last array item */
+    if (qspStrsCompare(key, (objsGroup + 1)->Name) < 0 && qspStrsCompare(key, objsGroup->Name) >= 0)
+        return 0;
+
+    return qspStrsCompare(key, objsGroup->Name);
+}
 
 void qspClearAllObjects(QSP_BOOL toInit)
 {
     if (!toInit && qspCurObjsCount)
     {
         int i;
-        QSPObj *curObj = qspCurObjects;
-        for (i = qspCurObjsCount; i > 0; --i, ++curObj)
+        QSPObj *curObj;
+        QSPObjsGroup *curObjsGroup;
+        for (i = qspCurObjsCount, curObj = qspCurObjects; i > 0; --i, ++curObj)
         {
             qspFreeString(&curObj->Name);
-            qspFreeString(&curObj->Desc);
             qspFreeString(&curObj->Image);
+        }
+        for (i = qspCurObjsGroupsCount, curObjsGroup = qspCurObjsGroups; i > 0; --i, ++curObjsGroup)
+        {
+            qspFreeString(&curObjsGroup->Name);
+            qspFreeString(&curObjsGroup->Desc);
+            qspFreeString(&curObjsGroup->Image);
         }
         qspIsObjsListChanged = QSP_TRUE;
     }
     qspCurObjsCount = 0;
+    qspCurObjsGroupsCount = 0;
     qspCurSelObject = -1;
+}
+
+INLINE int qspGetObjsGroupIndex(QSPString objName)
+{
+    if (qspCurObjsGroupsCount)
+    {
+        QSPObjsGroup *objsGroup;
+        objName = qspCopyToNewText(objName);
+        qspUpperStr(&objName);
+        objsGroup = (QSPObjsGroup *)bsearch(&objName, qspCurObjsGroups, qspCurObjsGroupsCount, sizeof(QSPObjsGroup), qspObjsGroupCompare);
+        qspFreeString(&objName);
+        if (objsGroup) return (int)(objsGroup - qspCurObjsGroups);
+    }
+    return -1;
+}
+
+INLINE int qspAddObjsGroup(QSPString objName)
+{
+    QSPObjsGroup *objsGroup;
+    int floorItem, groupsCount = qspCurObjsGroupsCount;
+    if (groupsCount == QSP_MAXOBJECTS)
+    {
+        qspSetError(QSP_ERR_CANTADDOBJECT);
+        return -1;
+    }
+    objName = qspCopyToNewText(objName);
+    qspUpperStr(&objName);
+    floorItem = groupsCount - 1;
+    if (groupsCount > 0)
+    {
+        /* Find the first item that's smaller than objName */
+        objsGroup = qspCurObjsGroups + floorItem;
+        if (qspStrsCompare(objName, objsGroup->Name) < 0)
+        {
+            objsGroup = (QSPObjsGroup *)bsearch(&objName, qspCurObjsGroups, floorItem, sizeof(QSPObjsGroup), qspObjsGroupFloorCompare);
+            floorItem = (objsGroup ? (int)(objsGroup - qspCurObjsGroups) : -1);
+        }
+    }
+    /* Shift existing items to allocate extra space */
+    ++floorItem;
+    while (groupsCount > floorItem)
+    {
+        qspCurObjsGroups[groupsCount] = qspCurObjsGroups[groupsCount - 1];
+        --groupsCount;
+    }
+    /* Add new object group */
+    objsGroup = qspCurObjsGroups + floorItem;
+    objsGroup->Name = objName;
+    objsGroup->Desc = qspNullString;
+    objsGroup->Image = qspNullString;
+    objsGroup->UpdatedFields = 0;
+    objsGroup->ObjsCount = 0;
+    ++qspCurObjsGroupsCount;
+    return floorItem;
+}
+
+INLINE void qspRemoveObjsGroupByIndex(int index)
+{
+    if (index >= 0 && index < qspCurObjsGroupsCount)
+    {
+        QSPObjsGroup *objsGroup = qspCurObjsGroups + index;
+        qspFreeString(&objsGroup->Name);
+        qspFreeString(&objsGroup->Desc);
+        qspFreeString(&objsGroup->Image);
+        --qspCurObjsGroupsCount;
+        while (index < qspCurObjsGroupsCount)
+        {
+            qspCurObjsGroups[index] = qspCurObjsGroups[index + 1];
+            ++index;
+        }
+        qspIsObjsListChanged = QSP_TRUE;
+    }
 }
 
 INLINE void qspRemoveObjectByIndex(int index)
 {
     if (index >= 0 && index < qspCurObjsCount)
     {
+        QSPObj *obj = qspCurObjects + index;
+        int groupIndex = qspGetObjsGroupIndex(obj->Name);
+        if (groupIndex >= 0)
+        {
+            QSPObjsGroup *objsGroup = qspCurObjsGroups + groupIndex;
+            if (--objsGroup->ObjsCount <= 0)
+                qspRemoveObjsGroupByIndex(groupIndex);
+        }
         if (qspCurSelObject >= index) qspCurSelObject = -1;
-        qspFreeString(&qspCurObjects[index].Name);
-        qspFreeString(&qspCurObjects[index].Desc);
-        qspFreeString(&qspCurObjects[index].Image);
+        qspFreeString(&obj->Name);
+        qspFreeString(&obj->Image);
         --qspCurObjsCount;
         while (index < qspCurObjsCount)
         {
@@ -157,33 +267,18 @@ INLINE void qspClearObjectsByNameWithEvents(QSPString objName, int maxObjects)
 
 int qspObjsCountByName(QSPString objName)
 {
-    if (qspCurObjsCount)
+    int groupIndex = qspGetObjsGroupIndex(objName);
+    if (groupIndex >= 0)
     {
-        int i, objsCount;
-        QSPString bufName;
-        QSPBufString buf;
-        objName = qspCopyToNewText(objName);
-        qspUpperStr(&objName);
-        buf = qspNewBufString(32);
-        objsCount = 0;
-        for (i = 0; i < qspCurObjsCount; ++i)
-        {
-            qspUpdateBufString(&buf, qspCurObjects[i].Name);
-            bufName = qspBufTextToString(buf);
-            qspUpperStr(&bufName);
-            if (!qspStrsCompare(bufName, objName))
-                ++objsCount;
-        }
-        qspFreeString(&objName);
-        qspFreeBufString(&buf);
-        return objsCount;
+        QSPObjsGroup *objsGroup = qspCurObjsGroups + groupIndex;
+        return objsGroup->ObjsCount;
     }
     return 0;
 }
 
 INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int objInd)
 {
-    int i;
+    int i, groupIndex;
     QSPObj *obj;
     QSPVariant addedObjName;
     if (qspCurObjsCount == QSP_MAXOBJECTS)
@@ -196,13 +291,21 @@ INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int obj
     else if (objInd > qspCurObjsCount)
         objInd = qspCurObjsCount;
     if (qspCurSelObject >= objInd) qspCurSelObject = -1;
+    /* Update object group */
+    groupIndex = qspGetObjsGroupIndex(objName);
+    if (groupIndex < 0)
+    {
+        /* Create object group for every object name */
+        groupIndex = qspAddObjsGroup(objName);
+        if (groupIndex < 0) return;
+    }
+    qspCurObjsGroups[groupIndex].ObjsCount++;
     /* Place the object at the specified position */
     for (i = qspCurObjsCount; i > objInd; --i)
         qspCurObjects[i] = qspCurObjects[i - 1];
     ++qspCurObjsCount;
     obj = qspCurObjects + objInd;
     obj->Name = qspCopyToNewText(objName);
-    obj->Desc = qspCopyToNewText(objName);
     obj->Image = qspCopyToNewText(objImage);
     qspIsObjsListChanged = QSP_TRUE;
     /* Send notification */
@@ -210,39 +313,42 @@ INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int obj
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJADDED), &addedObjName, 1);
 }
 
-INLINE void qspUpdateObjectsByName(QSPString objName, QSPString objDesc, QSPString objImage, QSP_BOOL toUpdateImage)
+INLINE void qspUpdateObjsGroup(QSPString objName, QSPString objDesc, QSPString objImage, QSP_BOOL toUpdateImage)
 {
-    if (qspCurObjsCount)
+    QSPObjsGroup *objsGroup;
+    int groupIndex = qspGetObjsGroupIndex(objName);
+    if (groupIndex < 0) return;
+    objsGroup = qspCurObjsGroups + groupIndex;
+    if (objsGroup->UpdatedFields & QSP_OBJUPDATED_DESC)
     {
-        int i;
-        QSPObj *curObj;
-        QSPString bufName;
-        QSPBufString buf;
-        objName = qspCopyToNewText(objName);
-        qspUpperStr(&objName);
-        buf = qspNewBufString(32);
-        curObj = qspCurObjects;
-        for (i = qspCurObjsCount; i > 0; --i, ++curObj)
+        if (qspStrsCompare(objsGroup->Desc, objDesc))
         {
-            qspUpdateBufString(&buf, curObj->Name);
-            bufName = qspBufTextToString(buf);
-            qspUpperStr(&bufName);
-            if (!qspStrsCompare(bufName, objName))
+            qspUpdateText(&objsGroup->Desc, objDesc);
+            qspIsObjsListChanged = QSP_TRUE;
+        }
+    }
+    else
+    {
+        objsGroup->UpdatedFields |= QSP_OBJUPDATED_DESC;
+        qspUpdateText(&objsGroup->Desc, objDesc);
+        qspIsObjsListChanged = QSP_TRUE;
+    }
+    if (toUpdateImage)
+    {
+        if (objsGroup->UpdatedFields & QSP_OBJUPDATED_IMAGE)
+        {
+            if (qspStrsCompare(objsGroup->Image, objImage))
             {
-                if (qspStrsCompare(curObj->Desc, objDesc))
-                {
-                    qspUpdateText(&curObj->Desc, objDesc);
-                    qspIsObjsListChanged = QSP_TRUE;
-                }
-                if (toUpdateImage && qspStrsCompare(curObj->Image, objImage))
-                {
-                    qspUpdateText(&curObj->Image, objImage);
-                    qspIsObjsListChanged = QSP_TRUE;
-                }
+                qspUpdateText(&objsGroup->Image, objImage);
+                qspIsObjsListChanged = QSP_TRUE;
             }
         }
-        qspFreeString(&objName);
-        qspFreeBufString(&buf);
+        else
+        {
+            objsGroup->UpdatedFields |= QSP_OBJUPDATED_IMAGE;
+            qspUpdateText(&objsGroup->Image, objImage);
+            qspIsObjsListChanged = QSP_TRUE;
+        }
     }
 }
 
@@ -250,15 +356,17 @@ QSPString qspGetAllObjectsAsCode(void)
 {
     int i;
     QSPObj *curObj;
-    QSPString objName, temp;
+    QSPObjsGroup *curObjsGroup;
+    QSPString temp;
     QSPBufString res = qspNewBufString(256);
+    /* Add objects */
     curObj = qspCurObjects;
     for (i = qspCurObjsCount; i > 0; --i, ++curObj)
     {
-        /* Add the object */
-        objName = qspReplaceText(curObj->Name, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
         qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ADDOBJ ") QSP_DEFQUOT));
-        qspAddBufText(&res, objName);
+        temp = qspReplaceText(curObj->Name, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+        qspAddBufText(&res, temp);
+        qspFreeNewString(&temp, &curObj->Name);
         if (curObj->Image.Str)
         {
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(", ") QSP_DEFQUOT));
@@ -267,20 +375,57 @@ QSPString qspGetAllObjectsAsCode(void)
             qspFreeNewString(&temp, &curObj->Image);
         }
         qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_STRSDELIM));
-        /* Assign the description if it's not the same as the name */
-        if (qspStrsCompare(curObj->Name, curObj->Desc))
+    }
+    /* Update object groups */
+    curObjsGroup = qspCurObjsGroups;
+    for (i = qspCurObjsGroupsCount; i > 0; --i, ++curObjsGroup)
+    {
+        /* Check for updates since object groups exist even for unmodified objects */
+        if (curObjsGroup->UpdatedFields)
         {
             qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("MODOBJ ") QSP_DEFQUOT));
-            qspAddBufText(&res, objName);
-            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(", ") QSP_DEFQUOT));
-            temp = qspReplaceText(curObj->Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+            temp = qspReplaceText(curObjsGroup->Name, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
             qspAddBufText(&res, temp);
-            qspFreeNewString(&temp, &curObj->Desc);
+            qspFreeNewString(&temp, &curObjsGroup->Name);
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(", ") QSP_DEFQUOT));
+            temp = qspReplaceText(curObjsGroup->Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+            qspAddBufText(&res, temp);
+            qspFreeNewString(&temp, &curObjsGroup->Desc);
+            if (curObjsGroup->UpdatedFields & QSP_OBJUPDATED_IMAGE)
+            {
+                qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(", ") QSP_DEFQUOT));
+                temp = qspReplaceText(curObjsGroup->Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+                qspAddBufText(&res, temp);
+                qspFreeNewString(&temp, &curObjsGroup->Image);
+            }
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_STRSDELIM));
         }
-        qspFreeNewString(&objName, &curObj->Name);
     }
     return qspBufTextToString(res);
+}
+
+QSP_BOOL qspGetObjectInfoByIndex(int index, QSPObjectItem *info)
+{
+    if (index >= 0 && index < qspCurObjsCount)
+    {
+        QSPObj *obj = qspCurObjects + index;
+        int groupIndex = qspGetObjsGroupIndex(obj->Name);
+        if (groupIndex >= 0)
+        {
+            QSPObjsGroup *objsGroup = qspCurObjsGroups + groupIndex;
+            info->Name = obj->Name;
+            info->Title = ((objsGroup->UpdatedFields & QSP_OBJUPDATED_DESC) ? objsGroup->Desc : obj->Name);
+            info->Image = ((objsGroup->UpdatedFields & QSP_OBJUPDATED_IMAGE) ? objsGroup->Image : obj->Image);
+        }
+        else
+        {
+            info->Name = obj->Name;
+            info->Title = obj->Name;
+            info->Image = obj->Image;
+        }
+        return QSP_TRUE;
+    }
+    return QSP_FALSE;
 }
 
 void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
@@ -322,10 +467,10 @@ void qspStatementModObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNU
     if (count == 3)
     {
         QSPString objImage = (qspIsAnyString(QSP_STR(args[2])) ? QSP_STR(args[2]) : qspNullString);
-        qspUpdateObjectsByName(QSP_STR(args[0]), QSP_STR(args[1]), objImage, QSP_TRUE);
+        qspUpdateObjsGroup(QSP_STR(args[0]), QSP_STR(args[1]), objImage, QSP_TRUE);
     }
     else
-        qspUpdateObjectsByName(QSP_STR(args[0]), QSP_STR(args[1]), qspNullString, QSP_FALSE);
+        qspUpdateObjsGroup(QSP_STR(args[0]), QSP_STR(args[1]), qspNullString, QSP_FALSE);
 }
 
 void qspStatementUnSelect(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT QSP_UNUSED(extArg))

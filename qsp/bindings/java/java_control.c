@@ -236,11 +236,15 @@ JNIEXPORT jobjectArray JNICALL Java_com_libqsp_jni_QSPLib_getObjects(JNIEnv *env
 {
     int i;
     JNIListItem item;
+    QSPObjectItem obj;
     jobjectArray res = (*env)->NewObjectArray(env, qspCurObjsCount, qspObjectItemClass, 0);
     for (i = 0; i < qspCurObjsCount; ++i)
     {
-        item = qspToJavaObjectItem(env, qspCurObjects[i].Name, qspCurObjects[i].Desc, qspCurObjects[i].Image);
-        (*env)->SetObjectArrayElement(env, res, i, item.ListItem);
+        if (qspGetObjectInfoByIndex(i, &obj))
+        {
+            item = qspToJavaObjectItem(env, obj.Name, obj.Title, obj.Image);
+            (*env)->SetObjectArrayElement(env, res, i, item.ListItem);
+        }
     }
     return res;
 }
