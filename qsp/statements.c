@@ -148,6 +148,7 @@ void qspInitStats(void)
     qspAddStatement(qspStatAddObj, qspStatementAddObject, 1, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
     qspAddStatement(qspStatDelObj, qspStatementDelObj, 1, 2, QSP_TYPE_STR, QSP_TYPE_NUM);
     qspAddStatement(qspStatModObj, qspStatementModObj, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_STR);
+    qspAddStatement(qspStatResetObj, qspStatementResetObj, 0, 1, QSP_TYPE_STR);
     qspAddStatement(qspStatKillObj, qspStatementDelObj, 0, 1, QSP_TYPE_NUM);
     qspAddStatement(qspStatUnSelect, qspStatementUnSelect, 0, 0);
 
@@ -230,6 +231,7 @@ void qspInitStats(void)
     qspAddStatName(qspStatDelObj, QSP_STATIC_STR(QSP_FMT("DEL OBJ")), QSP_TRUE, 2);
     qspAddStatName(qspStatModObj, QSP_STATIC_STR(QSP_FMT("MODOBJ")), QSP_TRUE, 2);
     qspAddStatName(qspStatModObj, QSP_STATIC_STR(QSP_FMT("MOD OBJ")), QSP_TRUE, 2);
+    qspAddStatName(qspStatResetObj, QSP_STATIC_STR(QSP_FMT("RESETOBJ")), QSP_TRUE, 2);
     qspAddStatName(qspStatKillObj, QSP_STATIC_STR(QSP_FMT("KILLOBJ")), QSP_TRUE, 2);
     qspAddStatName(qspStatUnSelect, QSP_STATIC_STR(QSP_FMT("UNSELECT")), QSP_TRUE, 1);
     qspAddStatName(qspStatUnSelect, QSP_STATIC_STR(QSP_FMT("UNSEL")), QSP_TRUE, 2);

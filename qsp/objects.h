@@ -49,6 +49,7 @@
     void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementModObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
+    void qspStatementResetObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementUnSelect(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 
 #endif
