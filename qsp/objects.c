@@ -277,7 +277,7 @@ INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int obj
 {
     int i, groupIndex;
     QSPObj *obj;
-    QSPVariant addedObjName;
+    QSPVariant addedObjProps[2];
     if (qspCurObjsCount == QSP_MAXOBJECTS)
     {
         qspSetError(QSP_ERR_CANTADDOBJECT);
@@ -306,8 +306,9 @@ INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int obj
     obj->Image = qspCopyToNewText(objImage);
     qspCurWindowsChangedState |= QSP_WIN_OBJS;
     /* Send notification */
-    addedObjName = qspStrVariant(objName, QSP_TYPE_STR);
-    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJADDED), &addedObjName, 1);
+    addedObjProps[0] = qspStrVariant(objName, QSP_TYPE_STR);
+    addedObjProps[1] = qspStrVariant(objImage, QSP_TYPE_STR);
+    qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_OBJADDED), addedObjProps, 2);
 }
 
 INLINE void qspUpdateObjsGroup(QSPString objName, QSPString objDesc, QSPString objImage, QSP_BOOL toUpdateImage)
