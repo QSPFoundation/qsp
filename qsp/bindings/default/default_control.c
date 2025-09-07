@@ -476,7 +476,7 @@ QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRef
 QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI)
 {
     qspPrepareExecution(QSP_FALSE);
-    if (!qspNewGame(QSP_TRUE)) return QSP_FALSE;
+    if (!qspRestartGame(QSP_TRUE)) return QSP_FALSE;
     if (qspErrorNum) return QSP_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;

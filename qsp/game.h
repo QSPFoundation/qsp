@@ -22,7 +22,7 @@
 
     /* External functions */
     void qspClearAllIncludes(QSP_BOOL toInit);
-    QSP_BOOL qspNewGame(QSP_BOOL toReset);
+    QSP_BOOL qspRestartGame(QSP_BOOL toReset);
     QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame);
     QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS);
     QSP_BOOL qspOpenGameStatus(void *data, int dataSize);

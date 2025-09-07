@@ -64,7 +64,7 @@ static const unsigned int qspCRCTable[256] =
 };
 
 INLINE int qspCRC(void *, int);
-INLINE void qspIncludeFile(QSPString s);
+INLINE void qspIncludeGameFile(QSPString s);
 INLINE void qspRestoreCurrentIncludes(void);
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS);
 INLINE QSP_BOOL qspSkipLines(int totalLinesCount, int linesToSkip, int *index);
@@ -100,7 +100,7 @@ void qspClearAllIncludes(QSP_BOOL toInit)
     qspCurIncLocsCount = 0;
 }
 
-INLINE void qspIncludeFile(QSPString s)
+INLINE void qspIncludeGameFile(QSPString s)
 {
     int i, oldLocationState;
     if (!qspIsAnyString(s)) return;
@@ -130,7 +130,7 @@ INLINE void qspRestoreCurrentIncludes(void)
     }
 }
 
-QSP_BOOL qspNewGame(QSP_BOOL toReset)
+QSP_BOOL qspRestartGame(QSP_BOOL toReset)
 {
     if (!qspLocsCount)
     {
@@ -657,11 +657,11 @@ void qspStatementOpenQst(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TI
             int oldLocationState = qspLocationState;
             qspCallOpenGame(QSP_STR(args[0]), QSP_TRUE);
             if (qspLocationState != oldLocationState) return;
-            qspNewGame(QSP_FALSE);
+            qspRestartGame(QSP_FALSE);
         }
         break;
     case qspStatIncLib:
-        qspIncludeFile(QSP_STR(args[0]));
+        qspIncludeGameFile(QSP_STR(args[0]));
         break;
     }
 }

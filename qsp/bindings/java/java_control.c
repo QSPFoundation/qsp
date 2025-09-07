@@ -502,7 +502,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_openSavedGameFromData(JNIE
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_restartGame(JNIEnv *env, jobject api, jboolean toRefreshUI)
 {
     qspPrepareExecution(QSP_FALSE);
-    if (!qspNewGame(QSP_TRUE)) return JNI_FALSE;
+    if (!qspRestartGame(QSP_TRUE)) return JNI_FALSE;
     if (qspErrorNum) return JNI_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return JNI_TRUE;
