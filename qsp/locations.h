@@ -22,11 +22,14 @@
     typedef struct
     {
         QSPString Name;
+        /* Base description */
         QSPString Desc;
+        /* Location code */
         QSPLineOfCode *OnVisitLines;
         int OnVisitLinesCount;
-        QSPLocAct Actions[QSP_MAXACTIONS];
-        int ActionsCount; /* number of base actions, some of them can be empty */
+        /* Base actions */
+        QSPLocAct *Actions;
+        int ActionsCount;
     } QSPLocation;
 
     typedef struct

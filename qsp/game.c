@@ -90,8 +90,8 @@ void qspClearAllIncludes(QSP_BOOL toInit)
             qspFreeString(qspCurIncFiles + i);
         if (qspCurIncLocsCount)
         {
-            int count = qspLocsCount - qspCurIncLocsCount;
-            qspCreateWorld(count, count);
+            int baseLocsCount = qspLocsCount - qspCurIncLocsCount;
+            qspCreateWorld(baseLocsCount, baseLocsCount);
             qspPrepareLocs();
             if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
         }
@@ -194,7 +194,9 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
 {
     QSP_BOOL isOldFormat, toAddLoc, isUCS;
     int i, j, ind, crc, count, locsCount, actsCount, startLoc, endLoc;
-    QSPString buf, gameString, *strs;
+    QSPLocation *curLoc;
+    QSPLocAct *curAct;
+    QSPString str, gameString, *strs;
     crc = (isNewGame ? qspCRC(data, dataSize) : 0);
     isUCS = (dataSize >= 2 && *((char *)data + 1) == 0);
     gameString = qspStringFromFileData(data, dataSize, isUCS);
@@ -221,46 +223,50 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     }
     locsCount = qspLocsCount;
     qspCreateWorld(startLoc, endLoc);
-    qspLocsCount = locsCount;
+    qspLocsCount = locsCount; /* reset location count to check for duplicates against existing locations */
     locsCount = startLoc;
     ind = (isOldFormat ? 30 : 4);
+    curLoc = qspLocs + startLoc;
     for (i = startLoc; i < endLoc; ++i)
     {
-        buf = qspDecodeString(strs[ind++], isUCS);
-        if ((toAddLoc = (isNewGame || qspLocIndex(buf) < 0)))
-            qspLocs[locsCount].Name = buf;
+        str = qspDecodeString(strs[ind++], isUCS);
+        toAddLoc = (isNewGame || qspLocIndex(str) < 0);
+        if (toAddLoc)
+            curLoc->Name = str;
         else
-            qspFreeString(&buf);
+            qspFreeString(&str);
         if (toAddLoc)
         {
-            qspLocs[locsCount].Desc = qspDecodeString(strs[ind++], isUCS);
-            buf = qspDecodeString(strs[ind++], isUCS);
-            qspLocs[locsCount].OnVisitLinesCount = qspPreprocessData(buf, &qspLocs[locsCount].OnVisitLines);
-            qspFreeString(&buf);
+            curLoc->Desc = qspDecodeString(strs[ind++], isUCS);
+            str = qspDecodeString(strs[ind++], isUCS);
+            curLoc->OnVisitLinesCount = qspPreprocessData(str, &curLoc->OnVisitLines);
+            qspFreeString(&str);
         }
         else
             ind += 2;
         actsCount = (isOldFormat ? 20 : qspReadEncodedIntVal(strs[ind++], isUCS));
         if (toAddLoc)
         {
-            qspLocs[locsCount].ActionsCount = actsCount;
-            for (j = 0; j < actsCount; ++j)
+            curLoc->ActionsCount = actsCount;
+            curAct = curLoc->Actions = (QSPLocAct *)malloc(actsCount * sizeof(QSPLocAct));
+            for (j = 0; j < actsCount; ++j, ++curAct)
             {
-                qspLocs[locsCount].Actions[j].Image = (isOldFormat ? qspNullString : qspDecodeString(strs[ind++], isUCS));
-                qspLocs[locsCount].Actions[j].Desc = qspDecodeString(strs[ind++], isUCS);
-                buf = qspDecodeString(strs[ind++], isUCS);
-                qspLocs[locsCount].Actions[j].OnPressLinesCount = qspPreprocessData(buf, &qspLocs[locsCount].Actions[j].OnPressLines);
-                qspFreeString(&buf);
+                curAct->Image = (isOldFormat ? qspNullString : qspDecodeString(strs[ind++], isUCS));
+                curAct->Desc = qspDecodeString(strs[ind++], isUCS);
+                str = qspDecodeString(strs[ind++], isUCS);
+                curAct->OnPressLinesCount = qspPreprocessData(str, &curAct->OnPressLines);
+                qspFreeString(&str);
             }
             ++locsCount;
+            ++curLoc;
         }
         else
             ind += actsCount * (isOldFormat ? 2 : 3);
     }
     qspFreeStrs(strs, count);
-    qspLocsCount = endLoc;
-    qspCreateWorld(endLoc, locsCount); /* in case we skipped some locations */
-    count = locsCount - startLoc;
+    qspLocsCount = endLoc; /* restore the number of allocated locations */
+    qspCreateWorld(endLoc, locsCount); /* reallocate to actual size after filtering out duplicates */
+    count = locsCount - startLoc; /* calculate the number of added locations */
     if (count) qspPrepareLocs();
     if (isNewGame)
     {
