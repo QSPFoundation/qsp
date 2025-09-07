@@ -248,14 +248,17 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
         if (toAddLoc)
         {
             curLoc->ActionsCount = actsCount;
-            curAct = curLoc->Actions = (QSPLocAct *)malloc(actsCount * sizeof(QSPLocAct));
-            for (j = 0; j < actsCount; ++j, ++curAct)
+            if (actsCount)
             {
-                curAct->Image = (isOldFormat ? qspNullString : qspDecodeString(strs[ind++], isUCS));
-                curAct->Desc = qspDecodeString(strs[ind++], isUCS);
-                str = qspDecodeString(strs[ind++], isUCS);
-                curAct->OnPressLinesCount = qspPreprocessData(str, &curAct->OnPressLines);
-                qspFreeString(&str);
+                curAct = curLoc->Actions = (QSPLocAct *)malloc(actsCount * sizeof(QSPLocAct));
+                for (j = 0; j < actsCount; ++j, ++curAct)
+                {
+                    curAct->Image = (isOldFormat ? qspNullString : qspDecodeString(strs[ind++], isUCS));
+                    curAct->Desc = qspDecodeString(strs[ind++], isUCS);
+                    str = qspDecodeString(strs[ind++], isUCS);
+                    curAct->OnPressLinesCount = qspPreprocessData(str, &curAct->OnPressLines);
+                    qspFreeString(&str);
+                }
             }
             ++locsCount;
             ++curLoc;
