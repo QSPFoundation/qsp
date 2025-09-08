@@ -39,15 +39,16 @@
     } QSPLocName;
 
     extern QSPLocation *qspLocs;
-    extern QSPLocName *qspLocsNames;
     extern int qspLocsCount;
+    extern QSPLocName *qspLocsNames;
+    extern int qspLocsNamesCount;
     extern int qspCurLoc;
     extern int qspLocationState; /* allows to check if we have to terminate execution of the code */
     extern int qspFullRefreshCount;
 
     /* External functions */
-    void qspCreateWorld(int start, int newLocsCount);
-    void qspPrepareLocs(void);
+    void qspResizeWorld(int newLocsCount);
+    void qspUpdateLocsNames(void);
     int qspLocIndex(QSPString name);
     void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res);
     void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount);

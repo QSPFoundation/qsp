@@ -52,8 +52,9 @@ void qspInitRuntime(void)
     qspQstCRC = 0;
     qspMSCount = 0;
     qspLocs = 0;
-    qspLocsNames = 0;
     qspLocsCount = 0;
+    qspLocsNames = 0;
+    qspLocsNamesCount = 0;
     qspCurLoc = -1;
     qspTimerInterval = 0;
     qspCurWindowsDisplayState = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT;
@@ -73,7 +74,8 @@ void qspTerminateRuntime(void)
 {
     qspMemClear(QSP_FALSE);
     qspClearVarsScope(&qspGlobalVars); /* completely destroy the global scope */
-    qspCreateWorld(0, 0);
+    qspResizeWorld(0);
+    qspUpdateLocsNames();
     qspTerminateMath();
     qspResetError(QSP_FALSE);
 }

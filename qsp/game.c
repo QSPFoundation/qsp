@@ -91,8 +91,8 @@ void qspClearAllIncludes(QSP_BOOL toInit)
         if (qspCurIncLocsCount)
         {
             int baseLocsCount = qspLocsCount - qspCurIncLocsCount;
-            qspCreateWorld(baseLocsCount, baseLocsCount);
-            qspPrepareLocs();
+            qspResizeWorld(baseLocsCount);
+            qspUpdateLocsNames();
             if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
         }
     }
@@ -215,22 +215,23 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
         qspClearAllIncludes(QSP_FALSE);
         startLoc = 0;
         endLoc = locsCount;
+        qspResizeWorld(0); /* clear the world */
+        qspUpdateLocsNames();
     }
     else
     {
         startLoc = qspLocsCount;
         endLoc = startLoc + locsCount;
+        /* Keep the location index to check for duplicates against existing locations */
     }
-    locsCount = qspLocsCount;
-    qspCreateWorld(startLoc, endLoc);
-    qspLocsCount = locsCount; /* reset location count to check for duplicates against existing locations */
+    qspResizeWorld(endLoc); /* allocate space for new locations */
     locsCount = startLoc;
     ind = (isOldFormat ? 30 : 4);
     curLoc = qspLocs + startLoc;
     for (i = startLoc; i < endLoc; ++i)
     {
         str = qspDecodeString(strs[ind++], isUCS);
-        toAddLoc = (isNewGame || qspLocIndex(str) < 0);
+        toAddLoc = (isNewGame || qspLocIndex(str) < 0); /* check for duplicates */
         if (toAddLoc)
             curLoc->Name = str;
         else
@@ -267,10 +268,9 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
             ind += actsCount * (isOldFormat ? 2 : 3);
     }
     qspFreeStrs(strs, count);
-    qspLocsCount = endLoc; /* restore the number of allocated locations */
-    qspCreateWorld(endLoc, locsCount); /* reallocate to actual size after filtering out duplicates */
-    count = locsCount - startLoc; /* calculate the number of added locations */
-    if (count) qspPrepareLocs();
+    qspResizeWorld(locsCount); /* reallocate to the actual size after filtering out duplicates */
+    count = locsCount - startLoc;
+    if (count) qspUpdateLocsNames();
     if (isNewGame)
     {
         qspQstCRC = crc;

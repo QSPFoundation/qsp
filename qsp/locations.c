@@ -15,17 +15,18 @@
 #include "variables.h"
 
 QSPLocation *qspLocs = 0;
-QSPLocName *qspLocsNames = 0;
 int qspLocsCount = 0;
+QSPLocName *qspLocsNames = 0;
+int qspLocsNamesCount = 0;
 int qspCurLoc = -1;
 int qspLocationState = 0;
 int qspFullRefreshCount = 0;
 
-INLINE int qspLocsCompare(const void *locName1, const void *locName2);
+INLINE int qspLocNamesCompare(const void *locName1, const void *locName2);
 INLINE int qspLocNameCompare(const void *name, const void *compareTo);
 INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc);
 
-INLINE int qspLocsCompare(const void *locName1, const void *locName2)
+INLINE int qspLocNamesCompare(const void *locName1, const void *locName2)
 {
     return qspStrsCompare(((QSPLocName *)locName1)->Name, ((QSPLocName *)locName2)->Name);
 }
@@ -35,71 +36,104 @@ INLINE int qspLocNameCompare(const void *name, const void *compareTo)
     return qspStrsCompare(*(QSPString *)name, ((QSPLocName *)compareTo)->Name);
 }
 
-void qspCreateWorld(int start, int newLocsCount)
+void qspResizeWorld(int newLocsCount)
 {
-    int i, j;
-    QSPLocation *curLoc;
-    QSPLocAct *curAct;
-    QSPLocName *curLocName;
-    /* Release overlapping locations */
-    curLoc = qspLocs + start;
-    curLocName = qspLocsNames + start;
-    for (i = start; i < qspLocsCount; ++i, ++curLoc, ++curLocName)
+    int oldLocsCount = qspLocsCount;
+    /* Clear existing locations only if the new world is smaller than the current one */
+    if (qspLocs && newLocsCount < oldLocsCount)
     {
-        qspFreeString(&curLocName->Name);
-        qspFreeString(&curLoc->Name);
-        qspFreeString(&curLoc->Desc);
-        qspFreePrepLines(curLoc->OnVisitLines, curLoc->OnVisitLinesCount);
-        if (curLoc->Actions)
+        int i, j;
+        QSPLocation *curLoc;
+        QSPLocAct *curAct;
+        curLoc = qspLocs + newLocsCount;
+        for (i = newLocsCount; i < oldLocsCount; ++i, ++curLoc)
         {
-            for (j = 0, curAct = curLoc->Actions; j < curLoc->ActionsCount; ++j, ++curAct)
+            qspFreeString(&curLoc->Name);
+            qspFreeString(&curLoc->Desc);
+            qspFreePrepLines(curLoc->OnVisitLines, curLoc->OnVisitLinesCount);
+            if (curLoc->Actions)
             {
-                qspFreeString(&curAct->Image);
-                qspFreeString(&curAct->Desc);
-                qspFreePrepLines(curAct->OnPressLines, curAct->OnPressLinesCount);
+                for (j = 0, curAct = curLoc->Actions; j < curLoc->ActionsCount; ++j, ++curAct)
+                {
+                    qspFreeString(&curAct->Image);
+                    qspFreeString(&curAct->Desc);
+                    qspFreePrepLines(curAct->OnPressLines, curAct->OnPressLinesCount);
+                }
+                free(curLoc->Actions);
             }
-            free(curLoc->Actions);
         }
     }
-    /* Reallocate resources, we can either increase or decrease the number of locations here */
-    if (qspLocsCount != newLocsCount)
+    /* Adjust the location buffer */
+    if (oldLocsCount != newLocsCount)
     {
         qspLocsCount = newLocsCount;
-        qspLocs = (QSPLocation *)realloc(qspLocs, qspLocsCount * sizeof(QSPLocation));
-        qspLocsNames = (QSPLocName *)realloc(qspLocsNames, qspLocsCount * sizeof(QSPLocName));
+        if (newLocsCount)
+            qspLocs = (QSPLocation *)realloc(qspLocs, newLocsCount * sizeof(QSPLocation));
+        else
+        {
+            free(qspLocs);
+            qspLocs = 0;
+        }
     }
-    /* Init locations */
-    curLoc = qspLocs + start;
-    curLocName = qspLocsNames + start;
-    for (i = start; i < qspLocsCount; ++i, ++curLoc, ++curLocName)
+    /* Init new locations only if the new world is bigger than the current one */
+    if (qspLocs && newLocsCount > oldLocsCount)
     {
-        curLocName->Name = qspNullString;
-        curLoc->Name = qspNullString;
-        curLoc->Desc = qspNullString;
-        curLoc->OnVisitLines = 0;
-        curLoc->OnVisitLinesCount = 0;
-        curLoc->Actions = 0;
-        curLoc->ActionsCount = 0;
+        int i;
+        QSPLocation *curLoc;
+        curLoc = qspLocs + oldLocsCount;
+        for (i = oldLocsCount; i < newLocsCount; ++i, ++curLoc)
+        {
+            curLoc->Name = qspNullString;
+            curLoc->Desc = qspNullString;
+            curLoc->OnVisitLines = 0;
+            curLoc->OnVisitLinesCount = 0;
+            curLoc->Actions = 0;
+            curLoc->ActionsCount = 0;
+        }
     }
 }
 
-void qspPrepareLocs(void)
+void qspUpdateLocsNames(void)
 {
-    int i;
-    QSPLocation *curLoc = qspLocs;
-    QSPLocName *curLocName = qspLocsNames;
-    for (i = 0; i < qspLocsCount; ++i, ++curLoc, ++curLocName)
+    /* Clear old location index */
+    if (qspLocsNames)
     {
-        curLocName->Index = i;
-        qspUpdateText(&curLocName->Name, curLoc->Name);
-        qspUpperStr(&curLocName->Name);
+        int i;
+        QSPLocName *curLocName = qspLocsNames;
+        for (i = 0; i < qspLocsNamesCount; ++i, ++curLocName)
+            qspFreeString(&curLocName->Name);
     }
-    qsort(qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocsCompare);
+    /* Adjust the size of the location index */
+    if (qspLocsNamesCount != qspLocsCount)
+    {
+        qspLocsNamesCount = qspLocsCount;
+        if (qspLocsNamesCount)
+            qspLocsNames = (QSPLocName *)realloc(qspLocsNames, qspLocsNamesCount * sizeof(QSPLocName));
+        else
+        {
+            free(qspLocsNames);
+            qspLocsNames = 0;
+        }
+    }
+    /* Init new location index */
+    if (qspLocsNames)
+    {
+        int i;
+        QSPLocation *curLoc = qspLocs;
+        QSPLocName *curLocName = qspLocsNames;
+        for (i = 0; i < qspLocsCount; ++i, ++curLoc, ++curLocName)
+        {
+            curLocName->Index = i;
+            curLocName->Name = qspCopyToNewText(curLoc->Name);
+            qspUpperStr(&curLocName->Name);
+        }
+        qsort(qspLocsNames, qspLocsNamesCount, sizeof(QSPLocName), qspLocNamesCompare);
+    }
 }
 
 int qspLocIndex(QSPString name)
 {
-    if (qspLocsCount)
+    if (qspLocsNamesCount)
     {
         name = qspDelSpc(name);
         if (!qspIsEmpty(name))
@@ -107,7 +141,7 @@ int qspLocIndex(QSPString name)
             QSPLocName *loc;
             name = qspCopyToNewText(name);
             qspUpperStr(&name);
-            loc = (QSPLocName *)bsearch(&name, qspLocsNames, qspLocsCount, sizeof(QSPLocName), qspLocNameCompare);
+            loc = (QSPLocName *)bsearch(&name, qspLocsNames, qspLocsNamesCount, sizeof(QSPLocName), qspLocNameCompare);
             qspFreeString(&name);
             if (loc) return loc->Index;
         }
