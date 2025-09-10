@@ -266,16 +266,16 @@ void qspInitMath(void)
     qspAddOperation(qspOpDiv, 17, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpMod, 16, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_NUM, QSP_TYPE_NUM);
 
-    qspAddOperation(qspOpAnd, 7, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_NUM, QSP_TYPE_NUM);
-    qspAddOperation(qspOpOr, 6, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_NUM, QSP_TYPE_NUM);
-    qspAddOperation(qspOpNot, 8, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_NUM);
-    qspAddOperation(qspOpNe, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpLeq, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpGeq, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpEq, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpLt, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpGt, 10, 0, QSP_TYPE_NUM, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpIIf, 30, 0, QSP_TYPE_UNDEF, 3, 3, QSP_TYPE_NUM, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpAnd, 7, 0, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_BOOL, QSP_TYPE_BOOL);
+    qspAddOperation(qspOpOr, 6, 0, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_BOOL, QSP_TYPE_BOOL);
+    qspAddOperation(qspOpNot, 8, 0, QSP_TYPE_BOOL, 1, 1, QSP_TYPE_BOOL);
+    qspAddOperation(qspOpNe, 10, 0, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpLeq, 10, 0, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpGeq, 10, 0, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpEq, 10, 0, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpLt, 10, 0, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpGt, 10, 0, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpIIf, 30, 0, QSP_TYPE_UNDEF, 3, 3, QSP_TYPE_BOOL, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
 
     qspAddOperation(qspOpMin, 30, qspFunctionMin, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddOperation(qspOpMax, 30, qspFunctionMax, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
@@ -293,7 +293,7 @@ void qspInitMath(void)
 
     qspAddOperation(qspOpStr, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpVal, 30, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpIsNum, 30, qspFunctionIsNum, QSP_TYPE_NUM, 1, 1, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpIsNum, 30, qspFunctionIsNum, QSP_TYPE_BOOL, 1, 1, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpLen, 30, qspFunctionLen, QSP_TYPE_NUM, 1, 1, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpLCase, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpUCase, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
@@ -301,14 +301,14 @@ void qspInitMath(void)
     qspAddOperation(qspOpMid, 30, qspFunctionMid, QSP_TYPE_STR, 2, 3, QSP_TYPE_STR, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpInstr, 30, qspFunctionInstr, QSP_TYPE_NUM, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
     qspAddOperation(qspOpReplace, 30, qspFunctionReplace, QSP_TYPE_STR, 2, 4, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
-    qspAddOperation(qspOpStrComp, 30, qspFunctionStrComp, QSP_TYPE_NUM, 2, 2, QSP_TYPE_STR, QSP_TYPE_STR);
+    qspAddOperation(qspOpStrComp, 30, qspFunctionStrComp, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_STR, QSP_TYPE_STR);
     qspAddOperation(qspOpStrFind, 30, qspFunctionStrFind, QSP_TYPE_STR, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
     qspAddOperation(qspOpStrPos, 30, qspFunctionStrPos, QSP_TYPE_NUM, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
 
     qspAddOperation(qspOpFunc, 30, qspFunctionFunc, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
 
-    qspAddOperation(qspOpLoc, 11, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_STR);
+    qspAddOperation(qspOpLoc, 11, 0, QSP_TYPE_BOOL, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpCurLoc, 30, 0, QSP_TYPE_STR, 0, 0);
     qspAddOperation(qspOpDesc, 30, qspFunctionDesc, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
 
@@ -327,7 +327,7 @@ void qspInitMath(void)
     qspAddOperation(qspOpCurActs, 30, 0, QSP_TYPE_CODE, 0, 0);
 
     qspAddOperation(qspOpRGB, 30, qspFunctionRGB, QSP_TYPE_NUM, 3, 4, QSP_TYPE_NUM, QSP_TYPE_NUM, QSP_TYPE_NUM, QSP_TYPE_NUM);
-    qspAddOperation(qspOpIsPlay, 30, qspFunctionIsPlay, QSP_TYPE_NUM, 1, 1, QSP_TYPE_STR);
+    qspAddOperation(qspOpIsPlay, 30, qspFunctionIsPlay, QSP_TYPE_BOOL, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpMsecsCount, 30, 0, QSP_TYPE_NUM, 0, 0);
     qspAddOperation(qspOpQSPVer, 30, 0, QSP_TYPE_STR, 0, 1, QSP_TYPE_STR);
 
@@ -989,12 +989,12 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         switch (opCode)
         {
         case qspOpAnd: /* logical AND operator, we don't pre-evaluate arguments */
-            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
+            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
             if (qspLocationState != oldLocationState)
                 return qspGetEmptyVariant(QSP_TYPE_UNDEF);
             if (QSP_ISTRUE(QSP_NUM(args[0])))
             {
-                args[1] = qspCalculateArgumentValue(expression, argIndices[1], QSP_TYPE_NUM);
+                args[1] = qspCalculateArgumentValue(expression, argIndices[1], QSP_TYPE_BOOL);
                 if (qspLocationState != oldLocationState)
                     return qspGetEmptyVariant(QSP_TYPE_UNDEF);
                 QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(args[1]));
@@ -1005,7 +1005,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
             }
             return tos;
         case qspOpOr: /* logical OR operator, we don't pre-evaluate arguments */
-            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
+            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
             if (qspLocationState != oldLocationState)
                 return qspGetEmptyVariant(QSP_TYPE_UNDEF);
             if (QSP_ISTRUE(QSP_NUM(args[0])))
@@ -1014,20 +1014,20 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
             }
             else
             {
-                args[1] = qspCalculateArgumentValue(expression, argIndices[1], QSP_TYPE_NUM);
+                args[1] = qspCalculateArgumentValue(expression, argIndices[1], QSP_TYPE_BOOL);
                 if (qspLocationState != oldLocationState)
                     return qspGetEmptyVariant(QSP_TYPE_UNDEF);
                 QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(args[1]));
             }
             return tos;
         case qspOpNot: /* logical NOT operator, we don't pre-evaluate arguments */
-            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
+            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
             if (qspLocationState != oldLocationState)
                 return qspGetEmptyVariant(QSP_TYPE_UNDEF);
             QSP_NUM(tos) = QSP_TOBOOL(!QSP_NUM(args[0]));
             return tos;
         case qspOpIIf: /* inline IF operator, we don't pre-evaluate arguments */
-            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_NUM);
+            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
             if (qspLocationState != oldLocationState)
                 return qspGetEmptyVariant(QSP_TYPE_UNDEF);
             tos = qspCalculateArgumentValue(expression, (QSP_ISTRUE(QSP_NUM(args[0])) ? argIndices[1] : argIndices[2]), QSP_TYPE_UNDEF);

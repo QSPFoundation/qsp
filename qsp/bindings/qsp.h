@@ -81,10 +81,11 @@
         QSP_TYPE_INLINESTR = -1, /* not used for values */
         QSP_TYPE_TUPLE = 0,
         QSP_TYPE_NUM = 1,
-        QSP_TYPE_STR = 2,
-        QSP_TYPE_CODE = 3,
-        QSP_TYPE_VARREF = 4,
-        QSP_TYPE_UNDEF = 5, /* not used for values, it has to be a string-based type */
+        QSP_TYPE_BOOL = 2,
+        QSP_TYPE_STR = 3,
+        QSP_TYPE_CODE = 4,
+        QSP_TYPE_VARREF = 5,
+        QSP_TYPE_UNDEF = 6, /* not used for values, it has to be a string-based type */
         QSP_TYPE_DEFINED_TYPES /* represents the number of defined values */
     };
 
@@ -113,6 +114,7 @@
     {
         /* TUPLE */  QSP_TYPE_TUPLE,
         /* NUMBER */ QSP_TYPE_NUM,
+        /* BOOL */   QSP_TYPE_NUM,
         /* STRING */ QSP_TYPE_STR,
         /* CODE */   QSP_TYPE_STR,
         /* VARREF */ QSP_TYPE_STR,

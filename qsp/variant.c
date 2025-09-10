@@ -7,37 +7,25 @@
 
 #include "variant.h"
 #include "errors.h"
+#include "mathops.h"
 #include "text.h"
 #include "tuples.h"
 
 static const QSP_BOOL qspTypeConversionTable[QSP_TYPE_DEFINED_TYPES][QSP_TYPE_DEFINED_TYPES] =
 {
-    /*             TUPLE     NUMBER    STRING     CODE      VARREF */
-    /* TUPLE */  { QSP_TRUE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
-    /* NUMBER */ { QSP_TRUE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
-    /* STRING */ { QSP_TRUE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
-    /* CODE */   { QSP_TRUE, QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE },
-    /* VARREF */ { QSP_TRUE, QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE },
-    /* UNDEF */  { QSP_TRUE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
+    /*             TUPLE     NUMBER     BOOL      STRING     CODE      VARREF */
+    /* TUPLE */  { QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
+    /* NUMBER */ { QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
+    /* BOOL */   { QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
+    /* STRING */ { QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
+    /* CODE */   { QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE },
+    /* VARREF */ { QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE },
+    /* UNDEF */  { QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
 };
 
-INLINE void qspFormatVariant(QSPVariant *val);
 INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
-
-INLINE void qspFormatVariant(QSPVariant *val)
-{
-    switch (val->Type)
-    {
-    case QSP_TYPE_VARREF:
-        {
-            QSPString temp = qspCopyToNewText(qspDelSpc(QSP_PSTR(val)));
-            qspUpperStr(&temp);
-            qspFreeVariant(val);
-            QSP_PSTR(val) = temp;
-            break;
-        }
-    }
-}
+INLINE QSPString qspGetVariantAsVarRef(QSPVariant *val);
+INLINE QSP_BOOL qspGetVariantAsBool(QSPVariant *val);
 
 INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
 {
@@ -113,6 +101,23 @@ QSPString qspGetVariantAsString(QSPVariant *val)
     return qspNullString;
 }
 
+INLINE QSPString qspGetVariantAsVarRef(QSPVariant *val)
+{
+    switch (QSP_BASETYPE(val->Type))
+    {
+    case QSP_TYPE_TUPLE:
+    case QSP_TYPE_NUM:
+        return qspGetVariantAsString(val); /* return invalid variable name */
+    case QSP_TYPE_STR:
+        {
+            QSPString result = qspCopyToNewText(qspDelSpc(QSP_PSTR(val)));
+            qspUpperStr(&result);
+            return result;
+        }
+    }
+    return qspNullString;
+}
+
 QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
 {
     switch (QSP_BASETYPE(val->Type))
@@ -129,39 +134,63 @@ QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
     return 0;
 }
 
+INLINE QSP_BOOL qspGetVariantAsBool(QSPVariant *val)
+{
+    switch (QSP_BASETYPE(val->Type))
+    {
+    case QSP_TYPE_TUPLE:
+        return QSP_ISTRUE(QSP_PTUPLE(val).ValsCount);
+    case QSP_TYPE_NUM:
+        return QSP_ISTRUE(QSP_PNUM(val));
+    case QSP_TYPE_STR:
+        return QSP_ISTRUE(qspStrLen(QSP_PSTR(val)));
+    }
+    return QSP_FALSE;
+}
+
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
 {
     /* NB: val->Type can be QSP_TYPE_UNDEF */
     if (val->Type != type && qspTypeConversionTable[val->Type][type])
     {
-        QSP_TINYINT toBaseType = QSP_BASETYPE(type);
-        if (QSP_BASETYPE(val->Type) != toBaseType)
+        switch (type)
         {
-            switch (toBaseType)
+        case QSP_TYPE_TUPLE:
+            QSP_PTUPLE(val) = qspMoveToNewTuple(val, 1);
+            break;
+        case QSP_TYPE_NUM:
             {
-            case QSP_TYPE_TUPLE:
-                QSP_PTUPLE(val) = qspMoveToNewTuple(val, 1);
+                QSP_BOOL isValid;
+                QSP_BIGINT result = qspGetVariantAsNum(val, &isValid);
+                if (!isValid) return QSP_FALSE;
+                qspFreeVariant(val);
+                QSP_PNUM(val) = result;
                 break;
-            case QSP_TYPE_NUM:
-                {
-                    QSP_BOOL isValid;
-                    QSP_BIGINT result = qspGetVariantAsNum(val, &isValid);
-                    if (!isValid) return QSP_FALSE;
-                    qspFreeVariant(val);
-                    QSP_PNUM(val) = result;
-                    break;
-                }
-            case QSP_TYPE_STR:
-                {
-                    QSPString result = qspGetVariantAsString(val);
-                    qspFreeVariant(val);
-                    QSP_PSTR(val) = result;
-                    break;
-                }
+            }
+        case QSP_TYPE_BOOL:
+            {
+                QSP_BOOL result = qspGetVariantAsBool(val);
+                qspFreeVariant(val);
+                QSP_PNUM(val) = QSP_TOBOOL(result);
+                break;
+            }
+        case QSP_TYPE_STR:
+        case QSP_TYPE_CODE:
+            {
+                QSPString result = qspGetVariantAsString(val);
+                qspFreeVariant(val);
+                QSP_PSTR(val) = result;
+                break;
+            }
+        case QSP_TYPE_VARREF:
+            {
+                QSPString result = qspGetVariantAsVarRef(val);
+                qspFreeVariant(val);
+                QSP_PSTR(val) = result;
+                break;
             }
         }
         val->Type = type;
-        qspFormatVariant(val);
     }
     return QSP_TRUE;
 }
