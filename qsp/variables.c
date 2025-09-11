@@ -220,7 +220,7 @@ INLINE QSPVar *qspGetVar(QSPVarsBucket *bucket, QSPString name)
     QSPVar *var = bucket->Vars;
     for (i = bucket->VarsCount; i > 0; --i)
     {
-        if (!qspStrsCompare(var->Name, name)) return var;
+        if (qspStrsEqual(var->Name, name)) return var;
         ++var;
     }
     return 0;
@@ -872,7 +872,7 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
                 }
                 else
                 {
-                    if (!qspStrsCompare(QSP_PSTR(val), QSP_PSTR(curValue))) return ind;
+                    if (qspStrsEqual(QSP_PSTR(val), QSP_PSTR(curValue))) return ind;
                 }
                 break;
             case QSP_TYPE_NUM:

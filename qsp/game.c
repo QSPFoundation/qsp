@@ -106,7 +106,7 @@ INLINE void qspIncludeGameFile(QSPString s)
     if (!qspIsAnyString(s)) return;
     for (i = 0; i < qspCurIncFilesCount; ++i)
     {
-        if (!qspStrsCompare(qspCurIncFiles[i], s))
+        if (qspStrsEqual(qspCurIncFiles[i], s))
             return;
     }
     if (qspCurIncFilesCount == QSP_MAXINCFILES)
@@ -167,32 +167,32 @@ QSP_BOOL qspRestartGame(QSP_BOOL toReset)
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS)
 {
     int i, ind, locsCount, actsCount;
-    QSP_BOOL isOldFormat = qspStrsCompare(strs[0], QSP_STATIC_STR(QSP_GAMEID)) != 0;
-    ind = (isOldFormat ? 30 : 4);
+    QSP_BOOL isLatestFormat = qspStrsEqual(strs[0], QSP_STATIC_STR(QSP_GAMEID));
+    ind = (isLatestFormat ? 4 : 30);
     if (ind >= count) return QSP_FALSE;
-    locsCount = (isOldFormat ? qspStrToNum(strs[0], 0) : qspReadEncodedIntVal(strs[3], isUCS));
+    locsCount = (isLatestFormat ? qspReadEncodedIntVal(strs[3], isUCS) : qspStrToNum(strs[0], 0));
     if (locsCount <= 0) return QSP_FALSE;
     for (i = 0; i < locsCount; ++i)
     {
         /* Location data: name, desc, code */
         if ((ind += 3) >= count) return QSP_FALSE;
-        if (isOldFormat)
-            actsCount = 20;
-        else
+        if (isLatestFormat)
         {
             if (ind >= count) return QSP_FALSE;
             actsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
             if (actsCount < 0 || actsCount > QSP_MAXACTIONS) return QSP_FALSE;
         }
+        else
+            actsCount = 20;
         /* Actions: image, description, code */
-        if ((ind += (actsCount * (isOldFormat ? 2 : 3))) >= count) return QSP_FALSE;
+        if ((ind += (actsCount * (isLatestFormat ? 3 : 2))) >= count) return QSP_FALSE;
     }
     return QSP_TRUE;
 }
 
 QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
 {
-    QSP_BOOL isOldFormat, toAddLoc, isUCS;
+    QSP_BOOL isLatestFormat, toAddLoc, isUCS;
     int i, j, ind, crc, count, locsCount, actsCount, startLoc, endLoc;
     QSPLocation *curLoc;
     QSPLocAct *curAct;
@@ -208,8 +208,8 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
         qspFreeStrs(strs, count);
         return QSP_FALSE;
     }
-    isOldFormat = qspStrsCompare(strs[0], QSP_STATIC_STR(QSP_GAMEID)) != 0;
-    locsCount = (isOldFormat ? qspStrToNum(strs[0], 0) : qspReadEncodedIntVal(strs[3], isUCS));
+    isLatestFormat = qspStrsEqual(strs[0], QSP_STATIC_STR(QSP_GAMEID));
+    locsCount = (isLatestFormat ? qspReadEncodedIntVal(strs[3], isUCS) : qspStrToNum(strs[0], 0));
     if (isNewGame)
     {
         qspClearAllIncludes(QSP_FALSE);
@@ -226,7 +226,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     }
     qspResizeWorld(endLoc); /* allocate space for new locations */
     locsCount = startLoc;
-    ind = (isOldFormat ? 30 : 4);
+    ind = (isLatestFormat ? 4 : 30);
     curLoc = qspLocs + startLoc;
     for (i = startLoc; i < endLoc; ++i)
     {
@@ -245,7 +245,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
         }
         else
             ind += 2;
-        actsCount = (isOldFormat ? 20 : qspReadEncodedIntVal(strs[ind++], isUCS));
+        actsCount = (isLatestFormat ? qspReadEncodedIntVal(strs[ind++], isUCS) : 20);
         if (toAddLoc)
         {
             curLoc->ActionsCount = actsCount;
@@ -254,7 +254,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
                 curAct = curLoc->Actions = (QSPLocAct *)malloc(actsCount * sizeof(QSPLocAct));
                 for (j = 0; j < actsCount; ++j, ++curAct)
                 {
-                    curAct->Image = (isOldFormat ? qspNullString : qspDecodeString(strs[ind++], isUCS));
+                    curAct->Image = (isLatestFormat ? qspDecodeString(strs[ind++], isUCS) : qspNullString);
                     curAct->Desc = qspDecodeString(strs[ind++], isUCS);
                     str = qspDecodeString(strs[ind++], isUCS);
                     curAct->OnPressLinesCount = qspPreprocessData(str, &curAct->OnPressLines);
@@ -265,7 +265,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
             ++curLoc;
         }
         else
-            ind += actsCount * (isOldFormat ? 2 : 3);
+            ind += actsCount * (isLatestFormat ? 3 : 2);
     }
     qspFreeStrs(strs, count);
     qspResizeWorld(locsCount); /* reallocate to the actual size after filtering out duplicates */
@@ -411,7 +411,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     int i, j, k, ind, count, groupsCount, varValuesCount, temp, selAction, selObject;
     ind = 12;
     if (ind >= strsCount) return QSP_FALSE;
-    if (qspStrsCompare(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
+    if (!qspStrsEqual(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
     if (QSP_ISFALSE(qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DEBUG")))))

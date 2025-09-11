@@ -228,6 +228,14 @@
         return 0;
     }
 
+    INLINE QSP_BOOL qspStrsEqual(QSPString str1, QSPString str2)
+    {
+        int len1 = qspStrLen(str1);
+        int len2 = qspStrLen(str2);
+
+        return len1 == len2 && !memcmp(str1.Str, str2.Str, len1 * sizeof(QSP_CHAR));
+    }
+
     INLINE int qspStrsCompare(QSPString str1, QSPString str2)
     {
         int delta;

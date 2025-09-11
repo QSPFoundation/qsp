@@ -52,7 +52,7 @@ INLINE int qspActIndex(QSPString name)
             qspUpdateBufString(&buf, qspCurActions[i].Desc);
             bufName = qspBufTextToString(buf);
             qspUpperStr(&bufName);
-            if (!qspStrsCompare(bufName, name))
+            if (qspStrsEqual(bufName, name))
             {
                 qspFreeString(&name);
                 qspFreeBufString(&buf);

@@ -372,7 +372,7 @@ INLINE int qspSearchLabel(QSPLineOfCode *lines, int start, int end, QSPString st
     lines += start;
     while (start < end)
     {
-        if (lines->Label.Str && !qspStrsCompare(lines->Label, str)) return start;
+        if (lines->Label.Str && qspStrsEqual(lines->Label, str)) return start;
         ++start;
         ++lines;
     }

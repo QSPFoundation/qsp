@@ -634,7 +634,7 @@ INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *
     if (qspAddBufText(strBuf, str) && strBuf->Len >= eolLen)
     {
         QSPString eol = qspStringFromLen(strBuf->Str + strBuf->Len - eolLen, eolLen);
-        if (!qspStrsCompare(eol, QSP_STATIC_STR(QSP_PREEOLEXT QSP_EOLEXT)))
+        if (qspStrsEqual(eol, QSP_STATIC_STR(QSP_PREEOLEXT QSP_EOLEXT)))
         {
             strBuf->Len -= QSP_STATIC_LEN(QSP_EOLEXT); /* keep QSP_PREEOLEXT */
             return QSP_FALSE;

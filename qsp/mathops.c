@@ -202,7 +202,7 @@ INLINE QSPMathExpression *qspMathExpGetCompiled(QSPString expStr)
     expsCount = bucket->ExpsCount;
     for (i = expsCount; i > 0; --i)
     {
-        if (!qspStrsCompare(exp->Text, expStr)) return &exp->CompiledExp;
+        if (qspStrsEqual(exp->Text, expStr)) return &exp->CompiledExp;
         ++exp;
     }
     /* Compile the new expression */

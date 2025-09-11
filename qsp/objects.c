@@ -241,7 +241,7 @@ INLINE void qspClearObjectsByNameWithEvents(QSPString objName, int maxObjects)
             qspUpdateBufString(&buf, qspCurObjects[i].Name);
             bufName = qspBufTextToString(buf);
             qspUpperStr(&bufName);
-            if (!qspStrsCompare(bufName, objName))
+            if (qspStrsEqual(bufName, objName))
             {
                 /* Add object to the notification list */
                 if (objsCount >= objsBufSize)
@@ -320,7 +320,7 @@ INLINE void qspUpdateObjsGroup(QSPString objName, QSPString objDesc, QSPString o
     objsGroup = qspCurObjsGroups + groupIndex;
     if (objsGroup->UpdatedFields & QSP_OBJUPDATED_DESC)
     {
-        if (qspStrsCompare(objsGroup->Desc, objDesc))
+        if (!qspStrsEqual(objsGroup->Desc, objDesc))
         {
             qspUpdateText(&objsGroup->Desc, objDesc);
             qspCurWindowsChangedState |= QSP_WIN_OBJS;
@@ -336,7 +336,7 @@ INLINE void qspUpdateObjsGroup(QSPString objName, QSPString objDesc, QSPString o
     {
         if (objsGroup->UpdatedFields & QSP_OBJUPDATED_IMAGE)
         {
-            if (qspStrsCompare(objsGroup->Image, objImage))
+            if (!qspStrsEqual(objsGroup->Image, objImage))
             {
                 qspUpdateText(&objsGroup->Image, objImage);
                 qspCurWindowsChangedState |= QSP_WIN_OBJS;
