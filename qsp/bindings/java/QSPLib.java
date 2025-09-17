@@ -30,22 +30,40 @@ public abstract class QSPLib {
         LOOPWHILENOTFOUND
     }
 
-    public enum Window {
-        MAIN(1 << 0),
-        VARS(1 << 1),
-        ACTS(1 << 2),
-        OBJS(1 << 3),
-        INPUT(1 << 4),
-        VIEW(1 << 5);
+    public final class Window {
+        public static final int MAIN  = 1 << 0;
+        public static final int VARS  = 1 << 1;
+        public static final int ACTS  = 1 << 2;
+        public static final int OBJS  = 1 << 3;
+        public static final int INPUT = 1 << 4;
+        public static final int VIEW  = 1 << 5;
 
-        private final int value;
+        private int value;
 
-        Window(int value) {
+        public Window() {
+            this.value = 0;
+        }
+
+        public Window(int value) {
             this.value = value;
         }
 
         public int getValue() {
             return value;
+        }
+
+        public boolean isSet(int flags) {
+            return (value & flags) == flags;
+        }
+
+        public Window set(int flags) {
+            value |= flags;
+            return this;
+        }
+
+        public Window clear(int flags) {
+            value &= ~flags;
+            return this;
         }
     }
 
