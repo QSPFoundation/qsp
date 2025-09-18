@@ -154,12 +154,15 @@ INLINE char qspDirectConvertSB(char ch, const unsigned char *table)
 
 INLINE char qspReverseConvertSB(char ch, const unsigned char *table)
 {
-    int i;
     unsigned char ch2 = (unsigned char)ch;
-    if (ch2 < 0x80) return ch;
-    for (i = 127; i >= 0; --i)
-        if (table[i] == ch2) return (char)(i + 0x80);
-    return 0x20;
+    if (ch2 >= 0x80)
+    {
+        int i;
+        for (i = 0; i < 0x80; ++i)
+            if (table[i] == ch2) return (char)(i + 0x80);
+        return 0x20;
+    }
+    return ch;
 }
 
 INLINE unsigned short qspDirectConvertUC(char ch, const unsigned short *table)
@@ -170,11 +173,14 @@ INLINE unsigned short qspDirectConvertUC(char ch, const unsigned short *table)
 
 INLINE char qspReverseConvertUC(unsigned short ch, const unsigned short *table)
 {
-    int i;
-    if (ch < 0x80) return (char)ch;
-    for (i = 127; i >= 0; --i)
-        if (table[i] == ch) return (char)(i + 0x80);
-    return 0x20;
+    if (ch >= 0x80)
+    {
+        int i;
+        for (i = 0; i < 0x80; ++i)
+            if (table[i] == ch) return (char)(i + 0x80);
+        return 0x20;
+    }
+    return (char)ch;
 }
 
 void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize)
