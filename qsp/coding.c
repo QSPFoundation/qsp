@@ -21,7 +21,7 @@ const unsigned char qspCP1251ToKOI8RTable[] =
     0xD2, 0xD3, 0xD4, 0xD5, 0xC6, 0xC8, 0xC3, 0xDE, 0xDB, 0xDD, 0xDF, 0xD9, 0xD8, 0xDC, 0xC0, 0xD1
 };
 
-const int qspKOI8RToUnicodeTable[] =
+const unsigned short qspKOI8RToUnicodeTable[] =
 {
     0x2500, 0x2502, 0x250C, 0x2510, 0x2514, 0x2518, 0x251C, 0x2524,
     0x252C, 0x2534, 0x253C, 0x2580, 0x2584, 0x2588, 0x258C, 0x2590,
@@ -41,7 +41,7 @@ const int qspKOI8RToUnicodeTable[] =
     0x042C, 0x042B, 0x0417, 0x0428, 0x042D, 0x0429, 0x0427, 0x042A
 };
 
-const int qspCP1251ToUnicodeTable[] =
+const unsigned short qspCP1251ToUnicodeTable[] =
 {
     0x0402, 0x0403, 0x201A, 0x0453, 0x201E, 0x2026, 0x2020, 0x2021,
     0x20AC, 0x2030, 0x0409, 0x2039, 0x040A, 0x040C, 0x040B, 0x040F,
@@ -143,8 +143,8 @@ const unsigned char qspKOI8RToLowerTable[] =
 
 INLINE char qspDirectConvertSB(char ch, const unsigned char *table);
 INLINE char qspReverseConvertSB(char ch, const unsigned char *table);
-INLINE int qspDirectConvertUC(char ch, const int *table);
-INLINE char qspReverseConvertUC(int ch, const int *table);
+INLINE unsigned short qspDirectConvertUC(char ch, const unsigned short *table);
+INLINE char qspReverseConvertUC(unsigned short ch, const unsigned short *table);
 
 INLINE char qspDirectConvertSB(char ch, const unsigned char *table)
 {
@@ -162,13 +162,13 @@ INLINE char qspReverseConvertSB(char ch, const unsigned char *table)
     return 0x20;
 }
 
-INLINE int qspDirectConvertUC(char ch, const int *table)
+INLINE unsigned short qspDirectConvertUC(char ch, const unsigned short *table)
 {
     unsigned char ch2 = (unsigned char)ch;
     return (ch2 >= 0x80 ? table[ch2 - 0x80] : ch);
 }
 
-INLINE char qspReverseConvertUC(int ch, const int *table)
+INLINE char qspReverseConvertUC(unsigned short ch, const unsigned short *table)
 {
     int i;
     if (ch < 0x80) return (char)ch;
@@ -186,9 +186,9 @@ void *qspStringToFileData(QSPString s, QSP_BOOL isUCS2, int *dataSize)
     buf = (char *)malloc(bufSize);
     if (isUCS2)
     {
-        unsigned short *uPtr = (unsigned short *)buf;
+        unsigned short *ptr = (unsigned short *)buf;
         while (--len >= 0)
-            uPtr[len] = QSP_TO_GAME_UC(origBuf[len]);
+            ptr[len] = QSP_TO_GAME_UC(origBuf[len]);
     }
     else
     {
@@ -208,9 +208,9 @@ QSPString qspStringFromFileData(void *data, int dataSize, QSP_BOOL isUCS2)
     curLen = len;
     if (isUCS2)
     {
-        unsigned short *uPtr = (unsigned short *)data;
+        unsigned short *ptr = (unsigned short *)data;
         while (--curLen >= 0)
-            ret[curLen] = (QSP_CHAR)QSP_FROM_GAME_UC(uPtr[curLen]);
+            ret[curLen] = (QSP_CHAR)QSP_FROM_GAME_UC(ptr[curLen]);
     }
     else
     {
