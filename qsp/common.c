@@ -84,9 +84,12 @@ void qspPrepareExecution(QSP_BOOL toInit)
 {
     qspResetError(toInit);
 
-    /* Reset local variables & switch to the global scope */
-    qspClearLocalVarsScopes(qspCurrentLocalVars);
-    qspCurrentLocalVars = 0;
+    /* Reset local variables & switch to the global scope, unless inside a callback */
+    if (!qspIsInCallback)
+    {
+        qspClearLocalVarsScopes(qspCurrentLocalVars);
+        qspCurrentLocalVars = 0;
+    }
 
     /* Reset the execution state */
     qspRealCurLoc = -1;
