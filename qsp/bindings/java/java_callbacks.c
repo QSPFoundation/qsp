@@ -145,6 +145,20 @@ void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
     }
 }
 
+void qspCallResetGameStatus(QSP_BOOL isNewGame)
+{
+    /* Reset game state */
+    if (qspCallbacks[QSP_CALL_RESETGAMESTATUS])
+    {
+        QSPCallState state;
+        JNIEnv *javaEnv = qspGetJniEnv();
+
+        qspPrepareCallback(&state, QSP_FALSE);
+        (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_RESETGAMESTATUS], isNewGame);
+        qspFinalizeCallback(&state, QSP_FALSE);
+    }
+}
+
 void qspCallOpenGameStatus(QSPString file)
 {
     /* Open game state (showing the dialog to choose a file) */

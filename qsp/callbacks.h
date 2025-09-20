@@ -46,6 +46,7 @@
     void qspCallSleep(int msecs);
     int qspCallGetMSCount(void);
     void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame);
+    void qspCallResetGameStatus(QSP_BOOL isNewGame);
     void qspCallOpenGameStatus(QSPString file);
     void qspCallSaveGameStatus(QSPString file);
     QSPString qspCallInputBox(QSPString text);
