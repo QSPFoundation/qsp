@@ -159,8 +159,8 @@ QSP_BOOL qspRestartGame(QSP_BOOL toReset)
         if (qspLocationState != oldLocationState) return QSP_FALSE;
         qspCallShowWindow(qspGetEnabledWindows(), QSP_TRUE);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
-        /* Notification on game reset */
-        qspCallResetGameStatus(QSP_TRUE);
+        /* Extra initialization of the game state */
+        qspCallInitGameStatus(QSP_TRUE);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
     }
     qspNavigateToLocation(0, QSP_TRUE, 0, 0);
@@ -649,8 +649,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspCallShowWindow(qspGetEnabledWindows(), QSP_TRUE);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
-    /* Notification on game reset */
-    qspCallResetGameStatus(QSP_FALSE);
+    /* Extra initialization of the game state */
+    qspCallInitGameStatus(QSP_FALSE);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     /* Call ONGLOAD with restored global variables */
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_GAMELOADED), 0, 0);

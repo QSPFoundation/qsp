@@ -109,14 +109,14 @@ void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
     }
 }
 
-void qspCallResetGameStatus(QSP_BOOL isNewGame)
+void qspCallInitGameStatus(QSP_BOOL isNewGame)
 {
-    /* Reset game state */
-    if (qspCallbacks[QSP_CALL_RESETGAMESTATUS])
+    /* Init game state */
+    if (qspCallbacks[QSP_CALL_INITGAMESTATUS])
     {
         QSPCallState state;
         qspPrepareCallback(&state, QSP_FALSE);
-        qspCallbacks[QSP_CALL_RESETGAMESTATUS](isNewGame);
+        qspCallbacks[QSP_CALL_INITGAMESTATUS](isNewGame);
         qspFinalizeCallback(&state, QSP_FALSE);
     }
 }

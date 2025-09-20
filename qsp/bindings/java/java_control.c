@@ -548,7 +548,7 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api)
     qspSetCallback(QSP_CALL_SETINPUTSTRTEXT, (*env)->GetMethodID(env, qspApiClass, "onSetInputStrText", "(Ljava/lang/String;)V"));
     qspSetCallback(QSP_CALL_SYSTEM, (*env)->GetMethodID(env, qspApiClass, "onSystem", "(Ljava/lang/String;)V"));
     qspSetCallback(QSP_CALL_OPENGAME, (*env)->GetMethodID(env, qspApiClass, "onOpenGame", "(Ljava/lang/String;Z)V"));
-    qspSetCallback(QSP_CALL_RESETGAMESTATUS, (*env)->GetMethodID(env, qspApiClass, "onResetGameStatus", "(Z)V"));
+    qspSetCallback(QSP_CALL_INITGAMESTATUS, (*env)->GetMethodID(env, qspApiClass, "onInitGameStatus", "(Z)V"));
     qspSetCallback(QSP_CALL_OPENGAMESTATUS, (*env)->GetMethodID(env, qspApiClass, "onOpenGameStatus", "(Ljava/lang/String;)V"));
     qspSetCallback(QSP_CALL_SAVEGAMESTATUS, (*env)->GetMethodID(env, qspApiClass, "onSaveGameStatus", "(Ljava/lang/String;)V"));
     qspSetCallback(QSP_CALL_SLEEP, (*env)->GetMethodID(env, qspApiClass, "onSleep", "(I)V"));
