@@ -145,16 +145,16 @@ void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
     }
 }
 
-void qspCallInitGameStatus(QSP_BOOL isNewGame)
+void qspCallInitGame(QSP_BOOL isNewGame)
 {
     /* Init game state */
-    if (qspCallbacks[QSP_CALL_INITGAMESTATUS])
+    if (qspCallbacks[QSP_CALL_INITGAME])
     {
         QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
 
         qspPrepareCallback(&state, QSP_FALSE);
-        (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_INITGAMESTATUS], isNewGame);
+        (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_INITGAME], isNewGame);
         qspFinalizeCallback(&state, QSP_FALSE);
     }
 }

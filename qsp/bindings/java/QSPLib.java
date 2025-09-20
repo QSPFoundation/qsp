@@ -154,7 +154,7 @@ public abstract class QSPLib {
     public void onSetInputStrText(String text) {}
     public void onSystem(String cmd) {}
     public void onOpenGame(String file, boolean isNewGame) {}
-    public void onInitGameStatus(boolean isNewGame) {}
+    public void onInitGame(boolean isNewGame) {}
     public void onOpenGameStatus(String file) {}
     public void onSaveGameStatus(String file) {}
     public void onSleep(int msecs) {}
