@@ -46,12 +46,14 @@ Please consider supporting our development on:
 
 ## TODO
 
+Take a look at the [Project Board](https://github.com/orgs/QSPFoundation/projects/3).
+
+Other important tasks we're planning to tackle:
 * A tool to automatically migrate older games (e.g. QSP 5.7) to the latest version of the engine
 * Extra tests (see [qsp-wasm-engine](https://github.com/QSPFoundation/qsp-wasm-engine/tree/main/tests))
 * Update the website
-* New documentation & document new features
+* New documentation & quick-start guide
 * Multi-user games (MUD-style games)
-* Move the whole global state into a context parameter
 * ???
 
 ## Chat group
