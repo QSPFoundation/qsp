@@ -289,7 +289,7 @@ void qspInitMath(void)
     qspAddOperation(qspOpLastArrItem, 30, 0, QSP_TYPE_UNDEF, 1, 1, QSP_TYPE_VARREF);
     qspAddOperation(qspOpArrPack, 30, qspFunctionArrPack, QSP_TYPE_TUPLE, 1, 3, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpArrPos, 30, qspFunctionArrPos, QSP_TYPE_NUM, 2, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_NUM);
-    qspAddOperation(qspOpArrComp, 30, qspFunctionArrComp, QSP_TYPE_NUM, 2, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_NUM);
+    qspAddOperation(qspOpArrComp, 30, qspFunctionArrComp, QSP_TYPE_NUM, 2, 3, QSP_TYPE_VARREF, QSP_TYPE_STR, QSP_TYPE_NUM);
 
     qspAddOperation(qspOpStr, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpVal, 30, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_UNDEF);
@@ -1390,22 +1390,22 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 INLINE void qspFunctionArrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     if (count == 2)
-        QSP_PNUM(res) = qspArrayPos(QSP_STR(args[0]), args + 1, 0, QSP_FALSE);
+        QSP_PNUM(res) = qspArrayPos(QSP_STR(args[0]), args + 1, 0);
     else
     {
         int startInd = QSP_TOINT(QSP_NUM(args[2]));
-        QSP_PNUM(res) = qspArrayPos(QSP_STR(args[0]), args + 1, startInd, QSP_FALSE);
+        QSP_PNUM(res) = qspArrayPos(QSP_STR(args[0]), args + 1, startInd);
     }
 }
 
 INLINE void qspFunctionArrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     if (count == 2)
-        QSP_PNUM(res) = qspArrayPos(QSP_STR(args[0]), args + 1, 0, QSP_TRUE);
+        QSP_PNUM(res) = qspArrayPosRegExp(QSP_STR(args[0]), QSP_STR(args[1]), 0);
     else
     {
         int startInd = QSP_TOINT(QSP_NUM(args[2]));
-        QSP_PNUM(res) = qspArrayPos(QSP_STR(args[0]), args + 1, startInd, QSP_TRUE);
+        QSP_PNUM(res) = qspArrayPosRegExp(QSP_STR(args[0]), QSP_STR(args[1]), startInd);
     }
 }
 

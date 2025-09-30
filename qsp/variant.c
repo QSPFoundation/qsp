@@ -245,6 +245,20 @@ int qspVariantsCompare(QSPVariant *first, QSPVariant *second)
     return 0;
 }
 
+QSP_BOOL qspVariantsEqual(QSPVariant *first, QSPVariant *second)
+{
+    switch (QSP_BASETYPE(first->Type))
+    {
+    case QSP_TYPE_TUPLE:
+        return (QSP_ISTUPLE(second->Type) && qspTuplesEqual(QSP_PTUPLE(first), QSP_PTUPLE(second)));
+    case QSP_TYPE_NUM:
+        return (QSP_ISNUM(second->Type) && QSP_PNUM(first) == QSP_PNUM(second));
+    case QSP_TYPE_STR:
+        return (QSP_ISSTR(second->Type) && qspStrsEqual(QSP_PSTR(first), QSP_PSTR(second)));
+    }
+    return QSP_FALSE;
+}
+
 void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
 {
     switch (QSP_BASETYPE(arg1->Type))

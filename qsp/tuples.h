@@ -26,6 +26,7 @@
     QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);
     int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value);
     int qspTuplesCompare(QSPTuple first, QSPTuple second);
+    QSP_BOOL qspTuplesEqual(QSPTuple first, QSPTuple second);
     void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res);
 
     INLINE QSPString qspGetTupleAsString(QSPTuple tuple)

@@ -161,6 +161,22 @@ int qspTuplesCompare(QSPTuple first, QSPTuple second)
     return (pos1 == end1) ? ((pos2 == end2) ? 0 : -1) : 1;
 }
 
+QSP_BOOL qspTuplesEqual(QSPTuple first, QSPTuple second)
+{
+    if (first.ValsCount == second.ValsCount)
+    {
+        QSPVariant *pos1 = first.Vals, *pos2 = second.Vals;
+        QSPVariant *end1 = first.Vals + first.ValsCount;
+        while (pos1 < end1)
+        {
+            if (!qspVariantsEqual(pos1, pos2)) return QSP_FALSE;
+            ++pos1, ++pos2;
+        }
+        return QSP_TRUE;
+    }
+    return QSP_FALSE;
+}
+
 void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
 {
     QSP_CHAR buf[QSP_MAX_BIGINT_LEN];

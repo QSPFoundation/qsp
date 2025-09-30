@@ -829,28 +829,17 @@ int qspArraySize(QSPString varName)
     return var->ValsCount;
 }
 
-int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
+int qspArrayPos(QSPString varName, QSPVariant *val, int ind)
 {
     QSP_TINYINT varType;
     QSPVariant defaultValue, *curValue;
-    QSPRegExp *regExp;
     QSPVar *var = qspVarReference(varName, QSP_FALSE);
     if (!var) return -1;
-    if (isRegExp)
+    varType = qspGetVarType(varName);
+    if (!qspConvertVariantTo(val, varType))
     {
-        varType = QSP_TYPE_STR;
-        qspConvertVariantTo(val, varType);
-        regExp = qspRegExpGetCompiled(QSP_PSTR(val));
-        if (!regExp) return -1;
-    }
-    else
-    {
-        varType = qspGetVarType(varName);
-        if (!qspConvertVariantTo(val, varType))
-        {
-            qspSetError(QSP_ERR_TYPEMISMATCH);
-            return -1;
-        }
+        qspSetError(QSP_ERR_TYPEMISMATCH);
+        return -1;
     }
     defaultValue = qspGetEmptyVariant(varType);
     if (ind < 0) ind = 0;
@@ -858,28 +847,27 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind, QSP_BOOL isRegExp)
     {
         curValue = var->Values + ind;
         if (!QSP_ISDEF(curValue->Type)) curValue = &defaultValue; /* check undefined values */
-        if (QSP_BASETYPE(curValue->Type) == varType)
-        {
-            switch (varType)
-            {
-            case QSP_TYPE_TUPLE:
-                if (!qspTuplesCompare(QSP_PTUPLE(val), QSP_PTUPLE(curValue))) return ind;
-                break;
-            case QSP_TYPE_STR:
-                if (isRegExp)
-                {
-                    if (qspRegExpStrMatch(regExp, QSP_PSTR(curValue))) return ind;
-                }
-                else
-                {
-                    if (qspStrsEqual(QSP_PSTR(val), QSP_PSTR(curValue))) return ind;
-                }
-                break;
-            case QSP_TYPE_NUM:
-                if (QSP_PNUM(val) == QSP_PNUM(curValue)) return ind;
-                break;
-            }
-        }
+        if (qspVariantsEqual(val, curValue)) return ind;
+        ++ind;
+    }
+    return -1;
+}
+
+int qspArrayPosRegExp(QSPString varName, QSPString regExpStr, int ind)
+{
+    QSPVariant defaultValue, *curValue;
+    QSPRegExp *regExp;
+    QSPVar *var = qspVarReference(varName, QSP_FALSE);
+    if (!var) return -1;
+    regExp = qspRegExpGetCompiled(regExpStr);
+    if (!regExp) return -1;
+    defaultValue = qspGetEmptyVariant(QSP_TYPE_STR);
+    if (ind < 0) ind = 0;
+    while (ind < var->ValsCount)
+    {
+        curValue = var->Values + ind;
+        if (!QSP_ISDEF(curValue->Type)) curValue = &defaultValue; /* check undefined values */
+        if (QSP_ISSTR(curValue->Type) && qspRegExpStrMatch(regExp, QSP_PSTR(curValue))) return ind;
         ++ind;
     }
     return -1;
