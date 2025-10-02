@@ -11,7 +11,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 set(CMAKE_C_STANDARD 90)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/Modules)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
 	set(PROJECT_COMPILER_FLAGS "-Wall")
@@ -50,12 +50,12 @@ if (USE_INSTALLED_ONIGURUMA)
 	find_package(oniguruma REQUIRED)
 else()
 	# Download and unpack oniguruma at configure time
-	configure_file(CMakeLists-oniguruma.txt.in "${CMAKE_BINARY_DIR}/oniguruma-download/CMakeLists.txt")
+	configure_file(CMakeLists-oniguruma.txt.in "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-download/CMakeLists.txt")
 	execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" "-DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}" .
-		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
+		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-download"
 	)
 	execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/oniguruma-download"
+		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-download"
 	)
 
 	# Disable oniguruma features we don't need
@@ -74,8 +74,8 @@ else()
 	# Add oniguruma directly to our build
 	set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
 	set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-	add_subdirectory("${CMAKE_BINARY_DIR}/oniguruma-src"
-					 "${CMAKE_BINARY_DIR}/oniguruma-build"
+	add_subdirectory("${CMAKE_CURRENT_BINARY_DIR}/oniguruma-src"
+					 "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-build"
 	)
 	add_library(oniguruma::onig ALIAS onig)
 endif()
