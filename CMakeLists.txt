@@ -141,23 +141,31 @@ target_include_directories(qsp
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp/default>"
 )
 
-install(TARGETS qsp onig EXPORT QspTargets)
-
 generate_export_header(qsp
-  BASE_NAME Qsp
-  EXPORT_MACRO_NAME QSP_EXTERN
+	BASE_NAME Qsp
+	EXPORT_MACRO_NAME QSP_EXTERN
 )
 
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfigVersion.cmake COMPATIBILITY AnyNewerVersion)
-configure_package_config_file(QspConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfig.cmake
+set(QSP_INSTALL_TARGETS qsp)
+if (TARGET onig)
+	get_target_property(ONIG_IS_IMPORTED onig IMPORTED)
+	if (NOT "${ONIG_IS_IMPORTED}" STREQUAL "TRUE")
+		list(APPEND QSP_INSTALL_TARGETS onig)
+	endif()
+endif()
+
+install(TARGETS ${QSP_INSTALL_TARGETS} EXPORT QspTargets)
+export(TARGETS ${QSP_INSTALL_TARGETS} NAMESPACE Qsp:: FILE "${CMAKE_CURRENT_BINARY_DIR}/QspTargets.cmake")
+
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfigVersion.cmake" COMPATIBILITY AnyNewerVersion)
+configure_package_config_file(QspConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfig.cmake"
 	INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
 )
 
-export(TARGETS qsp onig NAMESPACE Qsp:: FILE ${CMAKE_CURRENT_BINARY_DIR}/QspConfig.cmake)
 install(EXPORT QspTargets NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp")
 
 install(
-	DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cmake
+	DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cmake"
 	DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
 
