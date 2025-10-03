@@ -149,7 +149,7 @@ generate_export_header(qsp
 set(QSP_INSTALL_TARGETS qsp)
 if (TARGET onig)
 	get_target_property(ONIG_IS_IMPORTED onig IMPORTED)
-	if (NOT "${ONIG_IS_IMPORTED}" STREQUAL "TRUE")
+	if (NOT ONIG_IS_IMPORTED)
 		list(APPEND QSP_INSTALL_TARGETS onig)
 	endif()
 endif()
