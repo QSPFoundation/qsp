@@ -49,15 +49,18 @@ option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bun
 if (USE_INSTALLED_ONIGURUMA)
 	find_package(oniguruma REQUIRED)
 else()
-	# Download and unpack oniguruma at configure time
-	configure_file(CMakeLists-oniguruma.txt.in "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-download/CMakeLists.txt")
-	execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" "-DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}" .
-		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-download"
+	include(FetchContent)
+	FetchContent_Declare(oniguruma-custom
+		GIT_REPOSITORY https://github.com/kkos/oniguruma.git
+		GIT_TAG master
+		GIT_SHALLOW true # it works only with branch names and tags
+		GIT_PROGRESS true
+		SUBBUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-download"
+		SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-src"
+		BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-build"
 	)
-	execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-		WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-download"
-	)
-
+	# Configure the CRNL handling
+	add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR=1)
 	# Disable oniguruma features we don't need
 	set(INSTALL_DOCUMENTATION OFF)
 	set(INSTALL_EXAMPLES OFF)
@@ -65,18 +68,7 @@ else()
 	set(BUILD_SHARED_LIBS OFF)
 	set(MSVC_STATIC_RUNTIME ON)
 
-	# For Windows: Prevent overriding the parent project's compiler/linker settings
-	set(oniguruma_force_shared_crt ON CACHE BOOL "" FORCE)
-
-	# Configure the CRNL handling
-	add_compile_definitions(USE_CRNL_AS_LINE_TERMINATOR=1)
-
-	# Add oniguruma directly to our build
-	set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
-	set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-	add_subdirectory("${CMAKE_CURRENT_BINARY_DIR}/oniguruma-src"
-					 "${CMAKE_CURRENT_BINARY_DIR}/oniguruma-build"
-	)
+	FetchContent_MakeAvailable(oniguruma-custom)
 	add_library(oniguruma::onig ALIAS onig)
 endif()
 
