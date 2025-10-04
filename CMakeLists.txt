@@ -3,20 +3,24 @@ project(qsp VERSION 5.9.4)
 
 set(QSP_GAMEMIN_VER "5.9.4")
 
+option(BUILD_JAVA "Build with JVM bindings" OFF)
+option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" OFF)
+
 include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
 include(GNUInstallDirs)
 include(FetchContent)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
 set(CMAKE_C_STANDARD 90)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
-	set(PROJECT_COMPILER_FLAGS "-Wall")
-	set(PROJECT_LINKER_FLAGS "")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-char-subscripts -Wno-unused-variable")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -D_DEBUG -DDEBUG")
@@ -24,16 +28,12 @@ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Ofast -DNDEBUG")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast -DNDEBUG")
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
-	set(PROJECT_COMPILER_FLAGS "/W4")
-	set(PROJECT_LINKER_FLAGS "")
 	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /D_DEBUG /DDEBUG")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_DEBUG /DDEBUG")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /O2 /DNDEBUG")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /DNDEBUG")
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang")
-	set(PROJECT_COMPILER_FLAGS "")
-	set(PROJECT_LINKER_FLAGS "")
 	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -g -D_DEBUG -DDEBUG")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -D_DEBUG -DDEBUG")
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Ofast -DNDEBUG")
@@ -41,11 +41,6 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" ST
 else()
 	message(FATAL_ERROR "Compiler is not supported")
 endif()
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
-
-option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" OFF)
 
 if (USE_INSTALLED_ONIGURUMA)
 	find_package(oniguruma REQUIRED)
@@ -111,8 +106,6 @@ target_compile_definitions(qsp PUBLIC _UNICODE)
 if (WIN32)
 	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
-target_compile_options(qsp PRIVATE ${PROJECT_COMPILER_FLAGS})
-target_link_options(qsp PRIVATE ${PROJECT_LINKER_FLAGS})
 target_link_libraries(qsp PRIVATE oniguruma::onig)
 
 if (BUILD_JAVA)
@@ -128,6 +121,7 @@ endif()
 target_include_directories(qsp
 	INTERFACE
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/qsp/bindings/default>"
+		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/qsp/bindings>"
 		"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp>"
 		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp/default>"
@@ -149,17 +143,7 @@ endif()
 install(TARGETS ${QSP_INSTALL_TARGETS} EXPORT QspTargets)
 export(TARGETS ${QSP_INSTALL_TARGETS} NAMESPACE Qsp:: FILE "${CMAKE_CURRENT_BINARY_DIR}/QspTargets.cmake")
 
-write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfigVersion.cmake" COMPATIBILITY AnyNewerVersion)
-configure_package_config_file(QspConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfig.cmake"
-	INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
-)
-
-install(EXPORT QspTargets NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp")
-
-install(
-	DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cmake"
-	DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
+install(EXPORT QspTargets FILE QspTargets.cmake NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp")
 
 install(FILES
 		qsp/bindings/qsp.h
@@ -173,4 +157,13 @@ install(FILES
 		qsp/bindings/default/qsp_default.h
 	DESTINATION
 		"${CMAKE_INSTALL_INCLUDEDIR}/qsp/default"
+)
+
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfigVersion.cmake" COMPATIBILITY AnyNewerVersion)
+configure_package_config_file(QspConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfig.cmake"
+	INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
+)
+
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cmake"
+	DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
