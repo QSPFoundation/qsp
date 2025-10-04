@@ -6,6 +6,7 @@ set(QSP_GAMEMIN_VER "5.9.4")
 include(CMakePackageConfigHelpers)
 include(GenerateExportHeader)
 include(GNUInstallDirs)
+include(FetchContent)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
@@ -49,7 +50,6 @@ option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bun
 if (USE_INSTALLED_ONIGURUMA)
 	find_package(oniguruma REQUIRED)
 else()
-	include(FetchContent)
 	FetchContent_Declare(oniguruma-custom
 		GIT_REPOSITORY https://github.com/kkos/oniguruma.git
 		GIT_TAG master
