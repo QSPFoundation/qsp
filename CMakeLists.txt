@@ -143,8 +143,6 @@ endif()
 install(TARGETS ${QSP_INSTALL_TARGETS} EXPORT QspTargets)
 export(TARGETS ${QSP_INSTALL_TARGETS} NAMESPACE Qsp:: FILE "${CMAKE_CURRENT_BINARY_DIR}/QspTargets.cmake")
 
-install(EXPORT QspTargets FILE QspTargets.cmake NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp")
-
 install(FILES
 		qsp/bindings/qsp.h
 		qsp/bindings/bindings_config.h
@@ -152,7 +150,6 @@ install(FILES
 	DESTINATION
 		"${CMAKE_INSTALL_INCLUDEDIR}/qsp"
 )
-
 install(FILES
 		qsp/bindings/default/qsp_default.h
 	DESTINATION
@@ -164,6 +161,7 @@ configure_package_config_file(QspConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/cm
 	INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp"
 )
 
+install(EXPORT QspTargets FILE QspTargets.cmake NAMESPACE Qsp:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/Qsp")
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cmake"
 	DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )

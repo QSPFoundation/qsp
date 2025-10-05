@@ -9,3 +9,5 @@ include(CMakeFindDependencyMacro)
 find_dependency(oniguruma)
 
 include("${CMAKE_CURRENT_LIST_DIR}/QspTargets.cmake")
+
+check_required_components(@PROJECT_NAME@)
