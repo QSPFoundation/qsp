@@ -6,6 +6,7 @@
  */
 
 #include "locations.h"
+#include "callbacks.h"
 #include "codetools.h"
 #include "common.h"
 #include "errors.h"
@@ -151,7 +152,7 @@ int qspLocIndex(QSPString name)
 
 INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
 {
-    QSPString locDesc, actionName;
+    QSPString actionName;
     QSPLineOfCode *oldLine;
     QSPLocAct *curAct;
     int i, oldLoc, oldActIndex, oldLineNum, oldLocationState = qspLocationState;
@@ -166,55 +167,42 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
     qspRealActIndex = -1;
     qspRealLineNum = 0;
     qspRealLine = 0;
-    /* Update base description */
-    locDesc = qspFormatText(loc->Desc, QSP_FALSE);
-    if (qspLocationState != oldLocationState)
+    if (toChangeDesc && qspCurDesc.Len > 0)
     {
-        qspRealLine = oldLine;
-        qspRealLineNum = oldLineNum;
-        qspRealActIndex = oldActIndex;
-        qspRealCurLoc = oldLoc;
-        return;
-    }
-    if (toChangeDesc)
-    {
-        qspFreeBufString(&qspCurDesc);
-        qspCurDesc = qspStringToBufString(locDesc, 512);
+        qspClearBufString(&qspCurDesc);
         qspCurWindowsChangedState |= QSP_WIN_MAIN;
     }
-    else
+    if (qspIsDebug)
     {
+        /* Trigger debugger only if we have base description or base actions */
+        if (!qspIsEmpty(loc->Desc) || loc->ActionsCount)
+        {
+            qspCallDebug(qspNullString);
+            if (qspLocationState != oldLocationState) return;
+        }
+    }
+    /* Update base description */
+    if (!qspIsEmpty(loc->Desc))
+    {
+        QSPString locDesc = qspFormatText(loc->Desc, QSP_TRUE);
+        if (qspLocationState != oldLocationState) return;
         if (qspAddBufText(&qspCurDesc, locDesc))
             qspCurWindowsChangedState |= QSP_WIN_MAIN;
-        qspFreeString(&locDesc);
+        qspFreeNewString(&locDesc, &loc->Desc);
     }
     /* Update base actions */
     for (i = 0, curAct = loc->Actions; i < loc->ActionsCount; ++i, ++curAct)
     {
         if (qspIsEmpty(curAct->Desc)) break;
-        actionName = qspFormatText(curAct->Desc, QSP_FALSE);
-        if (qspLocationState != oldLocationState)
-        {
-            qspRealLine = oldLine;
-            qspRealLineNum = oldLineNum;
-            qspRealActIndex = oldActIndex;
-            qspRealCurLoc = oldLoc;
-            return;
-        }
         qspRealActIndex = i;
+        actionName = qspFormatText(curAct->Desc, QSP_TRUE);
+        if (qspLocationState != oldLocationState) return;
         if (!qspIsEmpty(curAct->Image))
             qspAddAction(actionName, curAct->Image, curAct->OnPressLines, 0, curAct->OnPressLinesCount);
         else
             qspAddAction(actionName, qspNullString, curAct->OnPressLines, 0, curAct->OnPressLinesCount);
-        qspFreeString(&actionName);
-        if (qspLocationState != oldLocationState)
-        {
-            qspRealLine = oldLine;
-            qspRealLineNum = oldLineNum;
-            qspRealActIndex = oldActIndex;
-            qspRealCurLoc = oldLoc;
-            return;
-        }
+        qspFreeNewString(&actionName, &curAct->Desc);
+        if (qspLocationState != oldLocationState) return;
     }
     /* Execute the code */
     qspRealActIndex = -1;
