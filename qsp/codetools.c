@@ -760,7 +760,7 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
                     isStatementStart = QSP_TRUE;
                 break;
             case QSP_COMMENT_CHAR:
-                if (isStatementStart && !roundBrackets && !squareBrackets)
+                if (isStatementStart)
                 {
                     isComment = QSP_TRUE;
                     isStatementStart = QSP_FALSE;
