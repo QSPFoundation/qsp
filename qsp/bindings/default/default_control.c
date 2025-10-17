@@ -155,7 +155,7 @@ QSPString QSPGetCompiledDateTime(void)
 /* Get text of the main description */
 QSPString QSPGetMainDesc(void)
 {
-    return qspBufTextToString(qspCurDesc);
+    return qspBufStringToString(qspCurDesc);
 }
 /* ------------------------------------------------------------ */
 /* Additional description */
@@ -163,7 +163,7 @@ QSPString QSPGetMainDesc(void)
 /* Get text of the additional description */
 QSPString QSPGetVarsDesc(void)
 {
-    return qspBufTextToString(qspCurVars);
+    return qspBufStringToString(qspCurVars);
 }
 /* ------------------------------------------------------------ */
 /* Synchronize the value of the text input control */

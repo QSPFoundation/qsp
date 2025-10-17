@@ -34,7 +34,7 @@ void qspInitSymbolClasses(void)
     qspFillSymbolClass(QSP_CHAR_DIGIT, QSP_DIGITS);
     qspFillSymbolClass(QSP_CHAR_DELIM, QSP_DELIMS);
     qspFillSymbolClass(QSP_CHAR_SIMPLEOP, QSP_ADD QSP_SUB QSP_DIV QSP_MUL);
-    qspFillSymbolClass(QSP_CHAR_LBRACKET, QSP_LQUOT QSP_LRBRACK QSP_LSBRACK);
+    qspFillSymbolClass(QSP_CHAR_LBRACKET, QSP_LCODE QSP_LRBRACK QSP_LSBRACK);
     qspFillSymbolClass(QSP_CHAR_TYPEPREFIX, QSP_TUPLETYPE QSP_NUMTYPE QSP_STRTYPE);
 }
 
@@ -46,33 +46,6 @@ QSP_CHAR *qspStringToC(QSPString s)
     memcpy(string, s.Str, stringLen * sizeof(QSP_CHAR));
     string[stringLen] = 0;
     return string;
-}
-
-QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val)
-{
-    int valLen = qspStrLen(val);
-    if (valLen)
-    {
-        if (dest->Str)
-        {
-            if (dest->Len + valLen > dest->Capacity)
-            {
-                dest->Capacity = dest->Len + valLen + dest->CapacityIncrement;
-                dest->Str = (QSP_CHAR *)realloc(dest->Str, dest->Capacity * sizeof(QSP_CHAR));
-            }
-            memcpy(dest->Str + dest->Len, val.Str, valLen * sizeof(QSP_CHAR));
-            dest->Len += valLen;
-        }
-        else
-        {
-            dest->Capacity = valLen + dest->CapacityIncrement;
-            dest->Str = (QSP_CHAR *)malloc(dest->Capacity * sizeof(QSP_CHAR));
-            memcpy(dest->Str, val.Str, valLen * sizeof(QSP_CHAR));
-            dest->Len = valLen;
-        }
-        return QSP_TRUE;
-    }
-    return QSP_FALSE;
 }
 
 QSPString qspConcatText(QSPString val1, QSPString val2)
@@ -99,14 +72,14 @@ QSPString qspConcatText(QSPString val1, QSPString val2)
 QSPString qspJoinStrs(QSPString *s, int count, QSPString delim)
 {
     int i;
-    QSPBufString buf = qspNewBufString(256);
+    QSPBufString buf = qspNewBufString(0, 256);
     for (i = 0; i < count; ++i)
     {
         qspAddBufText(&buf, s[i]);
         if (i == count - 1) break; /* don't add the delim */
         qspAddBufText(&buf, delim);
     }
-    return qspBufTextToString(buf);
+    return qspBufStringToString(buf);
 }
 
 int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
@@ -284,34 +257,34 @@ QSPString qspNumToStr(QSP_CHAR *buf, QSP_BIGINT val)
 
 QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
 {
-    int c1 = 0, c2 = 0, c3 = 0;
-    QSP_CHAR *pos = txt.Str;
+    int roundBrackets = 0, squareBrackets = 0, codeBrackets = 0;
+    QSP_CHAR quote, *pos = txt.Str;
     while (pos < txt.End)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            QSP_CHAR quot = *pos;
+            quote = *pos;
             while (++pos < txt.End)
             {
-                if (*pos == quot)
+                if (*pos == quote)
                 {
                     ++pos;
-                    if (pos >= txt.End) break;
-                    if (*pos != quot) break;
+                    if (pos >= txt.End || *pos != quote) break;
                 }
             }
+            /* It's past the closing quote or past the last valid position */
             continue;
         }
         switch (*pos)
         {
-        case QSP_LRBRACK_CHAR: QSP_INC_POSITIVE(c1); break;
-        case QSP_RRBRACK_CHAR: QSP_DEC_POSITIVE(c1); break;
-        case QSP_LSBRACK_CHAR: QSP_INC_POSITIVE(c2); break;
-        case QSP_RSBRACK_CHAR: QSP_DEC_POSITIVE(c2); break;
-        case QSP_LQUOT_CHAR: QSP_INC_POSITIVE(c3); break;
-        case QSP_RQUOT_CHAR: QSP_DEC_POSITIVE(c3); break;
+        case QSP_LRBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(roundBrackets); break;
+        case QSP_RRBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(roundBrackets); break;
+        case QSP_LSBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(squareBrackets); break;
+        case QSP_RSBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(squareBrackets); break;
+        case QSP_LCODE_CHAR: QSP_INC_POSITIVE(codeBrackets); break;
+        case QSP_RCODE_CHAR: QSP_DEC_POSITIVE(codeBrackets); break;
         }
-        if (!(c1 || c2 || c3) && *pos == ch) /* include brackets */
+        if (*pos == ch && !roundBrackets && !squareBrackets && !codeBrackets) /* include brackets */
             return pos;
         ++pos;
     }
@@ -321,8 +294,8 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
 QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 {
     QSP_BOOL isPrevDelim;
-    QSP_CHAR *lastPos, *pos;
-    int c1, c2, c3, strLen = qspStrLen(str);
+    QSP_CHAR quote, *lastPos, *pos;
+    int roundBrackets, squareBrackets, codeBrackets, strLen = qspStrLen(str);
     if (!strLen) return txt.Str;
     pos = qspStrStr(txt, str);
     if (!pos) return 0;
@@ -331,7 +304,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
         QSPString prefix = qspStringFromPair(txt.Str, pos);
         if (!qspStrCharClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_LBRACKET)) return pos;
     }
-    c1 = c2 = c3 = 0;
+    roundBrackets = squareBrackets = codeBrackets = 0;
     isPrevDelim = QSP_TRUE;
     pos = txt.Str;
     lastPos = txt.End - strLen;
@@ -339,29 +312,29 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            QSP_CHAR quot = *pos;
+            quote = *pos;
             while (++pos <= lastPos)
             {
-                if (*pos == quot)
+                if (*pos == quote)
                 {
                     ++pos;
-                    if (pos > lastPos) break;
-                    if (*pos != quot) break;
+                    if (pos > lastPos || *pos != quote) break;
                 }
             }
+            /* It's past the closing quote or past the last valid position */
             isPrevDelim = QSP_TRUE;
             continue;
         }
         switch (*pos)
         {
-        case QSP_LRBRACK_CHAR: QSP_INC_POSITIVE(c1); break;
-        case QSP_RRBRACK_CHAR: QSP_DEC_POSITIVE(c1); break;
-        case QSP_LSBRACK_CHAR: QSP_INC_POSITIVE(c2); break;
-        case QSP_RSBRACK_CHAR: QSP_DEC_POSITIVE(c2); break;
-        case QSP_LQUOT_CHAR: QSP_INC_POSITIVE(c3); break;
-        case QSP_RQUOT_CHAR: QSP_DEC_POSITIVE(c3); break;
+        case QSP_LRBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(roundBrackets); break;
+        case QSP_RRBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(roundBrackets); break;
+        case QSP_LSBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(squareBrackets); break;
+        case QSP_RSBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(squareBrackets); break;
+        case QSP_LCODE_CHAR: QSP_INC_POSITIVE(codeBrackets); break;
+        case QSP_RCODE_CHAR: QSP_DEC_POSITIVE(codeBrackets); break;
         }
-        if (!(c1 || c2 || c3)) /* include brackets */
+        if (!roundBrackets && !squareBrackets && !codeBrackets) /* include brackets */
         {
             if (isIsolated)
             {
@@ -372,7 +345,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
                     if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
                     {
                         txt.Str = pos;
-                        if (!qspStrsPartCompare(txt, str, strLen)) return pos;
+                        if (!qspStrsPartCompare(txt, str)) return pos;
                     }
                     isPrevDelim = QSP_FALSE;
                 }
@@ -381,7 +354,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
             {
                 /* It must support searching for delimiters */
                 txt.Str = pos;
-                if (!qspStrsPartCompare(txt, str, strLen)) return pos;
+                if (!qspStrsPartCompare(txt, str)) return pos;
             }
         }
         ++pos;
@@ -399,7 +372,7 @@ QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, i
             QSP_CHAR *pos = qspStrStr(txt, searchTxt);
             if (pos)
             {
-                QSPBufString res = qspNewBufString(256);
+                QSPBufString res = qspNewBufString(0, 256);
                 do
                 {
                     qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
@@ -409,7 +382,7 @@ QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, i
                     pos = qspStrStr(txt, searchTxt);
                 } while (pos);
                 qspAddBufText(&res, txt);
-                return qspBufTextToString(res);
+                return qspBufStringToString(res);
             }
         }
     }
@@ -429,7 +402,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         if (canReturnSelf) return txt;
         return qspCopyToNewText(txt);
     }
-    res = qspNewBufString(128);
+    res = qspNewBufString(64, 128);
     oldLocationState = qspLocationState;
     do
     {
@@ -458,5 +431,5 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         pos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
     } while (pos);
     qspAddBufText(&res, txt);
-    return qspBufTextToString(res);
+    return qspBufStringToString(res);
 }

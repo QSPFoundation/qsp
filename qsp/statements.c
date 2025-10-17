@@ -301,7 +301,7 @@ INLINE int qspSearchElse(QSPLineOfCode *lines, int start, int end)
             case qspStatIf:
                 if (lines->IsMultiline) /* skip internal multiline statements */
                 {
-                    ++c;
+                    QSP_INC_POSITIVE(c);
                     start += lines->LinesToEnd;
                     lines += lines->LinesToEnd;
                     continue;
@@ -317,7 +317,7 @@ INLINE int qspSearchElse(QSPLineOfCode *lines, int start, int end)
                 }
                 break;
             case qspStatEnd:
-                if (!(--c)) return -1;
+                if (!QSP_DEC_POSITIVE(c)) return -1;
                 break;
             }
         }
@@ -345,14 +345,14 @@ INLINE int qspSearchEnd(QSPLineOfCode *lines, int start, int end)
             case qspStatIf:
                 if (lines->IsMultiline) /* skip internal multiline statements */
                 {
-                    ++c;
+                    QSP_INC_POSITIVE(c);
                     start += lines->LinesToEnd;
                     lines += lines->LinesToEnd;
                     continue;
                 }
                 break;
             case qspStatEnd:
-                if (!(--c))
+                if (!QSP_DEC_POSITIVE(c))
                 {
                     /* Update the number of lines to skip next time */
                     startLine->LinesToEnd = lines - startLine;
@@ -751,11 +751,11 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
         switch (statements[i].Stat)
         {
         case qspStatIf:
-            ++c;
+            QSP_INC_POSITIVE(c);
             break;
         case qspStatElse:
         case qspStatElseIf:
-            --c;
+            QSP_DEC_POSITIVE(c);
             break;
         }
         if (!c)

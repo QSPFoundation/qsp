@@ -46,11 +46,11 @@ INLINE int qspActIndex(QSPString name)
         QSPString bufName;
         name = qspCopyToNewText(name);
         qspUpperStr(&name);
-        buf = qspNewBufString(64);
+        buf = qspNewBufString(0, 64);
         for (i = 0; i < qspCurActsCount; ++i)
         {
             qspUpdateBufString(&buf, qspCurActions[i].Desc);
-            bufName = qspBufTextToString(buf);
+            bufName = qspBufStringToString(buf);
             qspUpperStr(&bufName);
             if (qspStrsEqual(bufName, name))
             {
@@ -107,7 +107,7 @@ QSPString qspGetAllActionsAsCode(void)
     int count, i;
     QSPCurAct *curAct;
     QSPString temp;
-    QSPBufString res = qspNewBufString(256);
+    QSPBufString res = qspNewBufString(0, 256);
     curAct = qspCurActions;
     for (i = qspCurActsCount; i > 0; --i, ++curAct)
     {
@@ -139,7 +139,7 @@ QSPString qspGetAllActionsAsCode(void)
         }
         qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM));
     }
-    return qspBufTextToString(res);
+    return qspBufStringToString(res);
 }
 
 void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)

@@ -312,7 +312,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         *bufSize = 0;
         return QSP_FALSE;
     }
-    bufString = qspNewBufString(2048);
+    bufString = qspNewBufString(0, 2048);
     locName = (qspCurLoc >= 0 && qspCurLoc < qspLocsCount ? qspLocs[qspCurLoc].Name : qspNullString);
     qspAppendStrVal(&bufString, QSP_STATIC_STR(QSP_SAVEDGAMEID));
     qspAppendStrVal(&bufString, QSP_STATIC_STR(QSP_VER));
@@ -322,8 +322,8 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     qspAppendEncodedIntVal(&bufString, qspCurSelObject, isUCS);
     qspAppendEncodedStrVal(&bufString, qspViewPath, isUCS);
     qspAppendEncodedStrVal(&bufString, qspCurInput, isUCS);
-    qspAppendEncodedStrVal(&bufString, qspBufTextToString(qspCurDesc), isUCS);
-    qspAppendEncodedStrVal(&bufString, qspBufTextToString(qspCurVars), isUCS);
+    qspAppendEncodedStrVal(&bufString, qspBufStringToString(qspCurDesc), isUCS);
+    qspAppendEncodedStrVal(&bufString, qspBufStringToString(qspCurVars), isUCS);
     qspAppendEncodedStrVal(&bufString, locName, isUCS);
     qspAppendEncodedIntVal(&bufString, qspCurWindowsDisplayState, isUCS);
     qspAppendEncodedIntVal(&bufString, qspTimerInterval, isUCS);
@@ -381,7 +381,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
             }
         }
     }
-    gameData = qspStringToFileData(qspBufTextToString(bufString), isUCS, &dataSize);
+    gameData = qspStringToFileData(qspBufStringToString(bufString), isUCS, &dataSize);
     qspFreeBufString(&bufString);
     if (dataSize > *bufSize)
     {

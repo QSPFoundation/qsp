@@ -100,7 +100,7 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
 INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT type, int level)
 {
     int itemInd;
-    QSPBufString buf = qspNewBufString(16);
+    QSPBufString buf = qspNewBufString(0, 16);
     if (QSP_ISDEF(type))
     {
         switch (QSP_BASETYPE(type))
@@ -120,7 +120,7 @@ INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT
     if (buf.Len > qspOpMaxLen) qspOpMaxLen = buf.Len;
 
     itemInd = qspOpsNamesCounts[level]++;
-    qspOpsNames[level][itemInd].Name = qspBufTextToString(buf);
+    qspOpsNames[level][itemInd].Name = qspBufStringToString(buf);
     qspOpsNames[level][itemInd].Code = opCode;
 }
 
@@ -160,7 +160,7 @@ INLINE int qspMathOpStringFullCompare(const void *name, const void *compareTo)
 INLINE int qspMathOpStringCompare(const void *name, const void *compareTo)
 {
     QSPMathOpName *opName = (QSPMathOpName *)compareTo;
-    return qspStrsPartCompare(*(QSPString *)name, opName->Name, qspStrLen(opName->Name));
+    return qspStrsPartCompare(*(QSPString *)name, opName->Name);
 }
 
 void qspClearAllMathExps(QSP_BOOL toInit)
@@ -483,37 +483,31 @@ INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr)
 
 INLINE QSPString qspGetString(QSPString *expr)
 {
-    int strLen = 0, bufSize = 16;
-    QSP_CHAR *buf, *pos = expr->Str, *endPos = expr->End, quot = *pos;
-    buf = (QSP_CHAR *)malloc(bufSize * sizeof(QSP_CHAR));
+    QSP_CHAR *pos = expr->Str, *endPos = expr->End, quote = *pos;
+    QSPBufString buf = qspNewBufString(16, 128);
     while (1)
     {
         if (++pos >= endPos)
         {
             qspSetError(QSP_ERR_QUOTNOTFOUND);
-            free(buf);
+            qspFreeBufString(&buf);
             return qspNullString;
         }
-        if (*pos == quot)
+        if (*pos == quote)
         {
             ++pos;
-            if (pos >= endPos || *pos != quot) break;
+            if (pos >= endPos || *pos != quote) break;
         }
-        if (strLen >= bufSize)
-        {
-            bufSize = strLen + 128;
-            buf = (QSP_CHAR *)realloc(buf, bufSize * sizeof(QSP_CHAR));
-        }
-        buf[strLen++] = *pos;
+        qspAddBufChar(&buf, *pos);
     }
     expr->Str = pos;
-    return qspStringFromLen(buf, strLen);
+    return qspBufStringToString(buf);
 }
 
 INLINE QSPString qspGetCodeBlock(QSPString *expr)
 {
     QSP_CHAR *pos, *buf = expr->Str;
-    pos = qspDelimPos(*expr, QSP_RQUOT_CHAR);
+    pos = qspDelimPos(*expr, QSP_RCODE_CHAR);
     if (!pos)
     {
         qspSetError(QSP_ERR_QUOTNOTFOUND);
@@ -736,7 +730,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 }
                 waitForOperator = QSP_TRUE;
             }
-            else if (*s.Str == QSP_LQUOT_CHAR)
+            else if (*s.Str == QSP_LCODE_CHAR)
             {
                 name = qspGetCodeBlock(&s);
                 if (qspErrorNum) break;
@@ -1175,10 +1169,10 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         QSP_STR(tos) = (qspCurSelAction >= 0 ? qspCopyToNewText(qspCurActions[qspCurSelAction].Desc) : qspNullString);
         break;
     case qspOpMainText:
-        QSP_STR(tos) = (qspCurDesc.Len > 0 ? qspCopyToNewText(qspBufTextToString(qspCurDesc)) : qspNullString);
+        QSP_STR(tos) = (qspCurDesc.Len > 0 ? qspCopyToNewText(qspBufStringToString(qspCurDesc)) : qspNullString);
         break;
     case qspOpStatText:
-        QSP_STR(tos) = (qspCurVars.Len > 0 ? qspCopyToNewText(qspBufTextToString(qspCurVars)) : qspNullString);
+        QSP_STR(tos) = (qspCurVars.Len > 0 ? qspCopyToNewText(qspBufStringToString(qspCurVars)) : qspNullString);
         break;
     case qspOpCurActs:
         QSP_STR(tos) = qspGetAllActionsAsCode();

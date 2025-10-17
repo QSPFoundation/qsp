@@ -23,7 +23,7 @@ INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *
 INLINE int qspStatStringCompare(const void *name, const void *compareTo)
 {
     QSPStatName *statName = (QSPStatName *)compareTo;
-    return qspStrsPartCompare(*(QSPString *)name, statName->Name, qspStrLen(statName->Name));
+    return qspStrsPartCompare(*(QSPString *)name, statName->Name);
 }
 
 INLINE QSP_TINYINT qspGetStatCode(QSPString s, QSP_CHAR **pos)
@@ -583,42 +583,41 @@ void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int e
 QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim)
 {
     int i;
-    QSPBufString res = qspNewBufString(256);
+    QSPBufString res = qspNewBufString(0, 256);
     for (i = 0; i < count; ++i)
     {
         qspAddBufText(&res, s[i].Str);
         if (i == count - 1) break; /* don't add the delim */
         qspAddBufText(&res, delim);
     }
-    return qspBufTextToString(res);
+    return qspBufStringToString(res);
 }
 
 void qspPrepareStringToExecution(QSPString *str)
 {
-    int quotsCount = 0;
-    QSP_CHAR *pos = str->Str, *endPos = str->End;
+    int codeBrackets = 0;
+    QSP_CHAR quote, *pos = str->Str, *endPos = str->End;
     while (pos < endPos)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            QSP_CHAR quot = *pos;
+            quote = *pos;
             while (++pos < endPos)
             {
-                if (*pos == quot)
+                if (*pos == quote)
                 {
                     ++pos;
-                    if (pos >= endPos) break;
-                    if (*pos != quot) break;
+                    if (pos >= endPos || *pos != quote) break;
                 }
             }
             continue;
         }
         switch (*pos)
         {
-        case QSP_LQUOT_CHAR: QSP_INC_POSITIVE(quotsCount); break;
-        case QSP_RQUOT_CHAR: QSP_DEC_POSITIVE(quotsCount); break;
+        case QSP_LCODE_CHAR: QSP_INC_POSITIVE(codeBrackets); break;
+        case QSP_RCODE_CHAR: QSP_DEC_POSITIVE(codeBrackets); break;
         default:
-            if (!quotsCount) /* we have to keep code blocks untouched */
+            if (!codeBrackets) /* we have to keep code blocks untouched */
                 *pos = QSP_CHRUPR(*pos);
             break;
         }
@@ -640,7 +639,7 @@ INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *
             return QSP_FALSE;
         }
     }
-    lineStr = qspBufTextToString(*strBuf);
+    lineStr = qspBufStringToString(*strBuf);
     /* Prepare the buffer to execution */
     qspPrepareStringToExecution(&lineStr);
     /* Transfer ownership of the buffer to QSPLineOfCode */
@@ -652,7 +651,7 @@ INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *
 {
     QSPString lineStr;
     qspAddBufText(strBuf, str);
-    lineStr = qspBufTextToString(*strBuf);
+    lineStr = qspBufStringToString(*strBuf);
     /* Prepare the buffer to execution */
     qspPrepareStringToExecution(&lineStr);
     /* Transfer ownership of the buffer to QSPLineOfCode */
@@ -662,96 +661,142 @@ INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *
 int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
 {
     QSPLineOfCode *lines;
-    QSPBufString combinedStrBuf;
-    QSP_BOOL isNewLine;
-    QSP_CHAR *str, *pos, quot = 0;
-    int c1 = 0, c2 = 0, c3 = 0, lineNum = 0, lastLineNum = 0, linesCount = 0, linesBufSize = 8, strLen = 0, strBufSize = 256;
+    QSPBufString combinedBuf, strBuf;
+    QSP_CHAR *pos, quote = 0;
+    QSP_BOOL isNewLine, isComment = QSP_FALSE, isStatementStart = QSP_TRUE;
+    int codeBrackets = 0, roundBrackets = 0, squareBrackets = 0;
+    int lineNum = 0, lastLineNum = 0, linesCount = 0, linesBufSize = 8;
+
     if (qspIsEmpty(data))
     {
         *strs = 0;
         return 0;
     }
-    str = (QSP_CHAR *)malloc(strBufSize * sizeof(QSP_CHAR));
+
+    strBuf = qspNewBufString(0, 256);
+    combinedBuf = qspNewBufString(0, 64);
     lines = (QSPLineOfCode *)malloc(linesBufSize * sizeof(QSPLineOfCode));
-    combinedStrBuf = qspNewBufString(64);
+
     pos = data.Str;
     while (pos < data.End)
     {
-        isNewLine = (qspStrsPartCompare(data, QSP_STATIC_STR(QSP_STRSDELIM), QSP_STATIC_LEN(QSP_STRSDELIM)) == 0);
-        if (isNewLine) ++lineNum;
-        if (c1 || c2 || c3 || quot || !isNewLine)
+        data.Str = pos;
+        isNewLine = !qspStrsPartCompare(data, QSP_STATIC_STR(QSP_STRSDELIM));
+        if (isNewLine)
         {
-            /* Inside quotes or brackets, keep composing the current line */
-            if (strLen >= strBufSize)
+            ++lineNum;
+            if (!quote && !roundBrackets && !squareBrackets && !codeBrackets)
             {
-                strBufSize = strLen + 256;
-                str = (QSP_CHAR *)realloc(str, strBufSize * sizeof(QSP_CHAR));
-            }
-            str[strLen++] = *pos;
-            if (quot)
-            {
-                if (*pos++ == quot)
+                /* Flush the current line */
+                if (linesCount >= linesBufSize)
                 {
-                    if (pos < data.End && *pos == quot)
-                    {
-                        /* Escape code */
-                        if (strLen >= strBufSize)
-                        {
-                            strBufSize = strLen + 256;
-                            str = (QSP_CHAR *)realloc(str, strBufSize * sizeof(QSP_CHAR));
-                        }
-                        str[strLen++] = *pos++;
-                    }
-                    else
-                    {
-                        /* Termination of the string */
-                        quot = 0;
-                    }
+                    linesBufSize = linesCount + 16;
+                    lines = (QSPLineOfCode *)realloc(lines, linesBufSize * sizeof(QSPLineOfCode));
                 }
+                if (qspAppendLineToResult(qspDelSpc(qspBufStringToString(strBuf)), lastLineNum, &combinedBuf, lines + linesCount))
+                {
+                    /* Reset state for the next line */
+                    combinedBuf = qspNewBufString(0, 64);
+                    isComment = QSP_FALSE;
+                    isStatementStart = QSP_TRUE;
+                    lastLineNum = lineNum;
+                    ++linesCount;
+                }
+                qspUpdateBufString(&strBuf, qspNullString);
             }
             else
             {
-                if (qspIsInClass(*pos, QSP_CHAR_QUOT))
-                    quot = *pos;
-                else
-                {
-                    switch (*pos)
-                    {
-                    case QSP_LRBRACK_CHAR: QSP_INC_POSITIVE(c1); break;
-                    case QSP_RRBRACK_CHAR: QSP_DEC_POSITIVE(c1); break;
-                    case QSP_LSBRACK_CHAR: QSP_INC_POSITIVE(c2); break;
-                    case QSP_RSBRACK_CHAR: QSP_DEC_POSITIVE(c2); break;
-                    case QSP_LQUOT_CHAR: QSP_INC_POSITIVE(c3); break;
-                    case QSP_RQUOT_CHAR: QSP_DEC_POSITIVE(c3); break;
-                    }
-                }
-                ++pos;
+                /* The newline is inside a string / brackets */
+                qspAddBufText(&strBuf, QSP_STATIC_STR(QSP_STRSDELIM));
             }
-        }
-        else
-        {
-            /* New line has been found */
-            if (linesCount >= linesBufSize)
-            {
-                linesBufSize = linesCount + 16;
-                lines = (QSPLineOfCode *)realloc(lines, linesBufSize * sizeof(QSPLineOfCode));
-            }
-            if (qspAppendLineToResult(qspDelSpc(qspStringFromLen(str, strLen)), lastLineNum, &combinedStrBuf, lines + linesCount))
-            {
-                combinedStrBuf = qspNewBufString(64);
-                lastLineNum = lineNum;
-                ++linesCount;
-            }
-            strLen = 0;
             pos += QSP_STATIC_LEN(QSP_STRSDELIM);
+            continue;
         }
-        data.Str = pos;
+
+        /* Add current character to buffer */
+        qspAddBufChar(&strBuf, *pos);
+
+        if (quote) /* inside a quoted string */
+        {
+            if (*pos == quote)
+            {
+                if (pos + 1 < data.End && *(pos + 1) == quote)
+                {
+                    ++pos;
+                    qspAddBufChar(&strBuf, *pos);
+                }
+                else
+                    quote = 0; /* end of string */
+            }
+        }
+        else if (qspIsInClass(*pos, QSP_CHAR_QUOT)) /* new quoted string */
+        {
+            quote = *pos;
+            isStatementStart = QSP_FALSE;
+        }
+        else if (codeBrackets) /* inside a code block */
+        {
+            switch (*pos)
+            {
+            case QSP_LCODE_CHAR:
+                QSP_INC_POSITIVE(codeBrackets);
+                break;
+            case QSP_RCODE_CHAR:
+                QSP_DEC_POSITIVE(codeBrackets);
+                break;
+            }
+        }
+        else if (*pos == QSP_LCODE_CHAR) /* new code block */
+        {
+            QSP_INC_POSITIVE(codeBrackets);
+            isStatementStart = QSP_FALSE;
+        }
+        else if (!isComment) /* not in string / code block / comment */
+        {
+            switch (*pos)
+            {
+            case QSP_STATDELIM_CHAR:
+                if (!roundBrackets && !squareBrackets)
+                    isStatementStart = QSP_TRUE;
+                break;
+            case QSP_COMMENT_CHAR:
+                if (isStatementStart && !roundBrackets && !squareBrackets)
+                {
+                    isComment = QSP_TRUE;
+                    isStatementStart = QSP_FALSE;
+                }
+                break;
+            case QSP_LRBRACK_CHAR:
+                QSP_INC_POSITIVE(roundBrackets);
+                isStatementStart = QSP_FALSE;
+                break;
+            case QSP_RRBRACK_CHAR:
+                QSP_DEC_POSITIVE(roundBrackets);
+                isStatementStart = QSP_FALSE;
+                break;
+            case QSP_LSBRACK_CHAR:
+                QSP_INC_POSITIVE(squareBrackets);
+                isStatementStart = QSP_FALSE;
+                break;
+            case QSP_RSBRACK_CHAR:
+                QSP_DEC_POSITIVE(squareBrackets);
+                isStatementStart = QSP_FALSE;
+                break;
+            default:
+                if (!qspIsInClass(*pos, QSP_CHAR_SPACE))
+                    isStatementStart = QSP_FALSE;
+                break;
+            }
+        }
+        ++pos;
     }
+    /* Append the final line */
     if (linesCount >= linesBufSize)
         lines = (QSPLineOfCode *)realloc(lines, (linesCount + 1) * sizeof(QSPLineOfCode));
-    qspAppendLastLineToResult(qspDelSpc(qspStringFromLen(str, strLen)), lastLineNum, &combinedStrBuf, lines + linesCount);
+    qspAppendLastLineToResult(qspDelSpc(qspBufStringToString(strBuf)), lastLineNum, &combinedBuf, lines + linesCount);
+    qspFreeBufString(&strBuf);
     ++linesCount;
-    free(str);
+
     *strs = lines;
     return linesCount;
 }

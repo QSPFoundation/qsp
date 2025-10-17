@@ -40,13 +40,13 @@ INLINE int qspSearchPlayList(QSPString file)
         file = qspCopyToNewText(file);
         qspUpperStr(&file);
         fileLen = qspStrLen(file);
-        buf = qspNewBufString(32);
+        buf = qspNewBufString(0, 32);
         for (i = 0; i < qspPLFilesCount; ++i)
         {
             qspUpdateBufString(&buf, qspPLFiles[i]);
-            bufName = qspBufTextToString(buf);
+            bufName = qspBufStringToString(buf);
             qspUpperStr(&bufName);
-            if (!qspStrsPartCompare(bufName, file, fileLen))
+            if (!qspStrsPartCompare(bufName, file))
             {
                 /* The current item is prefixed with the file */
                 if (qspStrLen(bufName) == fileLen || qspIsCharAtPos(bufName, bufName.Str + fileLen, QSP_PLVOLUMEDELIM_CHAR))
@@ -65,7 +65,7 @@ INLINE int qspSearchPlayList(QSPString file)
 
 INLINE void qspAddToPlayList(QSPString file, int volume)
 {
-    QSPBufString fileBuf = qspNewBufString(8);
+    QSPBufString fileBuf = qspNewBufString(0, 8);
     qspAddBufText(&fileBuf, file);
     if (volume != 100)
     {
@@ -73,7 +73,7 @@ INLINE void qspAddToPlayList(QSPString file, int volume)
         qspAddBufText(&fileBuf, QSP_STATIC_STR(QSP_PLVOLUMEDELIM));
         qspAddBufText(&fileBuf, qspNumToStr(buf, volume));
     }
-    qspPLFiles[qspPLFilesCount++] = qspBufTextToString(fileBuf);
+    qspPLFiles[qspPLFilesCount++] = qspBufStringToString(fileBuf);
 }
 
 INLINE QSP_BOOL qspRemoveFromPlayList(QSPString file)

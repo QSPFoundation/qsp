@@ -40,7 +40,6 @@
     /* External functions */
     void qspInitSymbolClasses(void);
     QSP_CHAR *qspStringToC(QSPString s);
-    QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val);
     QSPString qspConcatText(QSPString val1, QSPString val2);
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);
@@ -213,19 +212,17 @@
         }
     }
 
-    INLINE int qspStrsPartCompare(QSPString str1, QSPString str2, int maxLen)
+    INLINE int qspStrsPartCompare(QSPString str1, QSPString str2)
     {
         int delta;
         QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;
         QSP_CHAR *end1 = str1.End, *end2 = str2.End;
-        while (maxLen && pos2 < end2 && pos1 < end1)
+        while (pos2 < end2 && pos1 < end1)
         {
             if ((delta = (int)*pos1 - *pos2)) return delta;
             ++pos1, ++pos2;
-            --maxLen;
         }
-        if (maxLen) return (pos1 == end1) ? ((pos2 == end2) ? 0 : -1) : 1;
-        return 0;
+        return (pos1 == end1) ? ((pos2 == end2) ? 0 : -1) : 1;
     }
 
     INLINE QSP_BOOL qspStrsEqual(QSPString str1, QSPString str2)
@@ -298,12 +295,20 @@
         return 0;
     }
 
-    INLINE QSPBufString qspNewBufString(int capacityIncrement)
+    INLINE QSPBufString qspNewBufString(int initialCapacity, int capacityIncrement)
     {
         QSPBufString res;
-        res.Str = 0;
+        if (initialCapacity)
+        {
+            res.Capacity = initialCapacity;
+            res.Str = (QSP_CHAR *)malloc(res.Capacity * sizeof(QSP_CHAR));
+        }
+        else
+        {
+            res.Capacity = 0;
+            res.Str = 0;
+        }
         res.Len = 0;
-        res.Capacity = 0;
         res.CapacityIncrement = capacityIncrement;
         return res;
     }
@@ -318,7 +323,7 @@
         return res;
     }
 
-    INLINE QSPString qspBufTextToString(QSPBufString buf)
+    INLINE QSPString qspBufStringToString(QSPBufString buf)
     {
     #if defined(__GNUC__)
         return (QSPString) { buf.Str, (buf.Str + buf.Len) };
@@ -330,15 +335,57 @@
     #endif
     }
 
-    INLINE void qspUpdateBufString(QSPBufString *buf, QSPString val)
-    {
-        buf->Len = 0; /* assign the whole string */
-        qspAddBufText(buf, val);
-    }
-
     INLINE void qspFreeBufString(QSPBufString *buf)
     {
         if (buf->Str) free(buf->Str);
+    }
+
+    INLINE QSP_BOOL qspAddBufText(QSPBufString *dest, QSPString val)
+    {
+        int valLen = qspStrLen(val);
+        if (valLen)
+        {
+            if (dest->Str)
+            {
+                if (dest->Len + valLen > dest->Capacity)
+                {
+                    dest->Capacity = dest->Len + valLen + dest->CapacityIncrement;
+                    dest->Str = (QSP_CHAR *)realloc(dest->Str, dest->Capacity * sizeof(QSP_CHAR));
+                }
+                memcpy(dest->Str + dest->Len, val.Str, valLen * sizeof(QSP_CHAR));
+                dest->Len += valLen;
+            }
+            else
+            {
+                dest->Capacity = valLen + dest->CapacityIncrement;
+                dest->Str = (QSP_CHAR *)malloc(dest->Capacity * sizeof(QSP_CHAR));
+                memcpy(dest->Str, val.Str, valLen * sizeof(QSP_CHAR));
+                dest->Len = valLen;
+            }
+            return QSP_TRUE;
+        }
+        return QSP_FALSE;
+    }
+
+    INLINE void qspAddBufChar(QSPBufString *dest, QSP_CHAR ch)
+    {
+        if (dest->Str)
+        {
+            if (dest->Len + QSP_CHAR_LEN > dest->Capacity)
+            {
+                dest->Capacity = dest->Len + QSP_CHAR_LEN + dest->CapacityIncrement;
+                dest->Str = (QSP_CHAR *)realloc(dest->Str, dest->Capacity * sizeof(QSP_CHAR));
+            }
+            dest->Str[dest->Len] = ch;
+            dest->Len += QSP_CHAR_LEN;
+        }
+        else
+        {
+            dest->Capacity = QSP_CHAR_LEN + dest->CapacityIncrement;
+            dest->Str = (QSP_CHAR *)malloc(dest->Capacity * sizeof(QSP_CHAR));
+            dest->Str[0] = ch;
+            dest->Len = QSP_CHAR_LEN;
+        }
     }
 
     INLINE void qspClearBufString(QSPBufString *s)
@@ -351,6 +398,12 @@
             s->Capacity = 0;
             /* Keep old CapacityIncrement */
         }
+    }
+
+    INLINE void qspUpdateBufString(QSPBufString *buf, QSPString val)
+    {
+        buf->Len = 0; /* assign the whole string */
+        qspAddBufText(buf, val);
     }
 
 #endif

@@ -126,8 +126,8 @@ void qspMemClear(QSP_BOOL toInit)
         qspFreeString(&qspCurInput);
         qspFreeString(&qspViewPath);
     }
-    qspCurDesc = qspNewBufString(512);
-    qspCurVars = qspNewBufString(512);
+    qspCurDesc = qspNewBufString(0, 512);
+    qspCurVars = qspNewBufString(0, 512);
     qspCurInput = qspNullString;
     qspViewPath = qspNullString;
 }

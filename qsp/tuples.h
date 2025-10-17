@@ -31,9 +31,9 @@
 
     INLINE QSPString qspGetTupleAsString(QSPTuple tuple)
     {
-        QSPBufString buf = qspNewBufString(16);
+        QSPBufString buf = qspNewBufString(0, 16);
         qspAppendTupleToString(tuple, &buf);
-        return qspBufTextToString(buf);
+        return qspBufStringToString(buf);
     }
 
 #endif

@@ -131,9 +131,9 @@
 
     INLINE QSPString qspGetVariantAsIndexString(QSPVariant *val)
     {
-        QSPBufString buf = qspNewBufString(16);
+        QSPBufString buf = qspNewBufString(0, 16);
         qspAppendVariantToIndexString(val, &buf);
-        return qspBufTextToString(buf);
+        return qspBufStringToString(buf);
     }
 
 #endif

@@ -234,12 +234,12 @@ INLINE void qspClearObjectsByNameWithEvents(QSPString objName, int maxObjects)
         objName = qspCopyToNewText(objName);
         qspUpperStr(&objName);
         /* Fill the list with objects to remove */
-        buf = qspNewBufString(32);
+        buf = qspNewBufString(0, 32);
         i = 0;
         while (i < qspCurObjsCount && objsCount < maxObjects)
         {
             qspUpdateBufString(&buf, qspCurObjects[i].Name);
-            bufName = qspBufTextToString(buf);
+            bufName = qspBufStringToString(buf);
             qspUpperStr(&bufName);
             if (qspStrsEqual(bufName, objName))
             {
@@ -376,7 +376,7 @@ QSPString qspGetAllObjectsAsCode(void)
     QSPObj *curObj;
     QSPObjsGroup *curObjsGroup;
     QSPString temp;
-    QSPBufString res = qspNewBufString(256);
+    QSPBufString res = qspNewBufString(0, 256);
     /* Add objects */
     curObj = qspCurObjects;
     for (i = qspCurObjsCount; i > 0; --i, ++curObj)
@@ -419,7 +419,7 @@ QSPString qspGetAllObjectsAsCode(void)
             qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_STRSDELIM));
         }
     }
-    return qspBufTextToString(res);
+    return qspBufStringToString(res);
 }
 
 QSP_BOOL qspGetObjectInfoByIndex(int index, QSPObjectItem *info)

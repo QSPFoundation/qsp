@@ -133,11 +133,11 @@
     #define QSP_RRBRACK      QSP_FMT(")")
     QSP_DEFINE_SPECIAL_CHAR(QSP_RRBRACK,    QSP_FMT(')'))
 
-    #define QSP_LQUOT        QSP_FMT("{")
-    QSP_DEFINE_SPECIAL_CHAR(QSP_LQUOT,      QSP_FMT('{'))
+    #define QSP_LCODE        QSP_FMT("{")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_LCODE,      QSP_FMT('{'))
 
-    #define QSP_RQUOT        QSP_FMT("}")
-    QSP_DEFINE_SPECIAL_CHAR(QSP_RQUOT,      QSP_FMT('}'))
+    #define QSP_RCODE        QSP_FMT("}")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_RCODE,      QSP_FMT('}'))
 
     #define QSP_DELIMS       QSP_FMT(" \t&'\"()[]=!<>+-/*:,{}\r\n")
 
