@@ -212,17 +212,17 @@
         }
     }
 
-    INLINE int qspStrsPartCompare(QSPString str1, QSPString str2)
+    INLINE int qspStrsPartCompare(QSPString str, QSPString part)
     {
         int delta;
-        QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str;
-        QSP_CHAR *end1 = str1.End, *end2 = str2.End;
+        QSP_CHAR *pos1 = str.Str, *pos2 = part.Str;
+        QSP_CHAR *end1 = str.End, *end2 = part.End;
         while (pos2 < end2 && pos1 < end1)
         {
             if ((delta = (int)*pos1 - *pos2)) return delta;
             ++pos1, ++pos2;
         }
-        return (pos1 == end1) ? ((pos2 == end2) ? 0 : -1) : 1;
+        return (pos2 == end2) ? 0 : -1;
     }
 
     INLINE QSP_BOOL qspStrsEqual(QSPString str1, QSPString str2)
