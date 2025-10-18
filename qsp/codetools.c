@@ -663,7 +663,7 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
     QSPLineOfCode *lines;
     QSPBufString combinedBuf, strBuf;
     QSP_CHAR *pos, quote = 0;
-    QSP_BOOL isNewLine, isComment = QSP_FALSE, isStatementStart = QSP_TRUE;
+    QSP_BOOL isComment = QSP_FALSE, isStatementStart = QSP_TRUE;
     int codeBrackets = 0, roundBrackets = 0, squareBrackets = 0;
     int lineNum = 0, lastLineNum = 0, linesCount = 0, linesBufSize = 8;
 
@@ -681,8 +681,7 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
     while (pos < data.End)
     {
         data.Str = pos;
-        isNewLine = !qspStrsPartCompare(data, QSP_STATIC_STR(QSP_STRSDELIM));
-        if (isNewLine)
+        if (!qspStrsPartCompare(data, QSP_STATIC_STR(QSP_STRSDELIM))) /* newline */
         {
             ++lineNum;
             if (!quote && !roundBrackets && !squareBrackets && !codeBrackets)
@@ -738,12 +737,8 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
         {
             switch (*pos)
             {
-            case QSP_LCODE_CHAR:
-                QSP_INC_POSITIVE(codeBrackets);
-                break;
-            case QSP_RCODE_CHAR:
-                QSP_DEC_POSITIVE(codeBrackets);
-                break;
+            case QSP_LCODE_CHAR: QSP_INC_POSITIVE(codeBrackets); break;
+            case QSP_RCODE_CHAR: QSP_DEC_POSITIVE(codeBrackets); break;
             }
         }
         else if (*pos == QSP_LCODE_CHAR) /* new code block */
@@ -755,10 +750,6 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
         {
             switch (*pos)
             {
-            case QSP_STATDELIM_CHAR:
-                if (!roundBrackets && !squareBrackets)
-                    isStatementStart = QSP_TRUE;
-                break;
             case QSP_COMMENT_CHAR:
                 if (isStatementStart)
                 {
@@ -766,24 +757,15 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
                     isStatementStart = QSP_FALSE;
                 }
                 break;
-            case QSP_LRBRACK_CHAR:
-                QSP_INC_POSITIVE(roundBrackets);
-                isStatementStart = QSP_FALSE;
+            case QSP_STATDELIM_CHAR:
+                isStatementStart = (!roundBrackets && !squareBrackets);
                 break;
-            case QSP_RRBRACK_CHAR:
-                QSP_DEC_POSITIVE(roundBrackets);
-                isStatementStart = QSP_FALSE;
-                break;
-            case QSP_LSBRACK_CHAR:
-                QSP_INC_POSITIVE(squareBrackets);
-                isStatementStart = QSP_FALSE;
-                break;
-            case QSP_RSBRACK_CHAR:
-                QSP_DEC_POSITIVE(squareBrackets);
-                isStatementStart = QSP_FALSE;
-                break;
+            case QSP_LRBRACK_CHAR: QSP_INC_POSITIVE(roundBrackets); isStatementStart = QSP_FALSE; break;
+            case QSP_RRBRACK_CHAR: QSP_DEC_POSITIVE(roundBrackets); isStatementStart = QSP_FALSE; break;
+            case QSP_LSBRACK_CHAR: QSP_INC_POSITIVE(squareBrackets); isStatementStart = QSP_FALSE; break;
+            case QSP_RSBRACK_CHAR: QSP_DEC_POSITIVE(squareBrackets); isStatementStart = QSP_FALSE; break;
             default:
-                if (!qspIsInClass(*pos, QSP_CHAR_SPACE))
+                if (isStatementStart && !qspIsInClass(*pos, QSP_CHAR_SPACE))
                     isStatementStart = QSP_FALSE;
                 break;
             }
