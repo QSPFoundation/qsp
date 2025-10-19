@@ -149,7 +149,7 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getCompiledDateTime(JNIEnv 
 /* Get text of the main description */
 JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getMainDesc(JNIEnv *env, jobject api)
 {
-    return qspToJavaString(env, qspBufTextToString(qspCurDesc));
+    return qspToJavaString(env, qspBufStringToString(qspCurDesc));
 }
 /* ------------------------------------------------------------ */
 /* Additional description */
@@ -157,7 +157,7 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getMainDesc(JNIEnv *env, jo
 /* Get text of the additional description */
 JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getVarsDesc(JNIEnv *env, jobject api)
 {
-    return qspToJavaString(env, qspBufTextToString(qspCurVars));
+    return qspToJavaString(env, qspBufStringToString(qspCurVars));
 }
 /* ------------------------------------------------------------ */
 /* Synchronize the value of the text input control */
