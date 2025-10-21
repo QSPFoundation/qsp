@@ -722,7 +722,7 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
                 if (pos + 1 < data.End && *(pos + 1) == quote)
                 {
                     ++pos;
-                    qspAddBufChar(&strBuf, *pos);
+                    qspAddBufChar(&strBuf, quote);
                 }
                 else
                     quote = 0; /* end of string */
@@ -748,6 +748,7 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
         }
         else if (!isComment) /* not in string / code block / comment */
         {
+            /* Ignore () [] brackets inside strings, code blocks and comments */
             switch (*pos)
             {
             case QSP_COMMENT_CHAR:
