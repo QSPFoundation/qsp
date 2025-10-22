@@ -749,6 +749,7 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
         else if (!isComment) /* not in string / code block / comment */
         {
             /* Ignore () [] brackets inside strings, code blocks and comments */
+            /* Allow interleaving brackets like "([)]" because the actual validation happens during code execution */
             switch (*pos)
             {
             case QSP_COMMENT_CHAR:

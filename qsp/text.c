@@ -275,7 +275,7 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
             /* It's past the closing quote or past the last valid position */
             continue;
         }
-        switch (*pos)
+        switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
         {
         case QSP_LRBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(roundBrackets); break;
         case QSP_RRBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(roundBrackets); break;
@@ -325,7 +325,7 @@ QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
             isPrevDelim = QSP_TRUE;
             continue;
         }
-        switch (*pos)
+        switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
         {
         case QSP_LRBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(roundBrackets); break;
         case QSP_RRBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(roundBrackets); break;
