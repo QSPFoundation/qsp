@@ -15,10 +15,10 @@ QSP {
 
     statementGroup     = ws (singleLineBlock | multiLineBlock | newline)
 
-    singleLineBlock    = singleLineGroup ws (&newline | &end)
+    singleLineBlock    = singleLineGroup ws (newline | &end)
     singleLineGroup    = statementUnitSingleLine (ws statementSeparator ws statementUnitSingleLine)*
 
-    multiLineBlock     = statementUnitMultiLine (ws statementSeparator ws singleLineGroup)? ws (&newline | &end)
+    multiLineBlock     = statementUnitMultiLine (ws statementSeparator ws singleLineGroup)? ws (newline | &end)
 
     /* ====================
        STATEMENT UNITS
@@ -330,14 +330,9 @@ QSP {
     rawCodeBlock               = "{" rawCodeBlockContent* "}"
     rawCodeBlockContent        = rawCodeBlock
                                | rawStringLiteral
-                               | rawCodeParentheses
-                               | rawCodeBrackets
                                | rawCodeBlockChar
 
-    rawCodeParentheses         = "(" rawCodeBlockContent* ")"
-    rawCodeBrackets            = "[" rawCodeBlockContent* "]"
-
-    rawCodeBlockChar = ~("{" | "}" | "'" | "\"" | "(" | ")" | "[" | "]") any
+    rawCodeBlockChar = ~("{" | "}" | "'" | "\"") any
 
     /* ====================
        IDENTIFIERS
