@@ -324,8 +324,8 @@ QSP {
 
     statementGroupInCodeBlock  = ws (singleLineCodeBlock | multiLineCodeBlock | newline)
 
-    singleLineCodeBlock        = singleLineGroup ws (&newline | &("}"))
-    multiLineCodeBlock         = statementUnitMultiLine (ws statementSeparator ws singleLineGroup)? ws (&newline | &("}"))
+    singleLineCodeBlock        = singleLineGroup ws (newline | &("}"))
+    multiLineCodeBlock         = statementUnitMultiLine (ws statementSeparator ws singleLineGroup)? ws (newline | &("}"))
 
     rawCodeBlock               = "{" rawCodeBlockContent* "}"
     rawCodeBlockContent        = rawCodeBlock
