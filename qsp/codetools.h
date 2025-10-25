@@ -49,6 +49,8 @@
     void qspCopyPrepStatements(QSPCachedStat **dest, QSPCachedStat *src, int start, int end, int codeOffset);
     void qspCopyPrepLines(QSPLineOfCode **dest, QSPLineOfCode *src, int start, int end);
     QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim);
+    QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch);
+    QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated);
     void qspPrepareStringToExecution(QSPString *str);
     int qspPreprocessData(QSPString data, QSPLineOfCode **strs);
 

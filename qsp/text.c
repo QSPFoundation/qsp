@@ -6,6 +6,7 @@
  */
 
 #include "text.h"
+#include "codetools.h"
 #include "errors.h"
 #include "locations.h"
 #include "mathops.h"
@@ -253,113 +254,6 @@ QSPString qspNumToStr(QSP_CHAR *buf, QSP_BIGINT val)
         ++first;
     }
     return qspStringFromPair(buf, last);
-}
-
-QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
-{
-    int roundBrackets = 0, squareBrackets = 0, codeBrackets = 0;
-    QSP_CHAR quote, *pos = txt.Str;
-    while (pos < txt.End)
-    {
-        if (qspIsInClass(*pos, QSP_CHAR_QUOT))
-        {
-            quote = *pos;
-            while (++pos < txt.End)
-            {
-                if (*pos == quote)
-                {
-                    ++pos;
-                    if (pos >= txt.End || *pos != quote) break;
-                }
-            }
-            /* It's past the closing quote or past the last valid position */
-            continue;
-        }
-        switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
-        {
-        case QSP_LRBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(roundBrackets); break;
-        case QSP_RRBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(roundBrackets); break;
-        case QSP_LSBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(squareBrackets); break;
-        case QSP_RSBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(squareBrackets); break;
-        case QSP_LCODE_CHAR: QSP_INC_POSITIVE(codeBrackets); break;
-        case QSP_RCODE_CHAR: QSP_DEC_POSITIVE(codeBrackets); break;
-        }
-        if (*pos == ch && !roundBrackets && !squareBrackets && !codeBrackets) /* include brackets */
-            return pos;
-        ++pos;
-    }
-    return 0;
-}
-
-QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
-{
-    QSP_BOOL isPrevDelim;
-    QSP_CHAR quote, *lastPos, *pos;
-    int roundBrackets, squareBrackets, codeBrackets, strLen = qspStrLen(str);
-    if (!strLen) return txt.Str;
-    pos = qspStrStr(txt, str);
-    if (!pos) return 0;
-    if (!isIsolated)
-    {
-        QSPString prefix = qspStringFromPair(txt.Str, pos);
-        if (!qspStrCharClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_LBRACKET)) return pos;
-    }
-    roundBrackets = squareBrackets = codeBrackets = 0;
-    isPrevDelim = QSP_TRUE;
-    pos = txt.Str;
-    lastPos = txt.End - strLen;
-    while (pos <= lastPos)
-    {
-        if (qspIsInClass(*pos, QSP_CHAR_QUOT))
-        {
-            quote = *pos;
-            while (++pos <= lastPos)
-            {
-                if (*pos == quote)
-                {
-                    ++pos;
-                    if (pos > lastPos || *pos != quote) break;
-                }
-            }
-            /* It's past the closing quote or past the last valid position */
-            isPrevDelim = QSP_TRUE;
-            continue;
-        }
-        switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
-        {
-        case QSP_LRBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(roundBrackets); break;
-        case QSP_RRBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(roundBrackets); break;
-        case QSP_LSBRACK_CHAR: if (!codeBrackets) QSP_INC_POSITIVE(squareBrackets); break;
-        case QSP_RSBRACK_CHAR: if (!codeBrackets) QSP_DEC_POSITIVE(squareBrackets); break;
-        case QSP_LCODE_CHAR: QSP_INC_POSITIVE(codeBrackets); break;
-        case QSP_RCODE_CHAR: QSP_DEC_POSITIVE(codeBrackets); break;
-        }
-        if (!roundBrackets && !squareBrackets && !codeBrackets) /* include brackets */
-        {
-            if (isIsolated)
-            {
-                if (qspIsInClass(*pos, QSP_CHAR_DELIM))
-                    isPrevDelim = QSP_TRUE;
-                else if (isPrevDelim)
-                {
-                    if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
-                    {
-                        txt.Str = pos;
-                        if (!qspStrsPartCompare(txt, str)) return pos;
-                    }
-                    isPrevDelim = QSP_FALSE;
-                }
-            }
-            else
-            {
-                /* It must support searching for delimiters */
-                txt.Str = pos;
-                if (!qspStrsPartCompare(txt, str)) return pos;
-            }
-        }
-        ++pos;
-    }
-    return 0;
 }
 
 QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, int maxReplacements, QSP_BOOL canReturnSelf)

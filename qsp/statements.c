@@ -8,6 +8,7 @@
 #include "statements.h"
 #include "actions.h"
 #include "callbacks.h"
+#include "codetools.h"
 #include "common.h"
 #include "errors.h"
 #include "game.h"

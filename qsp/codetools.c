@@ -17,6 +17,8 @@ INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg **args, QSP_TINYINT argsCou
 INLINE QSP_TINYINT qspInitUserCallArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUSED(statCode), QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_TINYINT qspInitSingleArg(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
 INLINE QSP_TINYINT qspInitRegularArgs(QSPCachedArg **args, QSP_TINYINT statCode, QSPString s, QSP_CHAR *origStart, QSP_TINYINT *errorCode);
+INLINE QSP_BOOL qspSkipCodeBlock(QSPString *str);
+INLINE QSP_BOOL qspSkipQuotedString(QSPString *str);
 INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 
@@ -593,34 +595,175 @@ QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim)
     return qspBufStringToString(res);
 }
 
-void qspPrepareStringToExecution(QSPString *str)
+INLINE QSP_BOOL qspSkipCodeBlock(QSPString *str)
 {
-    int codeBrackets = 0;
-    QSP_CHAR quote, *pos = str->Str, *endPos = str->End;
-    while (pos < endPos)
+    int codeBrackets = 1;
+    QSP_CHAR *pos = str->Str, *endPos = str->End;
+    while (++pos < endPos)
+    {
+        switch (*pos)
+        {
+        case QSP_LCODE_CHAR:
+            ++codeBrackets;
+            break;
+        case QSP_RCODE_CHAR:
+            if (!(--codeBrackets))
+            {
+                /* It's at the closing bracket */
+                str->Str = pos;
+                return QSP_TRUE;
+            }
+            break;
+        }
+    }
+    str->Str = pos;
+    return QSP_FALSE;
+}
+
+INLINE QSP_BOOL qspSkipQuotedString(QSPString *str)
+{
+    QSP_CHAR *pos = str->Str, *endPos = str->End, quote = *pos;
+    while (++pos < endPos)
+    {
+        if (*pos == quote)
+        {
+            ++pos;
+            if (pos >= endPos || *pos != quote)
+            {
+                /* It's past the closing quote */
+                str->Str = pos;
+                return QSP_TRUE;
+            }
+        }
+    }
+    str->Str = pos;
+    return QSP_FALSE;
+}
+
+QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
+{
+    int roundBrackets = 0, squareBrackets = 0;
+    QSP_CHAR *pos = txt.Str;
+    while (pos < txt.End)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            quote = *pos;
-            while (++pos < endPos)
-            {
-                if (*pos == quote)
-                {
-                    ++pos;
-                    if (pos >= endPos || *pos != quote) break;
-                }
-            }
+            txt.Str = pos;
+            if (!qspSkipQuotedString(&txt)) break;
+            pos = txt.Str;
             continue;
         }
-        switch (*pos)
+        if (*pos == QSP_LCODE_CHAR)
         {
-        case QSP_LCODE_CHAR: QSP_INC_POSITIVE(codeBrackets); break;
-        case QSP_RCODE_CHAR: QSP_DEC_POSITIVE(codeBrackets); break;
-        default:
-            if (!codeBrackets) /* we have to keep code blocks untouched */
-                *pos = QSP_CHRUPR(*pos);
-            break;
+            txt.Str = pos;
+            if (!qspSkipCodeBlock(&txt)) break;
+            pos = txt.Str;
+            continue;
         }
+        switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
+        {
+        case QSP_LRBRACK_CHAR: QSP_INC_POSITIVE(roundBrackets); break;
+        case QSP_RRBRACK_CHAR: QSP_DEC_POSITIVE(roundBrackets); break;
+        case QSP_LSBRACK_CHAR: QSP_INC_POSITIVE(squareBrackets); break;
+        case QSP_RSBRACK_CHAR: QSP_DEC_POSITIVE(squareBrackets); break;
+        }
+        if (*pos == ch && !roundBrackets && !squareBrackets) /* include brackets */
+            return pos;
+        ++pos;
+    }
+    return 0;
+}
+
+QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
+{
+    QSP_BOOL isPrevDelim;
+    QSP_CHAR *lastPos, *pos;
+    int roundBrackets, squareBrackets, strLen = qspStrLen(str);
+    if (!strLen) return txt.Str;
+    pos = qspStrStr(txt, str);
+    if (!pos) return 0;
+    if (!isIsolated)
+    {
+        QSPString prefix = qspStringFromPair(txt.Str, pos);
+        if (!qspStrCharClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_LBRACKET)) return pos;
+    }
+    roundBrackets = squareBrackets = 0;
+    isPrevDelim = QSP_TRUE;
+    pos = txt.Str;
+    lastPos = txt.End - strLen;
+    while (pos <= lastPos)
+    {
+        if (qspIsInClass(*pos, QSP_CHAR_QUOT))
+        {
+            txt.Str = pos;
+            if (!qspSkipQuotedString(&txt)) break;
+            pos = txt.Str;
+            isPrevDelim = QSP_TRUE;
+            continue;
+        }
+        if (*pos == QSP_LCODE_CHAR)
+        {
+            txt.Str = pos;
+            if (!qspSkipCodeBlock(&txt)) break;
+            pos = txt.Str;
+            continue;
+        }
+        switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
+        {
+        case QSP_LRBRACK_CHAR: QSP_INC_POSITIVE(roundBrackets); break;
+        case QSP_RRBRACK_CHAR: QSP_DEC_POSITIVE(roundBrackets); break;
+        case QSP_LSBRACK_CHAR: QSP_INC_POSITIVE(squareBrackets); break;
+        case QSP_RSBRACK_CHAR: QSP_DEC_POSITIVE(squareBrackets); break;
+        }
+        if (!roundBrackets && !squareBrackets) /* include brackets */
+        {
+            if (isIsolated)
+            {
+                if (qspIsInClass(*pos, QSP_CHAR_DELIM))
+                    isPrevDelim = QSP_TRUE;
+                else if (isPrevDelim)
+                {
+                    if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
+                    {
+                        txt.Str = pos;
+                        if (!qspStrsPartCompare(txt, str)) return pos;
+                    }
+                    isPrevDelim = QSP_FALSE;
+                }
+            }
+            else
+            {
+                /* It must support searching for delimiters */
+                txt.Str = pos;
+                if (!qspStrsPartCompare(txt, str)) return pos;
+            }
+        }
+        ++pos;
+    }
+    return 0;
+}
+
+void qspPrepareStringToExecution(QSPString *str)
+{
+    QSPString tempStr;
+    QSP_CHAR *pos = str->Str, *endPos = str->End;
+    while (pos < endPos)
+    {
+        if (qspIsInClass(*pos, QSP_CHAR_QUOT)) /* we have to keep strings untouched */
+        {
+            tempStr = qspStringFromPair(pos, endPos);
+            if (!qspSkipQuotedString(&tempStr)) break;
+            pos = tempStr.Str;
+            continue;
+        }
+        if (*pos == QSP_LCODE_CHAR) /* we have to keep code blocks untouched */
+        {
+            tempStr = qspStringFromPair(pos, endPos);
+            if (!qspSkipCodeBlock(&tempStr)) break;
+            pos = tempStr.Str;
+            continue;
+        }
+        *pos = QSP_CHRUPR(*pos);
         ++pos;
     }
 }
@@ -715,7 +858,20 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
         /* Add current character to buffer */
         qspAddBufChar(&strBuf, *pos);
 
-        if (quote) /* inside a quoted string */
+        if (codeBrackets) /* inside a code block */
+        {
+            switch (*pos)
+            {
+            case QSP_LCODE_CHAR: ++codeBrackets; break;
+            case QSP_RCODE_CHAR: --codeBrackets; break;
+            }
+        }
+        else if (*pos == QSP_LCODE_CHAR) /* new code block */
+        {
+            codeBrackets = 1;
+            isStatementStart = QSP_FALSE;
+        }
+        else if (quote) /* inside a quoted string */
         {
             if (*pos == quote)
             {
@@ -733,22 +889,9 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
             quote = *pos;
             isStatementStart = QSP_FALSE;
         }
-        else if (codeBrackets) /* inside a code block */
+        else if (!isComment) /* not in code block / string / comment */
         {
-            switch (*pos)
-            {
-            case QSP_LCODE_CHAR: QSP_INC_POSITIVE(codeBrackets); break;
-            case QSP_RCODE_CHAR: QSP_DEC_POSITIVE(codeBrackets); break;
-            }
-        }
-        else if (*pos == QSP_LCODE_CHAR) /* new code block */
-        {
-            QSP_INC_POSITIVE(codeBrackets);
-            isStatementStart = QSP_FALSE;
-        }
-        else if (!isComment) /* not in string / code block / comment */
-        {
-            /* Ignore () [] brackets inside strings, code blocks and comments */
+            /* Ignore () [] brackets inside code blocks, strings and comments */
             /* Allow interleaving brackets like "([)]" because the actual validation happens during code execution */
             switch (*pos)
             {

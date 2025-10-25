@@ -7,6 +7,7 @@
 
 #include "mathops.h"
 #include "callbacks.h"
+#include "codetools.h"
 #include "common.h"
 #include "errors.h"
 #include "game.h"
@@ -506,15 +507,15 @@ INLINE QSPString qspGetString(QSPString *expr)
 
 INLINE QSPString qspGetCodeBlock(QSPString *expr)
 {
-    QSP_CHAR *pos, *buf = expr->Str;
-    pos = qspDelimPos(*expr, QSP_RCODE_CHAR);
-    if (!pos)
+    QSP_CHAR *endPos, *startPos = expr->Str;
+    endPos = qspDelimPos(*expr, QSP_RCODE_CHAR);
+    if (!endPos)
     {
         qspSetError(QSP_ERR_QUOTNOTFOUND);
         return qspNullString;
     }
-    expr->Str = pos + QSP_CHAR_LEN;
-    return qspStringFromPair(buf + QSP_CHAR_LEN, pos);
+    expr->Str = endPos + QSP_CHAR_LEN;
+    return qspStringFromPair(startPos + QSP_CHAR_LEN, endPos);
 }
 
 INLINE QSP_BOOL qspPushOperationToStack(QSP_TINYINT *opStack, QSP_TINYINT *argStack, int *opSp, QSP_TINYINT opCode)

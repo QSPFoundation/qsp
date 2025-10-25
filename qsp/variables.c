@@ -6,6 +6,7 @@
  */
 
 #include "variables.h"
+#include "codetools.h"
 #include "coding.h"
 #include "common.h"
 #include "errors.h"
