@@ -858,20 +858,7 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
         /* Add current character to buffer */
         qspAddBufChar(&strBuf, *pos);
 
-        if (codeBrackets) /* inside a code block */
-        {
-            switch (*pos)
-            {
-            case QSP_LCODE_CHAR: ++codeBrackets; break;
-            case QSP_RCODE_CHAR: --codeBrackets; break;
-            }
-        }
-        else if (*pos == QSP_LCODE_CHAR) /* new code block */
-        {
-            codeBrackets = 1;
-            isStatementStart = QSP_FALSE;
-        }
-        else if (quote) /* inside a quoted string */
+        if (quote) /* inside a quoted string */
         {
             if (*pos == quote)
             {
@@ -884,9 +871,22 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
                     quote = 0; /* end of string */
             }
         }
+        else if (codeBrackets) /* inside a code block */
+        {
+            switch (*pos)
+            {
+            case QSP_LCODE_CHAR: ++codeBrackets; break;
+            case QSP_RCODE_CHAR: --codeBrackets; break;
+            }
+        }
         else if (qspIsInClass(*pos, QSP_CHAR_QUOT)) /* new quoted string */
         {
             quote = *pos;
+            isStatementStart = QSP_FALSE;
+        }
+        else if (*pos == QSP_LCODE_CHAR) /* new code block */
+        {
+            codeBrackets = 1;
             isStatementStart = QSP_FALSE;
         }
         else if (!isComment) /* not in code block / string / comment */
