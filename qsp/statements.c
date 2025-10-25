@@ -804,13 +804,13 @@ INLINE QSP_BOOL qspPrepareLoop(QSPString loopHeader, QSPMathExpression *conditio
     QSPLineOfCode initializatorLine;
     QSP_CHAR *whilePos, *stepPos;
     /* Extract loop parameters */
-    whilePos = qspStrPos(loopHeader, QSP_STATIC_STR(QSP_STATLOOPWHILE), QSP_TRUE);
+    whilePos = qspKeywordPos(loopHeader, QSP_STATIC_STR(QSP_STATLOOPWHILE), QSP_TRUE);
     if (!whilePos)
     {
         qspSetError(QSP_ERR_LOOPWHILENOTFOUND);
         return QSP_FALSE;
     }
-    stepPos = qspStrPos(qspStringFromPair(whilePos + QSP_STATIC_LEN(QSP_STATLOOPWHILE), loopHeader.End), QSP_STATIC_STR(QSP_STATLOOPSTEP), QSP_TRUE);
+    stepPos = qspKeywordPos(qspStringFromPair(whilePos + QSP_STATIC_LEN(QSP_STATLOOPWHILE), loopHeader.End), QSP_STATIC_STR(QSP_STATLOOPSTEP), QSP_TRUE);
     if (stepPos)
     {
         conditionStr = qspStringFromPair(whilePos + QSP_STATIC_LEN(QSP_STATLOOPWHILE), stepPos);

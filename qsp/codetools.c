@@ -316,8 +316,8 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
         default:
             statDelimPos = qspDelimPos(str, QSP_STATDELIM_CHAR);
             if (statDelimPos) nextPos = statDelimPos + QSP_CHAR_LEN;
-            elsePos = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
-            temp = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSEIF), QSP_TRUE);
+            elsePos = qspKeywordPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
+            temp = qspKeywordPos(str, QSP_STATIC_STR(QSP_STATELSEIF), QSP_TRUE);
             if (temp && !(elsePos && elsePos < temp)) elsePos = temp; /* keep ELSE if it goes before ELSEIF */
             if (elsePos)
             {
@@ -394,8 +394,8 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
                     if (elsePos && str.Str >= elsePos) elsePos = 0;
                     if (!elsePos && toSearchElse)
                     {
-                        elsePos = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
-                        temp = qspStrPos(str, QSP_STATIC_STR(QSP_STATELSEIF), QSP_TRUE);
+                        elsePos = qspKeywordPos(str, QSP_STATIC_STR(QSP_STATELSE), QSP_TRUE);
+                        temp = qspKeywordPos(str, QSP_STATIC_STR(QSP_STATELSEIF), QSP_TRUE);
                         if (temp && !(elsePos && elsePos < temp)) elsePos = temp; /* keep ELSE if it goes before ELSEIF */
                         if (!elsePos) toSearchElse = QSP_FALSE;
                     }
@@ -674,7 +674,7 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
     return 0;
 }
 
-QSP_CHAR *qspStrPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
+QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 {
     QSP_BOOL isPrevDelim;
     QSP_CHAR *lastPos, *pos;

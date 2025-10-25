@@ -302,7 +302,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
     {
         qspAddBufText(&res, qspStringFromPair(txt.Str, pos));
         txt.Str = pos + QSP_STATIC_LEN(QSP_LSUBEX);
-        pos = qspStrPos(txt, QSP_STATIC_STR(QSP_RSUBEX), QSP_FALSE);
+        pos = qspKeywordPos(txt, QSP_STATIC_STR(QSP_RSUBEX), QSP_FALSE);
         if (!pos)
         {
             qspSetError(QSP_ERR_BRACKNOTFOUND);
