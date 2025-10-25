@@ -889,9 +889,8 @@ int qspPreprocessData(QSPString data, QSPLineOfCode **strs)
             codeBrackets = 1;
             isStatementStart = QSP_FALSE;
         }
-        else if (!isComment) /* not in code block / string / comment */
+        else if (!isComment) /* ignore () [] brackets inside strings, code blocks and comments */
         {
-            /* Ignore () [] brackets inside code blocks, strings and comments */
             /* Allow interleaving brackets like "([)]" because the actual validation happens during code execution */
             switch (*pos)
             {
