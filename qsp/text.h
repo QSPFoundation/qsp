@@ -280,15 +280,30 @@
 
     INLINE QSP_CHAR *qspStrStr(QSPString str, QSPString strSearch)
     {
-        int searchLen = qspStrLen(strSearch);
+        int strLen, searchLen, bytesToCompare;
+        QSP_CHAR *pos, *lastPos, firstChar;
+
+        searchLen = qspStrLen(strSearch);
         if (!searchLen) return str.Str;
 
-        if (searchLen <= qspStrLen(str))
+        strLen = qspStrLen(str);
+        if (searchLen > strLen) return 0;
+
+        lastPos = str.End - searchLen;
+        firstChar = strSearch.Str[0];
+
+        if (searchLen == QSP_CHAR_LEN)
         {
-            size_t bytesToCompare = searchLen * sizeof(QSP_CHAR);
-            QSP_CHAR *pos, *lastPos = str.End - searchLen;
             for (pos = str.Str; pos <= lastPos; ++pos)
-                if (!memcmp(pos, strSearch.Str, bytesToCompare)) return pos;
+                if (*pos == firstChar) return pos;
+            return 0;
+        }
+
+        bytesToCompare = (int)((searchLen - QSP_CHAR_LEN) * sizeof(QSP_CHAR));
+        for (pos = str.Str; pos <= lastPos; ++pos)
+        {
+            if (*pos == firstChar && !memcmp(pos + QSP_CHAR_LEN, strSearch.Str + QSP_CHAR_LEN, bytesToCompare))
+                return pos;
         }
         return 0;
     }
