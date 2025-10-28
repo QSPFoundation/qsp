@@ -678,7 +678,6 @@ QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 {
     QSPString prefix;
     QSP_CHAR *startPos, *lastPos, *pos;
-    QSP_BOOL isDelimBefore, isDelimAfter;
     int roundBrackets, squareBrackets, strLen;
 
     strLen = qspStrLen(str);
@@ -695,12 +694,9 @@ QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
         /* Don't parse the string */
         if (isIsolated)
         {
-            isDelimBefore = (pos == startPos || qspIsInClass(pos[-QSP_CHAR_LEN], QSP_CHAR_DELIM));
-            if (isDelimBefore)
-            {
-                isDelimAfter = (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM));
-                if (isDelimAfter) return pos;
-            }
+            if ((pos == startPos || qspIsInClass(pos[-QSP_CHAR_LEN], QSP_CHAR_DELIM)) && /* delimiter before */
+                (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))) /* delimiter after */
+                return pos;
             return 0;
         }
         return pos;
@@ -735,15 +731,11 @@ QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
         {
             if (isIsolated)
             {
-                isDelimBefore = (pos == startPos || qspIsInClass(pos[-QSP_CHAR_LEN], QSP_CHAR_DELIM));
-                if (isDelimBefore)
+                if ((pos == startPos || qspIsInClass(pos[-QSP_CHAR_LEN], QSP_CHAR_DELIM)) && /* delimiter before */
+                    (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))) /* delimiter after */
                 {
-                    isDelimAfter = (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM));
-                    if (isDelimAfter)
-                    {
-                        txt.Str = pos;
-                        if (!qspStrsPartCompare(txt, str)) return pos;
-                    }
+                    txt.Str = pos;
+                    if (!qspStrsPartCompare(txt, str)) return pos;
                 }
             }
             else
