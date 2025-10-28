@@ -696,8 +696,12 @@ QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
         if (isIsolated)
         {
             isDelimBefore = (pos == startPos || qspIsInClass(pos[-QSP_CHAR_LEN], QSP_CHAR_DELIM));
-            isDelimAfter = (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM));
-            return (isDelimBefore && isDelimAfter) ? pos : 0;
+            if (isDelimBefore)
+            {
+                isDelimAfter = (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM));
+                if (isDelimAfter) return pos;
+            }
+            return 0;
         }
         return pos;
     }
