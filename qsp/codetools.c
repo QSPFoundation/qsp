@@ -676,21 +676,34 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
 
 QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
 {
-    QSP_BOOL isPrevDelim;
-    QSP_CHAR *lastPos, *pos;
-    int roundBrackets, squareBrackets, strLen = qspStrLen(str);
+    QSPString prefix;
+    QSP_CHAR *startPos, *lastPos, *pos;
+    QSP_BOOL isDelimBefore, isDelimAfter;
+    int roundBrackets, squareBrackets, strLen;
+
+    strLen = qspStrLen(str);
     if (!strLen) return txt.Str;
+
     pos = qspStrStr(txt, str);
     if (!pos) return 0;
-    if (!isIsolated)
-    {
-        QSPString prefix = qspStringFromPair(txt.Str, pos);
-        if (!qspStrCharClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_LBRACKET)) return pos;
-    }
-    roundBrackets = squareBrackets = 0;
-    isPrevDelim = QSP_TRUE;
-    pos = txt.Str;
+
+    startPos = txt.Str;
     lastPos = txt.End - strLen;
+    prefix = qspStringFromPair(startPos, pos);
+    if (!qspStrCharClass(prefix, QSP_CHAR_QUOT | QSP_CHAR_LBRACKET))
+    {
+        /* Don't parse the string */
+        if (isIsolated)
+        {
+            isDelimBefore = (pos == startPos || qspIsInClass(pos[-QSP_CHAR_LEN], QSP_CHAR_DELIM));
+            isDelimAfter = (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM));
+            return (isDelimBefore && isDelimAfter) ? pos : 0;
+        }
+        return pos;
+    }
+
+    roundBrackets = squareBrackets = 0;
+    pos = startPos;
     while (pos <= lastPos)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
@@ -698,7 +711,6 @@ QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
             txt.Str = pos;
             if (!qspSkipQuotedString(&txt)) break;
             pos = txt.Str;
-            isPrevDelim = QSP_TRUE;
             continue;
         }
         if (*pos == QSP_LCODE_CHAR)
@@ -719,16 +731,15 @@ QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
         {
             if (isIsolated)
             {
-                if (qspIsInClass(*pos, QSP_CHAR_DELIM))
-                    isPrevDelim = QSP_TRUE;
-                else if (isPrevDelim)
+                isDelimBefore = (pos == startPos || qspIsInClass(pos[-QSP_CHAR_LEN], QSP_CHAR_DELIM));
+                if (isDelimBefore)
                 {
-                    if (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM))
+                    isDelimAfter = (pos >= lastPos || qspIsInClass(pos[strLen], QSP_CHAR_DELIM));
+                    if (isDelimAfter)
                     {
                         txt.Str = pos;
                         if (!qspStrsPartCompare(txt, str)) return pos;
                     }
-                    isPrevDelim = QSP_FALSE;
                 }
             }
             else
