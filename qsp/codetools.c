@@ -605,7 +605,7 @@ INLINE QSP_CHAR *qspSkipQuotedString(QSP_CHAR *pos, QSP_CHAR *endPos)
             if (pos >= endPos || *pos != quote) break;
         }
     }
-    /* It's either past the closing quote or at the endPos */
+    /* It's either past the closing quote or past the last valid position */
     return pos;
 }
 
