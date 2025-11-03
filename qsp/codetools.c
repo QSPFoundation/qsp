@@ -720,9 +720,11 @@ void qspPrepareStringToExecution(QSPString *str)
         {
         case QSP_LCODE_CHAR: QSP_INC_POSITIVE(codeBrackets); break;
         case QSP_RCODE_CHAR: QSP_DEC_POSITIVE(codeBrackets); break;
+        default:
+            if (!codeBrackets) /* we have to keep code blocks untouched */
+                *pos = QSP_CHRUPR(*pos);
+            break;
         }
-        if (!codeBrackets) /* we have to keep code blocks untouched */
-            *pos = QSP_CHRUPR(*pos);
         ++pos;
     }
 }
