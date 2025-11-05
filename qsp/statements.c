@@ -119,7 +119,7 @@ void qspInitStats(void)
     qspAddStatement(qspStatImplicitStatement, qspStatementImplicitStatement, 1, 1, QSP_TYPE_UNDEF);
     qspAddStatement(qspStatLabel, 0, 0, 0);
     qspAddStatement(qspStatComment, 0, 0, 0);
-    qspAddStatement(qspStatUserCall, 0, 1, QSP_STATMAXARGS, QSP_TYPE_INLINESTR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddStatement(qspStatUserCall, 0, 1, QSP_MAXSTATARGS, QSP_TYPE_INLINESTR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddStatement(qspStatEnd, 0, 0, 0);
 
     qspAddStatement(qspStatLoop, 0, 0, 0);
@@ -132,10 +132,10 @@ void qspInitStats(void)
 
     qspAddStatement(qspStatExit, 0, 0, 0);
     qspAddStatement(qspStatJump, 0, 1, 1, QSP_TYPE_STR);
-    qspAddStatement(qspStatGoSub, qspStatementGoSub, 1, QSP_STATMAXARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
-    qspAddStatement(qspStatGoTo, qspStatementGoTo, 1, QSP_STATMAXARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
-    qspAddStatement(qspStatXGoTo, qspStatementGoTo, 1, QSP_STATMAXARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
-    qspAddStatement(qspStatDynamic, qspStatementDynamic, 1, QSP_STATMAXARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddStatement(qspStatGoSub, qspStatementGoSub, 1, QSP_MAXSTATARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddStatement(qspStatGoTo, qspStatementGoTo, 1, QSP_MAXSTATARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddStatement(qspStatXGoTo, qspStatementGoTo, 1, QSP_MAXSTATARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddStatement(qspStatDynamic, qspStatementDynamic, 1, QSP_MAXSTATARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddStatement(qspStatExec, qspStatementExec, 1, 1, QSP_TYPE_STR);
 
     qspAddStatement(qspStatSetVar, qspStatementSetVar, 2, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
@@ -429,11 +429,11 @@ QSP_TINYINT qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
 INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_TINYINT statCode;
+    QSPCachedStat *statement;
     int i, oldLocationState = qspLocationState;
-    QSPCachedStat *statements = line->Stats;
-    for (i = startStat; i < endStat; ++i)
+    for (i = startStat, statement = line->Stats + startStat; i < endStat; ++i, ++statement)
     {
-        statCode = statements[i].Stat;
+        statCode = statement->Stat;
         switch (statCode)
         {
         case qspStatUnknown:
@@ -449,11 +449,11 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
         case qspStatLoop:
             return qspStatementSinglelineLoop(line, i, endStat, jumpTo);
         case qspStatSet:
-            qspStatementSetVarsValues(line->Str, statements + i);
+            qspStatementSetVarsValues(line->Str, statement);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatLocal:
-            qspStatementLocal(line->Str, statements + i);
+            qspStatementLocal(line->Str, statement);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatExit:
@@ -461,7 +461,7 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
         case qspStatJump:
             {
                 QSPVariant arg; /* 1 argument only */
-                qspGetStatArgs(line->Str, statements + i, &arg);
+                qspGetStatArgs(line->Str, statement, &arg);
                 if (qspLocationState != oldLocationState) return QSP_FALSE;
                 qspUpdateText(jumpTo, qspDelSpc(QSP_STR(arg)));
                 qspUpperStr(jumpTo);
@@ -469,7 +469,7 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
                 return QSP_TRUE;
             }
         case qspStatUserCall:
-            qspStatementUserCall(line->Str, statements + i);
+            qspStatementUserCall(line->Str, statement);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatAct:
@@ -477,8 +477,8 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
             return QSP_FALSE;
         default:
             {
-                QSPVariant args[QSP_STATMAXARGS];
-                QSP_TINYINT argsCount = qspGetStatArgs(line->Str, statements + i, args);
+                QSPVariant args[QSP_MAXSTATARGS];
+                QSP_TINYINT argsCount = qspGetStatArgs(line->Str, statement, args);
                 if (qspLocationState != oldLocationState) return QSP_FALSE;
                 qspStats[statCode].Func(args, argsCount, statCode);
                 qspFreeVariants(args, argsCount);
@@ -1032,7 +1032,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
 
 INLINE void qspStatementUserCall(QSPString s, QSPCachedStat *stat)
 {
-    QSPVariant args[QSP_STATMAXARGS];
+    QSPVariant args[QSP_MAXSTATARGS];
     int oldLocationState = qspLocationState;
     QSP_TINYINT argsCount = qspGetStatArgs(s, stat, args);
     if (qspLocationState != oldLocationState) return;

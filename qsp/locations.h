@@ -11,6 +11,8 @@
 #ifndef QSP_LOCSDEFINES
     #define QSP_LOCSDEFINES
 
+    #define QSP_MAXLOCCALLDEPTH 4000
+
     typedef struct
     {
         QSPString Image;
@@ -45,6 +47,7 @@
     extern int qspCurLoc;
     extern int qspLocationState; /* allows to check if we have to terminate execution of the code */
     extern int qspFullRefreshCount;
+    extern int qspCurLocCallDepth;
 
     /* External functions */
     void qspResizeWorld(int newLocsCount);

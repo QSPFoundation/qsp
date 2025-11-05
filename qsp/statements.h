@@ -13,7 +13,7 @@
 
     #define QSP_STATSLEVELS 3
     #define QSP_MAXSTATSNAMES 100
-    #define QSP_STATMAXARGS 20
+    #define QSP_MAXSTATARGS 20
     #define QSP_STATELSE QSP_FMT("ELSE")
     #define QSP_STATELSEIF QSP_FMT("ELSEIF")
     #define QSP_STATLOOPWHILE QSP_FMT("WHILE")
@@ -32,7 +32,7 @@
     {
         QSP_TINYINT MinArgsCount;
         QSP_TINYINT MaxArgsCount;
-        QSP_TINYINT ArgsTypes[QSP_STATMAXARGS];
+        QSP_TINYINT ArgsTypes[QSP_MAXSTATARGS];
         QSP_STATEMENT Func;
     } QSPStatement;
 

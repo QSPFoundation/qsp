@@ -22,6 +22,7 @@ int qspLocsNamesCount = 0;
 int qspCurLoc = -1;
 int qspLocationState = 0;
 int qspFullRefreshCount = 0;
+int qspCurLocCallDepth = 0;
 
 INLINE int qspLocNamesCompare(const void *locName1, const void *locName2);
 INLINE int qspLocNameCompare(const void *name, const void *compareTo);
@@ -154,9 +155,17 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
 {
     QSPString actionName;
     QSPLineOfCode *oldLine;
+    QSPLocation *loc;
     QSPLocAct *curAct;
-    int i, oldLoc, oldActIndex, oldLineNum, oldLocationState = qspLocationState;
-    QSPLocation *loc = qspLocs + locInd;
+    int i, oldLoc, oldActIndex, oldLineNum, oldLocationState;
+    if (qspCurLocCallDepth >= QSP_MAXLOCCALLDEPTH)
+    {
+        qspSetError(QSP_ERR_LOCCALLDEPTH);
+        return;
+    }
+    ++qspCurLocCallDepth;
+    loc = qspLocs + locInd;
+    oldLocationState = qspLocationState;
     /* Remember the previous state to restore it after internal calls */
     oldLoc = qspRealCurLoc;
     oldActIndex = qspRealActIndex;
@@ -217,11 +226,14 @@ INLINE void qspExecLocByIndex(int locInd, QSP_BOOL toChangeDesc)
         qspExecCode(code, 0, count, 1, 0);
         qspFreePrepLines(code, count);
     }
+    if (qspLocationState != oldLocationState) return;
     /* Restore the old state */
     qspRealLine = oldLine;
     qspRealLineNum = oldLineNum;
     qspRealActIndex = oldActIndex;
     qspRealCurLoc = oldLoc;
+    /* Restore location call depth */
+    --qspCurLocCallDepth;
 }
 
 void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res)

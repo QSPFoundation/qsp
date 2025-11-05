@@ -504,7 +504,7 @@ INLINE QSPVar *qspGetVarData(QSPString s, int *index, QSP_BOOL isSetOperation)
             QSP_CHAR *rPos = qspDelimPos(s, QSP_RSBRACK_CHAR);
             if (!rPos)
             {
-                qspSetError(QSP_ERR_BRACKNOTFOUND);
+                qspSetError(QSP_ERR_BRACKETNOTFOUND);
                 return 0;
             }
             var = qspVarReference(qspStringFromPair(startPos, nameEnd), isSetOperation);
@@ -1051,7 +1051,7 @@ void qspStatementSetVarsValues(QSPString s, QSPCachedStat *stat)
     }
     if (stat->ArgsCount < 3)
     {
-        qspSetError(QSP_ERR_EQNOTFOUND);
+        qspSetError(QSP_ERR_INTERNAL);
         return;
     }
     oldLocationState = qspLocationState;

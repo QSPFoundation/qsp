@@ -10,11 +10,11 @@
 #ifndef QSP_MATHDEFINES
     #define QSP_MATHDEFINES
 
-    #define QSP_OPSLEVELS 2
-    #define QSP_MAXOPSNAMES 150
-    #define QSP_OPMAXARGS 20
-    #define QSP_STACKSIZE 30
-    #define QSP_MAXITEMS 200
+    #define QSP_MATHOPSLEVELS 2
+    #define QSP_MAXMATHOPSNAMES 150
+    #define QSP_MAXMATHOPARGS 20
+    #define QSP_MATHSTACKSIZE 30
+    #define QSP_MAXMATHITEMS 200
     #define QSP_CACHEDEXPSMAXBUCKETSIZE 5
     #define QSP_CACHEDEXPSBUCKETS 512
 
@@ -37,7 +37,7 @@
         QSP_TINYINT ResType;
         QSP_TINYINT MinArgsCount;
         QSP_TINYINT MaxArgsCount;
-        QSP_TINYINT ArgsTypes[QSP_OPMAXARGS];
+        QSP_TINYINT ArgsTypes[QSP_MAXMATHOPARGS];
         QSP_FUNCTION Func;
     } QSPMathOperation;
 

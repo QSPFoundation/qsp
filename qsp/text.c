@@ -305,7 +305,7 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         pos = qspKeywordPos(txt, QSP_STATIC_STR(QSP_RSUBEX), QSP_FALSE);
         if (!pos)
         {
-            qspSetError(QSP_ERR_BRACKNOTFOUND);
+            qspSetError(QSP_ERR_BRACKETNOTFOUND);
             qspFreeBufString(&res);
             return qspNullString;
         }

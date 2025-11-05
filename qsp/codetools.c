@@ -135,7 +135,7 @@ INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg **args, QSP_TINYINT argsCou
             QSP_CHAR *bracket = qspDelimPos(s, QSP_RRBRACK_CHAR);
             if (!bracket)
             {
-                *errorCode = QSP_ERR_BRACKNOTFOUND;
+                *errorCode = QSP_ERR_BRACKETNOTFOUND;
                 return argsCount;
             }
             if (!qspIsAnyString(qspStringFromPair(bracket + QSP_CHAR_LEN, s.End)))
@@ -203,7 +203,7 @@ INLINE QSP_TINYINT qspInitUserCallArgs(QSPCachedArg **args, QSP_TINYINT QSP_UNUS
         foundArgs[0].StartPos = (int)(s.Str - origStart);
         foundArgs[0].EndPos = (int)(nameEnd - origStart);
         s.Str = nameEnd;
-        argsCount = qspAppendRegularArgs(&foundArgs, 1, 1, QSP_STATMAXARGS, s, origStart, errorCode);
+        argsCount = qspAppendRegularArgs(&foundArgs, 1, 1, QSP_MAXSTATARGS, s, origStart, errorCode);
     }
     else
     {

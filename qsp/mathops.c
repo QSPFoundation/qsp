@@ -22,8 +22,8 @@
 #include "variant.h"
 
 QSPMathOperation qspOps[qspOpLast_Operation];
-QSPMathOpName qspOpsNames[QSP_OPSLEVELS][QSP_MAXOPSNAMES];
-int qspOpsNamesCounts[QSP_OPSLEVELS];
+QSPMathOpName qspOpsNames[QSP_MATHOPSLEVELS][QSP_MAXMATHOPSNAMES];
+int qspOpsNamesCounts[QSP_MATHOPSLEVELS];
 int qspOpMaxLen = 0;
 QSPCachedMathExpsBucket qspCachedMathExps[QSP_CACHEDEXPSBUCKETS];
 
@@ -247,7 +247,7 @@ void qspInitMath(void)
         );
     */
     int i;
-    for (i = 0; i < QSP_OPSLEVELS; ++i) qspOpsNamesCounts[i] = 0;
+    for (i = 0; i < QSP_MATHOPSLEVELS; ++i) qspOpsNamesCounts[i] = 0;
     qspOpMaxLen = 0;
     qspAddOperation(qspOpStart, 127, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpEnd, 0, 0, QSP_TYPE_UNDEF, 0, 0);
@@ -255,7 +255,7 @@ void qspInitMath(void)
     qspAddOperation(qspOpCloseRoundBracket, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpOpenSquareBracket, 127, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpCloseSquareBracket, 0, 0, QSP_TYPE_UNDEF, 0, 0);
-    qspAddOperation(qspOpTuple, 127, 0, QSP_TYPE_TUPLE, 0, QSP_OPMAXARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddOperation(qspOpTuple, 127, 0, QSP_TYPE_TUPLE, 0, QSP_MAXMATHOPARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddOperation(qspOpValue, 0, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpValueToFormat, 0, 0, QSP_TYPE_UNDEF, 0, 0);
 
@@ -278,8 +278,8 @@ void qspInitMath(void)
     qspAddOperation(qspOpGt, 10, 0, QSP_TYPE_BOOL, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpIIf, 30, 0, QSP_TYPE_UNDEF, 3, 3, QSP_TYPE_BOOL, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
 
-    qspAddOperation(qspOpMin, 30, qspFunctionMin, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
-    qspAddOperation(qspOpMax, 30, qspFunctionMax, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddOperation(qspOpMin, 30, qspFunctionMin, QSP_TYPE_UNDEF, 1, QSP_MAXMATHOPARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddOperation(qspOpMax, 30, qspFunctionMax, QSP_TYPE_UNDEF, 1, QSP_MAXMATHOPARGS, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddOperation(qspOpRand, 30, qspFunctionRand, QSP_TYPE_NUM, 1, 3, QSP_TYPE_NUM, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddOperation(qspOpRnd, 30, 0, QSP_TYPE_NUM, 0, 0);
 
@@ -306,8 +306,8 @@ void qspInitMath(void)
     qspAddOperation(qspOpStrFind, 30, qspFunctionStrFind, QSP_TYPE_STR, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
     qspAddOperation(qspOpStrPos, 30, qspFunctionStrPos, QSP_TYPE_NUM, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
 
-    qspAddOperation(qspOpFunc, 30, qspFunctionFunc, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
-    qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, QSP_TYPE_UNDEF, 1, QSP_OPMAXARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddOperation(qspOpFunc, 30, qspFunctionFunc, QSP_TYPE_UNDEF, 1, QSP_MAXMATHOPARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddOperation(qspOpDynEval, 30, qspFunctionDynEval, QSP_TYPE_UNDEF, 1, QSP_MAXMATHOPARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
 
     qspAddOperation(qspOpLoc, 11, 0, QSP_TYPE_BOOL, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpCurLoc, 30, 0, QSP_TYPE_STR, 0, 0);
@@ -411,14 +411,14 @@ void qspInitMath(void)
     qspAddOpName(qspOpMsecsCount, QSP_FMT("MSECSCOUNT"), 1, QSP_TRUE);
     qspAddOpName(qspOpQSPVer, QSP_FMT("QSPVER"), 1, QSP_TRUE);
 
-    for (i = 0; i < QSP_OPSLEVELS; ++i)
+    for (i = 0; i < QSP_MATHOPSLEVELS; ++i)
         qsort(qspOpsNames[i], qspOpsNamesCounts[i], sizeof(QSPMathOpName), qspMathOpsCompare);
 }
 
 void qspTerminateMath(void)
 {
     int i, j, count;
-    for (i = 0; i < QSP_OPSLEVELS; ++i)
+    for (i = 0; i < QSP_MATHOPSLEVELS; ++i)
     {
         count = qspOpsNamesCounts[i];
         for (j = 0; j < count; ++j)
@@ -431,8 +431,8 @@ INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName)
     /* All functions are in one group because we compare full names */
     QSPMathOpName *name = (QSPMathOpName *)bsearch(
         &funName,
-        qspOpsNames[QSP_OPSLEVELS - 1],
-        qspOpsNamesCounts[QSP_OPSLEVELS - 1],
+        qspOpsNames[QSP_MATHOPSLEVELS - 1],
+        qspOpsNamesCounts[QSP_MATHOPSLEVELS - 1],
         sizeof(QSPMathOpName),
         qspMathOpStringFullCompare);
 
@@ -470,7 +470,7 @@ INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr)
     int i;
     QSPMathOpName *name;
     if (qspIsEmpty(*expr)) return qspOpEnd;
-    for (i = 0; i < QSP_OPSLEVELS; ++i)
+    for (i = 0; i < QSP_MATHOPSLEVELS; ++i)
     {
         name = (QSPMathOpName *)bsearch(expr, qspOpsNames[i], qspOpsNamesCounts[i], sizeof(QSPMathOpName), qspMathOpStringCompare);
         if (name)
@@ -520,9 +520,9 @@ INLINE QSPString qspGetCodeBlock(QSPString *expr)
 
 INLINE QSP_BOOL qspPushOperationToStack(QSP_TINYINT *opStack, QSP_TINYINT *argStack, int *opSp, QSP_TINYINT opCode)
 {
-    if (*opSp >= QSP_STACKSIZE - 1)
+    if (*opSp >= QSP_MATHSTACKSIZE - 1)
     {
-        qspSetError(QSP_ERR_STACKOVERFLOW);
+        qspSetError(QSP_ERR_COMPLEXEXPRESSION);
         return QSP_FALSE;
     }
     ++(*opSp);
@@ -535,9 +535,9 @@ INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINY
 {
     QSPMathCompiledOp *compiledOp;
     int opIndex = expression->ItemsCount;
-    if (opIndex >= QSP_MAXITEMS)
+    if (opIndex >= QSP_MAXMATHITEMS)
     {
-        qspSetError(QSP_ERR_TOOMANYITEMS);
+        qspSetError(QSP_ERR_COMPLEXEXPRESSION);
         return QSP_FALSE;
     }
     if (opIndex >= expression->Capacity)
@@ -558,9 +558,9 @@ INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression *expression, QSP_
 {
     QSPMathCompiledOp *compiledOp;
     int opIndex = expression->ItemsCount;
-    if (opIndex >= QSP_MAXITEMS)
+    if (opIndex >= QSP_MAXMATHITEMS)
     {
-        qspSetError(QSP_ERR_TOOMANYITEMS);
+        qspSetError(QSP_ERR_COMPLEXEXPRESSION);
         return QSP_FALSE;
     }
     if (opIndex >= expression->Capacity)
@@ -579,7 +579,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
 {
     QSPVariant v;
     QSPString name;
-    QSP_TINYINT opCode, opStack[QSP_STACKSIZE], argStack[QSP_STACKSIZE];
+    QSP_TINYINT opCode, opStack[QSP_MATHSTACKSIZE], argStack[QSP_MATHSTACKSIZE];
     QSP_BOOL waitForOperator = QSP_FALSE;
     int opSp = -1;
     if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpStart)) return QSP_FALSE;
@@ -636,14 +636,14 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
             case qspOpEnd:
                 if (opSp)
                 {
-                    qspSetError(QSP_ERR_BRACKNOTFOUND);
+                    qspSetError(QSP_ERR_BRACKETNOTFOUND);
                     break;
                 }
                 return QSP_TRUE;
             case qspOpCloseRoundBracket:
                 if (opStack[opSp] != qspOpOpenRoundBracket)
                 {
-                    qspSetError(QSP_ERR_BRACKNOTFOUND);
+                    qspSetError(QSP_ERR_BRACKETNOTFOUND);
                     break;
                 }
                 opCode = opStack[--opSp];
@@ -657,7 +657,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
             case qspOpCloseSquareBracket:
                 if (opStack[opSp] != qspOpOpenSquareBracket)
                 {
-                    qspSetError(QSP_ERR_BRACKNOTFOUND);
+                    qspSetError(QSP_ERR_BRACKETNOTFOUND);
                     break;
                 }
                 --opSp; /* it's always positive */
@@ -797,7 +797,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                 --opSp; /* it's always positive */
                 if (opStack[opSp] != qspOpOpenSquareBracket)
                 {
-                    qspSetError(QSP_ERR_BRACKNOTFOUND);
+                    qspSetError(QSP_ERR_BRACKETNOTFOUND);
                     break;
                 }
                 --opSp; /* it's always positive */
@@ -860,7 +860,7 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
                         }
                         else
                         {
-                            qspSetError(QSP_ERR_BRACKSNOTFOUND);
+                            qspSetError(QSP_ERR_BRACKETNOTFOUND);
                             break;
                         }
                     }
@@ -957,12 +957,12 @@ INLINE QSPVariant qspCalculateArgumentValue(QSPMathExpression *expression, int v
 
 QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* the last item represents the whole expression */
 {
-    QSPVariant args[QSP_OPMAXARGS], tos;
+    QSPVariant args[QSP_MAXMATHOPARGS], tos;
     QSP_TINYINT opCode, argsCount, type;
     int oldLocationState;
     if (valueIndex < 0)
     {
-        qspSetError(QSP_ERR_SYNTAX);
+        qspSetError(QSP_ERR_INTERNAL);
         return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     }
     oldLocationState = qspLocationState;
@@ -972,7 +972,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
     if (QSP_ISDEF(type)) tos.Type = type;
     if (argsCount)
     {
-        int i, argIndices[QSP_OPMAXARGS];
+        int i, argIndices[QSP_MAXMATHOPARGS];
         /* Find positions of the arguments */
         --valueIndex; /* move to the last argument */
         for (i = argsCount - 1; i > 0; --i)
