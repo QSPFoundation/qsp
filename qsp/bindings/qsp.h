@@ -93,7 +93,7 @@
     #define QSP_FALSE 0
 
     typedef signed char QSP_TINYINT; /* char type can be unsigned by default */
-    typedef char QSP_BOOL;
+    typedef signed char QSP_BOOL;
 
     #ifdef QSP_USE_BIGINT
         typedef long long QSP_BIGINT;

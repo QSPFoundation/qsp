@@ -12,6 +12,7 @@
 #include "errors.h"
 #include "game.h"
 #include "locations.h"
+#include "memory.h"
 #include "objects.h"
 #include "regexp.h"
 #include "statements.h"
@@ -208,7 +209,7 @@ INLINE QSPMathExpression *qspMathExpGetCompiled(QSPString expStr)
     }
     /* Compile the new expression */
     if (!qspCompileMathExpression(expStr, &compiledExp)) return 0;
-    if (expsCount < QSP_CACHEDEXPSMAXBUCKETSIZE)
+    if (expsCount < QSP_MAXCACHEDEXPSBUCKETSIZE)
     {
         /* Add a new entry */
         exp = bucket->Exps + expsCount;
@@ -227,7 +228,7 @@ INLINE QSPMathExpression *qspMathExpGetCompiled(QSPString expStr)
         exp->Text = qspCopyToNewText(expStr);
         exp->CompiledExp = compiledExp;
         /* Update the next item to be evicted */
-        bucket->ExpToEvict = (bucket->ExpToEvict + 1) % QSP_CACHEDEXPSMAXBUCKETSIZE;
+        bucket->ExpToEvict = (bucket->ExpToEvict + 1) % QSP_MAXCACHEDEXPSBUCKETSIZE;
         return &exp->CompiledExp;
     }
 }
@@ -957,7 +958,7 @@ INLINE QSPVariant qspCalculateArgumentValue(QSPMathExpression *expression, int v
 
 QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* the last item represents the whole expression */
 {
-    QSPVariant args[QSP_MAXMATHOPARGS], tos;
+    QSPVariant *args, tos;
     QSP_TINYINT opCode, argsCount, type;
     int oldLocationState;
     if (valueIndex < 0)
@@ -984,52 +985,61 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         switch (opCode)
         {
         case qspOpAnd: /* logical AND operator, we don't pre-evaluate arguments */
-            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
-            if (qspLocationState != oldLocationState)
-                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            if (QSP_ISTRUE(QSP_NUM(args[0])))
             {
-                args[1] = qspCalculateArgumentValue(expression, argIndices[1], QSP_TYPE_BOOL);
+                QSPVariant arg = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
                 if (qspLocationState != oldLocationState)
                     return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-                QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(args[1]));
+                if (QSP_ISTRUE(QSP_NUM(arg)))
+                {
+                    arg = qspCalculateArgumentValue(expression, argIndices[1], QSP_TYPE_BOOL);
+                    if (qspLocationState != oldLocationState)
+                        return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+                    QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(arg));
+                }
+                else
+                {
+                    QSP_NUM(tos) = QSP_TOBOOL(QSP_FALSE);
+                }
+                return tos;
             }
-            else
-            {
-                QSP_NUM(tos) = QSP_TOBOOL(QSP_FALSE);
-            }
-            return tos;
         case qspOpOr: /* logical OR operator, we don't pre-evaluate arguments */
-            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
-            if (qspLocationState != oldLocationState)
-                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            if (QSP_ISTRUE(QSP_NUM(args[0])))
             {
-                QSP_NUM(tos) = QSP_TOBOOL(QSP_TRUE);
-            }
-            else
-            {
-                args[1] = qspCalculateArgumentValue(expression, argIndices[1], QSP_TYPE_BOOL);
+                QSPVariant arg = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
                 if (qspLocationState != oldLocationState)
                     return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-                QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(args[1]));
+                if (QSP_ISTRUE(QSP_NUM(arg)))
+                {
+                    QSP_NUM(tos) = QSP_TOBOOL(QSP_TRUE);
+                }
+                else
+                {
+                    arg = qspCalculateArgumentValue(expression, argIndices[1], QSP_TYPE_BOOL);
+                    if (qspLocationState != oldLocationState)
+                        return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+                    QSP_NUM(tos) = QSP_TOBOOL(QSP_NUM(arg));
+                }
+                return tos;
             }
-            return tos;
         case qspOpNot: /* logical NOT operator, we don't pre-evaluate arguments */
-            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
-            if (qspLocationState != oldLocationState)
-                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            QSP_NUM(tos) = QSP_TOBOOL(!QSP_NUM(args[0]));
-            return tos;
+            {
+                QSPVariant arg = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
+                if (qspLocationState != oldLocationState)
+                    return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+                QSP_NUM(tos) = QSP_TOBOOL(!QSP_NUM(arg));
+                return tos;
+            }
         case qspOpIIf: /* inline IF operator, we don't pre-evaluate arguments */
-            args[0] = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
-            if (qspLocationState != oldLocationState)
-                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            tos = qspCalculateArgumentValue(expression, (QSP_ISTRUE(QSP_NUM(args[0])) ? argIndices[1] : argIndices[2]), QSP_TYPE_UNDEF);
-            if (qspLocationState != oldLocationState)
-                return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            return tos;
+            {
+                QSPVariant arg = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_BOOL);
+                if (qspLocationState != oldLocationState)
+                    return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+                tos = qspCalculateArgumentValue(expression, (QSP_ISTRUE(QSP_NUM(arg)) ? argIndices[1] : argIndices[2]), QSP_TYPE_UNDEF);
+                if (qspLocationState != oldLocationState)
+                    return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+                return tos;
+            }
         default:
+            args = (QSPVariant *)qspAllocateMemory(argsCount * sizeof(QSPVariant));
             for (i = 0; i < argsCount; ++i)
             {
                 args[i] = qspCalculateArgumentValue(expression, argIndices[i], qspOps[opCode].ArgsTypes[i]);
@@ -1037,6 +1047,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
                 {
                     /* We have to clean up collected arguments */
                     qspFreeVariants(args, i);
+                    qspReleaseMemory(args);
                     return qspGetEmptyVariant(QSP_TYPE_UNDEF);
                 }
             }
@@ -1186,7 +1197,11 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         qspOps[opCode].Func(args, argsCount, &tos);
         break;
     }
-    if (argsCount) qspFreeVariants(args, argsCount);
+    if (argsCount)
+    {
+        qspFreeVariants(args, argsCount);
+        qspReleaseMemory(args);
+    }
     if (qspLocationState != oldLocationState) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     return tos;
 }

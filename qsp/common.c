@@ -12,6 +12,7 @@
 #include "game.h"
 #include "locations.h"
 #include "mathops.h"
+#include "memory.h"
 #include "objects.h"
 #include "playlist.h"
 #include "regexp.h"
@@ -62,6 +63,7 @@ void qspInitRuntime(void)
     qspSetSeed(0);
     qspInitVarTypes();
     qspInitSymbolClasses();
+    qspInitStackAllocator();
     qspInitVarsScope(&qspGlobalVars, QSP_VARSGLOBALBUCKETS);
     qspPrepareExecution(QSP_TRUE);
     qspMemClear(QSP_TRUE);
@@ -77,6 +79,7 @@ void qspTerminateRuntime(void)
     qspResizeWorld(0);
     qspUpdateLocsNames();
     qspTerminateMath();
+    qspTerminateStackAllocator();
     qspResetError(QSP_FALSE);
 }
 

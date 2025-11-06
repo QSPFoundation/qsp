@@ -11,7 +11,7 @@
 #ifndef QSP_LOCSDEFINES
     #define QSP_LOCSDEFINES
 
-    #define QSP_MAXLOCCALLDEPTH 1000
+    #define QSP_MAXLOCCALLDEPTH 2000
 
     typedef struct
     {

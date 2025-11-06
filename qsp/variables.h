@@ -13,10 +13,10 @@
 #ifndef QSP_VARSDEFINES
     #define QSP_VARSDEFINES
 
-    #define QSP_SETMAXVARS 20
+    #define QSP_MAXSETVARS 20
     #define QSP_VARSGLOBALBUCKETS 512
     #define QSP_VARSLOCALBUCKETS 16
-    #define QSP_VARSMAXBUCKETSIZE 32
+    #define QSP_MAXVARSBUCKETSIZE 32
     #define QSP_VARSSCOPECHUNKSIZE 128
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
@@ -172,7 +172,7 @@
         return chunk->Slots;
     }
 
-    INLINE void qspRemoveLastLocalScope(void)
+    INLINE void qspReleaseLastLocalScope(void)
     {
         QSPVarsScopeChunk *chunk = qspCurrentLocalVars;
         if (chunk)

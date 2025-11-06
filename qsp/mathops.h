@@ -15,7 +15,7 @@
     #define QSP_MAXMATHOPARGS 20
     #define QSP_MATHSTACKSIZE 30
     #define QSP_MAXMATHITEMS 200
-    #define QSP_CACHEDEXPSMAXBUCKETSIZE 5
+    #define QSP_MAXCACHEDEXPSBUCKETSIZE 5
     #define QSP_CACHEDEXPSBUCKETS 512
 
     /* Helpers */
@@ -63,7 +63,7 @@
 
     typedef struct
     {
-        QSPCachedMathExp Exps[QSP_CACHEDEXPSMAXBUCKETSIZE];
+        QSPCachedMathExp Exps[QSP_MAXCACHEDEXPSBUCKETSIZE];
         int ExpsCount;
         int ExpToEvict;
     } QSPCachedMathExpsBucket;

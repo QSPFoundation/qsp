@@ -14,6 +14,7 @@
 #include "game.h"
 #include "locations.h"
 #include "mathops.h"
+#include "memory.h"
 #include "menu.h"
 #include "objects.h"
 #include "playlist.h"
@@ -429,11 +430,11 @@ QSP_TINYINT qspGetStatArgs(QSPString s, QSPCachedStat *stat, QSPVariant *args)
 INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_TINYINT statCode;
-    QSPCachedStat *statement;
+    QSPCachedStat *stat;
     int i, oldLocationState = qspLocationState;
-    for (i = startStat, statement = line->Stats + startStat; i < endStat; ++i, ++statement)
+    for (i = startStat, stat = line->Stats + startStat; i < endStat; ++i, ++stat)
     {
-        statCode = statement->Stat;
+        statCode = stat->Stat;
         switch (statCode)
         {
         case qspStatUnknown:
@@ -449,11 +450,11 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
         case qspStatLoop:
             return qspStatementSinglelineLoop(line, i, endStat, jumpTo);
         case qspStatSet:
-            qspStatementSetVarsValues(line->Str, statement);
+            qspStatementSetVarsValues(line->Str, stat);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatLocal:
-            qspStatementLocal(line->Str, statement);
+            qspStatementLocal(line->Str, stat);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatExit:
@@ -461,7 +462,7 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
         case qspStatJump:
             {
                 QSPVariant arg; /* 1 argument only */
-                qspGetStatArgs(line->Str, statement, &arg);
+                qspGetStatArgs(line->Str, stat, &arg);
                 if (qspLocationState != oldLocationState) return QSP_FALSE;
                 qspUpdateText(jumpTo, qspDelSpc(QSP_STR(arg)));
                 qspUpperStr(jumpTo);
@@ -469,7 +470,7 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
                 return QSP_TRUE;
             }
         case qspStatUserCall:
-            qspStatementUserCall(line->Str, statement);
+            qspStatementUserCall(line->Str, stat);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case qspStatAct:
@@ -477,11 +478,16 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
             return QSP_FALSE;
         default:
             {
-                QSPVariant args[QSP_MAXSTATARGS];
-                QSP_TINYINT argsCount = qspGetStatArgs(line->Str, statement, args);
-                if (qspLocationState != oldLocationState) return QSP_FALSE;
+                QSPVariant *args = (QSPVariant *)qspAllocateMemory(stat->ArgsCount * sizeof(QSPVariant));
+                QSP_TINYINT argsCount = qspGetStatArgs(line->Str, stat, args);
+                if (qspLocationState != oldLocationState)
+                {
+                    qspReleaseMemory(args);
+                    return QSP_FALSE;
+                }
                 qspStats[statCode].Func(args, argsCount, statCode);
                 qspFreeVariants(args, argsCount);
+                qspReleaseMemory(args);
                 if (qspLocationState != oldLocationState) return QSP_FALSE;
                 break;
             }
@@ -692,7 +698,7 @@ QSP_BOOL qspExecCodeBlockWithLocals(QSPLineOfCode *s, int startLine, int endLine
     toExit = qspExecCode(s, startLine, endLine, codeOffset, jumpTo);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
 
-    qspRemoveLastLocalScope();
+    qspReleaseLastLocalScope();
     return toExit;
 }
 
@@ -705,7 +711,7 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int 
     toExit = qspExecString(line, startStat, endStat, jumpTo);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
 
-    qspRemoveLastLocalScope();
+    qspReleaseLastLocalScope();
     return toExit;
 }
 
@@ -722,7 +728,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
     if (qspLocationState != oldLocationState) return;
 
     if (res && !qspApplyResult(res)) return;
-    qspRemoveLastLocalScope();
+    qspReleaseLastLocalScope();
 }
 
 void qspExecStringAsCode(QSPString s)
@@ -939,7 +945,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
         qspFreeMathExpression(&condition);
         qspFreeLineOfCode(&iteratorLine);
     }
-    qspRemoveLastLocalScope();
+    qspReleaseLastLocalScope();
     return toExit;
 }
 
@@ -1026,18 +1032,23 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPLineOfCode *lines, int lineInd, int
         qspFreeMathExpression(&condition);
         qspFreeLineOfCode(&iteratorLine);
     }
-    qspRemoveLastLocalScope();
+    qspReleaseLastLocalScope();
     return toExit;
 }
 
 INLINE void qspStatementUserCall(QSPString s, QSPCachedStat *stat)
 {
-    QSPVariant args[QSP_MAXSTATARGS];
     int oldLocationState = qspLocationState;
+    QSPVariant *args = (QSPVariant *)qspAllocateMemory(stat->ArgsCount * sizeof(QSPVariant));
     QSP_TINYINT argsCount = qspGetStatArgs(s, stat, args);
-    if (qspLocationState != oldLocationState) return;
+    if (qspLocationState != oldLocationState)
+    {
+        qspReleaseMemory(args);
+        return;
+    }
     qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, argsCount - 1, QSP_TRUE, 0);
     qspFreeVariants(args, argsCount);
+    qspReleaseMemory(args);
 }
 
 INLINE void qspStatementImplicitStatement(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TINYINT QSP_UNUSED(extArg))

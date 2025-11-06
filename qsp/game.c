@@ -201,7 +201,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     QSPLocAct *curAct;
     QSPString str, gameString, *strs;
     crc = (isNewGame ? qspCRC(data, dataSize) : 0);
-    isUCS = (dataSize >= 2 && *((char *)data + 1) == 0);
+    isUCS = (dataSize >= 2 && *((unsigned char *)data + 1) == 0);
     gameString = qspStringFromFileData(data, dataSize, isUCS);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     qspFreeString(&gameString);
@@ -487,7 +487,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     {
         /* variables count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
-        if (count < 0 || count > QSP_VARSMAXBUCKETSIZE) return QSP_FALSE;
+        if (count < 0 || count > QSP_MAXVARSBUCKETSIZE) return QSP_FALSE;
         /* variables */
         for (j = 0; j < count; ++j)
         {
@@ -527,7 +527,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     QSPString *strs, locName, gameString;
     QSP_BIGINT msecsCount;
     int i, j, k, ind, count, varsCount, valsCount, oldLocationState;
-    QSP_BOOL isUCS = (dataSize >= 2 && *((char *)data + 1) == 0);
+    QSP_BOOL isUCS = (dataSize >= 2 && *((unsigned char *)data + 1) == 0);
     gameString = qspStringFromFileData(data, dataSize, isUCS);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     qspFreeString(&gameString);

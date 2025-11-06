@@ -260,7 +260,7 @@ INLINE QSPVar *qspAddVarToLocals(QSPString name)
     if (var) return var;
 
     /* It doesn't exist yet, so we have to add it */
-    if (bucket->VarsCount >= QSP_VARSMAXBUCKETSIZE)
+    if (bucket->VarsCount >= QSP_MAXVARSBUCKETSIZE)
     {
         qspSetError(QSP_ERR_TOOMANYVARS);
         return 0;
@@ -396,7 +396,7 @@ QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate)
     if (toCreate)
     {
         /* Create it in the global scope */
-        if (bucket->VarsCount >= QSP_VARSMAXBUCKETSIZE)
+        if (bucket->VarsCount >= QSP_MAXVARSBUCKETSIZE)
         {
             qspSetError(QSP_ERR_TOOMANYVARS);
             return 0;
@@ -1040,10 +1040,10 @@ INLINE void qspSetVarsValues(QSPString *varNames, int varsCount, QSPVariant *v, 
 
 void qspStatementSetVarsValues(QSPString s, QSPCachedStat *stat)
 {
-    QSPVariant v;
-    QSPString names[QSP_SETMAXVARS];
-    int namesCount, oldLocationState;
     QSP_CHAR op;
+    QSPVariant v;
+    QSPString names[QSP_MAXSETVARS];
+    int namesCount, oldLocationState;
     if (stat->ErrorCode)
     {
         qspSetError(stat->ErrorCode);
@@ -1057,7 +1057,7 @@ void qspStatementSetVarsValues(QSPString s, QSPCachedStat *stat)
     oldLocationState = qspLocationState;
     v = qspCalculateExprValue(qspStringFromPair(s.Str + stat->Args[2].StartPos, s.Str + stat->Args[2].EndPos));
     if (qspLocationState != oldLocationState) return;
-    namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), names, QSP_SETMAXVARS);
+    namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), names, QSP_MAXSETVARS);
     if (!namesCount)
     {
         qspFreeVariant(&v);
@@ -1078,7 +1078,7 @@ INLINE QSPString qspGetVarNameOnly(QSPString s)
 void qspStatementLocal(QSPString s, QSPCachedStat *stat)
 {
     QSPVariant v;
-    QSPString varName, names[QSP_SETMAXVARS];
+    QSPString varName, names[QSP_MAXSETVARS];
     int i, namesCount;
     if (stat->ErrorCode)
     {
@@ -1099,7 +1099,7 @@ void qspStatementLocal(QSPString s, QSPCachedStat *stat)
     }
     else
         v = qspGetEmptyVariant(QSP_TYPE_UNDEF);
-    namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), names, QSP_SETMAXVARS);
+    namesCount = qspGetVarsNames(qspStringFromPair(s.Str + stat->Args[0].StartPos, s.Str + stat->Args[0].EndPos), names, QSP_MAXSETVARS);
     if (!namesCount)
     {
         qspFreeVariant(&v);

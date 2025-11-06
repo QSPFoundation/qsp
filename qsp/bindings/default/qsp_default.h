@@ -17,22 +17,22 @@
         #define QSP_FMT2(x) L##x
         #define QSP_FMT(x) QSP_FMT2(x)
 
-        #define QSP_ONIG_ENC ((*(char *)&(qspEndiannessTestValue) == 1) ? \
+        #define QSP_ONIG_ENC ((*(unsigned char *)&(qspEndiannessTestValue) == 1) ? \
                     (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_LE : ONIG_ENCODING_UTF32_LE) : \
                     (sizeof(QSP_CHAR) == 2 ? ONIG_ENCODING_UTF16_BE : ONIG_ENCODING_UTF32_BE))
-        #define QSP_TO_GAME_SB(a) (char)qspReverseConvertUC((a), qspCP1251ToUnicodeTable)
+        #define QSP_TO_GAME_SB(a) (unsigned char)qspReverseConvertUC((a), qspCP1251ToUnicodeTable)
         #define QSP_TO_GAME_UC(a) (unsigned short)QSP_FIXBYTEORDER((unsigned short)(a))
         #define QSP_FROM_GAME_SB(a) qspDirectConvertUC((a), qspCP1251ToUnicodeTable)
         #define QSP_FROM_GAME_UC(a) QSP_FIXBYTEORDER(a)
         #define QSP_CHRLWR(a) qspToWLower(a)
         #define QSP_CHRUPR(a) qspToWUpper(a)
     #else
-        typedef char QSP_CHAR;
+        typedef unsigned char QSP_CHAR;
         #define QSP_FMT(x) x
 
         #if defined(WIN32)
             #define QSP_ONIG_ENC ONIG_ENCODING_CP1251
-            #define QSP_TO_GAME_SB(a) (char)(a)
+            #define QSP_TO_GAME_SB(a) (unsigned char)(a)
             #define QSP_TO_GAME_UC(a) (unsigned short)QSP_FIXBYTEORDER(qspDirectConvertUC((a), qspCP1251ToUnicodeTable))
             #define QSP_FROM_GAME_SB(a) (a)
             #define QSP_FROM_GAME_UC(a) qspReverseConvertUC(QSP_FIXBYTEORDER(a), qspCP1251ToUnicodeTable)
@@ -40,7 +40,7 @@
             #define QSP_CHRUPR(a) qspCP1251ToUpperTable[(unsigned char)(a)]
         #else
             #define QSP_ONIG_ENC ONIG_ENCODING_KOI8_R
-            #define QSP_TO_GAME_SB(a) (char)qspReverseConvertSB((a), qspCP1251ToKOI8RTable)
+            #define QSP_TO_GAME_SB(a) (unsigned char)qspReverseConvertSB((a), qspCP1251ToKOI8RTable)
             #define QSP_TO_GAME_UC(a) (unsigned short)QSP_FIXBYTEORDER(qspDirectConvertUC((a), qspKOI8RToUnicodeTable))
             #define QSP_FROM_GAME_SB(a) qspDirectConvertSB((a), qspCP1251ToKOI8RTable)
             #define QSP_FROM_GAME_UC(a) qspReverseConvertUC(QSP_FIXBYTEORDER(a), qspKOI8RToUnicodeTable)
@@ -49,7 +49,7 @@
         #endif
     #endif
 
-    #define QSP_FIXBYTEORDER(a) ((*(char *)&(qspEndiannessTestValue) == 1) ? \
+    #define QSP_FIXBYTEORDER(a) ((*(unsigned char *)&(qspEndiannessTestValue) == 1) ? \
                                 (a) : \
                                 ((unsigned short)(((a) << 8) | ((a) >> 8))))
 

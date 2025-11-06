@@ -90,6 +90,7 @@ set(QSP_SOURCES
 	qsp/game.c qsp/game.h
 	qsp/locations.c qsp/locations.h
 	qsp/mathops.c qsp/mathops.h
+	qsp/memory.c qsp/memory.h
 	qsp/memwatch.c qsp/memwatch.h
 	qsp/menu.c qsp/menu.h
 	qsp/objects.c qsp/objects.h
