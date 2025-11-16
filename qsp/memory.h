@@ -50,7 +50,6 @@
                 curChunk->Next = newChunk;
             }
             curChunk = curChunk->Next;
-            curChunk->Used = 0;
             qspCurAllocChunk = curChunk;
         }
         ptr = curChunk->Data + curChunk->Used;
