@@ -1166,7 +1166,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         QSP_NUM(tos) = qspGetTime();
         break;
     case qspOpQSPVer:
-        QSP_STR(tos) = (argsCount > 0 ? qspCallVersion(QSP_STR(args[0])) : qspCallVersion(qspNullString));
+        QSP_STR(tos) = (argsCount ? qspCallVersion(QSP_STR(args[0])) : qspCallVersion(qspNullString));
         break;
     case qspOpUserText:
         QSP_STR(tos) = (qspCurInput.Str ? qspCopyToNewText(qspCurInput) : qspNullString);
