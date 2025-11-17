@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
-project(qsp VERSION 5.9.4)
+project(qsp VERSION 5.9.5)
 
 set(QSP_GAMEMIN_VER "5.9.4")
 
