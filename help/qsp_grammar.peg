@@ -11,7 +11,37 @@ QSP {
        4. You can use https://ohmjs.org/editor/ to test the grammar;
     */
 
+    /*
     start              = statementGroup* end
+    */
+
+    start              = interLocText (locationBlock interLocText)* end
+
+    /* ====================
+       TXT2GAM LOCATION BLOCKS
+       ====================
+    */
+
+    locationBlock      = startOfLoc (~endLocMarker statementGroup)* endOfLoc
+
+    startOfLoc         = startLocMarker space* locName space* newline
+    locName            = locNameChar+ (space+ locNameChar+)*
+    locNameChar        = ~(space | newline) any
+
+    endOfLoc           = endLocMarker endOfLocChar* (newline | &end)
+    endOfLocChar       = ~newline any
+
+    interLocText       = (interLocLine | newline)*
+    interLocLine       = ~startLocMarker interLocChar+ (newline | &end)
+    interLocChar       = ~newline any
+
+    startLocMarker     = "#"
+    endLocMarker       = "--"
+
+    /* ====================
+       STATEMENT BLOCKS
+       ====================
+    */
 
     statementGroup     = ws (singleLineBlock | multiLineBlock | newline)
 
@@ -410,7 +440,10 @@ QSP {
     */
 
     /* END, ELSEIF, ELSE are pseudo-statements, but we don't include them here to help with identifying suspicious code */
-    statementName           = "exit"
+    statementName           = "play"
+                            | "close"
+                            | "view"
+                            | "exit"
                             | "jump"
                             | "gosub" | "gs"
                             | "goto" | "gt"
@@ -455,9 +488,6 @@ QSP {
                             | "showinput"
                             | "showobjs"
                             | "showstat"
-                            | "play"
-                            | "close"
-                            | "view"
 
     functionName            = "desc"
                             | "mod"
@@ -486,6 +516,9 @@ QSP {
                             | "arrpack"
                             | "arrpos"
                             | "arrcomp"
+                            | "strcomp"
+                            | "strfind"
+                            | "strpos"
                             | "instr"
                             | "isnum"
                             | "trim"
@@ -495,9 +528,6 @@ QSP {
                             | "mid"
                             | "replace"
                             | "str"
-                            | "strcomp"
-                            | "strfind"
-                            | "strpos"
                             | "isplay"
                             | "rgb"
                             | "msecscount"
