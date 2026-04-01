@@ -43,7 +43,7 @@ QSP {
        ====================
     */
 
-    statementGroup     = ws (singleLineBlock | multiLineBlock | newline)
+    statementGroup     = ws (multiLineBlock | singleLineBlock | newline)
 
     singleLineBlock    = singleLineGroup ws (newline | &end)
     singleLineGroup    = statementUnitSingleLine (ws statementSeparator ws statementUnitSingleLine)*
@@ -102,12 +102,12 @@ QSP {
                               elseClause?
                               ws endIfMarker &delimiterChar (ws noteString)?
 
-    elseifClause            = ws (elseifSingleLine | elseifMultiLine)
+    elseifClause            = ws (elseifMultiLine | elseifSingleLine)
     elseifSingleLine        = elseIfMarker &delimiterChar ws expression ws ":" ws singleLineGroup ws newline
     elseifMultiLine         = elseIfMarker &delimiterChar ws expression ws ":" ws commentStatement? newline
                               statementGroup*
 
-    elseClause              = ws (elseSingleLine | elseMultiLine)
+    elseClause              = ws (elseMultiLine | elseSingleLine)
     elseSingleLine          = elseMarker &delimiterChar ws (":" ws)? singleLineGroup ws newline
     elseMultiLine           = elseMarker &delimiterChar ws (":" ws commentStatement?)? newline
                               statementGroup*
