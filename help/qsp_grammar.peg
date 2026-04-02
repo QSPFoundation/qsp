@@ -48,7 +48,7 @@ QSP {
     singleLineBlock    = singleLineGroup ws (newline | &end)
     singleLineGroup    = statementUnitSingleLine (ws statementSeparator ws statementUnitSingleLine)*
 
-    multiLineBlock     = statementUnitMultiLine (ws statementSeparator ws singleLineGroup)? ws (newline | &end)
+    multiLineBlock     = statementUnitMultiLine ws (statementSeparator ws singleLineGroup ws)? (newline | &end)
 
     /* ====================
        STATEMENT UNITS
@@ -95,7 +95,7 @@ QSP {
        ====================
     */
 
-    ifSingleLine            = ifMarker &delimiterChar ws expression ws ":" ws singleLineGroup (ws elseIfMarker &delimiterChar ws expression ws ":" ws singleLineGroup)* (ws elseMarker &delimiterChar (ws ":")? ws singleLineGroup)?
+    ifSingleLine            = ifMarker &delimiterChar ws expression ws ":" ws singleLineGroup (ws elseIfMarker &delimiterChar ws expression ws ":" ws singleLineGroup)* (ws elseMarker &delimiterChar ws (":" ws)? singleLineGroup)?
     ifMultiLine             = ifMarker &delimiterChar ws expression ws ":" ws commentStatement? newline
                               statementGroup*
                               elseifClause*
@@ -109,7 +109,7 @@ QSP {
 
     elseClause              = ws (elseMultiLine | elseSingleLine)
     elseSingleLine          = elseMarker &delimiterChar ws (":" ws)? singleLineGroup ws newline
-    elseMultiLine           = elseMarker &delimiterChar ws (":" ws commentStatement?)? newline
+    elseMultiLine           = elseMarker &delimiterChar ws (":" ws)? commentStatement? newline
                               statementGroup*
 
     /* ====================
@@ -127,8 +127,8 @@ QSP {
        ====================
     */
 
-    loopSingleLine          = loopMarker &delimiterChar (ws singleLineGroup)? ws whileMarker &delimiterChar ws expression (ws stepMarker &delimiterChar ws singleLineGroup)? ws ":" ws singleLineGroup
-    loopMultiLine           = loopMarker &delimiterChar (ws singleLineGroup)? ws whileMarker &delimiterChar ws expression (ws stepMarker &delimiterChar ws singleLineGroup)? ws ":" ws commentStatement? newline
+    loopSingleLine          = loopMarker &delimiterChar ws (singleLineGroup ws)? whileMarker &delimiterChar ws expression ws (stepMarker &delimiterChar ws singleLineGroup ws)? ":" ws singleLineGroup
+    loopMultiLine           = loopMarker &delimiterChar ws (singleLineGroup ws)? whileMarker &delimiterChar ws expression ws (stepMarker &delimiterChar ws singleLineGroup ws)? ":" ws commentStatement? newline
                               statementGroup*
                               ws endLoopMarker &delimiterChar (ws noteString)?
 
@@ -355,7 +355,7 @@ QSP {
     statementGroupInCodeBlock  = ws (singleLineCodeBlock | multiLineCodeBlock | newline)
 
     singleLineCodeBlock        = singleLineGroup ws (newline | &("}"))
-    multiLineCodeBlock         = statementUnitMultiLine (ws statementSeparator ws singleLineGroup)? ws (newline | &("}"))
+    multiLineCodeBlock         = statementUnitMultiLine ws (statementSeparator ws singleLineGroup ws)? (newline | &("}"))
 
     rawCodeBlock               = "{" (rawCodeBlock | rawStringLiteral | rawCodeBlockChar)* "}"
     rawCodeBlockChar           = ~("{" | "}") any
@@ -490,7 +490,6 @@ QSP {
                             | "showstat"
 
     functionName            = "desc"
-                            | "mod"
                             | "max"
                             | "min"
                             | "rand"
