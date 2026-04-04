@@ -382,10 +382,10 @@ QSP {
 
     typePrefix          = "#" | "$" | "%"
     newline             = "\n" | "\r\n"
-    lineContinuation    = " _" newline
+    lineContinuation    = space "_" newline
     statementSeparator  = "&"
-    ws                  = (lineContinuation | " " | "\t")*
-    mws                 = (" " | "\t" | newline)*
+    ws                  = (lineContinuation | space)*
+    mws                 = (space | newline)*
 
     /* ====================
        KEYWORDS
