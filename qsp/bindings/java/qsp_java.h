@@ -67,4 +67,8 @@
     JNIListItem qspToJavaObjectItem(JNIEnv *env, QSPString name, QSPString title, QSPString image);
     void qspReleaseJavaListItem(JNIEnv *env, JNIListItem *listItem);
 
+    QSP_BOOL qspOpenQuestFromFILE(FILE *, QSP_BOOL);
+    QSP_BOOL qspSaveGameStatusToFILE(FILE *);
+    QSP_BOOL qspOpenGameStatusFromFILE(FILE *);
+
 #endif
