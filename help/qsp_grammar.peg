@@ -46,7 +46,7 @@ QSP {
     statementGroup     = ws (multiLineBlock | singleLineBlock | newline)
 
     singleLineBlock    = singleLineGroup ws (newline | &end)
-    singleLineGroup    = statementUnitSingleLine (ws statementSeparator ws statementUnitSingleLine)*
+    singleLineGroup    = statementUnitSingleLine (ws (statementSeparator ws)+ statementUnitSingleLine)*
 
     multiLineBlock     = statementUnitMultiLine ws (statementSeparator ws singleLineGroup ws)? (newline | &end)
 
