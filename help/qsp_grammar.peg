@@ -43,12 +43,14 @@ QSP {
        ====================
     */
 
-    statementGroup     = ws (multiLineBlock | singleLineBlock | newline)
+    statementGroup       = ws (multiLineBlock | singleLineBlock | newline)
 
-    singleLineBlock    = singleLineGroup ws (newline | &end)
-    singleLineGroup    = statementUnitSingleLine (ws (statementSeparator ws)+ statementUnitSingleLine)*
+    singleLineBlock      = singleLineGroup ws (newline | &end)
+    singleLineGroup      = singleLineStatements | statementSeparators
+    singleLineStatements = (statementSeparators ws)? statementUnitSingleLine (ws statementSeparators ws statementUnitSingleLine)* (ws statementSeparators)?
+    statementSeparators  = statementSeparator (ws statementSeparator)*
 
-    multiLineBlock     = statementUnitMultiLine ws (statementSeparator ws singleLineGroup ws)? (newline | &end)
+    multiLineBlock       = statementUnitMultiLine ws (statementSeparator ws singleLineGroup ws)? (newline | &end)
 
     /* ====================
        STATEMENT UNITS
