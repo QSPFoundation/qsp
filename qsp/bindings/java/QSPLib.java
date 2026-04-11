@@ -149,7 +149,7 @@ public abstract class QSPLib {
     public void onShowWindow(int type /* Window bit flags */, boolean toShow) {}
     public int onShowMenu(ListItem[] items) { return -1; }
     public void onShowMessage(String text) {}
-    public void onRefreshInt(boolean isForced, boolean isNewDesc) {}
+    public void onRefreshInt(boolean isForced, boolean isNewLoc) {}
     public void onSetTimer(int msecs) {}
     public void onSetInputStrText(String text) {}
     public void onSystem(String cmd) {}
