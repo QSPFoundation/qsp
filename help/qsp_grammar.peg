@@ -78,7 +78,7 @@ QSP {
     */
 
     commentStatement        = "!" commentText
-    commentText             = (rawCodeBlock | rawStringLiteral | commentChar)*
+    commentText             = (rawStringLiteral | rawCodeBlock | commentChar)*
     commentChar             = ~newline any
 
     /* ====================
@@ -210,7 +210,7 @@ QSP {
 
     labelName                       = noteString
 
-    noteString                      = (rawCodeBlock | rawStringLiteral | noteChar)+
+    noteString                      = (rawStringLiteral | rawCodeBlock | noteChar)+
     noteChar                        = ~(statementSeparator | newline) any
 
     /* ====================
@@ -249,9 +249,9 @@ QSP {
 
     primaryExpression               = parenthesizedExpression
                                     | numberLiteral
-                                    | codeBlock
                                     | interpolatedString /* Try to parse it as a string with subexpressions */
                                     | rawStringLiteral
+                                    | codeBlock
                                     | tuple
                                     | userFunctionCall
                                     | functionCall
@@ -259,9 +259,9 @@ QSP {
 
     multilinePrimaryExpression      = parenthesizedExpression
                                     | numberLiteral
-                                    | codeBlock
                                     | interpolatedString /* Try to parse it as a string with subexpressions */
                                     | rawStringLiteral
+                                    | codeBlock
                                     | tuple
                                     | multilineUserFunctionCall
                                     | multilineFunctionCall
@@ -269,9 +269,9 @@ QSP {
 
     nonAmpersandPrimaryExpression   = parenthesizedExpression
                                     | numberLiteral
-                                    | codeBlock
                                     | interpolatedString
                                     | rawStringLiteral
+                                    | codeBlock
                                     | tuple
                                     | userFunctionCall
                                     | nonAmpersandFunctionCall /* Functions with a single argument can't contain & */
@@ -359,7 +359,7 @@ QSP {
     singleLineCodeBlock        = singleLineGroup ws (newline | &("}"))
     multiLineCodeBlock         = statementUnitMultiLine ws (statementSeparator ws singleLineGroup ws)? (newline | &("}"))
 
-    rawCodeBlock               = "{" (rawCodeBlock | rawStringLiteral | rawCodeBlockChar)* "}"
+    rawCodeBlock               = "{" (rawStringLiteral | rawCodeBlock | rawCodeBlockChar)* "}"
     rawCodeBlockChar           = ~("{" | "}") any
 
     /* ====================
