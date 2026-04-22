@@ -79,7 +79,7 @@ QSP {
 
     commentStatement        = "!" commentText
     commentText             = (rawStringLiteral | rawCodeBlock | commentChar)*
-    commentChar             = ~newline any
+    commentChar             = ~(newline | "'" | "\"" | "{" | "}") any
 
     /* ====================
        ASSIGNMENTS & LOCALS
@@ -211,7 +211,7 @@ QSP {
     labelName                       = noteString
 
     noteString                      = (rawStringLiteral | rawCodeBlock | noteChar)+
-    noteChar                        = ~(statementSeparator | newline) any
+    noteChar                        = ~(statementSeparator | newline | "'" | "\"" | "{" | "}" | "(" | ")" | "[" | "]") any
 
     /* ====================
        EXPRESSIONS
