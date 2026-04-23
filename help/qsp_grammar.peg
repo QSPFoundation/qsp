@@ -360,7 +360,7 @@ QSP {
     multiLineCodeBlock         = statementUnitMultiLine ws (statementSeparator ws singleLineGroup ws)? (newline | &("}"))
 
     rawCodeBlock               = "{" (rawStringLiteral | rawCodeBlock | rawCodeBlockChar)* "}"
-    rawCodeBlockChar           = ~("{" | "}") any
+    rawCodeBlockChar           = ~("{" | "}" | "'" | "\"") any
 
     /* ====================
        IDENTIFIERS
