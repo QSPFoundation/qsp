@@ -249,12 +249,16 @@ INLINE QSPVar *qspAddVarToLocals(QSPString name)
         return 0;
     }
 
-    nameHash = qspGetNameHash(name);
-    scope = qspCurrentLocalVars->Slots + qspCurrentLocalVars->SlotsCount - 1;
+    if (qspCurrentLocalVars)
+        scope = qspCurrentLocalVars->Slots + qspCurrentLocalVars->SlotsCount - 1;
+    else
+        scope = qspAllocateLocalScope();
+
     if (!scope->Buckets)
         qspInitVarsScope(scope, QSP_VARSLOCALBUCKETS); /* init the scope the first time it's used */
 
     /* Check if the variable already exists in the current scope */
+    nameHash = qspGetNameHash(name);
     bucket = scope->Buckets + (nameHash % scope->BucketsCount);
     var = qspGetVar(bucket, name);
     if (var) return var;

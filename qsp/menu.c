@@ -126,13 +126,17 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     {
         int oldLocationState = qspLocationState;
         ind = qspCallShowMenu(menuItems, itemsCount);
-        if (qspLocationState != oldLocationState) return;
+        qspFreeMenuItems(menuItems, itemsCount);
+        if (qspLocationState != oldLocationState)
+        {
+            qspFreeMenuLocs(menuLocs, itemsCount);
+            return;
+        }
         if (ind >= 0 && ind < itemsCount)
         {
             QSPVariant arg = qspNumVariant(ind + 1);
             qspExecLocByNameWithArgs(menuLocs[ind], &arg, 1, QSP_FALSE, 0);
         }
-        qspFreeMenuItems(menuItems, itemsCount);
         qspFreeMenuLocs(menuLocs, itemsCount);
     }
 }
