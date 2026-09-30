@@ -1071,7 +1071,10 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         }
         break;
     case qspOpArrItem:
-        qspGetVarValueByIndex(QSP_STR(args[0]), args[1], &tos);
+        if (argsCount == 2)
+            qspGetVarValueByIndex(QSP_STR(args[0]), args[1], &tos);
+        else
+            qspGetFirstVarValue(QSP_STR(args[0]), &tos);
         break;
     case qspOpFirstArrItem:
         qspGetFirstVarValue(QSP_STR(args[0]), &tos);
