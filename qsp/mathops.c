@@ -46,7 +46,6 @@ INLINE QSP_BOOL qspAppendValueToCompiled(QSPMathExpression* expression, QSP_TINY
 INLINE QSP_BOOL qspAppendOperationToCompiled(QSPMathExpression* expression, QSP_TINYINT opCode, QSP_TINYINT argsCount);
 INLINE int qspSkipMathValue(QSPMathExpression *expression, int valueIndex);
 INLINE QSPVariant qspCalculateArgumentValue(QSPMathExpression *expression, int valueIndex, QSP_TINYINT type);
-INLINE void qspNegateValue(QSPVariant *val, QSPVariant *res);
 INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionStrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
@@ -261,6 +260,7 @@ void qspInitMath(void)
     qspAddOperation(qspOpValueToFormat, 0, 0, QSP_TYPE_UNDEF, 0, 0);
 
     qspAddOperation(qspOpNegation, 18, 0, QSP_TYPE_UNDEF, 1, 1, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpAffirmation, 18, 0, QSP_TYPE_UNDEF, 1, 1, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpAppend, 12, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpAdd, 14, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpSub, 14, 0, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
@@ -710,10 +710,15 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
             else if (qspIsInClass(*s.Str, QSP_CHAR_DIGIT))
             {
                 v = qspNumVariant(qspGetNumber(&s));
-                if (opStack[opSp] == qspOpNegation)
+                switch (opStack[opSp])
                 {
+                case qspOpNegation:
                     QSP_NUM(v) = -QSP_NUM(v);
                     --opSp;
+                    break;
+                case qspOpAffirmation:
+                    --opSp;
+                    break;
                 }
                 if (!qspAppendValueToCompiled(expression, qspOpValue, v)) break;
                 waitForOperator = QSP_TRUE;
@@ -747,6 +752,11 @@ QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression)
             else if (*s.Str == QSP_NEGATION_CHAR)
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpNegation)) break;
+                s.Str += QSP_CHAR_LEN;
+            }
+            else if (*s.Str == QSP_AFFIRMATION_CHAR)
+            {
+                if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpAffirmation)) break;
                 s.Str += QSP_CHAR_LEN;
             }
             else if (*s.Str == QSP_LRBRACK_CHAR) /* a subexpression OR a tuple */
@@ -1103,7 +1113,10 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex) /* t
         QSP_NUM(tos) = QSP_NUM(args[0]) % QSP_NUM(args[1]);
         break;
     case qspOpNegation:
-        qspNegateValue(args, &tos);
+        qspMultiplyVariantByNum(args, -1, &tos);
+        break;
+    case qspOpAffirmation:
+        qspMultiplyVariantByNum(args, 1, &tos);
         break;
     case qspOpTuple:
         QSP_TUPLE(tos) = qspMoveToNewTuple(args, argsCount);
@@ -1214,29 +1227,6 @@ QSPVariant qspCalculateExprValue(QSPString expr)
     QSPMathExpression *expression = qspMathExpGetCompiled(expr);
     if (!expression) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     return qspCalculateValue(expression, expression->ItemsCount - 1);
-}
-
-INLINE void qspNegateValue(QSPVariant *val, QSPVariant *res)
-{
-    switch (QSP_BASETYPE(val->Type))
-    {
-    case QSP_TYPE_TUPLE:
-        {
-            QSPVariant negativeOne = qspNumVariant(-1);
-            qspAutoConvertCombine(&negativeOne, val, QSP_MUL_CHAR, res);
-        }
-        break;
-    case QSP_TYPE_NUM:
-    case QSP_TYPE_STR:
-        if (!qspConvertVariantTo(val, QSP_TYPE_NUM))
-        {
-            qspSetError(QSP_ERR_TYPEMISMATCH);
-            return;
-        }
-        QSP_PNUM(res) = -QSP_PNUM(val);
-        res->Type = QSP_TYPE_NUM;
-        break;
-    }
 }
 
 INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)

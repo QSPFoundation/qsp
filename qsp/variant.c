@@ -385,6 +385,29 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
     return QSP_TRUE;
 }
 
+void qspMultiplyVariantByNum(QSPVariant *val, QSP_BIGINT num, QSPVariant *res)
+{
+    switch (QSP_BASETYPE(val->Type))
+    {
+    case QSP_TYPE_TUPLE:
+        {
+            QSPVariant multiplier = qspNumVariant(num);
+            qspAutoConvertCombine(&multiplier, val, QSP_MUL_CHAR, res);
+        }
+        break;
+    case QSP_TYPE_NUM:
+    case QSP_TYPE_STR:
+        if (!qspConvertVariantTo(val, QSP_TYPE_NUM))
+        {
+            qspSetError(QSP_ERR_TYPEMISMATCH);
+            return;
+        }
+        QSP_PNUM(res) = num * QSP_PNUM(val);
+        res->Type = QSP_TYPE_NUM;
+        break;
+    }
+}
+
 void qspAppendVariantToIndexString(QSPVariant *val, QSPBufString *res)
 {
     QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
