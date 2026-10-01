@@ -22,6 +22,7 @@
     QSP_BOOL qspVariantsEqual(QSPVariant *first, QSPVariant *second);
     void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
     QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, QSPVariant *res);
+    void qspMultiplyVariantByNum(QSPVariant *val, QSP_BIGINT num, QSPVariant *res);
     void qspAppendVariantToIndexString(QSPVariant *val, QSPBufString *res);
 
     INLINE void qspFreeVariant(QSPVariant *val)

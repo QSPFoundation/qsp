@@ -205,10 +205,6 @@ void qspStatementDelAct(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TIN
     qspFreeString(&qspCurActions[actInd].Desc);
     qspFreePrepLines(qspCurActions[actInd].OnPressLines, qspCurActions[actInd].OnPressLinesCount);
     --qspCurActsCount;
-    while (actInd < qspCurActsCount)
-    {
-        qspCurActions[actInd] = qspCurActions[actInd + 1];
-        ++actInd;
-    }
+    memmove(qspCurActions + actInd, qspCurActions + actInd + 1, (qspCurActsCount - actInd) * sizeof(QSPCurAct));
     qspCurWindowsChangedState |= QSP_WIN_ACTS;
 }

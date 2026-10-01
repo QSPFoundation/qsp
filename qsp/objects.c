@@ -113,13 +113,9 @@ INLINE int qspAddObjsGroup(QSPString objName)
     }
     /* Shift existing items to allocate extra space */
     ++floorItem;
-    while (groupsCount > floorItem)
-    {
-        qspCurObjsGroups[groupsCount] = qspCurObjsGroups[groupsCount - 1];
-        --groupsCount;
-    }
-    /* Add new object group */
     objsGroup = qspCurObjsGroups + floorItem;
+    memmove(objsGroup + 1, objsGroup, (groupsCount - floorItem) * sizeof(QSPObjsGroup));
+    /* Add new object group */
     objsGroup->Name = objName;
     objsGroup->Desc = qspNullString;
     objsGroup->Image = qspNullString;
@@ -138,11 +134,7 @@ INLINE void qspRemoveObjsGroupByIndex(int index)
         qspFreeString(&objsGroup->Desc);
         qspFreeString(&objsGroup->Image);
         --qspCurObjsGroupsCount;
-        while (index < qspCurObjsGroupsCount)
-        {
-            qspCurObjsGroups[index] = qspCurObjsGroups[index + 1];
-            ++index;
-        }
+        memmove(objsGroup, objsGroup + 1, (qspCurObjsGroupsCount - index) * sizeof(QSPObjsGroup));
         qspCurWindowsChangedState |= QSP_WIN_OBJS;
     }
 }
@@ -163,11 +155,7 @@ INLINE void qspRemoveObjectByIndex(int index)
         qspFreeString(&obj->Name);
         qspFreeString(&obj->Image);
         --qspCurObjsCount;
-        while (index < qspCurObjsCount)
-        {
-            qspCurObjects[index] = qspCurObjects[index + 1];
-            ++index;
-        }
+        memmove(obj, obj + 1, (qspCurObjsCount - index) * sizeof(QSPObj));
         qspCurWindowsChangedState |= QSP_WIN_OBJS;
     }
 }
@@ -276,7 +264,7 @@ int qspObjsCountByName(QSPString objName)
 
 INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int objInd)
 {
-    int i, groupIndex;
+    int groupIndex;
     QSPObj *obj;
     QSPVariant addedObjProps[2];
     if (qspCurObjsCount == QSP_MAXOBJECTS)
@@ -299,10 +287,9 @@ INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int obj
     }
     qspCurObjsGroups[groupIndex].ObjsCount++;
     /* Place the object at the specified position */
-    for (i = qspCurObjsCount; i > objInd; --i)
-        qspCurObjects[i] = qspCurObjects[i - 1];
-    ++qspCurObjsCount;
     obj = qspCurObjects + objInd;
+    memmove(obj + 1, obj, (qspCurObjsCount - objInd) * sizeof(QSPObj));
+    ++qspCurObjsCount;
     obj->Name = qspCopyToNewText(objName);
     obj->Image = qspCopyToNewText(objImage);
     qspCurWindowsChangedState |= QSP_WIN_OBJS;

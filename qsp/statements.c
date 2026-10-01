@@ -27,7 +27,7 @@ QSPStatName qspStatsNames[QSP_STATSLEVELS][QSP_MAXSTATSNAMES];
 int qspStatsNamesCounts[QSP_STATSLEVELS];
 int qspStatMaxLen = 0;
 
-INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...);
+INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYINT minArgs, int maxArgs, ...);
 INLINE void qspAddStatName(QSP_TINYINT statCode, QSPString statName, QSP_BOOL isIsolated, int level);
 INLINE int qspStatsCompare(const void *statName1, const void *statName2);
 INLINE int qspSearchElse(QSPLineOfCode *lines, int start, int end);
@@ -58,11 +58,11 @@ INLINE void qspStatementMsg(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT ext
 INLINE void qspStatementExec(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 INLINE void qspStatementDynamic(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 
-INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...)
+INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYINT minArgs, int maxArgs, ...)
 {
     qspStats[statCode].Func = func;
     qspStats[statCode].MinArgsCount = minArgs;
-    qspStats[statCode].MaxArgsCount = maxArgs;
+    qspStats[statCode].MaxArgsCount = (QSP_TINYINT)maxArgs;
     if (maxArgs > 0)
     {
         int i;
@@ -717,13 +717,15 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int 
 
 void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    QSPLineOfCode *strs;
+    QSPLineOfCode *strs, *oldLine;
     int oldLocationState, linesCount;
     qspAllocateLocalScopeWithArgs(args, count, QSP_TRUE);
 
     linesCount = qspPreprocessData(s, &strs);
     oldLocationState = qspLocationState;
+    oldLine = qspRealLine;
     qspExecCode(strs, 0, linesCount, 0, 0);
+    qspRealLine = oldLine; /* the executed lines won't exist anymore */
     qspFreePrepLines(strs, linesCount);
     if (qspLocationState != oldLocationState) return;
 

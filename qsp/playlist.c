@@ -85,11 +85,7 @@ INLINE QSP_BOOL qspRemoveFromPlayList(QSPString file)
         {
             qspFreeString(qspPLFiles + fileIndex);
             --qspPLFilesCount;
-            while (fileIndex < qspPLFilesCount)
-            {
-                qspPLFiles[fileIndex] = qspPLFiles[fileIndex + 1];
-                ++fileIndex;
-            }
+            memmove(qspPLFiles + fileIndex, qspPLFiles + fileIndex + 1, (qspPLFilesCount - fileIndex) * sizeof(QSPString));
             fileIndex = qspSearchPlayList(file);
         } while (fileIndex >= 0);
         return QSP_TRUE;

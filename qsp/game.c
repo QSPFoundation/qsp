@@ -540,6 +540,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     ++qspLocationState;
     ++qspFullRefreshCount;
     qspMemClear(QSP_FALSE);
+    qspCurLoc = -1;
     msecsCount = qspReadEncodedIntVal(strs[3], isUCS);
     qspCurSelAction = qspReadEncodedIntVal(strs[4], isUCS);
     qspCurSelObject = qspReadEncodedIntVal(strs[5], isUCS);
@@ -628,16 +629,21 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         }
     }
     qspFreeStrs(strs, count);
+    qspCurWindowsChangedState = QSP_WIN_ALL;
+    oldLocationState = qspLocationState;
+    /* Restore included files first, the current location can belong to one of them */
+    qspRestoreCurrentIncludes();
+    if (qspLocationState != oldLocationState)
+    {
+        qspFreeString(&locName);
+        return QSP_FALSE;
+    }
     qspCurLoc = qspLocIndex(locName);
     qspFreeString(&locName);
-    qspCurWindowsChangedState = QSP_WIN_ALL;
     /* Execute callbacks to update the current state */
-    oldLocationState = qspLocationState;
     qspResetTime(msecsCount);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspCallSetTimer(qspTimerInterval);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
-    qspRestoreCurrentIncludes();
     if (qspLocationState != oldLocationState) return QSP_FALSE;
     qspCallSetInputStrText(qspCurInput);
     if (qspLocationState != oldLocationState) return QSP_FALSE;

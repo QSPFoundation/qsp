@@ -82,6 +82,7 @@
         qspOpValue,
         qspOpValueToFormat,
         qspOpNegation,
+        qspOpAffirmation,
         qspOpAppend,
         qspOpAdd,
         qspOpSub,
