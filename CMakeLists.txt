@@ -145,7 +145,7 @@ if (TARGET onig)
 endif()
 
 install(TARGETS ${QSP_INSTALL_TARGETS} EXPORT QspTargets)
-export(TARGETS ${QSP_INSTALL_TARGETS} NAMESPACE Qsp:: FILE "${CMAKE_CURRENT_BINARY_DIR}/QspTargets.cmake")
+export(TARGETS ${QSP_INSTALL_TARGETS} NAMESPACE Qsp:: FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspTargets.cmake")
 
 install(FILES
 		qsp/bindings/qsp.h
