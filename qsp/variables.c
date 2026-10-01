@@ -1061,7 +1061,7 @@ void qspStatementSetVarsValues(QSPString s, QSPCachedStat *stat)
         qspFreeVariant(&v);
         return;
     }
-    op = *(s.Str + stat->Args[1].StartPos); /* contains one of QSP_CHAR_SIMPLEOP characters */
+    op = *(s.Str + stat->Args[1].StartPos);
     qspSetVarsValues(names, namesCount, &v, op);
     qspFreeVariant(&v);
 }

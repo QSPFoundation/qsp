@@ -717,13 +717,15 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int 
 
 void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    QSPLineOfCode *strs;
+    QSPLineOfCode *strs, *oldLine;
     int oldLocationState, linesCount;
     qspAllocateLocalScopeWithArgs(args, count, QSP_TRUE);
 
     linesCount = qspPreprocessData(s, &strs);
     oldLocationState = qspLocationState;
+    oldLine = qspRealLine;
     qspExecCode(strs, 0, linesCount, 0, 0);
+    qspRealLine = oldLine; /* the executed lines won't exist anymore */
     qspFreePrepLines(strs, linesCount);
     if (qspLocationState != oldLocationState) return;
 
