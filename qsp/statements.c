@@ -27,7 +27,7 @@ QSPStatName qspStatsNames[QSP_STATSLEVELS][QSP_MAXSTATSNAMES];
 int qspStatsNamesCounts[QSP_STATSLEVELS];
 int qspStatMaxLen = 0;
 
-INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...);
+INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYINT minArgs, int maxArgs, ...);
 INLINE void qspAddStatName(QSP_TINYINT statCode, QSPString statName, QSP_BOOL isIsolated, int level);
 INLINE int qspStatsCompare(const void *statName1, const void *statName2);
 INLINE int qspSearchElse(QSPLineOfCode *lines, int start, int end);
@@ -58,11 +58,11 @@ INLINE void qspStatementMsg(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT ext
 INLINE void qspStatementExec(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 INLINE void qspStatementDynamic(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 
-INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...)
+INLINE void qspAddStatement(QSP_TINYINT statCode, QSP_STATEMENT func, QSP_TINYINT minArgs, int maxArgs, ...)
 {
     qspStats[statCode].Func = func;
     qspStats[statCode].MinArgsCount = minArgs;
-    qspStats[statCode].MaxArgsCount = maxArgs;
+    qspStats[statCode].MaxArgsCount = (QSP_TINYINT)maxArgs;
     if (maxArgs > 0)
     {
         int i;

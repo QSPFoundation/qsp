@@ -28,7 +28,7 @@ int qspOpsNamesCounts[QSP_MATHOPSLEVELS];
 int qspOpMaxLen = 0;
 QSPCachedMathExpsBucket qspCachedMathExps[QSP_CACHEDEXPSBUCKETS];
 
-INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...);
+INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, int maxArgs, ...);
 INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT type, int level);
 INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BOOL isFunc);
 INLINE int qspMathOpsCompare(const void *opName1, const void *opName2);
@@ -68,13 +68,13 @@ INLINE void qspFunctionIsPlay(QSPVariant *args, QSP_TINYINT count, QSPVariant *r
 INLINE void qspFunctionFunc(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionDynEval(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 
-INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, QSP_TINYINT maxArgs, ...)
+INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, int maxArgs, ...)
 {
     qspOps[opCode].Priority = priority;
     qspOps[opCode].Func = func;
     qspOps[opCode].ResType = resType;
     qspOps[opCode].MinArgsCount = minArgs;
-    qspOps[opCode].MaxArgsCount = maxArgs;
+    qspOps[opCode].MaxArgsCount = (QSP_TINYINT)maxArgs;
     if (maxArgs > 0)
     {
         int i;
