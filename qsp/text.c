@@ -44,7 +44,7 @@ QSP_CHAR *qspStringToC(QSPString s)
     QSP_CHAR *string;
     int stringLen = qspStrLen(s);
     string = (QSP_CHAR *)malloc((stringLen + 1) * sizeof(QSP_CHAR));
-    memcpy(string, s.Str, stringLen * sizeof(QSP_CHAR));
+    if (stringLen) memcpy(string, s.Str, stringLen * sizeof(QSP_CHAR));
     string[stringLen] = 0;
     return string;
 }

@@ -308,7 +308,7 @@ QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize)
     QSPString res = qspGetVariantAsString(&value);
     resLen = qspStrLen(res);
     if (resLen >= bufSize) resLen = bufSize - 1;
-    memcpy(buf, res.Str, resLen * sizeof(QSP_CHAR));
+    if (resLen) memcpy(buf, res.Str, resLen * sizeof(QSP_CHAR));
     buf[resLen] = 0;
     qspFreeString(&res);
     return QSP_TRUE;
@@ -371,7 +371,7 @@ QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_
     qspConvertVariantTo(&value, QSP_TYPE_STR);
     resLen = qspStrLen(QSP_STR(value));
     if (resLen >= bufSize) resLen = bufSize - 1;
-    memcpy(buf, QSP_STR(value).Str, resLen * sizeof(QSP_CHAR));
+    if (resLen) memcpy(buf, QSP_STR(value).Str, resLen * sizeof(QSP_CHAR));
     buf[resLen] = 0;
     qspFreeVariant(&value);
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
