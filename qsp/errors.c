@@ -12,7 +12,7 @@
 int qspErrorNum = 0;
 QSPErrorInfo qspLastError;
 
-int qspRealCurLoc = -1;
+QSPLocation *qspRealCurLoc = 0;
 int qspRealActIndex = -1;
 int qspRealLineNum = 0;
 QSPLineOfCode *qspRealLine = 0;
@@ -29,8 +29,8 @@ void qspSetError(int num)
         qspLastError.ActIndex = qspRealActIndex;
         qspLastError.TopLineNum = qspRealLineNum;
 
-        if (qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount)
-            qspUpdateText(&qspLastError.LocName, qspLocs[qspRealCurLoc].Name);
+        if (qspRealCurLoc)
+            qspUpdateText(&qspLastError.LocName, qspRealCurLoc->Name);
         else
             qspClearText(&qspLastError.LocName);
 

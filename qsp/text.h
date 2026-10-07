@@ -13,6 +13,8 @@
     #define QSP_STRSDELIM QSP_FMT("\r\n")
     #define QSP_LSUBEX QSP_FMT("<<")
     #define QSP_RSUBEX QSP_FMT(">>")
+    #define QSP_TEXTHASHSEED 2166136261u
+    #define QSP_CAPACITYMASK(capacity) ((capacity) - 1) /* the capacity has to be a power of 2 */
 
     /* Frequently used classes of characters */
     enum
@@ -50,7 +52,7 @@
     QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid);
     QSPString qspNumToStr(QSP_CHAR *buf, QSP_BIGINT val);
     QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, int maxReplacements, QSP_BOOL canReturnSelf);
-    QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf);
+    QSPString qspFormatText(QSPString txt);
     int qspToWLower(int);
     int qspToWUpper(int);
 
@@ -124,6 +126,13 @@
         }
     }
 
+    INLINE QSPString qspCopyToText(QSP_CHAR *dest, QSPString s)
+    {
+        int strLen = qspStrLen(s);
+        if (strLen) memcpy(dest, s.Str, strLen * sizeof(QSP_CHAR));
+        return qspStringFromLen(dest, strLen);
+    }
+
     INLINE QSPString qspCopyToNewText(QSPString s)
     {
         int strLen = qspStrLen(s);
@@ -154,7 +163,7 @@
 
     INLINE QSP_BOOL qspIsCharAtPos(QSPString str, QSP_CHAR *pos, QSP_CHAR ch)
     {
-        return (pos < str.End && *pos == ch);
+        return (pos >= str.Str && pos < str.End && *pos == ch);
     }
 
     INLINE QSP_BOOL qspIsInList(QSP_CHAR ch, QSP_CHAR *list)
@@ -167,6 +176,11 @@
     INLINE QSP_BOOL qspIsInClass(QSP_CHAR ch, int charClass)
     {
         return (ch < sizeof(qspAsciiClasses)) && ((qspAsciiClasses[ch] & charClass) != 0);
+    }
+
+    INLINE QSP_BOOL qspIsInClassAtPos(QSPString str, QSP_CHAR *pos, int charClass)
+    {
+        return (pos >= str.Str && pos < str.End && qspIsInClass(*pos, charClass));
     }
 
     INLINE void qspSkipSpaces(QSPString *s)
@@ -188,6 +202,48 @@
     {
         qspSkipSpaces(&s);
         return (s.Str != s.End);
+    }
+
+    INLINE QSP_BIGINT qspParseUnsignedNumber(QSPString *s)
+    {
+        /* Too big numbers get the max value */
+        int digit;
+        QSP_BIGINT num = 0, maxNum = QSP_MAX_BIGINT;
+        QSP_CHAR *pos = s->Str, *end = s->End;
+        while (pos < end && qspIsInClass(*pos, QSP_CHAR_DIGIT))
+        {
+            digit = *pos - QSP_FMT('0');
+            if (num >= maxNum / 10 && num > (maxNum - digit) / 10) /* small numbers need only the 1st check */
+                num = maxNum;
+            else
+                num = num * 10 + digit;
+            ++pos;
+        }
+        s->Str = pos;
+        return num;
+    }
+
+    INLINE unsigned int qspAddCharToTextHash(unsigned int hash, QSP_CHAR ch)
+    {
+        return (hash ^ (unsigned int)ch) * 16777619u;
+    }
+
+    INLINE unsigned int qspFinalizeTextHash(unsigned int hash)
+    {
+        return hash ^ (hash >> 16);
+    }
+
+    INLINE unsigned int qspGetTextHash(QSPString s)
+    {
+        /* FNV-1a, folded to improve the low bits */
+        unsigned int hash = QSP_TEXTHASHSEED;
+        QSP_CHAR *pos = s.Str, *end = s.End;
+        while (pos < end)
+        {
+            hash = qspAddCharToTextHash(hash, *pos);
+            ++pos;
+        }
+        return qspFinalizeTextHash(hash);
     }
 
     INLINE void qspLowerStr(QSPString *str)

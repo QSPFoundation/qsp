@@ -16,6 +16,7 @@
 
     /* External functions */
     QSPString qspGetVariantAsString(QSPVariant *val);
+    void qspAppendVariantToString(QSPVariant *val, QSPBufString *res);
     QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid);
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
     int qspVariantsCompare(QSPVariant *first, QSPVariant *second);

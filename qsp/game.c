@@ -89,12 +89,7 @@ void qspClearAllIncludes(QSP_BOOL toInit)
         for (i = 0; i < qspCurIncFilesCount; ++i)
             qspFreeString(qspCurIncFiles + i);
         if (qspCurIncLocsCount)
-        {
-            int baseLocsCount = qspLocsCount - qspCurIncLocsCount;
-            qspResizeWorld(baseLocsCount);
-            qspUpdateLocsNames();
-            if (qspCurLoc >= qspLocsCount) qspCurLoc = -1;
-        }
+            qspTruncateWorld(qspLocsCount - qspCurIncLocsCount);
     }
     qspCurIncFilesCount = 0;
     qspCurIncLocsCount = 0;
@@ -163,7 +158,7 @@ QSP_BOOL qspRestartGame(QSP_BOOL toReset)
         qspCallInitGame(QSP_TRUE);
         if (qspLocationState != oldLocationState) return QSP_FALSE;
     }
-    qspNavigateToLocation(0, QSP_TRUE, 0, 0);
+    qspNavigateToLocation(qspLocs[0], QSP_TRUE, 0, 0);
     return QSP_TRUE;
 }
 
@@ -195,8 +190,8 @@ INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS)
 
 QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
 {
-    QSP_BOOL isLatestFormat, toAddLoc, isUCS;
-    int i, j, ind, crc, count, locsCount, actsCount, startLoc, endLoc;
+    QSP_BOOL isLatestFormat, isUCS;
+    int i, j, ind, crc, count, locsCount, actsCount, oldLocsCount;
     QSPLocation *curLoc;
     QSPLocAct *curAct;
     QSPString str, gameString, *strs;
@@ -216,40 +211,26 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     if (isNewGame)
     {
         qspClearAllIncludes(QSP_FALSE);
-        startLoc = 0;
-        endLoc = locsCount;
-        qspResizeWorld(0); /* clear the world */
-        qspUpdateLocsNames();
+        qspTruncateWorld(0); /* clear the world */
     }
-    else
-    {
-        startLoc = qspLocsCount;
-        endLoc = startLoc + locsCount;
-        /* Keep the location index to check for duplicates against existing locations */
-    }
-    qspResizeWorld(endLoc); /* allocate space for new locations */
-    locsCount = startLoc;
+    oldLocsCount = qspLocsCount;
     ind = (isLatestFormat ? 4 : 30);
-    curLoc = qspLocs + startLoc;
-    for (i = startLoc; i < endLoc; ++i)
+    for (i = 0; i < locsCount; ++i)
     {
         str = qspDecodeString(strs[ind++], isUCS);
-        toAddLoc = (isNewGame || qspLocIndex(str) < 0); /* check for duplicates */
-        if (toAddLoc)
-            curLoc->Name = str;
-        else
-            qspFreeString(&str);
-        if (toAddLoc)
+        curLoc = qspAddLocation(str); /* the first location with a name wins */
+        qspFreeString(&str);
+        if (curLoc)
         {
             curLoc->Desc = qspDecodeString(strs[ind++], isUCS);
             str = qspDecodeString(strs[ind++], isUCS);
-            curLoc->OnVisitLinesCount = qspPreprocessData(str, &curLoc->OnVisitLines);
+            curLoc->OnVisitCode = qspPreprocessData(str);
             qspFreeString(&str);
         }
         else
             ind += 2;
         actsCount = (isLatestFormat ? qspReadEncodedIntVal(strs[ind++], isUCS) : 20);
-        if (toAddLoc)
+        if (curLoc)
         {
             curLoc->ActionsCount = actsCount;
             if (actsCount)
@@ -260,37 +241,34 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
                     curAct->Image = (isLatestFormat ? qspDecodeString(strs[ind++], isUCS) : qspNullString);
                     curAct->Desc = qspDecodeString(strs[ind++], isUCS);
                     str = qspDecodeString(strs[ind++], isUCS);
-                    curAct->OnPressLinesCount = qspPreprocessData(str, &curAct->OnPressLines);
+                    curAct->OnPressCode = qspPreprocessData(str);
                     qspFreeString(&str);
                 }
             }
-            ++locsCount;
-            ++curLoc;
         }
         else
             ind += actsCount * (isLatestFormat ? 3 : 2);
     }
     qspFreeStrs(strs, count);
-    qspResizeWorld(locsCount); /* reallocate to the actual size after filtering out duplicates */
-    count = locsCount - startLoc;
-    if (count) qspUpdateLocsNames();
     if (isNewGame)
     {
         qspQstCRC = crc;
-        qspCurLoc = qspRealCurLoc = -1;
+        qspUpdateLocation(&qspRealCurLoc, 0);
     }
     else
-        qspCurIncLocsCount += count;
+        qspCurIncLocsCount += qspLocsCount - oldLocsCount;
     return QSP_TRUE;
 }
 
 QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
 {
     void *gameData;
+    QSPLineOfCode *line;
+    QSPLocation *loc;
     QSPString locName;
     QSPBufString bufString;
+    QSPVarSlot *slot;
     QSPVar *var;
-    QSPVarsBucket *bucket;
     QSP_BIGINT msecsCount;
     int i, j, k, dataSize, oldLocationState = qspLocationState;
     /* Call ONGSAVE without local variables */
@@ -313,7 +291,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         return QSP_FALSE;
     }
     bufString = qspNewBufString(0, 2048);
-    locName = (qspCurLoc >= 0 && qspCurLoc < qspLocsCount ? qspLocs[qspCurLoc].Name : qspNullString);
+    locName = (qspCurLoc ? qspCurLoc->Name : qspNullString);
     qspAppendStrVal(&bufString, QSP_STATIC_STR(QSP_SAVEDGAMEID));
     qspAppendStrVal(&bufString, QSP_STATIC_STR(QSP_VER));
     qspAppendEncodedIntVal(&bufString, qspQstCRC, isUCS);
@@ -341,10 +319,12 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         qspAppendEncodedIntVal(&bufString, qspCurActions[i].OnPressLinesCount, isUCS);
         for (j = 0; j < qspCurActions[i].OnPressLinesCount; ++j)
         {
-            qspAppendEncodedStrVal(&bufString, qspCurActions[i].OnPressLines[j].Str, isUCS);
-            qspAppendEncodedIntVal(&bufString, qspCurActions[i].OnPressLines[j].LineNum, isUCS);
+            line = qspCurActions[i].OnPressCode->Lines + qspCurActions[i].OnPressStartLine + j;
+            qspAppendEncodedStrVal(&bufString, line->Str, isUCS);
+            qspAppendEncodedIntVal(&bufString, line->LineNum, isUCS);
         }
-        qspAppendEncodedIntVal(&bufString, qspCurActions[i].Location, isUCS);
+        loc = qspCurActions[i].Location;
+        qspAppendEncodedStrVal(&bufString, (loc ? loc->Name : qspNullString), isUCS);
         qspAppendEncodedIntVal(&bufString, qspCurActions[i].ActIndex, isUCS);
     }
     qspAppendEncodedIntVal(&bufString, qspCurObjsCount, isUCS);
@@ -362,14 +342,14 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         qspAppendEncodedIntVal(&bufString, qspCurObjsGroups[i].UpdatedFields, isUCS);
         qspAppendEncodedIntVal(&bufString, qspCurObjsGroups[i].ObjsCount, isUCS);
     }
-    bucket = qspGlobalVars.Buckets; /* use the global scope */
-    for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i, ++bucket)
+    qspAppendEncodedIntVal(&bufString, qspGlobalVars.VarsCount, isUCS);
+    for (i = 0; i < qspGlobalVars.Capacity; ++i)
     {
-        qspAppendEncodedIntVal(&bufString, bucket->VarsCount, isUCS);
-        var = bucket->Vars;
-        for (j = 0; j < bucket->VarsCount; ++j, ++var)
+        slot = qspGlobalVars.VarSlots + i;
+        if (slot->Name.Str)
         {
-            qspAppendEncodedStrVal(&bufString, var->Name, isUCS);
+            var = &slot->Var;
+            qspAppendEncodedStrVal(&bufString, slot->Name, isUCS);
             qspAppendEncodedIntVal(&bufString, var->ValsCount, isUCS);
             for (k = 0; k < var->ValsCount; ++k)
                 qspAppendEncodedVariant(&bufString, var->Values[k], isUCS);
@@ -411,12 +391,14 @@ INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, 
 INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUCS)
 {
     QSPVariant val;
-    int i, j, k, ind, count, groupsCount, varValuesCount, temp, selAction, selObject;
+    QSP_BOOL isLatestFormat;
+    int i, j, k, ind, count, groupsCount, varsGroupsCount, varsCount, varValuesCount, temp, selAction, selObject;
     ind = 12;
     if (ind >= strsCount) return QSP_FALSE;
     if (!qspStrsEqual(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
+    isLatestFormat = (qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_NEWSAVEDGAMEVER)) >= 0);
     if (QSP_ISFALSE(qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DEBUG")))))
     {
         temp = qspReadEncodedIntVal(strs[2], isUCS);
@@ -457,11 +439,8 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
             if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &temp)) return QSP_FALSE;
             if (temp < 0) return QSP_FALSE;
         }
-        /* action's location */
-        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &temp)) return QSP_FALSE;
-        if (temp < 0) return QSP_FALSE;
-        /* action's source index */
-        if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
+        /* action's location + source index */
+        if (!qspSkipLines(strsCount, 2, &ind)) return QSP_FALSE;
     }
     /* qspCurObjsCount */
     if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
@@ -483,11 +462,14 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &temp)) return QSP_FALSE;
         if (temp < 0 || temp > QSP_MAXOBJECTS) return QSP_FALSE;
     }
-    for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i)
+    varsGroupsCount = (isLatestFormat ? 1 : QSP_OLDSAVEDVARSGROUPS);
+    varsCount = 0;
+    for (i = 0; i < varsGroupsCount; ++i)
     {
         /* variables count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
-        if (count < 0 || count > QSP_MAXVARSBUCKETSIZE) return QSP_FALSE;
+        if (count < 0 || count > QSP_MAXGLOBALVARS - varsCount) return QSP_FALSE;
+        varsCount += count;
         /* variables */
         for (j = 0; j < count; ++j)
         {
@@ -523,11 +505,11 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
 QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
 {
     QSPVar *var;
-    QSPVarsBucket *bucket;
-    QSPString *strs, locName, gameString;
+    QSPLineOfCode *lines;
+    QSPString *strs, actsLocs[QSP_MAXACTIONS], varName, locName, gameString;
     QSP_BIGINT msecsCount;
-    int i, j, k, ind, count, varsCount, valsCount, oldLocationState;
-    QSP_BOOL isUCS = (dataSize >= 2 && *((unsigned char *)data + 1) == 0);
+    int i, j, k, ind, count, varsGroupsCount, varsCount, valsCount, actsCount, oldLocationState;
+    QSP_BOOL isLatestFormat, isUCS = (dataSize >= 2 && *((unsigned char *)data + 1) == 0);
     gameString = qspStringFromFileData(data, dataSize, isUCS);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     qspFreeString(&gameString);
@@ -540,7 +522,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     ++qspLocationState;
     ++qspFullRefreshCount;
     qspMemClear(QSP_FALSE);
-    qspCurLoc = -1;
+    qspUpdateLocation(&qspCurLoc, 0);
+    isLatestFormat = (qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_NEWSAVEDGAMEVER)) >= 0);
     msecsCount = qspReadEncodedIntVal(strs[3], isUCS);
     qspCurSelAction = qspReadEncodedIntVal(strs[4], isUCS);
     qspCurSelObject = qspReadEncodedIntVal(strs[5], isUCS);
@@ -558,24 +541,27 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspCurIncFilesCount = qspReadEncodedIntVal(strs[ind++], isUCS);
     for (i = 0; i < qspCurIncFilesCount; ++i)
         qspCurIncFiles[i] = qspDecodeString(strs[ind++], isUCS);
-    qspCurActsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
-    for (i = 0; i < qspCurActsCount; ++i)
+    actsCount = qspCurActsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
+    for (i = 0; i < actsCount; ++i)
     {
         qspCurActions[i].Desc = qspDecodeString(strs[ind++], isUCS);
         qspCurActions[i].Image = qspDecodeString(strs[ind++], isUCS);
         valsCount = qspCurActions[i].OnPressLinesCount = qspReadEncodedIntVal(strs[ind++], isUCS);
         if (valsCount)
         {
-            qspCurActions[i].OnPressLines = (QSPLineOfCode *)malloc(valsCount * sizeof(QSPLineOfCode));
+            lines = (QSPLineOfCode *)malloc(valsCount * sizeof(QSPLineOfCode));
             for (j = 0; j < valsCount; ++j)
             {
-                qspInitLineOfCode(qspCurActions[i].OnPressLines + j, qspDecodeString(strs[ind++], isUCS), 0);
-                qspCurActions[i].OnPressLines[j].LineNum = qspReadEncodedIntVal(strs[ind++], isUCS);
+                qspInitLineOfCode(lines + j, qspDecodeString(strs[ind++], isUCS), 0);
+                lines[j].LineNum = qspReadEncodedIntVal(strs[ind++], isUCS);
             }
+            qspCurActions[i].OnPressCode = qspNewCodeBlock(lines, valsCount);
         }
         else
-            qspCurActions[i].OnPressLines = 0;
-        qspCurActions[i].Location = qspReadEncodedIntVal(strs[ind++], isUCS);
+            qspCurActions[i].OnPressCode = 0;
+        qspCurActions[i].OnPressStartLine = 0;
+        qspCurActions[i].Location = 0;
+        actsLocs[i] = qspDecodeString(strs[ind++], isUCS);
         qspCurActions[i].ActIndex = qspReadEncodedIntVal(strs[ind++], isUCS);
     }
     qspCurObjsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
@@ -593,37 +579,32 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         qspCurObjsGroups[i].UpdatedFields = (QSP_TINYINT)qspReadEncodedIntVal(strs[ind++], isUCS);
         qspCurObjsGroups[i].ObjsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
     }
-    bucket = qspGlobalVars.Buckets; /* use the global scope */
-    for (i = 0; i < QSP_VARSGLOBALBUCKETS; ++i, ++bucket)
+    varsGroupsCount = (isLatestFormat ? 1 : QSP_OLDSAVEDVARSGROUPS);
+    for (i = 0; i < varsGroupsCount; ++i)
     {
         varsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
-        if (varsCount)
+        for (j = 0; j < varsCount; ++j)
         {
-            bucket->Capacity = bucket->VarsCount = varsCount;
-            var = bucket->Vars = (QSPVar *)realloc(bucket->Vars, varsCount * sizeof(QSPVar));
-            for (j = 0; j < varsCount; ++j, ++var)
+            varName = qspDecodeString(strs[ind++], isUCS);
+            var = qspAddVarToScope(&qspGlobalVars, varName);
+            qspFreeString(&varName);
+            valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
+            if (valsCount)
             {
-                var->Name = qspDecodeString(strs[ind++], isUCS);
-                valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
                 var->ValsCapacity = var->ValsCount = valsCount;
-                var->Values = 0;
-                if (valsCount)
-                {
-                    var->Values = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
-                    for (k = 0; k < valsCount; ++k)
-                        qspReadEncodedVariant(strs, count, &ind, isUCS, var->Values + k);
-                }
-                valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
+                var->Values = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
+                for (k = 0; k < valsCount; ++k)
+                    qspReadEncodedVariant(strs, count, &ind, isUCS, var->Values + k);
+            }
+            valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
+            if (valsCount)
+            {
                 var->IndsCapacity = var->IndsCount = valsCount;
-                var->Indices = 0;
-                if (valsCount)
+                var->Indices = (QSPVarIndex *)malloc(valsCount * sizeof(QSPVarIndex));
+                for (k = 0; k < valsCount; ++k)
                 {
-                    var->Indices = (QSPVarIndex *)malloc(valsCount * sizeof(QSPVarIndex));
-                    for (k = 0; k < valsCount; ++k)
-                    {
-                        var->Indices[k].Index = qspReadEncodedIntVal(strs[ind++], isUCS);
-                        var->Indices[k].Str = qspDecodeString(strs[ind++], isUCS);
-                    }
+                    var->Indices[k].Index = qspReadEncodedIntVal(strs[ind++], isUCS);
+                    var->Indices[k].Str = qspDecodeString(strs[ind++], isUCS);
                 }
             }
         }
@@ -631,15 +612,23 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspFreeStrs(strs, count);
     qspCurWindowsChangedState = QSP_WIN_ALL;
     oldLocationState = qspLocationState;
-    /* Restore included files first, the current location can belong to one of them */
+    /* Restore included files first, the current location & the actions can belong to them */
     qspRestoreCurrentIncludes();
     if (qspLocationState != oldLocationState)
     {
+        for (i = 0; i < actsCount; ++i)
+            qspFreeString(actsLocs + i);
         qspFreeString(&locName);
         return QSP_FALSE;
     }
-    qspCurLoc = qspLocIndex(locName);
+    qspUpdateLocation(&qspCurLoc, qspLocByName(locName));
     qspFreeString(&locName);
+    for (i = 0; i < actsCount; ++i)
+    {
+        if (i < qspCurActsCount)
+            qspUpdateLocation(&qspCurActions[i].Location, qspLocByName(actsLocs[i]));
+        qspFreeString(actsLocs + i);
+    }
     /* Execute callbacks to update the current state */
     qspResetTime(msecsCount);
     if (qspLocationState != oldLocationState) return QSP_FALSE;

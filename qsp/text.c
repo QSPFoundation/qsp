@@ -94,7 +94,7 @@ int qspSplitStr(QSPString str, QSPString delim, QSPString **res)
         newStr = qspCopyToNewText(qspStringFromPair(str.Str, delimPos));
         if (count >= bufSize)
         {
-            bufSize = count + 16;
+            bufSize = count * 2; /* doubling is safe & efficient on huge data */
             ret = (QSPString *)realloc(ret, bufSize * sizeof(QSPString));
         }
         ret[count++] = newStr;
@@ -205,20 +205,14 @@ QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid)
     }
     if (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT))
     {
-        num = 0;
-        do
-        {
-            num = num * 10 + (*pos - QSP_FMT('0'));
-            ++pos;
-        } while (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT));
-        if (num < 0) num = QSP_MAX_BIGINT; /* simple overflow protection */
+        s.Str = pos;
+        num = qspParseUnsignedNumber(&s);
     }
     else
     {
         if (isValid) *isValid = QSP_FALSE;
         return 0;
     }
-    s.Str = pos;
     qspSkipSpaces(&s);
     if (!qspIsEmpty(s))
     {
@@ -284,18 +278,16 @@ QSPString qspReplaceText(QSPString txt, QSPString searchTxt, QSPString repTxt, i
     return qspCopyToNewText(txt);
 }
 
-QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
+QSPString qspFormatText(QSPString txt)
 {
     QSPVariant val;
-    QSPString expr;
     QSPBufString res;
     int oldLocationState;
-    QSP_CHAR *pos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
-    if (!pos)
-    {
-        if (canReturnSelf) return txt;
-        return qspCopyToNewText(txt);
-    }
+    QSPString expr, textCopy = qspCopyToNewText(txt);
+    QSP_CHAR *pos = qspStrStr(textCopy, QSP_STATIC_STR(QSP_LSUBEX));
+    if (!pos) return textCopy;
+    /* Expressions get uppercased in place & can release the text, so we work with a copy */
+    txt = textCopy;
     res = qspNewBufString(64, 128);
     oldLocationState = qspLocationState;
     do
@@ -307,23 +299,24 @@ QSPString qspFormatText(QSPString txt, QSP_BOOL canReturnSelf)
         {
             qspSetError(QSP_ERR_BRACKETNOTFOUND);
             qspFreeBufString(&res);
+            qspFreeString(&textCopy);
             return qspNullString;
         }
         expr = qspStringFromPair(txt.Str, pos);
-        /* Looks like it's ok to modify the original string here */
         qspPrepareStringToExecution(&expr);
         val = qspCalculateExprValue(expr);
         if (qspLocationState != oldLocationState)
         {
             qspFreeBufString(&res);
+            qspFreeString(&textCopy);
             return qspNullString;
         }
-        qspConvertVariantTo(&val, QSP_TYPE_STR);
-        qspAddBufText(&res, QSP_STR(val));
+        qspAppendVariantToString(&val, &res);
         qspFreeVariant(&val);
         txt.Str = pos + QSP_STATIC_LEN(QSP_RSUBEX);
         pos = qspStrStr(txt, QSP_STATIC_STR(QSP_LSUBEX));
     } while (pos);
     qspAddBufText(&res, txt);
+    qspFreeString(&textCopy);
     return qspBufStringToString(res);
 }

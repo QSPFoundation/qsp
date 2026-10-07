@@ -14,9 +14,7 @@
     #define QSP_MAXMATHOPSNAMES 150
     #define QSP_MAXMATHOPARGS 20
     #define QSP_MATHSTACKSIZE 30
-    #define QSP_MAXMATHITEMS 200
-    #define QSP_MAXCACHEDEXPSBUCKETSIZE 5
-    #define QSP_CACHEDEXPSBUCKETS 512
+    #define QSP_MAXMATHITEMS 1000
 
     /* Helpers */
     #define QSP_TOBOOL(x) ((x) != 0) /* converts a number to a QSP boolean value */
@@ -45,28 +43,18 @@
     {
         QSP_TINYINT OpCode;
         QSP_TINYINT ArgsCount;
-        QSPVariant Value;
+        unsigned short ValueIndex; /* for operations with a value */
     } QSPMathCompiledOp;
 
     typedef struct
     {
         QSPMathCompiledOp *CompItems;
         int ItemsCount;
-        int Capacity;
+        int ItemsCapacity;
+        QSPVariant *Values;
+        int ValsCount;
+        int ValsCapacity;
     } QSPMathExpression;
-
-    typedef struct
-    {
-        QSPString Text;
-        QSPMathExpression CompiledExp;
-    } QSPCachedMathExp;
-
-    typedef struct
-    {
-        QSPCachedMathExp Exps[QSP_MAXCACHEDEXPSBUCKETSIZE];
-        int ExpsCount;
-        int ExpToEvict;
-    } QSPCachedMathExpsBucket;
 
     enum
     {
@@ -80,7 +68,6 @@
         qspOpComma, /* sequence point */
         qspOpTuple,
         qspOpValue,
-        qspOpValueToFormat,
         qspOpNegation,
         qspOpAffirmation,
         qspOpAppend,
@@ -108,12 +95,14 @@
         qspOpArrSize,
         qspOpArrType,
         qspOpArrItem,
-        qspOpFirstArrItem,
-        qspOpLastArrItem,
+        qspOpInlineFirstArrItem,
+        qspOpInlineLastArrItem,
+        qspOpInlineIndexedArrItem,
         qspOpArrPack,
         qspOpArrPos,
         qspOpArrComp,
         qspOpStr,
+        qspOpFormat,
         qspOpVal,
         qspOpIsNum,
         qspOpLen,
@@ -153,10 +142,9 @@
     /* External functions */
     void qspInitMath(void);
     void qspTerminateMath(void);
-    void qspClearAllMathExps(QSP_BOOL toInit);
-    QSP_BOOL qspCompileMathExpression(QSPString s, QSPMathExpression *expression);
+    QSPMathExpression *qspCompileMathExpression(QSPString s);
     void qspFreeMathExpression(QSPMathExpression *expression);
-    QSPVariant qspCalculateValue(QSPMathExpression *expression, int valueIndex);
+    QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex);
     QSPVariant qspCalculateExprValue(QSPString expr);
 
 #endif

@@ -27,6 +27,7 @@ void qspPrepareCallback(QSPCallState *state, QSP_BOOL toRefreshUI)
     state->RealActIndex = qspRealActIndex;
     state->RealLineNum = qspRealLineNum;
     state->RealLine = qspRealLine;
+    if (state->RealCurLoc) qspAcquireLocation(state->RealCurLoc);
     /* Switch to the callback mode */
     qspIsInCallback = QSP_TRUE;
 
@@ -40,7 +41,8 @@ QSP_BOOL qspFinalizeCallback(QSPCallState *state, QSP_BOOL toResetLocationState)
     /* Restore the execution state */
     /* It's still fine to restore old values even when a new game was started
      * because we exit the old code & reset the state anyway */
-    qspRealCurLoc = state->RealCurLoc;
+    if (qspRealCurLoc) qspReleaseLocation(qspRealCurLoc);
+    qspRealCurLoc = state->RealCurLoc; /* takes over the saved reference */
     qspRealActIndex = state->RealActIndex;
     qspRealLineNum = state->RealLineNum;
     qspRealLine = state->RealLine;

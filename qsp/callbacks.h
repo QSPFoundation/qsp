@@ -7,6 +7,7 @@
 
 #include "declarations.h"
 #include "codetools.h"
+#include "locations.h"
 
 #ifndef QSP_CALLSDEFINES
     #define QSP_CALLSDEFINES
@@ -16,7 +17,7 @@
         int LocationState;
         QSP_BOOL IsInCallback;
         QSP_TINYINT WindowsChangedState;
-        int RealCurLoc;
+        QSPLocation *RealCurLoc;
         int RealActIndex;
         int RealLineNum;
         QSPLineOfCode *RealLine;

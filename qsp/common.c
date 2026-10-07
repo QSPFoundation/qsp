@@ -8,6 +8,7 @@
 #include "common.h"
 #include "actions.h"
 #include "callbacks.h"
+#include "codetools.h"
 #include "errors.h"
 #include "game.h"
 #include "locations.h"
@@ -52,19 +53,16 @@ void qspInitRuntime(void)
     qspFullRefreshCount = 0;
     qspQstCRC = 0;
     qspMSCount = 0;
-    qspLocs = 0;
-    qspLocsCount = 0;
-    qspLocsNames = 0;
-    qspLocsNamesCount = 0;
-    qspCurLoc = -1;
+    qspCurLoc = 0;
     qspTimerInterval = 0;
     qspCurWindowsDisplayState = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT;
+    qspInitWorld();
 
     qspSetSeed(0);
     qspInitVarTypes();
     qspInitSymbolClasses();
     qspInitStackAllocator();
-    qspInitVarsScope(&qspGlobalVars, QSP_VARSGLOBALBUCKETS);
+    qspInitVarsScope(&qspGlobalVars, QSP_VARSGLOBALCAPACITY);
     qspPrepareExecution(QSP_TRUE);
     qspMemClear(QSP_TRUE);
     qspInitCallbacks();
@@ -76,8 +74,8 @@ void qspTerminateRuntime(void)
 {
     qspMemClear(QSP_FALSE);
     qspClearVarsScope(&qspGlobalVars); /* completely destroy the global scope */
-    qspResizeWorld(0);
-    qspUpdateLocsNames();
+    qspUpdateLocation(&qspRealCurLoc, 0);
+    qspTerminateWorld();
     qspTerminateMath();
     qspTerminateStackAllocator();
     qspResetError(QSP_FALSE);
@@ -97,7 +95,7 @@ void qspPrepareExecution(QSP_BOOL toInit)
     }
 
     /* Reset the execution state */
-    qspRealCurLoc = -1;
+    qspUpdateLocation(&qspRealCurLoc, 0);
     qspRealActIndex = -1;
     qspRealLineNum = 0;
     qspRealLine = 0;
@@ -114,7 +112,7 @@ void qspMemClear(QSP_BOOL toInit)
     qspClearAllActions(toInit);
     qspClearPlayList(toInit);
     qspClearAllRegExps(toInit);
-    qspClearAllMathExps(toInit);
+    qspClearAllCodeBlocks(toInit);
     if (!toInit)
     {
         if (qspCurDesc.Len > 0)

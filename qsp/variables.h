@@ -13,10 +13,11 @@
 #ifndef QSP_VARSDEFINES
     #define QSP_VARSDEFINES
 
-    #define QSP_MAXSETVARS 20
-    #define QSP_VARSGLOBALBUCKETS 512
-    #define QSP_VARSLOCALBUCKETS 16
-    #define QSP_MAXVARSBUCKETSIZE 32
+    #define QSP_MAXGLOBALVARS 100000
+    #define QSP_MAXLOCALVARS 500
+    #define QSP_VARSGLOBALCAPACITY 1024
+    #define QSP_VARSLOCALCAPACITY 16
+    #define QSP_VARSNAMECHARSPERSLOT 2
     #define QSP_VARSSCOPECHUNKSIZE 128
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
@@ -29,7 +30,6 @@
 
     typedef struct
     {
-        QSPString Name;
         QSPVariant *Values;
         int ValsCount;
         int ValsCapacity;
@@ -40,15 +40,19 @@
 
     typedef struct
     {
-        QSPVar *Vars;
-        int VarsCount;
-        int Capacity;
-    } QSPVarsBucket;
+        QSPString Name; /* points into the scope's Names, Str is 0 for an empty slot */
+        unsigned int NameHash;
+        QSPVar Var;
+    } QSPVarSlot;
 
     typedef struct
     {
-        QSPVarsBucket *Buckets;
-        int BucketsCount;
+        QSPVarSlot *VarSlots;
+        int VarsCount;
+        int Capacity; /* has to be a power of 2 */
+        QSP_CHAR *Names;
+        int NamesLen;
+        int NamesCapacity;
     } QSPVarsScope;
 
     typedef struct QSPVarsScopeChunk_s QSPVarsScopeChunk;
@@ -70,11 +74,12 @@
     void qspInitVarTypes(void);
     QSPVarsScopeChunk *qspAllocateVarsScopeChunk(QSPVarsScopeChunk *parentChunk);
     void qspClearVarsScopeChunk(QSPVarsScopeChunk *chunk);
-    void qspInitVarsScope(QSPVarsScope *scope, int buckets);
+    void qspInitVarsScope(QSPVarsScope *scope, int capacity);
     void qspClearVarsScope(QSPVarsScope *scope);
     void qspClearVars(QSPVarsScope *scope);
     void qspClearLocalVarsScopes(QSPVarsScopeChunk *chunk);
     void qspClearAllVars(QSP_BOOL toInit);
+    QSPVar *qspAddVarToScope(QSPVarsScope *scope, QSPString name);
     QSPVarsScope *qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspApplyResult(QSPVariant *res);
@@ -92,8 +97,8 @@
     int qspArrayPosRegExp(QSPString varName, QSPString regExpStr, int ind);
     QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin);
     /* Statements */
-    void qspStatementSetVarsValues(QSPString s, QSPCachedStat *stat);
-    void qspStatementLocal(QSPString s, QSPCachedStat *stat);
+    void qspStatementSetVarsValues(QSPCachedStat *stat);
+    void qspStatementLocal(QSPCachedStat *stat);
     void qspStatementSetVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
@@ -110,9 +115,29 @@
         return QSP_TYPE_NUM;
     }
 
+    INLINE QSPString qspPrepareVarName(QSPString name, unsigned int *nameHash)
+    {
+        unsigned int hash = QSP_TEXTHASHSEED;
+        QSP_CHAR *pos = name.Str, *end = name.End;
+
+        /* Validate the name, skip its type prefix & hash it */
+        if (pos < end && qspIsInClass(*pos, QSP_CHAR_TYPEPREFIX))
+            name.Str = ++pos;
+
+        if (pos == end || qspIsInClass(*pos, QSP_CHAR_DIGIT))
+            return qspNullString;
+        do
+        {
+            if (qspIsInClass(*pos, QSP_CHAR_DELIM))
+                return qspNullString;
+            hash = qspAddCharToTextHash(hash, *pos);
+        } while (++pos < end);
+        *nameHash = qspFinalizeTextHash(hash);
+        return name;
+    }
+
     INLINE void qspInitVarData(QSPVar *var)
     {
-        /* We deliberately don't touch var's name here */
         var->Values = 0;
         var->ValsCount = 0;
         var->ValsCapacity = 0;
@@ -123,7 +148,6 @@
 
     INLINE void qspMoveVar(QSPVar *dest, QSPVar *src)
     {
-        /* We deliberately don't touch var's name here */
         dest->Values = src->Values;
         dest->ValsCount = src->ValsCount;
         dest->ValsCapacity = src->ValsCapacity;
@@ -135,7 +159,6 @@
 
     INLINE void qspEmptyVar(QSPVar *var)
     {
-        /* We deliberately don't touch var's name here */
         if (var->Values)
         {
             qspFreeVariants(var->Values, var->ValsCount);
@@ -155,7 +178,6 @@
     INLINE QSPVar qspGetUnknownVar(void)
     {
         QSPVar var;
-        var.Name = qspNullString;
         qspInitVarData(&var);
         return var;
     }
@@ -177,7 +199,15 @@
         QSPVarsScopeChunk *chunk = qspCurrentLocalVars;
         if (chunk)
         {
-            qspClearVars(&chunk->Slots[--chunk->SlotsCount]);
+            QSPVarsScope *scope = &chunk->Slots[--chunk->SlotsCount];
+            if (scope->Capacity > QSP_VARSLOCALCAPACITY)
+            {
+                qspClearVarsScope(scope); /* the next scope starts small */
+                scope->VarSlots = 0;
+                scope->Capacity = 0;
+            }
+            else if (scope->VarsCount)
+                qspClearVars(scope);
 
             if (!chunk->SlotsCount)
             {

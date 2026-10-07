@@ -7,6 +7,7 @@
 
 #include "declarations.h"
 #include "codetools.h"
+#include "locations.h"
 
 #ifndef QSP_ERRSDEFINES
     #define QSP_ERRSDEFINES
@@ -14,7 +15,7 @@
     extern int qspErrorNum;
     extern QSPErrorInfo qspLastError;
 
-    extern int qspRealCurLoc;
+    extern QSPLocation *qspRealCurLoc;
     extern int qspRealActIndex; /* points to the base action */
     extern int qspRealLineNum; /* points to the top-level line within the game code */
     extern QSPLineOfCode *qspRealLine; /* contains the internal details */

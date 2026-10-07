@@ -17,8 +17,11 @@
     #define QSP_DEFTIMERINTERVAL 500
     #define QSP_SAVEDGAMEDATAEXTRASPACE 8192
 
+    /* The following constants are used for compatibility with older saved games */
+    #define QSP_NEWSAVEDGAMEVER QSP_FMT("5.9.6") /* last time the saved game format has changed */
+    #define QSP_OLDSAVEDVARSGROUPS 512 /* older saves keep variables in groups */
+
     extern int qspQstCRC;
-    extern int qspCurIncLocsCount;
 
     /* External functions */
     void qspClearAllIncludes(QSP_BOOL toInit);

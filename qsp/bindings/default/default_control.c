@@ -39,6 +39,17 @@ QSPString QSPStringFromC(QSP_CHAR *s)
 {
     return qspStringFromC(s);
 }
+
+INLINE int qspGetLinesInfo(QSPLineOfCode *line, int linesCount, QSPLineInfo *lines, int linesBufSize)
+{
+    int i;
+    for (i = 0; i < linesCount && i < linesBufSize; ++i, ++line)
+    {
+        lines[i].Line = line->Str;
+        lines[i].LineNum = line->LineNum;
+    }
+    return linesCount;
+}
 /* ------------------------------------------------------------ */
 /* Debugger */
 
@@ -50,7 +61,7 @@ void QSPEnableDebugMode(QSP_BOOL isDebug)
 /* Get current execution state */
 void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum)
 {
-    *loc = ((qspRealCurLoc >= 0 && qspRealCurLoc < qspLocsCount) ? qspLocs[qspRealCurLoc].Name : qspNullString);
+    *loc = (qspRealCurLoc ? qspRealCurLoc->Name : qspNullString);
     *actIndex = qspRealActIndex;
     *lineNum = qspRealLineNum;
 }
@@ -59,24 +70,23 @@ int QSPGetLocationNames(QSPString *locNames, int namesBufSize)
 {
     int i;
     for (i = 0; i < qspLocsCount && i < namesBufSize; ++i)
-        locNames[i] = qspLocs[i].Name;
+        locNames[i] = qspLocs[i]->Name;
     return qspLocsCount;
 }
 /* Get base description of the specified location */
 QSPString QSPGetLocationDesc(QSPString locName)
 {
-    int locIndex = qspLocIndex(locName);
-    if (locIndex >= 0) return qspLocs[locIndex].Desc;
+    QSPLocation *loc = qspLocByName(locName);
+    if (loc) return loc->Desc;
     return qspNullString;
 }
 /* Get base actions of the specified location */
 int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBufSize)
 {
-    int locIndex = qspLocIndex(locName);
-    if (locIndex >= 0)
+    QSPLocation *loc = qspLocByName(locName);
+    if (loc)
     {
         int i;
-        QSPLocation *loc = qspLocs + locIndex;
         for (i = 0; i < loc->ActionsCount && i < actionsBufSize; ++i)
         {
             actions[i].Name = loc->Actions[i].Desc;
@@ -89,34 +99,22 @@ int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBu
 /* Get code of the base action of the specified location */
 int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPLineInfo *lines, int linesBufSize)
 {
-    int locIndex = qspLocIndex(locName);
-    if (locIndex >= 0 && actionIndex >= 0 && actionIndex < qspLocs[locIndex].ActionsCount)
+    QSPLocation *loc = qspLocByName(locName);
+    if (loc && actionIndex >= 0 && actionIndex < loc->ActionsCount)
     {
-        int i;
-        QSPLocAct *action = qspLocs[locIndex].Actions + actionIndex;
-        for (i = 0; i < action->OnPressLinesCount && i < linesBufSize; ++i)
-        {
-            lines[i].Line = action->OnPressLines[i].Str;
-            lines[i].LineNum = action->OnPressLines[i].LineNum;
-        }
-        return action->OnPressLinesCount;
+        QSPCodeBlock *code = loc->Actions[actionIndex].OnPressCode;
+        if (code) return qspGetLinesInfo(code->Lines, code->LinesCount, lines, linesBufSize);
     }
     return -1;
 }
 /* Get code of the specified location */
 int QSPGetLocationCode(QSPString locName, QSPLineInfo *lines, int linesBufSize)
 {
-    int locIndex = qspLocIndex(locName);
-    if (locIndex >= 0)
+    QSPLocation *loc = qspLocByName(locName);
+    if (loc)
     {
-        int i;
-        QSPLocation *loc = qspLocs + locIndex;
-        for (i = 0; i < loc->OnVisitLinesCount && i < linesBufSize; ++i)
-        {
-            lines[i].Line = loc->OnVisitLines[i].Str;
-            lines[i].LineNum = loc->OnVisitLines[i].LineNum;
-        }
-        return loc->OnVisitLinesCount;
+        QSPCodeBlock *code = loc->OnVisitCode;
+        if (code) return qspGetLinesInfo(code->Lines, code->LinesCount, lines, linesBufSize);
     }
     return -1;
 }
@@ -125,14 +123,9 @@ int QSPGetActionCode(int actionIndex, QSPLineInfo *lines, int linesBufSize)
 {
     if (actionIndex >= 0 && actionIndex < qspCurActsCount)
     {
-        int i;
         QSPCurAct *action = qspCurActions + actionIndex;
-        for (i = 0; i < action->OnPressLinesCount && i < linesBufSize; ++i)
-        {
-            lines[i].Line = action->OnPressLines[i].Str;
-            lines[i].LineNum = action->OnPressLines[i].LineNum;
-        }
-        return action->OnPressLinesCount;
+        QSPCodeBlock *code = action->OnPressCode;
+        if (code) return qspGetLinesInfo(code->Lines + action->OnPressStartLine, action->OnPressLinesCount, lines, linesBufSize);
     }
     return -1;
 }
@@ -363,10 +356,13 @@ QSP_BOOL QSPExecString(QSPString s, QSP_BOOL toRefreshUI)
 QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_BOOL toRefreshUI)
 {
     int resLen;
+    QSPString codeStr;
     QSPVariant value;
     qspPrepareExecution(QSP_FALSE);
-    qspPrepareStringToExecution(&s);
-    value = qspCalculateExprValue(s);
+    codeStr = qspCopyToNewText(s);
+    qspPrepareStringToExecution(&codeStr);
+    value = qspCalculateExprValue(codeStr);
+    qspFreeString(&codeStr);
     if (qspErrorNum) return QSP_FALSE;
     qspConvertVariantTo(&value, QSP_TYPE_STR);
     resLen = qspStrLen(QSP_STR(value));
@@ -380,10 +376,13 @@ QSP_BOOL QSPCalculateStrExpression(QSPString s, QSP_CHAR *buf, int bufSize, QSP_
 /* Calculate numeric value of an expression (causes execution of code) */
 QSP_BOOL QSPCalculateNumExpression(QSPString s, QSP_BIGINT *res, QSP_BOOL toRefreshUI)
 {
+    QSPString codeStr;
     QSPVariant value;
     qspPrepareExecution(QSP_FALSE);
-    qspPrepareStringToExecution(&s);
-    value = qspCalculateExprValue(s);
+    codeStr = qspCopyToNewText(s);
+    qspPrepareStringToExecution(&codeStr);
+    value = qspCalculateExprValue(codeStr);
+    qspFreeString(&codeStr);
     if (qspErrorNum) return QSP_FALSE;
     if (!qspConvertVariantTo(&value, QSP_TYPE_NUM))
     {
