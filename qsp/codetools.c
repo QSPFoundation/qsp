@@ -23,8 +23,8 @@ INLINE QSPCachedArg *qspNewUserCallArgs(QSPString s, QSP_TINYINT *argsCount, QSP
 INLINE QSPCachedAct *qspNewAct(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
 INLINE QSPCachedArg *qspNewSingleArg(QSPString s, QSP_TINYINT *argsCount);
 INLINE QSPCachedArg *qspNewRegularArgs(QSP_TINYINT statCode, QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
-INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, QSP_BOOL hasValue, QSP_TINYINT *errorCode);
-INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_BOOL hasValue, QSP_TINYINT *errorCode);
+INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, QSP_TINYINT *errorCode);
+INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TINYINT *errorCode);
 INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT argsCount, QSP_TINYINT statCode, QSPString s, QSP_TINYINT *errorCode);
 INLINE QSPCachedArg *qspCopyToNewArgs(QSPCachedArg *foundArgs, QSP_TINYINT argsCount);
 INLINE void qspFreeArg(QSPCachedArg *arg);
@@ -167,7 +167,7 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
         *errorCode = QSP_ERR_SYNTAX; /* SET requires a value */
         return 0;
     }
-    targetsCount = qspInitAssignmentTargets(targets, names, operation != 0, errorCode);
+    targetsCount = qspInitAssignmentTargets(targets, names, errorCode);
     if (*errorCode) return 0;
     assignment = (QSPCachedAssignment *)malloc(sizeof(QSPCachedAssignment));
     assignment->Targets = (QSPCachedTarget *)malloc(targetsCount * sizeof(QSPCachedTarget));
@@ -266,7 +266,7 @@ INLINE QSPCachedArg *qspNewRegularArgs(QSP_TINYINT statCode, QSPString s, QSP_TI
     return qspCopyToNewArgs(foundArgs, count);
 }
 
-INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, QSP_BOOL hasValue, QSP_TINYINT *errorCode)
+INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, QSP_TINYINT *errorCode)
 {
     QSP_CHAR *comma;
     QSPString items[QSP_MAXSTATARGS];
@@ -294,43 +294,42 @@ INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, Q
     ++itemsCount;
     for (i = 0; i < itemsCount; ++i)
     {
-        qspInitAssignmentTarget(targets + i, items[i], hasValue, errorCode);
+        qspInitAssignmentTarget(targets + i, items[i], errorCode);
         if (*errorCode) return 0;
     }
     return itemsCount;
 }
 
-INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_BOOL hasValue, QSP_TINYINT *errorCode)
+INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TINYINT *errorCode)
 {
     unsigned int nameHash;
     QSP_CHAR *nameEnd, *indexEnd;
     QSPString name;
     s = qspDelSpc(s);
     nameEnd = qspStrCharClass(s, QSP_CHAR_DELIM);
-    target->Index.Type = qspArgNone; /* no index */
     if (nameEnd)
     {
+        QSPString rest = qspStringFromPair(nameEnd, s.End);
         target->Name = qspStringFromPair(s.Str, nameEnd);
-        if (hasValue) /* LOCAL without a value ignores the rest */
+        qspSkipSpaces(&rest);
+        if (!qspIsCharAtPos(rest, rest.Str, QSP_LSBRACK_CHAR))
         {
-            QSPString rest = qspStringFromPair(nameEnd, s.End);
-            qspSkipSpaces(&rest);
-            if (!qspIsCharAtPos(rest, rest.Str, QSP_LSBRACK_CHAR))
-            {
-                *errorCode = QSP_ERR_INCORRECTNAME;
-                return;
-            }
-            indexEnd = qspDelimPos(rest, QSP_RSBRACK_CHAR);
-            if (!indexEnd)
-            {
-                *errorCode = QSP_ERR_BRACKETNOTFOUND;
-                return;
-            }
-            qspInitArg(&target->Index, qspStringFromPair(rest.Str + QSP_CHAR_LEN, indexEnd));
+            *errorCode = QSP_ERR_INCORRECTNAME;
+            return;
         }
+        indexEnd = qspDelimPos(rest, QSP_RSBRACK_CHAR);
+        if (!indexEnd)
+        {
+            *errorCode = QSP_ERR_BRACKETNOTFOUND;
+            return;
+        }
+        qspInitArg(&target->Index, qspStringFromPair(rest.Str + QSP_CHAR_LEN, indexEnd));
     }
     else
+    {
         target->Name = s; /* the name only */
+        target->Index.Type = qspArgNone;
+    }
 
     name = qspPrepareVarName(target->Name, &nameHash); /* validates the name */
     if (qspIsEmpty(name))
