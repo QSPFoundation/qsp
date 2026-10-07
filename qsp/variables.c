@@ -799,6 +799,7 @@ INLINE void qspSortArray(QSPVar *var, QSP_TINYINT baseValType, QSP_BOOL isAscend
     free(valuePositions);
     free(var->Values);
     var->Values = sortedValues;
+    var->ValsCapacity = valsCount;
 }
 
 int qspArraySize(QSPString varName)
