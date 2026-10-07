@@ -2,7 +2,7 @@ Specification of the QSP game file format.
 ---------------------------------------------
 
 1) All lines use the delimiter "\r\n" (0x0D, 0x0A).
-2) String encoding is performed by shifting the character codes of the string by -5 (for both Unicode and ANSI versions). This allows multiple game strings to be stored in one line (since "\r\n" is also encoded).
+2) String encoding is performed by shifting the character codes of the string by -5 (for both Unicode and ANSI versions), with two exceptions: the character 5 is encoded as -5 (0xFFFB in Unicode, 0xFB in ANSI) instead of 0, and the character 0 is kept as 0, so the encoding is reversible. This allows multiple game strings to be stored in one line (since "\r\n" is also encoded).
 3) Unicode is supported for both "old" and "new" formats. In the Unicode versions, each file character is represented by 2 bytes (UCS-2 LE) — the data type is uint16_t / unsigned short.
 
 The following notation is used:
