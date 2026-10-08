@@ -505,10 +505,11 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
 QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
 {
     QSPVar *var;
+    QSPVarIndex *varIndex;
     QSPLineOfCode *lines;
-    QSPString *strs, actsLocs[QSP_MAXACTIONS], varName, locName, gameString;
+    QSPString *strs, actsLocs[QSP_MAXACTIONS], varName, key, locName, gameString;
     QSP_BIGINT msecsCount;
-    int i, j, k, ind, count, varsGroupsCount, varsCount, valsCount, actsCount, oldLocationState;
+    int i, j, k, ind, count, varsGroupsCount, varsCount, valsCount, index, actsCount, oldLocationState;
     QSP_BOOL isLatestFormat, isUCS = (dataSize >= 2 && *((unsigned char *)data + 1) == 0);
     gameString = qspStringFromFileData(data, dataSize, isUCS);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
@@ -597,15 +598,13 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
                     qspReadEncodedVariant(strs, count, &ind, isUCS, var->Values + k);
             }
             valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
-            if (valsCount)
+            for (k = 0; k < valsCount; ++k)
             {
-                var->IndsCapacity = var->IndsCount = valsCount;
-                var->Indices = (QSPVarIndex *)malloc(valsCount * sizeof(QSPVarIndex));
-                for (k = 0; k < valsCount; ++k)
-                {
-                    var->Indices[k].Index = qspReadEncodedIntVal(strs[ind++], isUCS);
-                    var->Indices[k].Str = qspDecodeString(strs[ind++], isUCS);
-                }
+                index = qspReadEncodedIntVal(strs[ind++], isUCS);
+                key = qspDecodeString(strs[ind++], isUCS);
+                varIndex = qspAddVarIndex(var, qspGetTextHash(key));
+                varIndex->Str = key;
+                varIndex->Index = index;
             }
         }
     }

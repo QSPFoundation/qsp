@@ -19,13 +19,15 @@
     #define QSP_VARSLOCALCAPACITY 16
     #define QSP_VARSNAMECHARSPERSLOT 2
     #define QSP_VARSSCOPECHUNKSIZE 128
+    #define QSP_VARSINDICESCAPACITY 4
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
 
     typedef struct
     {
-        int Index;
         QSPString Str;
+        unsigned int Hash;
+        int Index; /* in Values */
     } QSPVarIndex;
 
     typedef struct
@@ -34,8 +36,9 @@
         int ValsCount;
         int ValsCapacity;
         QSPVarIndex *Indices;
+        int *IndsSlots; /* hash table by text indices, IndsCapacity * 2 slots */
         int IndsCount;
-        int IndsCapacity;
+        int IndsCapacity; /* has to be a power of 2 */
     } QSPVar;
 
     typedef struct
@@ -86,6 +89,7 @@
     QSPVarsScopeChunk *qspSaveLocalVarsAndRestoreGlobals(void);
     void qspRestoreSavedLocalVars(QSPVarsScopeChunk *chunk);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
+    QSPVarIndex *qspAddVarIndex(QSPVar *var, unsigned int hash);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
     QSP_BOOL qspGetFirstVarValue(QSPString varName, QSPVariant *res);
@@ -142,6 +146,7 @@
         var->ValsCount = 0;
         var->ValsCapacity = 0;
         var->Indices = 0;
+        var->IndsSlots = 0;
         var->IndsCount = 0;
         var->IndsCapacity = 0;
     }
@@ -152,6 +157,7 @@
         dest->ValsCount = src->ValsCount;
         dest->ValsCapacity = src->ValsCapacity;
         dest->Indices = src->Indices;
+        dest->IndsSlots = src->IndsSlots;
         dest->IndsCount = src->IndsCount;
         dest->IndsCapacity = src->IndsCapacity;
         qspInitVarData(src);
@@ -171,6 +177,7 @@
             for (curIndex = var->Indices; count > 0; --count, ++curIndex)
                 qspFreeString(&curIndex->Str);
             free(var->Indices);
+            free(var->IndsSlots);
         }
         qspInitVarData(var);
     }
