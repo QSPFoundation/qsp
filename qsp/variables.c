@@ -807,7 +807,7 @@ INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count)
         qspCopyToNewVariant(dest->Values + i, src->Values + start + i);
     /* Copy array indices */
     srcIndsCount = src->IndsCount;
-    if ((src->ValsCount - itemsToCopy) * 8 < srcIndsCount) /* check skipped items, break-even is about 1/8 */
+    if ((src->ValsCount - itemsToCopy) * 8 < srcIndsCount) /* skipped items bound the indices to remove, break-even is about 1/8 */
     {
         /* Almost all indices fit, copy the table & remove the rest */
         dest->Indices = (QSPVarIndex *)malloc(src->IndsCapacity * sizeof(QSPVarIndex));
