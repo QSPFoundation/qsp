@@ -220,29 +220,24 @@ int qspCallShowMenu(QSPListItem *items, int count)
     {
         QSPCallState state;
         int i, index;
-        JNIListItem *jniItems;
+        jobject jniItem;
         jobjectArray jniMenuArray;
         JNIEnv *javaEnv = qspGetJniEnv();
 
         qspPrepareCallback(&state, QSP_TRUE);
 
         /* Allocate an array */
-        jniItems = (JNIListItem *)malloc(count * sizeof(JNIListItem));
         jniMenuArray = (*javaEnv)->NewObjectArray(javaEnv, count, qspListItemClass, 0);
         for (i = 0; i < count; ++i)
         {
-            jniItems[i] = qspToJavaListItem(javaEnv, items[i].Name, items[i].Image);
-            (*javaEnv)->SetObjectArrayElement(javaEnv, jniMenuArray, i, jniItems[i].ListItem);
+            jniItem = qspToJavaListItem(javaEnv, items[i].Name, items[i].Image);
+            (*javaEnv)->SetObjectArrayElement(javaEnv, jniMenuArray, i, jniItem);
+            (*javaEnv)->DeleteLocalRef(javaEnv, jniItem);
         }
 
         /* Process user input */
         index = (*javaEnv)->CallIntMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_SHOWMENU], jniMenuArray);
-
-        /* Deallocate the resources */
-        for (i = 0; i < count; ++i)
-            qspReleaseJavaListItem(javaEnv, jniItems + i);
         (*javaEnv)->DeleteLocalRef(javaEnv, jniMenuArray);
-        free(jniItems);
 
         qspFinalizeCallback(&state, QSP_FALSE);
         return index;

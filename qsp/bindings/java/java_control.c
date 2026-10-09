@@ -31,6 +31,11 @@ jobject qspApiObject;
 
 jclass qspListItemClass;
 jclass qspObjectItemClass;
+jfieldID qspListItemNameField;
+jfieldID qspListItemImageField;
+jfieldID qspObjectItemNameField;
+jfieldID qspObjectItemTitleField;
+jfieldID qspObjectItemImageField;
 jclass qspExecutionStateClass;
 jclass qspErrorInfoClass;
 
@@ -51,55 +56,28 @@ QSPString qspFromJavaString(JNIEnv *env, jstring str)
     return res;
 }
 
-JNIListItem qspToJavaListItem(JNIEnv *env, QSPString name, QSPString image)
+INLINE void qspSetJavaStringField(JNIEnv *env, jobject obj, jfieldID field, QSPString str)
 {
-    JNIListItem res;
-    jfieldID fieldId;
+    jstring jniStr = qspToJavaString(env, str);
+    (*env)->SetObjectField(env, obj, field, jniStr);
+    (*env)->DeleteLocalRef(env, jniStr);
+}
+
+jobject qspToJavaListItem(JNIEnv *env, QSPString name, QSPString image)
+{
     jobject jniListItem = (*env)->AllocObject(env, qspListItemClass);
-
-    res.ListItem = jniListItem;
-    res.Name = qspToJavaString(env, name);
-    res.Title = 0;
-    res.Image = qspToJavaString(env, image);
-
-    fieldId = (*env)->GetFieldID(env, qspListItemClass , "name", "Ljava/lang/String;");
-    (*env)->SetObjectField(env, jniListItem, fieldId, res.Name);
-
-    fieldId = (*env)->GetFieldID(env, qspListItemClass , "image", "Ljava/lang/String;");
-    (*env)->SetObjectField(env, jniListItem, fieldId, res.Image);
-
-    return res;
+    qspSetJavaStringField(env, jniListItem, qspListItemNameField, name);
+    qspSetJavaStringField(env, jniListItem, qspListItemImageField, image);
+    return jniListItem;
 }
 
-JNIListItem qspToJavaObjectItem(JNIEnv *env, QSPString name, QSPString title, QSPString image)
+jobject qspToJavaObjectItem(JNIEnv *env, QSPString name, QSPString title, QSPString image)
 {
-    JNIListItem res;
-    jfieldID fieldId;
     jobject jniListItem = (*env)->AllocObject(env, qspObjectItemClass);
-
-    res.ListItem = jniListItem;
-    res.Name = qspToJavaString(env, name);
-    res.Title = qspToJavaString(env, title);
-    res.Image = qspToJavaString(env, image);
-
-    fieldId = (*env)->GetFieldID(env, qspObjectItemClass , "name", "Ljava/lang/String;");
-    (*env)->SetObjectField(env, jniListItem, fieldId, res.Name);
-
-    fieldId = (*env)->GetFieldID(env, qspObjectItemClass , "title", "Ljava/lang/String;");
-    (*env)->SetObjectField(env, jniListItem, fieldId, res.Title);
-
-    fieldId = (*env)->GetFieldID(env, qspObjectItemClass , "image", "Ljava/lang/String;");
-    (*env)->SetObjectField(env, jniListItem, fieldId, res.Image);
-
-    return res;
-}
-
-void qspReleaseJavaListItem(JNIEnv *env, JNIListItem *listItem)
-{
-    (*env)->DeleteLocalRef(env, listItem->Name);
-    (*env)->DeleteLocalRef(env, listItem->Title);
-    (*env)->DeleteLocalRef(env, listItem->Image);
-    (*env)->DeleteLocalRef(env, listItem->ListItem);
+    qspSetJavaStringField(env, jniListItem, qspObjectItemNameField, name);
+    qspSetJavaStringField(env, jniListItem, qspObjectItemTitleField, title);
+    qspSetJavaStringField(env, jniListItem, qspObjectItemImageField, image);
+    return jniListItem;
 }
 
 /* ------------------------------------------------------------ */
@@ -174,12 +152,13 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_setInputStrText(JNIEnv *env, j
 JNIEXPORT jobjectArray JNICALL Java_com_libqsp_jni_QSPLib_getActions(JNIEnv *env, jobject api)
 {
     int i;
-    JNIListItem item;
+    jobject item;
     jobjectArray res = (*env)->NewObjectArray(env, qspCurActsCount, qspListItemClass, 0);
     for (i = 0; i < qspCurActsCount; ++i)
     {
         item = qspToJavaListItem(env, qspCurActions[i].Desc, qspCurActions[i].Image);
-        (*env)->SetObjectArrayElement(env, res, i, item.ListItem);
+        (*env)->SetObjectArrayElement(env, res, i, item);
+        (*env)->DeleteLocalRef(env, item);
     }
     return res;
 }
@@ -220,7 +199,7 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getSelActIndex(JNIEnv *env, jo
 JNIEXPORT jobjectArray JNICALL Java_com_libqsp_jni_QSPLib_getObjects(JNIEnv *env, jobject api)
 {
     int i;
-    JNIListItem item;
+    jobject item;
     QSPObjectItem obj;
     jobjectArray res = (*env)->NewObjectArray(env, qspCurObjsCount, qspObjectItemClass, 0);
     for (i = 0; i < qspCurObjsCount; ++i)
@@ -228,7 +207,8 @@ JNIEXPORT jobjectArray JNICALL Java_com_libqsp_jni_QSPLib_getObjects(JNIEnv *env
         if (qspGetObjectInfoByIndex(i, &obj))
         {
             item = qspToJavaObjectItem(env, obj.Name, obj.Title, obj.Image);
-            (*env)->SetObjectArrayElement(env, res, i, item.ListItem);
+            (*env)->SetObjectArrayElement(env, res, i, item);
+            (*env)->DeleteLocalRef(env, item);
         }
     }
     return res;
@@ -602,9 +582,14 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api)
 
     clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ListItem");
     qspListItemClass = (jclass)(*env)->NewGlobalRef(env, clazz);
+    qspListItemNameField = (*env)->GetFieldID(env, qspListItemClass, "name", "Ljava/lang/String;");
+    qspListItemImageField = (*env)->GetFieldID(env, qspListItemClass, "image", "Ljava/lang/String;");
 
     clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ObjectItem");
     qspObjectItemClass = (jclass)(*env)->NewGlobalRef(env, clazz);
+    qspObjectItemNameField = (*env)->GetFieldID(env, qspObjectItemClass, "name", "Ljava/lang/String;");
+    qspObjectItemTitleField = (*env)->GetFieldID(env, qspObjectItemClass, "title", "Ljava/lang/String;");
+    qspObjectItemImageField = (*env)->GetFieldID(env, qspObjectItemClass, "image", "Ljava/lang/String;");
 
     clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ExecutionState");
     qspExecutionStateClass = (jclass)(*env)->NewGlobalRef(env, clazz);

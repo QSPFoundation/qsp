@@ -53,19 +53,16 @@
     extern jclass qspExecutionStateClass;
     extern jclass qspErrorInfoClass;
 
-    typedef struct
-    {
-        jstring Name;
-        jstring Title;
-        jstring Image;
-        jobject ListItem;
-    } JNIListItem;
+    extern jfieldID qspListItemNameField;
+    extern jfieldID qspListItemImageField;
+    extern jfieldID qspObjectItemNameField;
+    extern jfieldID qspObjectItemTitleField;
+    extern jfieldID qspObjectItemImageField;
 
     jstring qspToJavaString(JNIEnv *env, QSPString str);
     QSPString qspFromJavaString(JNIEnv *env, jstring str);
-    JNIListItem qspToJavaListItem(JNIEnv *env, QSPString name, QSPString image);
-    JNIListItem qspToJavaObjectItem(JNIEnv *env, QSPString name, QSPString title, QSPString image);
-    void qspReleaseJavaListItem(JNIEnv *env, JNIListItem *listItem);
+    jobject qspToJavaListItem(JNIEnv *env, QSPString name, QSPString image);
+    jobject qspToJavaObjectItem(JNIEnv *env, QSPString name, QSPString title, QSPString image);
 
     QSP_BOOL qspOpenQuestFromFILE(FILE *f, QSP_BOOL isNewGame);
     QSP_BOOL qspSaveGameStatusToFILE(FILE *f);
