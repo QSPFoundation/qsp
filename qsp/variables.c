@@ -448,13 +448,14 @@ INLINE void qspResizeVarIndices(QSPVar *var, int newCapacity)
 
 INLINE void qspRemoveVarIndex(QSPVar *var, int indexPos)
 {
-    int curInd, curIndexPos, *slot;
-    int *slots = var->IndsSlots, mask = QSP_CAPACITYMASK(var->IndsCapacity * 2), lastIndexPos = var->IndsCount - 1;
+    int lastIndexPos, mask, curInd, curIndexPos, *slot, *slots;
     /* Remove the index & empty the slot */
     qspFreeString(&var->Indices[indexPos].Str);
     slot = qspGetVarIndexSlotByPos(var, indexPos);
     *slot = -1;
     /* Re-insert the following indices up to the next empty slot, lookups stop at empty slots */
+    slots = var->IndsSlots;
+    mask = QSP_CAPACITYMASK(var->IndsCapacity * 2);
     curInd = ((int)(slot - slots) + 1) & mask;
     while ((curIndexPos = slots[curInd]) >= 0)
     {
@@ -464,9 +465,10 @@ INLINE void qspRemoveVarIndex(QSPVar *var, int indexPos)
         curInd = (curInd + 1) & mask;
     }
     /* Keep the indices dense, the last one fills the gap */
+    lastIndexPos = var->IndsCount - 1;
     if (indexPos != lastIndexPos)
     {
-        var->Indices[indexPos] = var->Indices[lastIndexPos];
+        var->Indices[indexPos] = var->Indices[lastIndexPos]; /* fill the gap */
         slot = qspGetVarIndexSlotByPos(var, lastIndexPos);
         *slot = indexPos; /* its slot points to the new position */
     }
@@ -788,8 +790,8 @@ INLINE void qspMoveTupleToArray(QSPVar *dest, QSPTuple *src, int start, int coun
 
 INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count)
 {
-    QSPVarIndex *ind;
-    int i, itemsToCopy, newInd;
+    QSPVarIndex *destIndex;
+    int i, itemsToCopy, srcIndsCount, newInd;
     /* Clear the dest array anyway */
     qspEmptyVar(dest);
     /* Validate parameters */
@@ -804,14 +806,51 @@ INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count)
     for (i = 0; i < itemsToCopy; ++i)
         qspCopyToNewVariant(dest->Values + i, src->Values + start + i);
     /* Copy array indices */
-    for (i = 0; i < src->IndsCount; ++i)
+    srcIndsCount = src->IndsCount;
+    if ((src->ValsCount - itemsToCopy) * 8 < srcIndsCount) /* check skipped items, break-even is about 1/8 */
     {
-        newInd = src->Indices[i].Index - start;
-        if (newInd >= 0 && newInd < itemsToCopy)
+        /* Almost all indices fit, copy the table & remove the rest */
+        dest->Indices = (QSPVarIndex *)malloc(src->IndsCapacity * sizeof(QSPVarIndex));
+        dest->IndsSlots = (int *)malloc((src->IndsCapacity * 2) * sizeof(int));
+        memcpy(dest->Indices, src->Indices, srcIndsCount * sizeof(QSPVarIndex));
+        memcpy(dest->IndsSlots, src->IndsSlots, (src->IndsCapacity * 2) * sizeof(int));
+        dest->IndsCount = srcIndsCount;
+        dest->IndsCapacity = src->IndsCapacity;
+        /* Go backwards, every removal moves the last index into its gap */
+        i = srcIndsCount;
+        while (--i >= 0)
         {
-            ind = qspAddVarIndex(dest, src->Indices[i].Hash);
-            ind->Str = qspCopyToNewText(src->Indices[i].Str);
-            ind->Index = newInd;
+            destIndex = dest->Indices + i;
+            newInd = destIndex->Index - start;
+            if (newInd >= 0 && newInd < itemsToCopy)
+            {
+                destIndex->Str = qspCopyToNewText(destIndex->Str);
+                destIndex->Index = newInd;
+            }
+            else
+            {
+                destIndex->Str = qspNullString; /* the string belongs to source */
+                qspRemoveVarIndex(dest, i);
+            }
+        }
+    }
+    else if (srcIndsCount > 0)
+    {
+        /* Allocate the final table at once */
+        int maxCount, capacity = QSP_VARSINDICESCAPACITY;
+        QSPVarIndex *srcIndex = src->Indices;
+        maxCount = (itemsToCopy < srcIndsCount ? itemsToCopy : srcIndsCount);
+        while (capacity < maxCount) capacity *= 2;
+        qspResizeVarIndices(dest, capacity);
+        for (i = 0; i < srcIndsCount; ++i, ++srcIndex)
+        {
+            newInd = srcIndex->Index - start;
+            if (newInd >= 0 && newInd < itemsToCopy)
+            {
+                destIndex = qspAddVarIndex(dest, srcIndex->Hash);
+                destIndex->Str = qspCopyToNewText(srcIndex->Str);
+                destIndex->Index = newInd;
+            }
         }
     }
 }
