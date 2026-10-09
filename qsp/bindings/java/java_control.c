@@ -443,7 +443,6 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getErrorDesc(JNIEnv *env, j
 }
 /* ------------------------------------------------------------ */
 /* Game controls */
-
 #ifdef __ANDROID__
 
 #include <unistd.h>
@@ -451,57 +450,66 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getErrorDesc(JNIEnv *env, j
 /* Loading a new game from FileDescriptor */
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_loadGameWorldFromFD(JNIEnv *env, jobject api, jint fileDescriptor, jboolean isNewGame)
 {
-	if (fileDescriptor < 0) return QSP_FALSE;
-	const int native_fd = dup(fileDescriptor);
-	if (native_fd < 0) return QSP_FALSE;
-    FILE *f = fdopen(native_fd, "rb");
-	if (f == NULL)
-	{
-		close(native_fd);
-		return QSP_FALSE;
-	}
-	QSP_BOOL res = qspOpenQuestFromFILE(f, isNewGame);
-	fclose(f);
+    FILE *f;
+    int nativeFd;
+    QSP_BOOL res;
+    if (fileDescriptor < 0) return QSP_FALSE;
+    nativeFd = dup(fileDescriptor);
+    if (nativeFd < 0) return QSP_FALSE;
+    if (!(f = fdopen(nativeFd, "rb")))
+    {
+        close(nativeFd);
+        return QSP_FALSE;
+    }
+    res = qspOpenQuestFromFILE(f, isNewGame);
+    fclose(f);
     return res;
 }
-/* Saving state by FileDescriptor */
+/* Saving state using FileDescriptor */
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_saveGameByFD(JNIEnv *env, jobject api, jint fileDescriptor, jboolean toRefreshUI)
 {
-	if (fileDescriptor < 0) return QSP_FALSE;
-    const int native_fd = dup(fileDescriptor);
-	if (native_fd < 0) return QSP_FALSE;
-	FILE *f = fdopen(native_fd, "wb");
-	if (!f) {
-		close(native_fd);
-		return QSP_FALSE;
-	}
+    FILE *f;
+    int nativeFd;
+    QSP_BOOL res;
+    if (fileDescriptor < 0) return QSP_FALSE;
+    nativeFd = dup(fileDescriptor);
+    if (nativeFd < 0) return QSP_FALSE;
+    if (!(f = fdopen(nativeFd, "wb")))
+    {
+        close(nativeFd);
+        return QSP_FALSE;
+    }
     qspPrepareExecution(QSP_FALSE);
-    QSP_BOOL res = qspSaveGameStatusToFILE(f);
+    res = qspSaveGameStatusToFILE(f);
     fclose(f);
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return res;
 }
-/* Loading state from FileDescriptor */
+/* Loading state using FileDescriptor */
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_openSavedGameFromFD(JNIEnv *env, jobject api, jint fileDescriptor, jboolean toRefreshUI)
 {
-	if (fileDescriptor < 0) return QSP_FALSE;
-	const int native_fd = dup(fileDescriptor);
-	if (native_fd < 0) return QSP_FALSE;
-	FILE *f = fdopen(native_fd, "rb");
-	if (!f)
-	{
-		close(native_fd);
-		return QSP_FALSE;
-	}
+    FILE *f;
+    int nativeFd;
+    QSP_BOOL res;
+    if (fileDescriptor < 0) return QSP_FALSE;
+    nativeFd = dup(fileDescriptor);
+    if (nativeFd < 0) return QSP_FALSE;
+    if (!(f = fdopen(nativeFd, "rb")))
+    {
+        close(nativeFd);
+        return QSP_FALSE;
+    }
     qspPrepareExecution(QSP_FALSE);
-	QSP_BOOL res = qspOpenGameStatusFromFILE(f);
-	fclose(f);
+    res = qspOpenGameStatusFromFILE(f);
+    fclose(f);
     if (!res) return JNI_FALSE;
     if (qspErrorNum) return JNI_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return JNI_TRUE;
 }
+
 #endif
+
 /* Load game from data */
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_loadGameWorldFromData(JNIEnv *env, jobject api, jbyteArray data, jboolean isNewGame)
 {
