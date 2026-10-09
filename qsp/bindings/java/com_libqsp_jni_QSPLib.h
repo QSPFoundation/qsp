@@ -257,6 +257,14 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_loadGameWorldFromData
 
 /*
  * Class:     com_libqsp_jni_QSPLib
+ * Method:    loadGameWorldFromFD
+ * Signature: (IZ)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_loadGameWorldFromFD
+  (JNIEnv *, jobject, jint, jboolean);
+
+/*
+ * Class:     com_libqsp_jni_QSPLib
  * Method:    saveGameAsData
  * Signature: (Z)[B
  */
@@ -265,11 +273,27 @@ JNIEXPORT jbyteArray JNICALL Java_com_libqsp_jni_QSPLib_saveGameAsData
 
 /*
  * Class:     com_libqsp_jni_QSPLib
+ * Method:    saveGameByFD
+ * Signature: (IZ)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_saveGameByFD
+  (JNIEnv *, jobject, jint, jboolean);
+
+/*
+ * Class:     com_libqsp_jni_QSPLib
  * Method:    openSavedGameFromData
  * Signature: ([BZ)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_openSavedGameFromData
   (JNIEnv *, jobject, jbyteArray, jboolean);
+
+/*
+ * Class:     com_libqsp_jni_QSPLib
+ * Method:    openSavedGameFromFD
+ * Signature: (IZ)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_openSavedGameFromFD
+  (JNIEnv *, jobject, jint, jboolean);
 
 /*
  * Class:     com_libqsp_jni_QSPLib

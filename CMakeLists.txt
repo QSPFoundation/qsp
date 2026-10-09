@@ -79,6 +79,7 @@ set(QSP_SOURCES
 	qsp/bindings/default/qsp_default.h
 	qsp/bindings/java/java_callbacks.c
 	qsp/bindings/java/java_control.c
+	qsp/bindings/java/java_files.c
 	qsp/bindings/java/qsp_java.h
 	qsp/bindings/qsp.h
 	qsp/actions.c qsp/actions.h
