@@ -482,8 +482,9 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_saveGameByFD(JNIEnv *env, 
     qspPrepareExecution(QSP_FALSE);
     res = qspSaveGameStatusToFILE(f);
     fclose(f);
+    if (!res) return JNI_FALSE;
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
-    return res;
+    return JNI_TRUE;
 }
 /* Loading state using FileDescriptor */
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_openSavedGameFromFD(JNIEnv *env, jobject api, jint fileDescriptor, jboolean toRefreshUI)
@@ -524,10 +525,11 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_loadGameWorldFromData(JNIE
 JNIEXPORT jbyteArray JNICALL Java_com_libqsp_jni_QSPLib_saveGameAsData(JNIEnv *env, jobject api, jboolean toRefreshUI)
 {
     jbyteArray res;
-    void *dataBuf;
+    void *newBuf, *dataBuf;
     int dataBufSize = 64 * 1024;
     qspPrepareExecution(QSP_FALSE);
     dataBuf = malloc(dataBufSize);
+    if (!dataBuf) return 0;
     while (1)
     {
         if (qspSaveGameStatus(dataBuf, &dataBufSize, QSP_TRUE))
@@ -540,9 +542,19 @@ JNIEXPORT jbyteArray JNICALL Java_com_libqsp_jni_QSPLib_saveGameAsData(JNIEnv *e
         /* Happens when we passed insufficient buffer, the new value contains required buffer size */
         /* We have to reserve some extra space to account for game updates during subsequent calls */
         dataBufSize += QSP_SAVEDGAMEDATAEXTRASPACE;
-        dataBuf = realloc(dataBuf, dataBufSize);
+        if (!(newBuf = realloc(dataBuf, dataBufSize)))
+        {
+            free(dataBuf);
+            return 0;
+        }
+        dataBuf = newBuf;
     }
     res = (*env)->NewByteArray(env, dataBufSize);
+    if (!res)
+    {
+        free(dataBuf);
+        return 0;
+    }
     (*env)->SetByteArrayRegion(env, res, 0, dataBufSize, (jbyte *)dataBuf);
     free(dataBuf);
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
