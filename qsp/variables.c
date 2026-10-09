@@ -1215,5 +1215,5 @@ void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
         }
     }
     else
-        qspClearAllVars(QSP_FALSE);
+        qspClearVars(&qspGlobalVars);
 }
