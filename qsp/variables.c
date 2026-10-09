@@ -174,7 +174,7 @@ INLINE QSPVarSlot *qspGetVarSlot(QSPVarsScope *scope, QSPString name, unsigned i
 {
     QSPVarSlot *slot;
     int mask = QSP_CAPACITYMASK(scope->Capacity), ind = (int)(nameHash & mask);
-    while ((slot = scope->VarSlots + ind)->Name.Str && (slot->NameHash != nameHash || qspStrsCompare(slot->Name, name)))
+    while ((slot = scope->VarSlots + ind)->Name.Str && (slot->NameHash != nameHash || !qspStrsEqual(slot->Name, name)))
         ind = (ind + 1) & mask;
     return slot;
 }

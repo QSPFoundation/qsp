@@ -283,8 +283,18 @@
     {
         int len1 = qspStrLen(str1);
         int len2 = qspStrLen(str2);
-
-        return len1 == len2 && !memcmp(str1.Str, str2.Str, len1 * sizeof(QSP_CHAR));
+        if (len1 != len2) return QSP_FALSE;
+        if (len1 < 16) /* the loop is cheaper for short strings */
+        {
+            QSP_CHAR *pos1 = str1.Str, *pos2 = str2.Str, *end1 = str1.End;
+            while (pos1 < end1)
+            {
+                if (*pos1 != *pos2) return QSP_FALSE;
+                ++pos1, ++pos2;
+            }
+            return QSP_TRUE;
+        }
+        return !memcmp(str1.Str, str2.Str, len1 * sizeof(QSP_CHAR));
     }
 
     INLINE int qspStrsCompare(QSPString str1, QSPString str2)
