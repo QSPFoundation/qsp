@@ -35,7 +35,6 @@ INLINE int qspMathOpsCompare(const void *opName1, const void *opName2);
 INLINE int qspMathOpStringFullCompare(const void *name, const void *compareTo);
 INLINE int qspMathOpStringCompare(const void *name, const void *compareTo);
 INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName);
-INLINE QSPString qspGetName(QSPString *expr);
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr);
 INLINE QSPString qspGetString(QSPString *expr);
 INLINE QSPString qspGetCodeBlock(QSPString *expr);
@@ -376,17 +375,6 @@ INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName)
 
     if (name) return name->Code;
     return qspOpUnknown;
-}
-
-INLINE QSPString qspGetName(QSPString *expr)
-{
-    QSP_CHAR *startPos = expr->Str, *endPos = expr->End, *pos = startPos;
-    while (++pos < endPos) /* the first character is not a delimiter */
-    {
-        if (qspIsInClass(*pos, QSP_CHAR_DELIM)) break;
-    }
-    expr->Str = pos;
-    return qspStringFromPair(startPos, pos);
 }
 
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr)
@@ -832,103 +820,107 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                 s.Str += QSP_CHAR_LEN;
                 waitForOperator = QSP_TRUE;
             }
+            else if (*s.Str == QSP_USERFUNC_CHAR) /* a user function call */
+            {
+                s.Str += QSP_CHAR_LEN;
+                qspSkipSpaces(&s);
+                name = qspParseName(&s);
+                if (qspIsEmpty(name))
+                {
+                    qspSetError(QSP_ERR_SYNTAX);
+                    break;
+                }
+                qspSkipSpaces(&s);
+                /* Add the loc name */
+                v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_STR);
+                if (!qspAppendValueToCompiled(expression, qspOpValue, v))
+                {
+                    qspFreeVariant(&v);
+                    break;
+                }
+                /* Add a function call */
+                if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpFunc)) break;
+                ++argStack[opSp]; /* added the function name already */
+                if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK_CHAR)
+                {
+                    if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
+                    s.Str += QSP_CHAR_LEN;
+                }
+                else
+                {
+                    waitForOperator = QSP_TRUE;
+                }
+            }
             else if (!qspIsInClass(*s.Str, QSP_CHAR_DELIM))
             {
-                name = qspGetName(&s);
+                name = qspParseName(&s);
                 qspSkipSpaces(&s);
-                if (*name.Str == QSP_USERFUNC_CHAR)
+                opCode = qspFunctionOpCode(name);
+                if (opCode >= qspOpFirst_Function)
                 {
-                    /* Ignore the @ symbol */
-                    name.Str += QSP_CHAR_LEN;
-                    /* Add the loc name */
-                    v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_STR);
-                    if (!qspAppendValueToCompiled(expression, qspOpValue, v))
-                    {
-                        qspFreeVariant(&v);
-                        break;
-                    }
-                    /* Add a function call */
-                    if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpFunc)) break;
-                    ++argStack[opSp]; /* added the function name already */
                     if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK_CHAR)
                     {
+                        if (!qspPushOperationToStack(opStack, argStack, &opSp, opCode)) break;
                         if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
                         s.Str += QSP_CHAR_LEN;
                     }
+                    else if (qspOps[opCode].MinArgsCount < 2)
+                    {
+                        if (!qspPushOperationToStack(opStack, argStack, &opSp, opCode)) break;
+                        if (qspOps[opCode].MinArgsCount)
+                        {
+                            /* The function has single argument */
+                            ++argStack[opSp];
+                        }
+                        else
+                        {
+                            /* The function has no arguments */
+                            waitForOperator = QSP_TRUE;
+                        }
+                    }
                     else
                     {
-                        waitForOperator = QSP_TRUE;
+                        qspSetError(QSP_ERR_BRACKETNOTFOUND);
+                        break;
                     }
                 }
                 else
                 {
-                    opCode = qspFunctionOpCode(name);
-                    if (opCode >= qspOpFirst_Function)
+                    v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_VARREF);
+                    if (!qspIsEmpty(s) && *s.Str == QSP_LSBRACK_CHAR)
                     {
-                        if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK_CHAR)
-                        {
-                            if (!qspPushOperationToStack(opStack, argStack, &opSp, opCode)) break;
-                            if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenRoundBracket)) break;
-                            s.Str += QSP_CHAR_LEN;
-                        }
-                        else if (qspOps[opCode].MinArgsCount < 2)
-                        {
-                            if (!qspPushOperationToStack(opStack, argStack, &opSp, opCode)) break;
-                            if (qspOps[opCode].MinArgsCount)
-                            {
-                                /* The function has single argument */
-                                ++argStack[opSp];
-                            }
-                            else
-                            {
-                                /* The function has no arguments */
-                                waitForOperator = QSP_TRUE;
-                            }
-                        }
-                        else
-                        {
-                            qspSetError(QSP_ERR_BRACKETNOTFOUND);
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_VARREF);
-                        if (!qspIsEmpty(s) && *s.Str == QSP_LSBRACK_CHAR)
+                        s.Str += QSP_CHAR_LEN;
+                        qspSkipSpaces(&s);
+                        if (!qspIsEmpty(s) && *s.Str == QSP_RSBRACK_CHAR)
                         {
                             s.Str += QSP_CHAR_LEN;
-                            qspSkipSpaces(&s);
-                            if (!qspIsEmpty(s) && *s.Str == QSP_RSBRACK_CHAR)
-                            {
-                                s.Str += QSP_CHAR_LEN;
-                                if (!qspAppendValueToCompiled(expression, qspOpInlineLastArrItem, v))
-                                {
-                                    qspFreeVariant(&v);
-                                    break;
-                                }
-                                waitForOperator = QSP_TRUE;
-                            }
-                            else
-                            {
-                                /* The operation gets appended after its index, so the name waits on the stack */
-                                if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpInlineIndexedArrItem))
-                                {
-                                    qspFreeVariant(&v);
-                                    break;
-                                }
-                                nameStack[opSp] = (unsigned short)qspStoreValue(expression, v);
-                                if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenSquareBracket)) break;
-                            }
-                        }
-                        else
-                        {
-                            if (!qspAppendValueToCompiled(expression, qspOpInlineFirstArrItem, v))
+                            if (!qspAppendValueToCompiled(expression, qspOpInlineLastArrItem, v))
                             {
                                 qspFreeVariant(&v);
                                 break;
                             }
                             waitForOperator = QSP_TRUE;
                         }
+                        else
+                        {
+                            /* The operation gets appended after its index, so the name waits on the stack */
+                            if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpInlineIndexedArrItem))
+                            {
+                                qspFreeVariant(&v);
+                                break;
+                            }
+                            nameStack[opSp] = (unsigned short)qspStoreValue(expression, v);
+                            if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpOpenSquareBracket)) break;
+                        }
+                    }
+                    else
+                    {
+                        if (!qspAppendValueToCompiled(expression, qspOpInlineFirstArrItem, v))
+                        {
+                            qspFreeVariant(&v);
+                            break;
+                        }
+                        waitForOperator = QSP_TRUE;
                     }
                 }
             }

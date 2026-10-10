@@ -150,9 +150,9 @@ QSP {
     */
 
     userCallStatement          = userCallStatementEmptyArgs | userCallStatementWithArgs | userCallStatementNoArgs
-    userCallStatementNoArgs    = "@@" userStatementName
-    userCallStatementEmptyArgs = "@@" userStatementName ws "(" mws ")"
-    userCallStatementWithArgs  = "@@" userStatementName ws ( parenthesizedArgument1plusList | nonAmpersandArgument1plusList )
+    userCallStatementNoArgs    = "@@" ws userStatementName
+    userCallStatementEmptyArgs = "@@" ws userStatementName ws "(" mws ")"
+    userCallStatementWithArgs  = "@@" ws userStatementName ws ( parenthesizedArgument1plusList | nonAmpersandArgument1plusList )
 
     /* ====================
        FUNCTION CALLS
@@ -193,12 +193,12 @@ QSP {
 
     nonAmpersandFunctionCallSingleArg = funcNameWithPrefix &delimiterChar ws ( parenthesizedExpression | nonAmpersandExpression )
 
-    userFunctionCallNoArgs          = "@" userFunctionName
-    userFunctionCallEmptyArgs       = "@" userFunctionName ws "(" mws ")"
-    userFunctionCallWithArgs        = "@" userFunctionName ws parenthesizedArgument1plusList
+    userFunctionCallNoArgs          = "@" ws userFunctionName
+    userFunctionCallEmptyArgs       = "@" ws userFunctionName ws "(" mws ")"
+    userFunctionCallWithArgs        = "@" ws userFunctionName ws parenthesizedArgument1plusList
 
-    multilineUserFunctionCallEmptyArgs = "@" userFunctionName mws "(" mws ")"
-    multilineUserFunctionCallWithArgs  = "@" userFunctionName mws parenthesizedArgument1plusList
+    multilineUserFunctionCallEmptyArgs = "@" ws userFunctionName mws "(" mws ")"
+    multilineUserFunctionCallWithArgs  = "@" ws userFunctionName mws parenthesizedArgument1plusList
 
     /* ====================
        OTHER STATEMENTS
@@ -379,7 +379,7 @@ QSP {
                           | binaryKeywordOperator
                           | unaryKeywordOperator
 
-    delimiterChar       = end | newline | " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "{" | "}" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | "\\" | "," | ":" | ";" | "^"
+    delimiterChar       = end | newline | " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "{" | "}" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | "\\" | "," | ":" | ";" | "^" | "@"
     nonDelimiterChar    = ~delimiterChar any
 
     typePrefix          = "#" | "$" | "%"

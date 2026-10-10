@@ -223,6 +223,14 @@
         return num;
     }
 
+    INLINE QSPString qspParseName(QSPString *s)
+    {
+        QSP_CHAR *startPos = s->Str, *pos = startPos, *end = s->End;
+        while (pos < end && !qspIsInClass(*pos, QSP_CHAR_DELIM)) ++pos;
+        s->Str = pos;
+        return qspStringFromPair(startPos, pos);
+    }
+
     INLINE unsigned int qspAddCharToTextHash(unsigned int hash, QSP_CHAR ch)
     {
         return (hash ^ (unsigned int)ch) * 16777619u;

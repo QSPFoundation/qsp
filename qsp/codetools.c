@@ -216,24 +216,22 @@ INLINE QSPCachedLoop *qspNewLoop(QSPString s, QSPString lineStr, QSP_TINYINT *er
 
 INLINE QSPCachedArg *qspNewUserCallArgs(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode)
 {
-    QSPCachedArg *args;
-    QSP_CHAR *nameEnd = qspStrCharClass(s, QSP_CHAR_DELIM);
-    if (nameEnd)
+    QSP_TINYINT count;
+    QSPString name;
+    QSPCachedArg foundArgs[QSP_MAXSTATARGS];
+    qspSkipSpaces(&s);
+    name = qspParseName(&s);
+    if (qspIsEmpty(name))
     {
-        QSP_TINYINT count;
-        QSPCachedArg foundArgs[QSP_MAXSTATARGS];
-        foundArgs[0].Data.Text = qspStringFromPair(s.Str, nameEnd); /* the name goes first */
-        foundArgs[0].Type = qspArgString;
-        count = qspAppendRegularArgs(foundArgs, 1, qspStatUserCall, qspStringFromPair(nameEnd, s.End), errorCode);
-        if (*errorCode) return 0;
-        *argsCount = count;
-        return qspCopyToNewArgs(foundArgs, count);
+        *errorCode = QSP_ERR_SYNTAX;
+        return 0;
     }
-    args = (QSPCachedArg *)malloc(sizeof(QSPCachedArg));
-    args->Data.Text = s; /* the name only */
-    args->Type = qspArgString;
-    *argsCount = 1;
-    return args;
+    foundArgs[0].Data.Text = name; /* the name goes first */
+    foundArgs[0].Type = qspArgString;
+    count = qspAppendRegularArgs(foundArgs, 1, qspStatUserCall, s, errorCode);
+    if (*errorCode) return 0;
+    *argsCount = count;
+    return qspCopyToNewArgs(foundArgs, count);
 }
 
 INLINE QSPCachedAct *qspNewAct(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode)

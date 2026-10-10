@@ -142,7 +142,7 @@
     #define QSP_RCODE        QSP_FMT("}")
     QSP_DEFINE_SPECIAL_CHAR(QSP_RCODE,       QSP_FMT('}'))
 
-    #define QSP_DELIMS       QSP_FMT(" \t&'\"()[]{}=!<>+-/*\\,:;^\r\n")
+    #define QSP_DELIMS       QSP_FMT(" \t&'\"()[]{}=!<>+-/*\\,:;^@\r\n")
 
     #define QSP_LOC_COUNTER QSP_FMT("COUNTER")
     #define QSP_LOC_USERCOMMAND QSP_FMT("USERCOM")
