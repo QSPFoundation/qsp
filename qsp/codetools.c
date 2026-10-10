@@ -926,14 +926,15 @@ void qspPrepareStringToExecution(QSPString *str)
 INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line)
 {
     QSPString lineStr;
-    int eolLen = QSP_STATIC_LEN(QSP_PREEOLEXT QSP_EOLEXT);
+    int eolLen = QSP_CHAR_LEN + QSP_STATIC_LEN(QSP_EOLEXT); /* a space or a tab, then the marker */
     /* Check line ending only if we add something to the combined line */
     if (qspAddBufText(strBuf, str) && strBuf->Len >= eolLen)
     {
         QSPString eol = qspStringFromLen(strBuf->Str + strBuf->Len - eolLen, eolLen);
-        if (qspStrsEqual(eol, QSP_STATIC_STR(QSP_PREEOLEXT QSP_EOLEXT)))
+        QSPString marker = qspStringFromPair(eol.Str + QSP_CHAR_LEN, eol.End);
+        if (qspStrsEqual(marker, QSP_STATIC_STR(QSP_EOLEXT)) && qspIsInClass(*eol.Str, QSP_CHAR_SPACE))
         {
-            strBuf->Len -= QSP_STATIC_LEN(QSP_EOLEXT); /* keep QSP_PREEOLEXT */
+            strBuf->Len -= QSP_STATIC_LEN(QSP_EOLEXT); /* keep the space */
             return QSP_FALSE;
         }
     }
