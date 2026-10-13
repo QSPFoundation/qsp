@@ -249,6 +249,7 @@ QSP {
 
     primaryExpression               = parenthesizedExpression
                                     | numberLiteral
+                                    | undefinedLiteral
                                     | interpolatedString /* Try to parse it as a string with subexpressions */
                                     | rawStringLiteral
                                     | codeBlock
@@ -259,6 +260,7 @@ QSP {
 
     multilinePrimaryExpression      = parenthesizedExpression
                                     | numberLiteral
+                                    | undefinedLiteral
                                     | interpolatedString /* Try to parse it as a string with subexpressions */
                                     | rawStringLiteral
                                     | codeBlock
@@ -269,6 +271,7 @@ QSP {
 
     nonAmpersandPrimaryExpression   = parenthesizedExpression
                                     | numberLiteral
+                                    | undefinedLiteral
                                     | interpolatedString
                                     | rawStringLiteral
                                     | codeBlock
@@ -330,6 +333,7 @@ QSP {
     quoteEscape                  = "\"\""
 
     numberLiteral                = digit+
+    undefinedLiteral             = "?"
 
     /* ====================
        INTERPOLATED STRINGS
@@ -379,7 +383,7 @@ QSP {
                           | binaryKeywordOperator
                           | unaryKeywordOperator
 
-    delimiterChar       = end | newline | " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "{" | "}" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | "\\" | "," | ":" | ";" | "^" | "@"
+    delimiterChar       = end | newline | " " | "\t" | "&" | "'" | "\"" | "(" | ")" | "[" | "]" | "{" | "}" | "=" | "!" | "<" | ">" | "+" | "-" | "/" | "*" | "\\" | "," | ":" | ";" | "^" | "@" | "?"
     nonDelimiterChar    = ~delimiterChar any
 
     typePrefix          = "#" | "$" | "%"
