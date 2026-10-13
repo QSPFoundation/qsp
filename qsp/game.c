@@ -399,7 +399,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
     isLatestFormat = (qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_NEWSAVEDGAMEVER)) >= 0);
-    if (QSP_ISFALSE(qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DEBUG")))))
+    if (QSP_ISFALSE(qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DEBUG")), 0)))
     {
         temp = qspReadEncodedIntVal(strs[2], isUCS);
         if (temp != qspQstCRC) return QSP_FALSE;

@@ -84,7 +84,7 @@
         QSP_TYPE_STR = 3,
         QSP_TYPE_CODE = 4,
         QSP_TYPE_VARREF = 5,
-        QSP_TYPE_UNDEF = 6, /* not used for values, it has to be a string-based type */
+        QSP_TYPE_UNDEF = 6, /* an undefined value acts as the empty value of the type it's used as */
         QSP_TYPE_DEFINED_TYPES /* represents the number of defined values */
     };
 
@@ -117,7 +117,7 @@
         /* STRING */ QSP_TYPE_STR,
         /* CODE */   QSP_TYPE_STR,
         /* VARREF */ QSP_TYPE_STR,
-        /* UNDEF */  QSP_TYPE_STR
+        /* UNDEF */  QSP_TYPE_UNDEF
     };
 
     #define QSP_ISDEF(a) ((a) != QSP_TYPE_UNDEF)

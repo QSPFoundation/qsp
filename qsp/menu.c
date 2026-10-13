@@ -65,6 +65,8 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
         itemName = itemLocation = itemImage = qspNullString;
         switch (QSP_BASETYPE(curItem->Type))
         {
+        case QSP_TYPE_UNDEF:
+            break; /* stops collecting items */
         case QSP_TYPE_TUPLE:
             tuple = QSP_PTUPLE(curItem);
             if (tuple.ValsCount < 2) break;

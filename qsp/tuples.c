@@ -47,6 +47,9 @@ QSP_BIGINT qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
     case 1:
         switch (QSP_BASETYPE(tuple.Vals[0].Type))
         {
+        case QSP_TYPE_UNDEF:
+            if (isValid) *isValid = QSP_TRUE;
+            return 0;
         case QSP_TYPE_TUPLE:
             return qspTupleToNum(QSP_TUPLE(tuple.Vals[0]), isValid);
         case QSP_TYPE_NUM:
@@ -129,6 +132,8 @@ int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value)
 {
     switch (QSP_BASETYPE(value->Type))
     {
+    case QSP_TYPE_UNDEF:
+        return (tuple.ValsCount ? 1 : 0); /* undefined value is the empty tuple here */
     case QSP_TYPE_TUPLE:
         return qspTuplesCompare(tuple, QSP_PTUPLE(value));
     case QSP_TYPE_NUM:
@@ -187,6 +192,10 @@ void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
     {
         switch (QSP_BASETYPE(item->Type))
         {
+        case QSP_TYPE_UNDEF:
+            qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT)); /* an empty string */
+            qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
+            break;
         case QSP_TYPE_TUPLE:
             qspAppendTupleToString(QSP_PTUPLE(item), res);
             break;

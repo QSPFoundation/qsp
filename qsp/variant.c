@@ -26,16 +26,24 @@ static const QSP_BOOL qspTypeConversionTable[QSP_TYPE_DEFINED_TYPES][QSP_TYPE_DE
 INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
 INLINE QSPString qspGetVariantAsVarRef(QSPVariant *val);
 INLINE QSP_BOOL qspGetVariantAsBool(QSPVariant *val);
+INLINE int qspEmptyValueCompare(QSPVariant *value);
 
 INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
 {
     switch (QSP_BASETYPE(arg1->Type))
     {
+    case QSP_TYPE_UNDEF:
+        qspCopyToNewVariant(res, arg2);
+        break;
     case QSP_TYPE_TUPLE:
         return QSP_FALSE; /* tuples get processed before calling this function */
     case QSP_TYPE_STR:
         switch (QSP_BASETYPE(arg2->Type))
         {
+        case QSP_TYPE_UNDEF:
+            QSP_PSTR(res) = qspCopyToNewText(QSP_PSTR(arg1));
+            res->Type = QSP_TYPE_STR;
+            break;
         case QSP_TYPE_TUPLE:
             return QSP_FALSE; /* tuples get processed before calling this function */
         case QSP_TYPE_STR:
@@ -60,6 +68,9 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
     case QSP_TYPE_NUM:
         switch (QSP_BASETYPE(arg2->Type))
         {
+        case QSP_TYPE_UNDEF:
+            *res = qspNumVariant(QSP_PNUM(arg1));
+            break;
         case QSP_TYPE_TUPLE:
             return QSP_FALSE; /* tuples get processed before calling this function */
         case QSP_TYPE_STR:
@@ -141,6 +152,9 @@ QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
 {
     switch (QSP_BASETYPE(val->Type))
     {
+    case QSP_TYPE_UNDEF:
+        if (isValid) *isValid = QSP_TRUE;
+        return 0;
     case QSP_TYPE_TUPLE:
         return qspTupleToNum(QSP_PTUPLE(val), isValid);
     case QSP_TYPE_NUM:
@@ -172,41 +186,44 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
     /* NB: val->Type can be QSP_TYPE_UNDEF */
     if (val->Type != type && qspTypeConversionTable[val->Type][type])
     {
-        switch (type)
+        if (QSP_ISDEF(val->Type)) /* an undefined value already holds the empty payload of any type */
         {
-        case QSP_TYPE_TUPLE:
-            QSP_PTUPLE(val) = qspMoveToNewTuple(val, 1);
-            break;
-        case QSP_TYPE_NUM:
+            switch (type)
             {
-                QSP_BOOL isValid;
-                QSP_BIGINT result = qspGetVariantAsNum(val, &isValid);
-                if (!isValid) return QSP_FALSE;
-                qspFreeVariant(val);
-                QSP_PNUM(val) = result;
+            case QSP_TYPE_TUPLE:
+                QSP_PTUPLE(val) = qspMoveToNewTuple(val, 1);
                 break;
-            }
-        case QSP_TYPE_BOOL:
-            {
-                QSP_BOOL result = qspGetVariantAsBool(val);
-                qspFreeVariant(val);
-                QSP_PNUM(val) = QSP_TOBOOL(result);
-                break;
-            }
-        case QSP_TYPE_STR:
-        case QSP_TYPE_CODE:
-            {
-                QSPString result = qspGetVariantAsString(val);
-                qspFreeVariant(val);
-                QSP_PSTR(val) = result;
-                break;
-            }
-        case QSP_TYPE_VARREF:
-            {
-                QSPString result = qspGetVariantAsVarRef(val);
-                qspFreeVariant(val);
-                QSP_PSTR(val) = result;
-                break;
+            case QSP_TYPE_NUM:
+                {
+                    QSP_BOOL isValid;
+                    QSP_BIGINT result = qspGetVariantAsNum(val, &isValid);
+                    if (!isValid) return QSP_FALSE;
+                    qspFreeVariant(val);
+                    QSP_PNUM(val) = result;
+                    break;
+                }
+            case QSP_TYPE_BOOL:
+                {
+                    QSP_BOOL result = qspGetVariantAsBool(val);
+                    qspFreeVariant(val);
+                    QSP_PNUM(val) = QSP_TOBOOL(result);
+                    break;
+                }
+            case QSP_TYPE_STR:
+            case QSP_TYPE_CODE:
+                {
+                    QSPString result = qspGetVariantAsString(val);
+                    qspFreeVariant(val);
+                    QSP_PSTR(val) = result;
+                    break;
+                }
+            case QSP_TYPE_VARREF:
+                {
+                    QSPString result = qspGetVariantAsVarRef(val);
+                    qspFreeVariant(val);
+                    QSP_PSTR(val) = result;
+                    break;
+                }
             }
         }
         val->Type = type;
@@ -214,15 +231,34 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
     return QSP_TRUE;
 }
 
+INLINE int qspEmptyValueCompare(QSPVariant *value)
+{
+    /* Compares the empty value of the same type with the value */
+    switch (QSP_BASETYPE(value->Type))
+    {
+    case QSP_TYPE_TUPLE:
+        return (QSP_PTUPLE(value).ValsCount ? -1 : 0);
+    case QSP_TYPE_NUM:
+        return (QSP_PNUM(value) > 0 ? -1 : (QSP_PNUM(value) < 0 ? 1 : 0));
+    case QSP_TYPE_STR:
+        return (qspIsEmpty(QSP_PSTR(value)) ? 0 : -1);
+    }
+    return 0;
+}
+
 int qspVariantsCompare(QSPVariant *first, QSPVariant *second)
 {
     switch (QSP_BASETYPE(first->Type))
     {
+    case QSP_TYPE_UNDEF:
+        return qspEmptyValueCompare(second); /* an undefined value is the empty value of the other operand's type */
     case QSP_TYPE_TUPLE:
         return qspTupleValueCompare(QSP_PTUPLE(first), second);
     case QSP_TYPE_NUM:
         switch (QSP_BASETYPE(second->Type))
         {
+        case QSP_TYPE_UNDEF:
+            return -qspEmptyValueCompare(first);
         case QSP_TYPE_TUPLE:
             return -qspTupleValueCompare(QSP_PTUPLE(second), first);
         case QSP_TYPE_NUM:
@@ -243,6 +279,8 @@ int qspVariantsCompare(QSPVariant *first, QSPVariant *second)
     case QSP_TYPE_STR:
         switch (QSP_BASETYPE(second->Type))
         {
+        case QSP_TYPE_UNDEF:
+            return -qspEmptyValueCompare(first);
         case QSP_TYPE_TUPLE:
             return -qspTupleValueCompare(QSP_PTUPLE(second), first);
         case QSP_TYPE_NUM:
@@ -268,6 +306,8 @@ QSP_BOOL qspVariantsEqual(QSPVariant *first, QSPVariant *second)
 {
     switch (QSP_BASETYPE(first->Type))
     {
+    case QSP_TYPE_UNDEF:
+        return !QSP_ISDEF(second->Type);
     case QSP_TYPE_TUPLE:
         return (QSP_ISTUPLE(second->Type) && qspTuplesEqual(QSP_PTUPLE(first), QSP_PTUPLE(second)));
     case QSP_TYPE_NUM:
@@ -282,9 +322,28 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
 {
     switch (QSP_BASETYPE(arg1->Type))
     {
+    case QSP_TYPE_UNDEF:
+        switch (QSP_BASETYPE(arg2->Type))
+        {
+        case QSP_TYPE_UNDEF:
+            qspInitVariant(res, QSP_TYPE_STR); /* undefined & undefined is an empty string */
+            break;
+        case QSP_TYPE_TUPLE:
+            *res = qspTupleVariant(qspCopyToNewTuple(QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).ValsCount)); /* the empty value doesn't change the other one */
+            break;
+        case QSP_TYPE_NUM:
+        case QSP_TYPE_STR:
+            QSP_PSTR(res) = qspGetVariantAsString(arg2);
+            res->Type = QSP_TYPE_STR;
+            break;
+        }
+        break;
     case QSP_TYPE_TUPLE:
         switch (QSP_BASETYPE(arg2->Type))
         {
+        case QSP_TYPE_UNDEF:
+            *res = qspTupleVariant(qspCopyToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).ValsCount));
+            break;
         case QSP_TYPE_TUPLE:
             *res = qspTupleVariant(qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).ValsCount, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).ValsCount));
             break;
@@ -298,6 +357,10 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
     case QSP_TYPE_STR:
         switch (QSP_BASETYPE(arg2->Type))
         {
+        case QSP_TYPE_UNDEF:
+            QSP_PSTR(res) = qspGetVariantAsString(arg1);
+            res->Type = QSP_TYPE_STR;
+            break;
         case QSP_TYPE_TUPLE:
             *res = qspTupleVariant(qspMergeToNewTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).ValsCount));
             break;
@@ -408,6 +471,9 @@ void qspMultiplyVariantByNum(QSPVariant *val, QSP_BIGINT num, QSPVariant *res)
 {
     switch (QSP_BASETYPE(val->Type))
     {
+    case QSP_TYPE_UNDEF:
+        *res = qspNumVariant(0); /* the empty value as a number */
+        break;
     case QSP_TYPE_TUPLE:
         {
             QSPVariant multiplier = qspNumVariant(num);
@@ -432,6 +498,9 @@ void qspAppendVariantToIndexString(QSPVariant *val, QSPBufString *res)
     QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
     switch (QSP_BASETYPE(val->Type))
     {
+    case QSP_TYPE_UNDEF:
+        qspAddBufText(res, QSP_STATIC_STR(QSP_UNDEFTYPE)); /* type id, no value */
+        break;
     case QSP_TYPE_TUPLE:
         {
             int count = QSP_PTUPLE(val).ValsCount;

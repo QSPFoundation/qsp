@@ -66,6 +66,9 @@
     #define QSP_TUPLETYPE    QSP_FMT("%")
     QSP_DEFINE_SPECIAL_CHAR(QSP_TUPLETYPE,   QSP_FMT('%'))
 
+    #define QSP_UNDEFTYPE    QSP_FMT("?")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_UNDEFTYPE,   QSP_FMT('?'))
+
     #define QSP_LABEL        QSP_FMT(":")
     QSP_DEFINE_SPECIAL_CHAR(QSP_LABEL,       QSP_FMT(':'))
 

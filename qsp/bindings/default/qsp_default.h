@@ -132,7 +132,7 @@
     QSP_EXTERN QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *res);
     QSP_EXTERN QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize);
     QSP_EXTERN QSP_BOOL QSPGetNumVarValue(QSPString name, int ind, QSP_BIGINT *res);
-    QSP_EXTERN QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSPString *res);
+    QSP_EXTERN QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSP_CHAR *buf, int bufSize);
 
     #ifdef __cplusplus
     }

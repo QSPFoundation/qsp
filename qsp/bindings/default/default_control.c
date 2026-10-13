@@ -309,36 +309,20 @@ QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize)
 /* Get numeric value of the specified array item */
 QSP_BOOL QSPGetNumVarValue(QSPString name, int ind, QSP_BIGINT *res)
 {
-    QSPVar *var = qspVarReference(name, QSP_FALSE);
-    if (var && ind >= 0 && ind < var->ValsCount)
-    {
-        QSPVariant *val = var->Values + ind;
-        if (QSP_ISNUM(val->Type))
-        {
-            *res = QSP_PNUM(val);
-            return QSP_TRUE;
-        }
-    }
-
-    *res = 0;
-    return QSP_FALSE;
+    *res = qspGetVarNumValue(name, ind);
+    return QSP_TRUE;
 }
 /* Get string value of the specified array item */
-QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSPString *res)
+QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSP_CHAR *buf, int bufSize)
 {
-    QSPVar *var = qspVarReference(name, QSP_FALSE);
-    if (var && ind >= 0 && ind < var->ValsCount)
-    {
-        QSPVariant *val = var->Values + ind;
-        if (QSP_ISSTR(val->Type))
-        {
-            *res = QSP_PSTR(val);
-            return QSP_TRUE;
-        }
-    }
-
-    *res = qspNullString;
-    return QSP_FALSE;
+    int resLen;
+    QSPString res = qspGetVarStrValue(name, ind);
+    resLen = qspStrLen(res);
+    if (resLen >= bufSize) resLen = bufSize - 1;
+    if (resLen) memcpy(buf, res.Str, resLen * sizeof(QSP_CHAR));
+    buf[resLen] = 0;
+    qspFreeString(&res);
+    return QSP_TRUE;
 }
 /* ------------------------------------------------------------ */
 /* Code execution */

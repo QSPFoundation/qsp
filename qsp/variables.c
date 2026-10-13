@@ -22,6 +22,7 @@ QSP_TINYINT qspSpecToBaseTypeTable[128];
 
 INLINE int qspValuePositionsAscCompare(const void *arg1, const void *arg2);
 INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2);
+INLINE QSP_BOOL qspGetArrayValsType(QSPVar *var, QSP_TINYINT *valsType);
 INLINE QSPVarSlot *qspNewVarSlots(int capacity);
 INLINE QSPVarSlot *qspGetVarSlot(QSPVarsScope *scope, QSPString name, unsigned int nameHash);
 INLINE QSPVarSlot *qspGetEmptyVarSlot(QSPVarsScope *scope, unsigned int nameHash);
@@ -46,14 +47,14 @@ INLINE void qspSetFirstVarValue(QSPString varName, QSPVariant *val);
 INLINE void qspSetVarValue(QSPCachedTarget *target, QSPVariant *val, QSP_CHAR op);
 INLINE void qspMoveTupleToArray(QSPVar *dest, QSPTuple *src, int start, int count);
 INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count);
-INLINE void qspSortArray(QSPVar *var, QSP_TINYINT baseValType, QSP_BOOL isAscending);
+INLINE void qspSortArray(QSPVar *var, QSP_TINYINT varType, QSP_BOOL isAscending);
 INLINE void qspSetVarsValues(QSPCachedAssignment *assignment, QSPVariant *v, QSP_CHAR op);
 
 void qspInitVarTypes(void)
 {
     int i;
     for (i = 0; i < sizeof(qspSpecToBaseTypeTable); ++i)
-        qspSpecToBaseTypeTable[i] = QSP_TYPE_NUM;
+        qspSpecToBaseTypeTable[i] = QSP_TYPE_UNDEF; /* no prefix: values as they are */
 
     qspSpecToBaseTypeTable[QSP_NUMTYPE_CHAR] = QSP_TYPE_NUM;
     qspSpecToBaseTypeTable[QSP_STRTYPE_CHAR] = QSP_TYPE_STR;
@@ -68,6 +69,28 @@ INLINE int qspValuePositionsAscCompare(const void *arg1, const void *arg2)
 INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2)
 {
     return qspVariantsCompare(*(QSPVariant **)arg2, *(QSPVariant **)arg1); /* base types of values should be the same */
+}
+
+INLINE QSP_BOOL qspGetArrayValsType(QSPVar *var, QSP_TINYINT *valsType)
+{
+    QSP_TINYINT type = QSP_TYPE_UNDEF;
+    QSPVariant *curValue = var->Values, *end = var->Values + var->ValsCount;
+    while (curValue < end)
+    {
+        if (QSP_ISDEF(curValue->Type))
+        {
+            if (!QSP_ISDEF(type))
+                type = QSP_BASETYPE(curValue->Type);
+            else if (QSP_BASETYPE(curValue->Type) != type)
+            {
+                *valsType = QSP_TYPE_UNDEF;
+                return QSP_FALSE;
+            }
+        }
+        ++curValue;
+    }
+    *valsType = type;
+    return QSP_TRUE;
 }
 
 QSPVarsScopeChunk *qspAllocateVarsScopeChunk(QSPVarsScopeChunk *parentChunk)
@@ -522,8 +545,13 @@ int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
 {
     unsigned int hash;
     QSPString key;
-    if (QSP_ISNUM(index.Type))
+    switch (QSP_BASETYPE(index.Type))
+    {
+    case QSP_TYPE_UNDEF:
+        return 0; /* an index without a value means the first item */
+    case QSP_TYPE_NUM:
         return QSP_TOINT(QSP_NUM(index));
+    }
     key = qspGetVariantAsIndexString(&index);
     qspUpperStr(&key);
     hash = qspGetTextHash(key);
@@ -578,7 +606,7 @@ INLINE QSP_BOOL qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT base
     if (ind >= 0 && ind < var->ValsCount)
     {
         QSP_TINYINT varType = var->Values[ind].Type;
-        if (QSP_ISDEF(varType) && QSP_BASETYPE(varType) == baseType)
+        if (!QSP_ISDEF(baseType) || QSP_BASETYPE(varType) == baseType)
         {
             qspCopyToNewVariant(res, var->Values + ind);
             return QSP_TRUE;
@@ -619,39 +647,19 @@ QSP_BOOL qspGetLastVarValue(QSPString varName, QSPVariant *res)
     return qspGetVarValueByReference(var, arrIndex, varType, res);
 }
 
-QSPString qspGetVarStrValue(QSPString name)
+QSPString qspGetVarStrValue(QSPString name, int ind)
 {
-    int oldLocationState = qspLocationState;
     QSPVar *var = qspVarReference(name, QSP_FALSE);
-    if (var)
-    {
-        if (var->ValsCount && QSP_ISSTR(var->Values[0].Type))
-            return QSP_STR(var->Values[0]);
-    }
-    else
-    {
-        /* Reset the location state */
-        qspLocationState = oldLocationState;
-        qspResetError(QSP_FALSE);
-    }
+    if (var && ind >= 0 && ind < var->ValsCount)
+        return qspGetVariantAsString(var->Values + ind);
     return qspNullString;
 }
 
-QSP_BIGINT qspGetVarNumValue(QSPString name)
+QSP_BIGINT qspGetVarNumValue(QSPString name, int ind)
 {
-    int oldLocationState = qspLocationState;
     QSPVar *var = qspVarReference(name, QSP_FALSE);
-    if (var)
-    {
-        if (var->ValsCount && QSP_ISNUM(var->Values[0].Type))
-            return QSP_NUM(var->Values[0]);
-    }
-    else
-    {
-        /* Reset the location state */
-        qspLocationState = oldLocationState;
-        qspResetError(QSP_FALSE);
-    }
+    if (var && ind >= 0 && ind < var->ValsCount)
+        return qspGetVariantAsNum(var->Values + ind, 0);
     return 0;
 }
 
@@ -855,24 +863,28 @@ INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count)
     }
 }
 
-INLINE void qspSortArray(QSPVar *var, QSP_TINYINT baseValType, QSP_BOOL isAscending)
+INLINE void qspSortArray(QSPVar *var, QSP_TINYINT varType, QSP_BOOL isAscending)
 {
+    QSP_TINYINT valsType;
     QSPVariant *curValue, *sortedValues, **valuePositions;
     int i, *indexMapping, indsCount, valsCount;
     valsCount = var->ValsCount;
     if (valsCount < 2) return;
+    if (!qspGetArrayValsType(var, &valsType))
+    {
+        qspSetError(QSP_ERR_TYPEMISMATCH);
+        return;
+    }
+    if (!QSP_ISDEF(valsType)) return; /* nothing but holes */
+    if (QSP_ISDEF(varType) && varType != valsType)
+    {
+        qspSetError(QSP_ERR_TYPEMISMATCH);
+        return;
+    }
     valuePositions = (QSPVariant **)malloc(valsCount * sizeof(QSPVariant *));
     curValue = var->Values;
     for (i = 0; i < valsCount; ++i, ++curValue)
-    {
-        if (QSP_BASETYPE(curValue->Type) != baseValType)
-        {
-            qspSetError(QSP_ERR_TYPEMISMATCH);
-            free(valuePositions);
-            return;
-        }
         valuePositions[i] = curValue;
-    }
     /* Sort positions of values by comparing values */
     if (isAscending)
         qsort(valuePositions, valsCount, sizeof(QSPVariant *), qspValuePositionsAscCompare);
@@ -917,7 +929,7 @@ int qspArrayPos(QSPString varName, QSPVariant *val, int ind)
         qspSetError(QSP_ERR_TYPEMISMATCH);
         return -1;
     }
-    defaultValue = qspGetEmptyVariant(varType);
+    defaultValue = qspGetEmptyVariant(QSP_BASETYPE(val->Type));
     if (ind < 0) ind = 0;
     while (ind < var->ValsCount)
     {
@@ -953,50 +965,35 @@ QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
 {
     int i;
     QSPVariant resultValue, *bestValue, *curValue;
-    QSP_TINYINT varType;
+    QSP_TINYINT varType, valsType;
     QSPVar *var = qspVarReference(varName, QSP_FALSE);
     if (!var) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     varType = qspGetVarType(varName);
-    resultValue = qspGetEmptyVariant(varType);
+    if (QSP_ISDEF(varType))
+        valsType = varType;
+    else if (!qspGetArrayValsType(var, &valsType))
+    {
+        qspSetError(QSP_ERR_TYPEMISMATCH);
+        return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+    }
+    resultValue = qspGetEmptyVariant(valsType);
+    if (!QSP_ISDEF(valsType)) return resultValue; /* nothing but holes */
     bestValue = 0;
     for (i = 0; i < var->ValsCount; ++i)
     {
         curValue = var->Values + i;
-        if (!QSP_ISDEF(curValue->Type)) curValue = &resultValue; /* check undefined values */
-        if (QSP_BASETYPE(curValue->Type) == varType)
+        if (!QSP_ISDEF(curValue->Type)) curValue = &resultValue;
+        if (QSP_BASETYPE(curValue->Type) == valsType)
         {
             if (bestValue)
             {
-                switch (varType)
+                if (isMin)
                 {
-                case QSP_TYPE_TUPLE:
-                    if (isMin)
-                    {
-                        if (qspTuplesCompare(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) < 0)
-                            bestValue = curValue;
-                    }
-                    else if (qspTuplesCompare(QSP_PTUPLE(curValue), QSP_PTUPLE(bestValue)) > 0)
+                    if (qspVariantsCompare(curValue, bestValue) < 0)
                         bestValue = curValue;
-                    break;
-                case QSP_TYPE_STR:
-                    if (isMin)
-                    {
-                        if (qspStrsCompare(QSP_PSTR(curValue), QSP_PSTR(bestValue)) < 0)
-                            bestValue = curValue;
-                    }
-                    else if (qspStrsCompare(QSP_PSTR(curValue), QSP_PSTR(bestValue)) > 0)
-                        bestValue = curValue;
-                    break;
-                case QSP_TYPE_NUM:
-                    if (isMin)
-                    {
-                        if (QSP_PNUM(curValue) < QSP_PNUM(bestValue))
-                            bestValue = curValue;
-                    }
-                    else if (QSP_PNUM(curValue) > QSP_PNUM(bestValue))
-                        bestValue = curValue;
-                    break;
                 }
+                else if (qspVariantsCompare(curValue, bestValue) > 0)
+                    bestValue = curValue;
             }
             else
                 bestValue = curValue;
@@ -1064,6 +1061,7 @@ INLINE void qspSetVarsValues(QSPCachedAssignment *assignment, QSPVariant *v, QSP
             }
             break;
         }
+    case QSP_TYPE_UNDEF:
     case QSP_TYPE_NUM:
     case QSP_TYPE_STR:
         /* Consider it a tuple with 1 item */

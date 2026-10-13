@@ -105,20 +105,17 @@ INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT
 {
     int itemInd;
     QSPBufString buf = qspNewBufString(0, 16);
-    if (QSP_ISDEF(type))
+    switch (QSP_BASETYPE(type))
     {
-        switch (QSP_BASETYPE(type))
-        {
-        case QSP_TYPE_TUPLE:
-            qspAddBufText(&buf, QSP_STATIC_STR(QSP_TUPLETYPE));
-            break;
-        case QSP_TYPE_NUM:
-            qspAddBufText(&buf, QSP_STATIC_STR(QSP_NUMTYPE));
-            break;
-        case QSP_TYPE_STR:
-            qspAddBufText(&buf, QSP_STATIC_STR(QSP_STRTYPE));
-            break;
-        }
+    case QSP_TYPE_TUPLE:
+        qspAddBufText(&buf, QSP_STATIC_STR(QSP_TUPLETYPE));
+        break;
+    case QSP_TYPE_NUM:
+        qspAddBufText(&buf, QSP_STATIC_STR(QSP_NUMTYPE));
+        break;
+    case QSP_TYPE_STR:
+        qspAddBufText(&buf, QSP_STATIC_STR(QSP_STRTYPE));
+        break;
     }
     qspAddBufText(&buf, opName);
     if (buf.Len > qspOpMaxLen) qspOpMaxLen = buf.Len;
@@ -1311,6 +1308,9 @@ INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPV
 {
     switch (QSP_BASETYPE(args[0].Type))
     {
+    case QSP_TYPE_UNDEF:
+        QSP_PNUM(res) = 0;
+        break;
     case QSP_TYPE_TUPLE:
         QSP_PNUM(res) = QSP_TUPLE(args[0]).ValsCount;
         break;
@@ -1330,6 +1330,9 @@ INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QS
 {
     switch (QSP_BASETYPE(args[0].Type))
     {
+    case QSP_TYPE_UNDEF:
+        QSP_PNUM(res) = QSP_TOBOOL(QSP_FALSE);
+        break;
     case QSP_TYPE_TUPLE:
         QSP_PNUM(res) = QSP_TOBOOL(qspIsTupleNumber(QSP_TUPLE(args[0])));
         break;
@@ -1443,29 +1446,27 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 {
     int arrIndex;
     QSP_TINYINT arrType;
+    QSPString typePrefix;
     QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_FALSE);
     if (!var) return;
     arrIndex = (count == 2 ? qspGetVarIndex(var, args[1], QSP_FALSE) : 0);
     arrType = ((arrIndex >= 0 && arrIndex < var->ValsCount) ? var->Values[arrIndex].Type : QSP_TYPE_UNDEF);
-    if (QSP_ISDEF(arrType))
+    switch (QSP_BASETYPE(arrType))
     {
-        QSPString typePrefix;
-        switch (QSP_BASETYPE(arrType))
-        {
-        case QSP_TYPE_TUPLE:
-            typePrefix = QSP_STATIC_STR(QSP_TUPLETYPE);
-            break;
-        case QSP_TYPE_NUM:
-            typePrefix = QSP_STATIC_STR(QSP_NUMTYPE);
-            break;
-        case QSP_TYPE_STR:
-            typePrefix = QSP_STATIC_STR(QSP_STRTYPE);
-            break;
-        }
-        QSP_PSTR(res) = qspCopyToNewText(typePrefix);
-        return;
+    case QSP_TYPE_UNDEF:
+        typePrefix = qspNullString;
+        break;
+    case QSP_TYPE_TUPLE:
+        typePrefix = QSP_STATIC_STR(QSP_TUPLETYPE);
+        break;
+    case QSP_TYPE_NUM:
+        typePrefix = QSP_STATIC_STR(QSP_NUMTYPE);
+        break;
+    case QSP_TYPE_STR:
+        typePrefix = QSP_STATIC_STR(QSP_STRTYPE);
+        break;
     }
-    QSP_PSTR(res) = qspNullString;
+    QSP_PSTR(res) = qspCopyToNewText(typePrefix);
 }
 
 INLINE void qspFunctionArrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)

@@ -274,28 +274,22 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByString(JNIEnv *en
 /* Get numeric value of the specified array item */
 JNIEXPORT jlong JNICALL Java_com_libqsp_jni_QSPLib_getNumVarValue(JNIEnv *env, jobject api, jstring name, jint ind)
 {
+    QSP_BIGINT res;
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarReference(varName, QSP_FALSE);
+    res = qspGetVarNumValue(varName, ind);
     qspFreeString(&varName);
-    if (var && ind >= 0 && ind < var->ValsCount)
-    {
-        QSPVariant *val = var->Values + ind;
-        if (QSP_ISNUM(val->Type)) return QSP_PNUM(val);
-    }
-    return 0;
+    return res;
 }
 /* Get string value of the specified array item */
 JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getStrVarValue(JNIEnv *env, jobject api, jstring name, jint ind)
 {
-    QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarReference(varName, QSP_FALSE);
+    jstring res;
+    QSPString text, varName = qspFromJavaString(env, name);
+    text = qspGetVarStrValue(varName, ind);
     qspFreeString(&varName);
-    if (var && ind >= 0 && ind < var->ValsCount)
-    {
-        QSPVariant *val = var->Values + ind;
-        if (QSP_ISSTR(val->Type)) return qspToJavaString(env, QSP_PSTR(val));
-    }
-    return qspToJavaString(env, qspNullString);
+    res = qspToJavaString(env, text);
+    qspFreeString(&text);
+    return res;
 }
 /* ------------------------------------------------------------ */
 /* Code execution */

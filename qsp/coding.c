@@ -342,6 +342,9 @@ void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val, QSP_BOOL isUCS2)
     qspAppendEncodedIntVal(s, val.Type, isUCS2);
     switch (QSP_BASETYPE(val.Type))
     {
+    case QSP_TYPE_UNDEF:
+        qspAppendEncodedStrVal(s, qspNullString, isUCS2);
+        break;
     case QSP_TYPE_TUPLE:
         {
             int i;
@@ -368,6 +371,11 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
     if (type < 0 || type >= QSP_TYPE_DEFINED_TYPES) return QSP_FALSE; /* unsupported value type */
     switch (QSP_BASETYPE(type))
     {
+    case QSP_TYPE_UNDEF:
+        if (ind >= strsCount) return QSP_FALSE;
+        ++ind;
+        qspInitVariant(val, QSP_TYPE_UNDEF);
+        break;
     case QSP_TYPE_TUPLE:
         {
             int itemsCount;

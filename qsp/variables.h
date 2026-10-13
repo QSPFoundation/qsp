@@ -94,8 +94,8 @@
     QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
     QSP_BOOL qspGetFirstVarValue(QSPString varName, QSPVariant *res);
     QSP_BOOL qspGetLastVarValue(QSPString varName, QSPVariant *res);
-    QSPString qspGetVarStrValue(QSPString name);
-    QSP_BIGINT qspGetVarNumValue(QSPString name);
+    QSPString qspGetVarStrValue(QSPString name, int ind);
+    QSP_BIGINT qspGetVarNumValue(QSPString name, int ind);
     int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind);
     int qspArrayPosRegExp(QSPString varName, QSPString regExpStr, int ind);
@@ -116,7 +116,7 @@
         if (specSymbol < sizeof(qspSpecToBaseTypeTable))
             return qspSpecToBaseTypeTable[specSymbol];
 
-        return QSP_TYPE_NUM;
+        return QSP_TYPE_UNDEF;
     }
 
     INLINE QSPString qspPrepareVarName(QSPString name, unsigned int *nameHash)

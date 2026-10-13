@@ -90,6 +90,9 @@
     {
         switch (QSP_BASETYPE(dest->Type = src->Type))
         {
+        case QSP_TYPE_UNDEF:
+            dest->Val = src->Val;
+            break;
         case QSP_TYPE_TUPLE:
             QSP_PTUPLE(dest) = qspCopyToNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).ValsCount);
             break;
