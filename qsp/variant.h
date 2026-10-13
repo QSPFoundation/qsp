@@ -55,6 +55,12 @@
         value->Type = type;
     }
 
+    INLINE void qspInitUndefinedVariants(QSPVariant *values, int count)
+    {
+        /* Zeroed memory is an undefined value */
+        memset(values, 0, count * sizeof(QSPVariant));
+    }
+
     INLINE QSPVariant qspGetEmptyVariant(QSP_TINYINT type)
     {
         QSPVariant ret;

@@ -689,7 +689,6 @@ INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
     if (ind >= oldCount)
     {
         /* A new item */
-        QSPVariant *curValue;
         if (ind >= var->ValsCapacity)
         {
             if (ind > 0)
@@ -700,8 +699,7 @@ INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
         }
         var->ValsCount = ind + 1;
         /* Init new values */
-        for (curValue = var->Values + oldCount; oldCount < ind; ++curValue, ++oldCount)
-            qspInitVariant(curValue, QSP_TYPE_UNDEF);
+        qspInitUndefinedVariants(var->Values + oldCount, ind - oldCount);
         qspMoveToNewVariant(var->Values + ind, val);
     }
     else if (ind >= 0)

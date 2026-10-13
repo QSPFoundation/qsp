@@ -78,13 +78,13 @@
     enum
     {
         QSP_TYPE_TERM = -1, /* not used for values */
-        QSP_TYPE_TUPLE = 0,
-        QSP_TYPE_NUM = 1,
-        QSP_TYPE_BOOL = 2,
-        QSP_TYPE_STR = 3,
-        QSP_TYPE_CODE = 4,
-        QSP_TYPE_VARREF = 5,
-        QSP_TYPE_UNDEF = 6, /* an undefined value acts as the empty value of the type it's used as */
+        QSP_TYPE_UNDEF = 0, /* undefined value acts as the empty value of the type it's used as */
+        QSP_TYPE_TUPLE = 1,
+        QSP_TYPE_NUM = 2,
+        QSP_TYPE_BOOL = 3,
+        QSP_TYPE_STR = 4,
+        QSP_TYPE_CODE = 5,
+        QSP_TYPE_VARREF = 6,
         QSP_TYPE_DEFINED_TYPES /* represents the number of defined values */
     };
 
@@ -111,13 +111,13 @@
 
     static const QSP_TINYINT qspBaseTypeTable[QSP_TYPE_DEFINED_TYPES] =
     {
+        /* UNDEF */  QSP_TYPE_UNDEF,
         /* TUPLE */  QSP_TYPE_TUPLE,
         /* NUMBER */ QSP_TYPE_NUM,
         /* BOOL */   QSP_TYPE_NUM,
         /* STRING */ QSP_TYPE_STR,
         /* CODE */   QSP_TYPE_STR,
-        /* VARREF */ QSP_TYPE_STR,
-        /* UNDEF */  QSP_TYPE_UNDEF
+        /* VARREF */ QSP_TYPE_STR
     };
 
     #define QSP_ISDEF(a) ((a) != QSP_TYPE_UNDEF)
