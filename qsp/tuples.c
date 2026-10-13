@@ -193,8 +193,7 @@ void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
         switch (QSP_BASETYPE(item->Type))
         {
         case QSP_TYPE_UNDEF:
-            qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT)); /* an empty string */
-            qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
+            qspAddBufText(res, QSP_STATIC_STR(QSP_UNDEFTYPE));
             break;
         case QSP_TYPE_TUPLE:
             qspAppendTupleToString(QSP_PTUPLE(item), res);

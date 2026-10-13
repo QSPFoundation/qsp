@@ -751,6 +751,13 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                 }
                 waitForOperator = QSP_TRUE;
             }
+            else if (*s.Str == QSP_UNDEFTYPE_CHAR)
+            {
+                qspInitVariant(&v, QSP_TYPE_UNDEF);
+                if (!qspAppendValueToCompiled(expression, qspOpValue, v)) break;
+                s.Str += QSP_CHAR_LEN;
+                waitForOperator = QSP_TRUE;
+            }
             else if (*s.Str == QSP_NEGATION_CHAR)
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, qspOpNegation)) break;

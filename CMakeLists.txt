@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(qsp VERSION 5.9.6)
 
-set(QSP_GAMEMIN_VER "5.9.4")
+set(QSP_GAMEMIN_VER "5.9.6")
 
 option(BUILD_JAVA "Build with JVM bindings" OFF)
 option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" OFF)
