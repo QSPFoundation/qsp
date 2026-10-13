@@ -252,10 +252,10 @@ void qspInitMath(void)
     qspAddOperation(qspOpUserText, 30, 0, QSP_TYPE_STR, 0, 0);
     qspAddOperation(qspOpInput, 30, 0, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
 
-    qspAddOperation(qspOpObj, 11, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_STR);
+    qspAddOperation(qspOpObj, 11, 0, QSP_TYPE_BOOL, 1, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpSelObj, 30, 0, QSP_TYPE_STR, 0, 0);
     qspAddOperation(qspOpGetObj, 30, qspFunctionGetObj, QSP_TYPE_STR, 1, 1, QSP_TYPE_NUM);
-    qspAddOperation(qspOpCountObj, 30, 0, QSP_TYPE_NUM, 0, 0);
+    qspAddOperation(qspOpCountObj, 30, 0, QSP_TYPE_NUM, 0, 1, QSP_TYPE_STR);
     qspAddOperation(qspOpCurObjs, 30, 0, QSP_TYPE_CODE, 0, 0);
 
     qspAddOperation(qspOpSelAct, 30, 0, QSP_TYPE_STR, 0, 0);
@@ -1226,7 +1226,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex) /* th
         QSP_NUM(tos) = QSP_TOBOOL(qspLocByName(QSP_STR(args[0])) != 0);
         break;
     case qspOpObj:
-        QSP_NUM(tos) = qspObjsCountByName(QSP_STR(args[0]));
+        QSP_NUM(tos) = QSP_TOBOOL(qspObjsCountByName(QSP_STR(args[0])) > 0);
         break;
     case qspOpLCase:
         qspMoveToNewVariant(&tos, args);
@@ -1255,7 +1255,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex) /* th
         QSP_NUM(tos) = qspUniformRand(1, 1000);
         break;
     case qspOpCountObj:
-        QSP_NUM(tos) = qspCurObjsCount;
+        QSP_NUM(tos) = (argsCount ? qspObjsCountByName(QSP_STR(args[0])) : qspCurObjsCount);
         break;
     case qspOpMsecsCount:
         QSP_NUM(tos) = qspGetTime();
