@@ -12,8 +12,6 @@
 #ifndef QSP_VARIANTDEFINES
     #define QSP_VARIANTDEFINES
 
-    #define QSP_IND_DELIM QSP_FMT("\0")
-
     /* External functions */
     QSPString qspGetVariantAsString(QSPVariant *val);
     void qspAppendVariantToString(QSPVariant *val, QSPBufString *res);
@@ -21,10 +19,11 @@
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
     int qspVariantsCompare(QSPVariant *first, QSPVariant *second);
     QSP_BOOL qspVariantsEqual(QSPVariant *first, QSPVariant *second);
+    QSP_BOOL qspVariantKeysEqual(QSPVariant *first, QSPVariant *second);
     void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
     QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, QSPVariant *res);
     void qspMultiplyVariantByNum(QSPVariant *val, QSP_BIGINT num, QSPVariant *res);
-    void qspAppendVariantToIndexString(QSPVariant *val, QSPBufString *res);
+    unsigned int qspGetVariantKeyHash(QSPVariant *val);
 
     INLINE void qspFreeVariant(QSPVariant *val)
     {
@@ -138,13 +137,6 @@
             }
         }
         return QSP_TRUE;
-    }
-
-    INLINE QSPString qspGetVariantAsIndexString(QSPVariant *val)
-    {
-        QSPBufString buf = qspNewBufString(0, 16);
-        qspAppendVariantToIndexString(val, &buf);
-        return qspBufStringToString(buf);
     }
 
 #endif

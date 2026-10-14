@@ -19,15 +19,15 @@
     #define QSP_VARSLOCALCAPACITY 16
     #define QSP_VARSNAMECHARSPERSLOT 2
     #define QSP_VARSSCOPECHUNKSIZE 128
-    #define QSP_VARSINDICESCAPACITY 4
+    #define QSP_VARSINDICESCAPACITY 4 /* has to be a power of 2 */
     #define QSP_VARARGS QSP_FMT("ARGS")
     #define QSP_VARRES QSP_FMT("RESULT")
 
     typedef struct
     {
-        QSPString Str;
+        QSPVariant Key;
         unsigned int Hash;
-        int Index; /* in Values */
+        int Offset; /* index in Values minus position in Indices */
     } QSPVarIndex;
 
     typedef struct
@@ -35,8 +35,8 @@
         QSPVariant *Values;
         int ValsCount;
         int ValsCapacity;
-        QSPVarIndex *Indices;
-        int *IndsSlots; /* hash table by text indices, IndsCapacity * 2 slots */
+        QSPVarIndex *Indices; /* ordered by index in Values */
+        int *IndsSlots; /* hash table by keys, IndsCapacity * 2 slots */
         int IndsCount;
         int IndsCapacity; /* has to be a power of 2 */
     } QSPVar;
@@ -89,7 +89,8 @@
     QSPVarsScopeChunk *qspSaveLocalVarsAndRestoreGlobals(void);
     void qspRestoreSavedLocalVars(QSPVarsScopeChunk *chunk);
     QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
-    QSPVarIndex *qspAddVarIndex(QSPVar *var, unsigned int hash);
+    QSPVarIndex *qspAddVarIndex(QSPVar *var, unsigned int hash, int index);
+    int qspGetVarIndexPos(QSPVar *var, int index);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
     QSP_BOOL qspGetFirstVarValue(QSPString varName, QSPVariant *res);
@@ -121,7 +122,7 @@
 
     INLINE QSPString qspPrepareVarName(QSPString name, unsigned int *nameHash)
     {
-        unsigned int hash = QSP_TEXTHASHSEED;
+        unsigned int hash = QSP_HASHSEED;
         QSP_CHAR *pos = name.Str, *end = name.End;
 
         /* Validate the name, skip its type prefix & hash it */
@@ -134,9 +135,9 @@
         {
             if (qspIsInClass(*pos, QSP_CHAR_DELIM))
                 return qspNullString;
-            hash = qspAddCharToTextHash(hash, *pos);
+            hash = qspAddValueToHash(hash, *pos);
         } while (++pos < end);
-        *nameHash = qspFinalizeTextHash(hash);
+        *nameHash = qspFinalizeHash(hash);
         return name;
     }
 
@@ -175,7 +176,7 @@
             QSPVarIndex *curIndex;
             int count = var->IndsCount;
             for (curIndex = var->Indices; count > 0; --count, ++curIndex)
-                qspFreeString(&curIndex->Str);
+                qspFreeVariant(&curIndex->Key);
             free(var->Indices);
             free(var->IndsSlots);
         }

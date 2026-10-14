@@ -13,7 +13,7 @@
     #define QSP_STRSDELIM QSP_FMT("\r\n")
     #define QSP_LSUBEX QSP_FMT("<<")
     #define QSP_RSUBEX QSP_FMT(">>")
-    #define QSP_TEXTHASHSEED 2166136261u
+    #define QSP_HASHSEED 2166136261u
     #define QSP_CAPACITYMASK(capacity) ((capacity) - 1) /* the capacity has to be a power of 2 */
 
     /* Frequently used classes of characters */
@@ -231,12 +231,12 @@
         return qspStringFromPair(startPos, pos);
     }
 
-    INLINE unsigned int qspAddCharToTextHash(unsigned int hash, QSP_CHAR ch)
+    INLINE unsigned int qspAddValueToHash(unsigned int hash, unsigned int value)
     {
-        return (hash ^ (unsigned int)ch) * 16777619u;
+        return (hash ^ value) * 16777619u;
     }
 
-    INLINE unsigned int qspFinalizeTextHash(unsigned int hash)
+    INLINE unsigned int qspFinalizeHash(unsigned int hash)
     {
         return hash ^ (hash >> 16);
     }
@@ -244,14 +244,14 @@
     INLINE unsigned int qspGetTextHash(QSPString s)
     {
         /* FNV-1a, folded to improve the low bits */
-        unsigned int hash = QSP_TEXTHASHSEED;
+        unsigned int hash = QSP_HASHSEED;
         QSP_CHAR *pos = s.Str, *end = s.End;
         while (pos < end)
         {
-            hash = qspAddCharToTextHash(hash, *pos);
+            hash = qspAddValueToHash(hash, *pos);
             ++pos;
         }
-        return qspFinalizeTextHash(hash);
+        return qspFinalizeHash(hash);
     }
 
     INLINE void qspLowerStr(QSPString *str)

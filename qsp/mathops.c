@@ -58,6 +58,7 @@ INLINE void qspFunctionInstr(QSPVariant *args, QSP_TINYINT count, QSPVariant *re
 INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionReplace(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
+INLINE void qspFunctionArrKey(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionArrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionArrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
 INLINE void qspFunctionArrPack(QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
@@ -217,6 +218,7 @@ void qspInitMath(void)
 
     qspAddOperation(qspOpArrSize, 30, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_VARREF);
     qspAddOperation(qspOpArrType, 30, qspFunctionArrType, QSP_TYPE_STR, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_UNDEF);
+    qspAddOperation(qspOpArrKey, 30, qspFunctionArrKey, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_VARREF, QSP_TYPE_NUM);
     qspAddOperation(qspOpArrItem, 30, 0, QSP_TYPE_UNDEF, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpInlineFirstArrItem, 30, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpInlineLastArrItem, 30, 0, QSP_TYPE_UNDEF, 0, 0);
@@ -299,6 +301,7 @@ void qspInitMath(void)
 
     qspAddOpName(qspOpArrSize, QSP_FMT("ARRSIZE"), 1, QSP_TRUE);
     qspAddOpName(qspOpArrType, QSP_FMT("ARRTYPE"), 1, QSP_TRUE);
+    qspAddOpName(qspOpArrKey, QSP_FMT("ARRKEY"), 1, QSP_TRUE);
     qspAddOpName(qspOpArrItem, QSP_FMT("ARRITEM"), 1, QSP_TRUE);
     qspAddOpName(qspOpArrPack, QSP_FMT("ARRPACK"), 1, QSP_TRUE);
     qspAddOpName(qspOpArrPos, QSP_FMT("ARRPOS"), 1, QSP_TRUE);
@@ -1474,6 +1477,24 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
         break;
     }
     QSP_PSTR(res) = qspCopyToNewText(typePrefix);
+}
+
+INLINE void qspFunctionArrKey(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
+{
+    int arrIndex;
+    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_FALSE);
+    if (!var) return;
+    arrIndex = QSP_TOINT(QSP_NUM(args[1]));
+    if (arrIndex >= 0 && arrIndex < var->ValsCount)
+    {
+        int indexPos = qspGetVarIndexPos(var, arrIndex);
+        if (indexPos >= 0)
+        {
+            qspCopyToNewVariant(res, &var->Indices[indexPos].Key);
+            return;
+        }
+    }
+    qspInitVariant(res, QSP_TYPE_UNDEF);
 }
 
 INLINE void qspFunctionArrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)

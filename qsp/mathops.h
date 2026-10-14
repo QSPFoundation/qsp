@@ -94,6 +94,7 @@
         qspOpRnd,
         qspOpArrSize,
         qspOpArrType,
+        qspOpArrKey,
         qspOpArrItem,
         qspOpInlineFirstArrItem,
         qspOpInlineLastArrItem,

@@ -27,6 +27,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
 INLINE QSPString qspGetVariantAsVarRef(QSPVariant *val);
 INLINE QSP_BOOL qspGetVariantAsBool(QSPVariant *val);
 INLINE int qspEmptyValueCompare(QSPVariant *value);
+INLINE unsigned int qspAddVariantToKeyHash(unsigned int hash, QSPVariant *val);
 
 INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
 {
@@ -304,16 +305,60 @@ int qspVariantsCompare(QSPVariant *first, QSPVariant *second)
 
 QSP_BOOL qspVariantsEqual(QSPVariant *first, QSPVariant *second)
 {
-    switch (QSP_BASETYPE(first->Type))
+    QSP_TINYINT baseType = QSP_BASETYPE(first->Type);
+    if (baseType == QSP_BASETYPE(second->Type))
     {
-    case QSP_TYPE_UNDEF:
-        return !QSP_ISDEF(second->Type);
-    case QSP_TYPE_TUPLE:
-        return (QSP_ISTUPLE(second->Type) && qspTuplesEqual(QSP_PTUPLE(first), QSP_PTUPLE(second)));
-    case QSP_TYPE_NUM:
-        return (QSP_ISNUM(second->Type) && QSP_PNUM(first) == QSP_PNUM(second));
-    case QSP_TYPE_STR:
-        return (QSP_ISSTR(second->Type) && qspStrsEqual(QSP_PSTR(first), QSP_PSTR(second)));
+        switch (baseType)
+        {
+        case QSP_TYPE_UNDEF:
+            return QSP_TRUE;
+        case QSP_TYPE_TUPLE:
+            return qspTuplesEqual(QSP_PTUPLE(first), QSP_PTUPLE(second));
+        case QSP_TYPE_NUM:
+            return (QSP_PNUM(first) == QSP_PNUM(second));
+        case QSP_TYPE_STR:
+            return qspStrsEqual(QSP_PSTR(first), QSP_PSTR(second));
+        }
+    }
+    return QSP_FALSE;
+}
+
+QSP_BOOL qspVariantKeysEqual(QSPVariant *first, QSPVariant *second)
+{
+    QSP_TINYINT baseType = QSP_BASETYPE(first->Type);
+    if (baseType == QSP_BASETYPE(second->Type))
+    {
+        switch (baseType)
+        {
+        case QSP_TYPE_UNDEF:
+            return QSP_TRUE;
+        case QSP_TYPE_TUPLE:
+            {
+                QSPVariant *pos1 = QSP_PTUPLE(first).Vals, *pos2 = QSP_PTUPLE(second).Vals;
+                QSPVariant *end1 = pos1 + QSP_PTUPLE(first).ValsCount;
+                if (QSP_PTUPLE(first).ValsCount != QSP_PTUPLE(second).ValsCount) return QSP_FALSE;
+                while (pos1 < end1)
+                {
+                    if (!qspVariantKeysEqual(pos1, pos2)) return QSP_FALSE;
+                    ++pos1, ++pos2;
+                }
+                return QSP_TRUE;
+            }
+        case QSP_TYPE_NUM:
+            return (QSP_PNUM(first) == QSP_PNUM(second));
+        case QSP_TYPE_STR:
+            {
+                QSP_CHAR *pos1 = QSP_PSTR(first).Str, *pos2 = QSP_PSTR(second).Str;
+                QSP_CHAR *end1 = QSP_PSTR(first).End;
+                if (qspStrLen(QSP_PSTR(first)) != qspStrLen(QSP_PSTR(second))) return QSP_FALSE;
+                while (pos1 < end1)
+                {
+                    if (*pos1 != *pos2 && QSP_CHRUPR(*pos1) != QSP_CHRUPR(*pos2)) return QSP_FALSE;
+                    ++pos1, ++pos2;
+                }
+                return QSP_TRUE;
+            }
+        }
     }
     return QSP_FALSE;
 }
@@ -493,39 +538,42 @@ void qspMultiplyVariantByNum(QSPVariant *val, QSP_BIGINT num, QSPVariant *res)
     }
 }
 
-void qspAppendVariantToIndexString(QSPVariant *val, QSPBufString *res)
+INLINE unsigned int qspAddVariantToKeyHash(unsigned int hash, QSPVariant *val)
 {
-    QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
-    switch (QSP_BASETYPE(val->Type))
+    QSP_TINYINT baseType = QSP_BASETYPE(val->Type);
+    hash = qspAddValueToHash(hash, (unsigned int)baseType);
+    switch (baseType)
     {
-    case QSP_TYPE_UNDEF:
-        qspAddBufText(res, QSP_STATIC_STR(QSP_UNDEFTYPE)); /* type id, no value */
-        break;
     case QSP_TYPE_TUPLE:
         {
             int count = QSP_PTUPLE(val).ValsCount;
-            qspAddBufText(res, qspNumToStr(buf, count));
-            if (count > 0)
+            QSPVariant *item = QSP_PTUPLE(val).Vals;
+            hash = qspAddValueToHash(hash, (unsigned int)count);
+            while (--count >= 0)
             {
-                QSPVariant *item = QSP_PTUPLE(val).Vals;
-                qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));
-                while (--count > 0)
-                {
-                    qspAppendVariantToIndexString(item, res);
-                    qspAddBufText(res, QSP_STATIC_STR(QSP_IND_DELIM));
-                    ++item;
-                }
-                qspAppendVariantToIndexString(item, res);
+                hash = qspAddVariantToKeyHash(hash, item);
+                ++item;
             }
             break;
         }
     case QSP_TYPE_NUM:
-        qspAddBufText(res, QSP_STATIC_STR(QSP_NUMTYPE)); /* type id */
-        qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(val)));
+        hash = qspAddValueToHash(hash, (unsigned int)QSP_PNUM(val)); /* the low bits are enough, equality decides */
         break;
     case QSP_TYPE_STR:
-        qspAddBufText(res, QSP_STATIC_STR(QSP_STRTYPE)); /* type id */
-        qspAddBufText(res, QSP_PSTR(val));
-        break;
+        {
+            QSP_CHAR *pos = QSP_PSTR(val).Str, *end = QSP_PSTR(val).End;
+            while (pos < end)
+            {
+                hash = qspAddValueToHash(hash, (unsigned int)QSP_CHRUPR(*pos));
+                ++pos;
+            }
+            break;
+        }
     }
+    return hash;
+}
+
+unsigned int qspGetVariantKeyHash(QSPVariant *val)
+{
+    return qspFinalizeHash(qspAddVariantToKeyHash(QSP_HASHSEED, val));
 }

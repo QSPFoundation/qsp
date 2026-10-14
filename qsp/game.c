@@ -356,8 +356,8 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
             qspAppendEncodedIntVal(&bufString, var->IndsCount, isUCS);
             for (k = 0; k < var->IndsCount; ++k)
             {
-                qspAppendEncodedIntVal(&bufString, var->Indices[k].Index, isUCS);
-                qspAppendEncodedStrVal(&bufString, var->Indices[k].Str, isUCS);
+                qspAppendEncodedIntVal(&bufString, k + var->Indices[k].Offset, isUCS);
+                qspAppendEncodedVariant(&bufString, var->Indices[k].Key, isUCS);
             }
         }
     }
@@ -391,7 +391,7 @@ INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, 
 INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUCS)
 {
     QSPVariant val;
-    int i, j, ind, count, groupsCount, varValuesCount, temp, selAction, selObject;
+    int i, j, ind, count, groupsCount, varValuesCount, keyIndex, temp, selAction, selObject;
     ind = 12;
     if (ind >= strsCount) return QSP_FALSE;
     if (!qspStrsEqual(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
@@ -478,17 +478,20 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
             if (!qspReadEncodedVariant(strs, strsCount, &ind, isUCS, &val)) return QSP_FALSE;
             qspFreeVariant(&val);
         }
-        /* indices count */
+        /* keys count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &groupsCount)) return QSP_FALSE;
-        if (groupsCount < 0) return QSP_FALSE;
-        /* indices */
+        if (groupsCount < 0 || groupsCount > varValuesCount) return QSP_FALSE;
+        /* keys */
+        keyIndex = -1;
         for (j = 0; j < groupsCount; ++j)
         {
-            /* value index */
+            /* value index, the positions keep growing */
             if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &temp)) return QSP_FALSE;
-            if (temp < 0 || temp >= varValuesCount) return QSP_FALSE;
-            /* text value */
-            if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
+            if (temp <= keyIndex || temp >= varValuesCount) return QSP_FALSE;
+            keyIndex = temp;
+            /* key type + key value */
+            if (!qspReadEncodedVariant(strs, strsCount, &ind, isUCS, &val)) return QSP_FALSE;
+            qspFreeVariant(&val);
         }
     }
     return (ind == strsCount - 1); /* the last line is always empty */
@@ -499,7 +502,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     QSPVar *var;
     QSPVarIndex *varIndex;
     QSPLineOfCode *lines;
-    QSPString *strs, actsLocs[QSP_MAXACTIONS], varName, key, locName, gameString;
+    QSPVariant key;
+    QSPString *strs, actsLocs[QSP_MAXACTIONS], varName, locName, gameString;
     QSP_BIGINT msecsCount;
     int i, j, ind, count, varsCount, valsCount, index, actsCount, oldLocationState;
     QSP_BOOL isUCS = (dataSize >= 2 && *((unsigned char *)data + 1) == 0);
@@ -589,10 +593,12 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         for (j = 0; j < valsCount; ++j)
         {
             index = qspReadEncodedIntVal(strs[ind++], isUCS);
-            key = qspDecodeString(strs[ind++], isUCS);
-            varIndex = qspAddVarIndex(var, qspGetTextHash(key));
-            varIndex->Str = key;
-            varIndex->Index = index;
+            qspReadEncodedVariant(strs, count, &ind, isUCS, &key);
+            if (QSP_ISDEF(key.Type)) /* an undefined key means no key */
+            {
+                varIndex = qspAddVarIndex(var, qspGetVariantKeyHash(&key), index);
+                varIndex->Key = key;
+            }
         }
     }
     qspFreeStrs(strs, count);
