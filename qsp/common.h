@@ -11,8 +11,6 @@
 #ifndef QSP_COMMONDEFINES
     #define QSP_COMMONDEFINES
 
-    #define QSP_RANDMASK 0x7FFFFFFF
-    #define QSP_RANDMAX QSP_RANDMASK
     #define QSP_NORMAL_SCALE 3.0
 
     extern QSP_BOOL qspIsDebug;

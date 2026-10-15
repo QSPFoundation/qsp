@@ -33,11 +33,11 @@ int qspTimerInterval = 0;
 QSP_TINYINT qspCurWindowsChangedState = 0;
 QSP_TINYINT qspCurWindowsDisplayState = 0;
 
-INLINE unsigned int qspURand(void);
-INLINE int qspRand(void);
+INLINE unsigned int qspRawRand(void);
+INLINE unsigned int qspRand(void);
 INLINE double qspRandN(void);
 INLINE double qspNormalCdf(double x);
-INLINE double qspPoly8Value(double const c[], double x);
+INLINE double qspPoly8Value(const double c[], double x);
 INLINE double qspNormalInvCdf(double p);
 
 void qspInitRuntime(void)
@@ -144,30 +144,29 @@ void qspSetSeed(unsigned int seed)
         qspRandX[i] = qspRandX[i - 1] + qspRandX[i - 2];
     qspRandI = 23;
     qspRandJ = 54;
-    for (i = 255; i >= 0; --i) qspURand();
-    for (i = 255; i >= 0; --i) qspRandY[i] = qspURand();
-    qspRandZ = qspURand();
+    for (i = 255; i >= 0; --i) qspRawRand();
+    for (i = 255; i >= 0; --i) qspRandY[i] = qspRawRand();
+    qspRandZ = qspRawRand();
 }
 
-INLINE unsigned int qspURand(void)
+INLINE unsigned int qspRawRand(void)
 {
     if (--qspRandI < 0) qspRandI = 54;
     if (--qspRandJ < 0) qspRandJ = 54;
     return qspRandX[qspRandJ] += qspRandX[qspRandI];
 }
 
-INLINE int qspRand(void)
+INLINE unsigned int qspRand(void)
 {
     int i = qspRandZ >> 24;
     qspRandZ = qspRandY[i];
-    if (--qspRandI < 0) qspRandI = 54;
-    if (--qspRandJ < 0) qspRandJ = 54;
-    qspRandY[i] = qspRandX[qspRandJ] += qspRandX[qspRandI];
-    return qspRandZ & QSP_RANDMASK;
+    qspRandY[i] = qspRawRand();
+    return qspRandZ;
 }
 
 int qspUniformRand(int min, int max)
 {
+    unsigned int count;
     if (min == max)
         return min;
     if (min > max)
@@ -176,18 +175,21 @@ int qspUniformRand(int min, int max)
         min = max;
         max = temp;
     }
-    return qspRand() % (max - min + 1) + min;
+    count = (unsigned int)max - (unsigned int)min + 1; /* might wrap to 0 */
+    if (count > 0)
+        return (int)((unsigned int)min + qspRand() % count);
+    return (int)qspRand();
 }
 
 INLINE double qspRandN(void)
 {
-    int x;
+    unsigned int x;
     do
     {
         x = qspRand();
     }
     while (x == 0);
-    return (double)x / (1.0 + QSP_RANDMAX);
+    return (double)x / 4294967296.0; /* 2^32, the result stays below 1 */
 }
 
 INLINE double qspNormalCdf(double x)
@@ -319,7 +321,7 @@ int qspNormalRand(int min, int max, int mean)
 
     /* Transform to integer bins */
     /* (res - min) / (max - min) * (max - min + 1.0) + min */
-    res = (realMin - res) / (realMin - realMax) + res;
+    res = floor((realMin - res) / (realMin - realMax) + res);
 
     if (res < min)
         return min;
