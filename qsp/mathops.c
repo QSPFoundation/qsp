@@ -1591,12 +1591,12 @@ INLINE void qspFunctionMax(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 
 INLINE void qspFunctionRand(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    int min, max;
-    min = QSP_TOINT(QSP_NUM(args[0]));
-    max = (count >= 2 ? QSP_TOINT(QSP_NUM(args[1])) : 1);
+    QSP_BIGINT min, max;
+    min = QSP_NUM(args[0]);
+    max = (count >= 2 ? QSP_NUM(args[1]) : 1);
     if (count == 3)
     {
-        int mean = QSP_TOINT(QSP_NUM(args[2]));
+        QSP_BIGINT mean = QSP_NUM(args[2]);
         QSP_PNUM(res) = qspNormalRand(min, max, mean);
     }
     else

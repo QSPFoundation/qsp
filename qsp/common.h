@@ -13,6 +13,14 @@
 
     #define QSP_NORMAL_SCALE 3.0
 
+    #ifdef QSP_USE_BIGINT
+        #define QSP_RAND_SHIFT 17 /* xoshiro256** */
+        #define QSP_RAND_ROTATE 45
+    #else
+        #define QSP_RAND_SHIFT 9 /* xoshiro128** */
+        #define QSP_RAND_ROTATE 11
+    #endif
+
     extern QSP_BOOL qspIsDebug;
     extern int qspTimerInterval;
 
@@ -29,8 +37,8 @@
     void qspPrepareExecution(QSP_BOOL toInit);
     void qspMemClear(QSP_BOOL toInit);
     void qspSetSeed(unsigned int seed);
-    int qspUniformRand(int min, int max);
-    int qspNormalRand(int min, int max, int mean);
+    QSP_BIGINT qspUniformRand(QSP_BIGINT min, QSP_BIGINT max);
+    QSP_BIGINT qspNormalRand(QSP_BIGINT min, QSP_BIGINT max, QSP_BIGINT mean);
     void qspSetWindowState(int type, QSP_BOOL toShow);
     QSP_TINYINT qspGetEnabledWindows(void);
     QSP_TINYINT qspGetDisabledWindows(void);

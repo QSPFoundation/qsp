@@ -22,8 +22,7 @@
 #include "time.h"
 #include "variables.h"
 
-static unsigned int qspRandX[55], qspRandY[256], qspRandZ;
-static int qspRandI, qspRandJ;
+static QSP_UBIGINT qspRandState[4];
 QSP_BOOL qspIsDebug = QSP_FALSE;
 QSPBufString qspCurDesc;
 QSPBufString qspCurVars;
@@ -33,8 +32,8 @@ int qspTimerInterval = 0;
 QSP_TINYINT qspCurWindowsChangedState = 0;
 QSP_TINYINT qspCurWindowsDisplayState = 0;
 
-INLINE unsigned int qspRawRand(void);
-INLINE unsigned int qspRand(void);
+INLINE QSP_UBIGINT qspRotl(QSP_UBIGINT x, int k);
+INLINE QSP_UBIGINT qspRand(void);
 INLINE double qspRandN(void);
 INLINE double qspNormalCdf(double x);
 INLINE double qspPoly8Value(const double c[], double x);
@@ -138,47 +137,52 @@ void qspMemClear(QSP_BOOL toInit)
 void qspSetSeed(unsigned int seed)
 {
     int i;
-    qspRandX[0] = 1;
-    qspRandX[1] = seed;
-    for (i = 2; i < 55; ++i)
-        qspRandX[i] = qspRandX[i - 1] + qspRandX[i - 2];
-    qspRandI = 23;
-    qspRandJ = 54;
-    for (i = 255; i >= 0; --i) qspRawRand();
-    for (i = 255; i >= 0; --i) qspRandY[i] = qspRawRand();
-    qspRandZ = qspRawRand();
+    /* Prevent the all-zero state */
+    for (i = 0; i < 4; ++i)
+    {
+        unsigned int z = (seed += 0x9E3779B9U);
+        z = (z ^ (z >> 16)) * 0x85EBCA6BU;
+        z = (z ^ (z >> 13)) * 0xC2B2AE35U;
+        qspRandState[i] = z ^ (z >> 16);
+    }
+    /* Mix the seeds into the whole state */
+    for (i = 0; i < 16; ++i) qspRand();
 }
 
-INLINE unsigned int qspRawRand(void)
+INLINE QSP_UBIGINT qspRotl(QSP_UBIGINT x, int k)
 {
-    if (--qspRandI < 0) qspRandI = 54;
-    if (--qspRandJ < 0) qspRandJ = 54;
-    return qspRandX[qspRandJ] += qspRandX[qspRandI];
+    return (x << k) | (x >> (8 * sizeof(x) - k));
 }
 
-INLINE unsigned int qspRand(void)
+INLINE QSP_UBIGINT qspRand(void)
 {
-    int i = qspRandZ >> 24;
-    qspRandZ = qspRandY[i];
-    qspRandY[i] = qspRawRand();
-    return qspRandZ;
+    /* xoshiro128** / xoshiro256** */
+    QSP_UBIGINT *s = qspRandState;
+    QSP_UBIGINT res = qspRotl(s[1] * 5, 7) * 9, t = s[1] << QSP_RAND_SHIFT;
+    s[2] ^= s[0];
+    s[3] ^= s[1];
+    s[1] ^= s[2];
+    s[0] ^= s[3];
+    s[2] ^= t;
+    s[3] = qspRotl(s[3], QSP_RAND_ROTATE);
+    return res;
 }
 
-int qspUniformRand(int min, int max)
+QSP_BIGINT qspUniformRand(QSP_BIGINT min, QSP_BIGINT max)
 {
-    unsigned int count;
+    QSP_UBIGINT count;
     if (min == max)
         return min;
     if (min > max)
     {
-        int temp = min;
+        QSP_BIGINT temp = min;
         min = max;
         max = temp;
     }
-    count = (unsigned int)max - (unsigned int)min + 1; /* might wrap to 0 */
+    count = (QSP_UBIGINT)max - (QSP_UBIGINT)min + 1; /* might wrap to 0 */
     if (count > 0)
-        return (int)((unsigned int)min + qspRand() % count);
-    return (int)qspRand();
+        return (QSP_BIGINT)((QSP_UBIGINT)min + qspRand() % count);
+    return (QSP_BIGINT)qspRand();
 }
 
 INLINE double qspRandN(void)
@@ -186,7 +190,7 @@ INLINE double qspRandN(void)
     unsigned int x;
     do
     {
-        x = qspRand();
+        x = (unsigned int)qspRand(); /* exact in a double */
     }
     while (x == 0);
     return (double)x / 4294967296.0; /* 2^32, the result stays below 1 */
@@ -277,7 +281,7 @@ INLINE double qspNormalInvCdf(double p)
     return value;
 }
 
-int qspNormalRand(int min, int max, int mean)
+QSP_BIGINT qspNormalRand(QSP_BIGINT min, QSP_BIGINT max, QSP_BIGINT mean)
 {
     /*
     Zdravko Botev, Pierre L'Ecuyer,
@@ -288,7 +292,7 @@ int qspNormalRand(int min, int max, int mean)
         return min;
     if (min > max)
     {
-        int temp = min;
+        QSP_BIGINT temp = min;
         min = max;
         max = temp;
     }
@@ -296,6 +300,9 @@ int qspNormalRand(int min, int max, int mean)
     realMin = (double)min;
     realMax = (double)max;
     realMean = (double)mean;
+
+    if (realMin == realMax)
+        return qspUniformRand(min, max);
 
     leftDist = fabs(realMin - realMean);
     rightDist = fabs(realMax - realMean);
@@ -323,11 +330,11 @@ int qspNormalRand(int min, int max, int mean)
     /* (res - min) / (max - min) * (max - min + 1.0) + min */
     res = floor((realMin - res) / (realMin - realMax) + res);
 
-    if (res < min)
+    if (res <= realMin)
         return min;
-    if (res > max)
+    if (res >= realMax)
         return max;
-    return (int)res;
+    return (QSP_BIGINT)res;
 }
 
 void qspSetWindowState(int type, QSP_BOOL toShow)
