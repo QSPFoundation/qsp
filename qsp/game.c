@@ -270,7 +270,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     QSPVarSlot *slot;
     QSPVar *var;
     QSP_BIGINT msecsCount;
-    int i, j, k, dataSize, oldLocationState = qspLocationState;
+    int i, j, dataSize, oldLocationState = qspLocationState;
     /* Call ONGSAVE without local variables */
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_GAMETOBESAVED), 0, 0);
     if (qspLocationState != oldLocationState)
@@ -351,13 +351,13 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
             var = &slot->Var;
             qspAppendEncodedStrVal(&bufString, slot->Name, isUCS);
             qspAppendEncodedIntVal(&bufString, var->ValsCount, isUCS);
-            for (k = 0; k < var->ValsCount; ++k)
-                qspAppendEncodedVariant(&bufString, var->Values[k], isUCS);
-            qspAppendEncodedIntVal(&bufString, var->IndsCount, isUCS);
-            for (k = 0; k < var->IndsCount; ++k)
+            for (j = 0; j < var->ValsCount; ++j)
+                qspAppendEncodedVariant(&bufString, var->Values[j], isUCS);
+            qspAppendEncodedIntVal(&bufString, var->KeysCount, isUCS);
+            for (j = 0; j < var->KeysCount; ++j)
             {
-                qspAppendEncodedIntVal(&bufString, k + var->Indices[k].Offset, isUCS);
-                qspAppendEncodedVariant(&bufString, var->Indices[k].Key, isUCS);
+                qspAppendEncodedIntVal(&bufString, var->Keys[j].Index, isUCS);
+                qspAppendEncodedVariant(&bufString, var->Keys[j].Key, isUCS);
             }
         }
     }
@@ -500,7 +500,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
 QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
 {
     QSPVar *var;
-    QSPVarIndex *varIndex;
+    QSPVarKey *varKey;
     QSPLineOfCode *lines;
     QSPVariant key;
     QSPString *strs, actsLocs[QSP_MAXACTIONS], varName, locName, gameString;
@@ -596,8 +596,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
             qspReadEncodedVariant(strs, count, &ind, isUCS, &key);
             if (QSP_ISDEF(key.Type)) /* an undefined key means no key */
             {
-                varIndex = qspAddVarIndex(var, qspGetVariantKeyHash(&key), index);
-                varIndex->Key = key;
+                varKey = qspAddVarKey(var, qspGetVariantKeyHash(&key), index);
+                varKey->Key = key;
             }
         }
     }

@@ -1487,10 +1487,10 @@ INLINE void qspFunctionArrKey(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), Q
     arrIndex = QSP_TOINT(QSP_NUM(args[1]));
     if (arrIndex >= 0 && arrIndex < var->ValsCount)
     {
-        int indexPos = qspGetVarIndexPos(var, arrIndex);
-        if (indexPos >= 0)
+        int keyIndex = qspGetVarKeyIndex(var, arrIndex);
+        if (keyIndex >= 0)
         {
-            qspCopyToNewVariant(res, &var->Indices[indexPos].Key);
+            qspCopyToNewVariant(res, &var->Keys[keyIndex].Key);
             return;
         }
     }
