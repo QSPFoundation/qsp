@@ -524,12 +524,13 @@ INLINE void qspRemoveArrayItem(QSPVar *var, int valIndex)
 {
     int keyIndex;
     if (valIndex < 0 || valIndex >= var->ValsCount) return;
+    /* Get index before the removal */
+    keyIndex = qspGetVarKeyLowerBound(var, valIndex);
     /* Remove the value */
     qspFreeVariant(var->Values + valIndex);
     var->ValsCount--;
     memmove(var->Values + valIndex, var->Values + valIndex + 1, (var->ValsCount - valIndex) * sizeof(QSPVariant));
     /* Update the keys at or after the item */
-    keyIndex = qspGetVarKeyLowerBound(var, valIndex);
     if (keyIndex < var->KeysCount)
     {
         QSPVarKey *key;
@@ -567,26 +568,33 @@ QSPVarKey *qspAddVarKey(QSPVar *var, unsigned int hash, int valIndex)
 
 INLINE int qspGetVarKeyLowerBound(QSPVar *var, int valIndex)
 {
-    QSPVarKey *keys = var->Keys;
-    int keyIndex, low, high, keysCount = var->KeysCount;
-    /* Every item has a key in the usual case, so the key index equals the value index */
-    if (valIndex >= 0 && valIndex < keysCount && keys[valIndex].Index == valIndex)
-        return valIndex;
-    low = 0;
-    high = keysCount - 1;
-    while (low <= high)
+    /* Value index has to be validated already */
+    int low, high, keysCount = var->KeysCount, keylessCount = var->ValsCount - keysCount;
+    /* Search from valIndex - keylessCount to valIndex inclusive */
+    low = (valIndex > keylessCount ? valIndex - keylessCount : 0);
+    high = (valIndex < keysCount ? valIndex : keysCount);
+    if (low < high)
     {
-        keyIndex = (low + high) / 2;
-        if (keys[keyIndex].Index < valIndex)
-            low = keyIndex + 1;
-        else
-            high = keyIndex - 1;
+        int keyIndex;
+        QSPVarKey *keys = var->Keys;
+        /* Search only when keyed and keyless items are mixed on both sides of the value index */
+        if (keys[low].Index >= valIndex) return low; /* all keys from low are at or after value index */
+        if (keys[high - 1].Index < valIndex) return high; /* all keys before high are before value index */
+        while (low < high)
+        {
+            keyIndex = (low + high) / 2;
+            if (keys[keyIndex].Index < valIndex)
+                low = keyIndex + 1;
+            else
+                high = keyIndex;
+        }
     }
     return low; /* the first key at or after the item */
 }
 
 int qspGetVarKeyIndex(QSPVar *var, int valIndex)
 {
+    /* Value index has to be validated already */
     int keyIndex = qspGetVarKeyLowerBound(var, valIndex);
     if (keyIndex < var->KeysCount && var->Keys[keyIndex].Index == valIndex)
         return keyIndex;
