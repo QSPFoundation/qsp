@@ -1,0 +1,143 @@
+// Ported from qsp-wasm-engine tests/engine/labels.test.ts
+
+@test JUMP should go to label
+@src
+
+x = 1
+jump 'end'
+x = 2
+:end
+
+@run
+@expect x => 1
+
+@test statements are allowed after label
+@src
+
+x = 1
+jump 'end'
+x = 2
+:end & y = 3
+
+@run
+@expect x => 1
+@expect y => 3
+
+@test labels at the beginning can be ignored
+@src
+
+:end & x = 1
+y = 2
+
+@run
+@expect x => 1
+@expect y => 2
+
+@test labels in the middle can be ignored
+@src
+
+x = 1 & :end & y = 2
+z = 3
+
+@run
+@expect x => 1
+@expect y => 2
+@expect z => 3
+
+@test labels are case insensitive
+@src
+
+x = 1
+jump 'END'
+x = 2
+:end
+
+@run
+@expect x => 1
+
+@test jump loops
+@src
+
+s=0
+:loop
+if s<9:
+  s+=1
+  p s
+  jump 'loop'
+end
+@run
+@expect event stats_changed 123456789
+
+@test JUMP works inside action code
+@src
+
+      act 'test':
+        x = 1
+        jump 'END'
+        x = 2
+        :end
+      end
+@run
+@expect #x => 0
+@expect x => ?
+@select-act 0
+@exec-act
+@expect x => 1
+
+@test JUMP works inside DYNAMIC
+@src
+
+      x = 3
+      DYNAMIC "
+        x = 1
+        jump 'END'
+        x = 2
+        :end
+      "
+@run
+@expect x => 1
+
+@test JUMP works inside DYNEVAL
+@src
+
+      x = 3
+      DYNEVAL("
+        x = 1
+        jump 'END'
+        x = 2
+        :end
+      ")
+@run
+@expect x => 1
+
+@test error jump from action
+@src
+
+act '1': x = 1 & jump 'end'
+:end
+
+@run
+@select-act 0
+@exec-act
+@expect x => 1
+@expect error LABELNOTFOUND
+
+@test error jump from dynamic
+@src
+
+dynamic { x = 1 & jump 'end' }
+:end
+
+@run
+@expect x => 1
+@expect error LABELNOTFOUND
+
+@test error jump from dynaeval
+@src
+
+DYNEVAL(" x = 1 & jump 'end' ")
+:end
+
+@run
+@expect x => 1
+@expect error LABELNOTFOUND

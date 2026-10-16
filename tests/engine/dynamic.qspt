@@ -1,0 +1,128 @@
+// Ported from qsp-wasm-engine tests/engine/dynamic.test.ts
+
+@test DYNAMIC: creating dynamic var name
+@src
+
+        $a = 'test'
+        DYNAMIC "<<$a>>_1 = 12"
+
+@run
+@expect test_1 => 12
+
+@test DYNAMIC: regular strings evaluate expressions when created
+@src
+
+        $args[0] = 'qwerty'
+        $code = '
+            *pl "<<$args[0]>>"
+            *pl $args[0]
+        '
+        dynamic $code, 'asdfg'
+
+@run
+@expect event main_changed qwerty\r\nasdfg\r\n
+
+@test DYNAMIC: curly braces evaluate expressions when dynamic is called
+@src
+
+        $args[0] = 'qwerty'
+        $code = {
+            *pl "<<$args[0]>>"
+            *pl $args[0]
+        }
+        dynamic $code, 'asdfg'
+
+@run
+@expect event main_changed asdfg\r\nasdfg\r\n
+
+@test DYNAMIC: args should be isolated from location
+@src
+
+      gt 'with_dynamic', 'test', 2, 4
+---
+# with_dynamic
+  $before_0 = $args[0]
+  before_1 = args[1]
+  before_2 = args[2]
+  dynamic {
+    $in_0 = $args[0]
+    in_1 = args[1]
+    in_2 = args[2]
+  }, 'other', 3
+  $after_0 = $args[0]
+  after_1 = args[1]
+  after_2 = args[2]
+
+@run
+@expect $before_0 => 'test'
+@expect before_1 => 2
+@expect before_2 => 4
+@expect $after_0 => 'test'
+@expect after_1 => 2
+@expect after_2 => 4
+@expect $in_0 => 'other'
+@expect in_1 => 3
+// wasm: readVariable('in_2') is 0, it reads the numeric view of the missing argument
+@expect #in_2 => 0
+@expect in_2 => ?
+
+@test DYNEVAL: returning number result
+@src
+
+        res = dyneval('result = 3 + 4')
+
+@run
+@expect res => 7
+
+@test DYNEVAL: returning string result
+@src
+
+          $res = $dyneval('$result = mid("abcd", 2, 1) + "qwerty"')
+
+@run
+@expect $res => 'bqwerty'
+
+@test DYNEVAL: implicit operator should not add new line if there was no return
+@src
+
+123
+dyneval("code = 123 + 890")
+code
+@run
+@expect event main_changed 123\r\n1013\r\n
+
+@test DYNEVAL: args should be isolated from locations
+@src
+
+      top_result = func('with_dyneval', 'test', 2, 4)
+---
+# with_dyneval
+$before_0 = $args[0]
+before_1 = args[1]
+before_2 = args[2]
+result = 5
+dyn_result = DYNEVAL({
+  $in_0 = $args[0]
+  in_1 = args[1]
+  in_2 = args[2]
+  result = 10
+}, 'other', 3)
+$after_0 = $args[0]
+after_1 = args[1]
+after_2 = args[2]
+after_result = result
+
+@run
+@expect $before_0 => 'test'
+@expect before_1 => 2
+@expect before_2 => 4
+@expect $after_0 => 'test'
+@expect after_1 => 2
+@expect after_2 => 4
+@expect $in_0 => 'other'
+@expect in_1 => 3
+@expect #in_2 => 0
+@expect in_2 => ?
+@expect dyn_result => 10
+@expect after_result => 5
+@expect top_result => 5

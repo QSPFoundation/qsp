@@ -1,0 +1,102 @@
+// Ported from qsp-wasm-engine tests/engine/main.test.ts
+
+@test *p should print text without line break
+@src
+*p 'works'
+@run
+@expect events
+main_changed works
+
+@test *pl should print text with line break
+@src
+*pl 'works'
+@run
+@expect events
+main_changed works\r\n
+
+@test *nl should print text with line break in front
+@src
+*nl 'works'
+@run
+@expect events
+main_changed \r\nworks
+
+@test MAINTXT should return text from main panel
+@src
+*p 'works' & $text = MAINTXT
+@run
+@expect $text => 'works'
+
+@test $MAINTXT should return text from main panel
+@src
+*p 'works' & $text = $MAINTXT
+@run
+@expect $text => 'works'
+
+@test $MAINTXT() should return text from main panel
+@src
+*p 'works' & $text = $MAINTXT()
+@run
+@expect $text => 'works'
+
+@test *CLEAR should clear main description
+@src
+*p 'works'
+@run
+@exec *CLEAR
+@expect events
+main_changed works
+main_changed
+
+@test *CLR should clear main description
+@src
+*p 'works'
+@run
+@exec *CLR
+@expect events
+main_changed works
+main_changed
+
+@test CLS should clear main description
+@src
+*p 'works'
+@run
+@exec CLS
+@expect count 2 main_changed
+@expect event main_changed
+
+@test implicit output to main
+@src
+
+        'test1'
+        1
+        'test2'
+
+@run
+@expect events
+main_changed test1\r\n1\r\ntest2\r\n
+
+@test implicit output is not working with functions that does not return
+@src
+
+'test'
+func('foo')
+'test'
+---
+# foo
+
+@run
+@expect events
+main_changed test\r\ntest\r\n
+
+@test complex example from wiki
+@src
+*P '1'
+      $txt = $MAINTXT
+      *PL '23'
+      *NL '456'
+      '78'
+@run
+@expect events
+main_changed 123\r\n\r\n45678\r\n
+@expect $txt => '1'

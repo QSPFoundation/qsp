@@ -1,0 +1,94 @@
+// Ported from qsp-wasm-engine tests/engine/loop.test.ts
+
+@test loop should not start if condition not met
+@src
+
+i = 1
+x = 1
+loop while i > 1: x += 1
+@run
+@expect x => 1
+
+@test loop should stop if condition is changed inside loop
+@src
+
+i = 1
+x = 1
+loop while i < 5: x += 1 & i = 10
+@run
+@expect x => 2
+
+@test step should be called on every loop run
+@src
+
+loop i = 1 while i < 10 step i += 2: x+=1
+@run
+@expect x => 5
+
+@test local vars should be for loop only
+@src
+
+i = 5
+loop local i = 1 while i < 10 step i+=2: x+=1
+z = i
+@run
+@expect x => 5
+@expect i => 5
+@expect z => 5
+
+@test processing arrays with loop
+@src
+
+mass[] = 23
+mass[2] = 45
+summ=0
+loop local i, size = 0, arrsize('mass') while i < size step i += 1:
+    summ += mass[i]
+end
+@run
+@expect summ => 68
+
+@test EXIT stops whole location not just loop
+@src
+
+        x = 0 & y = 1
+        loop local i = 1 while i < 10 step i+=1:
+          x+=i
+          if i = 5: exit
+        end
+        y = 2
+@run
+@expect x => 15
+@expect y => 1
+
+@test can JUMP outside loop
+@src
+
+        x = 0 & y = 0
+        loop local i = 1 while i < 10 step i+=1:
+          x+=2
+          if i = 5: jump 'endloop'
+        end
+        :endloop
+        y = 2
+@run
+@expect x => 10
+@expect y => 2
+
+@test multi line loop supports comments
+@src
+
+s = 0
+loop i = 0 while i < 3 step i += 1: ! test comment
+  s += 2
+end
+@run
+@expect s => 6
+
+@test multiline loop requires colon
+@src
+
+        loop while 0
+        end
+@run
+@expect error COLONNOTFOUND (location 'test', line 2, local 2, action -1) LOOP WHILE 0

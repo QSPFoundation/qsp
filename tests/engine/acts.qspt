@@ -1,0 +1,153 @@
+// Ported from qsp-wasm-engine tests/engine/acts.test.ts
+// Panels are the QSP_WIN_* flags: 1 - main, 2 - stats, 4 - actions, 8 - objects, 16 - user input, 32 - view
+
+@test SHOWACTS should toggle acts visibility
+@src
+SHOWACTS 0
+@run
+@expect event panel_visibility 4 0
+@exec SHOWACTS 1
+@expect event panel_visibility 4 1
+
+@test single line ACT
+@src
+act '1': p 1
+@run
+@expect event actions_changed [1]
+
+@test single line ACT with image
+@src
+act '1', '1.png': p 1
+@run
+@expect event actions_changed [1|1.png]
+
+@test multi line ACT
+@src
+act '1':
+  p 1
+end
+@run
+@expect event actions_changed [1]
+
+@test multi line ACT with image
+@src
+act '1', '1.png':
+  p 1
+end
+@run
+@expect event actions_changed [1|1.png]
+
+@test ACTs with same name are ignored
+@src
+act '1': p 1
+@run
+@expect event actions_changed [1]
+@clear-events
+@exec act '1': p 1
+@expect no-event actions_changed
+
+@test executing action
+@src
+act '1': p 'a'
+@run
+@select-act 0
+@exec-act
+@expect event stats_changed a
+
+@test DELACT should delete action
+@src
+act '1': p 1
+@run
+@expect event actions_changed [1]
+@clear-events
+@exec DELACT '1'
+@expect event actions_changed []
+
+@test DEL ACT should delete action
+@src
+act '1': p 1
+@run
+@expect event actions_changed [1]
+@clear-events
+@exec DEL ACT '1'
+@expect event actions_changed []
+
+@test $CURACTS should return acts list as code
+@src
+
+act '1': p '1'
+act '2':
+  p '2'
+  p '3'
+end
+p $CURACTS
+
+@run
+@expect event stats_changed ACT '1': P '1'\r\nACT '2':\r\nP '2'\r\nP '3'\r\nEND\r\n
+
+@test actions can be restored from CURACTS
+@src
+
+      act '1': p 'a'
+act '2':
+  p 'b'
+  p 'c'
+end
+$acts = $CURACTS
+@run
+@expect event actions_changed [1; 2]
+@clear-events
+@exec CLA
+@expect event actions_changed []
+@clear-events
+@exec dynamic $acts
+@expect event actions_changed [1; 2]
+
+@test $SELACT should return currently selected action
+@src
+act '1': p 1
+@run
+@select-act 0
+@exec $selected = $SELACT
+@expect $selected => '1'
+
+@test CLA should clear list of actions
+@src
+act '1': p 1
+@run
+@expect event actions_changed [1]
+@clear-events
+@exec CLA
+@expect event actions_changed []
+
+@test CLS should clear list of actions
+@src
+act '1': p 1
+@run
+@expect event actions_changed [1]
+@clear-events
+@exec CLS
+@expect event actions_changed []
+
+@test multi line act supports comments
+@src
+
+x = 1
+act 'test': ! test comment
+  x = 2
+end
+
+@run
+@expect x => 1
+@select-act 0
+@exec-act
+@expect x => 2
+
+@test multiline act requires colon
+@src
+
+        act 'test'
+        end
+
+@run
+@expect error COLONNOTFOUND (location 'test', line 2, local 2, action -1) ACT 'test'
