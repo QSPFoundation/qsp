@@ -161,11 +161,27 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarValuesCount
 
 /*
  * Class:     com_libqsp_jni_QSPLib
- * Method:    getVarIndexByString
- * Signature: (Ljava/lang/String;Ljava/lang/String;)I
+ * Method:    getVarIndexByKey
+ * Signature: (Ljava/lang/String;Lcom/libqsp/jni/QSPLib/Variant;)I
  */
-JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByString
-  (JNIEnv *, jobject, jstring, jstring);
+JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByKey
+  (JNIEnv *, jobject, jstring, jobject);
+
+/*
+ * Class:     com_libqsp_jni_QSPLib
+ * Method:    getVarValue
+ * Signature: (Ljava/lang/String;I)Lcom/libqsp/jni/QSPLib/VarItem;
+ */
+JNIEXPORT jobject JNICALL Java_com_libqsp_jni_QSPLib_getVarValue
+  (JNIEnv *, jobject, jstring, jint);
+
+/*
+ * Class:     com_libqsp_jni_QSPLib
+ * Method:    convertValueToString
+ * Signature: (Lcom/libqsp/jni/QSPLib/Variant;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_convertValueToString
+  (JNIEnv *, jobject, jobject);
 
 /*
  * Class:     com_libqsp_jni_QSPLib

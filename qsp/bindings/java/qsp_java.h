@@ -50,6 +50,8 @@
 
     extern jclass qspListItemClass;
     extern jclass qspObjectItemClass;
+    extern jclass qspVariantClass;
+    extern jclass qspVarItemClass;
     extern jclass qspExecutionStateClass;
     extern jclass qspErrorInfoClass;
 
@@ -58,11 +60,20 @@
     extern jfieldID qspObjectItemNameField;
     extern jfieldID qspObjectItemTitleField;
     extern jfieldID qspObjectItemImageField;
+    extern jfieldID qspVariantTypeField;
+    extern jfieldID qspVariantNumField;
+    extern jfieldID qspVariantStrField;
+    extern jfieldID qspVariantTupleField;
+    extern jfieldID qspVarItemValueField;
+    extern jfieldID qspVarItemKeyField;
 
     jstring qspToJavaString(JNIEnv *env, QSPString str);
     QSPString qspFromJavaString(JNIEnv *env, jstring str);
     jobject qspToJavaListItem(JNIEnv *env, QSPString name, QSPString image);
     jobject qspToJavaObjectItem(JNIEnv *env, QSPString name, QSPString title, QSPString image);
+    jobject qspToJavaVariant(JNIEnv *env, QSPVariant *value);
+    QSPVariant qspFromJavaVariant(JNIEnv *env, jobject variant);
+    jobject qspToJavaVarItem(JNIEnv *env, QSPVariant *value, QSPVariant *key);
 
     QSP_BOOL qspOpenQuestFromFILE(FILE *f, QSP_BOOL isNewGame);
     QSP_BOOL qspSaveGameStatusToFILE(FILE *f);

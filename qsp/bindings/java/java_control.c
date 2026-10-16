@@ -36,6 +36,14 @@ jfieldID qspListItemImageField;
 jfieldID qspObjectItemNameField;
 jfieldID qspObjectItemTitleField;
 jfieldID qspObjectItemImageField;
+jclass qspVariantClass;
+jclass qspVarItemClass;
+jfieldID qspVariantTypeField;
+jfieldID qspVariantNumField;
+jfieldID qspVariantStrField;
+jfieldID qspVariantTupleField;
+jfieldID qspVarItemValueField;
+jfieldID qspVarItemKeyField;
 jclass qspExecutionStateClass;
 jclass qspErrorInfoClass;
 
@@ -78,6 +86,104 @@ jobject qspToJavaObjectItem(JNIEnv *env, QSPString name, QSPString title, QSPStr
     qspSetJavaStringField(env, jniListItem, qspObjectItemTitleField, title);
     qspSetJavaStringField(env, jniListItem, qspObjectItemImageField, image);
     return jniListItem;
+}
+
+jobject qspToJavaVariant(JNIEnv *env, QSPVariant *value)
+{
+    jobject jniVariant = (*env)->AllocObject(env, qspVariantClass);
+    (*env)->SetIntField(env, jniVariant, qspVariantTypeField, value->Type);
+    switch (QSP_BASETYPE(value->Type))
+    {
+    case QSP_TYPE_TUPLE:
+        {
+            jobject jniItem;
+            int i, count = QSP_PTUPLE(value).ValsCount;
+            jobjectArray jniItems = (*env)->NewObjectArray(env, count, qspVariantClass, 0);
+            for (i = 0; i < count; ++i)
+            {
+                jniItem = qspToJavaVariant(env, QSP_PTUPLE(value).Vals + i);
+                (*env)->SetObjectArrayElement(env, jniItems, i, jniItem);
+                (*env)->DeleteLocalRef(env, jniItem);
+            }
+            (*env)->SetObjectField(env, jniVariant, qspVariantTupleField, jniItems);
+            (*env)->DeleteLocalRef(env, jniItems);
+            break;
+        }
+    case QSP_TYPE_NUM:
+        (*env)->SetLongField(env, jniVariant, qspVariantNumField, QSP_PNUM(value));
+        break;
+    case QSP_TYPE_STR:
+        qspSetJavaStringField(env, jniVariant, qspVariantStrField, QSP_PSTR(value));
+        break;
+    }
+    return jniVariant;
+}
+
+QSPVariant qspFromJavaVariant(JNIEnv *env, jobject variant)
+{
+    QSPVariant res;
+    jint type = (variant ? (*env)->GetIntField(env, variant, qspVariantTypeField) : QSP_TYPE_UNDEF);
+    if (type >= 0 && type < QSP_TYPE_DEFINED_TYPES)
+        qspInitVariant(&res, (QSP_TINYINT)type);
+    else
+        qspInitVariant(&res, QSP_TYPE_UNDEF);
+
+    switch (QSP_BASETYPE(res.Type))
+    {
+    case QSP_TYPE_TUPLE:
+        {
+            jobjectArray jniItems = (jobjectArray)(*env)->GetObjectField(env, variant, qspVariantTupleField);
+            if (jniItems)
+            {
+                int count = (*env)->GetArrayLength(env, jniItems);
+                if (count)
+                {
+                    int i;
+                    jobject jniItem;
+                    QSPVariant *items = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+                    for (i = 0; i < count; ++i)
+                    {
+                        jniItem = (*env)->GetObjectArrayElement(env, jniItems, i);
+                        items[i] = qspFromJavaVariant(env, jniItem);
+                        if (jniItem) (*env)->DeleteLocalRef(env, jniItem);
+                    }
+                    QSP_TUPLE(res).Vals = items;
+                    QSP_TUPLE(res).ValsCount = count;
+                }
+                (*env)->DeleteLocalRef(env, jniItems);
+            }
+            break;
+        }
+    case QSP_TYPE_NUM:
+        QSP_NUM(res) = (QSP_BIGINT)(*env)->GetLongField(env, variant, qspVariantNumField);
+        break;
+    case QSP_TYPE_STR:
+        {
+            jstring jniStr = (jstring)(*env)->GetObjectField(env, variant, qspVariantStrField);
+            if (jniStr)
+            {
+                QSP_STR(res) = qspFromJavaString(env, jniStr);
+                (*env)->DeleteLocalRef(env, jniStr);
+            }
+            break;
+        }
+    }
+    return res;
+}
+
+INLINE void qspSetJavaVariantField(JNIEnv *env, jobject obj, jfieldID field, QSPVariant *value)
+{
+    jobject jniVariant = qspToJavaVariant(env, value);
+    (*env)->SetObjectField(env, obj, field, jniVariant);
+    (*env)->DeleteLocalRef(env, jniVariant);
+}
+
+jobject qspToJavaVarItem(JNIEnv *env, QSPVariant *value, QSPVariant *key)
+{
+    jobject jniVarItem = (*env)->AllocObject(env, qspVarItemClass);
+    qspSetJavaVariantField(env, jniVarItem, qspVarItemValueField, value);
+    qspSetJavaVariantField(env, jniVarItem, qspVarItemKeyField, key);
+    return jniVarItem;
 }
 
 /* ------------------------------------------------------------ */
@@ -254,8 +360,8 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarValuesCount(JNIEnv *env,
     if (var) return var->ValsCount;
     return 0;
 }
-/* Get index of an item by string */
-JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByString(JNIEnv *env, jobject api, jstring name, jstring str)
+/* Get index of an item by key */
+JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByKey(JNIEnv *env, jobject api, jstring name, jobject key)
 {
     QSPString varName = qspFromJavaString(env, name);
     QSPVar *var = qspVarReference(varName, QSP_FALSE);
@@ -263,13 +369,38 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByString(JNIEnv *en
     if (var)
     {
         int arrIndex;
-        QSPString indexStr = qspFromJavaString(env, str);
-        QSPVariant index = qspStrVariant(indexStr, QSP_TYPE_STR);
+        QSPVariant index = qspFromJavaVariant(env, key);
         arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
-        qspFreeString(&indexStr);
-        return arrIndex;
+        qspFreeVariant(&index);
+        if (arrIndex >= 0 && arrIndex < var->ValsCount) return arrIndex;
     }
     return -1;
+}
+/* Get value & key of the specified array item */
+JNIEXPORT jobject JNICALL Java_com_libqsp_jni_QSPLib_getVarValue(JNIEnv *env, jobject api, jstring name, jint ind)
+{
+    QSPString varName = qspFromJavaString(env, name);
+    QSPVar *var = qspVarReference(varName, QSP_FALSE);
+    qspFreeString(&varName);
+    if (var && ind >= 0 && ind < var->ValsCount)
+    {
+        int keyIndex = qspGetVarKeyIndex(var, ind);
+        QSPVariant key = (keyIndex >= 0 ? var->Keys[keyIndex].Key : qspGetEmptyVariant(QSP_TYPE_UNDEF));
+        return qspToJavaVarItem(env, var->Values + ind, &key);
+    }
+    return 0;
+}
+/* Get display string of the specified value */
+JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_convertValueToString(JNIEnv *env, jobject api, jobject value)
+{
+    jstring res;
+    QSPString text;
+    QSPVariant val = qspFromJavaVariant(env, value);
+    text = qspGetVariantAsString(&val);
+    qspFreeVariant(&val);
+    res = qspToJavaString(env, text);
+    qspFreeString(&text);
+    return res;
 }
 /* Get numeric value of the specified array item */
 JNIEXPORT jlong JNICALL Java_com_libqsp_jni_QSPLib_getNumVarValue(JNIEnv *env, jobject api, jstring name, jint ind)
@@ -585,6 +716,18 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api)
     qspObjectItemTitleField = (*env)->GetFieldID(env, qspObjectItemClass, "title", "Ljava/lang/String;");
     qspObjectItemImageField = (*env)->GetFieldID(env, qspObjectItemClass, "image", "Ljava/lang/String;");
 
+    clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$Variant");
+    qspVariantClass = (jclass)(*env)->NewGlobalRef(env, clazz);
+    qspVariantTypeField = (*env)->GetFieldID(env, qspVariantClass, "type", "I");
+    qspVariantNumField = (*env)->GetFieldID(env, qspVariantClass, "num", "J");
+    qspVariantStrField = (*env)->GetFieldID(env, qspVariantClass, "str", "Ljava/lang/String;");
+    qspVariantTupleField = (*env)->GetFieldID(env, qspVariantClass, "tuple", "[Lcom/libqsp/jni/QSPLib$Variant;");
+
+    clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$VarItem");
+    qspVarItemClass = (jclass)(*env)->NewGlobalRef(env, clazz);
+    qspVarItemValueField = (*env)->GetFieldID(env, qspVarItemClass, "value", "Lcom/libqsp/jni/QSPLib$Variant;");
+    qspVarItemKeyField = (*env)->GetFieldID(env, qspVarItemClass, "key", "Lcom/libqsp/jni/QSPLib$Variant;");
+
     clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$ExecutionState");
     qspExecutionStateClass = (jclass)(*env)->NewGlobalRef(env, clazz);
 
@@ -623,6 +766,8 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_terminate(JNIEnv *env, jobject
     (*env)->DeleteGlobalRef(env, qspApiClass);
     (*env)->DeleteGlobalRef(env, qspListItemClass);
     (*env)->DeleteGlobalRef(env, qspObjectItemClass);
+    (*env)->DeleteGlobalRef(env, qspVariantClass);
+    (*env)->DeleteGlobalRef(env, qspVarItemClass);
     (*env)->DeleteGlobalRef(env, qspExecutionStateClass);
     (*env)->DeleteGlobalRef(env, qspErrorInfoClass);
 }

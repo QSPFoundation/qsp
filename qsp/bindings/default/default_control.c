@@ -263,16 +263,14 @@ QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
     *count = 0;
     return QSP_FALSE;
 }
-/* Get index of an item by string */
-QSP_BOOL QSPGetVarIndexByString(QSPString name, QSPString str, int *ind)
+/* Get index of an item by key */
+QSP_BOOL QSPGetVarIndexByKey(QSPString name, QSPVariant key, int *ind)
 {
     QSPVar *var = qspVarReference(name, QSP_FALSE);
     if (var)
     {
-        int arrIndex;
-        QSPVariant index = qspStrVariant(str, QSP_TYPE_STR);
-        arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
-        if (arrIndex >= 0)
+        int arrIndex = qspGetVarIndex(var, key, QSP_FALSE);
+        if (arrIndex >= 0 && arrIndex < var->ValsCount)
         {
             *ind = arrIndex;
             return QSP_TRUE;
@@ -281,17 +279,23 @@ QSP_BOOL QSPGetVarIndexByString(QSPString name, QSPString str, int *ind)
     *ind = -1;
     return QSP_FALSE;
 }
-/* Get value of the specified array item */
-QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *res)
+/* Get value & key of the specified array item, both are optional */
+QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *value, QSPVariant *key)
 {
     QSPVar *var = qspVarReference(name, QSP_FALSE);
     if (var && ind >= 0 && ind < var->ValsCount)
     {
-        *res = var->Values[ind];
+        if (value) *value = var->Values[ind];
+        if (key)
+        {
+            int keyIndex = qspGetVarKeyIndex(var, ind);
+            *key = (keyIndex >= 0 ? var->Keys[keyIndex].Key : qspGetEmptyVariant(QSP_TYPE_UNDEF));
+        }
         return QSP_TRUE;
     }
 
-    *res = qspGetEmptyVariant(QSP_TYPE_UNDEF);
+    if (value) *value = qspGetEmptyVariant(QSP_TYPE_UNDEF);
+    if (key) *key = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     return QSP_FALSE;
 }
 /* Get display string of the specified value */

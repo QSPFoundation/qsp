@@ -128,8 +128,8 @@
     QSP_EXTERN QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI);
     /* Variables */
     QSP_EXTERN QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count);
-    QSP_EXTERN QSP_BOOL QSPGetVarIndexByString(QSPString name, QSPString str, int *index);
-    QSP_EXTERN QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *res);
+    QSP_EXTERN QSP_BOOL QSPGetVarIndexByKey(QSPString name, QSPVariant key, int *index);
+    QSP_EXTERN QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *value, QSPVariant *key);
     QSP_EXTERN QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize);
     QSP_EXTERN QSP_BOOL QSPGetNumVarValue(QSPString name, int ind, QSP_BIGINT *res);
     QSP_EXTERN QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSP_CHAR *buf, int bufSize);

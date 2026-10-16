@@ -78,6 +78,45 @@ public abstract class QSPLib {
         public String image;
     }
 
+    public static class Variant {
+        public static final int UNDEF  = 0;
+        public static final int TUPLE  = 1;
+        public static final int NUM    = 2;
+        public static final int BOOL   = 3;
+        public static final int STR    = 4;
+        public static final int CODE   = 5;
+        public static final int VARREF = 6;
+
+        public int type;
+        public long num;
+        public String str;
+        public Variant[] tuple;
+
+        public Variant() {
+            this.type = UNDEF;
+        }
+
+        public Variant(long num) {
+            this.type = NUM;
+            this.num = num;
+        }
+
+        public Variant(String str) {
+            this.type = STR;
+            this.str = str;
+        }
+
+        public Variant(Variant... tuple) {
+            this.type = TUPLE;
+            this.tuple = tuple;
+        }
+    }
+
+    public class VarItem {
+        public Variant value;
+        public Variant key; /* UNDEF if the item has no key */
+    }
+
     public class ExecutionState {
         public String loc;
         public int actIndex;
@@ -120,11 +159,9 @@ public abstract class QSPLib {
     public native int getWindowsChangedState(); /* Window bit flags */
     public native void showWindow(int type /* Window bit flags */, boolean toShow);
     public native int getVarValuesCount(String name);
-    public native int getVarIndexByString(String name, String str);
-    /*
-    public native QSPVariant getVarValue(String name, int index);
-    public native String convertValueToString(QSPVariant value);
-    */
+    public native int getVarIndexByKey(String name, Variant key);
+    public native VarItem getVarValue(String name, int index);
+    public native String convertValueToString(Variant value);
     public native long getNumVarValue(String name, int index);
     public native String getStrVarValue(String name, int index);
     public native boolean execString(String code, boolean toRefreshUI);
