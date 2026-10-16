@@ -218,7 +218,7 @@ void qspInitMath(void)
 
     qspAddOperation(qspOpArrSize, 30, 0, QSP_TYPE_NUM, 1, 1, QSP_TYPE_VARREF);
     qspAddOperation(qspOpArrType, 30, qspFunctionArrType, QSP_TYPE_STR, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_UNDEF);
-    qspAddOperation(qspOpArrKey, 30, qspFunctionArrKey, QSP_TYPE_UNDEF, 2, 2, QSP_TYPE_VARREF, QSP_TYPE_NUM);
+    qspAddOperation(qspOpArrKey, 30, qspFunctionArrKey, QSP_TYPE_UNDEF, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_NUM);
     qspAddOperation(qspOpArrItem, 30, 0, QSP_TYPE_UNDEF, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_UNDEF);
     qspAddOperation(qspOpInlineFirstArrItem, 30, 0, QSP_TYPE_UNDEF, 0, 0);
     qspAddOperation(qspOpInlineLastArrItem, 30, 0, QSP_TYPE_UNDEF, 0, 0);
@@ -1479,12 +1479,12 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
     QSP_PSTR(res) = qspCopyToNewText(typePrefix);
 }
 
-INLINE void qspFunctionArrKey(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
+INLINE void qspFunctionArrKey(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int arrIndex;
     QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_FALSE);
     if (!var) return;
-    arrIndex = QSP_TOINT(QSP_NUM(args[1]));
+    arrIndex = (count == 2 ? QSP_TOINT(QSP_NUM(args[1])) : 0);
     if (arrIndex >= 0 && arrIndex < var->ValsCount)
     {
         int keyIndex = qspGetVarKeyIndex(var, arrIndex);
