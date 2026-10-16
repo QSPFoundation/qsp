@@ -64,6 +64,15 @@ QSPString qspFromJavaString(JNIEnv *env, jstring str)
     return res;
 }
 
+INLINE QSP_BIGINT qspFromJavaNum(jlong num)
+{
+    if (num > (jlong)QSP_MAX_BIGINT)
+        return (QSP_BIGINT)QSP_MAX_BIGINT;
+    if (num < -(jlong)QSP_MAX_BIGINT)
+        return -(QSP_BIGINT)QSP_MAX_BIGINT;
+    return (QSP_BIGINT)num;
+}
+
 INLINE void qspSetJavaStringField(JNIEnv *env, jobject obj, jfieldID field, QSPString str)
 {
     jstring jniStr = qspToJavaString(env, str);
@@ -155,7 +164,7 @@ QSPVariant qspFromJavaVariant(JNIEnv *env, jobject variant)
             break;
         }
     case QSP_TYPE_NUM:
-        QSP_NUM(res) = (QSP_BIGINT)(*env)->GetLongField(env, variant, qspVariantNumField);
+        QSP_NUM(res) = qspFromJavaNum((*env)->GetLongField(env, variant, qspVariantNumField));
         break;
     case QSP_TYPE_STR:
         {
