@@ -5,12 +5,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-// Host calls of the WebAssembly binding (see wasm_callbacks.c), linked with --js-library.
-// The JS side attaches the host object to the module (Module.qspHost), missing methods are ignored.
-// A method can return a promise, then the engine is suspended (Asyncify) until it settles and the
-// running export completes later (call such exports with ccall(..., {async: true})). Only the
-// outermost host call can suspend, a promise returned from a nested call (a host method calling
-// the API, an API call while another one is suspended) is ignored.
+// Host calls (wasm_callbacks.c): Module.qspHost[name](...), missing methods are ignored.
+// A returned promise suspends the engine (Asyncify) until it settles, the running export then
+// completes later (call it with ccall(..., {async: true})). Only the outermost host call can
+// suspend, a promise from a nested one (the host calling the API) is ignored.
 
 const hostCalls = {
   qspWasmHostDebug: (str, bytes) => qspHostCall('onDebug', () => [UTF16ToString(str, bytes)]),
@@ -40,17 +38,21 @@ const hostCalls = {
     qspHostCall('onOpenGameStatus', () => [UTF16ToString(file, bytes)]),
   qspWasmHostSaveGameStatus: (file, bytes) =>
     qspHostCall('onSaveGameStatus', () => [UTF16ToString(file, bytes)]),
-  qspWasmHostInputBox: (text, bytes) =>
-    qspHostCall('onInputBox', () => [UTF16ToString(text, bytes)], qspAllocString),
+  qspWasmHostInputBox: (text, bytes, buffer, maxLen) =>
+    qspHostCall('onInputBox', () => [UTF16ToString(text, bytes)], (res) =>
+      qspWriteString(res, buffer, maxLen),
+    ),
   qspWasmHostShowMenu: (items, count) =>
     qspHostCall('onShowMenu', () => [items, count], (res) => (Number.isInteger(res) ? res : -1)),
-  qspWasmHostVersion: (param, bytes) =>
-    qspHostCall('onVersion', () => [UTF16ToString(param, bytes)], qspAllocString),
+  qspWasmHostVersion: (param, bytes, buffer, maxLen) =>
+    qspHostCall('onVersion', () => [UTF16ToString(param, bytes)], (res) =>
+      qspWriteString(res, buffer, maxLen),
+    ),
 };
 
 for (const name of Object.keys(hostCalls)) {
-  hostCalls[`${name}__deps`] = ['$qspHostCall', '$qspAllocString', '$UTF16ToString'];
-  hostCalls[`${name}__async`] = true; // can suspend the engine (ASYNCIFY_IMPORTS)
+  hostCalls[`${name}__deps`] = ['$qspHostCall', '$qspWriteString', '$UTF16ToString'];
+  hostCalls[`${name}__async`] = true;
 }
 
 addToLibrary({
@@ -58,15 +60,20 @@ addToLibrary({
 
   $qspHostDepth: 0, // host calls in progress
 
-  // Calls Module.qspHost[name](...getArgs()), the result (converted to the C value) is returned
-  // to the engine; the arguments are prepared once, not again when the engine resumes
+  // getArgs decodes the arguments only if the host has the method
   $qspHostCall__deps: ['$Asyncify', '$qspHostDepth'],
   $qspHostCall: (name, getArgs, convert) =>
     Asyncify.handleSleep((wakeUp) => {
       const host = Module['qspHost'];
       const done = (res) => {
+        let value = 0;
         --qspHostDepth;
-        wakeUp(convert ? convert(res) : 0);
+        try {
+          if (convert) value = convert(res);
+        } catch (e) {
+          console.error(e);
+        }
+        wakeUp(value);
       };
       let res;
       ++qspHostDepth;
@@ -89,14 +96,9 @@ addToLibrary({
       });
     }),
 
-  // Strings returned by the host are allocated with malloc & owned by the engine, 0 if there's none
-  $qspAllocString__deps: ['$lengthBytesUTF16', '$stringToUTF16', 'malloc'],
-  $qspAllocString: (str) => {
-    if (str == null) return 0;
-    str = String(str);
-    const size = lengthBytesUTF16(str) + 2;
-    const ptr = _malloc(size);
-    stringToUTF16(str, ptr, size);
-    return ptr;
+  // A longer string is cut, no answer (null, undefined) leaves the buffer empty
+  $qspWriteString__deps: ['$stringToUTF16'],
+  $qspWriteString: (str, buffer, maxLen) => {
+    if (str != null) stringToUTF16(String(str), buffer, (maxLen + 1) * 2);
   },
 });

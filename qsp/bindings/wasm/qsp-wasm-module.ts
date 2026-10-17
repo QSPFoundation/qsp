@@ -15,7 +15,6 @@ export type StringPtr = Brand<number>; // QSPString { Str, End }
 export type VariantPtr = Brand<number>; // QSPVariant
 export type ErrorPtr = Brand<number>; // QSPErrorInfo
 export type IntPtr = Brand<number>;
-export type PtrPtr = Brand<number>; // a pointer written by the export
 export type BufferPtr = Brand<number>;
 export type Bool = 0 | 1;
 
@@ -56,11 +55,8 @@ export interface QspErrorData {
   lineSrc: string;
 }
 
-// The host object is attached to the module as qspHost, missing methods are ignored.
-// Any method can return a promise: the engine is suspended until it settles and the running
-// export completes later (call such exports with ccall to get their results). A promise returned
-// from a nested call (a host method calling the API, an API call while another one is suspended)
-// is ignored, see qsp-wasm-host.js.
+// The host object (module.qspHost), missing methods are ignored. A returned promise suspends the
+// engine until it settles, unless it comes from a nested call, see qsp-wasm-host.js.
 export interface QspWasmHost {
   onDebug?(code: string): void | Promise<void>;
   onSetTimer?(msecs: number): void | Promise<void>;
@@ -88,7 +84,7 @@ export interface QspWasmHost {
 type Unprefixed<K> = K extends `_${infer N}` ? N : never;
 export type QspExportName = Unprefixed<Extract<keyof QspWasmModule, `_QSP${string}`>>;
 
-// Buffers returned by the exports are allocated with malloc, free them with _free
+// The exports write to the memory the JS side allocates and frees
 export interface QspWasmModule {
   HEAP8: Int8Array;
   HEAPU8: Uint8Array;
@@ -99,8 +95,7 @@ export interface QspWasmModule {
   _free(ptr: number): void;
 
   qspHost?: QspWasmHost;
-  // Runs an export that executes game code: the promise resolves with the result when the engine
-  // finishes the call, even if a host promise suspended it
+  // Resolves with the result when the engine finishes the call, even if a host promise suspended it
   ccall(
     name: QspExportName,
     returnType: 'number',
@@ -116,21 +111,27 @@ export interface QspWasmModule {
 
   _QSPEnableDebugMode(isDebug: Bool): void;
   _QSPGetCurStateData(loc: StringPtr, actIndex: IntPtr, lineNum: IntPtr): void;
-  _QSPGetLocationNames(res: PtrPtr): number;
+  _QSPGetLocationNames(locNames: StringPtr, bufSize: number): number;
   _QSPGetLocationDesc(name: CharsPtr, res: StringPtr): void;
-  _QSPGetLocationActions(name: CharsPtr, res: PtrPtr): number; // -1 if there is no location
-  _QSPGetLocationActionCode(name: CharsPtr, index: number, res: PtrPtr): number;
-  _QSPGetLocationCode(name: CharsPtr, res: PtrPtr): number;
+  // -1 if there is no location
+  _QSPGetLocationActions(name: CharsPtr, actions: Ptr, bufSize: number): number;
+  _QSPGetLocationActionCode(
+    name: CharsPtr,
+    index: number,
+    lines: Ptr,
+    bufSize: number,
+  ): number;
+  _QSPGetLocationCode(name: CharsPtr, lines: Ptr, bufSize: number): number;
 
   _QSPGetMainDesc(res: StringPtr): void;
   _QSPGetVarsDesc(res: StringPtr): void;
 
-  _QSPGetActions(res: PtrPtr): number;
+  _QSPGetActions(items: Ptr, bufSize: number): number;
   _QSPSetSelActionIndex(index: number, toRefreshUI: Bool): Bool;
   _QSPExecuteSelActionCode(toRefreshUI: Bool): Bool;
   _QSPGetSelActionIndex(): number;
 
-  _QSPGetObjects(res: PtrPtr): number;
+  _QSPGetObjects(items: Ptr, bufSize: number): number;
   _QSPSetSelObjectIndex(index: number, toRefreshUI: Bool): Bool;
   _QSPGetSelObjectIndex(): number;
 
@@ -142,8 +143,12 @@ export interface QspWasmModule {
   _QSPGetVarValue(name: CharsPtr, index: number, value: VariantPtr | 0, key: VariantPtr | 0): Bool;
 
   _QSPExecString(code: CharsPtr, toRefreshUI: Bool): Bool;
-  // res is allocated by the module
-  _QSPCalculateStrExpression(expression: CharsPtr, res: StringPtr, toRefreshUI: Bool): Bool;
+  _QSPCalculateStrExpression(
+    expression: CharsPtr,
+    buf: CharsPtr,
+    bufSize: number,
+    toRefreshUI: Bool,
+  ): Bool;
   _QSPCalculateNumExpression(expression: CharsPtr, res: IntPtr, toRefreshUI: Bool): Bool;
   _QSPExecLocationCode(name: CharsPtr, toRefreshUI: Bool): Bool;
   _QSPExecCounter(toRefreshUI: Bool): Bool;
@@ -153,7 +158,7 @@ export interface QspWasmModule {
   _QSPGetErrorDesc(errorNum: number, res: StringPtr): void;
 
   _QSPLoadGameWorldFromData(data: BufferPtr, size: number, isNewGame: Bool): Bool;
-  _QSPSaveGameAsData(res: PtrPtr, size: IntPtr, toRefreshUI: Bool): Bool;
+  _QSPSaveGameAsData(buf: BufferPtr, size: IntPtr, toRefreshUI: Bool): Bool; // size: in/out
   _QSPOpenSavedGameFromData(data: BufferPtr, size: number, toRefreshUI: Bool): Bool;
   _QSPRestartGame(toRefreshUI: Bool): Bool;
 

@@ -17,8 +17,8 @@
 #include "../../objects.h"
 #include "../../text.h"
 
-/* Host calls, implemented in qsp-wasm-host.js.
-   Strings are passed as UTF-16 buffers with their size in bytes. */
+/* Implemented in qsp-wasm-host.js. Strings are UTF-16 with the size in bytes,
+   the answers (input, version) are written to the buffers of the engine. */
 void qspWasmHostDebug(const QSP_CHAR *str, int bytes);
 void qspWasmHostSetTimer(int msecs);
 void qspWasmHostRefreshInt(int isForced, int isNewLoc);
@@ -36,9 +36,9 @@ void qspWasmHostOpenGame(const QSP_CHAR *file, int bytes, int isNewGame);
 void qspWasmHostInitGame(int isNewGame);
 void qspWasmHostOpenGameStatus(const QSP_CHAR *file, int bytes);
 void qspWasmHostSaveGameStatus(const QSP_CHAR *file, int bytes);
-QSP_CHAR *qspWasmHostInputBox(const QSP_CHAR *text, int bytes); /* allocated, 0 if there's no input */
+void qspWasmHostInputBox(const QSP_CHAR *text, int bytes, QSP_CHAR *buffer, int maxLen);
 int qspWasmHostShowMenu(const QSPListItem *items, int count);
-QSP_CHAR *qspWasmHostVersion(const QSP_CHAR *param, int bytes); /* allocated, 0 if there's no info */
+void qspWasmHostVersion(const QSP_CHAR *param, int bytes, QSP_CHAR *buffer, int maxLen);
 
 #define QSP_WASM_STRBYTES(s) ((int)(((s).End - (s).Str) * sizeof(QSP_CHAR)))
 
@@ -49,7 +49,6 @@ void qspInitCallbacks(void)
 
 void qspCallDebug(QSPString str)
 {
-    /* Jump into the debugger */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostDebug(str.Str, QSP_WASM_STRBYTES(str));
@@ -58,7 +57,6 @@ void qspCallDebug(QSPString str)
 
 void qspCallSetTimer(int msecs)
 {
-    /* Set timer interval */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostSetTimer(msecs);
@@ -67,7 +65,6 @@ void qspCallSetTimer(int msecs)
 
 void qspCallRefreshInt(QSP_BOOL isForced)
 {
-    /* Refresh UI to show the latest state */
     static int oldFullRefreshCount = 0;
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
@@ -83,7 +80,6 @@ void qspCallRefreshInt(QSP_BOOL isForced)
 
 void qspCallSetInputStrText(QSPString text)
 {
-    /* Set value of the text input control */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostSetInputStrText(text.Str, QSP_WASM_STRBYTES(text));
@@ -92,7 +88,6 @@ void qspCallSetInputStrText(QSPString text)
 
 void qspCallSystem(QSPString cmd)
 {
-    /* Execute system call */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostSystem(cmd.Str, QSP_WASM_STRBYTES(cmd));
@@ -101,7 +96,6 @@ void qspCallSystem(QSPString cmd)
 
 void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
 {
-    /* Open game file */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostOpenGame(file.Str, QSP_WASM_STRBYTES(file), isNewGame);
@@ -110,7 +104,6 @@ void qspCallOpenGame(QSPString file, QSP_BOOL isNewGame)
 
 void qspCallInitGame(QSP_BOOL isNewGame)
 {
-    /* Init game state */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostInitGame(isNewGame);
@@ -119,7 +112,6 @@ void qspCallInitGame(QSP_BOOL isNewGame)
 
 void qspCallOpenGameStatus(QSPString file)
 {
-    /* Open game state (showing the dialog to choose a file) */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostOpenGameStatus(file.Str, QSP_WASM_STRBYTES(file));
@@ -128,7 +120,6 @@ void qspCallOpenGameStatus(QSPString file)
 
 void qspCallSaveGameStatus(QSPString file)
 {
-    /* Save game state (showing the dialog to choose a file) */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostSaveGameStatus(file.Str, QSP_WASM_STRBYTES(file));
@@ -137,7 +128,6 @@ void qspCallSaveGameStatus(QSPString file)
 
 void qspCallShowMessage(QSPString text)
 {
-    /* Show a message */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_TRUE);
     qspWasmHostShowMessage(text.Str, QSP_WASM_STRBYTES(text));
@@ -146,7 +136,6 @@ void qspCallShowMessage(QSPString text)
 
 int qspCallShowMenu(QSPListItem *items, int count)
 {
-    /* Show a menu */
     QSPCallState state;
     int index;
     qspPrepareCallback(&state, QSP_TRUE);
@@ -157,7 +146,6 @@ int qspCallShowMenu(QSPListItem *items, int count)
 
 void qspCallShowPicture(QSPString file)
 {
-    /* Show an image */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostShowPicture(file.Str, QSP_WASM_STRBYTES(file));
@@ -166,7 +154,6 @@ void qspCallShowPicture(QSPString file)
 
 void qspCallShowWindow(int type, QSP_BOOL toShow)
 {
-    /* Show (hide) a region of the UI */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostShowWindow(type, toShow);
@@ -175,7 +162,6 @@ void qspCallShowWindow(int type, QSP_BOOL toShow)
 
 void qspCallPlayFile(QSPString file, int volume)
 {
-    /* Start playing a music file */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostPlayFile(file.Str, QSP_WASM_STRBYTES(file), volume);
@@ -184,7 +170,6 @@ void qspCallPlayFile(QSPString file, int volume)
 
 QSP_BOOL qspCallIsPlayingFile(QSPString file)
 {
-    /* Check whether a file is still playing */
     QSPCallState state;
     QSP_BOOL isPlaying;
     qspPrepareCallback(&state, QSP_FALSE);
@@ -195,7 +180,6 @@ QSP_BOOL qspCallIsPlayingFile(QSPString file)
 
 void qspCallCloseFile(QSPString file)
 {
-    /* Stop playing a file */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_FALSE);
     qspWasmHostCloseFile(file.Str, QSP_WASM_STRBYTES(file));
@@ -204,7 +188,6 @@ void qspCallCloseFile(QSPString file)
 
 void qspCallSleep(int msecs)
 {
-    /* Wait for the specified number of milliseconds */
     QSPCallState state;
     qspPrepareCallback(&state, QSP_TRUE);
     qspWasmHostSleep(msecs);
@@ -213,7 +196,6 @@ void qspCallSleep(int msecs)
 
 int qspCallGetMSCount(void)
 {
-    /* Get the number of milliseconds since the last call of this function */
     QSPCallState state;
     int count;
     qspPrepareCallback(&state, QSP_FALSE);
@@ -224,37 +206,43 @@ int qspCallGetMSCount(void)
 
 QSPString qspCallInputBox(QSPString text)
 {
-    /* Get input from the user */
+    const int maxLen = 511;
     QSPCallState state;
+    QSPString res;
     QSP_CHAR *buffer;
     qspPrepareCallback(&state, QSP_TRUE);
-    buffer = qspWasmHostInputBox(text.Str, QSP_WASM_STRBYTES(text));
+    buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
+    *buffer = 0;
+    qspWasmHostInputBox(text.Str, QSP_WASM_STRBYTES(text), buffer, maxLen);
+    buffer[maxLen] = 0;
+    res = qspStringFromC(buffer);
     if (!qspFinalizeCallback(&state, QSP_FALSE))
     {
-        if (buffer) free(buffer);
+        qspFreeString(&res);
         return qspNullString;
     }
-    return (buffer ? qspStringFromC(buffer) : qspNullString);
+    return res;
 }
 
 QSPString qspCallVersion(QSPString param)
 {
-    /* Get info from the player */
+    const int maxLen = 511;
     QSPCallState state;
+    QSPString res;
     QSP_CHAR *buffer;
     qspPrepareCallback(&state, QSP_FALSE);
-    buffer = qspWasmHostVersion(param.Str, QSP_WASM_STRBYTES(param));
+    buffer = (QSP_CHAR *)malloc((maxLen + 1) * sizeof(QSP_CHAR));
+    *buffer = 0;
+    qspWasmHostVersion(param.Str, QSP_WASM_STRBYTES(param), buffer, maxLen);
+    buffer[maxLen] = 0;
+    res = qspStringFromC(buffer);
     if (!qspFinalizeCallback(&state, QSP_FALSE))
     {
-        if (buffer) free(buffer);
+        qspFreeString(&res);
         return qspNullString;
     }
-    if (buffer)
-    {
-        QSPString res = qspStringFromC(buffer);
-        if (!(qspIsEmpty(res) && qspIsEmpty(param))) return res;
-        free(buffer);
-    }
+    if (!(qspIsEmpty(res) && qspIsEmpty(param))) return res;
+    qspFreeString(&res);
     return qspCopyToNewText(QSP_STATIC_STR(QSP_VER));
 }
 

@@ -33,151 +33,121 @@
     #endif
 #endif
 
-/* Layouts assumed by qsp-wasm-memory.ts */
+/* Layouts read by qsp-wasm-memory.ts */
 typedef char qspWasmLayoutCheck[(sizeof(QSP_CHAR) == 2 && sizeof(QSPVariant) == 12 && sizeof(QSP_BIGINT) == 4 &&
-    sizeof(QSPListItem) == 16 && sizeof(QSPObjectItem) == 24 && sizeof(QSPErrorInfo) == 40) ? 1 : -1];
+    sizeof(QSPListItem) == 16 && sizeof(QSPObjectItem) == 24 && sizeof(QSPLineInfo) == 12 &&
+    sizeof(QSPErrorInfo) == 40) ? 1 : -1];
 
-/* Strings passed by the JS side are UTF-16 buffers terminated with 0.
-   The functions return the same results as the default binding (state, count, index); strings,
-   variants, error data & lists are written through pointers instead of being returned or copied
-   into buffers of the caller. Lists & buffers are allocated with malloc, the JS side frees them with _free. */
+/* The JS side allocates & frees all the memory the functions write to */
 
-INLINE QSPString *qspWasmCopyLines(QSPLineOfCode *line, int count)
+INLINE int qspGetLinesInfo(QSPLineOfCode *line, int linesCount, QSPLineInfo *lines, int linesBufSize)
 {
     int i;
-    QSPString *lines = (QSPString *)malloc(count * sizeof(QSPString));
-    for (i = 0; i < count; ++i, ++line)
-        lines[i] = line->Str;
-    return lines;
+    for (i = 0; i < linesCount && i < linesBufSize; ++i, ++line)
+    {
+        lines[i].Line = line->Str;
+        lines[i].LineNum = line->LineNum;
+    }
+    return linesCount;
 }
-/* ------------------------------------------------------------ */
-/* Debugger */
 
-/* Enable the debugger */
 void QSPEnableDebugMode(QSP_BOOL isDebug)
 {
     qspIsDebug = isDebug;
 }
-/* Get current execution state */
+
 void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum)
 {
     *loc = (qspRealCurLoc ? qspRealCurLoc->Name : qspNullString);
     *actIndex = qspRealActIndex;
     *lineNum = qspRealLineNum;
 }
-/* Get names of all locations */
-int QSPGetLocationNames(QSPString **locNames)
+
+int QSPGetLocationNames(QSPString *locNames, int namesBufSize)
 {
     int i;
-    QSPString *names = (QSPString *)malloc(qspLocsCount * sizeof(QSPString));
-    for (i = 0; i < qspLocsCount; ++i)
-        names[i] = qspLocs[i]->Name;
-    *locNames = names;
+    for (i = 0; i < qspLocsCount && i < namesBufSize; ++i)
+        locNames[i] = qspLocs[i]->Name;
     return qspLocsCount;
 }
-/* Get base description of the specified location */
+
 void QSPGetLocationDesc(QSP_CHAR *locName, QSPString *desc)
 {
     QSPLocation *loc = qspLocByName(qspStringFromC(locName));
     *desc = (loc ? loc->Desc : qspNullString);
 }
-/* Get base actions of the specified location */
-int QSPGetLocationActions(QSP_CHAR *locName, QSPListItem **actions)
+
+/* The lists return the count (-1 if there is no such location or code), a bigger one than the
+   buffer means the JS side has to repeat the call with a bigger buffer */
+int QSPGetLocationActions(QSP_CHAR *locName, QSPListItem *actions, int actionsBufSize)
 {
     QSPLocation *loc = qspLocByName(qspStringFromC(locName));
     if (loc)
     {
         int i;
-        QSPListItem *items = (QSPListItem *)malloc(loc->ActionsCount * sizeof(QSPListItem));
-        for (i = 0; i < loc->ActionsCount; ++i)
+        for (i = 0; i < loc->ActionsCount && i < actionsBufSize; ++i)
         {
-            items[i].Name = loc->Actions[i].Desc;
-            items[i].Image = loc->Actions[i].Image;
+            actions[i].Name = loc->Actions[i].Desc;
+            actions[i].Image = loc->Actions[i].Image;
         }
-        *actions = items;
         return loc->ActionsCount;
     }
-    *actions = 0;
     return -1;
 }
-/* Get code of the base action of the specified location */
-int QSPGetLocationActionCode(QSP_CHAR *locName, int actionIndex, QSPString **lines)
+
+int QSPGetLocationActionCode(QSP_CHAR *locName, int actionIndex, QSPLineInfo *lines, int linesBufSize)
 {
     QSPLocation *loc = qspLocByName(qspStringFromC(locName));
     if (loc && actionIndex >= 0 && actionIndex < loc->ActionsCount)
     {
         QSPCodeBlock *code = loc->Actions[actionIndex].OnPressCode;
-        if (code)
-        {
-            *lines = qspWasmCopyLines(code->Lines, code->LinesCount);
-            return code->LinesCount;
-        }
+        if (code) return qspGetLinesInfo(code->Lines, code->LinesCount, lines, linesBufSize);
     }
-    *lines = 0;
     return -1;
 }
-/* Get code of the specified location */
-int QSPGetLocationCode(QSP_CHAR *locName, QSPString **lines)
+
+int QSPGetLocationCode(QSP_CHAR *locName, QSPLineInfo *lines, int linesBufSize)
 {
     QSPLocation *loc = qspLocByName(qspStringFromC(locName));
     if (loc)
     {
         QSPCodeBlock *code = loc->OnVisitCode;
-        if (code)
-        {
-            *lines = qspWasmCopyLines(code->Lines, code->LinesCount);
-            return code->LinesCount;
-        }
+        if (code) return qspGetLinesInfo(code->Lines, code->LinesCount, lines, linesBufSize);
     }
-    *lines = 0;
     return -1;
 }
-/* ------------------------------------------------------------ */
-/* Version details */
 
-/* Get version of the library */
 void QSPGetVersion(QSPString *version)
 {
     *version = QSP_STATIC_STR(QSP_VER);
 }
-/* Get build datetime of the library */
+
 void QSPGetCompiledDateTime(QSPString *dateTime)
 {
     *dateTime = QSP_STATIC_STR(QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__));
 }
-/* ------------------------------------------------------------ */
-/* Main description */
 
-/* Get text of the main description */
 void QSPGetMainDesc(QSPString *desc)
 {
     *desc = qspBufStringToString(qspCurDesc);
 }
-/* ------------------------------------------------------------ */
-/* Additional description */
 
-/* Get text of the additional description */
 void QSPGetVarsDesc(QSPString *desc)
 {
     *desc = qspBufStringToString(qspCurVars);
 }
-/* ------------------------------------------------------------ */
-/* Actions */
 
-/* Get current actions */
-int QSPGetActions(QSPListItem **items)
+int QSPGetActions(QSPListItem *items, int itemsBufSize)
 {
     int i;
-    QSPListItem *actions = (QSPListItem *)malloc(qspCurActsCount * sizeof(QSPListItem));
-    for (i = 0; i < qspCurActsCount; ++i)
+    for (i = 0; i < qspCurActsCount && i < itemsBufSize; ++i)
     {
-        actions[i].Name = qspCurActions[i].Desc;
-        actions[i].Image = qspCurActions[i].Image;
+        items[i].Name = qspCurActions[i].Desc;
+        items[i].Image = qspCurActions[i].Image;
     }
-    *items = actions;
     return qspCurActsCount;
 }
-/* Set index of the selected action */
+
 QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI)
 {
     if (ind >= 0 && ind < qspCurActsCount && ind != qspCurSelAction)
@@ -190,7 +160,7 @@ QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI)
     }
     return QSP_TRUE;
 }
-/* Execute the selected action */
+
 QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI)
 {
     if (qspCurSelAction >= 0)
@@ -202,25 +172,20 @@ QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI)
     }
     return QSP_TRUE;
 }
-/* Get index of the selected action */
+
 int QSPGetSelActionIndex(void)
 {
     return qspCurSelAction;
 }
-/* ------------------------------------------------------------ */
-/* Objects */
 
-/* Get current objects */
-int QSPGetObjects(QSPObjectItem **items)
+int QSPGetObjects(QSPObjectItem *items, int itemsBufSize)
 {
     int i;
-    QSPObjectItem *objects = (QSPObjectItem *)malloc(qspCurObjsCount * sizeof(QSPObjectItem));
-    for (i = 0; i < qspCurObjsCount; ++i)
-        qspGetObjectInfoByIndex(i, objects + i);
-    *items = objects;
+    for (i = 0; i < qspCurObjsCount && i < itemsBufSize; ++i)
+        qspGetObjectInfoByIndex(i, items + i);
     return qspCurObjsCount;
 }
-/* Set index of the selected object */
+
 QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI)
 {
     if (ind >= 0 && ind < qspCurObjsCount && ind != qspCurSelObject)
@@ -233,26 +198,22 @@ QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI)
     }
     return QSP_TRUE;
 }
-/* Get index of the selected object */
+
 int QSPGetSelObjectIndex(void)
 {
     return qspCurSelObject;
 }
-/* ------------------------------------------------------------ */
-/* Get the state of changes per window */
+
 int QSPGetWindowsChangedState(void)
 {
     return qspCurWindowsChangedState;
 }
-/* Synchronize visibility of a region of the UI */
+
 void QSPShowWindow(int type, QSP_BOOL toShow)
 {
     qspSetWindowState(type, toShow);
 }
-/* ------------------------------------------------------------ */
-/* Variables */
 
-/* Get the number of items in an array */
 QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
 {
     QSPVar *var = qspVarReference(qspStringFromC(name), QSP_FALSE);
@@ -264,7 +225,7 @@ QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
     *count = 0;
     return QSP_FALSE;
 }
-/* Get index of an item by key */
+
 QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
 {
     QSPVar *var = qspVarReference(qspStringFromC(name), QSP_FALSE);
@@ -280,7 +241,8 @@ QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
     *ind = -1;
     return QSP_FALSE;
 }
-/* Get value & key of the specified array item, both are optional */
+
+/* Both the value & the key are optional */
 QSP_BOOL QSPGetVarValue(QSP_CHAR *name, int ind, QSPVariant *value, QSPVariant *key)
 {
     QSPVar *var = qspVarReference(qspStringFromC(name), QSP_FALSE);
@@ -299,10 +261,7 @@ QSP_BOOL QSPGetVarValue(QSP_CHAR *name, int ind, QSPVariant *value, QSPVariant *
     if (key) *key = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     return QSP_FALSE;
 }
-/* ------------------------------------------------------------ */
-/* Code execution */
 
-/* Execute a line of code */
 QSP_BOOL QSPExecString(QSP_CHAR *s, QSP_BOOL toRefreshUI)
 {
     qspPrepareExecution(QSP_FALSE);
@@ -311,24 +270,29 @@ QSP_BOOL QSPExecString(QSP_CHAR *s, QSP_BOOL toRefreshUI)
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
-/* Calculate string value of an expression (causes execution of code), the result is allocated */
-QSP_BOOL QSPCalculateStrExpression(QSP_CHAR *s, QSPString *res, QSP_BOOL toRefreshUI)
+
+/* A longer result is cut */
+QSP_BOOL QSPCalculateStrExpression(QSP_CHAR *s, QSP_CHAR *buf, int bufSize, QSP_BOOL toRefreshUI)
 {
+    int resLen;
     QSPString codeStr;
     QSPVariant value;
-    *res = qspNullString;
     qspPrepareExecution(QSP_FALSE);
     codeStr = qspCopyToNewText(qspStringFromC(s));
     qspPrepareStringToExecution(&codeStr);
     value = qspCalculateExprValue(codeStr);
     qspFreeString(&codeStr);
     if (qspErrorNum) return QSP_FALSE;
-    *res = qspGetVariantAsString(&value);
+    qspConvertVariantTo(&value, QSP_TYPE_STR);
+    resLen = qspStrLen(QSP_STR(value));
+    if (resLen >= bufSize) resLen = bufSize - 1;
+    if (resLen) memcpy(buf, QSP_STR(value).Str, resLen * sizeof(QSP_CHAR));
+    buf[resLen] = 0;
     qspFreeVariant(&value);
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
-/* Calculate numeric value of an expression (causes execution of code) */
+
 QSP_BOOL QSPCalculateNumExpression(QSP_CHAR *s, QSP_BIGINT *res, QSP_BOOL toRefreshUI)
 {
     QSPString codeStr;
@@ -348,7 +312,7 @@ QSP_BOOL QSPCalculateNumExpression(QSP_CHAR *s, QSP_BIGINT *res, QSP_BOOL toRefr
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
-/* Execute code of the specified location */
+
 QSP_BOOL QSPExecLocationCode(QSP_CHAR *name, QSP_BOOL toRefreshUI)
 {
     qspPrepareExecution(QSP_FALSE);
@@ -357,7 +321,7 @@ QSP_BOOL QSPExecLocationCode(QSP_CHAR *name, QSP_BOOL toRefreshUI)
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
-/* Execute code of the special "COUNTER" location */
+
 QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI)
 {
     if (!qspIsInCallback)
@@ -369,7 +333,7 @@ QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI)
     }
     return QSP_TRUE;
 }
-/* Execute code of the special "USERCOM" location with the specified text of the input control */
+
 QSP_BOOL QSPExecUserInput(QSP_CHAR *text, QSP_BOOL toRefreshUI)
 {
     qspUpdateText(&qspCurInput, qspStringFromC(text));
@@ -379,61 +343,38 @@ QSP_BOOL QSPExecUserInput(QSP_CHAR *text, QSP_BOOL toRefreshUI)
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
-/* ------------------------------------------------------------ */
-/* Errors */
 
-/* Get details of the last error */
 void QSPGetLastErrorData(QSPErrorInfo *error)
 {
     *error = qspLastError;
 }
-/* Get error description by numeric code */
+
 void QSPGetErrorDesc(int errorNum, QSPString *desc)
 {
     *desc = qspGetErrorDesc(errorNum);
 }
-/* ------------------------------------------------------------ */
-/* Game controls */
 
-/* Load game from data */
 QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame)
 {
-    /* We don't execute any game code here */
     return qspOpenGame((void *)data, dataSize, isNewGame);
 }
-/* Save game state to an allocated buffer */
-QSP_BOOL QSPSaveGameAsData(void **data, int *dataSize, QSP_BOOL toRefreshUI)
+
+QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI)
 {
-    void *buf, *newBuf;
-    int bufSize = 64 * 1024;
-    *data = 0;
-    *dataSize = 0;
-    buf = malloc(bufSize);
-    if (!buf) return QSP_FALSE;
     qspPrepareExecution(QSP_FALSE);
-    while (!qspSaveGameStatus(buf, &bufSize, QSP_TRUE))
+    if (!qspSaveGameStatus(buf, bufSize, QSP_TRUE))
     {
-        if (!bufSize)
+        if (*bufSize)
         {
-            free(buf);
-            return QSP_FALSE;
+            /* The buffer is too small: the new size is required, with extra space for game updates */
+            *bufSize += QSP_SAVEDGAMEDATAEXTRASPACE;
         }
-        /* The buffer is too small, the new value contains required buffer size */
-        /* We have to reserve some extra space to account for game updates during subsequent calls */
-        bufSize += QSP_SAVEDGAMEDATAEXTRASPACE;
-        if (!(newBuf = realloc(buf, bufSize)))
-        {
-            free(buf);
-            return QSP_FALSE;
-        }
-        buf = newBuf;
+        return QSP_FALSE;
     }
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
-    *data = buf;
-    *dataSize = bufSize;
     return QSP_TRUE;
 }
-/* Load game state from data */
+
 QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRefreshUI)
 {
     qspPrepareExecution(QSP_FALSE);
@@ -442,7 +383,7 @@ QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRef
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
-/* Restart current game */
+
 QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI)
 {
     qspPrepareExecution(QSP_FALSE);
@@ -451,8 +392,7 @@ QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI)
     if (toRefreshUI) qspCallRefreshInt(QSP_FALSE);
     return QSP_TRUE;
 }
-/* ------------------------------------------------------------ */
-/* Initialization of the engine */
+
 void QSPInit(void)
 {
 #ifdef _DEBUG
@@ -460,7 +400,7 @@ void QSPInit(void)
 #endif
     qspInitRuntime();
 }
-/* Deallocate all resources */
+
 void QSPTerminate(void)
 {
     qspTerminateRuntime();
@@ -468,15 +408,15 @@ void QSPTerminate(void)
     mwTerm();
 #endif
 }
-/* ------------------------------------------------------------ */
-/* Sanitizer builds */
+
 #ifdef QSP_WASM_ASAN
 const char *__asan_default_options(void)
 {
     return "detect_stack_use_after_return=1:print_stats=1";
 }
 #endif
-/* Run the leak check */
+
+/* Runs the leak check of the sanitizer builds */
 void QSPRunChecks(void)
 {
 #ifdef QSP_WASM_ASAN

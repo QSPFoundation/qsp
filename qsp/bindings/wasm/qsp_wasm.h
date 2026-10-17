@@ -29,10 +29,10 @@
 
     #define QSP_TIME time
 
-    /* The host is called directly (see wasm_callbacks.c), callbacks aren't registered */
+    /* The callbacks are not registered, the host is called directly */
     typedef void *QSP_CALLBACK;
 
-    /* Functions called from JS, see qsp-wasm-module.ts */
+    /* Functions called from JS (qsp-wasm-module.ts) */
     #define QSP_WASM_EXPORT EMSCRIPTEN_KEEPALIVE
 
     #include "../qsp.h"
@@ -44,22 +44,22 @@
     /* Debugging */
     QSP_WASM_EXPORT void QSPEnableDebugMode(QSP_BOOL isDebug);
     QSP_WASM_EXPORT void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum);
-    QSP_WASM_EXPORT int QSPGetLocationNames(QSPString **locNames);
+    QSP_WASM_EXPORT int QSPGetLocationNames(QSPString *locNames, int namesBufSize);
     QSP_WASM_EXPORT void QSPGetLocationDesc(QSP_CHAR *locName, QSPString *desc);
-    QSP_WASM_EXPORT int QSPGetLocationActions(QSP_CHAR *locName, QSPListItem **actions);
-    QSP_WASM_EXPORT int QSPGetLocationActionCode(QSP_CHAR *locName, int actionIndex, QSPString **lines);
-    QSP_WASM_EXPORT int QSPGetLocationCode(QSP_CHAR *locName, QSPString **lines);
+    QSP_WASM_EXPORT int QSPGetLocationActions(QSP_CHAR *locName, QSPListItem *actions, int actionsBufSize);
+    QSP_WASM_EXPORT int QSPGetLocationActionCode(QSP_CHAR *locName, int actionIndex, QSPLineInfo *lines, int linesBufSize);
+    QSP_WASM_EXPORT int QSPGetLocationCode(QSP_CHAR *locName, QSPLineInfo *lines, int linesBufSize);
     /* Main desc */
     QSP_WASM_EXPORT void QSPGetMainDesc(QSPString *desc);
     /* Vars desc */
     QSP_WASM_EXPORT void QSPGetVarsDesc(QSPString *desc);
     /* Actions */
-    QSP_WASM_EXPORT int QSPGetActions(QSPListItem **items);
+    QSP_WASM_EXPORT int QSPGetActions(QSPListItem *items, int itemsBufSize);
     QSP_WASM_EXPORT QSP_BOOL QSPSetSelActionIndex(int ind, QSP_BOOL toRefreshUI);
     QSP_WASM_EXPORT int QSPGetSelActionIndex(void);
     QSP_WASM_EXPORT QSP_BOOL QSPExecuteSelActionCode(QSP_BOOL toRefreshUI);
     /* Objects */
-    QSP_WASM_EXPORT int QSPGetObjects(QSPObjectItem **items);
+    QSP_WASM_EXPORT int QSPGetObjects(QSPObjectItem *items, int itemsBufSize);
     QSP_WASM_EXPORT QSP_BOOL QSPSetSelObjectIndex(int ind, QSP_BOOL toRefreshUI);
     QSP_WASM_EXPORT int QSPGetSelObjectIndex(void);
     /* Windows */
@@ -67,7 +67,7 @@
     QSP_WASM_EXPORT void QSPShowWindow(int type, QSP_BOOL toShow);
     /* Code execution */
     QSP_WASM_EXPORT QSP_BOOL QSPExecString(QSP_CHAR *s, QSP_BOOL toRefreshUI);
-    QSP_WASM_EXPORT QSP_BOOL QSPCalculateStrExpression(QSP_CHAR *s, QSPString *res, QSP_BOOL toRefreshUI);
+    QSP_WASM_EXPORT QSP_BOOL QSPCalculateStrExpression(QSP_CHAR *s, QSP_CHAR *buf, int bufSize, QSP_BOOL toRefreshUI);
     QSP_WASM_EXPORT QSP_BOOL QSPCalculateNumExpression(QSP_CHAR *s, QSP_BIGINT *res, QSP_BOOL toRefreshUI);
     QSP_WASM_EXPORT QSP_BOOL QSPExecCounter(QSP_BOOL toRefreshUI);
     QSP_WASM_EXPORT QSP_BOOL QSPExecUserInput(QSP_CHAR *text, QSP_BOOL toRefreshUI);
@@ -77,7 +77,7 @@
     QSP_WASM_EXPORT void QSPGetErrorDesc(int errorNum, QSPString *desc);
     /* Game */
     QSP_WASM_EXPORT QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame);
-    QSP_WASM_EXPORT QSP_BOOL QSPSaveGameAsData(void **data, int *dataSize, QSP_BOOL toRefreshUI);
+    QSP_WASM_EXPORT QSP_BOOL QSPSaveGameAsData(void *buf, int *bufSize, QSP_BOOL toRefreshUI);
     QSP_WASM_EXPORT QSP_BOOL QSPOpenSavedGameFromData(const void *data, int dataSize, QSP_BOOL toRefreshUI);
 
     QSP_WASM_EXPORT QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI);

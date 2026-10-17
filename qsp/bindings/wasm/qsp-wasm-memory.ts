@@ -5,7 +5,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-// Access to the module memory: strings, lists & variants in the layout of qsp.h (32-bit pointers)
+// Heap access: strings, lists & variants in the layout of qsp.h (32-bit pointers)
 
 import {
   BufferPtr,
@@ -13,7 +13,6 @@ import {
   ErrorPtr,
   IntPtr,
   Ptr,
-  PtrPtr,
   QspErrorData,
   QspListItem,
   QspObjectItem,
@@ -28,6 +27,10 @@ import {
 export const POINTER_SIZE = 4;
 const CHAR_SIZE = 2; // UTF-16 code units, the same as JS strings
 const VARIANT_SIZE = POINTER_SIZE * 3; // QSPVariant: 2-word union + type byte, padded
+const STRING_SIZE = POINTER_SIZE * 2; // QSPString { Str, End }
+const LIST_ITEM_SIZE = STRING_SIZE * 2; // QSPListItem
+const OBJECT_ITEM_SIZE = STRING_SIZE * 3; // QSPObjectItem
+const LINE_INFO_SIZE = POINTER_SIZE + STRING_SIZE; // QSPLineInfo { LineNum, Line }
 
 // value types from qsp.h
 const QSP_TYPE_UNDEF = 0;
@@ -40,14 +43,6 @@ const QSP_TYPE_VARREF = 6;
 
 export function allocPointer(module: QspWasmModule): IntPtr {
   return module._malloc(POINTER_SIZE) as number as IntPtr;
-}
-
-function allocPtrPointer(module: QspWasmModule): PtrPtr {
-  return module._malloc(POINTER_SIZE) as number as PtrPtr;
-}
-
-export function allocStringPointer(module: QspWasmModule): StringPtr {
-  return module._malloc(POINTER_SIZE * 2) as number as StringPtr;
 }
 
 export function allocVariantPointer(module: QspWasmModule): VariantPtr {
@@ -90,26 +85,28 @@ export function readString(module: QspWasmModule, ptr: StringPtr): string {
   return readChars(module, start, (end - start) / CHAR_SIZE);
 }
 
-// Allocates a UTF-16 string terminated with 0
 export function writeString(module: QspWasmModule, value: string): CharsPtr {
   const ptr = module._malloc((value.length + 1) * CHAR_SIZE) as number as CharsPtr;
   writeChars(module, value, ptr);
   return ptr;
 }
 
-// The callbacks of the helpers below run exports that execute game code and may return a promise
-// (see ccall), the buffers live until it settles
+// The helpers run exports that execute game code: the buffers live until the call settles
 
-// Reads a string allocated by the module and frees it
-export async function withAllocatedStringRead(
+// The export writes at most maxLength characters (a longer string is cut)
+export async function withCharsRead(
   module: QspWasmModule,
-  callback: (ptr: StringPtr) => unknown,
+  maxLength: number,
+  callback: (buffer: CharsPtr, size: number) => Promise<number>,
 ): Promise<string> {
-  const ptr = allocStringPointer(module);
-  await callback(ptr);
-  const result = readString(module, ptr);
-  freePointer(module, derefPointer(module, ptr));
-  freePointer(module, ptr);
+  const buffer = module._malloc((maxLength + 1) * CHAR_SIZE) as number as CharsPtr;
+  module.HEAPU16[buffer >> 1] = 0;
+  await callback(buffer, maxLength + 1);
+  const codes = module.HEAPU16;
+  let length = 0;
+  while (length < maxLength && codes[(buffer >> 1) + length]) ++length;
+  const result = readChars(module, buffer, length);
+  freePointer(module, buffer);
   return result;
 }
 
@@ -124,40 +121,71 @@ export async function withStringWrite<T>(
   return result;
 }
 
-// Lists allocated by the module: the callback returns the count and writes the list to the pointer
-function withAllocatedListRead<T>(
+// Reusable memory for the lists the exports write to, grows when a list doesn't fit.
+// Shared by the calls that only read the state: no game code can run while a list is read.
+export interface ListBuffer {
+  ptr: Ptr;
+  size: number; // in bytes
+}
+
+export function allocListBuffer(module: QspWasmModule, size = 4096): ListBuffer {
+  return { ptr: module._malloc(size), size };
+}
+
+export function freeListBuffer(module: QspWasmModule, buffer: ListBuffer): void {
+  freePointer(module, buffer.ptr);
+}
+
+// The call is repeated with a bigger buffer if the list did not fit
+function readList<T>(
   module: QspWasmModule,
-  callback: (list: PtrPtr) => number,
-  read: (module: QspWasmModule, list: Ptr, count: number) => T[],
+  buffer: ListBuffer,
+  itemSize: number,
+  callback: (items: Ptr, bufSize: number) => number,
+  read: (module: QspWasmModule, items: Ptr, count: number) => T[],
 ): T[] {
-  const listPtr = allocPtrPointer(module);
-  const count = callback(listPtr);
-  const list = derefPointer(module, listPtr);
-  const items = read(module, list, count);
-  freePointer(module, list);
-  freePointer(module, listPtr);
-  return items;
+  let capacity = Math.floor(buffer.size / itemSize);
+  let count = callback(buffer.ptr, capacity);
+  if (count > capacity) {
+    freePointer(module, buffer.ptr);
+    buffer.size = Math.max(count * itemSize, buffer.size * 2);
+    buffer.ptr = module._malloc(buffer.size);
+    capacity = Math.floor(buffer.size / itemSize);
+    count = callback(buffer.ptr, capacity);
+  }
+  return count > 0 ? read(module, buffer.ptr, count) : [];
 }
 
 export function withListRead(
   module: QspWasmModule,
-  callback: (list: PtrPtr) => number,
+  buffer: ListBuffer,
+  callback: (items: Ptr, bufSize: number) => number,
 ): QspListItem[] {
-  return withAllocatedListRead(module, callback, readListItems);
+  return readList(module, buffer, LIST_ITEM_SIZE, callback, readListItems);
 }
 
 export function withObjectRead(
   module: QspWasmModule,
-  callback: (list: PtrPtr) => number,
+  buffer: ListBuffer,
+  callback: (items: Ptr, bufSize: number) => number,
 ): QspObjectItem[] {
-  return withAllocatedListRead(module, callback, readObjectItems);
+  return readList(module, buffer, OBJECT_ITEM_SIZE, callback, readObjectItems);
 }
 
 export function withStringListRead(
   module: QspWasmModule,
-  callback: (list: PtrPtr) => number,
+  buffer: ListBuffer,
+  callback: (items: Ptr, bufSize: number) => number,
 ): string[] {
-  return withAllocatedListRead(module, callback, readStringList);
+  return readList(module, buffer, STRING_SIZE, callback, readStringList);
+}
+
+export function withLinesRead(
+  module: QspWasmModule,
+  buffer: ListBuffer,
+  callback: (lines: Ptr, bufSize: number) => number,
+): string[] {
+  return readList(module, buffer, LINE_INFO_SIZE, callback, readLines);
 }
 
 export async function withBufferWrite<T>(
@@ -173,22 +201,31 @@ export async function withBufferWrite<T>(
   return result;
 }
 
-// Buffers allocated by the module: the callback writes the buffer & its size to the pointers
+// Too small a buffer fails with the required size, then the call is repeated; size 0 is an error
 export async function withBufferRead(
   module: QspWasmModule,
-  callback: (buffer: PtrPtr, size: IntPtr) => unknown,
+  callback: (buffer: BufferPtr, size: IntPtr) => Promise<number>,
+  initialSize = 64 * 1024,
 ): Promise<ArrayBuffer | null> {
-  const bufferPtr = allocPtrPointer(module);
   const sizePtr = allocPointer(module);
-  await callback(bufferPtr, sizePtr);
-  const buffer = derefPointer(module, bufferPtr);
-  const size = readInt(module, sizePtr);
-  freePointer(module, sizePtr);
-  freePointer(module, bufferPtr);
-  if (!buffer) return null;
-  const data = module.HEAPU8.slice(buffer, buffer + size);
+  let size = initialSize;
+  let buffer = module._malloc(size) as number as BufferPtr;
+  let data: ArrayBuffer | null = null;
+  for (;;) {
+    module.HEAP32[sizePtr >> 2] = size;
+    const isSaved = await callback(buffer, sizePtr);
+    size = readInt(module, sizePtr);
+    if (isSaved) {
+      data = module.HEAPU8.slice(buffer, buffer + size).buffer;
+      break;
+    }
+    if (!size) break;
+    freePointer(module, buffer);
+    buffer = module._malloc(size) as number as BufferPtr;
+  }
   freePointer(module, buffer);
-  return data.buffer;
+  freePointer(module, sizePtr);
+  return data;
 }
 
 // QSPListItem { Name, Image }
@@ -231,6 +268,17 @@ export function readStringList(module: QspWasmModule, listPtr: Ptr, count: numbe
   for (let i = 0; i < count; ++i) {
     list.push(readString(module, ptr));
     ptr = movePointer(ptr, 2);
+  }
+  return list;
+}
+
+// QSPLineInfo { LineNum, Line }
+export function readLines(module: QspWasmModule, listPtr: Ptr, count: number): string[] {
+  const list: string[] = [];
+  let ptr = listPtr as number as StringPtr;
+  for (let i = 0; i < count; ++i) {
+    list.push(readString(module, movePointer(ptr) as number as StringPtr));
+    ptr = (ptr + LINE_INFO_SIZE) as StringPtr;
   }
   return list;
 }
@@ -300,7 +348,7 @@ function readTuple(module: QspWasmModule, variant: VariantPtr): QspTuple {
   return values;
 }
 
-// Writes a variant in the layout readVariant expects, strings and tuple items are allocated
+// Strings and tuple items are allocated, freeVariantData frees them
 function writeVariant(module: QspWasmModule, variant: VariantPtr, value: QspVariableValue): void {
   module.HEAPU8.fill(0, variant, variant + VARIANT_SIZE); // undefined
   if (value === undefined) return;
@@ -344,7 +392,7 @@ function freeVariantData(module: QspWasmModule, variant: VariantPtr): void {
 
 const utf16Decoder = typeof TextDecoder === 'undefined' ? undefined : new TextDecoder('utf-16le');
 
-// Reads count code units, short strings are faster to decode by hand
+// Short strings are decoded faster by hand
 function readChars(module: QspWasmModule, ptr: number, count: number): string {
   if (utf16Decoder && count > 16) {
     return utf16Decoder.decode(module.HEAPU8.subarray(ptr, ptr + count * CHAR_SIZE));
@@ -355,7 +403,6 @@ function readChars(module: QspWasmModule, ptr: number, count: number): string {
   return str;
 }
 
-// Writes the string and the terminator
 function writeChars(module: QspWasmModule, str: string, ptr: number): void {
   const codes = module.HEAPU16;
   let i = ptr >> 1;
