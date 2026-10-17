@@ -8,8 +8,6 @@
 #ifndef QSP_H
     #define QSP_H
 
-    #include "qsp_export.h"
-
     enum
     {
         QSP_ERR_INTERNAL = 10,

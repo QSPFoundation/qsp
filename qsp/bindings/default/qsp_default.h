@@ -68,6 +68,7 @@
     #endif
 
     #include "../qsp.h"
+    #include "qsp_export.h"
 
     #ifdef __cplusplus
     extern "C"

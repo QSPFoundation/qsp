@@ -37,6 +37,18 @@ cmake -S . -B build -G "Visual Studio 17 2022" -A Win32 -DCMAKE_INSTALL_PREFIX=o
 cmake --build build --target install --config Release
 ```
 
+## WebAssembly build
+
+Requires the [Emscripten SDK](https://emscripten.org/):
+
+```bash
+emcmake cmake -S . -B build -DBUILD_STATIC=ON -DBUILD_WASM=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+cmake --install build --component wasm --prefix <output directory>
+```
+
+The `wasm` component contains the modules (`qsp-engine*.js`, `qsp-engine*.wasm`), their typings and the TypeScript part of the binding.
+
 ## Support us
 
 Please consider supporting our development on:

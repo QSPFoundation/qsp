@@ -4,11 +4,12 @@ project(qsp VERSION 5.9.6)
 set(QSP_GAMEMIN_VER "5.9.6")
 
 option(BUILD_JAVA "Build with JVM bindings" OFF)
+option(BUILD_WASM "Build WebAssembly module (requires the Emscripten toolchain)" OFF)
+option(BUILD_STATIC "Build a static library instead of a shared one" OFF)
 option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" OFF)
 option(QSP_BUILD_TESTS "Build the test runner and register the tests with CTest" OFF)
 
 include(CMakePackageConfigHelpers)
-include(GenerateExportHeader)
 include(GNUInstallDirs)
 include(FetchContent)
 
@@ -75,13 +76,6 @@ configure_file(qsp_config.h.cmakein qsp_config.h @ONLY)
 
 set(QSP_SOURCES
 	qsp/bindings/bindings_config.h
-	qsp/bindings/default/default_callbacks.c
-	qsp/bindings/default/default_control.c
-	qsp/bindings/default/qsp_default.h
-	qsp/bindings/java/java_callbacks.c
-	qsp/bindings/java/java_control.c
-	qsp/bindings/java/java_files.c
-	qsp/bindings/java/qsp_java.h
 	qsp/bindings/qsp.h
 	qsp/actions.c qsp/actions.h
 	qsp/callbacks.c qsp/callbacks.h
@@ -107,7 +101,11 @@ set(QSP_SOURCES
 	qsp/variables.c qsp/variables.h
 	qsp/variant.c qsp/variant.h
 )
-add_library(qsp SHARED ${QSP_SOURCES})
+if (BUILD_STATIC)
+	add_library(qsp STATIC ${QSP_SOURCES})
+else()
+	add_library(qsp SHARED ${QSP_SOURCES})
+endif()
 target_compile_definitions(qsp PUBLIC _UNICODE)
 if (WIN32)
 	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS)
@@ -115,28 +113,12 @@ endif()
 target_link_libraries(qsp PRIVATE oniguruma::onig)
 
 if (BUILD_JAVA)
-	set_property(TARGET qsp PROPERTY C_STANDARD 11)
-	target_compile_definitions(qsp PRIVATE _JAVA)
-	if (NOT ANDROID)
-		find_package(JNI)
-		target_include_directories(qsp PRIVATE ${JNI_INCLUDE_DIRS})
-		target_link_libraries(qsp PRIVATE ${JNI_LIBRARIES})
-	endif()
+	add_subdirectory(qsp/bindings/java)
+elseif (BUILD_WASM)
+	add_subdirectory(qsp/bindings/wasm)
+else()
+	add_subdirectory(qsp/bindings/default)
 endif()
-
-target_include_directories(qsp
-	INTERFACE
-		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/qsp/bindings/default>"
-		"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/qsp/bindings>"
-		"$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>"
-		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp>"
-		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/qsp/default>"
-)
-
-generate_export_header(qsp
-	BASE_NAME Qsp
-	EXPORT_MACRO_NAME QSP_EXTERN
-)
 
 set(QSP_INSTALL_TARGETS qsp)
 if (TARGET onig)
@@ -148,19 +130,6 @@ endif()
 
 install(TARGETS ${QSP_INSTALL_TARGETS} EXPORT QspTargets)
 export(TARGETS ${QSP_INSTALL_TARGETS} NAMESPACE Qsp:: FILE "${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspTargets.cmake")
-
-install(FILES
-		qsp/bindings/qsp.h
-		qsp/bindings/bindings_config.h
-		"${CMAKE_CURRENT_BINARY_DIR}/qsp_export.h"
-	DESTINATION
-		"${CMAKE_INSTALL_INCLUDEDIR}/qsp"
-)
-install(FILES
-		qsp/bindings/default/qsp_default.h
-	DESTINATION
-		"${CMAKE_INSTALL_INCLUDEDIR}/qsp/default"
-)
 
 write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfigVersion.cmake" COMPATIBILITY AnyNewerVersion)
 configure_package_config_file(QspConfig.cmake.in "${CMAKE_CURRENT_BINARY_DIR}/cmake/Qsp/QspConfig.cmake"
