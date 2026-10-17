@@ -1,0 +1,20 @@
+// Ported from qsp-wasm-engine tests/engine/msg.test.ts
+
+@test MSG should trigger event in api
+@src
+msg 'works'
+@run
+@expect event msg works
+
+// The engine forces the update of every window before it shows the message
+@test msg should stop execution flow
+@src
+*p '1' & msg 'works' & *p '2'
+@run
+@expect events
+main_changed 1
+stats_changed
+actions_changed []
+objects_changed []
+msg works
+main_changed 12

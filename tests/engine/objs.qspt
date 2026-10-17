@@ -1,0 +1,177 @@
+// Ported from qsp-wasm-engine tests/engine/objs.test.ts
+// The lists show "name|image", the title is added as " => title" only when it differs from the name
+// Panels are the QSP_WIN_* flags: 1 - main, 2 - stats, 4 - actions, 8 - objects, 16 - user input, 32 - view
+
+@test SHOWOBJS should toggle objs visibility
+@src
+SHOWOBJS 0
+@run
+@expect event panel_visibility 8 0
+@exec SHOWOBJS 1
+@expect event panel_visibility 8 1
+
+@test ADDOBJ should add object to end of list
+@src
+ADDOBJ 'first' & ADDOBJ 'second'
+@run
+@expect event objects_changed [first; second]
+
+@test ADDOBJ should add objects with same name
+@src
+ADDOBJ 'first' & ADDOBJ 'first'
+@run
+@expect event objects_changed [first; first]
+
+@test ADDOBJ should add object with image
+@src
+ADDOBJ 'first', '1.png'
+@run
+@expect event objects_changed [first|1.png]
+
+@test ADDOBJ should add object into specified position (1 based)
+@src
+ADDOBJ 'first' & ADDOBJ 'second', '', 1
+@run
+@expect event objects_changed [second; first]
+
+@test ADD OBJ should add object to end of list
+@src
+ADD OBJ 'first' & ADD OBJ 'second'
+@run
+@expect event objects_changed [first; second]
+
+@test ADD OBJ should add object with image
+@src
+ADD OBJ 'first', '1.png'
+@run
+@expect event objects_changed [first|1.png]
+
+@test ADD OBJ should add object into specified position
+@src
+ADD OBJ 'first' & ADD OBJ 'second', '', 1
+@run
+@expect event objects_changed [second; first]
+
+@test $CUROBJS should return list of objects
+@src
+ADDOBJ 'first','1.png' & ADDOBJ 'second' & p $CUROBJS
+@run
+@expect event stats_changed ADDOBJ 'first', '1.png'\r\nADDOBJ 'second'\r\n
+
+@test objects should be restored from $CUROBJS
+@src
+ADDOBJ 'first' & ADDOBJ 'second','2.png' & $objs = $CUROBJS
+@run
+@expect event objects_changed [first; second|2.png]
+@clear-events
+@exec KILLOBJ
+@expect event objects_changed []
+@clear-events
+@exec dynamic $objs
+@expect event objects_changed [first; second|2.png]
+
+@test DELOBJ should delete object by name
+@src
+ADDOBJ 'first', '1.png'
+@run
+@expect event objects_changed [first|1.png]
+@clear-events
+@exec DELOBJ 'first'
+@expect event objects_changed []
+
+@test DEL OBJ should delete object by name
+@src
+ADDOBJ 'first', '1.png'
+@run
+@expect event objects_changed [first|1.png]
+@clear-events
+@exec DEL OBJ 'first'
+@expect event objects_changed []
+
+@test DELOBJ deletes first object in list if there are several objects with the same name
+@src
+ADDOBJ 'first', '1.png' & ADDOBJ 'first', '2.png'
+@run
+@expect event objects_changed [first|1.png; first|2.png]
+@clear-events
+@exec DELOBJ 'first'
+@expect event objects_changed [first|2.png]
+
+@test KILLOBJ should delete object by index
+@src
+ADD OBJ 'first' & ADD OBJ 'second'
+@run
+@expect event objects_changed [first; second]
+@clear-events
+@exec KILLOBJ 1
+@expect event objects_changed [second]
+
+@test KILLOBJ should clear inventory when called without index
+@src
+ADD OBJ 'first' & ADD OBJ 'second'
+@run
+@expect event objects_changed [first; second]
+@clear-events
+@exec KILLOBJ
+@expect event objects_changed []
+
+@test KILLALL should clear inventory
+@src
+ADD OBJ 'first' & ADD OBJ 'second'
+@run
+@expect event objects_changed [first; second]
+@clear-events
+@exec KILLALL
+@expect event objects_changed []
+
+@test $SELOBJ should return name of selected object
+@src
+ADDOBJ 'first' & ADDOBJ 'second'
+@run
+@select-obj 1
+@exec $selected = $SELOBJ
+@expect $selected => 'second'
+
+@test COUNTOBJ should return number of objects
+@src
+ADDOBJ 'first' & ADDOBJ 'second' & count = COUNTOBJ
+@run
+@expect count => 2
+
+@test $GETOBJ should return object name at position
+@src
+ADDOBJ 'first' & ADDOBJ 'second' & $first = $GETOBJ(1)
+@run
+@expect $first => 'first'
+
+@test reading last object in list
+@src
+ADDOBJ 'first' & ADDOBJ 'second' & $last = $GETOBJ(COUNTOBJ)
+@run
+@expect $last => 'second'
+
+@test $GETOBJ should return empty string if no object at position
+@src
+$first = $GETOBJ(1)
+@run
+@expect $first => ''
+
+@test UNSELECT should unselect object
+@src
+ADDOBJ 'first' & ADDOBJ 'second'
+@run
+@select-obj 1
+@exec $obj = $SELOBJ
+@expect $obj => 'second'
+@exec UNSELECT & $obj = $SELOBJ
+@expect $obj => ''
+
+@test UNSEL should unselect object
+@src
+ADDOBJ 'first' & ADDOBJ 'second'
+@run
+@select-obj 1
+@exec $obj = $SELOBJ
+@expect $obj => 'second'
+@exec UNSEL & $obj = $SELOBJ
+@expect $obj => ''
