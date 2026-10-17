@@ -60,7 +60,7 @@ export interface QspErrorData {
 // Any method can return a promise: the engine is suspended until it settles and the running
 // export completes later (call such exports with ccall to get their results). A promise returned
 // from a nested call (a host method calling the API, an API call while another one is suspended)
-// is ignored, see wasm_callbacks.c.
+// is ignored, see qsp-wasm-host.js.
 export interface QspWasmHost {
   onDebug?(code: string): void | Promise<void>;
   onSetTimer?(msecs: number): void | Promise<void>;
