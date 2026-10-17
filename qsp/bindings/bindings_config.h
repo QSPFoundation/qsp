@@ -15,6 +15,13 @@
         #include "java/qsp_java.h"
     #endif
 
+    /* WebAssembly binding */
+    #ifdef _WASM
+        #define QSP_BINDING
+        #define _WASM_BINDING
+        #include "wasm/qsp_wasm.h"
+    #endif
+
     /* Place your bindings here */
 
     #ifndef QSP_BINDING

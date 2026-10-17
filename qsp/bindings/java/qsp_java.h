@@ -17,7 +17,7 @@
             #define QSP_FMT2(x) L##x
             #define QSP_FMT(x) QSP_FMT2(x)
         #else
-            typedef unsigned short QSP_CHAR;
+            typedef unsigned short QSP_CHAR; /* UTF-16 */
             #define QSP_FMT2(x) u##x
             #define QSP_FMT(x) QSP_FMT2(x)
         #endif
