@@ -123,6 +123,8 @@ export interface QspWasmModule {
   ): number;
   _QSPGetLocationCode(name: CharsPtr, lines: Ptr, bufSize: number): number;
 
+  _QSPGetCurLocation(res: StringPtr): void;
+
   _QSPGetMainDesc(res: StringPtr): void;
   _QSPGetVarsDesc(res: StringPtr): void;
 

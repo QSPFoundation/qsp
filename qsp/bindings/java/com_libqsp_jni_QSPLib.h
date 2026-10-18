@@ -41,6 +41,14 @@ JNIEXPORT jobject JNICALL Java_com_libqsp_jni_QSPLib_getCurrentState
 
 /*
  * Class:     com_libqsp_jni_QSPLib
+ * Method:    getCurrentLocation
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getCurrentLocation
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_libqsp_jni_QSPLib
  * Method:    getVersion
  * Signature: ()Ljava/lang/String;
  */

@@ -49,6 +49,8 @@
     QSP_WASM_EXPORT int QSPGetLocationActions(QSP_CHAR *locName, QSPListItem *actions, int actionsBufSize);
     QSP_WASM_EXPORT int QSPGetLocationActionCode(QSP_CHAR *locName, int actionIndex, QSPLineInfo *lines, int linesBufSize);
     QSP_WASM_EXPORT int QSPGetLocationCode(QSP_CHAR *locName, QSPLineInfo *lines, int linesBufSize);
+    /* Current location */
+    QSP_WASM_EXPORT void QSPGetCurLocation(QSPString *loc);
     /* Main desc */
     QSP_WASM_EXPORT void QSPGetMainDesc(QSPString *desc);
     /* Vars desc */

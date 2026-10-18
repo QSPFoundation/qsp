@@ -127,6 +127,11 @@ void QSPGetCompiledDateTime(QSPString *dateTime)
     *dateTime = QSP_STATIC_STR(QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__));
 }
 
+void QSPGetCurLocation(QSPString *loc)
+{
+    *loc = (qspCurLoc ? qspCurLoc->Name : qspNullString);
+}
+
 void QSPGetMainDesc(QSPString *desc)
 {
     *desc = qspBufStringToString(qspCurDesc);

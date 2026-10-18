@@ -93,6 +93,8 @@
     QSP_EXTERN int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPLineInfo *lines, int linesBufSize);
     QSP_EXTERN int QSPGetLocationCode(QSPString locName, QSPLineInfo *lines, int linesBufSize);
     QSP_EXTERN int QSPGetActionCode(int actionIndex, QSPLineInfo *lines, int linesBufSize);
+    /* Current location */
+    QSP_EXTERN QSPString QSPGetCurLocation(void);
     /* Main desc */
     QSP_EXTERN QSPString QSPGetMainDesc(void);
     /* Vars desc */

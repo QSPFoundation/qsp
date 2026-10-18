@@ -983,9 +983,12 @@ INLINE int qspSkipMathValue(QSPMathExpression *expression, int itemIndex)
 
 void qspFreeMathExpression(QSPMathExpression *expression)
 {
-    qspFreeVariants(expression->Values, expression->ValsCount);
-    free(expression->Values);
-    free(expression->CompItems);
+    if (expression->Values)
+    {
+        qspFreeVariants(expression->Values, expression->ValsCount);
+        free(expression->Values);
+    }
+    if (expression->CompItems) free(expression->CompItems);
     free(expression);
 }
 
