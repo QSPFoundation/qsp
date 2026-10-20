@@ -117,6 +117,17 @@ int QSPGetLocationCode(QSP_CHAR *locName, QSPLineInfo *lines, int linesBufSize)
     return -1;
 }
 
+int QSPGetActionCode(int actionIndex, QSPLineInfo *lines, int linesBufSize)
+{
+    if (actionIndex >= 0 && actionIndex < qspCurActsCount)
+    {
+        QSPCurAct *action = qspCurActions + actionIndex;
+        QSPCodeBlock *code = action->OnPressCode;
+        if (code) return qspGetLinesInfo(code->Lines + action->OnPressStartLine, action->OnPressLinesCount, lines, linesBufSize);
+    }
+    return -1;
+}
+
 void QSPGetVersion(QSPString *version)
 {
     *version = QSP_STATIC_STR(QSP_VER);

@@ -34,13 +34,13 @@ INLINE int qspSearchElse(QSPLineOfCode *lines, int start, int end);
 INLINE int qspSearchEnd(QSPLineOfCode *lines, int start, int end);
 INLINE int qspSearchLabel(QSPCodeBlock *code, int startLine, int endLine, QSPString name);
 INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo);
-INLINE QSP_BOOL qspExecMultilineCode(QSPCodeBlock *code, int endLine, int codeOffset, QSPString *jumpTo, int *lineInd, int *action);
+INLINE QSP_BOOL qspExecMultilineCode(QSPCodeBlock *code, int endLine, QSP_BOOL toTrackLines, QSPString *jumpTo, int *lineInd, int *action);
 INLINE QSP_BOOL qspExecSinglelineCode(QSPCodeBlock *code, int endLine, QSPString *jumpTo, int *lineInd, int *action);
 INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo);
 INLINE QSP_BOOL qspCheckCondition(QSPCachedArg *condition);
 INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo);
-INLINE QSP_BOOL qspStatementMultilineLoop(QSPCodeBlock *code, int lineInd, int endLine, int codeOffset, QSPString *jumpTo);
+INLINE QSP_BOOL qspStatementMultilineLoop(QSPCodeBlock *code, int lineInd, int endLine, QSP_BOOL toTrackLines, QSPString *jumpTo);
 INLINE void qspStatementUserCall(QSPCachedStat *stat);
 INLINE void qspStatementImplicitStatement(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 INLINE void qspStatementAddText(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
@@ -482,7 +482,7 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
     return QSP_FALSE;
 }
 
-INLINE QSP_BOOL qspExecMultilineCode(QSPCodeBlock *code, int endLine, int codeOffset,
+INLINE QSP_BOOL qspExecMultilineCode(QSPCodeBlock *code, int endLine, QSP_BOOL toTrackLines,
     QSPString *jumpTo, int *lineInd, int *action)
 {
     QSPLineOfCode *line, *lines = code->Lines;
@@ -513,8 +513,8 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPCodeBlock *code, int endLine, int codeOf
                 *lineInd = endLine;
                 *action = qspFlowJumpToSpecified;
                 if (elsePos >= 0)
-                    return qspExecCodeBlockWithLocals(code, ind + 1, elsePos, codeOffset, jumpTo);
-                return qspExecCodeBlockWithLocals(code, ind + 1, endLine, codeOffset, jumpTo);
+                    return qspExecCodeBlockWithLocals(code, ind + 1, elsePos, toTrackLines, jumpTo);
+                return qspExecCodeBlockWithLocals(code, ind + 1, endLine, toTrackLines, jumpTo);
             }
             else
             {
@@ -529,13 +529,13 @@ INLINE QSP_BOOL qspExecMultilineCode(QSPCodeBlock *code, int endLine, int codeOf
             *lineInd = endLine;
             *action = qspFlowJumpToSpecified;
             if (elsePos >= 0)
-                return qspExecCodeBlockWithLocals(code, ind + 1, elsePos, codeOffset, jumpTo);
-            return qspExecCodeBlockWithLocals(code, ind + 1, endLine, codeOffset, jumpTo);
+                return qspExecCodeBlockWithLocals(code, ind + 1, elsePos, toTrackLines, jumpTo);
+            return qspExecCodeBlockWithLocals(code, ind + 1, endLine, toTrackLines, jumpTo);
         }
     case qspStatLoop:
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
-        return qspStatementMultilineLoop(code, ind, endLine, codeOffset, jumpTo);
+        return qspStatementMultilineLoop(code, ind, endLine, toTrackLines, jumpTo);
     case qspStatAct:
         *lineInd = endLine;
         *action = qspFlowJumpToSpecified;
@@ -599,7 +599,7 @@ INLINE QSP_BOOL qspExecSinglelineCode(QSPCodeBlock *code, int endLine,
     return QSP_FALSE;
 }
 
-QSP_BOOL qspExecCode(QSPCodeBlock *code, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
+QSP_BOOL qspExecCode(QSPCodeBlock *code, int startLine, int endLine, QSP_BOOL toTrackLines, QSPString *jumpTo)
 {
     QSPString jumpToFake;
     QSP_BOOL uLevel, toExit = QSP_FALSE;
@@ -625,9 +625,9 @@ QSP_BOOL qspExecCode(QSPCodeBlock *code, int startLine, int endLine, int codeOff
         }
 
         qspRealLine = line;
-        if (codeOffset > 0)
+        if (toTrackLines)
         {
-            qspRealLineNum = line->LineNum + codeOffset;
+            qspRealLineNum = line->LineNum;
             if (qspIsDebug)
             {
                 qspCallDebug(line->Str);
@@ -635,7 +635,7 @@ QSP_BOOL qspExecCode(QSPCodeBlock *code, int startLine, int endLine, int codeOff
             }
         }
         if (line->IsMultiline)
-            toExit = qspExecMultilineCode(code, endLine, codeOffset, jumpTo, &i, &action);
+            toExit = qspExecMultilineCode(code, endLine, toTrackLines, jumpTo, &i, &action);
         else
             toExit = qspExecSinglelineCode(code, endLine, jumpTo, &i, &action);
         if (qspLocationState != oldLocationState) break;
@@ -680,13 +680,13 @@ QSP_BOOL qspExecCode(QSPCodeBlock *code, int startLine, int endLine, int codeOff
     return toExit;
 }
 
-QSP_BOOL qspExecCodeBlockWithLocals(QSPCodeBlock *code, int startLine, int endLine, int codeOffset, QSPString *jumpTo)
+QSP_BOOL qspExecCodeBlockWithLocals(QSPCodeBlock *code, int startLine, int endLine, QSP_BOOL toTrackLines, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
     int oldLocationState = qspLocationState;
     qspAllocateLocalScope();
 
-    toExit = qspExecCode(code, startLine, endLine, codeOffset, jumpTo);
+    toExit = qspExecCode(code, startLine, endLine, toTrackLines, jumpTo);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
 
     qspReleaseLastLocalScope();
@@ -716,7 +716,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
     {
         int oldLocationState = qspLocationState;
         QSPLineOfCode *oldLine = qspRealLine;
-        qspExecCode(code, 0, code->LinesCount, 0, 0);
+        qspExecCode(code, 0, code->LinesCount, QSP_FALSE, 0);
         qspRealLine = oldLine; /* the executed lines can be released */
         qspReleaseCodeBlock(code);
         if (qspLocationState != oldLocationState) return;
@@ -733,7 +733,7 @@ void qspExecStringAsCode(QSPString s)
     if (code)
     {
         QSPLineOfCode *oldLine = qspRealLine;
-        qspExecCodeBlockWithLocals(code, 0, code->LinesCount, 0, 0);
+        qspExecCodeBlockWithLocals(code, 0, code->LinesCount, QSP_FALSE, 0);
         qspRealLine = oldLine; /* the executed lines can be released */
         qspReleaseCodeBlock(code);
     }
@@ -862,7 +862,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
 }
 
 INLINE QSP_BOOL qspStatementMultilineLoop(QSPCodeBlock *code, int lineInd, int endLine,
-    int codeOffset, QSPString *jumpTo)
+    QSP_BOOL toTrackLines, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
     int oldLocationState;
@@ -882,9 +882,9 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPCodeBlock *code, int lineInd, int e
         while (1)
         {
             qspRealLine = line;
-            if (codeOffset > 0)
+            if (toTrackLines)
             {
-                qspRealLineNum = line->LineNum + codeOffset;
+                qspRealLineNum = line->LineNum;
                 if (qspIsDebug)
                 {
                     qspCallDebug(line->Str);
@@ -896,16 +896,16 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPCodeBlock *code, int lineInd, int e
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             if (!conditionValue) break;
             /* Execute body */
-            toExit = qspExecCodeBlockWithLocals(code, lineInd, endLine, codeOffset, jumpTo);
+            toExit = qspExecCodeBlockWithLocals(code, lineInd, endLine, toTrackLines, jumpTo);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             if (toExit) break;
             /* Execute iterator */
             if (loop->Iterator.StatsCount)
             {
                 qspRealLine = line;
-                if (codeOffset > 0)
+                if (toTrackLines)
                 {
-                    qspRealLineNum = line->LineNum + codeOffset;
+                    qspRealLineNum = line->LineNum;
                     if (qspIsDebug)
                     {
                         qspCallDebug(line->Str);

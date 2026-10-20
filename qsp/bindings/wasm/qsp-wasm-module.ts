@@ -45,6 +45,12 @@ export interface QspObjectItem {
   image: string;
 }
 
+// A code entry (lines the engine joins are one entry) and its first line, as errors number it
+export interface QspLineInfo {
+  line: number;
+  code: string;
+}
+
 export interface QspErrorData {
   errorCode: number;
   description: string;
@@ -122,6 +128,7 @@ export interface QspWasmModule {
     bufSize: number,
   ): number;
   _QSPGetLocationCode(name: CharsPtr, lines: Ptr, bufSize: number): number;
+  _QSPGetActionCode(index: number, lines: Ptr, bufSize: number): number; // a current action
 
   _QSPGetCurLocation(res: StringPtr): void;
 

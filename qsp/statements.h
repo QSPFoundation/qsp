@@ -119,8 +119,8 @@
     /* External functions */
     void qspInitStats(void);
     QSP_TINYINT qspGetStatArgs(QSPCachedStat *stat, QSPCachedArg *statArgs, QSPVariant *args);
-    QSP_BOOL qspExecCode(QSPCodeBlock *code, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
-    QSP_BOOL qspExecCodeBlockWithLocals(QSPCodeBlock *code, int startLine, int endLine, int codeOffset, QSPString *jumpTo);
+    QSP_BOOL qspExecCode(QSPCodeBlock *code, int startLine, int endLine, QSP_BOOL toTrackLines, QSPString *jumpTo);
+    QSP_BOOL qspExecCodeBlockWithLocals(QSPCodeBlock *code, int startLine, int endLine, QSP_BOOL toTrackLines, QSPString *jumpTo);
     void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
     void qspExecStringAsCode(QSPString s);
 

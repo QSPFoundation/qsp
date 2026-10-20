@@ -36,7 +36,7 @@ void qspSetError(int num)
 
         if (qspRealLine)
         {
-            qspLastError.IntLineNum = qspRealLine->LineNum + 1;
+            qspLastError.IntLineNum = qspRealLine->LineNum;
             qspUpdateText(&qspLastError.IntLine, qspRealLine->Str);
         }
         else

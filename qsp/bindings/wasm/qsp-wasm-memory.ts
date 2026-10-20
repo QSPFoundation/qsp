@@ -14,6 +14,7 @@ import {
   IntPtr,
   Ptr,
   QspErrorData,
+  QspLineInfo,
   QspListItem,
   QspObjectItem,
   QspTuple,
@@ -184,7 +185,7 @@ export function withLinesRead(
   module: QspWasmModule,
   buffer: ListBuffer,
   callback: (lines: Ptr, bufSize: number) => number,
-): string[] {
+): QspLineInfo[] {
   return readList(module, buffer, LINE_INFO_SIZE, callback, readLines);
 }
 
@@ -273,11 +274,13 @@ export function readStringList(module: QspWasmModule, listPtr: Ptr, count: numbe
 }
 
 // QSPLineInfo { LineNum, Line }
-export function readLines(module: QspWasmModule, listPtr: Ptr, count: number): string[] {
-  const list: string[] = [];
+export function readLines(module: QspWasmModule, listPtr: Ptr, count: number): QspLineInfo[] {
+  const list: QspLineInfo[] = [];
   let ptr = listPtr as number as StringPtr;
   for (let i = 0; i < count; ++i) {
-    list.push(readString(module, movePointer(ptr) as number as StringPtr));
+    const line = readInt(module, ptr);
+    const code = readString(module, movePointer(ptr) as number as StringPtr);
+    list.push({ line, code });
     ptr = (ptr + LINE_INFO_SIZE) as StringPtr;
   }
   return list;
