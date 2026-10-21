@@ -370,7 +370,7 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_showWindow(JNIEnv *env, jobjec
 JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarValuesCount(JNIEnv *env, jobject api, jstring name)
 {
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarReference(varName, QSP_FALSE);
+    QSPVar *var = qspVarReference(varName, QSP_VARREF_GETSILENTLY);
     qspFreeString(&varName);
     if (var) return var->ValsCount;
     return 0;
@@ -379,7 +379,7 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarValuesCount(JNIEnv *env,
 JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByKey(JNIEnv *env, jobject api, jstring name, jobject key)
 {
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarReference(varName, QSP_FALSE);
+    QSPVar *var = qspVarReference(varName, QSP_VARREF_GETSILENTLY);
     qspFreeString(&varName);
     if (var)
     {
@@ -395,7 +395,7 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByKey(JNIEnv *env, 
 JNIEXPORT jobject JNICALL Java_com_libqsp_jni_QSPLib_getVarValue(JNIEnv *env, jobject api, jstring name, jint ind)
 {
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarReference(varName, QSP_FALSE);
+    QSPVar *var = qspVarReference(varName, QSP_VARREF_GETSILENTLY);
     qspFreeString(&varName);
     if (var && ind >= 0 && ind < var->ValsCount)
     {

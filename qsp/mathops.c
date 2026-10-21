@@ -1460,7 +1460,7 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
     int arrIndex;
     QSP_TINYINT arrType;
     QSPString typePrefix;
-    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_FALSE);
+    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_VARREF_GET);
     if (!var) return;
     arrIndex = (count == 2 ? qspGetVarIndex(var, args[1], QSP_FALSE) : 0);
     arrType = ((arrIndex >= 0 && arrIndex < var->ValsCount) ? var->Values[arrIndex].Type : QSP_TYPE_UNDEF);
@@ -1485,7 +1485,7 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 INLINE void qspFunctionArrKey(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int arrIndex;
-    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_FALSE);
+    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_VARREF_GET);
     if (!var) return;
     arrIndex = (count == 2 ? QSP_TOINT(QSP_NUM(args[1])) : 0);
     if (arrIndex >= 0 && arrIndex < var->ValsCount)
@@ -1525,7 +1525,7 @@ INLINE void qspFunctionArrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 INLINE void qspFunctionArrPack(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int itemsCount;
-    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_FALSE);
+    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_VARREF_GET);
     if (!var) return;
     itemsCount = var->ValsCount;
     if (itemsCount > 0)

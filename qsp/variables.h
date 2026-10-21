@@ -67,6 +67,13 @@
         QSPVarsScopeChunk *ParentChunk;
     } QSPVarsScopeChunk;
 
+    enum
+    {
+        QSP_VARREF_GET,
+        QSP_VARREF_GETORCREATE,
+        QSP_VARREF_GETSILENTLY /* no errors reported */
+    };
+
     extern QSPVar qspNullVar;
     extern QSPVarsScope qspGlobalVars; /* there's only one global scope, we don't recreate it */
     extern QSPVarsScopeChunk *qspCurrentLocalVars; /* local scopes can be recreated */
@@ -88,7 +95,7 @@
     QSP_BOOL qspApplyResult(QSPVariant *res);
     QSPVarsScopeChunk *qspSaveLocalVarsAndRestoreGlobals(void);
     void qspRestoreSavedLocalVars(QSPVarsScopeChunk *chunk);
-    QSPVar *qspVarReference(QSPString name, QSP_BOOL toCreate);
+    QSPVar *qspVarReference(QSPString name, QSP_TINYINT mode);
     QSPVarKey *qspAddVarKey(QSPVar *var, unsigned int hash, int valIndex);
     int qspGetVarKeyIndex(QSPVar *var, int valIndex);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
