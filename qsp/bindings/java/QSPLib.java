@@ -144,6 +144,7 @@ public abstract class QSPLib {
 
     public native void enableDebugMode(boolean isDebug);
     public native ExecutionState getCurrentState();
+    public native String getCurrentLocation();
     public native String getVersion();
     public native String getCompiledDateTime();
     public native String getMainDesc();

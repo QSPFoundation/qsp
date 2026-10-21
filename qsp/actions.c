@@ -106,7 +106,7 @@ void qspExecAction(int ind)
             if (loc) qspAcquireLocation(loc);
             qspAcquireCodeBlock(code);
             oldLine = qspRealLine;
-            qspExecCodeBlockWithLocals(code, act->OnPressStartLine, act->OnPressStartLine + act->OnPressLinesCount, 1, 0);
+            qspExecCodeBlockWithLocals(code, act->OnPressStartLine, act->OnPressStartLine + act->OnPressLinesCount, QSP_TRUE, 0);
             qspRealLine = oldLine;
             qspReleaseCodeBlock(code);
             if (loc) qspReleaseLocation(loc);

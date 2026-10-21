@@ -273,7 +273,7 @@ INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc)
     if (loc->OnVisitCode)
     {
         qspRealActIndex = -1;
-        qspExecCode(loc->OnVisitCode, 0, loc->OnVisitCode->LinesCount, 1, 0);
+        qspExecCode(loc->OnVisitCode, 0, loc->OnVisitCode->LinesCount, QSP_TRUE, 0);
     }
     qspRealLine = oldLine; /* the executed lines can be released */
     qspReleaseLocation(loc);

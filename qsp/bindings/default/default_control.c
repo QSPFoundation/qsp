@@ -143,6 +143,12 @@ QSPString QSPGetCompiledDateTime(void)
     return QSP_STATIC_STR(QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__));
 }
 /* ------------------------------------------------------------ */
+/* Get name of the current location */
+QSPString QSPGetCurLocation(void)
+{
+    return (qspCurLoc ? qspCurLoc->Name : qspNullString);
+}
+/* ------------------------------------------------------------ */
 /* Main description */
 
 /* Get text of the main description */

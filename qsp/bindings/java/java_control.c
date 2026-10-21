@@ -237,6 +237,12 @@ JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getCompiledDateTime(JNIEnv 
     return qspToJavaString(env, QSP_STATIC_STR(QSP_FMT(__DATE__) QSP_FMT(", ") QSP_FMT(__TIME__)));
 }
 /* ------------------------------------------------------------ */
+/* Get name of the current location */
+JNIEXPORT jstring JNICALL Java_com_libqsp_jni_QSPLib_getCurrentLocation(JNIEnv *env, jobject api)
+{
+    return qspToJavaString(env, (qspCurLoc ? qspCurLoc->Name : qspNullString));
+}
+/* ------------------------------------------------------------ */
 /* Main description */
 
 /* Get text of the main description */

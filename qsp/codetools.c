@@ -962,7 +962,7 @@ QSPCodeBlock *qspPreprocessData(QSPString data)
     QSP_CHAR *pos, quote = 0;
     QSP_BOOL isComment = QSP_FALSE, isStatementStart = QSP_TRUE;
     int codeBrackets = 0, roundBrackets = 0, squareBrackets = 0;
-    int lineNum = 0, lastLineNum = 0, linesCount = 0, linesBufSize = 8;
+    int lineNum = 1, lastLineNum = 1, linesCount = 0, linesBufSize = 8;
 
     if (qspIsEmpty(data)) return 0;
 
