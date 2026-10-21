@@ -32,7 +32,7 @@
     extern QSP_TINYINT qspCurWindowsDisplayState;
 
     /* External functions */
-    void qspInitRuntime(void);
+    void qspInitRuntime(unsigned int seed);
     void qspTerminateRuntime(void);
     void qspPrepareExecution(QSP_BOOL toInit);
     void qspMemClear(QSP_BOOL toInit);

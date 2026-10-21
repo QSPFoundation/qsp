@@ -33,12 +33,6 @@
         #error "Non-Unicode build using Java binding is not supported"
     #endif
 
-    #if defined(_MSC_VER)
-        #define QSP_TIME _time64
-    #else
-        #define QSP_TIME time
-    #endif
-
     typedef jmethodID QSP_CALLBACK;
 
     #include "../qsp.h"

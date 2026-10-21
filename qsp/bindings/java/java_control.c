@@ -707,11 +707,11 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_restartGame(JNIEnv *env, j
 }
 /* ------------------------------------------------------------ */
 /* Initialization of the engine */
-JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api)
+JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api, jint seed)
 {
     jclass clazz;
 
-    qspInitRuntime();
+    qspInitRuntime((unsigned int)seed);
 
     /* Get JVM references */
     (*env)->GetJavaVM(env, &qspJvm);

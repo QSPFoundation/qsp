@@ -482,12 +482,12 @@ void QSPSetCallback(int type, QSP_CALLBACK func)
 }
 /* ------------------------------------------------------------ */
 /* Initialization of the engine */
-void QSPInit(void)
+void QSPInit(unsigned int seed)
 {
 #ifdef _DEBUG
     mwInit();
 #endif
-    qspInitRuntime();
+    qspInitRuntime(seed);
 }
 /* Deallocate all resources */
 void QSPTerminate(void)

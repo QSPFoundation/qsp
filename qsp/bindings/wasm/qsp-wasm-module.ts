@@ -110,7 +110,7 @@ export interface QspWasmModule {
     opts: { async: true },
   ): Promise<number>;
 
-  _QSPInit(): void;
+  _QSPInit(seed: number): void;
   _QSPTerminate(): void;
   _QSPGetVersion(res: StringPtr): void;
   _QSPGetCompiledDateTime(res: StringPtr): void;

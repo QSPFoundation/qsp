@@ -135,7 +135,6 @@ QSP_BOOL qspRestartGame(QSP_BOOL toReset)
     if (toReset)
     {
         int oldLocationState = qspLocationState;
-        qspSetSeed((unsigned int)QSP_TIME(0));
         qspTimerInterval = QSP_DEFTIMERINTERVAL;
         qspCurWindowsDisplayState = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT;
         qspMemClear(QSP_FALSE);

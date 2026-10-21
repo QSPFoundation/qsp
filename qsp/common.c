@@ -39,7 +39,7 @@ INLINE double qspNormalCdf(double x);
 INLINE double qspPoly8Value(const double c[], double x);
 INLINE double qspNormalInvCdf(double p);
 
-void qspInitRuntime(void)
+void qspInitRuntime(unsigned int seed)
 {
     setlocale(LC_ALL, QSP_LOCALE);
 
@@ -57,7 +57,7 @@ void qspInitRuntime(void)
     qspCurWindowsDisplayState = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT;
     qspInitWorld();
 
-    qspSetSeed(0);
+    qspSetSeed(seed);
     qspInitVarTypes();
     qspInitSymbolClasses();
     qspInitStackAllocator();

@@ -27,8 +27,6 @@
         #error "Non-Unicode build using WebAssembly binding is not supported"
     #endif
 
-    #define QSP_TIME time
-
     /* The callbacks are not registered, the host is called directly */
     typedef void *QSP_CALLBACK;
 
@@ -37,7 +35,7 @@
 
     #include "../qsp.h"
 
-    QSP_WASM_EXPORT void QSPInit(void);
+    QSP_WASM_EXPORT void QSPInit(unsigned int seed);
     QSP_WASM_EXPORT void QSPTerminate(void);
     QSP_WASM_EXPORT void QSPGetVersion(QSPString *version);
     QSP_WASM_EXPORT void QSPGetCompiledDateTime(QSPString *dateTime);

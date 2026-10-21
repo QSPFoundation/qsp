@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <locale.h>
-#include <time.h>
 #include <math.h>
 #include <limits.h>
 #include <string.h>

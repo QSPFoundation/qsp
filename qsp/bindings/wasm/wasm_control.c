@@ -409,12 +409,12 @@ QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI)
     return QSP_TRUE;
 }
 
-void QSPInit(void)
+void QSPInit(unsigned int seed)
 {
 #ifdef _DEBUG
     mwInit();
 #endif
-    qspInitRuntime();
+    qspInitRuntime(seed);
 }
 
 void QSPTerminate(void)

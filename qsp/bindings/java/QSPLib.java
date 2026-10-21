@@ -139,7 +139,7 @@ public abstract class QSPLib {
     }
 
     // Main API
-    public native void init();
+    public native void init(int seed);
     public native void terminate();
 
     public native void enableDebugMode(boolean isDebug);
