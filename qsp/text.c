@@ -160,10 +160,10 @@ QSP_BOOL qspIsStrNumber(QSPString s)
     pos = s.Str;
     if (pos < s.End)
     {
-        if (*pos == QSP_FMT('-'))
-            ++pos;
-        else if (*pos == QSP_FMT('+'))
-            ++pos;
+        if (*pos == QSP_NEGATION_CHAR)
+            pos += QSP_STATIC_LEN(QSP_NEGATION);
+        else if (*pos == QSP_AFFIRMATION_CHAR)
+            pos += QSP_STATIC_LEN(QSP_AFFIRMATION);
     }
     else
         return QSP_FALSE;
@@ -190,13 +190,13 @@ QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid)
     pos = s.Str;
     if (pos < s.End)
     {
-        if (*pos == QSP_FMT('-'))
+        if (*pos == QSP_NEGATION_CHAR)
         {
             isNeg = QSP_TRUE;
-            ++pos;
+            pos += QSP_STATIC_LEN(QSP_NEGATION);
         }
-        else if (*pos == QSP_FMT('+'))
-            ++pos;
+        else if (*pos == QSP_AFFIRMATION_CHAR)
+            pos += QSP_STATIC_LEN(QSP_AFFIRMATION);
     }
     else /* a special case, i.e. an empty string must be convertible to 0 */
     {
@@ -229,7 +229,7 @@ QSPString qspNumToStr(QSP_CHAR *buf, QSP_BIGINT val)
     QSP_CHAR temp, *last, *str = buf, *first = str;
     if (val < 0)
     {
-        *str++ = QSP_FMT('-');
+        *str++ = QSP_NEGATION_CHAR;
         val = -val;
         ++first;
     }
