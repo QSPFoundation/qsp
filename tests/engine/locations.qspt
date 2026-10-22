@@ -1,0 +1,309 @@
+// Ported from qsp-wasm-engine tests/engine/locations.test.ts
+// runTestFileWithGoto() of qsp-wasm-engine is "@exec gt 'test'" here
+
+@test GOTO should change locations
+@src
+
+*p 'main'
+p 'stats'
+$location = $curloc
+act '1': x
+---
+# target
+*p 'target main'
+nl 'target stats'
+act '2': x
+$gt_location = $curloc
+
+@exec gt 'test'
+@expect event main_changed main
+@expect event stats_changed stats
+@expect event actions_changed [1]
+@expect $location => 'test'
+@exec GOTO 'target', 1, 'test'
+@expect event main_changed target main
+@expect event stats_changed stats\r\ntarget stats
+@expect event actions_changed [2]
+@expect args[0] => 1
+@expect $args[1] => 'test'
+@expect $gt_location => 'target'
+
+@test GT should change locations
+@src
+
+*p 'main'
+p 'stats'
+$location = $curloc
+act '1': x
+---
+# target
+*p 'target main'
+nl 'target stats'
+act '2': x
+$gt_location = $curloc
+
+@exec gt 'test'
+@expect event main_changed main
+@expect event stats_changed stats
+@expect event actions_changed [1]
+@expect $location => 'test'
+@exec GT 'target', 1, 'test'
+@expect event main_changed target main
+@expect event stats_changed stats\r\ntarget stats
+@expect event actions_changed [2]
+@expect args[0] => 1
+@expect $args[1] => 'test'
+@expect $gt_location => 'target'
+
+@test XGOTO
+@src
+
+*p 'main'
+p 'stats'
+$location = $curloc
+act '1': x
+---
+# target
+*nl 'target main'
+nl 'target stats'
+act '2': x
+$xgt_location = $curloc
+
+@exec gt 'test'
+@expect event main_changed main
+@expect event stats_changed stats
+@expect event actions_changed [1]
+@expect $location => 'test'
+@exec XGOTO 'target', 1, 'test'
+@expect event main_changed main\r\ntarget main
+@expect event stats_changed stats\r\ntarget stats
+@expect event actions_changed [2]
+@expect args[0] => 1
+@expect $args[1] => 'test'
+@expect $xgt_location => 'target'
+
+@test XGT
+@src
+
+*p 'main'
+p 'stats'
+$location = $curloc
+act '1': x
+---
+# target
+*nl 'target main'
+nl 'target stats'
+act '2': x
+$xgt_location = $curloc
+
+@exec gt 'test'
+@expect event main_changed main
+@expect event stats_changed stats
+@expect event actions_changed [1]
+@expect $location => 'test'
+@exec XGT 'target', 1, 'test'
+@expect event main_changed main\r\ntarget main
+@expect event stats_changed stats\r\ntarget stats
+@expect event actions_changed [2]
+@expect args[0] => 1
+@expect $args[1] => 'test'
+@expect $xgt_location => 'target'
+
+@test GOSUB should execute location without changing it
+@src
+
+*p 'main'
+p 'stats'
+$location = $curloc
+act '1': x
+---
+# target
+*nl 'target main'
+nl 'target stats'
+$gs_location = $curloc
+act '2': x
+first = args[0]
+$second = $args[1]
+
+@exec gt 'test'
+@expect event main_changed main
+@expect event stats_changed stats
+@expect event actions_changed [1]
+@expect $location => 'test'
+@exec GOSUB 'target', 1, 'test'
+@expect event main_changed main\r\ntarget main
+@expect event stats_changed stats\r\ntarget stats
+@expect event actions_changed [1; 2]
+@expect first => 1
+@expect $second => 'test'
+@expect $gs_location => 'test'
+
+@test GS should execute location without changing it
+@src
+
+*p 'main'
+p 'stats'
+$location = $curloc
+act '1': x
+---
+# target
+*nl 'target main'
+nl 'target stats'
+$gs_location = $curloc
+act '2': x
+first = args[0]
+$second = $args[1]
+
+@exec gt 'test'
+@expect event main_changed main
+@expect event stats_changed stats
+@expect event actions_changed [1]
+@expect $location => 'test'
+@exec GS 'target', 1, 'test'
+@expect event main_changed main\r\ntarget main
+@expect event stats_changed stats\r\ntarget stats
+@expect event actions_changed [1; 2]
+@expect first => 1
+@expect $second => 'test'
+@expect $gs_location => 'test'
+
+@test FUNC
+@src
+
+*p 'main'
+p 'stats'
+act '1': x
+---
+# target
+*nl 'target main'
+nl 'target stats'
+act '2': x
+first = args[0]
+$second = $args[1]
+
+@run
+@expect event main_changed main
+@expect event stats_changed stats
+@expect event actions_changed [1]
+@exec func('target', 1, 'test')
+@expect event main_changed main\r\ntarget main
+@expect event stats_changed stats\r\ntarget stats
+@expect event actions_changed [1; 2]
+@expect first => 1
+@expect $second => 'test'
+
+@test FUNC with RESULT
+@src
+
+x = func('process')
+---
+# process
+result = 5
+
+@run
+@expect x => 5
+
+@test FUNC with $RESULT
+@src
+
+$x = func('process')
+---
+# process
+$result = 'test'
+
+@run
+@expect $x => 'test'
+
+@test EXIT should stop code execution
+@src
+
+x = 1
+exit
+x = 2
+
+@run
+@expect x => 1
+
+@test GOTO arguments should be avaliable in actions
+@src
+
+gt 'target', 'test', 12
+---
+# target
+act '2':
+  $args_0 = $args[0]
+  args_1 = args[1]
+end
+
+@run
+@select-act 0
+@exec-act
+@expect $args_0 => 'test'
+@expect args_1 => 12
+
+@test XGOTO arguments in actions
+@src
+
+xgt 'target', 'test', 12
+---
+# target
+act '2':
+  $args_0 = $args[0]
+  args_1 = args[1]
+end
+
+@run
+@select-act 0
+@exec-act
+@expect $args_0 => 'test'
+@expect args_1 => 12
+
+@test user func shorthand
+@src
+
+@@target(1, 'test')
+---
+# target
+first = args[0]
+$second = $args[1]
+@run
+@expect first => 1
+@expect $second => 'test'
+
+@test user func shorthand RESULT
+@src
+
+x = @process
+---
+# process
+result = 5
+@run
+@expect x => 5
+
+@test restoring args and result
+@src
+
+gs 'first', 'fir', 1
+---
+# first
+$first_0_before = $args[0]
+first_1_before = args[1]
+result = 1
+gs 'second', 'sec', 2
+$first_0_after = $args[0]
+first_1_after = args[1]
+first_result = result
+---
+#second
+$second_0 = $args[0]
+second_1 = args[1]
+result = 2
+
+@run
+@expect $first_0_before => 'fir'
+@expect first_1_before => 1
+@expect $first_0_after => 'fir'
+@expect first_1_after => 1
+@expect first_result => 1
+@expect $second_0 => 'sec'
+@expect second_1 => 2

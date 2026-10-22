@@ -1,0 +1,518 @@
+// Ported from qsp-wasm-engine tests/engine/arrays.test.ts
+// readVariable*('x') of qsp-wasm-engine reads the numeric view, so a missing value is written as
+// "#x[i] => 0"; '$x' reads the string view, written as "$x[i] => ''".
+// readVariableByIndex() takes the position in the array, readVariableByKey() the text key.
+
+@test overriding string value with number
+@src
+
+$arr[1] = 'test'
+arr[1] = 1
+@run
+@expect $arr[1] => ''
+@expect arr[1] => 1
+
+@test overriding number value with string
+@src
+
+arr[1] = 1
+$arr[1] = 'test'
+@run
+@expect $arr[1] => 'test'
+@expect #arr[1] => 0
+
+@test last element assignment
+@src
+
+$objs[] = 'Напильник'
+$objs[] = 'Топор'
+$objs[] = 'Доска'
+@run
+@expect $objs[0] => 'Напильник'
+@expect $objs[1] => 'Топор'
+@expect $objs[2] => 'Доска'
+
+@test last element read
+@src
+
+$objs[] = 'Напильник'
+$objs[] = 'Топор'
+$objs[] = 'Доска'
+$a = $objs[]
+@run
+@expect $a => 'Доска'
+
+@test string index
+@src
+любимое_число['Алексей'] = 5 & x = любимое_число['Алексей']
+@run
+@expect любимое_число['Алексей'] => 5
+@expect x => 5
+
+@test killvar all variables
+@src
+a = 1 & $b = "xx"
+@run
+@expect a => 1
+@expect $b => 'xx'
+@exec killvar
+@expect #a => 0
+@expect $b => ''
+
+@test killvar whole number array
+@src
+a[0] = 1 & a[1] = 2
+@run
+@expect a[0] => 1
+@expect a[1] => 2
+@exec killvar 'a'
+@expect #a[0] => 0
+@expect #a[1] => 0
+
+@test killvar whole string array
+@src
+$a[0] = "zz" & $a[1] = "xx"
+@run
+@expect $a[0] => 'zz'
+@expect $a[1] => 'xx'
+@exec killvar 'a'
+@expect $a[0] => ''
+@expect $a[1] => ''
+
+@test killvar array index in numeric array
+@src
+a[0] = 1 & a[1] = 2 & a[2] = 3
+@run
+@expect a[0] => 1
+@expect a[1] => 2
+@expect a[2] => 3
+@exec killvar 'a', 1
+@expect a[0] => 1
+@expect a[1] => 3
+@expect #a[2] => 0
+
+@test killvar array index in string array
+@src
+$a[0] = "aa" & $a[1] = "bb" & $a[2] = "cc"
+@run
+@expect $a[0] => 'aa'
+@expect $a[1] => 'bb'
+@expect $a[2] => 'cc'
+@exec killvar 'a', 1
+@expect $a[0] => 'aa'
+@expect $a[1] => 'cc'
+@expect $a[2] => ''
+
+@test killvar array key in number array
+@src
+a['test'] = 1 & a['other'] = 2
+@run
+@expect a['test'] => 1
+@expect a['other'] => 2
+@exec killvar 'a', 'test'
+@expect #a['test'] => 0
+@expect a['other'] => 2
+
+@test killvar array key in string array
+@src
+$a['test'] = "aa" & $a['other'] = "zz"
+@run
+@expect $a['test'] => 'aa'
+@expect $a['other'] => 'zz'
+@exec killvar 'a', 'test'
+@expect $a['test'] => ''
+@expect $a['other'] => 'zz'
+
+@test killall clears all variables
+@src
+a = 1 & $b = "xx"
+@run
+@expect a => 1
+@expect $b => 'xx'
+@exec killall
+@expect #a => 0
+@expect $b => ''
+
+@test copyarr whole numeric array
+@src
+a[0] = 1 & a[1] = 2 & a[2] = 3
+@run
+@expect #b[0] => 0
+@exec copyarr 'b', 'a'
+@expect a[0] => 1
+@expect a[1] => 2
+@expect a[2] => 3
+@expect b[0] => 1
+@expect b[1] => 2
+@expect b[2] => 3
+
+@test copyarr whole string array
+@src
+$a[0] = "aa" & $a[1] = "bb" & $a[2] = "cc"
+@run
+@expect $b[0] => ''
+@exec copyarr 'b', 'a'
+@expect $a[0] => 'aa'
+@expect $a[1] => 'bb'
+@expect $a[2] => 'cc'
+@expect $b[0] => 'aa'
+@expect $b[1] => 'bb'
+@expect $b[2] => 'cc'
+
+@test copyarr with start index in numeric array
+@src
+a[0] = 1 & a[1] = 2 & a[2] = 3
+@run
+@exec copyarr 'b', 'a', 1
+@expect a[0] => 1
+@expect a[1] => 2
+@expect a[2] => 3
+@expect b[0] => 2
+@expect b[1] => 3
+@expect #b[2] => 0
+
+// wasm: the second test is also named "copyarr with start index in numeric array"
+@test copyarr with start index in string array
+@src
+$a[0] = "aa" & $a[1] = "bb" & $a[2] = "cc"
+@run
+@exec copyarr 'b', 'a', 1
+@expect $a[0] => 'aa'
+@expect $a[1] => 'bb'
+@expect $a[2] => 'cc'
+@expect $b[0] => 'bb'
+@expect $b[1] => 'cc'
+@expect $b[2] => ''
+
+@test copyarr with count in numeric array
+@src
+a[0] = 1 & a[1] = 2 & a[2] = 3
+@run
+@exec copyarr 'b', 'a', 1, 1
+@expect a[0] => 1
+@expect a[1] => 2
+@expect a[2] => 3
+@expect b[0] => 2
+@expect #b[1] => 0
+@expect #b[2] => 0
+
+@test copyarr with count in string array
+@src
+$a[0] = "aa" & $a[1] = "bb" & $a[2] = "cc"
+@run
+@exec copyarr 'b', 'a', 1, 1
+@expect $a[0] => 'aa'
+@expect $a[1] => 'bb'
+@expect $a[2] => 'cc'
+@expect $b[0] => 'bb'
+@expect $b[1] => ''
+@expect $b[2] => ''
+
+@test copyarr on number array copies string values
+@src
+a[0] = 1 & $a[1] = 'a' & a[2] = 3
+@run
+@expect a[0] => 1
+@expect $a[1] => 'a'
+@expect a[2] => 3
+@expect #b[0] => 0
+@expect $b[1] => ''
+@exec copyarr 'b', 'a'
+@expect a[0] => 1
+@expect $a[1] => 'a'
+@expect a[2] => 3
+@expect b[0] => 1
+@expect $b[1] => 'a'
+@expect b[2] => 3
+
+@test ARRSIZE: return array size
+@src
+$a[0] = "aa" & $a[1] = "bb" & $a[2] = "cc" & s = arrsize('a')
+@run
+@expect s => 3
+
+@test ARRSIZE: return array size with mixed values
+@src
+a[] = 1 & $a[] = "aa" & a[] = 3 & s = arrsize('$a')
+@run
+@expect s => 3
+
+@test ARRPOS: return index when found for numbers
+@src
+mass[0]=1 & mass[1]=2 & mass[2]=4 & r = arrpos('mass',2)
+@run
+@expect r => 1
+
+@test ARRPOS: return index when found for strings
+@src
+$mass[0]="aa" & $mass[1]="bb" & $mass[2]="cc" & r = arrpos('$mass',"bb")
+@run
+@expect r => 1
+
+@test ARRPOS: return index for mixed items when found for numbers
+@src
+$mass[0]='aa' & mass[1]=2 & $mass[2]='xx' & mass[4]=5 & r = arrpos('mass',5)
+@run
+@expect r => 4
+
+@test ARRPOS: return index for mixed items when found for strings
+@src
+$mass[0]='aa' & mass[1]=2 & $mass[2]='xx' & mass[4]=5 & r = arrpos('$mass','xx')
+@run
+@expect r => 2
+
+@test ARRPOS: supports holes
+@src
+mass[0]=1 & mass[2]=2 & mass[4]=6 & r = arrpos('mass',6)
+@run
+@expect r => 4
+
+@test ARRPOS: return index including empty elements for numbers
+@src
+mass[0]=1 & mass[2]=2 & r = arrpos('mass',0)
+@run
+@expect r => 1
+
+@test ARRPOS: return index including empty elements for strings
+@src
+$mass[0]='sdsd' & $mass[2]='qq' & r = arrpos('$mass','')
+@run
+@expect r => 1
+
+@test ARRPOS: return index skipping several elements for numbers
+@src
+mass[0]=1 & mass[1]=2 & mass[2]=4 & mass[3]=2 & r = arrpos('mass',2,2)
+@run
+@expect r => 3
+
+@test ARRPOS: return index skipping several elements for strings
+@src
+$mass[0]="aa" & $mass[1]="bb" & $mass[3]="bb" & r = arrpos('$mass',"bb", 2)
+@run
+@expect r => 3
+
+@test ARRPOS: return -1 when not found for numbers
+@src
+mass[0]=1 & mass[1]=2 & mass[2]=4 & r = arrpos('mass',10)
+@run
+@expect r => -1
+
+@test ARRPOS: return -1 when not found for strings
+@src
+$mass[0]="aa" & $mass[1]="bb" & $mass[3]="bb" & r = arrpos('$mass',"zz")
+@run
+@expect r => -1
+
+@test ARRPOS: search for 0
+@src
+mass[0]=1 & mass[1]=2 & mass[2]=1 & r = arrpos('mass',0)
+@run
+@expect r => -1
+
+@test ARRPOS: string search for empty string
+@src
+$mass[0]='a' & $mass[1]='b' & $mass[2]='c' & r = arrpos('$mass','')
+@run
+@expect r => -1
+
+@test ARRCOMP: finds index by regexp
+@src
+$a[0] = 'a1' & $a[1] = 'b1' & $a[2] = 'c1' & r = arrcomp('$a', 'b\d')
+@run
+@expect r => 1
+
+@test ARRCOMP: returns -1 when not found
+@src
+$a[0] = 'a1' & $a[1] = 'b1' & $a[2] = 'c1' & r = arrcomp('$a', 'f\d')
+@run
+@expect r => -1
+
+@test ARRCOMP: includes empty elements
+@src
+$a[0] = 'a1' & $a[2] = 'c1' & r = arrcomp('$a', '')
+@run
+@expect r => 1
+
+@test ARRCOMP: can skip elements
+@src
+$a[0] = 'a1' & $a[1] = 'b1' & $a[2] = 'a1' & r = arrcomp('$a', 'a\d', 1)
+@run
+@expect r => 2
+
+@test ARRCOMP: supports holes
+@src
+$a[0] = 'a1' & $a[2] = 'c1' & $a[4] = 'b1' & r = arrcomp('$a', 'b\d')
+@run
+@expect r => 4
+
+@test ARRCOMP: finding element by regexp
+@src
+
+          $mass[0] = "топаю вперёд"
+          $mass[1] = " иду в пещеру"
+          $mass[2] = "не иду в пещеру"
+          $mass[3] = "топаю к дому"
+          res = arrcomp('$mass', '\s?\S+\s\S+\s\S+\s?')
+@run
+@expect res => 1
+
+@test ARRCOMP: finding element by regexp with skip
+@src
+
+          $mass[0] = "топаю вперёд"
+          $mass[1] = " иду в пещеру"
+          $mass[2] = "не иду в пещеру"
+          $mass[3] = "топаю к дому"
+          res = arrcomp('$mass', '\s?\S+\s\S+\s\S+\s?', 2)
+@run
+@expect res => 3
+
+@test ARRCOMP: return -1 for empty array
+@src
+res = arrcomp('$mass', 'ab')
+@run
+@expect res => -1
+
+@test ARRITEM: finding element numeric index in numeric array
+@src
+arr[123]=256 & res = arritem('arr',123)
+@run
+@expect res => 256
+
+@test ARRITEM: finding element numeric index in string array
+@src
+$arr[123]="cc" & $res = arritem('$arr', 123)
+@run
+@expect $res => 'cc'
+
+@test ARRITEM: finding element by string index in numeric array
+@src
+arr['first']=256 & res = arritem('arr','first')
+@run
+@expect res => 256
+
+@test ARRITEM: finding element by string index in string array
+@src
+$arr['first']="xx" & $res = arritem('$arr','first')
+@run
+@expect $res => 'xx'
+
+@test ARRITEM: finding element by tuple index in numeric array
+@src
+arr[1,3]=256 & res = arritem('arr', [1,3])
+@run
+@expect res => 256
+
+@test ARRITEM: finding element by tuple index in string array
+@src
+$arr[1,3]="zz" & $res = arritem('$arr', [1,3])
+@run
+@expect $res => 'zz'
+
+@test negative index
+@src
+arr[0] = 123 & x = arr[-1] & arr[-1] = 234 & y = arr[0]
+@run
+@expect #x => 0
+@expect y => 123
+
+@test tuple index numbers
+@src
+
+$arr[1,3] = 'test'
+$res = $arr[1,3]
+@run
+@expect $res => 'test'
+
+@test tuple index strings
+@src
+
+$arr['first','second'] = 'test'
+$res = $arr['first','second']
+@run
+@expect $res => 'test'
+
+@test tuple index mixed
+@src
+
+$arr['first',2,'sss'] = 'test'
+$res = $arr['first',2,'sss']
+@run
+@expect $res => 'test'
+
+@test tuple index collision
+@src
+
+$arr[1,3] = 'test'
+$arr['1,3'] = 'test1'
+$res = $arr[1,3]
+@run
+@expect $res => 'test'
+
+@test SORTARR: sorting numeric array
+@src
+
+        a[] = 2
+        a[] = -1
+        a[] = 5
+        a[] = 3
+
+        SORTARR('a')
+@run
+@expect a[0] => -1
+@expect a[1] => 2
+@expect a[2] => 3
+@expect a[3] => 5
+
+@test SORTARR: sorting numeric array desc
+@src
+
+        a[] = 2
+        a[] = -1
+        a[] = 5
+        a[] = 3
+
+        SORTARR('a', 1)
+@run
+@expect a[0] => 5
+@expect a[1] => 3
+@expect a[2] => 2
+@expect a[3] => -1
+
+@test SORTARR: sort string array
+@src
+
+        $a[] = 'b'
+        $a[] = 'a'
+        $a[] = 'c'
+
+        SORTARR('$a')
+@run
+@expect $a[0] => 'a'
+@expect $a[1] => 'b'
+@expect $a[2] => 'c'
+
+@test SORTARR: sort string array desc
+@src
+
+        $a[] = 'b'
+        $a[] = 'a'
+        $a[] = 'c'
+
+        SORTARR('$a', 1)
+@run
+@expect $a[0] => 'c'
+@expect $a[1] => 'b'
+@expect $a[2] => 'a'
+
+@test SORTARR: sorting mized values should error
+@src
+
+        a[] = 2
+        $a[] = 'b'
+        $a[] = 'a'
+        $a[] = 'c'
+
+        SORTARR('$a')
+@run
+@expect error TYPEMISMATCH (location 'test', line 7, local 7, action -1) SORTARR('$a')
