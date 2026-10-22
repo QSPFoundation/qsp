@@ -11,14 +11,14 @@
 #ifndef QSP_COMMONDEFINES
     #define QSP_COMMONDEFINES
 
-    #define QSP_NORMAL_SCALE 3.0
+    #define QSP_NORMALSCALE 3.0
 
     #ifdef QSP_USE_BIGINT
-        #define QSP_RAND_SHIFT 17 /* xoshiro256** */
-        #define QSP_RAND_ROTATE 45
+        #define QSP_RANDSHIFT 17 /* xoshiro256** */
+        #define QSP_RANDROTATE 45
     #else
-        #define QSP_RAND_SHIFT 9 /* xoshiro128** */
-        #define QSP_RAND_ROTATE 11
+        #define QSP_RANDSHIFT 9 /* xoshiro128** */
+        #define QSP_RANDROTATE 11
     #endif
 
     extern QSP_BOOL qspIsDebug;

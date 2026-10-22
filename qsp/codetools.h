@@ -18,22 +18,22 @@
 
     enum
     {
-        qspArgNone, /* no argument */
-        qspArgEmpty, /* empty text */
-        qspArgExpression, /* compiled on the first evaluation */
-        qspArgCompiled, /* the compiled expression */
-        qspArgNumber,
-        qspArgString, /* the text between the quotes, without doubled quotes & subexpressions */
-        qspArgCode /* the text between the brackets */
+        QSP_ARG_NONE, /* no argument */
+        QSP_ARG_EMPTY, /* empty text */
+        QSP_ARG_EXPRESSION, /* compiled on the first evaluation */
+        QSP_ARG_COMPILED, /* the compiled expression */
+        QSP_ARG_NUMBER,
+        QSP_ARG_STRING, /* the text between the quotes, without doubled quotes & subexpressions */
+        QSP_ARG_CODE /* the text between the brackets */
     };
 
     typedef struct
     {
         union
         {
-            QSPString Text; /* qspArgEmpty, qspArgExpression, qspArgString, qspArgCode */
-            QSPMathExpression *Expression; /* qspArgCompiled */
-            QSP_BIGINT Number; /* qspArgNumber */
+            QSPString Text; /* QSP_ARG_EMPTY, QSP_ARG_EXPRESSION, QSP_ARG_STRING, QSP_ARG_CODE */
+            QSPMathExpression *Expression; /* QSP_ARG_COMPILED */
+            QSP_BIGINT Number; /* QSP_ARG_NUMBER */
         } Data;
         QSP_TINYINT Type; /* selects the member of Data */
     } QSPCachedArg;

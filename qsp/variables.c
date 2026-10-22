@@ -339,17 +339,17 @@ QSPVarsScope *qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOO
     if (!scope->VarSlots)
         qspInitVarsScope(scope, QSP_VARSLOCALCAPACITY); /* init the uninitialized scope */
 
-    varArgs = qspAddVarToScope(scope, QSP_STATIC_STR(QSP_VARARGS));
+    varArgs = qspAddVarToScope(scope, QSP_STATIC_STR(QSP_VAR_ARGS));
     qspSetVarValuesByReference(varArgs, args, count, toMove);
 
-    qspAddVarToScope(scope, QSP_STATIC_STR(QSP_VARRES));
+    qspAddVarToScope(scope, QSP_STATIC_STR(QSP_VAR_RESULT));
 
     return scope;
 }
 
 QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove)
 {
-    QSPVar *varArgs = qspVarReference(QSP_STATIC_STR(QSP_VARARGS), QSP_VARREF_GETORCREATE);
+    QSPVar *varArgs = qspVarReference(QSP_STATIC_STR(QSP_VAR_ARGS), QSP_VARREF_GETORCREATE);
     if (!varArgs) return QSP_FALSE;
 
     qspEmptyVar(varArgs);
@@ -359,7 +359,7 @@ QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove)
 
 QSP_BOOL qspApplyResult(QSPVariant *res)
 {
-    QSPVar *varRes = qspVarReference(QSP_STATIC_STR(QSP_VARRES), QSP_VARREF_GET);
+    QSPVar *varRes = qspVarReference(QSP_STATIC_STR(QSP_VAR_RESULT), QSP_VARREF_GET);
     if (!varRes) return QSP_FALSE;
 
     if (varRes->ValsCount)
@@ -633,11 +633,11 @@ INLINE QSPVar *qspGetVarData(QSPCachedTarget *target, QSPVariant *index, QSP_TIN
     int oldLocationState;
     switch (target->Index.Type)
     {
-    case qspArgNone: /* plain variable */
+    case QSP_ARG_NONE: /* plain variable */
         var = qspVarReference(target->Name, mode);
         if (var) *index = qspNumVariant(0);
         return var;
-    case qspArgEmpty: /* x[] means a new item */
+    case QSP_ARG_EMPTY: /* x[] means a new item */
         var = qspVarReference(target->Name, mode);
         if (var) *index = qspNumVariant(var->ValsCount);
         return var;

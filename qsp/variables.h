@@ -20,8 +20,10 @@
     #define QSP_VARSNAMECHARSPERSLOT 2
     #define QSP_VARSSCOPECHUNKSIZE 128
     #define QSP_VARSKEYSCAPACITY 4 /* has to be a power of 2 */
-    #define QSP_VARARGS QSP_FMT("ARGS")
-    #define QSP_VARRES QSP_FMT("RESULT")
+
+    #define QSP_VAR_ARGS QSP_FMT("ARGS")
+    #define QSP_VAR_RESULT QSP_FMT("RESULT")
+    #define QSP_VAR_DEBUG QSP_FMT("DEBUG")
 
     typedef struct
     {

@@ -396,7 +396,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     if (!qspStrsEqual(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
-    if (QSP_ISFALSE(qspGetVarNumValue(QSP_STATIC_STR(QSP_FMT("DEBUG")), 0)))
+    if (QSP_ISFALSE(qspGetVarNumValue(QSP_STATIC_STR(QSP_VAR_DEBUG), 0)))
     {
         temp = qspReadEncodedIntVal(strs[2], isUCS);
         if (temp != qspQstCRC) return QSP_FALSE;
@@ -647,7 +647,7 @@ void qspStatementOpenQst(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TI
 {
     switch (extArg)
     {
-    case qspStatOpenQst:
+    case QSP_STAT_OPENQST:
         if (qspIsAnyString(QSP_STR(args[0])))
         {
             int oldLocationState = qspLocationState;
@@ -656,7 +656,7 @@ void qspStatementOpenQst(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP_TI
             qspRestartGame(QSP_FALSE);
         }
         break;
-    case qspStatIncLib:
+    case QSP_STAT_INCLIB:
         qspIncludeGameFile(QSP_STR(args[0]));
         break;
     }

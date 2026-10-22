@@ -49,7 +49,7 @@
 
     #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
     #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
-    #define QSP_CHAR_LEN 1
+    #define QSP_CHARLEN 1
 
     #define QSP_DEFINE_SPECIAL_CHAR(name, ch) enum { name##_CHAR = ch }; /* use enum to make it compile-time constant */
 
