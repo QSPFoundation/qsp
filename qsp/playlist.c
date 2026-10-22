@@ -126,7 +126,7 @@ void qspPlayPLFiles(void)
         pos = qspStrLastChar(qspPLFiles[i], QSP_PLVOLUMEDELIM_CHAR);
         if (pos)
         {
-            volume = qspStrToNum(qspStringFromPair(pos + QSP_CHARLEN, qspPLFiles[i].End), 0);
+            volume = qspStrToNum(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_PLVOLUMEDELIM), qspPLFiles[i].End), 0);
             qspPlayFile(qspStringFromPair(qspPLFiles[i].Str, pos), volume, QSP_FALSE);
         }
         else

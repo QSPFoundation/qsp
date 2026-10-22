@@ -91,14 +91,14 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
             if ((pos = qspStrLastChar(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM_CHAR)))
             {
                 itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos));
-                itemLocation = qspCopyToNewText(qspStringFromPair(pos + QSP_CHARLEN, pos2));
-                itemImage = qspStringFromPair(pos2 + QSP_CHARLEN, str.End);
+                itemLocation = qspCopyToNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
+                itemImage = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
                 itemImage = (qspIsAnyString(itemImage) ? qspCopyToNewText(itemImage) : qspNullString);
             }
             else
             {
                 itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos2));
-                itemLocation = qspCopyToNewText(qspStringFromPair(pos2 + QSP_CHARLEN, str.End));
+                itemLocation = qspCopyToNewText(qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End));
             }
             break;
         }

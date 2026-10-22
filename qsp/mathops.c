@@ -413,7 +413,7 @@ INLINE QSPString qspGetString(QSPString *expr)
             ++doubledQuotesCount;
         }
     }
-    text = qspStringFromPair(expr->Str + QSP_CHARLEN, pos - QSP_CHARLEN);
+    text = qspStringFromPair(expr->Str + 1, pos - 1);
     expr->Str = pos;
     len = qspStrLen(text) - doubledQuotesCount;
     dest = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
@@ -435,8 +435,8 @@ INLINE QSPString qspGetCodeBlock(QSPString *expr)
         qspSetError(QSP_ERR_QUOTNOTFOUND);
         return qspNullString;
     }
-    expr->Str = endPos + QSP_CHARLEN;
-    return qspStringFromPair(startPos + QSP_CHARLEN, endPos);
+    expr->Str = endPos + QSP_STATIC_LEN(QSP_RCODE);
+    return qspStringFromPair(startPos + QSP_STATIC_LEN(QSP_LCODE), endPos);
 }
 
 INLINE QSP_BOOL qspPushOperationToStack(QSP_TINYINT *opStack, QSP_TINYINT *argStack, int *opSp, QSP_TINYINT opCode)
@@ -758,23 +758,23 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
             {
                 qspInitVariant(&v, QSP_TYPE_UNDEF);
                 if (!qspAppendValueToCompiled(expression, QSP_OP_VALUE, v)) break;
-                s.Str += QSP_CHARLEN;
+                s.Str += QSP_STATIC_LEN(QSP_UNDEFTYPE);
                 waitForOperator = QSP_TRUE;
             }
             else if (*s.Str == QSP_NEGATION_CHAR)
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, QSP_OP_NEGATION)) break;
-                s.Str += QSP_CHARLEN;
+                s.Str += QSP_STATIC_LEN(QSP_NEGATION);
             }
             else if (*s.Str == QSP_AFFIRMATION_CHAR)
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, QSP_OP_AFFIRMATION)) break;
-                s.Str += QSP_CHARLEN;
+                s.Str += QSP_STATIC_LEN(QSP_AFFIRMATION);
             }
             else if (*s.Str == QSP_LRBRACK_CHAR) /* a subexpression OR a tuple */
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, QSP_OP_OPENROUNDBRACKET)) break;
-                s.Str += QSP_CHARLEN;
+                s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
             }
             else if (*s.Str == QSP_RRBRACK_CHAR) /* happens when "(" gets closed with ")" without any values */
             {
@@ -800,14 +800,14 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                 {
                     if (!qspAppendOperationToCompiled(expression, QSP_OP_TUPLE, 0)) break;
                 }
-                s.Str += QSP_CHARLEN;
+                s.Str += QSP_STATIC_LEN(QSP_RRBRACK);
                 waitForOperator = QSP_TRUE;
             }
             else if (*s.Str == QSP_LSBRACK_CHAR) /* a tuple */
             {
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, QSP_OP_OPENSQUAREBRACKET)) break;
                 if (!qspPushOperationToStack(opStack, argStack, &opSp, QSP_OP_TUPLE)) break;
-                s.Str += QSP_CHARLEN;
+                s.Str += QSP_STATIC_LEN(QSP_LSBRACK);
             }
             else if (*s.Str == QSP_RSBRACK_CHAR) /* happens when "[" gets closed with "]" without any values */
             {
@@ -824,12 +824,12 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                     break;
                 }
                 --opSp; /* it's always positive */
-                s.Str += QSP_CHARLEN;
+                s.Str += QSP_STATIC_LEN(QSP_RSBRACK);
                 waitForOperator = QSP_TRUE;
             }
             else if (*s.Str == QSP_USERFUNC_CHAR) /* a user function call */
             {
-                s.Str += QSP_CHARLEN;
+                s.Str += QSP_STATIC_LEN(QSP_USERFUNC);
                 qspSkipSpaces(&s);
                 name = qspParseName(&s);
                 if (qspIsEmpty(name))
@@ -851,7 +851,7 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                 if (!qspIsEmpty(s) && *s.Str == QSP_LRBRACK_CHAR)
                 {
                     if (!qspPushOperationToStack(opStack, argStack, &opSp, QSP_OP_OPENROUNDBRACKET)) break;
-                    s.Str += QSP_CHARLEN;
+                    s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
                 }
                 else
                 {
@@ -869,7 +869,7 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                     {
                         if (!qspPushOperationToStack(opStack, argStack, &opSp, opCode)) break;
                         if (!qspPushOperationToStack(opStack, argStack, &opSp, QSP_OP_OPENROUNDBRACKET)) break;
-                        s.Str += QSP_CHARLEN;
+                        s.Str += QSP_STATIC_LEN(QSP_LRBRACK);
                     }
                     else if (qspOps[opCode].MinArgsCount < 2)
                     {
@@ -896,11 +896,11 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                     v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_VARREF);
                     if (!qspIsEmpty(s) && *s.Str == QSP_LSBRACK_CHAR)
                     {
-                        s.Str += QSP_CHARLEN;
+                        s.Str += QSP_STATIC_LEN(QSP_LSBRACK);
                         qspSkipSpaces(&s);
                         if (!qspIsEmpty(s) && *s.Str == QSP_RSBRACK_CHAR)
                         {
-                            s.Str += QSP_CHARLEN;
+                            s.Str += QSP_STATIC_LEN(QSP_RSBRACK);
                             if (!qspAppendValueToCompiled(expression, QSP_OP_INLINELASTARRITEM, v))
                             {
                                 qspFreeVariant(&v);

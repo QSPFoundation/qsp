@@ -7,6 +7,7 @@
 
 #include "declarations.h"
 #include "mathops.h"
+#include "text.h"
 
 #ifndef QSP_CODETOOLSDEFINES
     #define QSP_CODETOOLSDEFINES
@@ -128,7 +129,6 @@
     QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim);
     int qspCollectLabels(QSPLineOfCode *lines, int linesCount, QSPCodeLabel **labels);
     void qspFreeLabels(QSPCodeLabel *labels, int count);
-    QSPCodeBlock *qspGetSinglelineActCode(QSPLineOfCode *line, int statPos, int endPos);
     QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch);
     QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated);
     void qspPrepareStringToExecution(QSPString *str);
@@ -145,6 +145,14 @@
         code->LabelsCount = qspCollectLabels(lines, linesCount, &code->Labels);
         code->RefsCount = 1;
         return code;
+    }
+
+    INLINE QSPCodeBlock *qspNewSinglelineCodeBlock(QSPString str, int lineNum)
+    {
+        QSPLineOfCode *line = (QSPLineOfCode *)malloc(sizeof(QSPLineOfCode));
+        qspInitLineOfCode(line, qspCopyToNewText(str), lineNum); /* the line takes the copy */
+        line->IsMultiline = QSP_FALSE; /* a part of a single-line statement */
+        return qspNewCodeBlock(line, 1);
     }
 
     INLINE void qspAcquireCodeBlock(QSPCodeBlock *code)

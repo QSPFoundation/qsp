@@ -158,7 +158,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
 {
     QSPVariant args[2];
     QSP_TINYINT argsCount;
-    QSPCodeBlock *code;
+    QSPCachedAct *act;
     int oldLocationState;
     QSPCachedStat *stat = line->Stats + statPos;
     if (!qspIsCharAtPos(line->Str, line->Str.Str + stat->EndPos, QSP_COLONDELIM_CHAR))
@@ -171,14 +171,23 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
         qspSetError(QSP_ERR_CODENOTFOUND);
         return;
     }
+    act = stat->Data.Act;
     oldLocationState = qspLocationState;
-    argsCount = qspGetStatArgs(stat, stat->Data.Act->Args, args);
+    argsCount = qspGetStatArgs(stat, act->Args, args);
     if (qspLocationState != oldLocationState) return;
-    code = qspGetSinglelineActCode(line, statPos, endPos);
+    if (!act->OnPressCode)
+    {
+        QSP_CHAR *firstPos, *lastPos;
+        firstPos = line->Str.Str + stat->EndPos + QSP_STATIC_LEN(QSP_COLONDELIM); /* skip the colon */
+        lastPos = line->Str.Str + line->Stats[endPos - 1].EndPos;
+        if (qspIsCharAtPos(line->Str, lastPos, QSP_COLONDELIM_CHAR))
+            lastPos += QSP_STATIC_LEN(QSP_COLONDELIM); /* include the last colon */
+        act->OnPressCode = qspNewSinglelineCodeBlock(qspStringFromPair(firstPos, lastPos), line->LineNum);
+    }
     if (argsCount == 2)
-        qspAddAction(QSP_STR(args[0]), QSP_STR(args[1]), code, 0, 1);
+        qspAddAction(QSP_STR(args[0]), QSP_STR(args[1]), act->OnPressCode, 0, 1);
     else
-        qspAddAction(QSP_STR(args[0]), qspNullString, code, 0, 1);
+        qspAddAction(QSP_STR(args[0]), qspNullString, act->OnPressCode, 0, 1);
     qspFreeVariants(args, argsCount);
 }
 
