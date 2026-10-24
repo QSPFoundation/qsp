@@ -39,7 +39,7 @@ INLINE double qspNormalCdf(double x);
 INLINE double qspPoly8Value(const double c[], double x);
 INLINE double qspNormalInvCdf(double p);
 
-void qspInitRuntime(void)
+void qspInitRuntime(unsigned int seed)
 {
     setlocale(LC_ALL, QSP_LOCALE);
 
@@ -57,7 +57,7 @@ void qspInitRuntime(void)
     qspCurWindowsDisplayState = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT;
     qspInitWorld();
 
-    qspSetSeed(0);
+    qspSetSeed(seed);
     qspInitVarTypes();
     qspInitSymbolClasses();
     qspInitStackAllocator();
@@ -158,13 +158,13 @@ INLINE QSP_UBIGINT qspRand(void)
 {
     /* xoshiro128** / xoshiro256** */
     QSP_UBIGINT *s = qspRandState;
-    QSP_UBIGINT res = qspRotl(s[1] * 5, 7) * 9, t = s[1] << QSP_RAND_SHIFT;
+    QSP_UBIGINT res = qspRotl(s[1] * 5, 7) * 9, t = s[1] << QSP_RANDSHIFT;
     s[2] ^= s[0];
     s[3] ^= s[1];
     s[1] ^= s[2];
     s[0] ^= s[3];
     s[2] ^= t;
-    s[3] = qspRotl(s[3], QSP_RAND_ROTATE);
+    s[3] = qspRotl(s[3], QSP_RANDROTATE);
     return res;
 }
 
@@ -307,7 +307,7 @@ QSP_BIGINT qspNormalRand(QSP_BIGINT min, QSP_BIGINT max, QSP_BIGINT mean)
     leftDist = fabs(realMin - realMean);
     rightDist = fabs(realMax - realMean);
     maxDist = rightDist > leftDist ? rightDist : leftDist;
-    sigma = maxDist / QSP_NORMAL_SCALE;
+    sigma = maxDist / QSP_NORMALSCALE;
 
     a = (realMin - realMean) / sigma;
     b = (realMax - realMean) / sigma;

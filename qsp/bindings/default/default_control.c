@@ -260,7 +260,7 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 /* Get the number of items in an array */
 QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 {
-    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    QSPVar *var = qspVarReference(name, QSP_VARREF_GETSILENTLY);
     if (var)
     {
         *count = var->ValsCount;
@@ -272,7 +272,7 @@ QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 /* Get index of an item by key */
 QSP_BOOL QSPGetVarIndexByKey(QSPString name, QSPVariant key, int *ind)
 {
-    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    QSPVar *var = qspVarReference(name, QSP_VARREF_GETSILENTLY);
     if (var)
     {
         int arrIndex = qspGetVarIndex(var, key, QSP_FALSE);
@@ -288,7 +288,7 @@ QSP_BOOL QSPGetVarIndexByKey(QSPString name, QSPVariant key, int *ind)
 /* Get value & key of the specified array item, both are optional */
 QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *value, QSPVariant *key)
 {
-    QSPVar *var = qspVarReference(name, QSP_FALSE);
+    QSPVar *var = qspVarReference(name, QSP_VARREF_GETSILENTLY);
     if (var && ind >= 0 && ind < var->ValsCount)
     {
         if (value) *value = var->Values[ind];
@@ -482,12 +482,12 @@ void QSPSetCallback(int type, QSP_CALLBACK func)
 }
 /* ------------------------------------------------------------ */
 /* Initialization of the engine */
-void QSPInit(void)
+void QSPInit(unsigned int seed)
 {
 #ifdef _DEBUG
     mwInit();
 #endif
-    qspInitRuntime();
+    qspInitRuntime(seed);
 }
 /* Deallocate all resources */
 void QSPTerminate(void)

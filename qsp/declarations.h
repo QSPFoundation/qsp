@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <locale.h>
-#include <time.h>
 #include <math.h>
 #include <limits.h>
 #include <string.h>
@@ -50,7 +49,6 @@
 
     #define QSP_STATIC_LEN(x) (sizeof(x) / sizeof(QSP_CHAR) - 1)
     #define QSP_STATIC_STR(x) (qspStringFromLen(x, QSP_STATIC_LEN(x)))
-    #define QSP_CHAR_LEN 1
 
     #define QSP_DEFINE_SPECIAL_CHAR(name, ch) enum { name##_CHAR = ch }; /* use enum to make it compile-time constant */
 

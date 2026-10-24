@@ -43,7 +43,7 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     QSPString menuLocs[QSP_MAXMENUITEMS], itemName, itemLocation, itemImage, str;
     QSPTuple tuple;
     QSP_CHAR *pos, *pos2;
-    if (!((var = qspVarReference(QSP_STR(args[0]), QSP_FALSE)))) return;
+    if (!((var = qspVarReference(QSP_STR(args[0]), QSP_VARREF_GET)))) return;
     if (count >= 2)
     {
         ind = QSP_TOINT(QSP_NUM(args[1]));
@@ -91,14 +91,14 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
             if ((pos = qspStrLastChar(qspStringFromPair(str.Str, pos2), QSP_MENUDELIM_CHAR)))
             {
                 itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos));
-                itemLocation = qspCopyToNewText(qspStringFromPair(pos + QSP_CHAR_LEN, pos2));
-                itemImage = qspStringFromPair(pos2 + QSP_CHAR_LEN, str.End);
+                itemLocation = qspCopyToNewText(qspStringFromPair(pos + QSP_STATIC_LEN(QSP_MENUDELIM), pos2));
+                itemImage = qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End);
                 itemImage = (qspIsAnyString(itemImage) ? qspCopyToNewText(itemImage) : qspNullString);
             }
             else
             {
                 itemName = qspCopyToNewText(qspStringFromPair(str.Str, pos2));
-                itemLocation = qspCopyToNewText(qspStringFromPair(pos2 + QSP_CHAR_LEN, str.End));
+                itemLocation = qspCopyToNewText(qspStringFromPair(pos2 + QSP_STATIC_LEN(QSP_MENUDELIM), str.End));
             }
             break;
         }

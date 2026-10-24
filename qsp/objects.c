@@ -449,13 +449,13 @@ void qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
 {
     switch (extArg)
     {
-    case qspStatDelObj:
+    case QSP_STAT_DELOBJ:
         {
             int maxObjects = (count == 2 ? QSP_TOINT(QSP_NUM(args[1])) : 1);
             qspClearObjectsByNameWithEvents(QSP_STR(args[0]), maxObjects);
             break;
         }
-    case qspStatKillObj:
+    case QSP_STAT_KILLOBJ:
         if (count)
         {
             int objInd = QSP_TOINT(QSP_NUM(args[0]) - 1);

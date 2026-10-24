@@ -53,12 +53,6 @@
                                 (a) : \
                                 ((unsigned short)(((a) << 8) | ((a) >> 8))))
 
-    #if defined(_MSC_VER)
-        #define QSP_TIME _time64
-    #else
-        #define QSP_TIME time
-    #endif
-
     #ifdef __cplusplus
         typedef int (*QSP_CALLBACK)(...);
     #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L
@@ -79,7 +73,7 @@
     QSP_EXTERN QSPString QSPStringFromLen(QSP_CHAR *start, int length);
     QSP_EXTERN QSPString QSPStringFromC(QSP_CHAR *s);
 
-    QSP_EXTERN void QSPInit(void);
+    QSP_EXTERN void QSPInit(unsigned int seed);
     QSP_EXTERN void QSPTerminate(void);
     QSP_EXTERN void QSPSetCallback(int type, QSP_CALLBACK func);
     QSP_EXTERN QSPString QSPGetVersion(void);

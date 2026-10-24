@@ -366,17 +366,17 @@
         lastPos = str.End - searchLen;
         firstChar = strSearch.Str[0];
 
-        if (searchLen == QSP_CHAR_LEN)
+        if (searchLen == 1)
         {
             for (pos = str.Str; pos <= lastPos; ++pos)
                 if (*pos == firstChar) return pos;
             return 0;
         }
 
-        bytesToCompare = (int)((searchLen - QSP_CHAR_LEN) * sizeof(QSP_CHAR));
+        bytesToCompare = (int)((searchLen - 1) * sizeof(QSP_CHAR));
         for (pos = str.Str; pos <= lastPos; ++pos)
         {
-            if (*pos == firstChar && !memcmp(pos + QSP_CHAR_LEN, strSearch.Str + QSP_CHAR_LEN, bytesToCompare))
+            if (*pos == firstChar && !memcmp(pos + 1, strSearch.Str + 1, bytesToCompare))
                 return pos;
         }
         return 0;
@@ -458,20 +458,20 @@
     {
         if (dest->Str)
         {
-            if (dest->Len + QSP_CHAR_LEN > dest->Capacity)
+            if (dest->Len + 1 > dest->Capacity)
             {
-                dest->Capacity = dest->Len + QSP_CHAR_LEN + dest->CapacityIncrement;
+                dest->Capacity = dest->Len + dest->CapacityIncrement + 1;
                 dest->Str = (QSP_CHAR *)realloc(dest->Str, dest->Capacity * sizeof(QSP_CHAR));
             }
             dest->Str[dest->Len] = ch;
-            dest->Len += QSP_CHAR_LEN;
+            ++dest->Len;
         }
         else
         {
-            dest->Capacity = QSP_CHAR_LEN + dest->CapacityIncrement;
+            dest->Capacity = dest->CapacityIncrement + 1;
             dest->Str = (QSP_CHAR *)malloc(dest->Capacity * sizeof(QSP_CHAR));
             dest->Str[0] = ch;
-            dest->Len = QSP_CHAR_LEN;
+            dest->Len = 1;
         }
     }
 

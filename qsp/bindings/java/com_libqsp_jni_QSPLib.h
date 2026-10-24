@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_libqsp_jni_QSPLib
  * Method:    init
- * Signature: ()V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jint);
 
 /*
  * Class:     com_libqsp_jni_QSPLib

@@ -232,7 +232,7 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 
 QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
 {
-    QSPVar *var = qspVarReference(qspStringFromC(name), QSP_FALSE);
+    QSPVar *var = qspVarReference(qspStringFromC(name), QSP_VARREF_GETSILENTLY);
     if (var)
     {
         *count = var->ValsCount;
@@ -244,7 +244,7 @@ QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
 
 QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
 {
-    QSPVar *var = qspVarReference(qspStringFromC(name), QSP_FALSE);
+    QSPVar *var = qspVarReference(qspStringFromC(name), QSP_VARREF_GETSILENTLY);
     if (var)
     {
         int arrIndex = qspGetVarIndex(var, *key, QSP_FALSE);
@@ -261,7 +261,7 @@ QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
 /* Both the value & the key are optional */
 QSP_BOOL QSPGetVarValue(QSP_CHAR *name, int ind, QSPVariant *value, QSPVariant *key)
 {
-    QSPVar *var = qspVarReference(qspStringFromC(name), QSP_FALSE);
+    QSPVar *var = qspVarReference(qspStringFromC(name), QSP_VARREF_GETSILENTLY);
     if (var && ind >= 0 && ind < var->ValsCount)
     {
         if (value) *value = var->Values[ind];
@@ -409,12 +409,12 @@ QSP_BOOL QSPRestartGame(QSP_BOOL toRefreshUI)
     return QSP_TRUE;
 }
 
-void QSPInit(void)
+void QSPInit(unsigned int seed)
 {
 #ifdef _DEBUG
     mwInit();
 #endif
-    qspInitRuntime();
+    qspInitRuntime(seed);
 }
 
 void QSPTerminate(void)

@@ -7,6 +7,7 @@
 
 #include "declarations.h"
 #include "mathops.h"
+#include "text.h"
 
 #ifndef QSP_CODETOOLSDEFINES
     #define QSP_CODETOOLSDEFINES
@@ -18,22 +19,22 @@
 
     enum
     {
-        qspArgNone, /* no argument */
-        qspArgEmpty, /* empty text */
-        qspArgExpression, /* compiled on the first evaluation */
-        qspArgCompiled, /* the compiled expression */
-        qspArgNumber,
-        qspArgString, /* the text between the quotes, without doubled quotes & subexpressions */
-        qspArgCode /* the text between the brackets */
+        QSP_ARG_NONE, /* no argument */
+        QSP_ARG_EMPTY, /* empty text */
+        QSP_ARG_EXPRESSION, /* compiled on the first evaluation */
+        QSP_ARG_COMPILED, /* the compiled expression */
+        QSP_ARG_NUMBER,
+        QSP_ARG_STRING, /* the text between the quotes, without doubled quotes & subexpressions */
+        QSP_ARG_CODE /* the text between the brackets */
     };
 
     typedef struct
     {
         union
         {
-            QSPString Text; /* qspArgEmpty, qspArgExpression, qspArgString, qspArgCode */
-            QSPMathExpression *Expression; /* qspArgCompiled */
-            QSP_BIGINT Number; /* qspArgNumber */
+            QSPString Text; /* QSP_ARG_EMPTY, QSP_ARG_EXPRESSION, QSP_ARG_STRING, QSP_ARG_CODE */
+            QSPMathExpression *Expression; /* QSP_ARG_COMPILED */
+            QSP_BIGINT Number; /* QSP_ARG_NUMBER */
         } Data;
         QSP_TINYINT Type; /* selects the member of Data */
     } QSPCachedArg;
@@ -128,7 +129,6 @@
     QSPString qspJoinPrepLines(QSPLineOfCode *s, int count, QSPString delim);
     int qspCollectLabels(QSPLineOfCode *lines, int linesCount, QSPCodeLabel **labels);
     void qspFreeLabels(QSPCodeLabel *labels, int count);
-    QSPCodeBlock *qspGetSinglelineActCode(QSPLineOfCode *line, int statPos, int endPos);
     QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch);
     QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated);
     void qspPrepareStringToExecution(QSPString *str);
@@ -145,6 +145,14 @@
         code->LabelsCount = qspCollectLabels(lines, linesCount, &code->Labels);
         code->RefsCount = 1;
         return code;
+    }
+
+    INLINE QSPCodeBlock *qspNewSinglelineCodeBlock(QSPString str, int lineNum)
+    {
+        QSPLineOfCode *line = (QSPLineOfCode *)malloc(sizeof(QSPLineOfCode));
+        qspInitLineOfCode(line, qspCopyToNewText(str), lineNum); /* the line takes the copy */
+        line->IsMultiline = QSP_FALSE; /* a part of a single-line statement */
+        return qspNewCodeBlock(line, 1);
     }
 
     INLINE void qspAcquireCodeBlock(QSPCodeBlock *code)
