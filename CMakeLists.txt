@@ -7,6 +7,7 @@ option(BUILD_JAVA "Build with JVM bindings" OFF)
 option(BUILD_WASM "Build WebAssembly module (requires the Emscripten toolchain)" OFF)
 option(BUILD_STATIC "Build a static library instead of a shared one" OFF)
 option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bundling it" OFF)
+option(QSP_BUILD_TESTS "Build the test runner and register the tests with CTest" OFF)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
@@ -139,3 +140,11 @@ install(EXPORT QspTargets FILE QspTargets.cmake NAMESPACE Qsp:: DESTINATION "${C
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cmake"
 	DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 )
+
+if (QSP_BUILD_TESTS)
+	if (BUILD_JAVA)
+		message(FATAL_ERROR "The tests use the default binding, turn BUILD_JAVA off to build them")
+	endif()
+	enable_testing()
+	add_subdirectory(tests)
+endif()

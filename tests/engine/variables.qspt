@@ -1,0 +1,412 @@
+// Ported from qsp-wasm-engine tests/engine/variables.test.ts
+// readVariable('x') of qsp-wasm-engine reads the numeric view of the variable, so a missing value
+// is written here as "#x => 0"; a name without a prefix checks the exact value ("x => ?")
+
+@test default number value
+@expect #not_defined => 0
+@expect not_defined => ?
+
+@test default string value
+@expect $not_defined => ''
+
+@test variables are case insensitive
+@src
+money = 100 & MONEY += 1
+@run
+@expect MoNeY => 101
+
+@test LET assignment
+@src
+LET money = 100
+@run
+@expect money => 100
+
+@test SET assignment
+@src
+SET money = 100
+@run
+@expect money => 100
+
+@test assignment
+@src
+money = 100
+@run
+@expect money => 100
+
+@test assignment to array item by numeric index
+@src
+money[2] = 100
+@run
+@expect #money[0] => 0
+@expect #money[1] => 0
+@expect money[0] => ?
+@expect money[2] => 100
+
+@test assignment to array item by string index
+@src
+money['key'] = 100
+@run
+@expect money['key'] => 100
+
+@test multi assignment
+@src
+a, $b, $c, d = 1, 'test', 'other', 2
+@run
+@expect a => 1
+@expect $b => 'test'
+@expect $c => 'other'
+@expect d => 2
+
+@test multi assignment with explicit tuple
+@src
+a, $b, $c, d = [1, 'test', 'other', 2]
+@run
+@expect a => 1
+@expect $b => 'test'
+@expect $c => 'other'
+@expect d => 2
+
+@test multi assignment with array and numeric indices
+@src
+a[3], $b[2], $c[1], d = 1, 'test', 'other', 2
+@run
+@expect a[3] => 1
+@expect $b[2] => 'test'
+@expect $c[1] => 'other'
+@expect d => 2
+
+@test multi assignment with array and string indices
+@src
+a['t1'], $b['t2'], $c['t3'], d = 1, 'test', 'other', 2
+@run
+@expect a['t1'] => 1
+@expect $b['t2'] => 'test'
+@expect $c['t3'] => 'other'
+@expect d => 2
+
+@test partial assignment
+@src
+a, $b, $c, d, %e = 3, 'test'
+@run
+@expect a => 3
+@expect $b => 'test'
+@expect $c => ''
+@expect #d => 0
+@expect %e => []
+
+@test local without assignment
+@src
+
+a, $b, c = 1, 'old', 2
+if 1:
+  local a, $b, c
+  a_new, $b_new, c_new = a, $b, c
+end
+a_old, $b_old, c_old = a, $b, c
+@run
+@expect #a_new => 0
+@expect $b_new => ''
+@expect #c_new => 0
+@expect a_old => 1
+@expect $b_old => 'old'
+@expect c_old => 2
+
+@test multi assignment local
+@src
+
+a, $b, $c, d = 1, 'old', 'oldest', 2
+if 1:
+  local a, $b, $c, d = 3, 'test', 'other', 4
+  a_new, $b_new, $c_new, d_new = a, $b, $c, d
+end
+a_old, $b_old, $c_old, d_old = a, $b, $c, d
+@run
+@expect a_new => 3
+@expect $b_new => 'test'
+@expect $c_new => 'other'
+@expect d_new => 4
+@expect a_old => 1
+@expect $b_old => 'old'
+@expect $c_old => 'oldest'
+@expect d_old => 2
+
+@test local with partial assignment
+@src
+
+a, $b, $c, d = 1, 'old', 'oldest', 2
+if 1:
+  local a, $b, $c, d = 3, 'test'
+  a_new, $b_new, $c_new, d_new = a, $b, $c, d
+end
+a_old, $b_old, $c_old, d_old = a, $b, $c, d
+@run
+@expect a_new => 3
+@expect $b_new => 'test'
+@expect $c_new => ''
+@expect #d_new => 0
+@expect a_old => 1
+@expect $b_old => 'old'
+@expect $c_old => 'oldest'
+@expect d_old => 2
+
+@test multi assignment with the same variable and last num value
+@src
+a, $a, A = 2, 'test', 4
+@run
+@expect a => 4
+@expect $a => ''
+
+@test multi assignment with the same variable and last string value
+@src
+$a, a, $A = 'test', 3, 'new'
+@run
+@expect #a => 0
+@expect $a => 'new'
+
+@test multi assignment local with the same variable and last num value
+@src
+
+local a, $a, A = 2, 'test', 4
+new_num, $new_str = a, $a
+@run
+@expect new_num => 4
+@expect $new_str => ''
+
+@test multi assignment local with the same variable and last string value
+@src
+
+local $a, a, $A = 'test', 3, 'new'
+new_num, $new_str = a, $a
+@run
+@expect #new_num => 0
+@expect $new_str => 'new'
+
+@test multi assignment with the same array
+@src
+a[1], $a[2], A[3] = 2, 'test', 4
+@run
+@expect a[1] => 2
+@expect $a[2] => 'test'
+@expect a[3] => 4
+
+@test local variables get removed on killvar
+@src
+
+a = 1 & $b = 'test' & c = 3
+if 1:
+  local a, $b
+  killvar
+end
+@run
+@expect #a => 0
+@expect $b => ''
+@expect #c => 0
+
+@test variable swap
+@src
+
+$x = "aa"
+$y = "bb"
+$y, $x = $x, $y
+@run
+@expect $x => 'bb'
+@expect $y => 'aa'
+
+@test local
+@src
+
+$a = "aa" & $b = "bb" & c = 11 & $d = "dd"
+gs 'other'
+---
+# other
+local $a,$b,c,$d = "la","lb",22,"ld"
+$la = $a
+$lb = $b
+lc = c
+$ld = $d
+@run
+@expect $a => 'aa'
+@expect $la => 'la'
+@expect $b => 'bb'
+@expect $lb => 'lb'
+@expect c => 11
+@expect lc => 22
+@expect $d => 'dd'
+@expect $ld => 'ld'
+
+@test global variables get restored on gt
+@src
+
+$test='value'
+local $test='value 1'
+if 1:
+  local $test='value 2'
+  $last_loc_test = $test
+  gt 'other'
+end
+---
+# other
+$glob_test = $test
+@run
+@expect $last_loc_test => 'value 2'
+@expect $glob_test => 'value'
+
+@test global variables get restored on goto
+@src
+
+$test='value'
+local $test='value 1'
+if 1:
+  local $test='value 2'
+  $last_loc_test = $test
+  goto 'other'
+end
+---
+# other
+$glob_test = $test
+@run
+@expect $last_loc_test => 'value 2'
+@expect $glob_test => 'value'
+
+@test global variables get restored on xgt
+@src
+
+$test='value'
+local $test='value 1'
+if 1:
+  local $test='value 2'
+  $last_loc_test = $test
+  xgt 'other'
+end
+---
+# other
+$glob_test = $test
+@run
+@expect $last_loc_test => 'value 2'
+@expect $glob_test => 'value'
+
+@test global variables get restored on xgoto
+@src
+
+$test='value'
+local $test='value 1'
+if 1:
+  local $test='value 2'
+  $last_loc_test = $test
+  xgoto 'other'
+end
+---
+# other
+$glob_test = $test
+@run
+@expect $last_loc_test => 'value 2'
+@expect $glob_test => 'value'
+
+// The save callback of the runner saves the game, like the handler in the original test;
+// the save is cancelled because $ONGSAVE moves to another location
+@test global variables get restored if ONGSAVE calls goto
+@src
+
+$ongsave = 'other'
+$test='value'
+local $test='value 1'
+if 1:
+  local $test='value 2'
+  $last_loc_test1 = $test
+  savegame 'test.sav'
+  $last_loc_test2 = $test
+end
+---
+# other
+$glob_test1 = $test
+gt 'new'
+---
+# new
+$glob_test2 = $test
+act 'test value':
+  $glob_test3 = $test
+end
+@run
+@select-act 0
+@exec-act
+@expect $last_loc_test1 => 'value 2'
+@expect event save_game test.sav
+@expect event save_cancelled
+@expect $last_loc_test2 => ''
+@expect $glob_test1 => 'value'
+@expect $glob_test2 => 'value'
+@expect $glob_test3 => 'value'
+
+@test local variables in nested calls are preserved (shadowing global)
+@src
+
+$a = "aa"
+gs 'other'
+---
+# other
+local $a = "la"
+$la = $a
+gs 'nested'
+---
+# nested
+$na = $a
+@run
+@expect $a => 'aa'
+@expect $la => 'la'
+@expect $na => 'la'
+
+@test local reset on subsequent calls
+@src
+
+gs 'other', 'first', "ff"
+gs 'other', 'second', "ss"
+---
+# other
+local $a
+$a[] = $args[1]
+size[$args[0]] = arrsize('a')
+$res[$args[0]] = $a[0]
+@run
+@expect $res['first'] => 'ff'
+@expect $res['second'] => 'ss'
+@expect size['first'] => 1
+@expect size['second'] => 1
+
+// runTestFileWithGoto() of qsp-wasm-engine is "@exec gt 'test'"
+@test local variables are not visible in actions (unlike args)
+@src
+
+local $a = "aa"
+$args[0] = "bb"
+act '1': $a & $args[0]
+@exec gt 'test'
+@select-act 0
+@exec-act
+@expect event main_changed \r\nbb\r\n
+
+@test local variables inside actions
+@src
+
+$i="ii"
+act "local i":
+    local $i = "lii"
+    *pl $i
+end
+act "global i":
+    *pl $i
+end
+@run
+@select-act 0
+@exec-act
+@expect event main_changed lii\r\n
+@select-act 1
+@exec-act
+@expect event main_changed lii\r\nii\r\n
+
+@test local variables available with flow stop in callbacks
+@watch-msg $i
+@src
+local $i="ii" & msg ''
+@run
+@expect event read $i => 'ii'
+@expect $i => ''

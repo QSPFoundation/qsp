@@ -1,0 +1,62 @@
+// Ported from qsp-wasm-engine tests/engine/time.test.ts
+
+@test WAIT should trigger wait event
+@src
+WAIT 1000
+@run
+@expect event wait 1000
+
+// WAIT refreshes the UI with isRedraw on, so every window is reported
+@test WAIT should pause execution
+@src
+pl 'before wait' & WAIT 1000 & p 'after wait'
+@run
+@expect event stats_changed before wait\r\n
+@expect event wait 1000
+@expect event stats_changed before wait\r\nafter wait
+
+// The host reports the time passed since the previous call
+@test MSECSCOUNT should return msec passed from game start
+@src
+res = MSECSCOUNT
+@run
+@expect res => 0
+@reply mscount 2000
+@exec res = MSECSCOUNT
+@expect res => 2000
+
+@test SETTIMER should change counter frequency
+@src
+SETTIMER 100
+@run
+@expect event timer 100
+
+@test counter location should be called
+@src
+
+$counter = 'counter'
+---
+#counter
+p 'works'
+
+@run
+@counter
+@expect event stats_changed works
+@counter
+@expect event stats_changed worksworks
+
+@test several counters should be supported
+@src
+
+$counter = 'counter'
+$counter[] = 'counter_other'
+---
+#counter
+p 'works'
+--
+#counter_other
+p ' & works other'
+
+@run
+@counter
+@expect event stats_changed works & works other

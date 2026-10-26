@@ -1,0 +1,68 @@
+// Ported from qsp-wasm-engine tests/engine/stats.test.ts
+
+@test p should print text without line break
+@src
+p 'works'
+@run
+@expect events
+stats_changed works
+
+@test pl should print text with line break
+@src
+pl 'works'
+@run
+@expect events
+stats_changed works\r\n
+
+@test nl should print text with line break in front
+@src
+nl 'works'
+@run
+@expect events
+stats_changed \r\nworks
+
+@test CLEAR should clear stats description
+@src
+p 'works'
+@run
+@exec CLEAR
+@expect events
+stats_changed works
+stats_changed
+
+@test CLR should clear stats description
+@src
+p 'works'
+@run
+@exec CLR
+@expect events
+stats_changed works
+stats_changed
+
+@test CLS should clear stats description
+@src
+p 'works'
+@run
+@exec CLS
+@expect count 2 stats_changed
+@expect event stats_changed
+
+@test $STATTXT should return text from stats panel
+@src
+p 'works' & $text = $STATTXT
+@run
+@expect $text => 'works'
+
+@test $STATTXT() should return text from stats panel
+@src
+p 'works' & $text = $STATTXT()
+@run
+@expect $text => 'works'
+
+@test SHOWSTAT should change panel visibility
+@src
+SHOWSTAT 0
+@run
+@expect event panel_visibility 2 0
+@exec SHOWSTAT 1
+@expect event panel_visibility 2 1

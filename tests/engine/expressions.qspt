@@ -1,0 +1,949 @@
+// Ported from qsp-wasm-engine tests/engine/expressions.test.ts
+
+@test *: 2 * 4 = 8
+@src
+res = 2 * 4
+@run
+@expect res => 8
+
+@test *: -2 * 4 = -8
+@src
+res = -2 * 4
+@run
+@expect res => -8
+
+@test *: -2 * -4 = 8
+@src
+res = -2 * -4
+@run
+@expect res => 8
+
+@test *: 0 * 2 = 0
+@src
+res = 0 * 2
+@run
+@expect res => 0
+
+@test *: -2 * 0 = 0
+@src
+res = -2 * 0
+@run
+@expect res => 0
+
+@test *: 0 * 0 = 0
+@src
+res = 0 * 0
+@run
+@expect res => 0
+
+@test *: 1 * 3 = 3
+@src
+res = 1 * 3
+@run
+@expect res => 3
+
+@test *=: res *= 2 -> 4
+@src
+res = 2 & res *= 2
+@run
+@expect res => 4
+
+@test *=: res *= -2 -> -4
+@src
+res = 2 & res *= -2
+@run
+@expect res => -4
+
+@test *=: res *= 0 -> 0
+@src
+res = 2 & res *= 0
+@run
+@expect res => 0
+
+@test *=: res *= 1 -> 2
+@src
+res = 2 & res *= 1
+@run
+@expect res => 2
+
+@test +: 2 + 2 = 4
+@src
+res = 2 + 2
+@run
+@expect res => 4
+
+@test +: -2 + 2 = 0
+@src
+res = -2 + 2
+@run
+@expect res => 0
+
+@test +: -2 + -2 = -4
+@src
+res = -2 + -2
+@run
+@expect res => -4
+
+@test +: 0 + 2 = 2
+@src
+res = 0 + 2
+@run
+@expect res => 2
+
+@test +: -2 + 0 = -2
+@src
+res = -2 + 0
+@run
+@expect res => -2
+
+@test +: 0 + 0 = 0
+@src
+res = 0 + 0
+@run
+@expect res => 0
+
+@test +: 1 + 3 = 4
+@src
+res = 1 + 3
+@run
+@expect res => 4
+
+@test + acts as concatenations for strings
+@src
+$res = 'a' + 'b'
+@run
+@expect $res => 'ab'
+
+@test + acts as concatenations for strings with numbers
+@src
+$res = '1' + '2'
+@run
+@expect $res => '12'
+
+@test +: if string is convertable to number - number is returned
+@src
+
+          res = 1 + '2'
+          res2 = '1' + 2
+
+@run
+@expect res => 3
+@expect $res => ''
+@expect res2 => 3
+@expect $res2 => ''
+
+@test +: if string is not convertable to number - string is returned
+@src
+$res = 1 + '2a'
+@run
+@expect #res => 0
+@expect $res => '12a'
+
+@test +=: res += 2 -> 4
+@src
+res = 2 & res += 2
+@run
+@expect res => 4
+
+@test +=: res += -2 -> 0
+@src
+res = 2 & res += -2
+@run
+@expect res => 0
+
+@test +=: res += 0 -> 2
+@src
+res = 2 & res += 0
+@run
+@expect res => 2
+
+@test +=: res += 1 -> 3
+@src
+res = 2 & res += 1
+@run
+@expect res => 3
+
+@test +=: it acts as concatenation for strings
+@src
+$res = 'a'
+        $res += 'b'
+@run
+@expect $res => 'ab'
+
+@test -: 2 - 2 = 0
+@src
+res = 2 - 2
+@run
+@expect res => 0
+
+@test -: -2 - 2 = -4
+@src
+res = -2 - 2
+@run
+@expect res => -4
+
+@test -: -2 - -2 = 0
+@src
+res = -2 - -2
+@run
+@expect res => 0
+
+@test -: 0 - 2 = -2
+@src
+res = 0 - 2
+@run
+@expect res => -2
+
+@test -: -2 - 0 = -2
+@src
+res = -2 - 0
+@run
+@expect res => -2
+
+@test -: 0 - 0 = 0
+@src
+res = 0 - 0
+@run
+@expect res => 0
+
+@test -: 1 - 3 = -2
+@src
+res = 1 - 3
+@run
+@expect res => -2
+
+@test -: if string can be converted to number - it gets subtracted
+@src
+
+        res = '2' - '1'
+        res2 = 2 - '1'
+        res3 = '2' - 1
+
+@run
+@expect res => 1
+@expect res2 => 1
+@expect res3 => 1
+
+@test -: if string cannot be converted to number - error is shown
+@src
+res = '2a' - '1'
+@run
+@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) RES = '2a' - '1'
+
+@test -=: res -= 2 -> 0
+@src
+res = 2 & res -= 2
+@run
+@expect res => 0
+
+@test -=: res -= -2 -> 4
+@src
+res = 2 & res -= -2
+@run
+@expect res => 4
+
+@test -=: res -= 0 -> 2
+@src
+res = 2 & res -= 0
+@run
+@expect res => 2
+
+@test -=: res -= 1 -> 1
+@src
+res = 2 & res -= 1
+@run
+@expect res => 1
+
+@test unary minus: -2 = -2
+@src
+res = -2
+@run
+@expect res => -2
+
+@test unary minus: --2 = 2
+@src
+res = --2
+@run
+@expect res => 2
+
+@test unary minus: -0 = 0
+@src
+res = -0
+@run
+@expect res => 0
+
+@test unary minus: it should negate group result
+@src
+res = -(3 + 6) & res2 = -(-3)
+@run
+@expect res => -9
+@expect res2 => 3
+
+@test unary minus: it coverts and negates string
+@src
+res = -'2'
+@run
+@expect res => -2
+
+@test unary minus: error should be shown if string cannot be converted to number
+@src
+res = -'2a'
+@run
+@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) RES = -'2a'
+
+@test /: 2 / 2 = 1
+@src
+res = 2 / 2
+@run
+@expect res => 1
+
+@test /: 4 / 2 = 2
+@src
+res = 4 / 2
+@run
+@expect res => 2
+
+@test /: -4 / 2 = -2
+@src
+res = -4 / 2
+@run
+@expect res => -2
+
+@test /: -4 / -2 = 2
+@src
+res = -4 / -2
+@run
+@expect res => 2
+
+@test /: 17 / 3 = 5
+@src
+res = 17 / 3
+@run
+@expect res => 5
+
+@test /: 37 / 100 = 0
+@src
+res = 37 / 100
+@run
+@expect res => 0
+
+@test /: strings are converted to numbers
+@src
+res = '2' / '1'
+@run
+@expect res => 2
+
+@test /: if string cannot be converted to number - error is shown
+@src
+res = '2a' / '1'
+@run
+@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) RES = '2a' / '1'
+
+@test /: error on zero division
+@src
+res = 2 / 0
+@run
+@expect error DIVBYZERO (location 'test', line 1, local 1, action -1) RES = 2 / 0
+
+@test /=: res /= 2 -> 2
+@src
+res = 4 & res /= 2
+@run
+@expect res => 2
+
+@test /=: res /= 4 -> 1
+@src
+res = 4 & res /= 4
+@run
+@expect res => 1
+
+@test /=: res /= 37 -> 0
+@src
+res = 4 & res /= 37
+@run
+@expect res => 0
+
+@test <: 2 < 4 = 1 (numbers)
+@src
+res = 2 < 4
+@run
+@expect res => 1
+
+@test <: 5 < 5 = 0 (numbers)
+@src
+res = 5 < 5
+@run
+@expect res => 0
+
+@test <: 7 < 3 = 0 (numbers)
+@src
+res = 7 < 3
+@run
+@expect res => 0
+
+@test <: a < z = 1 (strings)
+@src
+res = "a" < "z"
+@run
+@expect res => 1
+
+@test <: a < a = 0 (strings)
+@src
+res = "a" < "a"
+@run
+@expect res => 0
+
+@test <: z < a = 0 (strings)
+@src
+res = "z" < "a"
+@run
+@expect res => 0
+
+@test <: z < zz = 1 (strings)
+@src
+res = "z" < "zz"
+@run
+@expect res => 1
+
+@test <: aaaaaa < z = 1 (strings)
+@src
+res = "aaaaaa" < "z"
+@run
+@expect res => 1
+
+@test <: A < Z = 1 (strings)
+@src
+res = "A" < "Z"
+@run
+@expect res => 1
+
+@test <: z < A = 0 (strings)
+@src
+res = "z" < "A"
+@run
+@expect res => 0
+
+@test <: a < A = 0 (strings)
+@src
+res = "a" < "A"
+@run
+@expect res => 0
+
+@test <=: 2 <= 4 = 1 (numbers)
+@src
+res = 2 <= 4
+@run
+@expect res => 1
+
+@test <=: 5 <= 5 = 1 (numbers)
+@src
+res = 5 <= 5
+@run
+@expect res => 1
+
+@test <=: 7 <= 3 = 0 (numbers)
+@src
+res = 7 <= 3
+@run
+@expect res => 0
+
+@test <=: a <= z = 1 (strings)
+@src
+res = "a" <= "z"
+@run
+@expect res => 1
+
+@test <=: a <= a = 1 (strings)
+@src
+res = "a" <= "a"
+@run
+@expect res => 1
+
+@test <=: z <= a = 0 (strings)
+@src
+res = "z" <= "a"
+@run
+@expect res => 0
+
+@test <=: A <= Z = 1 (strings)
+@src
+res = "A" <= "Z"
+@run
+@expect res => 1
+
+@test <=: z <= A = 0 (strings)
+@src
+res = "z" <= "A"
+@run
+@expect res => 0
+
+@test <=: a <= A = 0 (strings)
+@src
+res = "a" <= "A"
+@run
+@expect res => 0
+
+@test <=: A <= A = 1 (strings)
+@src
+res = "A" <= "A"
+@run
+@expect res => 1
+
+@test <>: 2 <> 4 = 1 (numbers)
+@src
+res = 2 <> 4
+@run
+@expect res => 1
+
+@test <>: 5 <> 5 = 0 (numbers)
+@src
+res = 5 <> 5
+@run
+@expect res => 0
+
+@test <>: 7 <> 3 = 1 (numbers)
+@src
+res = 7 <> 3
+@run
+@expect res => 1
+
+@test <>: a <> z = 1 (strings)
+@src
+res = "a" <> "z"
+@run
+@expect res => 1
+
+@test <>: a <> a = 0 (strings)
+@src
+res = "a" <> "a"
+@run
+@expect res => 0
+
+@test <>: z <> a = 1 (strings)
+@src
+res = "z" <> "a"
+@run
+@expect res => 1
+
+@test <>: a <> A = 1 (strings)
+@src
+res = "a" <> "A"
+@run
+@expect res => 1
+
+@test =: 2 = 2 = 1 (numbers)
+@src
+res = (2 = 2)
+@run
+@expect res => 1
+
+@test =: 4 = 2 = 0 (numbers)
+@src
+res = (4 = 2)
+@run
+@expect res => 0
+
+@test =: -17 = -17 = 1 (numbers)
+@src
+res = (-17 = -17)
+@run
+@expect res => 1
+
+@test =: a = a = 1 (strings)
+@src
+res = ("a" = "a")
+@run
+@expect res => 1
+
+@test =: a = b = 0 (strings)
+@src
+res = ("a" = "b")
+@run
+@expect res => 0
+
+@test =: b = a = 0 (strings)
+@src
+res = ("b" = "a")
+@run
+@expect res => 0
+
+@test =: a = A = 0 (strings)
+@src
+res = ("a" = "A")
+@run
+@expect res => 0
+
+@test =<: 2 =< 2 = 1 (numbers)
+@src
+res = (2 =< 2)
+@run
+@expect res => 1
+
+@test =<: 4 =< 2 = 0 (numbers)
+@src
+res = (4 =< 2)
+@run
+@expect res => 0
+
+@test =<: -17 =< -17 = 1 (numbers)
+@src
+res = (-17 =< -17)
+@run
+@expect res => 1
+
+@test =<: a =< a = 1 (strings)
+@src
+res = ("a" =< "a")
+@run
+@expect res => 1
+
+@test =<: a =< b = 1 (strings)
+@src
+res = ("a" =< "b")
+@run
+@expect res => 1
+
+@test =<: b =< a = 0 (strings)
+@src
+res = ("b" =< "a")
+@run
+@expect res => 0
+
+@test =<: a =< A = 0 (strings)
+@src
+res = ("a" =< "A")
+@run
+@expect res => 0
+
+@test =>: 2 => 2 = 1 (numbers)
+@src
+res = (2 => 2)
+@run
+@expect res => 1
+
+@test =>: 4 => 2 = 1 (numbers)
+@src
+res = (4 => 2)
+@run
+@expect res => 1
+
+@test =>: -17 => -17 = 1 (numbers)
+@src
+res = (-17 => -17)
+@run
+@expect res => 1
+
+@test =>: a => a = 1 (strings)
+@src
+res = ("a" => "a")
+@run
+@expect res => 1
+
+@test =>: a => b = 0 (strings)
+@src
+res = ("a" => "b")
+@run
+@expect res => 0
+
+@test =>: b => a = 1 (strings)
+@src
+res = ("b" => "a")
+@run
+@expect res => 1
+
+@test =>: a => A = 1 (strings)
+@src
+res = ("a" => "A")
+@run
+@expect res => 1
+
+@test >: 2 > 2 = 0 (numbers)
+@src
+res = (2 > 2)
+@run
+@expect res => 0
+
+@test >: 4 > 2 = 1 (numbers)
+@src
+res = (4 > 2)
+@run
+@expect res => 1
+
+@test >: -17 > -17 = 0 (numbers)
+@src
+res = (-17 > -17)
+@run
+@expect res => 0
+
+@test >: a > a = 0 (strings)
+@src
+res = ("a" > "a")
+@run
+@expect res => 0
+
+@test >: a > b = 0 (strings)
+@src
+res = ("a" > "b")
+@run
+@expect res => 0
+
+@test >: b > a = 1 (strings)
+@src
+res = ("b" > "a")
+@run
+@expect res => 1
+
+@test >: a > A = 1 (strings)
+@src
+res = ("a" > "A")
+@run
+@expect res => 1
+
+@test >=: 2 >= 2 = 1 (numbers)
+@src
+res = (2 >= 2)
+@run
+@expect res => 1
+
+@test >=: 4 >= 2 = 1 (numbers)
+@src
+res = (4 >= 2)
+@run
+@expect res => 1
+
+@test >=: -17 >= -17 = 1 (numbers)
+@src
+res = (-17 >= -17)
+@run
+@expect res => 1
+
+@test >=: a >= a = 1 (strings)
+@src
+res = ("a" >= "a")
+@run
+@expect res => 1
+
+@test >=: a >= b = 0 (strings)
+@src
+res = ("a" >= "b")
+@run
+@expect res => 0
+
+@test >=: b >= a = 1 (strings)
+@src
+res = ("b" >= "a")
+@run
+@expect res => 1
+
+@test >=: a >= A = 1 (strings)
+@src
+res = ("a" >= "A")
+@run
+@expect res => 1
+
+@test !: 2 ! 2 = 0 (numbers)
+@src
+res = (2 ! 2)
+@run
+@expect res => 0
+
+@test !: 4 ! 2 = 1 (numbers)
+@src
+res = (4 ! 2)
+@run
+@expect res => 1
+
+@test !: -17 ! -17 = 0 (numbers)
+@src
+res = (-17 ! -17)
+@run
+@expect res => 0
+
+@test !: a ! a = 0 (strings)
+@src
+res = ("a" ! "a")
+@run
+@expect res => 0
+
+@test !: a ! b = 1 (strings)
+@src
+res = ("a" ! "b")
+@run
+@expect res => 1
+
+@test !: b ! a = 1 (strings)
+@src
+res = ("b" ! "a")
+@run
+@expect res => 1
+
+@test !: a ! A = 1 (strings)
+@src
+res = ("a" ! "A")
+@run
+@expect res => 1
+
+@test &: string contenations
+@src
+$res = ('a' & 'b')
+@run
+@expect $res => 'ab'
+
+// wasm: readVariable('res') is 12; since d938a28 a variable without a prefix keeps the type of the
+// value, so "res" holds the string '12' (the numeric view of it is 0)
+@test &: number are convered to string and concatenated
+@src
+res = (1 & 2)
+@run
+@expect res => '12'
+@expect #res => 0
+
+@test NO (3 = 2) = 1
+@src
+res = NO (3 = 2)
+@run
+@expect res => 1
+
+@test NO (2 = 2) = 0
+@src
+res = NO (2 = 2)
+@run
+@expect res => 0
+
+@test AND: (2 = 2) AND (3 <> 2) = 1
+@src
+res = (2 = 2) AND (3 <> 2)
+@run
+@expect res => 1
+
+@test AND: (3 <> 2) AND (2 = 2) = 1
+@src
+res = (3 <> 2) AND (2 = 2)
+@run
+@expect res => 1
+
+@test AND: (2 <> 2) AND (3 <> 2) = 0
+@src
+res = (2 <> 2) AND (3 <> 2)
+@run
+@expect res => 0
+
+@test AND: (2 <> 2) AND (3 = 2) = 0
+@src
+res = (2 <> 2) AND (3 = 2)
+@run
+@expect res => 0
+
+@test OR: (2 = 2) OR (3 <> 2) = 1
+@src
+res = (2 = 2) OR (3 <> 2)
+@run
+@expect res => 1
+
+@test OR: (3 <> 2) OR (2 = 2) = 1
+@src
+res = (3 <> 2) OR (2 = 2)
+@run
+@expect res => 1
+
+@test OR: (2 <> 2) OR (3 <> 2) = 1
+@src
+res = (2 <> 2) OR (3 <> 2)
+@run
+@expect res => 1
+
+@test OR: (2 <> 2) OR (3 = 2) = 0
+@src
+res = (2 <> 2) OR (3 = 2)
+@run
+@expect res => 0
+
+@test LOC should return 1 if location exists
+@src
+res = LOC('test')
+@run
+@expect res => 1
+
+@test LOC should return 0 if location does exists
+@src
+res = LOC('unknown')
+@run
+@expect res => 0
+
+@test OBJ should return 1 if object exists
+@src
+addobj 'test' & res = OBJ('test')
+@run
+@expect res => 1
+
+@test OBJ should return 0 if object does exists
+@src
+res = OBJ('unknown')
+@run
+@expect res => 0
+
+@test MOD: 4 MOD 2 = 0
+@src
+res = (4 MOD 2)
+@run
+@expect res => 0
+
+@test MOD: 5 MOD 2 = 1
+@src
+res = (5 MOD 2)
+@run
+@expect res => 1
+
+@test MOD: -7 MOD 5 = -2
+@src
+res = (-7 MOD 5)
+@run
+@expect res => -2
+
+@test MOD: 7 MOD -5 = 2
+@src
+res = (7 MOD -5)
+@run
+@expect res => 2
+
+@test MOD: -7 MOD -5 = -2
+@src
+res = (-7 MOD -5)
+@run
+@expect res => -2
+
+@test priorities: same level priority
+@src
+res = 15*5/2
+        res2 = 15/2*5
+@run
+@expect res => 37
+@expect res2 => 35
+
+@test priorities: multi level priorities
+@src
+x = 5 & y = 6 & res = x*y + y*-x/2
+@run
+@expect res => 15
+
+@test priorities: OBJ priority
+@src
+res = OBJ '1' = OBJ '2'
+@run
+@expect res => 1
+@exec addobj '1' & res = OBJ '1' = OBJ '2'
+@expect res => 0
+@exec addobj '2' & res = OBJ '1' = OBJ '2'
+@expect res => 1
+
+@test priorities: LOC priority
+@src
+
+  first = LOC 'other' = LOC 'another'
+  second = LOC 'start' = LOC 'another'
+  third = LOC 'start' = LOC 'test'
+
+@run
+@expect first => 1
+@expect second => 0
+@expect third => 1

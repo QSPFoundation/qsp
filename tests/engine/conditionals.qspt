@@ -1,0 +1,728 @@
+// Ported from qsp-wasm-engine tests/engine/conditionals.test.ts
+
+@test IIF true
+@src
+x = 1 & abs_x = IIF(x > 0, x, -x)
+@run
+@expect abs_x => 1
+
+@test IIF false
+@src
+x = -1 & abs_x = IIF(x > 0, x, -x)
+@run
+@expect abs_x => 1
+
+@test single line if true
+@src
+
+x = 1 & y = 2
+if x = 1: y = 1
+
+@run
+@expect y => 1
+
+@test single line if false
+@src
+
+x = 2 & y = 2
+if x = 1: y = 1
+
+@run
+@expect y => 2
+
+@test single line if true with else
+@src
+
+x = 2
+if x = 2: x = 3 else x = 4
+
+@run
+@expect x => 3
+
+@test single line if false with else
+@src
+
+x = 2 & y = 2
+if x = 1: x = 3 else y = 3
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test single line if true with elseif
+@src
+
+x = 2
+if x = 2: x = 3 elseif x = 2: x = 4
+
+@run
+@expect x => 3
+
+@test single line if false with elseif true
+@src
+
+x = 2 & y = 2
+if x = 1: x = 3 elseif x = 2: y = 4
+
+@run
+@expect y => 4
+@expect x => 2
+
+@test single line if false with elseif false
+@src
+
+x = 2 & y = 2
+if x = 1: x = 4 elseif x = 3: y = 4
+
+@run
+@expect y => 2
+@expect x => 2
+
+@test single line if false with elseif true with else
+@src
+
+x = 2 & y = 2
+if x = 1: x = 3 elseif x = 2: y = 4 else x = 4
+
+@run
+@expect y => 4
+@expect x => 2
+
+@test single line if false with elseif false with else
+@src
+
+x = 2 & y = 2
+if x = 1: x = 3 elseif x = 3: x = 4 else y = 3
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test single line if false with else if true
+@src
+
+x = 2 & y = 2
+if x = 1: x = 3 else if x = 2: y = 4
+
+@run
+@expect y => 4
+@expect x => 2
+
+@test single line if false with else if false
+@src
+
+x = 2 & y = 2
+if x = 1: x = 3 else if x = 3: y = 4
+
+@run
+@expect y => 2
+@expect x => 2
+
+@test single line if false with else if true with else
+@src
+
+x = 2 & y = 2
+if x = 1: x = 3 else if x = 2: y = 4 else x = 4
+
+@run
+@expect y => 4
+@expect x => 2
+
+@test single line if false with else if false with else
+@src
+
+x = 2 & y = 2
+if x = 1: x = 3 else if x = 3: x = 4 else y = 3
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if true
+@src
+
+x = 1 & y = 2
+if x = 1:
+  y = 1
+end
+
+@run
+@expect y => 1
+
+@test multi line if false
+@src
+
+x = 2 & y = 2
+if x = 1:
+  y = 1
+end
+
+@run
+@expect y => 2
+
+@test multi line if false with multi line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+else
+  y = 3
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if true with multi line else
+@src
+
+x = 2 & y = 2
+if x = 2:
+  y = 1
+else
+  x = 3
+end
+
+@run
+@expect y => 1
+@expect x => 2
+
+@test multi line if true with multi line elseif
+@src
+
+x = 2
+if x = 2:
+  x = 3
+elseif x = 2:
+  x = 4
+else
+  x = 5
+end
+
+@run
+@expect x => 3
+
+@test multi line if true with single line else
+@src
+
+x = 2
+if x = 2:
+  x = 3
+else if x = 2: x = 4
+  x = 5
+end
+
+@run
+@expect x => 3
+
+@test multi line if true with single line elseif
+@src
+
+x = 2
+if x = 2:
+  x = 3
+elseif x = 2: x = 4
+  x = 5
+end
+
+@run
+@expect x => 3
+
+@test multi line if true with code after end
+@src
+
+x = 1 & y = 2
+if x = 1:
+  x = 2
+end & y = 3
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with code after end
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+end & y = 3
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with multi line else with code after end
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+else
+  x = 4
+end & y = 3
+
+@run
+@expect y => 3
+@expect x => 4
+
+@test multi line if true with multi line else with code after end
+@src
+
+x = 2 & y = 2
+if x = 2:
+  x = 1
+else
+  x = 3
+end & y = 3
+
+@run
+@expect y => 3
+@expect x => 1
+
+@test multi line if false with multi line else with colon
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+else:
+  y = 3
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with single line else with colon
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 1
+else: y = 3
+  x = 4
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with single line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+else y = 4
+  x = 5
+end
+
+@run
+@expect y => 4
+@expect x => 2
+
+@test multi line if false with 2 single line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+else y = 3
+  x = 4
+else y = 5
+  x = 6
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with 2 multi line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+else
+  y = 4
+else
+  x = 5
+end
+
+@run
+@expect y => 4
+@expect x => 2
+
+@test multi line if false with multi line elseif true with else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 2:
+  y = 4
+else
+  x = 5
+end
+
+@run
+@expect y => 4
+@expect x => 2
+
+@test multi line if false with multi line elseif false with multi line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 3:
+  x = 4
+else
+  y = 3
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with multi line elseif false with single line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 3:
+  x = 4
+else y = 3
+  x = 5
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with single line elseif true
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 2: y = 3
+  x = 4
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with single line elseif false
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 3: y = 3
+  x = 4
+end
+
+@run
+@expect y => 2
+@expect x => 2
+
+@test multi line if false with 2 single line elseif true
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 3: x = 4
+elseif x = 2: y = 5
+  x = 5
+end
+
+@run
+@expect y => 5
+@expect x => 2
+
+@test multi line if false with 2 single line elseif false with multi line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 3: x = 4
+elseif x = 4: x = 5
+else
+  y = 3
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with 2 single line elseif false with single line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 3: x = 4
+elseif x = 4: x = 5
+else y = 3
+  x = 6
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with 2 multi line elseif true
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 3:
+  x = 4
+elseif x = 2:
+  y = 3
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with 2 multi line elseif false
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 3:
+  x = 4
+elseif x = 4:
+  y = 3
+end
+
+@run
+@expect y => 2
+@expect x => 2
+
+@test multi line if false with mixed elseif true with else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+elseif x = 3: x = 4
+elseif x = 2:
+  y = 3
+else
+  x = 5
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with multi line else if true with else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+else if x = 2:
+  y = 3 & ! 'else if' gets converted to 'elseif'
+else
+  x = 4
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with multi line else if false with multi line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+else if x = 3:
+  x = 4
+else
+  y = 3 & ! 'else if' gets converted to 'elseif'
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if false with multi line else if false with single line else
+@src
+
+x = 2 & y = 2
+if x = 1:
+  x = 3
+else if x = 3:
+  x = 4
+else y = 3 & ! 'else if' gets converted to 'elseif'
+  x = 5
+end
+
+@run
+@expect y => 3
+@expect x => 2
+
+@test multi line if nested
+@src
+
+x = 1 & y = 1 & z = 1 & out = 1
+if x = 1:
+    x = 2
+    if y = 2:
+      x = 3
+    elseif y = 1:
+      x = 4
+      if z = 2: x = 6 else out = 7
+    else
+      x = 5
+    end
+end
+
+@run
+@expect out => 7
+@expect x => 4
+
+@test multi line if supports comments
+@src
+
+x = 1
+if x = 0: ! test comment
+  x = 2
+end
+
+@run
+@expect x => 1
+
+@test multi line elseif supports comments
+@src
+
+x = 1
+if x = 0:
+elseif x = 1: ! test comment
+  x = 2
+end
+
+@run
+@expect x => 2
+
+@test multi line else if supports comments
+@src
+
+x = 1
+if x = 0:
+else if x = 1: ! test comment
+  x = 2
+end
+
+@run
+@expect x => 2
+
+@test multi line else supports comments
+@src
+
+x = 1
+if x = 0:
+else ! test comment
+  x = 2
+end
+
+@run
+@expect x => 2
+
+@test multi line else with colon supports comments
+@src
+
+x = 1
+if x = 0:
+else: ! test comment
+  x = 2
+end
+
+@run
+@expect x => 2
+
+@test wrong multi line if
+@src
+
+if abcd = 3: k1 = 34
+    k2 = 35 & ! this will be executed because if is single line
+end
+
+@run
+@expect #k1 => 0
+@expect k1 => ?
+@expect k2 => 35
+
+@test multi line if without end shows error
+@src
+
+if abcd = 3:
+  k1 = 34
+else
+  k1 = 25
+
+@run
+@expect error ENDNOTFOUND (location 'test', line 2, local 2, action -1) IF ABCD = 3:
+
+@test nested multi line if without end shows error
+@src
+
+abc = 4
+if abc <> 3:
+  k1 = 34
+  if abc = 4:
+    k1 = 25
+end
+
+@run
+@expect error ENDNOTFOUND (location 'test', line 3, local 3, action -1) IF ABC <> 3:
+
+@test end in single line if shows error
+@src
+
+        if abcd=3: k1=34 else k1=25 end
+
+@run
+@expect error UNKNOWNACTION (location 'test', line 2, local 2, action -1) IF ABCD=3: K1=34 ELSE K1=25 END
+
+@test multiline if requires colon
+@src
+
+        if 0
+        end
+
+@run
+@expect error COLONNOTFOUND (location 'test', line 2, local 2, action -1) IF 0
+
+@test multiline elseif requires colon
+@src
+
+        if 0:
+        elseif 3
+        end
+
+@run
+@expect error COLONNOTFOUND (location 'test', line 3, local 3, action -1) ELSEIF 3
+
+@test multiline else if requires colon
+@src
+
+        if 0:
+        else if 3
+        end
+
+@run
+@expect error COLONNOTFOUND (location 'test', line 3, local 3, action -1) ELSE IF 3
