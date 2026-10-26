@@ -610,7 +610,7 @@ INLINE void qspMoveVarKey(QSPVar *var, int keyIndex, int newKeyIndex)
 INLINE void qspMoveArrayItem(QSPVar *var, int valIndex, int newIndex)
 {
     QSPVariant movedValue;
-    int startIndex, endIndex;
+    int keyIndex, newKeyIndex;
     if (valIndex < 0 || newIndex < 0) return;
     if (valIndex >= var->ValsCount)
     {
@@ -626,54 +626,35 @@ INLINE void qspMoveArrayItem(QSPVar *var, int valIndex, int newIndex)
         QSPVariant undefinedValue = qspGetEmptyVariant(QSP_TYPE_UNDEF);
         qspSetVarValueByReference(var, newIndex, &undefinedValue);
     }
+    keyIndex = qspGetVarKeyIndex(var, valIndex);
     movedValue = var->Values[valIndex];
     if (newIndex < valIndex)
     {
         /* Items from new position to the old position move up */
+        int i, startKeyIndex, endKeyIndex;
         memmove(var->Values + newIndex + 1, var->Values + newIndex, (valIndex - newIndex) * sizeof(QSPVariant));
-        startIndex = newIndex;
-        endIndex = valIndex;
+        startKeyIndex = qspGetVarKeyLowerBound(var, newIndex);
+        endKeyIndex = qspGetVarKeyLowerBound(var, valIndex);
+        newKeyIndex = startKeyIndex;
+        for (i = startKeyIndex; i < endKeyIndex; ++i)
+            var->Keys[i].Index++;
     }
     else
     {
         /* Items after the old position up to new position move down */
+        int i, startKeyIndex, endKeyIndex;
         memmove(var->Values + valIndex, var->Values + valIndex + 1, (newIndex - valIndex) * sizeof(QSPVariant));
-        startIndex = valIndex + 1;
-        endIndex = newIndex + 1;
+        startKeyIndex = qspGetVarKeyLowerBound(var, valIndex + 1);
+        endKeyIndex = qspGetVarKeyLowerBound(var, newIndex + 1);
+        newKeyIndex = endKeyIndex - 1;
+        for (i = startKeyIndex; i < endKeyIndex; ++i)
+            var->Keys[i].Index--;
     }
     var->Values[newIndex] = movedValue;
-    if (var->KeysCount > 0)
+    if (keyIndex >= 0) /* -1 for keyless item */
     {
-        QSPVarKey *key;
-        int keyIndex, startKeyIndex, endKeyIndex, count;
-        keyIndex = qspGetVarKeyIndex(var, valIndex);
-        startKeyIndex = qspGetVarKeyLowerBound(var, startIndex);
-        endKeyIndex = qspGetVarKeyLowerBound(var, endIndex);
-        /* Update keys of the items in between */
-        key = var->Keys + startKeyIndex;
-        count = endKeyIndex - startKeyIndex;
-        if (newIndex < valIndex)
-        {
-            while (--count >= 0)
-            {
-                key->Index++;
-                ++key;
-            }
-        }
-        else
-        {
-            while (--count >= 0)
-            {
-                key->Index--;
-                ++key;
-            }
-        }
-        if (keyIndex >= 0) /* -1 for keyless item */
-        {
-            int newKeyIndex = (newIndex < valIndex ? startKeyIndex : endKeyIndex - 1);
-            qspMoveVarKey(var, keyIndex, newKeyIndex);
-            var->Keys[newKeyIndex].Index = newIndex;
-        }
+        qspMoveVarKey(var, keyIndex, newKeyIndex);
+        var->Keys[newKeyIndex].Index = newIndex;
     }
 }
 
