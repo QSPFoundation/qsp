@@ -342,9 +342,9 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         qspAppendEncodedIntVal(&bufString, qspCurObjsGroups[i].ObjsCount, isUCS);
     }
     qspAppendEncodedIntVal(&bufString, qspGlobalVars.VarsCount, isUCS);
-    for (i = 0; i < qspGlobalVars.Capacity; ++i)
+    slot = qspGlobalVars.VarSlots;
+    for (i = QSP_SLOTSCOUNT(qspGlobalVars.Capacity); i > 0; --i, ++slot)
     {
-        slot = qspGlobalVars.VarSlots + i;
         if (slot->Name.Str)
         {
             var = &slot->Var;

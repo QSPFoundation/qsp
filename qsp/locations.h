@@ -42,7 +42,6 @@
     extern int qspLocsCount;
     extern int qspLocsCapacity;
     extern QSPLocName *qspLocsNames; /* hash table by names */
-    extern int qspLocsNamesCapacity; /* has to be a power of 2 */
     extern QSPLocation *qspCurLoc;
     extern int qspLocationState; /* allows to check if we have to terminate execution of the code */
     extern int qspFullRefreshCount;

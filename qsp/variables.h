@@ -15,9 +15,9 @@
 
     #define QSP_MAXGLOBALVARS 100000
     #define QSP_MAXLOCALVARS 500
-    #define QSP_VARSGLOBALCAPACITY 1024
-    #define QSP_VARSLOCALCAPACITY 16
-    #define QSP_VARSNAMECHARSPERSLOT 2
+    #define QSP_VARSGLOBALCAPACITY 512
+    #define QSP_VARSLOCALCAPACITY 8
+    #define QSP_VARSNAMECHARSPERVAR 4
     #define QSP_VARSSCOPECHUNKSIZE 128
     #define QSP_VARSKEYSCAPACITY 4 /* has to be a power of 2 */
 
@@ -52,7 +52,7 @@
 
     typedef struct
     {
-        QSPVarSlot *VarSlots;
+        QSPVarSlot *VarSlots; /* hash table by names, QSP_SLOTSCOUNT(Capacity) slots */
         int VarsCount;
         int Capacity; /* has to be a power of 2 */
         QSP_CHAR *Names;
