@@ -87,7 +87,7 @@ void qspInitWorld(void)
     qspLocsCount = 0;
     qspLocsCapacity = QSP_LOCSCAPACITY;
     qspLocs = (QSPLocation **)malloc(qspLocsCapacity * sizeof(QSPLocation *));
-    qspLocsNamesCapacity = qspLocsCapacity * 2; /* the names table stays at most half full */
+    qspLocsNamesCapacity = QSP_SLOTSCOUNT(qspLocsCapacity);
     qspLocsNames = qspNewLocNames(qspLocsNamesCapacity);
 }
 
@@ -148,7 +148,7 @@ QSPLocation *qspAddLocation(QSPString name)
     {
         qspLocsCapacity *= 2;
         qspLocs = (QSPLocation **)realloc(qspLocs, qspLocsCapacity * sizeof(QSPLocation *));
-        qspRebuildLocsNames(qspLocsCapacity * 2, qspLocsCount); /* the names table stays at most half full */
+        qspRebuildLocsNames(QSP_SLOTSCOUNT(qspLocsCapacity), qspLocsCount);
     }
     /* Create a new location */
     loc = (QSPLocation *)malloc(sizeof(QSPLocation));

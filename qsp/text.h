@@ -15,6 +15,7 @@
     #define QSP_RSUBEX QSP_FMT(">>")
     #define QSP_HASHSEED 2166136261u
     #define QSP_CAPACITYMASK(capacity) ((capacity) - 1) /* the capacity has to be a power of 2 */
+    #define QSP_SLOTSCOUNT(capacity) ((capacity) * 2) /* hash tables are half full at most */
 
     /* Frequently used classes of characters */
     enum

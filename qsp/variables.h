@@ -38,7 +38,7 @@
         int ValsCount;
         int ValsCapacity;
         QSPVarKey *Keys; /* ordered by index in Values */
-        int *KeysSlots; /* hash table by keys, KeysCapacity * 2 slots */
+        int *KeysSlots; /* hash table by keys, QSP_SLOTSCOUNT(KeysCapacity) slots */
         int KeysCount;
         int KeysCapacity; /* has to be a power of 2 */
     } QSPVar;
