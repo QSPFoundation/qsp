@@ -479,6 +479,7 @@ QSP {
                             | "settimer"
                             | "dynamic"
                             | "setvar"
+                            | "insvar"
                             | "killvar"
                             | "copyarr"
                             | "sortarr"

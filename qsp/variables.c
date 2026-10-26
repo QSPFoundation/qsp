@@ -37,8 +37,11 @@ INLINE int *qspGetVarKeySlotByIndex(QSPVar *var, int keyIndex);
 INLINE void qspRebuildVarKeysSlots(QSPVar *var);
 INLINE void qspResizeVarKeys(QSPVar *var, int newCapacity);
 INLINE void qspRemoveVarKey(QSPVar *var, int keyIndex);
+INLINE void qspMoveVarKey(QSPVar *var, int keyIndex, int newKeyIndex);
+INLINE void qspMoveArrayItem(QSPVar *var, int valIndex, int newIndex);
 INLINE void qspRemoveArrayItem(QSPVar *var, int valIndex);
 INLINE int qspGetVarKeyLowerBound(QSPVar *var, int valIndex);
+INLINE QSP_BOOL qspIsPosIndex(QSPVariant *index);
 INLINE QSPVar *qspGetVarData(QSPCachedTarget *target, QSPVariant *index, QSP_TINYINT mode);
 INLINE QSP_BOOL qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);
 INLINE void qspResetVarValue(QSPCachedTarget *target);
@@ -134,10 +137,10 @@ INLINE QSPVarSlot *qspNewVarSlots(int capacity)
 
 void qspInitVarsScope(QSPVarsScope *scope, int capacity)
 {
-    int namesCapacity = capacity * QSP_VARSNAMECHARSPERSLOT;
+    int namesCapacity = capacity * QSP_VARSNAMECHARSPERVAR;
     scope->VarsCount = 0;
     scope->Capacity = capacity;
-    scope->VarSlots = qspNewVarSlots(capacity);
+    scope->VarSlots = qspNewVarSlots(QSP_SLOTSCOUNT(capacity));
     scope->NamesLen = 0;
     scope->NamesCapacity = namesCapacity;
     scope->Names = (QSP_CHAR *)malloc(namesCapacity * sizeof(QSP_CHAR));
@@ -197,7 +200,7 @@ void qspClearAllVars(QSP_BOOL toInit)
 INLINE QSPVarSlot *qspGetVarSlot(QSPVarsScope *scope, QSPString name, unsigned int nameHash)
 {
     QSPVarSlot *slot;
-    int mask = QSP_CAPACITYMASK(scope->Capacity), ind = (int)(nameHash & mask);
+    int mask = QSP_SLOTSMASK(scope->Capacity), ind = (int)(nameHash & mask);
     while ((slot = scope->VarSlots + ind)->Name.Str && (slot->NameHash != nameHash || !qspStrsEqual(slot->Name, name)))
         ind = (ind + 1) & mask;
     return slot;
@@ -205,22 +208,22 @@ INLINE QSPVarSlot *qspGetVarSlot(QSPVarsScope *scope, QSPString name, unsigned i
 
 INLINE QSPVarSlot *qspGetEmptyVarSlot(QSPVarsScope *scope, unsigned int nameHash)
 {
-    int mask = QSP_CAPACITYMASK(scope->Capacity), ind = (int)(nameHash & mask);
+    int mask = QSP_SLOTSMASK(scope->Capacity), ind = (int)(nameHash & mask);
     while (scope->VarSlots[ind].Name.Str) ind = (ind + 1) & mask;
     return scope->VarSlots + ind;
 }
 
 INLINE void qspResizeVarsScope(QSPVarsScope *scope, int newCapacity)
 {
-    int oldCapacity = scope->Capacity;
+    int oldSlotsCount = QSP_SLOTSCOUNT(scope->Capacity);
     QSPVarSlot *oldSlots = scope->VarSlots;
     scope->Capacity = newCapacity;
-    scope->VarSlots = qspNewVarSlots(newCapacity);
+    scope->VarSlots = qspNewVarSlots(QSP_SLOTSCOUNT(newCapacity));
     if (oldSlots)
     {
         int i;
         QSPVarSlot *slot, *oldSlot = oldSlots;
-        for (i = 0; i < oldCapacity; ++i, ++oldSlot)
+        for (i = 0; i < oldSlotsCount; ++i, ++oldSlot)
         {
             if (oldSlot->Name.Str)
             {
@@ -243,7 +246,7 @@ INLINE void qspResizeVarsNames(QSPVarsScope *scope, int newCapacity)
         QSPVarSlot *slot = scope->VarSlots;
         /* The old names have to stay valid until the slots are updated */
         memcpy(scope->Names, oldNames, scope->NamesLen * sizeof(QSP_CHAR));
-        for (i = scope->Capacity; i > 0; --i, ++slot)
+        for (i = QSP_SLOTSCOUNT(scope->Capacity); i > 0; --i, ++slot)
         {
             if (slot->Name.Str)
             {
@@ -259,7 +262,7 @@ INLINE QSPVar *qspCreateNewVar(QSPVarsScope *scope, QSPString name, unsigned int
 {
     QSPVarSlot *slot;
     int newNamesLen = scope->NamesLen + qspStrLen(name);
-    if (scope->VarsCount * 2 >= scope->Capacity)
+    if (scope->VarsCount >= scope->Capacity)
         qspResizeVarsScope(scope, scope->Capacity * 2);
     if (newNamesLen > scope->NamesCapacity)
         qspResizeVarsNames(scope, newNamesLen * 2);
@@ -307,7 +310,7 @@ INLINE QSPVar *qspAddVarToLocals(QSPString name)
 
 QSPVar *qspAddVarToScope(QSPVarsScope *scope, QSPString name)
 {
-    /* Special & loaded variables: the name isn't validated or looked up */
+    /* Special variables: the name isn't validated or looked up */
     unsigned int nameHash = qspGetTextHash(name);
     return qspCreateNewVar(scope, name, nameHash);
 }
@@ -433,7 +436,7 @@ QSPVar *qspVarReference(QSPString name, QSP_TINYINT mode)
 INLINE int *qspGetVarKeySlot(QSPVar *var, QSPVariant *key, unsigned int hash)
 {
     QSPVarKey *curKey;
-    int *slot, mask = QSP_CAPACITYMASK(var->KeysCapacity * 2), ind = (int)(hash & mask);
+    int *slot, mask = QSP_SLOTSMASK(var->KeysCapacity), ind = (int)(hash & mask);
     while (*(slot = var->KeysSlots + ind) >= 0)
     {
         curKey = var->Keys + *slot;
@@ -446,7 +449,7 @@ INLINE int *qspGetVarKeySlot(QSPVar *var, QSPVariant *key, unsigned int hash)
 
 INLINE int *qspGetEmptyVarKeySlot(QSPVar *var, unsigned int hash)
 {
-    int mask = QSP_CAPACITYMASK(var->KeysCapacity * 2), ind = (int)(hash & mask);
+    int mask = QSP_SLOTSMASK(var->KeysCapacity), ind = (int)(hash & mask);
     while (var->KeysSlots[ind] >= 0)
         ind = (ind + 1) & mask;
     return var->KeysSlots + ind;
@@ -454,7 +457,7 @@ INLINE int *qspGetEmptyVarKeySlot(QSPVar *var, unsigned int hash)
 
 INLINE int *qspGetVarKeySlotByIndex(QSPVar *var, int keyIndex)
 {
-    int mask = QSP_CAPACITYMASK(var->KeysCapacity * 2), ind = (int)(var->Keys[keyIndex].Hash & mask);
+    int mask = QSP_SLOTSMASK(var->KeysCapacity), ind = (int)(var->Keys[keyIndex].Hash & mask);
     while (var->KeysSlots[ind] != keyIndex)
         ind = (ind + 1) & mask;
     return var->KeysSlots + ind;
@@ -462,7 +465,7 @@ INLINE int *qspGetVarKeySlotByIndex(QSPVar *var, int keyIndex)
 
 INLINE void qspRebuildVarKeysSlots(QSPVar *var)
 {
-    int i, *slot, keysCount = var->KeysCount, slotsCount = var->KeysCapacity * 2;
+    int i, *slot, keysCount = var->KeysCount, slotsCount = QSP_SLOTSCOUNT(var->KeysCapacity);
     for (i = 0; i < slotsCount; ++i)
         var->KeysSlots[i] = -1;
     for (i = 0; i < keysCount; ++i)
@@ -476,8 +479,26 @@ INLINE void qspResizeVarKeys(QSPVar *var, int newCapacity)
 {
     var->KeysCapacity = newCapacity;
     var->Keys = (QSPVarKey *)realloc(var->Keys, newCapacity * sizeof(QSPVarKey));
-    var->KeysSlots = (int *)realloc(var->KeysSlots, newCapacity * 2 * sizeof(int)); /* at most half full */
+    var->KeysSlots = (int *)realloc(var->KeysSlots, QSP_SLOTSCOUNT(newCapacity) * sizeof(int));
     qspRebuildVarKeysSlots(var);
+}
+
+QSPVarKey *qspAddVarKey(QSPVar *var, unsigned int hash, int valIndex)
+{
+    int *slot;
+    QSPVarKey *key;
+    if (var->KeysCount >= var->KeysCapacity)
+    {
+        int newCapacity = (var->KeysCapacity ? var->KeysCapacity * 2 : QSP_VARSKEYSCAPACITY);
+        qspResizeVarKeys(var, newCapacity);
+    }
+    slot = qspGetEmptyVarKeySlot(var, hash);
+    *slot = var->KeysCount; /* store the new key index */
+    key = var->Keys + var->KeysCount;
+    key->Hash = hash;
+    key->Index = valIndex;
+    ++var->KeysCount;
+    return key;
 }
 
 INLINE void qspRemoveVarKey(QSPVar *var, int keyIndex)
@@ -490,7 +511,7 @@ INLINE void qspRemoveVarKey(QSPVar *var, int keyIndex)
     *slot = -1;
     /* Re-insert the following keys up to the next empty slot, lookups stop at empty slots */
     slots = var->KeysSlots;
-    mask = QSP_CAPACITYMASK(var->KeysCapacity * 2);
+    mask = QSP_SLOTSMASK(var->KeysCapacity);
     curInd = ((int)(slot - slots) + 1) & mask;
     while ((curKeyIndex = slots[curInd]) >= 0)
     {
@@ -513,7 +534,7 @@ INLINE void qspRemoveVarKey(QSPVar *var, int keyIndex)
     else
     {
         /* Update all slots */
-        int i, slotsCount = var->KeysCapacity * 2;
+        int i, slotsCount = QSP_SLOTSCOUNT(var->KeysCapacity);
         for (i = 0; i < slotsCount; ++i)
             slots[i] -= (slots[i] > keyIndex);
     }
@@ -521,50 +542,134 @@ INLINE void qspRemoveVarKey(QSPVar *var, int keyIndex)
     var->KeysCount = lastKeyIndex;
 }
 
-INLINE void qspRemoveArrayItem(QSPVar *var, int valIndex)
+INLINE void qspMoveVarKey(QSPVar *var, int keyIndex, int newKeyIndex)
 {
-    int keyIndex;
-    if (valIndex < 0 || valIndex >= var->ValsCount) return;
-    /* Get index before the removal */
-    keyIndex = qspGetVarKeyLowerBound(var, valIndex);
-    /* Remove the value */
-    qspFreeVariant(var->Values + valIndex);
-    var->ValsCount--;
-    memmove(var->Values + valIndex, var->Values + valIndex + 1, (var->ValsCount - valIndex) * sizeof(QSPVariant));
-    /* Update the keys at or after the item */
-    if (keyIndex < var->KeysCount)
+    /* It trusts the passed indices */
+    QSPVarKey movedKey = var->Keys[keyIndex];
+    int *keySlot = qspGetVarKeySlotByIndex(var, keyIndex);
+    if (newKeyIndex < keyIndex)
     {
-        QSPVarKey *key;
-        int count;
-        if (var->Keys[keyIndex].Index == valIndex)
-            qspRemoveVarKey(var, keyIndex);
-        /* The items of the following keys moved down */
-        key = var->Keys + keyIndex;
-        count = var->KeysCount - keyIndex;
-        while (--count >= 0)
+        /* Keys from new position to the old position move up */
+        if (keyIndex - newKeyIndex <= var->KeysCapacity / 16)
         {
-            key->Index--;
-            ++key;
+            int *curSlot, curKeyIndex;
+            for (curKeyIndex = keyIndex - 1; curKeyIndex >= newKeyIndex; --curKeyIndex)
+            {
+                curSlot = qspGetVarKeySlotByIndex(var, curKeyIndex);
+                ++(*curSlot);
+            }
         }
+        else
+        {
+            int i, lastKeyIndex = var->KeysCount - 1, *slots = var->KeysSlots, slotsCount = QSP_SLOTSCOUNT(var->KeysCapacity);
+            if (keyIndex < lastKeyIndex)
+            {
+                for (i = 0; i < slotsCount; ++i)
+                    slots[i] += (slots[i] >= newKeyIndex && slots[i] < keyIndex);
+            }
+            else
+            {
+                for (i = 0; i < slotsCount; ++i)
+                    slots[i] += (slots[i] >= newKeyIndex);
+            }
+        }
+        memmove(var->Keys + newKeyIndex + 1, var->Keys + newKeyIndex, (keyIndex - newKeyIndex) * sizeof(QSPVarKey));
+    }
+    else
+    {
+        /* Keys after the old position up to the new position move down */
+        if (newKeyIndex - keyIndex <= var->KeysCapacity / 16)
+        {
+            int *curSlot, curKeyIndex;
+            for (curKeyIndex = keyIndex + 1; curKeyIndex <= newKeyIndex; ++curKeyIndex)
+            {
+                curSlot = qspGetVarKeySlotByIndex(var, curKeyIndex);
+                --(*curSlot);
+            }
+        }
+        else
+        {
+            int i, lastKeyIndex = var->KeysCount - 1, *slots = var->KeysSlots, slotsCount = QSP_SLOTSCOUNT(var->KeysCapacity);
+            if (newKeyIndex < lastKeyIndex)
+            {
+                for (i = 0; i < slotsCount; ++i)
+                    slots[i] -= (slots[i] > keyIndex && slots[i] <= newKeyIndex);
+            }
+            else
+            {
+                for (i = 0; i < slotsCount; ++i)
+                    slots[i] -= (slots[i] > keyIndex);
+            }
+        }
+        memmove(var->Keys + keyIndex, var->Keys + keyIndex + 1, (newKeyIndex - keyIndex) * sizeof(QSPVarKey));
+    }
+    var->Keys[newKeyIndex] = movedKey;
+    *keySlot = newKeyIndex;
+}
+
+INLINE void qspMoveArrayItem(QSPVar *var, int valIndex, int newIndex)
+{
+    QSPVariant movedValue;
+    int keyIndex, newKeyIndex;
+    if (valIndex < 0 || newIndex < 0) return;
+    if (valIndex >= var->ValsCount)
+    {
+        /* Prepare the value to move */
+        QSPVariant undefinedValue = qspGetEmptyVariant(QSP_TYPE_UNDEF);
+        valIndex = var->ValsCount;
+        qspSetVarValueByReference(var, valIndex, &undefinedValue);
+    }
+    if (newIndex == valIndex) return;
+    if (newIndex >= var->ValsCount)
+    {
+        /* Prepare space for the new value */
+        QSPVariant undefinedValue = qspGetEmptyVariant(QSP_TYPE_UNDEF);
+        qspSetVarValueByReference(var, newIndex, &undefinedValue);
+    }
+    keyIndex = qspGetVarKeyIndex(var, valIndex);
+    movedValue = var->Values[valIndex];
+    if (newIndex < valIndex)
+    {
+        /* Items from new position to the old position move up */
+        int i, startKeyIndex, endKeyIndex;
+        memmove(var->Values + newIndex + 1, var->Values + newIndex, (valIndex - newIndex) * sizeof(QSPVariant));
+        startKeyIndex = qspGetVarKeyLowerBound(var, newIndex);
+        endKeyIndex = qspGetVarKeyLowerBound(var, valIndex);
+        newKeyIndex = startKeyIndex;
+        for (i = startKeyIndex; i < endKeyIndex; ++i)
+            var->Keys[i].Index++;
+    }
+    else
+    {
+        /* Items after the old position up to new position move down */
+        int i, startKeyIndex, endKeyIndex;
+        memmove(var->Values + valIndex, var->Values + valIndex + 1, (newIndex - valIndex) * sizeof(QSPVariant));
+        startKeyIndex = qspGetVarKeyLowerBound(var, valIndex + 1);
+        endKeyIndex = qspGetVarKeyLowerBound(var, newIndex + 1);
+        newKeyIndex = endKeyIndex - 1;
+        for (i = startKeyIndex; i < endKeyIndex; ++i)
+            var->Keys[i].Index--;
+    }
+    var->Values[newIndex] = movedValue;
+    if (keyIndex >= 0) /* -1 for keyless item */
+    {
+        qspMoveVarKey(var, keyIndex, newKeyIndex);
+        var->Keys[newKeyIndex].Index = newIndex;
     }
 }
 
-QSPVarKey *qspAddVarKey(QSPVar *var, unsigned int hash, int valIndex)
+INLINE void qspRemoveArrayItem(QSPVar *var, int valIndex)
 {
-    int *slot;
-    QSPVarKey *key;
-    if (var->KeysCount >= var->KeysCapacity)
-    {
-        int newCapacity = (var->KeysCapacity ? var->KeysCapacity * 2 : QSP_VARSKEYSCAPACITY);
-        qspResizeVarKeys(var, newCapacity);
-    }
-    slot = qspGetEmptyVarKeySlot(var, hash);
-    *slot = var->KeysCount; /* store the new key index */
-    key = var->Keys + var->KeysCount;
-    key->Hash = hash;
-    key->Index = valIndex;
-    ++var->KeysCount;
-    return key;
+    int keyIndex, lastValIndex = var->ValsCount - 1;
+    if (valIndex < 0 || valIndex > lastValIndex) return;
+    /* Move the item to the end */
+    qspMoveArrayItem(var, valIndex, lastValIndex);
+    /* Remove it */
+    keyIndex = qspGetVarKeyIndex(var, lastValIndex);
+    if (keyIndex >= 0) /* -1 for keyless item */
+        qspRemoveVarKey(var, keyIndex);
+    qspFreeVariant(var->Values + lastValIndex);
+    var->ValsCount = lastValIndex;
 }
 
 INLINE int qspGetVarKeyLowerBound(QSPVar *var, int valIndex)
@@ -602,16 +707,24 @@ int qspGetVarKeyIndex(QSPVar *var, int valIndex)
     return -1;
 }
 
+INLINE QSP_BOOL qspIsPosIndex(QSPVariant *index)
+{
+    /* Numbers specify positions */
+    switch (QSP_BASETYPE(index->Type))
+    {
+    case QSP_TYPE_UNDEF:
+    case QSP_TYPE_NUM:
+        return QSP_TRUE;
+    }
+    return QSP_FALSE;
+}
+
 int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
 {
     unsigned int hash;
-    switch (QSP_BASETYPE(index.Type))
-    {
-    case QSP_TYPE_UNDEF:
-        return 0; /* an index without a value means the first item */
-    case QSP_TYPE_NUM:
+    if (qspIsPosIndex(&index))
         return QSP_TOINT(QSP_NUM(index));
-    }
+
     hash = qspGetVariantKeyHash(&index);
     if (var->KeysCount > 0)
     {
@@ -866,14 +979,31 @@ INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count)
     keysCount = qspGetVarKeyLowerBound(src, start + itemsToCopy) - keyIndex;
     if (keysCount > 0)
     {
-        int capacity = QSP_VARSKEYSCAPACITY;
         QSPVarKey *destKey, *srcKey = src->Keys + keyIndex;
-        while (capacity < keysCount) capacity *= 2;
-        qspResizeVarKeys(dest, capacity);
-        for (i = 0; i < keysCount; ++i, ++srcKey)
+        if (keysCount == src->KeysCount)
         {
-            destKey = qspAddVarKey(dest, srcKey->Hash, srcKey->Index - start);
-            qspCopyToNewVariant(&destKey->Key, &srcKey->Key);
+            /* All keys stay the same & the slots can be copied */
+            qspResizeVarKeys(dest, src->KeysCapacity);
+            memcpy(dest->KeysSlots, src->KeysSlots, QSP_SLOTSCOUNT(src->KeysCapacity) * sizeof(int));
+            destKey = dest->Keys;
+            for (i = 0; i < keysCount; ++i, ++srcKey, ++destKey)
+            {
+                destKey->Hash = srcKey->Hash;
+                destKey->Index = srcKey->Index - start;
+                qspCopyToNewVariant(&destKey->Key, &srcKey->Key);
+            }
+            dest->KeysCount = keysCount;
+        }
+        else
+        {
+            int capacity = QSP_VARSKEYSCAPACITY;
+            while (capacity < keysCount) capacity *= 2;
+            qspResizeVarKeys(dest, capacity);
+            for (i = 0; i < keysCount; ++i, ++srcKey)
+            {
+                destKey = qspAddVarKey(dest, srcKey->Hash, srcKey->Index - start);
+                qspCopyToNewVariant(&destKey->Key, &srcKey->Key);
+            }
         }
     }
 }
@@ -1163,6 +1293,63 @@ void qspStatementSetVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNU
         qspSetFirstVarValue(QSP_STR(args[0]), args + 1);
     else
         qspSetVarValueByIndex(QSP_STR(args[0]), args[2], args + 1);
+}
+
+void qspStatementInsVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
+{
+    int valIndex, newIndex;
+    QSP_TINYINT varType;
+    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_VARREF_GETORCREATE);
+    if (!var) return;
+    varType = qspGetVarType(QSP_STR(args[0]));
+    if (!qspConvertVariantTo(args + 1, varType))
+    {
+        qspSetError(QSP_ERR_TYPEMISMATCH);
+        return;
+    }
+    if (count == 2)
+    {
+        /* New last item */
+        qspSetVarValueByReference(var, var->ValsCount, args + 1);
+        return;
+    }
+    if (qspIsPosIndex(args + 2))
+    {
+        /* Insert by position */
+        if (count == 3)
+        {
+            /* New last item, move it to the specified position */
+            valIndex = var->ValsCount;
+            newIndex = QSP_TOINT(QSP_NUM(args[2]));
+        }
+        else
+        {
+            /* The item at the position ends up at the new position */
+            valIndex = QSP_TOINT(QSP_NUM(args[2]));
+            newIndex = QSP_TOINT(QSP_NUM(args[3]));
+        }
+        if (valIndex < 0 || newIndex < 0) return;
+    }
+    else
+    {
+        /* Insert by key */
+        if (count == 3)
+        {
+            /* Same as SETVAR */
+            valIndex = qspGetVarIndex(var, args[2], QSP_TRUE);
+            newIndex = valIndex;
+        }
+        else
+        {
+            /* The item of the key ends up at the new position */
+            newIndex = QSP_TOINT(QSP_NUM(args[3]));
+            if (newIndex < 0) return;
+            valIndex = qspGetVarIndex(var, args[2], QSP_TRUE);
+        }
+    }
+    /* Move item to the new position and update the value */
+    qspMoveArrayItem(var, valIndex, newIndex);
+    qspSetVarValueByReference(var, newIndex, args + 1);
 }
 
 void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))

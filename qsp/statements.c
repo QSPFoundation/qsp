@@ -138,6 +138,7 @@ void qspInitStats(void)
     qspAddStatement(QSP_STAT_EXEC, qspStatementExec, 1, 1, QSP_TYPE_STR);
 
     qspAddStatement(QSP_STAT_SETVAR, qspStatementSetVar, 2, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
+    qspAddStatement(QSP_STAT_INSVAR, qspStatementInsVar, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF, QSP_TYPE_NUM);
     qspAddStatement(QSP_STAT_UNPACKARR, qspStatementUnpackArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_TUPLE, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(QSP_STAT_COPYARR, qspStatementCopyArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(QSP_STAT_SORTARR, qspStatementSortArr, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_BOOL);
@@ -218,6 +219,7 @@ void qspInitStats(void)
     qspAddStatName(QSP_STAT_EXEC, QSP_STATIC_STR(QSP_FMT("EXEC")), QSP_TRUE, 2);
 
     qspAddStatName(QSP_STAT_SETVAR, QSP_STATIC_STR(QSP_FMT("SETVAR")), QSP_TRUE, 1);
+    qspAddStatName(QSP_STAT_INSVAR, QSP_STATIC_STR(QSP_FMT("INSVAR")), QSP_TRUE, 2);
     qspAddStatName(QSP_STAT_UNPACKARR, QSP_STATIC_STR(QSP_FMT("UNPACKARR")), QSP_TRUE, 2);
     qspAddStatName(QSP_STAT_COPYARR, QSP_STATIC_STR(QSP_FMT("COPYARR")), QSP_TRUE, 2);
     qspAddStatName(QSP_STAT_SORTARR, QSP_STATIC_STR(QSP_FMT("SORTARR")), QSP_TRUE, 2);

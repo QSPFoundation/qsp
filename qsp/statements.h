@@ -65,6 +65,7 @@
         QSP_STAT_DYNAMIC,
         QSP_STAT_EXEC,
         QSP_STAT_SETVAR,
+        QSP_STAT_INSVAR,
         QSP_STAT_UNPACKARR,
         QSP_STAT_COPYARR,
         QSP_STAT_SORTARR,
