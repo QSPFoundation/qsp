@@ -22,6 +22,7 @@
 #define MAX_LIST_ITEMS 1000
 #define SAVE_BUF_SIZE (64 * 1024)
 #define RESULT_VAR "QSPT_EXPECT_RESULT"
+#define RAND_SEED 0
 
 /* ------------------------------------------------------------ */
 /* Small helpers */
@@ -1145,7 +1146,7 @@ static void resetEngine(void)
 {
     int i;
     QSPTerminate();
-    QSPInit();
+    QSPInit(RAND_SEED);
     setCallbacks();
     freeGame(&T.Main);
     for (i = 0; i < T.ModulesCount; ++i) freeGame(T.Modules + i);
@@ -1664,7 +1665,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "usage: %s FILE.qspt...\n", argv[0]);
         return 2;
     }
-    QSPInit();
+    QSPInit(RAND_SEED);
     for (i = 1; i < argc; ++i)
         if (!runFile(argv[i])) isOk = 0;
     resetEngine();
