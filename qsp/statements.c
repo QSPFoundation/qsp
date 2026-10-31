@@ -127,6 +127,7 @@ void qspInitStats(void)
     qspAddStatement(QSP_STAT_ELSEIF, 0, 1, 1, QSP_TYPE_BOOL);
 
     qspAddStatement(QSP_STAT_LOCAL, 0, 0, 0);
+    qspAddStatement(QSP_STAT_ALIAS, 0, 0, 0);
     qspAddStatement(QSP_STAT_SET, 0, 0, 0);
 
     qspAddStatement(QSP_STAT_EXIT, 0, 0, 0);
@@ -204,6 +205,7 @@ void qspInitStats(void)
     qspAddStatName(QSP_STAT_ELSEIF, QSP_STATIC_STR(QSP_KEYWORD_ELSEIF), QSP_TRUE, 1);
 
     qspAddStatName(QSP_STAT_LOCAL, QSP_STATIC_STR(QSP_FMT("LOCAL")), QSP_TRUE, 2);
+    qspAddStatName(QSP_STAT_ALIAS, QSP_STATIC_STR(QSP_FMT("ALIAS")), QSP_TRUE, 2);
     qspAddStatName(QSP_STAT_SET, QSP_STATIC_STR(QSP_FMT("SET")), QSP_TRUE, 2);
     qspAddStatName(QSP_STAT_SET, QSP_STATIC_STR(QSP_FMT("LET")), QSP_TRUE, 2);
 
@@ -443,6 +445,10 @@ INLINE QSP_BOOL qspExecString(QSPLineOfCode *line, int startStat, int endStat, Q
             break;
         case QSP_STAT_LOCAL:
             qspStatementLocal(stat);
+            if (qspLocationState != oldLocationState) return QSP_FALSE;
+            break;
+        case QSP_STAT_ALIAS:
+            qspStatementAlias(stat);
             if (qspLocationState != oldLocationState) return QSP_FALSE;
             break;
         case QSP_STAT_EXIT:

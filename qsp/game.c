@@ -347,7 +347,7 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     {
         if (slot->Name.Str)
         {
-            var = &slot->Var;
+            var = qspGetVarFromSlot(slot);
             qspAppendEncodedStrVal(&bufString, slot->Name, isUCS);
             qspAppendEncodedIntVal(&bufString, var->ValsCount, isUCS);
             for (j = 0; j < var->ValsCount; ++j)

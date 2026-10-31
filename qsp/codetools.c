@@ -118,6 +118,7 @@ INLINE void qspInitStatData(QSPCachedStat *stat, QSPString s, QSPString lineStr)
         break;
     case QSP_STAT_SET:
     case QSP_STAT_LOCAL:
+    case QSP_STAT_ALIAS:
         stat->Data.Assignment = qspNewAssignment(stat->Stat, s, &stat->ErrorCode);
         break;
     case QSP_STAT_LOOP:
@@ -156,19 +157,31 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
         names.End = opPos;
         operation = *opPos;
         value = qspStringFromPair(equalPos + QSP_STATIC_LEN(QSP_EQUAL), s.End);
-        if (statCode == QSP_STAT_LOCAL && operation != QSP_EQUAL_CHAR)
+        if (statCode != QSP_STAT_SET && operation != QSP_EQUAL_CHAR)
         {
-            *errorCode = QSP_ERR_SYNTAX;
+            *errorCode = QSP_ERR_SYNTAX; /* LOCAL & ALIAS don't support compound operations */
             return 0;
         }
     }
-    else if (statCode == QSP_STAT_SET)
+    else if (statCode != QSP_STAT_LOCAL)
     {
-        *errorCode = QSP_ERR_SYNTAX; /* SET requires a value */
+        *errorCode = QSP_ERR_SYNTAX; /* SET & ALIAS require a value */
         return 0;
     }
     targetsCount = qspInitAssignmentTargets(targets, names, errorCode);
     if (*errorCode) return 0;
+    if (statCode == QSP_STAT_ALIAS)
+    {
+        int i;
+        for (i = 0; i < targetsCount; ++i)
+        {
+            if (targets[i].Index.Type != QSP_ARG_NONE)
+            {
+                *errorCode = QSP_ERR_SYNTAX; /* ALIAS doesn't support indices */
+                return 0;
+            }
+        }
+    }
     assignment = (QSPCachedAssignment *)malloc(sizeof(QSPCachedAssignment));
     assignment->Targets = (QSPCachedTarget *)malloc(targetsCount * sizeof(QSPCachedTarget));
     memcpy(assignment->Targets, targets, targetsCount * sizeof(QSPCachedTarget));
@@ -664,6 +677,7 @@ INLINE void qspFreeLineOfCode(QSPLineOfCode *line)
                 break;
             case QSP_STAT_SET:
             case QSP_STAT_LOCAL:
+            case QSP_STAT_ALIAS:
                 if (stat->Data.Assignment)
                 {
                     QSPCachedTarget *target;

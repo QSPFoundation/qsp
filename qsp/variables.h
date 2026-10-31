@@ -45,9 +45,20 @@
 
     typedef struct
     {
+        QSPVar Var;
+        int RefsCount;
+    } QSPSharedVar;
+
+    typedef struct
+    {
         QSPString Name; /* points into the scope's Names, Str is 0 for an empty slot */
         unsigned int NameHash;
-        QSPVar Var;
+        QSP_BOOL IsRef;
+        union
+        {
+            QSPVar Var;
+            QSPSharedVar *Shared;
+        } Data;
     } QSPVarSlot;
 
     typedef struct
@@ -76,7 +87,7 @@
         QSP_VARREF_GETSILENTLY /* no errors reported */
     };
 
-    extern QSPVar qspNullVar;
+    extern QSPVarSlot qspNullVarSlot;
     extern QSPVarsScope qspGlobalVars; /* there's only one global scope, we don't recreate it */
     extern QSPVarsScopeChunk *qspCurrentLocalVars; /* local scopes can be recreated */
 
@@ -97,7 +108,7 @@
     QSP_BOOL qspApplyResult(QSPVariant *res);
     QSPVarsScopeChunk *qspSaveLocalVarsAndRestoreGlobals(void);
     void qspRestoreSavedLocalVars(QSPVarsScopeChunk *chunk);
-    QSPVar *qspVarReference(QSPString name, QSP_TINYINT mode);
+    QSPVarSlot *qspVarSlotReference(QSPString name, QSP_TINYINT mode);
     QSPVarKey *qspAddVarKey(QSPVar *var, unsigned int hash, int valIndex);
     int qspGetVarKeyIndex(QSPVar *var, int valIndex);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
@@ -113,6 +124,7 @@
     /* Statements */
     void qspStatementSetVarsValues(QSPCachedStat *stat);
     void qspStatementLocal(QSPCachedStat *stat);
+    void qspStatementAlias(QSPCachedStat *stat);
     void qspStatementSetVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementInsVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
@@ -193,11 +205,25 @@
         qspInitVarData(var);
     }
 
-    INLINE QSPVar qspGetUnknownVar(void)
+    INLINE QSPVar *qspGetVarFromSlot(QSPVarSlot *slot)
     {
-        QSPVar var;
-        qspInitVarData(&var);
-        return var;
+        return (slot->IsRef ? &slot->Data.Shared->Var : &slot->Data.Var);
+    }
+
+    INLINE QSPVar *qspVarReference(QSPString name, QSP_TINYINT mode)
+    {
+        QSPVarSlot *slot = qspVarSlotReference(name, mode);
+        return (slot ? qspGetVarFromSlot(slot) : 0);
+    }
+
+    INLINE QSPVarSlot qspGetUnknownVarSlot(void)
+    {
+        QSPVarSlot slot;
+        slot.Name = qspNullString;
+        slot.NameHash = 0;
+        slot.IsRef = QSP_FALSE;
+        qspInitVarData(&slot.Data.Var);
+        return slot;
     }
 
     INLINE QSPVarsScope *qspAllocateLocalScope(void)

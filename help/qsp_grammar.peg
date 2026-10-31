@@ -63,6 +63,7 @@ QSP {
                             | actSingleLine
                             | loopSingleLine
                             | localStatement
+                            | aliasStatement
                             | assignmentStatement
                             | userCallStatement
                             | statement
@@ -88,6 +89,7 @@ QSP {
 
     assignmentStatement     = (setMarker &delimiterChar ws)? variableList ws assignmentOperator ws nonAmpersandArgument1plusList
     localStatement          = localMarker &delimiterChar ws variableList (ws "=" ws nonAmpersandArgument1plusList)?
+    aliasStatement          = aliasMarker &delimiterChar ws variableList ws "=" ws nonAmpersandArgument1plusList
 
     variableList            = variableRef (ws "," ws variableRef)*
     assignmentOperator      = "=" | "+=" | "-=" | "*=" | "/="
@@ -400,6 +402,7 @@ QSP {
 
     setMarker           = "set" | "let"
     localMarker         = "local"
+    aliasMarker         = "alias"
 
     actMarker           = "act"
     endActMarker        = "end"
@@ -416,7 +419,7 @@ QSP {
     stepMarker          = "step"
     endLoopMarker       = "end"
 
-    standardMarker      = setMarker | localMarker
+    standardMarker      = setMarker | localMarker | aliasMarker
                         | actMarker | endActMarker
                         | ifMarker | elseIfNoSpaceMarker | elseMarker | endIfMarker
                         | loopMarker | whileMarker | stepMarker | endLoopMarker

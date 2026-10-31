@@ -56,6 +56,7 @@
         QSP_STAT_ELSE,
         QSP_STAT_ELSEIF,
         QSP_STAT_LOCAL,
+        QSP_STAT_ALIAS,
         QSP_STAT_SET,
         QSP_STAT_EXIT,
         QSP_STAT_JUMP,

@@ -13,8 +13,9 @@
 #include "locations.h"
 #include "mathops.h"
 #include "regexp.h"
+#include "statements.h"
 
-QSPVar qspNullVar;
+QSPVarSlot qspNullVarSlot;
 QSPVarsScope qspGlobalVars;
 QSPVarsScopeChunk *qspCurrentLocalVars = 0;
 
@@ -28,8 +29,11 @@ INLINE QSPVarSlot *qspGetVarSlot(QSPVarsScope *scope, QSPString name, unsigned i
 INLINE QSPVarSlot *qspGetEmptyVarSlot(QSPVarsScope *scope, unsigned int nameHash);
 INLINE void qspResizeVarsScope(QSPVarsScope *scope, int newCapacity);
 INLINE void qspResizeVarsNames(QSPVarsScope *scope, int newCapacity);
-INLINE QSPVar *qspCreateNewVar(QSPVarsScope *scope, QSPString name, unsigned int nameHash);
-INLINE QSPVar *qspAddVarToLocals(QSPString name);
+INLINE QSPVarSlot *qspCreateNewVar(QSPVarsScope *scope, QSPString name, unsigned int nameHash);
+INLINE void qspEmptyVarSlot(QSPVarSlot *slot);
+INLINE QSPSharedVar *qspShareVarSlot(QSPVarSlot *slot);
+INLINE void qspReferenceVarSlot(QSPVarSlot *slot, QSPSharedVar *sharedVar);
+INLINE QSPVarSlot *qspAddVarToLocals(QSPString name);
 INLINE void qspSetVarValuesByReference(QSPVar *var, QSPVariant *vals, int count, QSP_BOOL toMove);
 INLINE int *qspGetVarKeySlot(QSPVar *var, QSPVariant *key, unsigned int hash);
 INLINE int *qspGetEmptyVarKeySlot(QSPVar *var, unsigned int hash);
@@ -165,7 +169,7 @@ void qspClearVars(QSPVarsScope *scope)
     {
         if (slot->Name.Str)
         {
-            qspEmptyVar(&slot->Var);
+            qspEmptyVarSlot(slot);
             slot->Name = qspNullString;
             --scope->VarsCount;
         }
@@ -258,7 +262,7 @@ INLINE void qspResizeVarsNames(QSPVarsScope *scope, int newCapacity)
     }
 }
 
-INLINE QSPVar *qspCreateNewVar(QSPVarsScope *scope, QSPString name, unsigned int nameHash)
+INLINE QSPVarSlot *qspCreateNewVar(QSPVarsScope *scope, QSPString name, unsigned int nameHash)
 {
     QSPVarSlot *slot;
     int newNamesLen = scope->NamesLen + qspStrLen(name);
@@ -269,13 +273,51 @@ INLINE QSPVar *qspCreateNewVar(QSPVarsScope *scope, QSPString name, unsigned int
     slot = qspGetEmptyVarSlot(scope, nameHash);
     slot->Name = qspCopyToText(scope->Names + scope->NamesLen, name);
     slot->NameHash = nameHash;
+    slot->IsRef = QSP_FALSE;
     scope->NamesLen = newNamesLen;
-    qspInitVarData(&slot->Var);
+    qspInitVarData(&slot->Data.Var);
     ++scope->VarsCount;
-    return &slot->Var;
+    return slot;
 }
 
-INLINE QSPVar *qspAddVarToLocals(QSPString name)
+INLINE void qspEmptyVarSlot(QSPVarSlot *slot)
+{
+    if (slot->IsRef)
+    {
+        QSPSharedVar *sharedVar = slot->Data.Shared;
+        if (--sharedVar->RefsCount == 0)
+        {
+            qspEmptyVar(&sharedVar->Var);
+            free(sharedVar);
+        }
+        slot->IsRef = QSP_FALSE;
+        qspInitVarData(&slot->Data.Var);
+    }
+    else
+        qspEmptyVar(&slot->Data.Var);
+}
+
+INLINE QSPSharedVar *qspShareVarSlot(QSPVarSlot *slot)
+{
+    QSPSharedVar *sharedVar;
+    if (slot->IsRef) return slot->Data.Shared;
+    sharedVar = (QSPSharedVar *)malloc(sizeof(QSPSharedVar));
+    qspMoveVar(&sharedVar->Var, &slot->Data.Var);
+    sharedVar->RefsCount = 1;
+    slot->IsRef = QSP_TRUE;
+    slot->Data.Shared = sharedVar;
+    return sharedVar;
+}
+
+INLINE void qspReferenceVarSlot(QSPVarSlot *slot, QSPSharedVar *sharedVar)
+{
+    ++sharedVar->RefsCount; /* slot can hold the last reference */
+    qspEmptyVarSlot(slot);
+    slot->IsRef = QSP_TRUE;
+    slot->Data.Shared = sharedVar;
+}
+
+INLINE QSPVarSlot *qspAddVarToLocals(QSPString name)
 {
     unsigned int nameHash;
     QSPVarsScope *scope;
@@ -297,7 +339,7 @@ INLINE QSPVar *qspAddVarToLocals(QSPString name)
 
     /* Check if the variable already exists in the current scope */
     slot = qspGetVarSlot(scope, name, nameHash);
-    if (slot->Name.Str) return &slot->Var;
+    if (slot->Name.Str) return slot;
 
     /* It doesn't exist yet, so we have to add it */
     if (scope->VarsCount >= QSP_MAXLOCALVARS)
@@ -312,7 +354,8 @@ QSPVar *qspAddVarToScope(QSPVarsScope *scope, QSPString name)
 {
     /* Special variables: the name isn't validated or looked up */
     unsigned int nameHash = qspGetTextHash(name);
-    return qspCreateNewVar(scope, name, nameHash);
+    QSPVarSlot *slot = qspCreateNewVar(scope, name, nameHash);
+    return &slot->Data.Var;
 }
 
 INLINE void qspSetVarValuesByReference(QSPVar *var, QSPVariant *vals, int count, QSP_BOOL toMove)
@@ -385,7 +428,7 @@ void qspRestoreSavedLocalVars(QSPVarsScopeChunk *chunk)
     qspCurrentLocalVars = chunk;
 }
 
-QSPVar *qspVarReference(QSPString name, QSP_TINYINT mode)
+QSPVarSlot *qspVarSlotReference(QSPString name, QSP_TINYINT mode)
 {
     unsigned int nameHash;
     QSPVarsScopeChunk *chunk;
@@ -410,7 +453,7 @@ QSPVar *qspVarReference(QSPString name, QSP_TINYINT mode)
             if (scope->VarsCount)
             {
                 slot = qspGetVarSlot(scope, name, nameHash);
-                if (slot->Name.Str) return &slot->Var;
+                if (slot->Name.Str) return slot;
             }
         }
         chunk = chunk->ParentChunk;
@@ -418,7 +461,7 @@ QSPVar *qspVarReference(QSPString name, QSP_TINYINT mode)
 
     /* Check the global scope */
     slot = qspGetVarSlot(&qspGlobalVars, name, nameHash);
-    if (slot->Name.Str) return &slot->Var;
+    if (slot->Name.Str) return slot;
 
     if (mode == QSP_VARREF_GETORCREATE)
     {
@@ -430,7 +473,7 @@ QSPVar *qspVarReference(QSPString name, QSP_TINYINT mode)
         }
         return qspCreateNewVar(&qspGlobalVars, name, nameHash);
     }
-    return &qspNullVar;
+    return &qspNullVarSlot;
 }
 
 INLINE int *qspGetVarKeySlot(QSPVar *var, QSPVariant *key, unsigned int hash)
@@ -1284,6 +1327,51 @@ void qspStatementLocal(QSPCachedStat *stat)
     {
         qspSetVarsValues(assignment, &v, QSP_EQUAL_CHAR);
         qspFreeVariant(&v);
+    }
+}
+
+void qspStatementAlias(QSPCachedStat *stat)
+{
+    QSPVariant names, *name;
+    QSPVarSlot *slot;
+    QSPSharedVar *sharedVars[QSP_MAXSTATARGS];
+    QSPCachedAssignment *assignment = stat->Data.Assignment;
+    int i, namesCount, oldLocationState = qspLocationState;
+    /* We have to evaluate expression before allocation of local vars */
+    names = qspCalculateArgValue(&assignment->Value);
+    if (qspLocationState != oldLocationState) return;
+    if (QSP_ISTUPLE(names.Type))
+    {
+        name = QSP_TUPLE(names).Vals;
+        namesCount = QSP_TUPLE(names).ValsCount;
+    }
+    else
+    {
+        name = &names;
+        namesCount = 1;
+    }
+    if (namesCount != assignment->TargetsCount)
+    {
+        qspSetError(QSP_ERR_ARGSCOUNT);
+        qspFreeVariant(&names);
+        return;
+    }
+    /* Share the arrays before the local variables exist */
+    for (i = 0; i < namesCount; ++i, ++name)
+    {
+        qspConvertVariantTo(name, QSP_TYPE_VARREF);
+        if (!((slot = qspVarSlotReference(QSP_PSTR(name), QSP_VARREF_GETORCREATE))))
+        {
+            qspFreeVariant(&names);
+            return;
+        }
+        sharedVars[i] = qspShareVarSlot(slot);
+    }
+    qspFreeVariant(&names);
+    for (i = 0; i < namesCount; ++i)
+    {
+        if (!((slot = qspAddVarToLocals(assignment->Targets[i].Name)))) return;
+        qspReferenceVarSlot(slot, sharedVars[i]);
     }
 }
 
