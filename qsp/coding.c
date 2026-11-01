@@ -348,11 +348,11 @@ void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val, QSP_BOOL isUCS2)
         {
             int i;
             QSPTuple tuple = QSP_TUPLE(val);
-            qspAppendEncodedIntVal(s, tuple.ValsCount, isUCS2);
-            for (i = 0; i < tuple.ValsCount; ++i)
+            qspAppendEncodedIntVal(s, tuple.FieldsCount, isUCS2);
+            for (i = 0; i < tuple.FieldsCount; ++i)
             {
-                qspAppendEncodedStrVal(s, qspGetNameText(tuple.Vals[i].NameIndex), isUCS2); /* empty for unnamed value */
-                qspAppendEncodedVariant(s, tuple.Vals[i].Value, isUCS2);
+                qspAppendEncodedStrVal(s, qspGetNameText(tuple.Fields[i].NameIndex), isUCS2); /* empty for unnamed value */
+                qspAppendEncodedVariant(s, tuple.Fields[i].Value, isUCS2);
             }
             break;
         }
@@ -408,8 +408,8 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
                         return QSP_FALSE;
                     }
                 }
-                QSP_PTUPLE(val).Vals = fields;
-                QSP_PTUPLE(val).ValsCount = itemsCount;
+                QSP_PTUPLE(val).Fields = fields;
+                QSP_PTUPLE(val).FieldsCount = itemsCount;
             }
             else
                 QSP_PTUPLE(val) = qspNullTuple;

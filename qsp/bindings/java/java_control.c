@@ -112,10 +112,10 @@ jobject qspToJavaVariant(JNIEnv *env, QSPVariant *value)
             int i;
             jobject jniItem;
             QSPTuple tuple = QSP_PTUPLE(value);
-            jobjectArray jniItems = (*env)->NewObjectArray(env, tuple.ValsCount, qspVariantClass, 0);
-            for (i = 0; i < tuple.ValsCount; ++i)
+            jobjectArray jniItems = (*env)->NewObjectArray(env, tuple.FieldsCount, qspVariantClass, 0);
+            for (i = 0; i < tuple.FieldsCount; ++i)
             {
-                jniItem = qspToJavaVariant(env, &tuple.Vals[i].Value);
+                jniItem = qspToJavaVariant(env, &tuple.Fields[i].Value);
                 (*env)->SetObjectArrayElement(env, jniItems, i, jniItem);
                 (*env)->DeleteLocalRef(env, jniItem);
             }
@@ -124,12 +124,12 @@ jobject qspToJavaVariant(JNIEnv *env, QSPVariant *value)
             if (qspTupleHasNames(tuple))
             {
                 jstring jniName;
-                jobjectArray jniNames = (*env)->NewObjectArray(env, tuple.ValsCount, qspStringClass, 0);
-                for (i = 0; i < tuple.ValsCount; ++i)
+                jobjectArray jniNames = (*env)->NewObjectArray(env, tuple.FieldsCount, qspStringClass, 0);
+                for (i = 0; i < tuple.FieldsCount; ++i)
                 {
-                    if (tuple.Vals[i].NameIndex > 0)
+                    if (tuple.Fields[i].NameIndex > 0)
                     {
-                        jniName = qspToJavaString(env, qspGetNameText(tuple.Vals[i].NameIndex));
+                        jniName = qspToJavaString(env, qspGetNameText(tuple.Fields[i].NameIndex));
                         (*env)->SetObjectArrayElement(env, jniNames, i, jniName);
                         (*env)->DeleteLocalRef(env, jniName);
                     }
@@ -175,8 +175,8 @@ QSPVariant qspFromJavaVariant(JNIEnv *env, jobject variant)
                     for (i = 0; i < count; ++i)
                     {
                         jniItem = (*env)->GetObjectArrayElement(env, jniItems, i);
-                        tuple.Vals[i].NameIndex = 0;
-                        tuple.Vals[i].Value = qspFromJavaVariant(env, jniItem);
+                        tuple.Fields[i].NameIndex = 0;
+                        tuple.Fields[i].Value = qspFromJavaVariant(env, jniItem);
                         if (jniItem) (*env)->DeleteLocalRef(env, jniItem);
                     }
                     if (jniNames)
@@ -184,12 +184,12 @@ QSPVariant qspFromJavaVariant(JNIEnv *env, jobject variant)
                         QSPString name;
                         jstring jniName;
                         count = (*env)->GetArrayLength(env, jniNames);
-                        if (count > tuple.ValsCount) count = tuple.ValsCount;
+                        if (count > tuple.FieldsCount) count = tuple.FieldsCount;
                         for (i = 0; i < count; ++i)
                         {
                             jniName = (jstring)(*env)->GetObjectArrayElement(env, jniNames, i);
                             name = qspFromJavaString(env, jniName);
-                            tuple.Vals[i].NameIndex = qspGetNameIndex(name, QSP_FALSE);
+                            tuple.Fields[i].NameIndex = qspGetNameIndex(name, QSP_FALSE);
                             qspFreeString(&name);
                             (*env)->DeleteLocalRef(env, jniName);
                         }

@@ -593,7 +593,7 @@ INLINE QSP_BOOL qspAppendRecordNameToCompiled(QSPMathExpression *expression, QSP
         return QSP_FALSE;
     }
     names = &QSP_TUPLE(expression->Values[nameStack[opSp]]);
-    if (names->ValsCount > argStack[opSp])
+    if (names->FieldsCount > argStack[opSp])
     {
         qspSetError(QSP_ERR_SYNTAX); /* some names don't have values */
         return QSP_FALSE;
@@ -1153,8 +1153,8 @@ INLINE QSPVariant qspCalculateFieldValue(QSPMathExpression *expression, QSPMathC
     QSPTuple names = QSP_TUPLE(expression->Values[item->ValueIndex]);
     base = qspCalculateArgumentValue(expression, baseIndex, QSP_TYPE_UNDEF);
     if (qspLocationState != oldLocationState) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-    value = qspGetTupleFieldValueByPath(&base, names.Vals, names.ValsCount);
-    qspInitVariantFrom(&res, value, names.Vals[names.ValsCount - 1].Value.Type); /* value has no name, the last field types it */
+    value = qspGetTupleFieldValueByPath(&base, names.Fields, names.FieldsCount);
+    qspInitVariantFrom(&res, value, names.Fields[names.FieldsCount - 1].Value.Type); /* value has no name, the last field types it */
     qspFreeVariant(&base);
     return res;
 }
@@ -1170,16 +1170,16 @@ INLINE QSPVariant qspCalculateInlineFieldValue(QSPMathExpression *expression, QS
     switch (baseItem->OpCode)
     {
     case QSP_OP_INLINEFIRSTARRITEM:
-        qspGetFirstVarFieldValue(varName, names.Vals, names.ValsCount, &res);
+        qspGetFirstVarFieldValue(varName, names.Fields, names.FieldsCount, &res);
         break;
     case QSP_OP_INLINELASTARRITEM:
-        qspGetLastVarFieldValue(varName, names.Vals, names.ValsCount, &res);
+        qspGetLastVarFieldValue(varName, names.Fields, names.FieldsCount, &res);
         break;
     default: /* QSP_OP_INLINEINDEXEDARRITEM */
         {
             QSPVariant index = qspCalculateArgumentValue(expression, baseIndex - 1, QSP_TYPE_UNDEF);
             if (qspLocationState != oldLocationState) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            qspGetVarFieldValueByIndex(varName, index, names.Vals, names.ValsCount, &res);
+            qspGetVarFieldValueByIndex(varName, index, names.Fields, names.FieldsCount, &res);
             qspFreeVariant(&index);
             break;
         }
@@ -1379,9 +1379,9 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex) /* th
     case QSP_OP_RECORD:
         {
             QSPTuple names = QSP_TUPLE(expression->Values[item->ValueIndex]);
-            if (!qspConvertRecordValues(args, names.Vals, names.ValsCount)) break;
+            if (!qspConvertRecordValues(args, names.Fields, names.FieldsCount)) break;
             QSP_TUPLE(tos) = qspMoveToNewTuple(args, argsCount);
-            qspAssignNamesToTupleItems(&QSP_TUPLE(tos), names.Vals, names.ValsCount);
+            qspAssignNamesToTupleItems(&QSP_TUPLE(tos), names.Fields, names.FieldsCount);
             break;
         }
     case QSP_OP_APPEND:
@@ -1503,7 +1503,7 @@ INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPV
         QSP_PNUM(res) = 0;
         break;
     case QSP_TYPE_TUPLE:
-        QSP_PNUM(res) = QSP_TUPLE(args[0]).ValsCount;
+        QSP_PNUM(res) = QSP_TUPLE(args[0]).FieldsCount;
         break;
     case QSP_TYPE_NUM:
         {

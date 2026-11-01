@@ -1153,14 +1153,14 @@ INLINE void qspMoveTupleToArray(QSPVar *dest, QSPTuple *src, int start, int coun
     /* Validate parameters */
     if (count <= 0) return;
     if (start < 0) start = 0;
-    itemsToMove = src->ValsCount - start;
+    itemsToMove = src->FieldsCount - start;
     if (itemsToMove <= 0) return;
     if (count < itemsToMove) itemsToMove = count;
     /* Move tuple items */
     dest->ValsCapacity = dest->ValsCount = itemsToMove;
     dest->Values = (QSPVariant *)malloc(itemsToMove * sizeof(QSPVariant));
     for (i = 0; i < itemsToMove; ++i)
-        qspMoveToNewVariant(dest->Values + i, &src->Vals[start + i].Value);
+        qspMoveToNewVariant(dest->Values + i, &src->Fields[start + i].Value);
 }
 
 INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count)
@@ -1396,7 +1396,7 @@ INLINE void qspSetTargetsValues(QSPCachedAssignment *assignment, QSPVariant *val
     case QSP_TYPE_TUPLE:
         {
             QSPTuple *tuple = &QSP_PTUPLE(val);
-            int valuesCount = tuple->ValsCount;
+            int valuesCount = tuple->FieldsCount;
             if (varsCount < valuesCount)
             {
                 /* Assign variables that contain single values */
@@ -1404,12 +1404,12 @@ INLINE void qspSetTargetsValues(QSPCachedAssignment *assignment, QSPVariant *val
                 int lastVarIndex = varsCount - 1;
                 for (i = 0; i < lastVarIndex; ++i)
                 {
-                    qspSetTargetValue(targets + i, &tuple->Vals[i].Value, op);
+                    qspSetTargetValue(targets + i, &tuple->Fields[i].Value, op);
                     if (qspLocationState != oldLocationState)
                         return;
                 }
                 /* Only 1 variable left, fill it with a tuple containing all the values left */
-                restValues = qspTupleVariant(qspMoveFieldsToNewTuple(tuple->Vals + i, valuesCount - i));
+                restValues = qspTupleVariant(qspMoveFieldsToNewTuple(tuple->Fields + i, valuesCount - i));
                 qspSetTargetValue(targets + lastVarIndex, &restValues, op);
                 qspFreeVariant(&restValues);
             }
@@ -1418,7 +1418,7 @@ INLINE void qspSetTargetsValues(QSPCachedAssignment *assignment, QSPVariant *val
                 /* Assign all values to the variables */
                 for (i = 0; i < valuesCount; ++i)
                 {
-                    qspSetTargetValue(targets + i, &tuple->Vals[i].Value, op);
+                    qspSetTargetValue(targets + i, &tuple->Fields[i].Value, op);
                     if (qspLocationState != oldLocationState)
                         return;
                 }
@@ -1503,7 +1503,7 @@ void qspStatementAlias(QSPCachedStat *stat)
     /* We have to evaluate expression before allocation of local vars */
     names = qspCalculateArgValue(&assignment->Value);
     if (qspLocationState != oldLocationState) return;
-    namesCount = (QSP_ISTUPLE(names.Type) ? QSP_TUPLE(names).ValsCount : 1);
+    namesCount = (QSP_ISTUPLE(names.Type) ? QSP_TUPLE(names).FieldsCount : 1);
     if (namesCount != assignment->TargetsCount)
     {
         qspSetError(QSP_ERR_ARGSCOUNT);
@@ -1516,7 +1516,7 @@ void qspStatementAlias(QSPCachedStat *stat)
         QSPVariant *name;
         for (i = 0; i < namesCount; ++i)
         {
-            name = &QSP_TUPLE(names).Vals[i].Value;
+            name = &QSP_TUPLE(names).Fields[i].Value;
             qspConvertVariantTo(name, QSP_TYPE_VARREF);
             if (!((sharedVars[i] = qspShareVarByName(QSP_PSTR(name)))))
             {
@@ -1634,7 +1634,7 @@ void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     if (!dest) return;
     src = &QSP_TUPLE(args[1]);
     startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
-    maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->ValsCount);
+    maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->FieldsCount);
     qspMoveTupleToArray(dest, src, startInd, maxCount);
 }
 

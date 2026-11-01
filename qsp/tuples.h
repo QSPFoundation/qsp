@@ -47,8 +47,8 @@
         if (nameIndex > 0)
         {
             int i;
-            for (i = 0; i < tuple.ValsCount; ++i)
-                if (tuple.Vals[i].NameIndex == nameIndex) return i;
+            for (i = 0; i < tuple.FieldsCount; ++i)
+                if (tuple.Fields[i].NameIndex == nameIndex) return i;
         }
         return -1;
     }
@@ -56,12 +56,12 @@
     INLINE QSPVariant *qspGetTupleFieldValue(QSPTuple tuple, int nameIndex)
     {
         int fieldIndex = qspGetTupleFieldIndex(tuple, nameIndex);
-        return (fieldIndex >= 0 ? &tuple.Vals[fieldIndex].Value : 0);
+        return (fieldIndex >= 0 ? &tuple.Fields[fieldIndex].Value : 0);
     }
 
     INLINE QSP_BOOL qspTupleHasNames(QSPTuple tuple)
     {
-        QSPField *item = tuple.Vals, *itemsEnd = item + tuple.ValsCount;
+        QSPField *item = tuple.Fields, *itemsEnd = item + tuple.FieldsCount;
         while (item < itemsEnd)
         {
             if (item->NameIndex > 0) return QSP_TRUE;

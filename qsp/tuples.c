@@ -19,13 +19,13 @@ QSPTuple qspNewTuple(int count)
     QSPTuple tuple;
     if (count)
     {
-        tuple.Vals = (QSPField *)malloc(count * sizeof(QSPField));
-        tuple.ValsCount = count;
+        tuple.Fields = (QSPField *)malloc(count * sizeof(QSPField));
+        tuple.FieldsCount = count;
     }
     else
     {
-        tuple.Vals = 0;
-        tuple.ValsCount = 0;
+        tuple.Fields = 0;
+        tuple.FieldsCount = 0;
     }
     return tuple;
 }
@@ -41,28 +41,28 @@ void qspFreeTupleFields(QSPField *fields, int count)
 
 void qspFreeTuple(QSPTuple *tuple)
 {
-    if (tuple->Vals)
+    if (tuple->Fields)
     {
-        qspFreeTupleFields(tuple->Vals, tuple->ValsCount);
-        free(tuple->Vals);
+        qspFreeTupleFields(tuple->Fields, tuple->FieldsCount);
+        free(tuple->Fields);
     }
 }
 
 QSP_BOOL qspIsTupleNumber(QSPTuple tuple)
 {
-    if (tuple.ValsCount == 1)
+    if (tuple.FieldsCount == 1)
     {
-        if (tuple.Vals[0].NameIndex > 0) /* tuple with named fields is not a single scalar value */
+        if (tuple.Fields[0].NameIndex > 0) /* tuple with named field is not a single scalar value */
             return QSP_FALSE;
 
-        switch (QSP_BASETYPE(tuple.Vals[0].Value.Type))
+        switch (QSP_BASETYPE(tuple.Fields[0].Value.Type))
         {
         case QSP_TYPE_TUPLE:
-            return qspIsTupleNumber(QSP_TUPLE(tuple.Vals[0].Value));
+            return qspIsTupleNumber(QSP_TUPLE(tuple.Fields[0].Value));
         case QSP_TYPE_NUM:
             return QSP_TRUE;
         case QSP_TYPE_STR:
-            return qspIsStrNumber(QSP_STR(tuple.Vals[0].Value));
+            return qspIsStrNumber(QSP_STR(tuple.Fields[0].Value));
         }
     }
     return QSP_FALSE;
@@ -70,27 +70,27 @@ QSP_BOOL qspIsTupleNumber(QSPTuple tuple)
 
 QSP_BIGINT qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid)
 {
-    switch (tuple.ValsCount)
+    switch (tuple.FieldsCount)
     {
     case 0: /* a special case, i.e. an empty tuple must be convertible to 0 */
         if (isValid) *isValid = QSP_TRUE;
         return 0;
     case 1:
-        if (tuple.Vals[0].NameIndex > 0) /* tuple with named fields is not a single scalar value */
+        if (tuple.Fields[0].NameIndex > 0) /* tuple with named field is not a single scalar value */
             break;
 
-        switch (QSP_BASETYPE(tuple.Vals[0].Value.Type))
+        switch (QSP_BASETYPE(tuple.Fields[0].Value.Type))
         {
         case QSP_TYPE_UNDEF:
             if (isValid) *isValid = QSP_TRUE;
             return 0;
         case QSP_TYPE_TUPLE:
-            return qspTupleToNum(QSP_TUPLE(tuple.Vals[0].Value), isValid);
+            return qspTupleToNum(QSP_TUPLE(tuple.Fields[0].Value), isValid);
         case QSP_TYPE_NUM:
             if (isValid) *isValid = QSP_TRUE;
-            return QSP_NUM(tuple.Vals[0].Value);
+            return QSP_NUM(tuple.Fields[0].Value);
         case QSP_TYPE_STR:
-            return qspStrToNum(QSP_STR(tuple.Vals[0].Value), isValid);
+            return qspStrToNum(QSP_STR(tuple.Fields[0].Value), isValid);
         }
         break;
     }
@@ -103,7 +103,7 @@ QSPTuple qspCopyToNewTuple(QSPVariant *values, int count)
 {
     QSPField *newItem;
     QSPTuple tuple = qspNewTuple(count);
-    for (newItem = tuple.Vals; count > 0; --count, ++values, ++newItem)
+    for (newItem = tuple.Fields; count > 0; --count, ++values, ++newItem)
     {
         newItem->NameIndex = 0;
         qspCopyToNewVariant(&newItem->Value, values);
@@ -115,7 +115,7 @@ QSPTuple qspMoveToNewTuple(QSPVariant *values, int count)
 {
     QSPField *newItem;
     QSPTuple tuple = qspNewTuple(count);
-    for (newItem = tuple.Vals; count > 0; --count, ++values, ++newItem)
+    for (newItem = tuple.Fields; count > 0; --count, ++values, ++newItem)
     {
         newItem->NameIndex = 0;
         qspMoveToNewVariant(&newItem->Value, values);
@@ -126,7 +126,7 @@ QSPTuple qspMoveToNewTuple(QSPVariant *values, int count)
 void qspAssignNamesToTupleItems(QSPTuple *tuple, QSPField *fields, int count)
 {
     QSPField *item;
-    for (item = tuple->Vals; count > 0; --count, ++fields, ++item)
+    for (item = tuple->Fields; count > 0; --count, ++fields, ++item)
         item->NameIndex = fields->NameIndex;
 }
 
@@ -134,7 +134,7 @@ QSPTuple qspCopyFieldsToNewTuple(QSPField *fields, int count)
 {
     QSPField *newItem;
     QSPTuple tuple = qspNewTuple(count);
-    for (newItem = tuple.Vals; count > 0; --count, ++fields, ++newItem)
+    for (newItem = tuple.Fields; count > 0; --count, ++fields, ++newItem)
     {
         newItem->NameIndex = fields->NameIndex;
         qspCopyToNewVariant(&newItem->Value, &fields->Value);
@@ -146,7 +146,7 @@ QSPTuple qspMoveFieldsToNewTuple(QSPField *fields, int count)
 {
     QSPField *newItem;
     QSPTuple tuple = qspNewTuple(count);
-    for (newItem = tuple.Vals; count > 0; --count, ++fields, ++newItem)
+    for (newItem = tuple.Fields; count > 0; --count, ++fields, ++newItem)
     {
         newItem->NameIndex = fields->NameIndex;
         qspMoveToNewVariant(&newItem->Value, &fields->Value);
@@ -158,13 +158,13 @@ QSPTuple qspAppendValueToNewTuple(QSPTuple *tuple, QSPVariant *value)
 {
     /* Builds new tuple with combined values, old items are moved to the result */
     QSPField *item;
-    QSPTuple result = qspNewTuple(tuple->ValsCount + 1);
-    if (tuple->Vals)
+    QSPTuple result = qspNewTuple(tuple->FieldsCount + 1);
+    if (tuple->Fields)
     {
-        memcpy(result.Vals, tuple->Vals, tuple->ValsCount * sizeof(QSPField));
-        free(tuple->Vals);
+        memcpy(result.Fields, tuple->Fields, tuple->FieldsCount * sizeof(QSPField));
+        free(tuple->Fields);
     }
-    item = result.Vals + tuple->ValsCount;
+    item = result.Fields + tuple->FieldsCount;
     item->NameIndex = 0;
     qspMoveToNewVariant(&item->Value, value);
     *tuple = qspNullTuple;
@@ -175,13 +175,13 @@ QSPTuple qspPrependValueToNewTuple(QSPTuple *tuple, QSPVariant *value)
 {
     /* Builds new tuple with combined values, old items are moved to the result */
     QSPField *item;
-    QSPTuple result = qspNewTuple(tuple->ValsCount + 1);
-    if (tuple->Vals)
+    QSPTuple result = qspNewTuple(tuple->FieldsCount + 1);
+    if (tuple->Fields)
     {
-        memcpy(result.Vals + 1, tuple->Vals, tuple->ValsCount * sizeof(QSPField));
-        free(tuple->Vals);
+        memcpy(result.Fields + 1, tuple->Fields, tuple->FieldsCount * sizeof(QSPField));
+        free(tuple->Fields);
     }
-    item = result.Vals;
+    item = result.Fields;
     item->NameIndex = 0;
     qspMoveToNewVariant(&item->Value, value);
     *tuple = qspNullTuple;
@@ -197,9 +197,9 @@ QSPTuple qspMergeToNewTuple(QSPTuple *first, QSPTuple *second)
     QSPTuple result = *first;
     *first = qspNullTuple;
     /* Preprocess the second tuple */
-    newItem = second->Vals;
-    itemsEnd = second->Vals + second->ValsCount;
-    for (item = second->Vals; item < itemsEnd; ++item)
+    newItem = second->Fields;
+    itemsEnd = second->Fields + second->FieldsCount;
+    for (item = second->Fields; item < itemsEnd; ++item)
     {
         fieldValue = qspGetTupleFieldValue(result, item->NameIndex);
         if (fieldValue)
@@ -216,37 +216,37 @@ QSPTuple qspMergeToNewTuple(QSPTuple *first, QSPTuple *second)
         }
     }
     /* Append items of the second tuple */
-    appendedCount = (int)(newItem - second->Vals);
+    appendedCount = (int)(newItem - second->Fields);
     if (appendedCount)
     {
-        QSPTuple merged = qspNewTuple(result.ValsCount + appendedCount);
-        if (result.Vals)
+        QSPTuple merged = qspNewTuple(result.FieldsCount + appendedCount);
+        if (result.Fields)
         {
-            memcpy(merged.Vals, result.Vals, result.ValsCount * sizeof(QSPField));
-            free(result.Vals);
+            memcpy(merged.Fields, result.Fields, result.FieldsCount * sizeof(QSPField));
+            free(result.Fields);
         }
-        memcpy(merged.Vals + result.ValsCount, second->Vals, appendedCount * sizeof(QSPField));
+        memcpy(merged.Fields + result.FieldsCount, second->Fields, appendedCount * sizeof(QSPField));
         result = merged;
     }
     /* All items are moved to the result */
-    if (second->Vals) free(second->Vals);
+    if (second->Fields) free(second->Fields);
     *second = qspNullTuple;
     return result;
 }
 
 void qspReserveTupleItems(QSPTuple *tuple, int count)
 {
-    if (count > tuple->ValsCount)
+    if (count > tuple->FieldsCount)
     {
         QSPField *item, *itemsEnd;
         QSPTuple result = qspNewTuple(count);
-        if (tuple->Vals)
+        if (tuple->Fields)
         {
-            memcpy(result.Vals, tuple->Vals, tuple->ValsCount * sizeof(QSPField));
-            free(tuple->Vals);
+            memcpy(result.Fields, tuple->Fields, tuple->FieldsCount * sizeof(QSPField));
+            free(tuple->Fields);
         }
-        itemsEnd = result.Vals + count;
-        for (item = result.Vals + tuple->ValsCount; item < itemsEnd; ++item)
+        itemsEnd = result.Fields + count;
+        for (item = result.Fields + tuple->FieldsCount; item < itemsEnd; ++item)
         {
             item->NameIndex = 0;
             qspInitVariant(&item->Value, QSP_TYPE_UNDEF);
@@ -261,13 +261,13 @@ QSPVariant *qspReserveTupleFieldValue(QSPTuple *tuple, int nameIndex)
     QSPTuple result;
     QSPVariant *fieldValue = qspGetTupleFieldValue(*tuple, nameIndex);
     if (fieldValue) return fieldValue;
-    result = qspNewTuple(tuple->ValsCount + 1);
-    if (tuple->Vals)
+    result = qspNewTuple(tuple->FieldsCount + 1);
+    if (tuple->Fields)
     {
-        memcpy(result.Vals, tuple->Vals, tuple->ValsCount * sizeof(QSPField));
-        free(tuple->Vals);
+        memcpy(result.Fields, tuple->Fields, tuple->FieldsCount * sizeof(QSPField));
+        free(tuple->Fields);
     }
-    item = result.Vals + tuple->ValsCount;
+    item = result.Fields + tuple->FieldsCount;
     item->NameIndex = nameIndex;
     qspInitVariant(&item->Value, QSP_TYPE_UNDEF);
     *tuple = result;
@@ -295,15 +295,15 @@ void qspRemoveTupleField(QSPTuple *tuple, int nameIndex)
     QSPTuple result;
     int itemsCount, fieldIndex = qspGetTupleFieldIndex(*tuple, nameIndex);
     if (fieldIndex < 0) return;
-    qspFreeVariant(&tuple->Vals[fieldIndex].Value);
-    itemsCount = tuple->ValsCount - 1;
+    qspFreeVariant(&tuple->Fields[fieldIndex].Value);
+    itemsCount = tuple->FieldsCount - 1;
     result = qspNewTuple(itemsCount);
     if (itemsCount)
     {
-        memcpy(result.Vals, tuple->Vals, fieldIndex * sizeof(QSPField));
-        memcpy(result.Vals + fieldIndex, tuple->Vals + fieldIndex + 1, (itemsCount - fieldIndex) * sizeof(QSPField));
+        memcpy(result.Fields, tuple->Fields, fieldIndex * sizeof(QSPField));
+        memcpy(result.Fields + fieldIndex, tuple->Fields + fieldIndex + 1, (itemsCount - fieldIndex) * sizeof(QSPField));
     }
-    free(tuple->Vals);
+    free(tuple->Fields);
     *tuple = result;
 }
 
@@ -323,18 +323,18 @@ int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value)
     switch (QSP_BASETYPE(value->Type))
     {
     case QSP_TYPE_UNDEF:
-        return (tuple.ValsCount ? 1 : 0); /* undefined value is the empty tuple here */
+        return (tuple.FieldsCount ? 1 : 0); /* undefined value is the empty tuple here */
     case QSP_TYPE_TUPLE:
         return qspTuplesCompare(tuple, QSP_PTUPLE(value));
     case QSP_TYPE_NUM:
     case QSP_TYPE_STR:
         {
             int delta;
-            if (tuple.ValsCount == 0)
+            if (tuple.FieldsCount == 0)
                 return -1; /* an empty tuple is always smaller than any value */
-            delta = qspVariantsCompare(&tuple.Vals->Value, value); /* compare the first tuple item with the value */
+            delta = qspVariantsCompare(&tuple.Fields->Value, value); /* compare the first tuple item with the value */
             if (delta) return delta;
-            if (tuple.ValsCount > 1 || tuple.Vals->NameIndex > 0)
+            if (tuple.FieldsCount > 1 || tuple.Fields->NameIndex > 0)
                 return 1; /* the tuple is bigger if it contains more than 1 item or the item has a name */
             break;
         }
@@ -344,8 +344,8 @@ int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value)
 
 INLINE int qspTupleNamesCompare(QSPTuple first, QSPTuple second)
 {
-    QSPField *pos1 = first.Vals, *pos2 = second.Vals;
-    QSPField *end1 = first.Vals + first.ValsCount, *end2 = second.Vals + second.ValsCount;
+    QSPField *pos1 = first.Fields, *pos2 = second.Fields;
+    QSPField *end1 = first.Fields + first.FieldsCount, *end2 = second.Fields + second.FieldsCount;
     while (pos2 < end2 && pos1 < end1)
     {
         if (pos1->NameIndex != pos2->NameIndex) /* the same name has the same index */
@@ -360,8 +360,8 @@ INLINE int qspTupleNamesCompare(QSPTuple first, QSPTuple second)
 int qspTuplesCompare(QSPTuple first, QSPTuple second)
 {
     int delta;
-    QSPField *pos1 = first.Vals, *pos2 = second.Vals;
-    QSPField *end1 = first.Vals + first.ValsCount, *end2 = second.Vals + second.ValsCount;
+    QSPField *pos1 = first.Fields, *pos2 = second.Fields;
+    QSPField *end1 = first.Fields + first.FieldsCount, *end2 = second.Fields + second.FieldsCount;
     while (pos2 < end2 && pos1 < end1)
     {
         delta = qspVariantsCompare(&pos1->Value, &pos2->Value);
@@ -375,10 +375,10 @@ int qspTuplesCompare(QSPTuple first, QSPTuple second)
 
 QSP_BOOL qspTuplesEqual(QSPTuple first, QSPTuple second)
 {
-    if (first.ValsCount == second.ValsCount)
+    if (first.FieldsCount == second.FieldsCount)
     {
-        QSPField *pos1 = first.Vals, *pos2 = second.Vals;
-        QSPField *end1 = first.Vals + first.ValsCount;
+        QSPField *pos1 = first.Fields, *pos2 = second.Fields;
+        QSPField *end1 = first.Fields + first.FieldsCount;
         while (pos1 < end1)
         {
             if (pos1->NameIndex != pos2->NameIndex || !qspVariantsEqual(&pos1->Value, &pos2->Value))
@@ -395,7 +395,7 @@ void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
     QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
     QSPString temp;
     QSPVariant *value;
-    QSPField *item = tuple.Vals, *itemsEnd = item + tuple.ValsCount;
+    QSPField *item = tuple.Fields, *itemsEnd = item + tuple.FieldsCount;
     qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAY_START));
     while (item < itemsEnd)
     {

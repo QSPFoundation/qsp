@@ -99,7 +99,7 @@
             dest->Val = src->Val;
             break;
         case QSP_TYPE_TUPLE:
-            QSP_PTUPLE(dest) = qspCopyFieldsToNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).ValsCount);
+            QSP_PTUPLE(dest) = qspCopyFieldsToNewTuple(QSP_PTUPLE(src).Fields, QSP_PTUPLE(src).FieldsCount);
             break;
         case QSP_TYPE_NUM:
             QSP_PNUM(dest) = QSP_PNUM(src);

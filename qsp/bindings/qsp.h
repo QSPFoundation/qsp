@@ -138,8 +138,8 @@
 
     typedef struct
     {
-        QSPField *Vals;
-        int ValsCount;
+        QSPField *Fields;
+        int FieldsCount;
     } QSPTuple;
 
     typedef struct

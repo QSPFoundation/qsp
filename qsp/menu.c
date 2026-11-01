@@ -69,14 +69,14 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
             break; /* stops collecting items */
         case QSP_TYPE_TUPLE:
             tuple = QSP_PTUPLE(curItem);
-            if (tuple.ValsCount < 2) break;
-            if (tuple.ValsCount >= 3)
+            if (tuple.FieldsCount < 2) break;
+            if (tuple.FieldsCount >= 3)
             {
-                itemImage = qspGetVariantAsString(&tuple.Vals[2].Value);
+                itemImage = qspGetVariantAsString(&tuple.Fields[2].Value);
                 if (!qspIsAnyString(itemImage)) qspClearText(&itemImage);
             }
-            itemName = qspGetVariantAsString(&tuple.Vals[0].Value);
-            itemLocation = qspGetVariantAsString(&tuple.Vals[1].Value);
+            itemName = qspGetVariantAsString(&tuple.Fields[0].Value);
+            itemLocation = qspGetVariantAsString(&tuple.Fields[1].Value);
             break;
         case QSP_TYPE_STR:
             str = QSP_PSTR(curItem);
