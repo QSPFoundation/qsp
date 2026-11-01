@@ -13,8 +13,8 @@
 
     #define QSP_TUPLEDISPLAY_START QSP_LSBRACK
     #define QSP_TUPLEDISPLAY_END QSP_RSBRACK
-    #define QSP_TUPLEDISPLAY_DELIM QSP_COMMA
-    #define QSP_TUPLEDISPLAY_FIELDDELIM QSP_FIELDVALUEDELIM
+    #define QSP_TUPLEDISPLAY_DELIM QSP_COMMA QSP_FMT(" ")
+    #define QSP_TUPLEDISPLAY_FIELDDELIM QSP_FIELDVALUEDELIM QSP_FMT(" ")
 
     extern QSPTuple qspNullTuple;
 
@@ -55,8 +55,8 @@
 
     INLINE QSPVariant *qspGetTupleFieldValue(QSPTuple tuple, int nameIndex)
     {
-        int index = qspGetTupleFieldIndex(tuple, nameIndex);
-        return (index >= 0 ? &tuple.Vals[index].Value : 0);
+        int fieldIndex = qspGetTupleFieldIndex(tuple, nameIndex);
+        return (fieldIndex >= 0 ? &tuple.Vals[fieldIndex].Value : 0);
     }
 
     INLINE QSP_BOOL qspTupleHasNames(QSPTuple tuple)

@@ -423,7 +423,7 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByKey(JNIEnv *env, 
     {
         int arrIndex;
         QSPVariant index = qspFromJavaVariant(env, key);
-        arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
+        arrIndex = qspGetVarItemIndex(var, index, QSP_FALSE);
         qspFreeVariant(&index);
         if (arrIndex >= 0 && arrIndex < var->ValsCount) return arrIndex;
     }

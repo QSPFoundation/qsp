@@ -33,9 +33,9 @@ INLINE QSPVarSlot *qspCreateNewVar(QSPVarsScope *scope, QSPString name, unsigned
 INLINE void qspReleaseSharedVar(QSPSharedVar *sharedVar);
 INLINE void qspEmptyVarSlot(QSPVarSlot *slot);
 INLINE QSPSharedVar *qspShareVarByName(QSPString name);
-INLINE void qspReferenceVarSlot(QSPVarSlot *slot, QSPSharedVar *sharedVar);
+INLINE void qspMoveReferenceToVarSlot(QSPVarSlot *slot, QSPSharedVar *sharedVar);
 INLINE QSPVarSlot *qspAddVarToLocals(QSPString name);
-INLINE void qspSetVarValuesByReference(QSPVar *var, QSPVariant *vals, int count, QSP_BOOL toMove);
+INLINE void qspInitVarValues(QSPVar *var, QSPVariant *vals, int count, QSP_BOOL toMove);
 INLINE int *qspGetVarKeySlot(QSPVar *var, QSPVariant *key, unsigned int hash);
 INLINE int *qspGetEmptyVarKeySlot(QSPVar *var, unsigned int hash);
 INLINE int *qspGetVarKeySlotByIndex(QSPVar *var, int keyIndex);
@@ -43,22 +43,23 @@ INLINE void qspRebuildVarKeysSlots(QSPVar *var);
 INLINE void qspResizeVarKeys(QSPVar *var, int newCapacity);
 INLINE void qspRemoveVarKey(QSPVar *var, int keyIndex);
 INLINE void qspMoveVarKey(QSPVar *var, int keyIndex, int newKeyIndex);
-INLINE void qspMoveArrayItem(QSPVar *var, int valIndex, int newIndex);
-INLINE void qspRemoveArrayItem(QSPVar *var, int valIndex);
+INLINE void qspMoveVarItem(QSPVar *var, int valIndex, int newIndex);
+INLINE void qspRemoveVarItem(QSPVar *var, int valIndex);
 INLINE int qspGetVarKeyLowerBound(QSPVar *var, int valIndex);
 INLINE QSP_BOOL qspIsPosIndex(QSPVariant *index);
-INLINE QSPVar *qspGetVarData(QSPCachedTarget *target, QSPVariant *index, QSP_TINYINT mode);
-INLINE void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res);
-INLINE void qspGetVarFieldValueByReference(QSPVar *var, int ind, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *res);
-INLINE void qspResetVarValue(QSPCachedTarget *target);
-INLINE QSPVariant *qspReserveVarItem(QSPVar *var, int ind);
-INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val);
-INLINE void qspSetVarFieldValue(QSPVar *var, QSP_TINYINT varType, QSPVariant index, QSPField *fields, int count, QSPVariant *val, QSP_CHAR op);
-INLINE void qspSetVarValue(QSPCachedTarget *target, QSPVariant *val, QSP_CHAR op);
+INLINE QSPVar *qspGetTargetVar(QSPCachedTarget *target, QSPVariant *index, QSP_TINYINT mode);
+INLINE void qspGetVarItemValue(QSPVar *var, int valIndex, QSP_TINYINT varType, QSPVariant *res);
+INLINE void qspGetVarItemFieldValue(QSPVar *var, int valIndex, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *res);
+INLINE void qspResetTargetValue(QSPCachedTarget *target);
+INLINE QSPVariant *qspReserveVarItem(QSPVar *var, int valIndex);
+INLINE void qspSetVarItemValue(QSPVar *var, int valIndex, QSPVariant *val);
+INLINE void qspSetVarItemFieldValue(QSPVar *var, int valIndex, QSPField *fields, int count, QSPVariant *val);
+INLINE void qspSetVarFieldValue(QSPVar *var, QSPVariant index, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *val, QSP_CHAR op);
+INLINE void qspSetTargetValue(QSPCachedTarget *target, QSPVariant *val, QSP_CHAR op);
 INLINE void qspMoveTupleToArray(QSPVar *dest, QSPTuple *src, int start, int count);
 INLINE void qspCopyArray(QSPVar *dest, QSPVar *src, int start, int count);
 INLINE void qspSortArray(QSPVar *var, QSP_TINYINT varType, QSP_BOOL isAscending);
-INLINE void qspSetVarsValues(QSPCachedAssignment *assignment, QSPVariant *v, QSP_CHAR op);
+INLINE void qspSetTargetsValues(QSPCachedAssignment *assignment, QSPVariant *val, QSP_CHAR op);
 
 void qspInitVarTypes(void)
 {
@@ -322,7 +323,7 @@ INLINE QSPSharedVar *qspShareVarByName(QSPString name)
     return sharedVar;
 }
 
-INLINE void qspReferenceVarSlot(QSPVarSlot *slot, QSPSharedVar *sharedVar)
+INLINE void qspMoveReferenceToVarSlot(QSPVarSlot *slot, QSPSharedVar *sharedVar)
 {
     /* Slot owns the reference */
     qspEmptyVarSlot(slot);
@@ -371,7 +372,7 @@ QSPVar *qspAddVarToScope(QSPVarsScope *scope, QSPString name)
     return &slot->Data.Var;
 }
 
-INLINE void qspSetVarValuesByReference(QSPVar *var, QSPVariant *vals, int count, QSP_BOOL toMove)
+INLINE void qspInitVarValues(QSPVar *var, QSPVariant *vals, int count, QSP_BOOL toMove)
 {
     if (count)
     {
@@ -399,7 +400,7 @@ QSPVarsScope *qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOO
         qspInitVarsScope(scope, QSP_VARSLOCALCAPACITY); /* init the uninitialized scope */
 
     varArgs = qspAddVarToScope(scope, QSP_STATIC_STR(QSP_VAR_ARGS));
-    qspSetVarValuesByReference(varArgs, args, count, toMove);
+    qspInitVarValues(varArgs, args, count, toMove);
 
     qspAddVarToScope(scope, QSP_STATIC_STR(QSP_VAR_RESULT));
 
@@ -412,7 +413,7 @@ QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove)
     if (!varArgs) return QSP_FALSE;
 
     qspEmptyVar(varArgs);
-    qspSetVarValuesByReference(varArgs, args, count, toMove);
+    qspInitVarValues(varArgs, args, count, toMove);
     return QSP_TRUE;
 }
 
@@ -663,7 +664,7 @@ INLINE void qspMoveVarKey(QSPVar *var, int keyIndex, int newKeyIndex)
     *keySlot = newKeyIndex;
 }
 
-INLINE void qspMoveArrayItem(QSPVar *var, int valIndex, int newIndex)
+INLINE void qspMoveVarItem(QSPVar *var, int valIndex, int newIndex)
 {
     QSPVariant movedValue;
     int keyIndex, newKeyIndex;
@@ -673,14 +674,14 @@ INLINE void qspMoveArrayItem(QSPVar *var, int valIndex, int newIndex)
         /* Prepare the value to move */
         QSPVariant undefinedValue = qspGetEmptyVariant(QSP_TYPE_UNDEF);
         valIndex = var->ValsCount;
-        qspSetVarValueByReference(var, valIndex, &undefinedValue);
+        qspSetVarItemValue(var, valIndex, &undefinedValue);
     }
     if (newIndex == valIndex) return;
     if (newIndex >= var->ValsCount)
     {
         /* Prepare space for the new value */
         QSPVariant undefinedValue = qspGetEmptyVariant(QSP_TYPE_UNDEF);
-        qspSetVarValueByReference(var, newIndex, &undefinedValue);
+        qspSetVarItemValue(var, newIndex, &undefinedValue);
     }
     keyIndex = qspGetVarKeyIndex(var, valIndex);
     movedValue = var->Values[valIndex];
@@ -714,12 +715,12 @@ INLINE void qspMoveArrayItem(QSPVar *var, int valIndex, int newIndex)
     }
 }
 
-INLINE void qspRemoveArrayItem(QSPVar *var, int valIndex)
+INLINE void qspRemoveVarItem(QSPVar *var, int valIndex)
 {
     int keyIndex, lastValIndex = var->ValsCount - 1;
     if (valIndex < 0 || valIndex > lastValIndex) return;
     /* Move the item to the end */
-    qspMoveArrayItem(var, valIndex, lastValIndex);
+    qspMoveVarItem(var, valIndex, lastValIndex);
     /* Remove it */
     keyIndex = qspGetVarKeyIndex(var, lastValIndex);
     if (keyIndex >= 0) /* -1 for keyless item */
@@ -775,7 +776,7 @@ INLINE QSP_BOOL qspIsPosIndex(QSPVariant *index)
     return QSP_FALSE;
 }
 
-int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
+int qspGetVarItemIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
 {
     unsigned int hash;
     if (qspIsPosIndex(&index))
@@ -796,7 +797,7 @@ int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
     return -1;
 }
 
-INLINE QSPVar *qspGetVarData(QSPCachedTarget *target, QSPVariant *index, QSP_TINYINT mode)
+INLINE QSPVar *qspGetTargetVar(QSPCachedTarget *target, QSPVariant *index, QSP_TINYINT mode)
 {
     QSPVar *var;
     int oldLocationState;
@@ -825,16 +826,16 @@ INLINE QSPVar *qspGetVarData(QSPCachedTarget *target, QSPVariant *index, QSP_TIN
     return 0;
 }
 
-INLINE void qspGetVarValueByReference(QSPVar *var, int ind, QSP_TINYINT baseType, QSPVariant *res)
+INLINE void qspGetVarItemValue(QSPVar *var, int valIndex, QSP_TINYINT varType, QSPVariant *res)
 {
-    QSPVariant *value = ((ind >= 0 && ind < var->ValsCount) ? var->Values + ind : 0);
-    qspInitVariantFrom(res, value, baseType);
+    QSPVariant *value = ((valIndex >= 0 && valIndex < var->ValsCount) ? var->Values + valIndex : 0);
+    qspInitVariantFrom(res, value, varType);
 }
 
-INLINE void qspGetVarFieldValueByReference(QSPVar *var, int ind, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *res)
+INLINE void qspGetVarItemFieldValue(QSPVar *var, int valIndex, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *res)
 {
     /* The type prefix of the name or the last field specifies the type of the value */
-    QSPVariant *value = ((ind >= 0 && ind < var->ValsCount) ? var->Values + ind : 0);
+    QSPVariant *value = ((valIndex >= 0 && valIndex < var->ValsCount) ? var->Values + valIndex : 0);
     if (count && !QSP_ISDEF(varType)) varType = fields[count - 1].Value.Type;
     value = qspGetTupleFieldValueByPath(value, fields, count);
     qspInitVariantFrom(res, value, varType);
@@ -846,9 +847,9 @@ void qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res)
     QSP_TINYINT varType;
     QSPVar *var = qspVarReference(varName, QSP_REF_GET);
     if (!var) return;
-    arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
+    arrIndex = qspGetVarItemIndex(var, index, QSP_FALSE);
     varType = qspGetVarType(varName);
-    qspGetVarValueByReference(var, arrIndex, varType, res);
+    qspGetVarItemValue(var, arrIndex, varType, res);
 }
 
 void qspGetFirstVarValue(QSPString varName, QSPVariant *res)
@@ -857,7 +858,7 @@ void qspGetFirstVarValue(QSPString varName, QSPVariant *res)
     QSPVar *var = qspVarReference(varName, QSP_REF_GET);
     if (!var) return;
     varType = qspGetVarType(varName);
-    qspGetVarValueByReference(var, 0, varType, res);
+    qspGetVarItemValue(var, 0, varType, res);
 }
 
 void qspGetLastVarValue(QSPString varName, QSPVariant *res)
@@ -868,7 +869,7 @@ void qspGetLastVarValue(QSPString varName, QSPVariant *res)
     if (!var) return;
     arrIndex = var->ValsCount - 1;
     varType = qspGetVarType(varName);
-    qspGetVarValueByReference(var, arrIndex, varType, res);
+    qspGetVarItemValue(var, arrIndex, varType, res);
 }
 
 void qspGetVarFieldValueByIndex(QSPString varName, QSPVariant index, QSPField *fields, int count, QSPVariant *res)
@@ -877,9 +878,9 @@ void qspGetVarFieldValueByIndex(QSPString varName, QSPVariant index, QSPField *f
     QSP_TINYINT varType;
     QSPVar *var = qspVarReference(varName, QSP_REF_GET);
     if (!var) return;
-    arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
+    arrIndex = qspGetVarItemIndex(var, index, QSP_FALSE);
     varType = qspGetVarType(varName);
-    qspGetVarFieldValueByReference(var, arrIndex, varType, fields, count, res);
+    qspGetVarItemFieldValue(var, arrIndex, varType, fields, count, res);
 }
 
 void qspGetFirstVarFieldValue(QSPString varName, QSPField *fields, int count, QSPVariant *res)
@@ -888,7 +889,7 @@ void qspGetFirstVarFieldValue(QSPString varName, QSPField *fields, int count, QS
     QSPVar *var = qspVarReference(varName, QSP_REF_GET);
     if (!var) return;
     varType = qspGetVarType(varName);
-    qspGetVarFieldValueByReference(var, 0, varType, fields, count, res);
+    qspGetVarItemFieldValue(var, 0, varType, fields, count, res);
 }
 
 void qspGetLastVarFieldValue(QSPString varName, QSPField *fields, int count, QSPVariant *res)
@@ -897,7 +898,7 @@ void qspGetLastVarFieldValue(QSPString varName, QSPField *fields, int count, QSP
     QSPVar *var = qspVarReference(varName, QSP_REF_GET);
     if (!var) return;
     varType = qspGetVarType(varName);
-    qspGetVarFieldValueByReference(var, var->ValsCount - 1, varType, fields, count, res);
+    qspGetVarItemFieldValue(var, var->ValsCount - 1, varType, fields, count, res);
 }
 
 int qspParseFieldsPath(QSPString *s, QSP_TINYINT varType, QSPField *fields, QSP_BOOL toIntern)
@@ -984,8 +985,8 @@ void qspGetVarFieldValueByPath(QSPString varName, QSPVariant index, QSPString pa
     varType = qspGetVarType(varName);
     count = qspGetFieldsFromText(path, varType, fields, QSP_FALSE);
     if (count < 0) return;
-    arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
-    qspGetVarFieldValueByReference(var, arrIndex, varType, fields, count, res);
+    arrIndex = qspGetVarItemIndex(var, index, QSP_FALSE);
+    qspGetVarItemFieldValue(var, arrIndex, varType, fields, count, res);
 }
 
 QSPVar *qspVarByName(QSPString name)
@@ -997,29 +998,29 @@ QSPVar *qspVarByName(QSPString name)
     return var;
 }
 
-QSPString qspGetVarStrValue(QSPString name, int ind)
+QSPString qspGetVarStrValue(QSPString name, int valIndex)
 {
     QSPVar *var = qspVarByName(name);
-    if (var && ind >= 0 && ind < var->ValsCount)
-        return qspGetVariantAsString(var->Values + ind);
+    if (var && valIndex >= 0 && valIndex < var->ValsCount)
+        return qspGetVariantAsString(var->Values + valIndex);
     return qspNullString;
 }
 
-QSP_BIGINT qspGetVarNumValue(QSPString name, int ind)
+QSP_BIGINT qspGetVarNumValue(QSPString name, int valIndex)
 {
     QSPVar *var = qspVarByName(name);
-    if (var && ind >= 0 && ind < var->ValsCount)
-        return qspGetVariantAsNum(var->Values + ind, 0);
+    if (var && valIndex >= 0 && valIndex < var->ValsCount)
+        return qspGetVariantAsNum(var->Values + valIndex, 0);
     return 0;
 }
 
-INLINE void qspResetVarValue(QSPCachedTarget *target)
+INLINE void qspResetTargetValue(QSPCachedTarget *target)
 {
     int arrIndex;
     QSPVariant index;
-    QSPVar *var = qspGetVarData(target, &index, QSP_REF_GET); /* missing items stay empty, so we don't create them */
+    QSPVar *var = qspGetTargetVar(target, &index, QSP_REF_GET); /* missing items stay empty, so we don't create them */
     if (!var) return;
-    arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
+    arrIndex = qspGetVarItemIndex(var, index, QSP_FALSE);
     qspFreeVariant(&index);
     if (arrIndex >= 0 && arrIndex < var->ValsCount)
     {
@@ -1032,46 +1033,55 @@ INLINE void qspResetVarValue(QSPCachedTarget *target)
     }
 }
 
-INLINE QSPVariant *qspReserveVarItem(QSPVar *var, int ind)
+INLINE QSPVariant *qspReserveVarItem(QSPVar *var, int valIndex)
 {
-    if (ind >= 0)
+    if (valIndex >= 0)
     {
         int oldCount = var->ValsCount;
-        if (ind >= oldCount)
+        if (valIndex >= oldCount)
         {
-            if (ind >= var->ValsCapacity)
+            if (valIndex >= var->ValsCapacity)
             {
-                var->ValsCapacity = (ind > 0 ? ind + 4 : 1); /* allocate only 1 item for the first value */
+                var->ValsCapacity = (valIndex > 0 ? valIndex + 4 : 1); /* allocate only 1 item for the first value */
                 var->Values = (QSPVariant *)realloc(var->Values, var->ValsCapacity * sizeof(QSPVariant));
             }
-            var->ValsCount = ind + 1;
-            qspInitUndefinedVariants(var->Values + oldCount, ind - oldCount + 1);
+            var->ValsCount = valIndex + 1;
+            qspInitUndefinedVariants(var->Values + oldCount, valIndex - oldCount + 1);
         }
-        return var->Values + ind;
+        return var->Values + valIndex;
     }
     return 0;
 }
 
-INLINE void qspSetVarValueByReference(QSPVar *var, int ind, QSPVariant *val)
+INLINE void qspSetVarItemValue(QSPVar *var, int valIndex, QSPVariant *val)
 {
     /* The value has to be converted to the type of the variable already */
-    QSPVariant *item = qspReserveVarItem(var, ind);
+    QSPVariant *item = qspReserveVarItem(var, valIndex);
     if (!item) return;
     qspFreeVariant(item);
     qspMoveToNewVariant(item, val);
 }
 
-INLINE void qspSetVarFieldValue(QSPVar *var, QSP_TINYINT varType, QSPVariant index, QSPField *fields, int count, QSPVariant *val, QSP_CHAR op)
+INLINE void qspSetVarItemFieldValue(QSPVar *var, int valIndex, QSPField *fields, int count, QSPVariant *val)
 {
-    QSPVariant *item;
+    /* The value has to be converted to the type of the variable already */
+    QSPVariant *item = qspReserveVarItem(var, valIndex);
+    if (!item) return;
+    item = qspReserveTupleFieldValueByPath(item, fields, count);
+    qspFreeVariant(item);
+    qspMoveToNewVariant(item, val);
+}
+
+INLINE void qspSetVarFieldValue(QSPVar *var, QSPVariant index, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *val, QSP_CHAR op)
+{
     int arrIndex = -1;
     if (count && !QSP_ISDEF(varType)) varType = fields[count - 1].Value.Type;
     if (op != QSP_EQUAL_CHAR)
     {
         /* Replace the value with its combination with the current value */
         QSPVariant oldVal, res;
-        arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
-        qspGetVarFieldValueByReference(var, arrIndex, varType, fields, count, &oldVal);
+        arrIndex = qspGetVarItemIndex(var, index, QSP_FALSE);
+        qspGetVarItemFieldValue(var, arrIndex, varType, fields, count, &oldVal);
         if (!qspAutoConvertCombine(&oldVal, val, op, &res))
         {
             qspFreeVariant(&oldVal);
@@ -1088,25 +1098,21 @@ INLINE void qspSetVarFieldValue(QSPVar *var, QSP_TINYINT varType, QSPVariant ind
         return;
     }
     if (arrIndex < 0)
-        arrIndex = qspGetVarIndex(var, index, QSP_TRUE);
-    item = qspReserveVarItem(var, arrIndex);
-    if (!item) return;
-    item = qspReserveTupleFieldValueByPath(item, fields, count);
-    qspFreeVariant(item);
-    qspMoveToNewVariant(item, val);
+        arrIndex = qspGetVarItemIndex(var, index, QSP_TRUE);
+    qspSetVarItemFieldValue(var, arrIndex, fields, count, val);
 }
 
-INLINE void qspSetVarValue(QSPCachedTarget *target, QSPVariant *val, QSP_CHAR op)
+INLINE void qspSetTargetValue(QSPCachedTarget *target, QSPVariant *val, QSP_CHAR op)
 {
     QSPVariant index;
     QSP_TINYINT varType;
     int arrIndex = -1;
-    QSPVar *var = qspGetVarData(target, &index, QSP_REF_GETORCREATE);
+    QSPVar *var = qspGetTargetVar(target, &index, QSP_REF_GETORCREATE);
     if (!var) return;
     varType = qspGetVarType(target->Name);
     if (target->FieldsCount)
     {
-        qspSetVarFieldValue(var, varType, index, target->Fields, target->FieldsCount, val, op);
+        qspSetVarFieldValue(var, index, varType, target->Fields, target->FieldsCount, val, op);
         qspFreeVariant(&index);
         return;
     }
@@ -1114,8 +1120,8 @@ INLINE void qspSetVarValue(QSPCachedTarget *target, QSPVariant *val, QSP_CHAR op
     {
         /* Replace the value with its combination with the current value */
         QSPVariant oldVal, res;
-        arrIndex = qspGetVarIndex(var, index, QSP_FALSE);
-        qspGetVarValueByReference(var, arrIndex, varType, &oldVal);
+        arrIndex = qspGetVarItemIndex(var, index, QSP_FALSE);
+        qspGetVarItemValue(var, arrIndex, varType, &oldVal);
         if (!qspAutoConvertCombine(&oldVal, val, op, &res))
         {
             qspFreeVariant(&oldVal);
@@ -1134,9 +1140,9 @@ INLINE void qspSetVarValue(QSPCachedTarget *target, QSPVariant *val, QSP_CHAR op
         return;
     }
     if (arrIndex < 0)
-        arrIndex = qspGetVarIndex(var, index, QSP_TRUE);
+        arrIndex = qspGetVarItemIndex(var, index, QSP_TRUE);
     qspFreeVariant(&index);
-    qspSetVarValueByReference(var, arrIndex, val);
+    qspSetVarItemValue(var, arrIndex, val);
 }
 
 INLINE void qspMoveTupleToArray(QSPVar *dest, QSPTuple *src, int start, int count)
@@ -1368,13 +1374,13 @@ QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin)
     return resultValue;
 }
 
-INLINE void qspSetVarsValues(QSPCachedAssignment *assignment, QSPVariant *v, QSP_CHAR op)
+INLINE void qspSetTargetsValues(QSPCachedAssignment *assignment, QSPVariant *val, QSP_CHAR op)
 {
     int i, oldLocationState, varsCount = assignment->TargetsCount;
     QSPCachedTarget *targets = assignment->Targets;
     if (varsCount == 1)
     {
-        qspSetVarValue(targets, v, op);
+        qspSetTargetValue(targets, val, op);
         return;
     }
     /* Examples:
@@ -1385,41 +1391,41 @@ INLINE void qspSetVarsValues(QSPCachedAssignment *assignment, QSPVariant *v, QSP
      * a,b=[]
      * */
     oldLocationState = qspLocationState;
-    switch (QSP_BASETYPE(v->Type))
+    switch (QSP_BASETYPE(val->Type))
     {
     case QSP_TYPE_TUPLE:
         {
-            QSPTuple *tuple = &QSP_PTUPLE(v);
+            QSPTuple *tuple = &QSP_PTUPLE(val);
             int valuesCount = tuple->ValsCount;
             if (varsCount < valuesCount)
             {
                 /* Assign variables that contain single values */
-                QSPVariant v2;
+                QSPVariant restValues;
                 int lastVarIndex = varsCount - 1;
                 for (i = 0; i < lastVarIndex; ++i)
                 {
-                    qspSetVarValue(targets + i, &tuple->Vals[i].Value, op);
+                    qspSetTargetValue(targets + i, &tuple->Vals[i].Value, op);
                     if (qspLocationState != oldLocationState)
                         return;
                 }
                 /* Only 1 variable left, fill it with a tuple containing all the values left */
-                v2 = qspTupleVariant(qspMoveFieldsToNewTuple(tuple->Vals + i, valuesCount - i));
-                qspSetVarValue(targets + lastVarIndex, &v2, op);
-                qspFreeVariant(&v2);
+                restValues = qspTupleVariant(qspMoveFieldsToNewTuple(tuple->Vals + i, valuesCount - i));
+                qspSetTargetValue(targets + lastVarIndex, &restValues, op);
+                qspFreeVariant(&restValues);
             }
             else
             {
                 /* Assign all values to the variables */
                 for (i = 0; i < valuesCount; ++i)
                 {
-                    qspSetVarValue(targets + i, &tuple->Vals[i].Value, op);
+                    qspSetTargetValue(targets + i, &tuple->Vals[i].Value, op);
                     if (qspLocationState != oldLocationState)
                         return;
                 }
                 /* No values left, reset the rest of vars with default values */
                 while (i < varsCount)
                 {
-                    qspResetVarValue(targets + i);
+                    qspResetTargetValue(targets + i);
                     if (qspLocationState != oldLocationState)
                         return;
                     ++i;
@@ -1431,12 +1437,12 @@ INLINE void qspSetVarsValues(QSPCachedAssignment *assignment, QSPVariant *v, QSP
     case QSP_TYPE_NUM:
     case QSP_TYPE_STR:
         /* Consider it a tuple with 1 item */
-        qspSetVarValue(targets, v, op);
+        qspSetTargetValue(targets, val, op);
         if (qspLocationState != oldLocationState)
             return;
         for (i = 1; i < varsCount; ++i)
         {
-            qspResetVarValue(targets + i);
+            qspResetTargetValue(targets + i);
             if (qspLocationState != oldLocationState)
                 return;
         }
@@ -1453,7 +1459,7 @@ void qspStatementSetVarsValues(QSPCachedStat *stat)
     oldLocationState = qspLocationState;
     v = qspCalculateArgValue(&assignment->Value);
     if (qspLocationState != oldLocationState) return;
-    qspSetVarsValues(assignment, &v, assignment->Operation);
+    qspSetTargetsValues(assignment, &v, assignment->Operation);
     qspFreeVariant(&v);
 }
 
@@ -1482,7 +1488,7 @@ void qspStatementLocal(QSPCachedStat *stat)
     }
     if (assignment->Operation)
     {
-        qspSetVarsValues(assignment, &v, QSP_EQUAL_CHAR);
+        qspSetTargetsValues(assignment, &v, QSP_EQUAL_CHAR);
         qspFreeVariant(&v);
     }
 }
@@ -1541,7 +1547,7 @@ void qspStatementAlias(QSPCachedStat *stat)
             }
             return;
         }
-        qspReferenceVarSlot(slot, sharedVars[i]);
+        qspMoveReferenceToVarSlot(slot, sharedVars[i]);
     }
 }
 
@@ -1560,7 +1566,7 @@ void qspStatementSetVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNU
         if (fieldsCount < 0) return;
     }
     index = (count == 2 ? qspNumVariant(0) : args[2]);
-    qspSetVarFieldValue(var, varType, index, fields, fieldsCount, args + 1, QSP_EQUAL_CHAR);
+    qspSetVarFieldValue(var, index, varType, fields, fieldsCount, args + 1, QSP_EQUAL_CHAR);
 }
 
 void qspStatementInsVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
@@ -1578,7 +1584,7 @@ void qspStatementInsVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNU
     if (count == 2)
     {
         /* New last item */
-        qspSetVarValueByReference(var, var->ValsCount, args + 1);
+        qspSetVarItemValue(var, var->ValsCount, args + 1);
         return;
     }
     if (qspIsPosIndex(args + 2))
@@ -1604,7 +1610,7 @@ void qspStatementInsVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNU
         if (count == 3)
         {
             /* Same as SETVAR */
-            valIndex = qspGetVarIndex(var, args[2], QSP_TRUE);
+            valIndex = qspGetVarItemIndex(var, args[2], QSP_TRUE);
             newIndex = valIndex;
         }
         else
@@ -1612,12 +1618,12 @@ void qspStatementInsVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNU
             /* The item of the key ends up at the new position */
             newIndex = QSP_TOINT(QSP_NUM(args[3]));
             if (newIndex < 0) return;
-            valIndex = qspGetVarIndex(var, args[2], QSP_TRUE);
+            valIndex = qspGetVarItemIndex(var, args[2], QSP_TRUE);
         }
     }
     /* Move item to the new position and update the value */
-    qspMoveArrayItem(var, valIndex, newIndex);
-    qspSetVarValueByReference(var, newIndex, args + 1);
+    qspMoveVarItem(var, valIndex, newIndex);
+    qspSetVarItemValue(var, newIndex, args + 1);
 }
 
 void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
@@ -1699,7 +1705,7 @@ void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
         {
             /* The item or its field */
             QSPField fields[QSP_MAXMATHOPARGS];
-            int fieldsCount = 0, arrIndex = qspGetVarIndex(var, args[1], QSP_FALSE);
+            int fieldsCount = 0, arrIndex = qspGetVarItemIndex(var, args[1], QSP_FALSE);
             if (count == 3)
             {
                 QSP_TINYINT varType = qspGetVarType(QSP_STR(args[0]));
@@ -1718,7 +1724,7 @@ void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
                 else
                 {
                     /* Empty path removes the item itself */
-                    qspRemoveArrayItem(var, arrIndex);
+                    qspRemoveVarItem(var, arrIndex);
                 }
             }
         }

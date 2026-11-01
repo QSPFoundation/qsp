@@ -276,7 +276,7 @@ QSP_BOOL QSPGetVarIndexByKey(QSPString name, QSPVariant key, int *ind)
     QSPVar *var = qspVarByName(name);
     if (var)
     {
-        int arrIndex = qspGetVarIndex(var, key, QSP_FALSE);
+        int arrIndex = qspGetVarItemIndex(var, key, QSP_FALSE);
         if (arrIndex >= 0 && arrIndex < var->ValsCount)
         {
             *ind = arrIndex;

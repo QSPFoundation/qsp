@@ -191,7 +191,7 @@ QSPTuple qspPrependValueToNewTuple(QSPTuple *tuple, QSPVariant *value)
 QSPTuple qspMergeToNewTuple(QSPTuple *first, QSPTuple *second)
 {
     /* Old items are moved to the result, named items of the second tuple replace items with the same name */
-    int newCount;
+    int appendedCount;
     QSPVariant *fieldValue;
     QSPField *item, *itemsEnd, *newItem;
     QSPTuple result = *first;
@@ -216,16 +216,16 @@ QSPTuple qspMergeToNewTuple(QSPTuple *first, QSPTuple *second)
         }
     }
     /* Append items of the second tuple */
-    newCount = (int)(newItem - second->Vals);
-    if (newCount)
+    appendedCount = (int)(newItem - second->Vals);
+    if (appendedCount)
     {
-        QSPTuple merged = qspNewTuple(result.ValsCount + newCount);
+        QSPTuple merged = qspNewTuple(result.ValsCount + appendedCount);
         if (result.Vals)
         {
             memcpy(merged.Vals, result.Vals, result.ValsCount * sizeof(QSPField));
             free(result.Vals);
         }
-        memcpy(merged.Vals + result.ValsCount, second->Vals, newCount * sizeof(QSPField));
+        memcpy(merged.Vals + result.ValsCount, second->Vals, appendedCount * sizeof(QSPField));
         result = merged;
     }
     /* All items are moved to the result */

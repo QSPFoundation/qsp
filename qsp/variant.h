@@ -115,7 +115,10 @@
         if (src)
         {
             if (!QSP_ISDEF(baseType) || QSP_BASETYPE(src->Type) == baseType)
+            {
                 qspCopyToNewVariant(dest, src);
+                return;
+            }
         }
         qspInitVariant(dest, baseType);
     }

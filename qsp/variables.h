@@ -112,7 +112,7 @@
     QSPVarSlot *qspVarSlotReference(QSPString name, QSP_TINYINT mode);
     QSPVarKey *qspAddVarKey(QSPVar *var, unsigned int hash, int valIndex);
     int qspGetVarKeyIndex(QSPVar *var, int valIndex);
-    int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
+    int qspGetVarItemIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
     void qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
     void qspGetFirstVarValue(QSPString varName, QSPVariant *res);
     void qspGetLastVarValue(QSPString varName, QSPVariant *res);
@@ -124,8 +124,8 @@
     QSP_BOOL qspParseTargetFields(QSPCachedTarget *target);
     void qspGetVarFieldValueByPath(QSPString varName, QSPVariant index, QSPString path, QSPVariant *res);
     QSPVar *qspVarByName(QSPString name);
-    QSPString qspGetVarStrValue(QSPString name, int ind);
-    QSP_BIGINT qspGetVarNumValue(QSPString name, int ind);
+    QSPString qspGetVarStrValue(QSPString name, int valIndex);
+    QSP_BIGINT qspGetVarNumValue(QSPString name, int valIndex);
     int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind);
     int qspArrayPosRegExp(QSPString varName, QSPString regExpStr, int ind);
@@ -142,9 +142,9 @@
     void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
 
-    INLINE QSP_TINYINT qspGetVarType(QSPString str)
+    INLINE QSP_TINYINT qspGetVarType(QSPString name)
     {
-        QSP_CHAR specSymbol = *str.Str;
+        QSP_CHAR specSymbol = *name.Str;
         if (specSymbol < sizeof(qspSpecToBaseTypeTable))
             return qspSpecToBaseTypeTable[specSymbol];
 

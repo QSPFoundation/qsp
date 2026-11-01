@@ -1640,7 +1640,7 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
     QSPString typePrefix;
     QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_REF_GET);
     if (!var) return;
-    arrIndex = (count >= 2 ? qspGetVarIndex(var, args[1], QSP_FALSE) : 0);
+    arrIndex = (count >= 2 ? qspGetVarItemIndex(var, args[1], QSP_FALSE) : 0);
     value = ((arrIndex >= 0 && arrIndex < var->ValsCount) ? var->Values + arrIndex : 0);
     if (count == 3)
     {
