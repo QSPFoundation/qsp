@@ -175,9 +175,9 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
         int i;
         for (i = 0; i < targetsCount; ++i)
         {
-            if (targets[i].Index.Type != QSP_ARG_NONE)
+            if (targets[i].Index.Type != QSP_ARG_NONE || targets[i].Path.Str)
             {
-                *errorCode = QSP_ERR_SYNTAX; /* ALIAS doesn't support indices */
+                *errorCode = QSP_ERR_SYNTAX; /* ALIAS doesn't support indices or fields */
                 return 0;
             }
         }
@@ -233,7 +233,7 @@ INLINE QSPCachedArg *qspNewUserCallArgs(QSPString s, QSP_TINYINT *argsCount, QSP
     QSPString name;
     QSPCachedArg foundArgs[QSP_MAXSTATARGS];
     qspSkipSpaces(&s);
-    name = qspParseName(&s);
+    name = qspParseName(&s, QSP_CHAR_DELIM);
     if (qspIsEmpty(name))
     {
         *errorCode = QSP_ERR_SYNTAX;
@@ -313,37 +313,44 @@ INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, Q
 
 INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TINYINT *errorCode)
 {
-    unsigned int nameHash;
-    QSP_CHAR *nameEnd, *indexEnd;
     QSPString name;
+    unsigned int nameHash;
     s = qspDelSpc(s);
-    nameEnd = qspStrCharClass(s, QSP_CHAR_DELIM);
-    if (nameEnd)
+    target->Index.Type = QSP_ARG_NONE;
+    target->Path = qspNullString;
+    target->Fields = 0;
+    target->FieldsCount = 0;
+    target->Name = qspParseName(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
+    name = qspPrepareVarName(target->Name, &nameHash); /* validates the name */
+    if (qspIsEmpty(name))
     {
-        QSPString rest = qspStringFromPair(nameEnd, s.End);
-        target->Name = qspStringFromPair(s.Str, nameEnd);
-        qspSkipSpaces(&rest);
-        if (!qspIsCharAtPos(rest, rest.Str, QSP_LSBRACK_CHAR))
-        {
-            *errorCode = QSP_ERR_INCORRECTNAME;
-            return;
-        }
-        indexEnd = qspDelimPos(rest, QSP_RSBRACK_CHAR);
+        *errorCode = QSP_ERR_INCORRECTNAME;
+        return;
+    }
+    qspSkipSpaces(&s);
+    if (qspIsCharAtPos(s, s.Str, QSP_LSBRACK_CHAR))
+    {
+        QSP_CHAR *indexEnd = qspDelimPos(s, QSP_RSBRACK_CHAR);
         if (!indexEnd)
         {
             *errorCode = QSP_ERR_BRACKETNOTFOUND;
             return;
         }
-        qspInitArg(&target->Index, qspStringFromPair(rest.Str + QSP_STATIC_LEN(QSP_LSBRACK), indexEnd));
+        qspInitArg(&target->Index, qspStringFromPair(s.Str + QSP_STATIC_LEN(QSP_LSBRACK), indexEnd));
+        s.Str = indexEnd + QSP_STATIC_LEN(QSP_RSBRACK);
+        qspSkipSpaces(&s);
     }
-    else
+    if (qspIsCharAtPos(s, s.Str, QSP_FIELDDELIM_CHAR))
     {
-        target->Name = s; /* the name only */
-        target->Index.Type = QSP_ARG_NONE;
+        s.Str += QSP_STATIC_LEN(QSP_FIELDDELIM);
+        if (qspIsEmpty(s))
+        {
+            *errorCode = QSP_ERR_INCORRECTNAME;
+            return;
+        }
+        target->Path = s; /* parsed on the first evaluation */
     }
-
-    name = qspPrepareVarName(target->Name, &nameHash); /* validates the name */
-    if (qspIsEmpty(name))
+    else if (!qspIsEmpty(s))
         *errorCode = QSP_ERR_INCORRECTNAME;
 }
 
@@ -684,7 +691,10 @@ INLINE void qspFreeLineOfCode(QSPLineOfCode *line)
                     QSPCachedAssignment *assignment = stat->Data.Assignment;
                     qspFreeArg(&assignment->Value);
                     for (j = assignment->TargetsCount, target = assignment->Targets; j > 0; --j, ++target)
+                    {
                         qspFreeArg(&target->Index);
+                        if (target->Fields) free(target->Fields);
+                    }
                     free(assignment->Targets);
                     free(assignment);
                 }
@@ -1145,7 +1155,7 @@ QSPVariant qspCalculateArgValue(QSPCachedArg *arg)
     case QSP_ARG_CODE:
         return qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_CODE);
     }
-    /* The text is compiled on the first evaluation, it stays until the compilation succeeds */
+    /* The text is compiled on the first evaluation */
     expression = qspCompileMathExpression(arg->Data.Text);
     if (!expression) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
     arg->Data.Expression = expression;

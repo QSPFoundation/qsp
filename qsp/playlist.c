@@ -36,28 +36,26 @@ INLINE int qspSearchPlayList(QSPString file)
     {
         int i, fileLen;
         QSPBufString buf;
-        QSPString bufName;
-        file = qspCopyToNewText(file);
-        qspUpperStr(&file);
-        fileLen = qspStrLen(file);
+        QSPString bufName, upperFile = qspUpperText(file);
+        fileLen = qspStrLen(upperFile);
         buf = qspNewBufString(0, 32);
         for (i = 0; i < qspPLFilesCount; ++i)
         {
             qspUpdateBufString(&buf, qspPLFiles[i]);
             bufName = qspBufStringToString(buf);
             qspUpperStr(&bufName);
-            if (!qspStrsPartCompare(bufName, file))
+            if (!qspStrsPartCompare(bufName, upperFile))
             {
                 /* The current item is prefixed with the file */
                 if (qspStrLen(bufName) == fileLen || qspIsCharAtPos(bufName, bufName.Str + fileLen, QSP_PLVOLUMEDELIM_CHAR))
                 {
-                    qspFreeString(&file);
+                    qspFreeNewString(&upperFile, &file);
                     qspFreeBufString(&buf);
                     return i;
                 }
             }
         }
-        qspFreeString(&file);
+        qspFreeNewString(&upperFile, &file);
         qspFreeBufString(&buf);
     }
     return -1;

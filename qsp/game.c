@@ -14,6 +14,7 @@
 #include "errors.h"
 #include "locations.h"
 #include "mathops.h"
+#include "names.h"
 #include "objects.h"
 #include "playlist.h"
 #include "statements.h"
@@ -211,6 +212,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     {
         qspClearAllIncludes(QSP_FALSE);
         qspTruncateWorld(0); /* clear the world */
+        qspAdvanceNamesGeneration(); /* names are used by preprocessed code */
     }
     oldLocsCount = qspLocsCount;
     ind = (isLatestFormat ? 4 : 30);

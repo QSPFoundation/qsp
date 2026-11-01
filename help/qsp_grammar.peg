@@ -87,11 +87,12 @@ QSP {
        ====================
     */
 
-    assignmentStatement     = (setMarker &delimiterChar ws)? variableList ws assignmentOperator ws nonAmpersandArgument1plusList
-    localStatement          = localMarker &delimiterChar ws variableList (ws "=" ws nonAmpersandArgument1plusList)?
-    aliasStatement          = aliasMarker &delimiterChar ws variableList ws "=" ws nonAmpersandArgument1plusList
+    assignmentStatement     = (setMarker &delimiterChar ws)? assignmentTargets ws assignmentOperator ws nonAmpersandArgument1plusList
+    localStatement          = localMarker &delimiterChar ws assignmentTargets (ws "=" ws nonAmpersandArgument1plusList)?
+    aliasStatement          = aliasMarker &delimiterChar ws assignmentTargets ws "=" ws nonAmpersandArgument1plusList
 
-    variableList            = variableRef (ws "," ws variableRef)*
+    assignmentTargets       = assignmentTarget (ws "," ws assignmentTarget)*
+    assignmentTarget        = variableRef (ws fieldAccess)*
     assignmentOperator      = "=" | "+=" | "-=" | "*=" | "/="
 
     /* ====================
@@ -184,7 +185,7 @@ QSP {
                                     | multilineUserFunctionCallWithArgs
                                     | userFunctionCallNoArgs
 
-    functionCallNoArgs              = funcNameWithPrefix &delimiterChar
+    functionCallNoArgs              = funcNameWithPrefix ~nameChar
     functionCallEmptyArgs           = funcNameWithPrefix &delimiterChar ws "(" mws ")"
     functionCallSingleArg           = funcNameWithPrefix &delimiterChar ws ( parenthesizedExpression | expression )
     functionCallMultiArgs           = funcNameWithPrefix &delimiterChar ws parenthesizedArgument2plusList
@@ -249,7 +250,17 @@ QSP {
        ====================
     */
 
-    primaryExpression               = parenthesizedExpression
+    /* Any value can be followed by the fields of a record */
+
+    primaryExpression               = primaryValue (ws fieldAccess)*
+    multilinePrimaryExpression      = multilinePrimaryValue (mws multilineFieldAccess)*
+    nonAmpersandPrimaryExpression   = nonAmpersandPrimaryValue (ws fieldAccess)*
+
+    /* Fields are read like variables: the type prefix sets the type, a missing field reads as the empty value */
+    fieldAccess                     = "." ws typePrefix? fieldName
+    multilineFieldAccess            = "." mws typePrefix? fieldName
+
+    primaryValue                    = parenthesizedExpression
                                     | numberLiteral
                                     | undefinedLiteral
                                     | interpolatedString /* Try to parse it as a string with subexpressions */
@@ -260,7 +271,7 @@ QSP {
                                     | functionCall
                                     | variableRef
 
-    multilinePrimaryExpression      = parenthesizedExpression
+    multilinePrimaryValue           = parenthesizedExpression
                                     | numberLiteral
                                     | undefinedLiteral
                                     | interpolatedString /* Try to parse it as a string with subexpressions */
@@ -271,7 +282,7 @@ QSP {
                                     | multilineFunctionCall
                                     | multilineVariableRef
 
-    nonAmpersandPrimaryExpression   = parenthesizedExpression
+    nonAmpersandPrimaryValue        = parenthesizedExpression
                                     | numberLiteral
                                     | undefinedLiteral
                                     | interpolatedString
@@ -289,7 +300,7 @@ QSP {
     nonAmpersandArgument1plusList   = nonAmpersandExpression (ws "," ws nonAmpersandExpression)*
     parenthesizedArgument1plusList  = "(" mws multilineArgument1plusList mws ")" /* Inside parentheses, & is always an operator */
 
-    multilineArgument2plusList      = multilineExpression mws "," mws multilineExpression (mws "," mws multilineExpression)*
+    multilineArgument2plusList      = multilineExpression (mws "," mws multilineExpression)+
     parenthesizedArgument2plusList  = "(" mws multilineArgument2plusList mws ")" /* Inside parentheses, & is always an operator */
 
     /* ====================
@@ -303,7 +314,8 @@ QSP {
                         | nonEmptyPseudoTuple
 
     emptyTuple          = "[" mws "]"
-    nonEmptyTuple       = "[" mws multilineArgument1plusList mws "]"
+    nonEmptyTuple       = "[" mws tupleItem (mws "," mws tupleItem)* mws "]"
+    tupleItem           = (typePrefix? fieldName mws ":" mws)? multilineExpression
     emptyPseudoTuple    = "(" mws ")"
     nonEmptyPseudoTuple = "(" mws multilineArgument1plusList mws ")"
 
@@ -376,8 +388,10 @@ QSP {
     userStatementName     = nonDelimiterChar+
     userFunctionName      = nonDelimiterChar+
     funcNameWithPrefix    = typePrefix? functionName
-    varName               = ~(keyword delimiterChar) ~digit nonDelimiterChar+
+    varName               = ~(keyword ~nameChar) ~digit nameChar+
     varNameWithPrefix     = typePrefix? varName
+    fieldName             = ~digit ~typePrefix nameChar+
+    nameChar              = ~"." nonDelimiterChar
 
     keyword               = functionName
                           | statementName
@@ -446,6 +460,8 @@ QSP {
        18       | - (unary negation)
        30       | ALL REGULAR FUNCTIONS
        127      | ( ) PARENTHESES
+
+       Parentheses close "no"/"loc"/"obj" as well: no(x) = 1 is (no x) = 1, while no x = 1 is no (x = 1)
     */
 
     /* END, ELSEIF, ELSE are pseudo-statements, but we don't include them here to help with identifying suspicious code */

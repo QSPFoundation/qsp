@@ -17,6 +17,7 @@
 #include "../../locations.h"
 #include "../../mathops.h"
 #include "../../menu.h"
+#include "../../names.h"
 #include "../../objects.h"
 #include "../../statements.h"
 #include "../../text.h"
@@ -34,8 +35,8 @@
 #endif
 
 /* Layouts read by qsp-wasm-memory.ts */
-typedef char qspWasmLayoutCheck[(sizeof(QSP_CHAR) == 2 && sizeof(QSPVariant) == 12 && sizeof(QSP_BIGINT) == 4 &&
-    sizeof(QSPListItem) == 16 && sizeof(QSPObjectItem) == 24 && sizeof(QSPLineInfo) == 12 &&
+typedef char qspWasmLayoutCheck[(sizeof(QSP_CHAR) == 2 && sizeof(QSPVariant) == 12 && sizeof(QSPField) == 16 &&
+    sizeof(QSP_BIGINT) == 4 && sizeof(QSPListItem) == 16 && sizeof(QSPObjectItem) == 24 && sizeof(QSPLineInfo) == 12 &&
     sizeof(QSPErrorInfo) == 40) ? 1 : -1];
 
 /* The JS side allocates & frees all the memory the functions write to */
@@ -232,7 +233,7 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 
 QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
 {
-    QSPVar *var = qspVarReference(qspStringFromC(name), QSP_VARREF_GETSILENTLY);
+    QSPVar *var = qspVarByName(qspStringFromC(name));
     if (var)
     {
         *count = var->ValsCount;
@@ -244,7 +245,7 @@ QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
 
 QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
 {
-    QSPVar *var = qspVarReference(qspStringFromC(name), QSP_VARREF_GETSILENTLY);
+    QSPVar *var = qspVarByName(qspStringFromC(name));
     if (var)
     {
         int arrIndex = qspGetVarIndex(var, *key, QSP_FALSE);
@@ -261,7 +262,7 @@ QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
 /* Both the value & the key are optional */
 QSP_BOOL QSPGetVarValue(QSP_CHAR *name, int ind, QSPVariant *value, QSPVariant *key)
 {
-    QSPVar *var = qspVarReference(qspStringFromC(name), QSP_VARREF_GETSILENTLY);
+    QSPVar *var = qspVarByName(qspStringFromC(name));
     if (var && ind >= 0 && ind < var->ValsCount)
     {
         if (value) *value = var->Values[ind];
@@ -276,6 +277,18 @@ QSP_BOOL QSPGetVarValue(QSP_CHAR *name, int ind, QSPVariant *value, QSPVariant *
     if (value) *value = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     if (key) *key = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     return QSP_FALSE;
+}
+
+/* Get index of a name */
+int QSPGetNameIndex(QSP_CHAR *name, QSP_BOOL toCreate)
+{
+    return qspGetNameIndex(qspStringFromC(name), toCreate);
+}
+
+/* Get name by index */
+void QSPGetName(int nameIndex, QSPString *name)
+{
+    *name = qspGetNameText(nameIndex);
 }
 
 QSP_BOOL QSPExecString(QSP_CHAR *s, QSP_BOOL toRefreshUI)

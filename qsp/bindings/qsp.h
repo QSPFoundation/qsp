@@ -134,10 +134,11 @@
     #define QSP_PTUPLE(a) (a)->Val.Tuple
 
     typedef struct QSPVariant_s QSPVariant;
+    typedef struct QSPField_s QSPField;
 
     typedef struct
     {
-        QSPVariant *Vals;
+        QSPField *Vals;
         int ValsCount;
     } QSPTuple;
 
@@ -157,6 +158,12 @@
         } Val;
         QSP_TINYINT Type;
     } QSPVariant;
+
+    typedef struct QSPField_s
+    {
+        int NameIndex; /* name in interned names, 0 for no name, -1 for unknown name */
+        QSPVariant Value;
+    } QSPField;
 
     typedef struct
     {

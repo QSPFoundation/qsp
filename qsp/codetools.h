@@ -43,6 +43,9 @@
     {
         QSPString Name;
         QSPCachedArg Index;
+        QSPString Path; /* text of the field path */
+        QSPField *Fields; /* 0 until the first evaluation */
+        int FieldsCount;
     } QSPCachedTarget;
 
     typedef struct

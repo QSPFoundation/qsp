@@ -6,6 +6,7 @@
  */
 
 #include "coding.h"
+#include "names.h"
 #include "text.h"
 #include "variant.h"
 
@@ -145,6 +146,7 @@ INLINE unsigned char qspDirectConvertSB(unsigned char ch, const unsigned char *t
 INLINE unsigned char qspReverseConvertSB(unsigned char ch, const unsigned char *table);
 INLINE unsigned short qspDirectConvertUC(unsigned char ch, const unsigned short *table);
 INLINE unsigned char qspReverseConvertUC(unsigned short ch, const unsigned short *table);
+INLINE QSP_BOOL qspReadEncodedField(QSPString *strs, int strsCount, int *curIndex, QSP_BOOL isUCS2, QSPField *field);
 
 INLINE unsigned char qspDirectConvertSB(unsigned char ch, const unsigned char *table)
 {
@@ -348,7 +350,10 @@ void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val, QSP_BOOL isUCS2)
             QSPTuple tuple = QSP_TUPLE(val);
             qspAppendEncodedIntVal(s, tuple.ValsCount, isUCS2);
             for (i = 0; i < tuple.ValsCount; ++i)
-                qspAppendEncodedVariant(s, tuple.Vals[i], isUCS2);
+            {
+                qspAppendEncodedStrVal(s, qspGetNameText(tuple.Vals[i].NameIndex), isUCS2); /* empty for unnamed value */
+                qspAppendEncodedVariant(s, tuple.Vals[i].Value, isUCS2);
+            }
             break;
         }
     case QSP_TYPE_STR:
@@ -358,6 +363,19 @@ void qspAppendEncodedVariant(QSPBufString *s, QSPVariant val, QSP_BOOL isUCS2)
         qspAppendEncodedIntVal(s, QSP_NUM(val), isUCS2);
         break;
     }
+}
+
+INLINE QSP_BOOL qspReadEncodedField(QSPString *strs, int strsCount, int *curIndex, QSP_BOOL isUCS2, QSPField *field)
+{
+    QSPString name;
+    int ind = *curIndex;
+    if (ind >= strsCount) return QSP_FALSE;
+    name = qspDecodeString(strs[ind++], isUCS2);
+    field->NameIndex = qspInternPreparedName(name, qspGetTextHash(name));
+    qspFreeString(&name);
+    if (!qspReadEncodedVariant(strs, strsCount, &ind, isUCS2, &field->Value)) return QSP_FALSE;
+    *curIndex = ind;
+    return QSP_TRUE;
 }
 
 QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QSP_BOOL isUCS2, QSPVariant *val)
@@ -376,27 +394,25 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
             int itemsCount;
             if (ind >= strsCount) return QSP_FALSE;
             itemsCount = qspReadEncodedIntVal(strs[ind++], isUCS2);
-            if (itemsCount > 0)
+            if (itemsCount < 0) return QSP_FALSE;
+            if (itemsCount)
             {
                 int i;
-                QSPVariant *vals = (QSPVariant *)malloc(itemsCount * sizeof(QSPVariant));
+                QSPField *fields = (QSPField *)malloc(itemsCount * sizeof(QSPField));
                 for (i = 0; i < itemsCount; ++i)
                 {
-                    if (!qspReadEncodedVariant(strs, strsCount, &ind, isUCS2, vals + i))
+                    if (!qspReadEncodedField(strs, strsCount, &ind, isUCS2, fields + i))
                     {
-                        qspFreeVariants(vals, i);
-                        free(vals);
+                        qspFreeTupleFields(fields, i);
+                        free(fields);
                         return QSP_FALSE;
                     }
                 }
-                QSP_PTUPLE(val).Vals = vals;
+                QSP_PTUPLE(val).Vals = fields;
                 QSP_PTUPLE(val).ValsCount = itemsCount;
             }
             else
-            {
-                QSP_PTUPLE(val).Vals = 0;
-                QSP_PTUPLE(val).ValsCount = 0;
-            }
+                QSP_PTUPLE(val) = qspNullTuple;
             break;
         }
     case QSP_TYPE_STR:

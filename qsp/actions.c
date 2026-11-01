@@ -44,23 +44,21 @@ INLINE int qspActIndex(QSPString name)
     {
         int i;
         QSPBufString buf;
-        QSPString bufName;
-        name = qspCopyToNewText(name);
-        qspUpperStr(&name);
+        QSPString bufName, upperName = qspUpperText(name);
         buf = qspNewBufString(0, 64);
         for (i = 0; i < qspCurActsCount; ++i)
         {
             qspUpdateBufString(&buf, qspCurActions[i].Desc);
             bufName = qspBufStringToString(buf);
             qspUpperStr(&bufName);
-            if (qspStrsEqual(bufName, name))
+            if (qspStrsEqual(bufName, upperName))
             {
-                qspFreeString(&name);
+                qspFreeNewString(&upperName, &name);
                 qspFreeBufString(&buf);
                 return i;
             }
         }
-        qspFreeString(&name);
+        qspFreeNewString(&upperName, &name);
         qspFreeBufString(&buf);
     }
     return -1;

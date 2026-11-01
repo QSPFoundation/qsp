@@ -14,6 +14,7 @@
 #include "locations.h"
 #include "mathops.h"
 #include "memory.h"
+#include "names.h"
 #include "objects.h"
 #include "playlist.h"
 #include "regexp.h"
@@ -46,6 +47,7 @@ void qspInitRuntime(unsigned int seed)
     qspNullString = qspStringFromPair(0, 0);
     qspNullTuple = qspCopyToNewTuple(0, 0);
     qspNullVarSlot = qspGetUnknownVarSlot();
+    qspNullName = qspGetNullName();
 
     qspIsDebug = QSP_FALSE;
     qspLocationState = 0;
@@ -55,6 +57,7 @@ void qspInitRuntime(unsigned int seed)
     qspCurLoc = 0;
     qspTimerInterval = 0;
     qspCurWindowsDisplayState = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT;
+    qspClearNames(QSP_TRUE);
     qspInitWorld();
 
     qspSetSeed(seed);
@@ -75,6 +78,7 @@ void qspTerminateRuntime(void)
     qspClearVarsScope(&qspGlobalVars); /* completely destroy the global scope */
     qspUpdateLocation(&qspRealCurLoc, 0);
     qspTerminateWorld();
+    qspClearNames(QSP_FALSE);
     qspTerminateMath();
     qspTerminateStackAllocator();
     qspResetError(QSP_FALSE);
@@ -114,6 +118,8 @@ void qspMemClear(QSP_BOOL toInit)
     qspClearAllCodeBlocks(toInit);
     if (!toInit)
     {
+        qspReleaseNamesGeneration();
+
         if (qspCurDesc.Len > 0)
         {
             qspFreeBufString(&qspCurDesc);

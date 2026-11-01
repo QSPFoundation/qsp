@@ -17,6 +17,7 @@
 #include "../../locations.h"
 #include "../../mathops.h"
 #include "../../menu.h"
+#include "../../names.h"
 #include "../../objects.h"
 #include "../../statements.h"
 #include "../../text.h"
@@ -36,12 +37,14 @@ jfieldID qspListItemImageField;
 jfieldID qspObjectItemNameField;
 jfieldID qspObjectItemTitleField;
 jfieldID qspObjectItemImageField;
+jclass qspStringClass;
 jclass qspVariantClass;
 jclass qspVarItemClass;
 jfieldID qspVariantTypeField;
 jfieldID qspVariantNumField;
 jfieldID qspVariantStrField;
 jfieldID qspVariantTupleField;
+jfieldID qspVariantNamesField;
 jfieldID qspVarItemValueField;
 jfieldID qspVarItemKeyField;
 jclass qspExecutionStateClass;
@@ -57,6 +60,7 @@ QSPString qspFromJavaString(JNIEnv *env, jstring str)
     jsize length;
     jchar *chars;
     QSPString res;
+    if (!str) return qspNullString;
     length = (*env)->GetStringLength(env, str);
     chars = (jchar *)(*env)->GetStringChars(env, str, 0);
     res = qspCopyToNewText(qspStringFromLen(chars, length));
@@ -105,17 +109,34 @@ jobject qspToJavaVariant(JNIEnv *env, QSPVariant *value)
     {
     case QSP_TYPE_TUPLE:
         {
+            int i;
             jobject jniItem;
-            int i, count = QSP_PTUPLE(value).ValsCount;
-            jobjectArray jniItems = (*env)->NewObjectArray(env, count, qspVariantClass, 0);
-            for (i = 0; i < count; ++i)
+            QSPTuple tuple = QSP_PTUPLE(value);
+            jobjectArray jniItems = (*env)->NewObjectArray(env, tuple.ValsCount, qspVariantClass, 0);
+            for (i = 0; i < tuple.ValsCount; ++i)
             {
-                jniItem = qspToJavaVariant(env, QSP_PTUPLE(value).Vals + i);
+                jniItem = qspToJavaVariant(env, &tuple.Vals[i].Value);
                 (*env)->SetObjectArrayElement(env, jniItems, i, jniItem);
                 (*env)->DeleteLocalRef(env, jniItem);
             }
             (*env)->SetObjectField(env, jniVariant, qspVariantTupleField, jniItems);
             (*env)->DeleteLocalRef(env, jniItems);
+            if (qspTupleHasNames(tuple))
+            {
+                jstring jniName;
+                jobjectArray jniNames = (*env)->NewObjectArray(env, tuple.ValsCount, qspStringClass, 0);
+                for (i = 0; i < tuple.ValsCount; ++i)
+                {
+                    if (tuple.Vals[i].NameIndex > 0)
+                    {
+                        jniName = qspToJavaString(env, qspGetNameText(tuple.Vals[i].NameIndex));
+                        (*env)->SetObjectArrayElement(env, jniNames, i, jniName);
+                        (*env)->DeleteLocalRef(env, jniName);
+                    }
+                }
+                (*env)->SetObjectField(env, jniVariant, qspVariantNamesField, jniNames);
+                (*env)->DeleteLocalRef(env, jniNames);
+            }
             break;
         }
     case QSP_TYPE_NUM:
@@ -149,15 +170,32 @@ QSPVariant qspFromJavaVariant(JNIEnv *env, jobject variant)
                 {
                     int i;
                     jobject jniItem;
-                    QSPVariant *items = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+                    QSPTuple tuple = qspNewTuple(count);
+                    jobjectArray jniNames = (jobjectArray)(*env)->GetObjectField(env, variant, qspVariantNamesField);
                     for (i = 0; i < count; ++i)
                     {
                         jniItem = (*env)->GetObjectArrayElement(env, jniItems, i);
-                        items[i] = qspFromJavaVariant(env, jniItem);
+                        tuple.Vals[i].NameIndex = 0;
+                        tuple.Vals[i].Value = qspFromJavaVariant(env, jniItem);
                         if (jniItem) (*env)->DeleteLocalRef(env, jniItem);
                     }
-                    QSP_TUPLE(res).Vals = items;
-                    QSP_TUPLE(res).ValsCount = count;
+                    if (jniNames)
+                    {
+                        QSPString name;
+                        jstring jniName;
+                        count = (*env)->GetArrayLength(env, jniNames);
+                        if (count > tuple.ValsCount) count = tuple.ValsCount;
+                        for (i = 0; i < count; ++i)
+                        {
+                            jniName = (jstring)(*env)->GetObjectArrayElement(env, jniNames, i);
+                            name = qspFromJavaString(env, jniName);
+                            tuple.Vals[i].NameIndex = qspGetNameIndex(name, QSP_FALSE);
+                            qspFreeString(&name);
+                            (*env)->DeleteLocalRef(env, jniName);
+                        }
+                        (*env)->DeleteLocalRef(env, jniNames);
+                    }
+                    QSP_TUPLE(res) = tuple;
                 }
                 (*env)->DeleteLocalRef(env, jniItems);
             }
@@ -370,7 +408,7 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_showWindow(JNIEnv *env, jobjec
 JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarValuesCount(JNIEnv *env, jobject api, jstring name)
 {
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarReference(varName, QSP_VARREF_GETSILENTLY);
+    QSPVar *var = qspVarByName(varName);
     qspFreeString(&varName);
     if (var) return var->ValsCount;
     return 0;
@@ -379,7 +417,7 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarValuesCount(JNIEnv *env,
 JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByKey(JNIEnv *env, jobject api, jstring name, jobject key)
 {
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarReference(varName, QSP_VARREF_GETSILENTLY);
+    QSPVar *var = qspVarByName(varName);
     qspFreeString(&varName);
     if (var)
     {
@@ -395,7 +433,7 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByKey(JNIEnv *env, 
 JNIEXPORT jobject JNICALL Java_com_libqsp_jni_QSPLib_getVarValue(JNIEnv *env, jobject api, jstring name, jint ind)
 {
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarReference(varName, QSP_VARREF_GETSILENTLY);
+    QSPVar *var = qspVarByName(varName);
     qspFreeString(&varName);
     if (var && ind >= 0 && ind < var->ValsCount)
     {
@@ -731,12 +769,16 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_init(JNIEnv *env, jobject api,
     qspObjectItemTitleField = (*env)->GetFieldID(env, qspObjectItemClass, "title", "Ljava/lang/String;");
     qspObjectItemImageField = (*env)->GetFieldID(env, qspObjectItemClass, "image", "Ljava/lang/String;");
 
+    clazz = (*env)->FindClass(env, "java/lang/String");
+    qspStringClass = (jclass)(*env)->NewGlobalRef(env, clazz);
+
     clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$Variant");
     qspVariantClass = (jclass)(*env)->NewGlobalRef(env, clazz);
     qspVariantTypeField = (*env)->GetFieldID(env, qspVariantClass, "type", "I");
     qspVariantNumField = (*env)->GetFieldID(env, qspVariantClass, "num", "J");
     qspVariantStrField = (*env)->GetFieldID(env, qspVariantClass, "str", "Ljava/lang/String;");
     qspVariantTupleField = (*env)->GetFieldID(env, qspVariantClass, "tuple", "[Lcom/libqsp/jni/QSPLib$Variant;");
+    qspVariantNamesField = (*env)->GetFieldID(env, qspVariantClass, "names", "[Ljava/lang/String;");
 
     clazz = (*env)->FindClass(env, "com/libqsp/jni/QSPLib$VarItem");
     qspVarItemClass = (jclass)(*env)->NewGlobalRef(env, clazz);
@@ -781,6 +823,7 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_terminate(JNIEnv *env, jobject
     (*env)->DeleteGlobalRef(env, qspApiClass);
     (*env)->DeleteGlobalRef(env, qspListItemClass);
     (*env)->DeleteGlobalRef(env, qspObjectItemClass);
+    (*env)->DeleteGlobalRef(env, qspStringClass);
     (*env)->DeleteGlobalRef(env, qspVariantClass);
     (*env)->DeleteGlobalRef(env, qspVarItemClass);
     (*env)->DeleteGlobalRef(env, qspExecutionStateClass);

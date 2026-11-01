@@ -17,6 +17,7 @@
 #include "../../locations.h"
 #include "../../mathops.h"
 #include "../../menu.h"
+#include "../../names.h"
 #include "../../objects.h"
 #include "../../statements.h"
 #include "../../text.h"
@@ -260,7 +261,7 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 /* Get the number of items in an array */
 QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 {
-    QSPVar *var = qspVarReference(name, QSP_VARREF_GETSILENTLY);
+    QSPVar *var = qspVarByName(name);
     if (var)
     {
         *count = var->ValsCount;
@@ -272,7 +273,7 @@ QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 /* Get index of an item by key */
 QSP_BOOL QSPGetVarIndexByKey(QSPString name, QSPVariant key, int *ind)
 {
-    QSPVar *var = qspVarReference(name, QSP_VARREF_GETSILENTLY);
+    QSPVar *var = qspVarByName(name);
     if (var)
     {
         int arrIndex = qspGetVarIndex(var, key, QSP_FALSE);
@@ -288,7 +289,7 @@ QSP_BOOL QSPGetVarIndexByKey(QSPString name, QSPVariant key, int *ind)
 /* Get value & key of the specified array item, both are optional */
 QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *value, QSPVariant *key)
 {
-    QSPVar *var = qspVarReference(name, QSP_VARREF_GETSILENTLY);
+    QSPVar *var = qspVarByName(name);
     if (var && ind >= 0 && ind < var->ValsCount)
     {
         if (value) *value = var->Values[ind];
@@ -303,6 +304,16 @@ QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *value, QSPVariant *
     if (value) *value = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     if (key) *key = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     return QSP_FALSE;
+}
+/* Get index of a name */
+int QSPGetNameIndex(QSPString name, QSP_BOOL toCreate)
+{
+    return qspGetNameIndex(name, toCreate);
+}
+/* Get name by index */
+QSPString QSPGetName(int nameIndex)
+{
+    return qspGetNameText(nameIndex);
 }
 /* Get display string of the specified value */
 QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize)

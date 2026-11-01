@@ -7,6 +7,7 @@
 
 #include "declarations.h"
 #include "codetools.h"
+#include "names.h"
 #include "text.h"
 #include "variant.h"
 
@@ -82,9 +83,9 @@
 
     enum
     {
-        QSP_VARREF_GET,
-        QSP_VARREF_GETORCREATE,
-        QSP_VARREF_GETSILENTLY /* no errors reported */
+        QSP_REF_GET,
+        QSP_REF_GETORCREATE,
+        QSP_REF_GETSILENTLY /* no errors reported */
     };
 
     extern QSPVarSlot qspNullVarSlot;
@@ -112,9 +113,17 @@
     QSPVarKey *qspAddVarKey(QSPVar *var, unsigned int hash, int valIndex);
     int qspGetVarKeyIndex(QSPVar *var, int valIndex);
     int qspGetVarIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
-    QSP_BOOL qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
-    QSP_BOOL qspGetFirstVarValue(QSPString varName, QSPVariant *res);
-    QSP_BOOL qspGetLastVarValue(QSPString varName, QSPVariant *res);
+    void qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
+    void qspGetFirstVarValue(QSPString varName, QSPVariant *res);
+    void qspGetLastVarValue(QSPString varName, QSPVariant *res);
+    void qspGetVarFieldValueByIndex(QSPString varName, QSPVariant index, QSPField *fields, int count, QSPVariant *res);
+    void qspGetFirstVarFieldValue(QSPString varName, QSPField *fields, int count, QSPVariant *res);
+    void qspGetLastVarFieldValue(QSPString varName, QSPField *fields, int count, QSPVariant *res);
+    int qspParseFieldsPath(QSPString *s, QSP_TINYINT varType, QSPField *fields, QSP_BOOL toIntern);
+    int qspGetFieldsFromText(QSPString path, QSP_TINYINT varType, QSPField *fields, QSP_BOOL toIntern);
+    QSP_BOOL qspParseTargetFields(QSPCachedTarget *target);
+    void qspGetVarFieldValueByPath(QSPString varName, QSPVariant index, QSPString path, QSPVariant *res);
+    QSPVar *qspVarByName(QSPString name);
     QSPString qspGetVarStrValue(QSPString name, int ind);
     QSP_BIGINT qspGetVarNumValue(QSPString name, int ind);
     int qspArraySize(QSPString varName);
@@ -155,12 +164,29 @@
             return qspNullString;
         do
         {
-            if (qspIsInClass(*pos, QSP_CHAR_DELIM))
+            if (qspIsInClass(*pos, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF))
                 return qspNullString;
             hash = qspAddValueToHash(hash, *pos);
         } while (++pos < end);
         *nameHash = qspFinalizeHash(hash);
         return name;
+    }
+
+    INLINE QSP_BOOL qspInitField(QSPField *field, QSPString name, QSP_BOOL toIntern)
+    {
+        unsigned int nameHash;
+        QSPString fieldName, upperName = qspUpperText(name);
+        fieldName = qspPrepareVarName(upperName, &nameHash);
+        if (qspIsEmpty(fieldName) || qspIsInClass(*fieldName.Str, QSP_CHAR_TYPEPREFIX))
+        {
+            /* Field names can't double the type prefix */
+            qspFreeNewString(&upperName, &name);
+            return QSP_FALSE;
+        }
+        field->NameIndex = (toIntern ? qspInternPreparedName(fieldName, nameHash) : qspFindPreparedName(fieldName, nameHash));
+        field->Value = qspGetEmptyVariant(qspGetVarType(name)); /* type of value if the field is missing */
+        qspFreeNewString(&upperName, &name);
+        return QSP_TRUE;
     }
 
     INLINE void qspInitVarData(QSPVar *var)

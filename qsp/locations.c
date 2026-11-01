@@ -170,10 +170,9 @@ QSPLocation *qspLocByName(QSPString name)
         if (!qspIsEmpty(name))
         {
             QSPLocName *slot;
-            name = qspCopyToNewText(name);
-            qspUpperStr(&name);
-            slot = qspGetLocSlot(name, qspGetTextHash(name));
-            qspFreeString(&name);
+            QSPString upperName = qspUpperText(name);
+            slot = qspGetLocSlot(upperName, qspGetTextHash(upperName));
+            qspFreeNewString(&upperName, &name);
             if (slot->Name.Str) return qspLocs[slot->Index];
         }
     }
@@ -312,7 +311,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
     while (1)
     {
         /* The variable might be updated during the previous code execution */
-        if (!((var = qspVarReference(name, QSP_VARREF_GET))))
+        if (!((var = qspVarReference(name, QSP_REF_GET))))
         {
             qspClearLocalVarsScopes(savedLocalVars);
             return;

@@ -334,12 +334,13 @@ QSP_BOOL qspVariantKeysEqual(QSPVariant *first, QSPVariant *second)
             return QSP_TRUE;
         case QSP_TYPE_TUPLE:
             {
-                QSPVariant *pos1 = QSP_PTUPLE(first).Vals, *pos2 = QSP_PTUPLE(second).Vals;
-                QSPVariant *end1 = pos1 + QSP_PTUPLE(first).ValsCount;
+                QSPField *pos1 = QSP_PTUPLE(first).Vals, *pos2 = QSP_PTUPLE(second).Vals;
+                QSPField *end1 = pos1 + QSP_PTUPLE(first).ValsCount;
                 if (QSP_PTUPLE(first).ValsCount != QSP_PTUPLE(second).ValsCount) return QSP_FALSE;
                 while (pos1 < end1)
                 {
-                    if (!qspVariantKeysEqual(pos1, pos2)) return QSP_FALSE;
+                    if (pos1->NameIndex != pos2->NameIndex || !qspVariantKeysEqual(&pos1->Value, &pos2->Value))
+                        return QSP_FALSE;
                     ++pos1, ++pos2;
                 }
                 return QSP_TRUE;
@@ -374,7 +375,7 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
             qspInitVariant(res, QSP_TYPE_STR); /* undefined & undefined is an empty string */
             break;
         case QSP_TYPE_TUPLE:
-            *res = qspTupleVariant(qspCopyToNewTuple(QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).ValsCount)); /* the empty value doesn't change the other one */
+            qspMoveToNewVariant(res, arg2); /* the empty value doesn't change the other one */
             break;
         case QSP_TYPE_NUM:
         case QSP_TYPE_STR:
@@ -387,14 +388,14 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
         switch (QSP_BASETYPE(arg2->Type))
         {
         case QSP_TYPE_UNDEF:
-            *res = qspTupleVariant(qspCopyToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).ValsCount));
+            qspMoveToNewVariant(res, arg1);
             break;
         case QSP_TYPE_TUPLE:
-            *res = qspTupleVariant(qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).ValsCount, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).ValsCount));
+            *res = qspTupleVariant(qspMergeToNewTuple(&QSP_PTUPLE(arg1), &QSP_PTUPLE(arg2)));
             break;
         case QSP_TYPE_NUM:
         case QSP_TYPE_STR:
-            *res = qspTupleVariant(qspMergeToNewTuple(QSP_PTUPLE(arg1).Vals, QSP_PTUPLE(arg1).ValsCount, arg2, 1));
+            *res = qspTupleVariant(qspAppendValueToNewTuple(&QSP_PTUPLE(arg1), arg2));
             break;
         }
         break;
@@ -407,7 +408,7 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
             res->Type = QSP_TYPE_STR;
             break;
         case QSP_TYPE_TUPLE:
-            *res = qspTupleVariant(qspMergeToNewTuple(arg1, 1, QSP_PTUPLE(arg2).Vals, QSP_PTUPLE(arg2).ValsCount));
+            *res = qspTupleVariant(qspPrependValueToNewTuple(&QSP_PTUPLE(arg2), arg1));
             break;
         case QSP_TYPE_NUM:
         case QSP_TYPE_STR:
@@ -430,24 +431,22 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
         if (tuple->Vals)
         {
             int i;
-            QSPVariant *vals = (QSPVariant *)malloc(tuple->ValsCount * sizeof(QSPVariant));
+            QSPField *fields = (QSPField *)malloc(tuple->ValsCount * sizeof(QSPField));
             for (i = 0; i < tuple->ValsCount; ++i)
             {
-                if (!qspAutoConvertCombine(tuple->Vals + i, arg2, op, vals + i))
+                if (!qspAutoConvertCombine(&tuple->Vals[i].Value, arg2, op, &fields[i].Value))
                 {
-                    qspFreeVariants(vals, i);
-                    free(vals);
+                    qspFreeTupleFields(fields, i);
+                    free(fields);
                     return QSP_FALSE;
                 }
+                fields[i].NameIndex = tuple->Vals[i].NameIndex;
             }
-            QSP_PTUPLE(res).Vals = vals;
+            QSP_PTUPLE(res).Vals = fields;
             QSP_PTUPLE(res).ValsCount = tuple->ValsCount;
         }
         else
-        {
-            QSP_PTUPLE(res).Vals = 0;
-            QSP_PTUPLE(res).ValsCount = 0;
-        }
+            QSP_PTUPLE(res) = qspNullTuple;
         res->Type = QSP_TYPE_TUPLE;
         return QSP_TRUE;
     }
@@ -457,24 +456,22 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
         if (tuple->Vals)
         {
             int i;
-            QSPVariant *vals = (QSPVariant *)malloc(tuple->ValsCount * sizeof(QSPVariant));
+            QSPField *fields = (QSPField *)malloc(tuple->ValsCount * sizeof(QSPField));
             for (i = 0; i < tuple->ValsCount; ++i)
             {
-                if (!qspAutoConvertCombine(arg1, tuple->Vals + i, op, vals + i))
+                if (!qspAutoConvertCombine(arg1, &tuple->Vals[i].Value, op, &fields[i].Value))
                 {
-                    qspFreeVariants(vals, i);
-                    free(vals);
+                    qspFreeTupleFields(fields, i);
+                    free(fields);
                     return QSP_FALSE;
                 }
+                fields[i].NameIndex = tuple->Vals[i].NameIndex;
             }
-            QSP_PTUPLE(res).Vals = vals;
+            QSP_PTUPLE(res).Vals = fields;
             QSP_PTUPLE(res).ValsCount = tuple->ValsCount;
         }
         else
-        {
-            QSP_PTUPLE(res).Vals = 0;
-            QSP_PTUPLE(res).ValsCount = 0;
-        }
+            QSP_PTUPLE(res) = qspNullTuple;
         res->Type = QSP_TYPE_TUPLE;
         return QSP_TRUE;
     }
@@ -547,11 +544,13 @@ INLINE unsigned int qspAddVariantToKeyHash(unsigned int hash, QSPVariant *val)
     case QSP_TYPE_TUPLE:
         {
             int count = QSP_PTUPLE(val).ValsCount;
-            QSPVariant *item = QSP_PTUPLE(val).Vals;
+            QSPField *item = QSP_PTUPLE(val).Vals;
             hash = qspAddValueToHash(hash, (unsigned int)count);
             while (--count >= 0)
             {
-                hash = qspAddVariantToKeyHash(hash, item);
+                hash = qspAddVariantToKeyHash(hash, &item->Value);
+                if (item->NameIndex > 0)
+                    hash = qspAddValueToHash(hash, (unsigned int)item->NameIndex);
                 ++item;
             }
             break;

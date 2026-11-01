@@ -138,13 +138,13 @@ void qspInitStats(void)
     qspAddStatement(QSP_STAT_DYNAMIC, qspStatementDynamic, 1, QSP_MAXSTATARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddStatement(QSP_STAT_EXEC, qspStatementExec, 1, 1, QSP_TYPE_STR);
 
-    qspAddStatement(QSP_STAT_SETVAR, qspStatementSetVar, 2, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF);
+    qspAddStatement(QSP_STAT_SETVAR, qspStatementSetVar, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF, QSP_TYPE_STR);
     qspAddStatement(QSP_STAT_INSVAR, qspStatementInsVar, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF, QSP_TYPE_NUM);
     qspAddStatement(QSP_STAT_UNPACKARR, qspStatementUnpackArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_TUPLE, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(QSP_STAT_COPYARR, qspStatementCopyArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(QSP_STAT_SORTARR, qspStatementSortArr, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_BOOL);
     qspAddStatement(QSP_STAT_SCANSTR, qspStatementScanStr, 3, 4, QSP_TYPE_VARREF, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
-    qspAddStatement(QSP_STAT_KILLVAR, qspStatementKillVar, 0, 2, QSP_TYPE_VARREF, QSP_TYPE_UNDEF);
+    qspAddStatement(QSP_STAT_KILLVAR, qspStatementKillVar, 0, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_STR);
     qspAddStatement(QSP_STAT_KILLALL, qspStatementClear, 0, 0);
 
     qspAddStatement(QSP_STAT_ADDOBJ, qspStatementAddObject, 1, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);

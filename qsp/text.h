@@ -26,7 +26,8 @@
         QSP_CHAR_DELIM = 1 << 3, /* delimiters */
         QSP_CHAR_SIMPLEOP = 1 << 4, /* simple math operations */
         QSP_CHAR_LBRACKET = 1 << 5, /* opening brackets of an expression */
-        QSP_CHAR_TYPEPREFIX = 1 << 6 /* type prefix */
+        QSP_CHAR_TYPEPREFIX = 1 << 6, /* type prefix */
+        QSP_CHAR_FIELDREF = 1 << 7 /* field delimiter */
     };
 
     typedef struct
@@ -224,10 +225,10 @@
         return num;
     }
 
-    INLINE QSPString qspParseName(QSPString *s)
+    INLINE QSPString qspParseName(QSPString *s, int delimClass)
     {
         QSP_CHAR *startPos = s->Str, *pos = startPos, *end = s->End;
-        while (pos < end && !qspIsInClass(*pos, QSP_CHAR_DELIM)) ++pos;
+        while (pos < end && !qspIsInClass(*pos, delimClass)) ++pos;
         s->Str = pos;
         return qspStringFromPair(startPos, pos);
     }
@@ -273,6 +274,28 @@
             *pos = (QSP_CHAR)QSP_CHRUPR(*pos);
             ++pos;
         }
+    }
+
+    INLINE QSPString qspUpperText(QSPString txt)
+    {
+        /* The text itself when it's uppercase already, otherwise its uppercased copy */
+        QSP_CHAR ch, *pos = txt.Str, *end = txt.End;
+        while (pos < end)
+        {
+            ch = (QSP_CHAR)QSP_CHRUPR(*pos);
+            if (ch != *pos)
+            {
+                /* Previous text is uppercase already */
+                QSPString rest, res = qspCopyToNewText(txt);
+                pos = res.Str + (pos - txt.Str);
+                *pos = ch;
+                rest = qspStringFromPair(pos + 1, res.End);
+                qspUpperStr(&rest);
+                return res;
+            }
+            ++pos;
+        }
+        return txt;
     }
 
     INLINE int qspStrsPartCompare(QSPString str, QSPString part)

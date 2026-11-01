@@ -99,7 +99,7 @@
             dest->Val = src->Val;
             break;
         case QSP_TYPE_TUPLE:
-            QSP_PTUPLE(dest) = qspCopyToNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).ValsCount);
+            QSP_PTUPLE(dest) = qspCopyFieldsToNewTuple(QSP_PTUPLE(src).Vals, QSP_PTUPLE(src).ValsCount);
             break;
         case QSP_TYPE_NUM:
             QSP_PNUM(dest) = QSP_PNUM(src);
@@ -108,6 +108,16 @@
             QSP_PSTR(dest) = qspCopyToNewText(QSP_PSTR(src));
             break;
         }
+    }
+
+    INLINE void qspInitVariantFrom(QSPVariant *dest, QSPVariant *src, QSP_TINYINT baseType)
+    {
+        if (src)
+        {
+            if (!QSP_ISDEF(baseType) || QSP_BASETYPE(src->Type) == baseType)
+                qspCopyToNewVariant(dest, src);
+        }
+        qspInitVariant(dest, baseType);
     }
 
     INLINE void qspMoveToNewVariant(QSPVariant *dest, QSPVariant *src)

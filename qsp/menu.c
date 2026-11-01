@@ -43,7 +43,7 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     QSPString menuLocs[QSP_MAXMENUITEMS], itemName, itemLocation, itemImage, str;
     QSPTuple tuple;
     QSP_CHAR *pos, *pos2;
-    if (!((var = qspVarReference(QSP_STR(args[0]), QSP_VARREF_GET)))) return;
+    if (!((var = qspVarReference(QSP_STR(args[0]), QSP_REF_GET)))) return;
     if (count >= 2)
     {
         ind = QSP_TOINT(QSP_NUM(args[1]));
@@ -72,11 +72,11 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
             if (tuple.ValsCount < 2) break;
             if (tuple.ValsCount >= 3)
             {
-                itemImage = qspGetVariantAsString(&tuple.Vals[2]);
+                itemImage = qspGetVariantAsString(&tuple.Vals[2].Value);
                 if (!qspIsAnyString(itemImage)) qspClearText(&itemImage);
             }
-            itemName = qspGetVariantAsString(&tuple.Vals[0]);
-            itemLocation = qspGetVariantAsString(&tuple.Vals[1]);
+            itemName = qspGetVariantAsString(&tuple.Vals[0].Value);
+            itemLocation = qspGetVariantAsString(&tuple.Vals[1].Value);
             break;
         case QSP_TYPE_STR:
             str = QSP_PSTR(curItem);
