@@ -138,13 +138,13 @@ void qspInitStats(void)
     qspAddStatement(QSP_STAT_DYNAMIC, qspStatementDynamic, 1, QSP_MAXSTATARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddStatement(QSP_STAT_EXEC, qspStatementExec, 1, 1, QSP_TYPE_STR);
 
-    qspAddStatement(QSP_STAT_SETVAR, qspStatementSetVar, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF, QSP_TYPE_STR);
+    qspAddStatement(QSP_STAT_SETVAR, qspStatementSetVar, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF, QSP_TYPE_TUPLE);
     qspAddStatement(QSP_STAT_INSVAR, qspStatementInsVar, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_UNDEF, QSP_TYPE_NUM);
     qspAddStatement(QSP_STAT_UNPACKARR, qspStatementUnpackArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_TUPLE, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(QSP_STAT_COPYARR, qspStatementCopyArr, 2, 4, QSP_TYPE_VARREF, QSP_TYPE_VARREF, QSP_TYPE_NUM, QSP_TYPE_NUM);
     qspAddStatement(QSP_STAT_SORTARR, qspStatementSortArr, 1, 2, QSP_TYPE_VARREF, QSP_TYPE_BOOL);
     qspAddStatement(QSP_STAT_SCANSTR, qspStatementScanStr, 3, 4, QSP_TYPE_VARREF, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
-    qspAddStatement(QSP_STAT_KILLVAR, qspStatementKillVar, 0, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_STR);
+    qspAddStatement(QSP_STAT_KILLVAR, qspStatementKillVar, 0, 3, QSP_TYPE_VARREF, QSP_TYPE_UNDEF, QSP_TYPE_TUPLE);
     qspAddStatement(QSP_STAT_KILLALL, qspStatementClear, 0, 0);
 
     qspAddStatement(QSP_STAT_ADDOBJ, qspStatementAddObject, 1, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
@@ -389,22 +389,15 @@ QSP_TINYINT qspGetStatArgs(QSPCachedStat *stat, QSPCachedArg *statArgs, QSPVaria
     QSP_TINYINT argsCount = stat->ArgsCount;
     if (argsCount > 0)
     {
-        QSP_TINYINT argIndex, type, *statArgsTypes;
+        QSP_TINYINT argIndex, *statArgsTypes;
         int oldLocationState = qspLocationState;
         statArgsTypes = qspStats[stat->Stat].ArgsTypes;
         for (argIndex = 0; argIndex < argsCount; ++argIndex)
         {
-            type = statArgsTypes[argIndex];
-            args[argIndex] = qspCalculateArgValue(statArgs + argIndex);
+            args[argIndex] = qspCalculateTypedArgValue(statArgs + argIndex, statArgsTypes[argIndex]);
             if (qspLocationState != oldLocationState)
             {
                 qspFreeVariants(args, argIndex);
-                return 0;
-            }
-            if (QSP_ISDEF(type) && !qspConvertVariantTo(args + argIndex, type))
-            {
-                qspSetError(QSP_ERR_TYPEMISMATCH);
-                qspFreeVariants(args, argIndex + 1); /* include the current item */
                 return 0;
             }
         }
@@ -813,15 +806,7 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
 
 INLINE QSP_BOOL qspCheckCondition(QSPCachedArg *condition)
 {
-    int oldLocationState = qspLocationState;
-    QSPVariant condValue = qspCalculateArgValue(condition);
-    if (qspLocationState != oldLocationState) return QSP_FALSE;
-    if (!qspConvertVariantTo(&condValue, QSP_TYPE_BOOL))
-    {
-        qspSetError(QSP_ERR_TYPEMISMATCH);
-        qspFreeVariant(&condValue);
-        return QSP_FALSE;
-    }
+    QSPVariant condValue = qspCalculateTypedArgValue(condition, QSP_TYPE_BOOL);
     return QSP_ISTRUE(QSP_NUM(condValue));
 }
 

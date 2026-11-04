@@ -48,6 +48,14 @@
 
     typedef struct
     {
+        QSP_TINYINT OpCode;
+        QSP_TINYINT ArgsCount;
+        unsigned short ValueIndex; /* operand value for the operation */
+        QSPTuple Fields; /* field names of a tuple */
+    } QSPMathLevel;
+
+    typedef struct
+    {
         QSPMathCompiledOp *CompItems;
         int ItemsCount;
         int ItemsCapacity;
@@ -68,8 +76,8 @@
         QSP_OP_COMMA, /* sequence point */
         QSP_OP_TUPLE,
         QSP_OP_RECORD, /* tuple with field names */
-        QSP_OP_FIELD, /* field of the tuple value */
-        QSP_OP_INLINEFIELD, /* field of the array item */
+        QSP_OP_FIELD, /* field of a tuple */
+        QSP_OP_INLINEFIELD, /* field of an array item */
         QSP_OP_VALUE,
         QSP_OP_NEGATION,
         QSP_OP_AFFIRMATION,
@@ -146,6 +154,7 @@
     /* External functions */
     void qspInitMath(void);
     void qspTerminateMath(void);
+    QSPString qspGetString(QSPString *expr);
     QSPMathExpression *qspCompileMathExpression(QSPString s);
     void qspFreeMathExpression(QSPMathExpression *expression);
     QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex);

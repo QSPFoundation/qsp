@@ -371,7 +371,7 @@ INLINE QSP_BOOL qspReadEncodedField(QSPString *strs, int strsCount, int *curInde
     int ind = *curIndex;
     if (ind >= strsCount) return QSP_FALSE;
     name = qspDecodeString(strs[ind++], isUCS2);
-    field->NameIndex = qspInternPreparedName(name, qspGetTextHash(name));
+    field->NameIndex = qspGetNameIndex(name, QSP_TRUE);
     qspFreeString(&name);
     if (!qspReadEncodedVariant(strs, strsCount, &ind, isUCS2, &field->Value)) return QSP_FALSE;
     *curIndex = ind;

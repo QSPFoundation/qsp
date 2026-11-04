@@ -23,8 +23,6 @@
     extern QSPName qspNullName;
 
     /* External functions */
-    int qspInternPreparedName(QSPString name, unsigned int nameHash);
-    int qspFindPreparedName(QSPString name, unsigned int nameHash);
     int qspGetNameIndex(QSPString name, QSP_BOOL toIntern);
     QSPString qspGetNameText(int nameIndex);
     void qspAdvanceNamesGeneration(void);

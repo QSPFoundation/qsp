@@ -12,7 +12,10 @@
 
 QSPTuple qspNullTuple;
 
+INLINE QSPVariant *qspReserveTupleFieldValue(QSPTuple *tuple, int nameIndex);
 INLINE int qspTupleNamesCompare(QSPTuple first, QSPTuple second);
+INLINE QSP_BOOL qspIsPlainFieldName(QSPString name);
+INLINE void qspAppendQuotedText(QSPString text, QSPBufString *res);
 
 QSPTuple qspNewTuple(int count)
 {
@@ -121,13 +124,6 @@ QSPTuple qspMoveToNewTuple(QSPVariant *values, int count)
         qspMoveToNewVariant(&newItem->Value, values);
     }
     return tuple;
-}
-
-void qspAssignNamesToTupleItems(QSPTuple *tuple, QSPField *fields, int count)
-{
-    QSPField *item;
-    for (item = tuple->Fields; count > 0; --count, ++fields, ++item)
-        item->NameIndex = fields->NameIndex;
 }
 
 QSPTuple qspCopyFieldsToNewTuple(QSPField *fields, int count)
@@ -255,7 +251,7 @@ void qspReserveTupleItems(QSPTuple *tuple, int count)
     }
 }
 
-QSPVariant *qspReserveTupleFieldValue(QSPTuple *tuple, int nameIndex)
+INLINE QSPVariant *qspReserveTupleFieldValue(QSPTuple *tuple, int nameIndex)
 {
     QSPField *item;
     QSPTuple result;
@@ -390,10 +386,28 @@ QSP_BOOL qspTuplesEqual(QSPTuple first, QSPTuple second)
     return QSP_FALSE;
 }
 
+INLINE QSP_BOOL qspIsPlainFieldName(QSPString name)
+{
+    if (qspIsEmpty(name)) return QSP_FALSE;
+    if (qspIsInClass(*name.Str, QSP_CHAR_DIGIT | QSP_CHAR_TYPEPREFIX)) return QSP_FALSE;
+    if (qspStrCharClass(name, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF)) return QSP_FALSE;
+    return QSP_TRUE;
+}
+
+INLINE void qspAppendQuotedText(QSPString text, QSPBufString *res)
+{
+    QSPString temp;
+    qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
+    temp = qspReplaceText(text, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
+    qspAddBufText(res, temp);
+    qspFreeNewString(&temp, &text);
+    qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
+}
+
 void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
 {
     QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
-    QSPString temp;
+    QSPString name;
     QSPVariant *value;
     QSPField *item = tuple.Fields, *itemsEnd = item + tuple.FieldsCount;
     qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAY_START));
@@ -401,7 +415,11 @@ void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
     {
         if (item->NameIndex > 0)
         {
-            qspAddBufText(res, qspGetNameText(item->NameIndex));
+            name = qspGetNameText(item->NameIndex);
+            if (qspIsPlainFieldName(name))
+                qspAddBufText(res, name);
+            else
+                qspAppendQuotedText(name, res);
             qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAY_FIELDDELIM));
         }
         value = &item->Value;
@@ -417,11 +435,7 @@ void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
             qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(value)));
             break;
         case QSP_TYPE_STR:
-            qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
-            temp = qspReplaceText(QSP_PSTR(value), QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
-            qspAddBufText(res, temp);
-            qspFreeNewString(&temp, &QSP_PSTR(value));
-            qspAddBufText(res, QSP_STATIC_STR(QSP_DEFQUOT));
+            qspAppendQuotedText(QSP_PSTR(value), res);
             break;
         }
         if (++item == itemsEnd) break;

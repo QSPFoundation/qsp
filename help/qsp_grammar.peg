@@ -390,7 +390,9 @@ QSP {
     funcNameWithPrefix    = typePrefix? functionName
     varName               = ~(keyword ~nameChar) ~digit nameChar+
     varNameWithPrefix     = typePrefix? varName
-    fieldName             = ~digit ~typePrefix nameChar+
+    fieldName             = (~digit ~typePrefix nameChar+)
+                          | interpolatedString
+                          | rawStringLiteral
     nameChar              = ~"." nonDelimiterChar
 
     keyword               = functionName

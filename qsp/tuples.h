@@ -26,14 +26,12 @@
     QSP_BIGINT qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid);
     QSPTuple qspCopyToNewTuple(QSPVariant *values, int count);
     QSPTuple qspMoveToNewTuple(QSPVariant *values, int count);
-    void qspAssignNamesToTupleItems(QSPTuple *tuple, QSPField *fields, int count);
     QSPTuple qspCopyFieldsToNewTuple(QSPField *fields, int count);
     QSPTuple qspMoveFieldsToNewTuple(QSPField *fields, int count);
     QSPTuple qspAppendValueToNewTuple(QSPTuple *tuple, QSPVariant *value);
     QSPTuple qspPrependValueToNewTuple(QSPTuple *tuple, QSPVariant *value);
     QSPTuple qspMergeToNewTuple(QSPTuple *first, QSPTuple *second);
     void qspReserveTupleItems(QSPTuple *tuple, int count);
-    QSPVariant *qspReserveTupleFieldValue(QSPTuple *tuple, int nameIndex);
     QSPVariant *qspReserveTupleFieldValueByPath(QSPVariant *value, QSPField *fields, int count);
     void qspRemoveTupleField(QSPTuple *tuple, int nameIndex);
     QSPVariant *qspGetTupleFieldValueByPath(QSPVariant *value, QSPField *fields, int count);

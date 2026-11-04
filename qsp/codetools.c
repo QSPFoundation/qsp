@@ -6,6 +6,7 @@
  */
 
 #include "codetools.h"
+#include "errors.h"
 #include "statements.h"
 #include "text.h"
 #include "variables.h"
@@ -320,6 +321,8 @@ INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TI
     target->Path = qspNullString;
     target->Fields = 0;
     target->FieldsCount = 0;
+    target->DynamicFields = 0;
+    target->DynamicCount = 0;
     target->Name = qspParseName(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
     name = qspPrepareVarName(target->Name, &nameHash); /* validates the name */
     if (qspIsEmpty(name))
@@ -694,6 +697,11 @@ INLINE void qspFreeLineOfCode(QSPLineOfCode *line)
                     {
                         qspFreeArg(&target->Index);
                         if (target->Fields) free(target->Fields);
+                        if (target->DynamicFields)
+                        {
+                            qspFreeArgs(target->DynamicFields, target->DynamicCount);
+                            free(target->DynamicFields);
+                        }
                     }
                     free(assignment->Targets);
                     free(assignment);
@@ -1141,9 +1149,81 @@ QSPCodeBlock *qspGetCachedCodeBlock(QSPString s)
     return block->Code;
 }
 
+QSP_BOOL qspParseTargetFields(QSPCachedTarget *target)
+{
+    QSPField fields[QSP_MAXMATHOPARGS];
+    QSPCachedArg args[QSP_MAXMATHOPARGS];
+    QSPString path, dynamicNames[QSP_MAXMATHOPARGS];
+    int i, fieldsCount, dynamicCount;
+    QSP_TINYINT varType = qspGetVarType(target->Name); /* name is never empty here */
+    path = target->Path;
+    fieldsCount = qspParseFieldsPath(&path, varType, fields, dynamicNames);
+    if (fieldsCount < 0) return QSP_FALSE;
+    if (!qspIsEmpty(path))
+    {
+        qspSetError(QSP_ERR_INCORRECTNAME);
+        return QSP_FALSE;
+    }
+    /* Prepare code of dynamic names */
+    dynamicCount = 0;
+    for (i = 0; i < fieldsCount; ++i)
+    {
+        if (fields[i].NameIndex < 0)
+        {
+            qspInitArg(args + dynamicCount, dynamicNames[i]);
+            ++dynamicCount;
+        }
+    }
+    if (fieldsCount)
+    {
+        target->FieldsCount = fieldsCount;
+        target->Fields = (QSPField *)malloc(fieldsCount * sizeof(QSPField));
+        memcpy(target->Fields, fields, fieldsCount * sizeof(QSPField));
+    }
+    if (dynamicCount)
+    {
+        target->DynamicCount = dynamicCount;
+        target->DynamicFields = (QSPCachedArg *)malloc(dynamicCount * sizeof(QSPCachedArg));
+        memcpy(target->DynamicFields, args, dynamicCount * sizeof(QSPCachedArg));
+    }
+    return QSP_TRUE;
+}
+
+QSP_BOOL qspCalculateTargetFields(QSPCachedTarget *target, QSPField *fields, QSP_TINYINT mode)
+{
+    QSPVariant name;
+    QSPField *fieldsEnd;
+    int oldLocationState;
+    QSPCachedArg *fieldArg = target->DynamicFields;
+    if (!fieldArg)
+    {
+        qspSetError(QSP_ERR_INTERNAL);
+        return QSP_FALSE;
+    }
+    memcpy(fields, target->Fields, target->FieldsCount * sizeof(QSPField));
+    oldLocationState = qspLocationState;
+    fieldsEnd = fields + target->FieldsCount;
+    while (fields < fieldsEnd)
+    {
+        if (fields->NameIndex < 0)
+        {
+            name = qspCalculateTypedArgValue(fieldArg, QSP_TYPE_STR);
+            if (qspLocationState != oldLocationState) return QSP_FALSE;
+            if (!qspGetFieldNameIndex(QSP_STR(name), mode, &fields->NameIndex))
+            {
+                qspFreeVariant(&name);
+                return QSP_FALSE;
+            }
+            qspFreeVariant(&name);
+            ++fieldArg;
+        }
+        ++fields;
+    }
+    return QSP_TRUE;
+}
+
 QSPVariant qspCalculateArgValue(QSPCachedArg *arg)
 {
-    QSPMathExpression *expression;
     switch (arg->Type)
     {
     case QSP_ARG_COMPILED:
@@ -1154,11 +1234,16 @@ QSPVariant qspCalculateArgValue(QSPCachedArg *arg)
         return qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_STR);
     case QSP_ARG_CODE:
         return qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_CODE);
+    case QSP_ARG_EXPRESSION:
+        {
+            /* The text is compiled on the first evaluation */
+            QSPMathExpression *expression = qspCompileMathExpression(arg->Data.Text);
+            if (!expression) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+            arg->Data.Expression = expression;
+            arg->Type = QSP_ARG_COMPILED;
+            return qspCalculateValue(expression, expression->ItemsCount - 1);
+        }
     }
-    /* The text is compiled on the first evaluation */
-    expression = qspCompileMathExpression(arg->Data.Text);
-    if (!expression) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-    arg->Data.Expression = expression;
-    arg->Type = QSP_ARG_COMPILED;
-    return qspCalculateValue(expression, expression->ItemsCount - 1);
+    qspSetError(QSP_ERR_INTERNAL);
+    return qspGetEmptyVariant(QSP_TYPE_UNDEF);
 }

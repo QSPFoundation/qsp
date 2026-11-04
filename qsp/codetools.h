@@ -45,7 +45,9 @@
         QSPCachedArg Index;
         QSPString Path; /* text of the field path */
         QSPField *Fields; /* 0 until the first evaluation */
+        QSPCachedArg *DynamicFields; /* computed field names */
         int FieldsCount;
+        int DynamicCount;
     } QSPCachedTarget;
 
     typedef struct
@@ -138,6 +140,8 @@
     QSPCodeBlock *qspPreprocessData(QSPString data);
     void qspClearAllCodeBlocks(QSP_BOOL toInit);
     QSPCodeBlock *qspGetCachedCodeBlock(QSPString s);
+    QSP_BOOL qspParseTargetFields(QSPCachedTarget *target);
+    QSP_BOOL qspCalculateTargetFields(QSPCachedTarget *target, QSPField *fields, QSP_TINYINT mode);
     QSPVariant qspCalculateArgValue(QSPCachedArg *arg);
 
     INLINE QSPCodeBlock *qspNewCodeBlock(QSPLineOfCode *lines, int linesCount)

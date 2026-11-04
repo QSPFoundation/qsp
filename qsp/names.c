@@ -22,6 +22,8 @@ INLINE int *qspGetNameSlot(QSPString name, unsigned int nameHash);
 INLINE int *qspGetEmptyNameSlot(unsigned int nameHash);
 INLINE void qspRebuildNamesSlots(void);
 INLINE void qspResizeNames(int newCapacity);
+INLINE int qspInternExactName(QSPString name, unsigned int nameHash);
+INLINE int qspFindExactName(QSPString name, unsigned int nameHash);
 
 INLINE int *qspGetNameSlot(QSPString name, unsigned int nameHash)
 {
@@ -74,7 +76,7 @@ INLINE void qspResizeNames(int newCapacity)
     qspRebuildNamesSlots();
 }
 
-int qspInternPreparedName(QSPString name, unsigned int nameHash)
+INLINE int qspInternExactName(QSPString name, unsigned int nameHash)
 {
     /* The name has to be uppercased */
     QSPName *entry;
@@ -104,7 +106,7 @@ int qspInternPreparedName(QSPString name, unsigned int nameHash)
     return nameIndex;
 }
 
-int qspFindPreparedName(QSPString name, unsigned int nameHash)
+INLINE int qspFindExactName(QSPString name, unsigned int nameHash)
 {
     /* The name has to be uppercased */
     if (qspIsEmpty(name)) return 0;
@@ -122,7 +124,7 @@ int qspGetNameIndex(QSPString name, QSP_BOOL toIntern)
     unsigned int nameHash;
     QSPString upperName = qspUpperText(name);
     nameHash = qspGetTextHash(upperName);
-    nameIndex = (toIntern ? qspInternPreparedName(upperName, nameHash) : qspFindPreparedName(upperName, nameHash));
+    nameIndex = (toIntern ? qspInternExactName(upperName, nameHash) : qspFindExactName(upperName, nameHash));
     qspFreeNewString(&upperName, &name);
     return nameIndex;
 }

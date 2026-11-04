@@ -81,6 +81,13 @@
         QSPVarsScopeChunk *ParentChunk;
     } QSPVarsScopeChunk;
 
+    typedef struct
+    {
+        QSPVar *Var;
+        QSPVariant Index;
+        QSPField *Fields;
+    } QSPResolvedTarget;
+
     enum
     {
         QSP_REF_GET,
@@ -119,13 +126,17 @@
     void qspGetVarFieldValueByIndex(QSPString varName, QSPVariant index, QSPField *fields, int count, QSPVariant *res);
     void qspGetFirstVarFieldValue(QSPString varName, QSPField *fields, int count, QSPVariant *res);
     void qspGetLastVarFieldValue(QSPString varName, QSPField *fields, int count, QSPVariant *res);
-    int qspParseFieldsPath(QSPString *s, QSP_TINYINT varType, QSPField *fields, QSP_BOOL toIntern);
-    int qspGetFieldsFromText(QSPString path, QSP_TINYINT varType, QSPField *fields, QSP_BOOL toIntern);
-    QSP_BOOL qspParseTargetFields(QSPCachedTarget *target);
-    void qspGetVarFieldValueByPath(QSPString varName, QSPVariant index, QSPString path, QSPVariant *res);
+    QSP_BOOL qspGetFieldNameIndex(QSPString name, QSP_TINYINT mode, int *nameIndex);
+    QSP_BOOL qspInitPlainField(QSPField *field, QSPString name);
+    QSP_BOOL qspInitQuotedField(QSPField *field, QSPString name, QSP_TINYINT fieldType);
+    QSP_BOOL qspParseFieldName(QSPString *s, QSPField *field, QSPString *code);
+    int qspParseFieldsPath(QSPString *s, QSP_TINYINT varType, QSPField *fields, QSPString *dynamicNames);
+    int qspGetFieldsFromPath(QSPTuple path, QSPField *fields, QSP_TINYINT mode);
+    void qspGetVarFieldValueByPath(QSPString varName, QSPVariant index, QSPTuple path, QSPVariant *res);
     QSPVar *qspVarByName(QSPString name);
     QSPString qspGetVarStrValue(QSPString name, int valIndex);
     QSP_BIGINT qspGetVarNumValue(QSPString name, int valIndex);
+    QSPTuple qspCopyArrayToNewTuple(QSPVar *src, int start, int count);
     int qspArraySize(QSPString varName);
     int qspArrayPos(QSPString varName, QSPVariant *val, int ind);
     int qspArrayPosRegExp(QSPString varName, QSPString regExpStr, int ind);
@@ -172,21 +183,12 @@
         return name;
     }
 
-    INLINE QSP_BOOL qspInitField(QSPField *field, QSPString name, QSP_BOOL toIntern)
+    INLINE QSP_BOOL qspIsTypedQuote(QSPString s)
     {
-        unsigned int nameHash;
-        QSPString fieldName, upperName = qspUpperText(name);
-        fieldName = qspPrepareVarName(upperName, &nameHash);
-        if (qspIsEmpty(fieldName) || qspIsInClass(*fieldName.Str, QSP_CHAR_TYPEPREFIX))
-        {
-            /* Field names can't double the type prefix */
-            qspFreeNewString(&upperName, &name);
-            return QSP_FALSE;
-        }
-        field->NameIndex = (toIntern ? qspInternPreparedName(fieldName, nameHash) : qspFindPreparedName(fieldName, nameHash));
-        field->Value = qspGetEmptyVariant(qspGetVarType(name)); /* type of value if the field is missing */
-        qspFreeNewString(&upperName, &name);
-        return QSP_TRUE;
+        /* Type prefix of a quoted name is outside the quotes */
+        if (qspStrLen(s) >= 2)
+            return qspIsInClass(*s.Str, QSP_CHAR_TYPEPREFIX) && qspIsInClass(*(s.Str + 1), QSP_CHAR_QUOT);
+        return QSP_FALSE;
     }
 
     INLINE void qspInitVarData(QSPVar *var)
