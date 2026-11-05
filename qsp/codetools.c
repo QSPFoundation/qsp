@@ -334,7 +334,6 @@ INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, Q
 INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TINYINT *errorCode)
 {
     QSPString name;
-    unsigned int nameHash;
     s = qspDelSpc(s);
     target->Index.Type = QSP_ARG_NONE;
     target->Path = qspNullString;
@@ -343,7 +342,7 @@ INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TI
     target->DynamicFields = 0;
     target->DynamicCount = 0;
     target->Name = qspParseToDelim(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
-    name = qspPrepareVarName(target->Name, &nameHash); /* validates the name */
+    name = qspPrepareVarName(target->Name, 0); /* validates the name */
     if (qspIsEmpty(name))
     {
         *errorCode = QSP_ERR_INCORRECTNAME;

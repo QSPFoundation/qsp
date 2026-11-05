@@ -164,7 +164,6 @@
 
     INLINE QSPString qspPrepareVarName(QSPString name, unsigned int *nameHash)
     {
-        unsigned int hash = QSP_HASHSEED;
         QSP_CHAR *pos = name.Str, *end = name.End;
 
         /* Validate the name, skip its type prefix & hash it */
@@ -173,13 +172,26 @@
 
         if (pos == end || qspIsInClass(*pos, QSP_CHAR_DIGIT))
             return qspNullString;
-        do
+
+        if (nameHash)
         {
-            if (qspIsInClass(*pos, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF))
-                return qspNullString;
-            hash = qspAddValueToHash(hash, *pos);
-        } while (++pos < end);
-        *nameHash = qspFinalizeHash(hash);
+            unsigned int hash = QSP_HASHSEED;
+            do
+            {
+                if (qspIsInClass(*pos, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF))
+                    return qspNullString;
+                hash = qspAddValueToHash(hash, *pos);
+            } while (++pos < end);
+            *nameHash = qspFinalizeHash(hash);
+        }
+        else
+        {
+            do
+            {
+                if (qspIsInClass(*pos, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF))
+                    return qspNullString;
+            } while (++pos < end);
+        }
         return name;
     }
 

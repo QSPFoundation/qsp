@@ -939,8 +939,7 @@ QSP_BOOL qspGetFieldNameIndex(QSPString name, QSP_TINYINT mode, int *nameIndex)
 
 QSP_BOOL qspInitPlainField(QSPField *field, QSPString name)
 {
-    unsigned int nameHash;
-    QSPString fieldName = qspPrepareVarName(name, &nameHash); /* validates the name */
+    QSPString fieldName = qspPrepareVarName(name, 0); /* validates the name */
     if (qspIsEmpty(fieldName) || qspIsInClass(*fieldName.Str, QSP_CHAR_TYPEPREFIX))
     {
         /* Field names can't double the type prefix */
