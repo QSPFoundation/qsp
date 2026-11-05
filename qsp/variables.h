@@ -183,14 +183,6 @@
         return name;
     }
 
-    INLINE QSP_BOOL qspIsTypedQuote(QSPString s)
-    {
-        /* Type prefix of a quoted name is outside the quotes */
-        if (qspStrLen(s) >= 2)
-            return qspIsInClass(*s.Str, QSP_CHAR_TYPEPREFIX) && qspIsInClass(*(s.Str + 1), QSP_CHAR_QUOT);
-        return QSP_FALSE;
-    }
-
     INLINE void qspInitVarData(QSPVar *var)
     {
         var->Values = 0;
