@@ -341,7 +341,7 @@ INLINE QSPVarSlot *qspAddVarToLocals(QSPString name)
     name = qspPrepareVarName(name, &nameHash); /* validates the name */
     if (qspIsEmpty(name))
     {
-        qspSetError(QSP_ERR_INCORRECTNAME);
+        qspSetError(QSP_ERR_INCORRECTVARNAME);
         return 0;
     }
 
@@ -454,7 +454,7 @@ QSPVarSlot *qspVarSlotReference(QSPString name, QSP_TINYINT mode)
     if (qspIsEmpty(name))
     {
         if (mode != QSP_REF_GETSILENTLY)
-            qspSetError(QSP_ERR_INCORRECTNAME);
+            qspSetError(QSP_ERR_INCORRECTVARNAME);
         return 0;
     }
 
@@ -930,7 +930,7 @@ QSP_BOOL qspGetFieldNameIndex(QSPString name, QSP_TINYINT mode, int *nameIndex)
     if (qspIsEmpty(name))
     {
         if (mode != QSP_REF_GETSILENTLY)
-            qspSetError(QSP_ERR_INCORRECTNAME);
+            qspSetError(QSP_ERR_INCORRECTFIELDNAME);
         return QSP_FALSE;
     }
     *nameIndex = qspGetNameIndex(name, (mode == QSP_REF_GETORCREATE));
@@ -943,7 +943,7 @@ QSP_BOOL qspInitPlainField(QSPField *field, QSPString name)
     if (qspIsEmpty(fieldName) || qspIsInClass(*fieldName.Str, QSP_CHAR_TYPEPREFIX))
     {
         /* Field names can't double the type prefix */
-        qspSetError(QSP_ERR_INCORRECTNAME);
+        qspSetError(QSP_ERR_INCORRECTFIELDNAME);
         return QSP_FALSE;
     }
     field->Value = qspGetEmptyVariant(qspGetVarType(name)); /* type of value if the field is missing */
@@ -1007,13 +1007,13 @@ int qspParseFieldsPath(QSPString *s, QSP_TINYINT varType, QSPField *fields, QSPS
         if (!qspParseChar(s, QSP_FIELDDELIM_CHAR)) break;
         if (QSP_ISDEF(fieldType) && fieldType != QSP_TYPE_TUPLE)
         {
-            qspSetError(QSP_ERR_INCORRECTNAME); /* we don't allow scalar value prefixes in between */
+            qspSetError(QSP_ERR_INCORRECTFIELDNAME); /* we don't allow scalar value prefixes in between */
             return -1;
         }
     }
     if (QSP_ISDEF(varType) && QSP_ISDEF(fieldType) && fieldType != varType)
     {
-        qspSetError(QSP_ERR_INCORRECTNAME); /* type prefixes should match */
+        qspSetError(QSP_ERR_INCORRECTFIELDNAME); /* type prefixes should match */
         return -1;
     }
     return count;
@@ -1033,7 +1033,7 @@ int qspGetFieldsFromPath(QSPTuple path, QSPField *fields, QSP_TINYINT mode)
     {
         if (!QSP_ISSTR(item->Value.Type))
         {
-            qspSetError(QSP_ERR_INCORRECTNAME); /* only strings are names */
+            qspSetError(QSP_ERR_INCORRECTFIELDNAME); /* only strings are names */
             return -1;
         }
         fields[i].Value = qspGetEmptyVariant(QSP_TYPE_UNDEF);

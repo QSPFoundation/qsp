@@ -571,9 +571,9 @@ INLINE QSP_BOOL qspAppendRecordFieldToCompiled(QSPMathExpression *expression, QS
         qspSetError(QSP_ERR_SYNTAX); /* some names don't have values */
         return QSP_FALSE;
     }
-    if (qspGetTupleFieldValue(*fieldNames, field->NameIndex))
+    if (qspGetTupleFieldIndex(*fieldNames, field->NameIndex) >= 0)
     {
-        qspSetError(QSP_ERR_SYNTAX); /* the names are unique */
+        qspSetError(QSP_ERR_DUPLICATEFIELD);
         return QSP_FALSE;
     }
     if (field->NameIndex > 0)
@@ -1343,7 +1343,7 @@ INLINE QSPTuple qspMoveToNewRecord(QSPVariant *values, int count, QSPTuple names
         if (qspGetTupleFieldIndex(tuple, item->NameIndex) >= 0)
         {
             qspFreeTuple(&tuple);
-            qspSetError(QSP_ERR_SYNTAX); /* the names are unique */
+            qspSetError(QSP_ERR_DUPLICATEFIELD);
             return qspNullTuple;
         }
         qspMoveToNewVariant(&item->Value, values);

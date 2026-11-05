@@ -84,7 +84,9 @@ QSPString qspGetErrorDesc(int errorNum)
     case QSP_ERR_CANTADDMENUITEM: str = QSP_STATIC_STR(QSP_FMT("Can't add menu item!")); break;
     case QSP_ERR_LOCNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Location not found!")); break;
     case QSP_ERR_LABELNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Label not found!")); break;
-    case QSP_ERR_INCORRECTNAME: str = QSP_STATIC_STR(QSP_FMT("Incorrect variable name!")); break;
+    case QSP_ERR_INCORRECTVARNAME: str = QSP_STATIC_STR(QSP_FMT("Incorrect variable name!")); break;
+    case QSP_ERR_INCORRECTFIELDNAME: str = QSP_STATIC_STR(QSP_FMT("Incorrect field name!")); break;
+    case QSP_ERR_DUPLICATEFIELD: str = QSP_STATIC_STR(QSP_FMT("Duplicate field name!")); break;
     case QSP_ERR_QUOTNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Quote not found!")); break;
     case QSP_ERR_BRACKETNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Bracket not found!")); break;
     case QSP_ERR_SYNTAX: str = QSP_STATIC_STR(QSP_FMT("Syntax error!")); break;

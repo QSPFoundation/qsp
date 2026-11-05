@@ -345,7 +345,7 @@ INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TI
     name = qspPrepareVarName(target->Name, 0); /* validates the name */
     if (qspIsEmpty(name))
     {
-        *errorCode = QSP_ERR_INCORRECTNAME;
+        *errorCode = QSP_ERR_INCORRECTVARNAME;
         return;
     }
     qspSkipSpaces(&s);
@@ -365,13 +365,13 @@ INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TI
     {
         if (qspIsEmpty(s))
         {
-            *errorCode = QSP_ERR_INCORRECTNAME;
+            *errorCode = QSP_ERR_INCORRECTFIELDNAME;
             return;
         }
         target->Path = s; /* parsed on the first evaluation */
     }
     else if (!qspIsEmpty(s))
-        *errorCode = QSP_ERR_INCORRECTNAME;
+        *errorCode = QSP_ERR_INCORRECTVARNAME;
 }
 
 INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT argsCount, QSP_TINYINT statCode, QSPString s, QSP_TINYINT *errorCode)
@@ -1207,7 +1207,7 @@ QSP_BOOL qspParseTargetFields(QSPCachedTarget *target)
     if (fieldsCount < 0) return QSP_FALSE;
     if (!qspIsEmpty(path))
     {
-        qspSetError(QSP_ERR_INCORRECTNAME);
+        qspSetError(QSP_ERR_INCORRECTFIELDNAME);
         return QSP_FALSE;
     }
     /* Prepare code of dynamic names */
