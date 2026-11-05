@@ -1584,7 +1584,7 @@ void qspStatementLocal(QSPCachedStat *stat)
     QSPVariant v;
     QSPCachedTarget *target;
     QSPCachedAssignment *assignment = stat->Data.Assignment;
-    if (assignment->Operation)
+    if (assignment->Value.Type != QSP_ARG_NONE)
     {
         int oldLocationState = qspLocationState;
         /* We have to evaluate expression before allocation of local vars */

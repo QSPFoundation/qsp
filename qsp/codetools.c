@@ -22,7 +22,7 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
 INLINE QSPCachedLoop *qspNewLoop(QSPString s, QSPString lineStr, QSP_TINYINT *errorCode);
 INLINE QSPCachedArg *qspNewUserCallArgs(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
 INLINE QSPCachedAct *qspNewAct(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
-INLINE QSPCachedArg *qspNewSingleArg(QSPString s, QSP_TINYINT *argsCount);
+INLINE QSPCachedArg *qspNewSingleArg(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
 INLINE QSPCachedArg *qspNewRegularArgs(QSP_TINYINT statCode, QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
 INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, QSP_TINYINT *errorCode);
 INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TINYINT *errorCode);
@@ -134,7 +134,7 @@ INLINE void qspInitStatData(QSPCachedStat *stat, QSPString s, QSPString lineStr)
     case QSP_STAT_IMPLICITSTATEMENT:
     case QSP_STAT_IF:
     case QSP_STAT_ELSEIF:
-        stat->Data.Args = qspNewSingleArg(s, &stat->ArgsCount);
+        stat->Data.Args = qspNewSingleArg(s, &stat->ArgsCount, &stat->ErrorCode);
         break;
     default:
         stat->Data.Args = qspNewRegularArgs(stat->Stat, s, &stat->ArgsCount, &stat->ErrorCode);
@@ -147,7 +147,7 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
     int targetsCount;
     QSPCachedTarget targets[QSP_MAXSTATARGS];
     QSPCachedAssignment *assignment;
-    QSPString names = s, value = qspNullString;
+    QSPString names = s, value;
     QSP_CHAR operation = 0, *equalPos = qspDelimPos(s, QSP_EQUAL_CHAR);
     if (equalPos)
     {
@@ -161,6 +161,11 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
         if (statCode != QSP_STAT_SET && operation != QSP_EQUAL_CHAR)
         {
             *errorCode = QSP_ERR_SYNTAX; /* LOCAL & ALIAS don't support compound operations */
+            return 0;
+        }
+        if (!qspIsAnyString(value))
+        {
+            *errorCode = QSP_ERR_SYNTAX; /* missing value */
             return 0;
         }
     }
@@ -188,7 +193,10 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
     memcpy(assignment->Targets, targets, targetsCount * sizeof(QSPCachedTarget));
     assignment->TargetsCount = targetsCount;
     assignment->Operation = operation;
-    qspInitArg(&assignment->Value, value);
+    if (equalPos)
+        qspInitArg(&assignment->Value, value);
+    else
+        assignment->Value.Type = QSP_ARG_NONE; /* no value */
     return assignment;
 }
 
@@ -220,6 +228,11 @@ INLINE QSPCachedLoop *qspNewLoop(QSPString s, QSPString lineStr, QSP_TINYINT *er
             *errorCode = QSP_ERR_CODENOTFOUND; /* STEP without code */
             return 0;
         }
+    }
+    if (!qspIsAnyString(condition))
+    {
+        *errorCode = QSP_ERR_SYNTAX; /* WHILE without condition */
+        return 0;
     }
     loop = (QSPCachedLoop *)malloc(sizeof(QSPCachedLoop));
     qspInitLineOfCode(&loop->Initializer, qspStringFromPair(s.Str, whilePos), 0);
@@ -261,9 +274,15 @@ INLINE QSPCachedAct *qspNewAct(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT 
     return act;
 }
 
-INLINE QSPCachedArg *qspNewSingleArg(QSPString s, QSP_TINYINT *argsCount)
+INLINE QSPCachedArg *qspNewSingleArg(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode)
 {
-    QSPCachedArg *args = (QSPCachedArg *)malloc(sizeof(QSPCachedArg));
+    QSPCachedArg *args;
+    if (!qspIsAnyString(s))
+    {
+        *errorCode = QSP_ERR_SYNTAX; /* missing value */
+        return 0;
+    }
+    args = (QSPCachedArg *)malloc(sizeof(QSPCachedArg));
     qspInitArg(args, s); /* the whole text is the argument */
     *argsCount = 1;
     return args;
@@ -380,6 +399,7 @@ INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT arg
         if (!qspIsEmpty(s))
         {
             QSP_CHAR *pos;
+            QSPString arg;
             while (1)
             {
                 if (argsCount >= qspStats[statCode].MaxArgsCount)
@@ -390,7 +410,13 @@ INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT arg
                 pos = qspDelimPos(s, QSP_COMMA_CHAR);
                 if (pos)
                 {
-                    qspInitArg(foundArgs + argsCount, qspStringFromPair(s.Str, pos));
+                    arg = qspStringFromPair(s.Str, pos);
+                    if (!qspIsAnyString(arg))
+                    {
+                        *errorCode = QSP_ERR_SYNTAX; /* missing argument */
+                        break;
+                    }
+                    qspInitArg(foundArgs + argsCount, arg);
                     ++argsCount;
                 }
                 else
