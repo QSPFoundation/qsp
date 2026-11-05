@@ -1005,15 +1005,12 @@ int qspParseFieldsPath(QSPString *s, QSP_TINYINT varType, QSPField *fields, QSPS
         fieldType = fields[count].Value.Type; /* specified type prefix */
         ++count;
         qspSkipSpaces(s);
-        if (qspIsEmpty(*s) || *(s->Str) != QSP_FIELDDELIM_CHAR)
-            break;
-
+        if (!qspParseChar(s, QSP_FIELDDELIM_CHAR)) break;
         if (QSP_ISDEF(fieldType) && fieldType != QSP_TYPE_TUPLE)
         {
             qspSetError(QSP_ERR_INCORRECTNAME); /* we don't allow scalar value prefixes in between */
             return -1;
         }
-        s->Str += QSP_STATIC_LEN(QSP_FIELDDELIM);
     }
     if (QSP_ISDEF(varType) && QSP_ISDEF(fieldType) && fieldType != varType)
     {

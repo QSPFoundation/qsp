@@ -233,6 +233,13 @@
         return qspStringFromPair(startPos, pos);
     }
 
+    INLINE QSP_BOOL qspParseChar(QSPString *s, QSP_CHAR ch)
+    {
+        if (qspIsEmpty(*s) || *(s->Str) != ch) return QSP_FALSE;
+        ++s->Str;
+        return QSP_TRUE;
+    }
+
     INLINE unsigned int qspAddValueToHash(unsigned int hash, unsigned int value)
     {
         return (hash ^ value) * 16777619u;

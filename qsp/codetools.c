@@ -362,9 +362,8 @@ INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TI
         s.Str = indexEnd + QSP_STATIC_LEN(QSP_RSBRACK);
         qspSkipSpaces(&s);
     }
-    if (qspIsCharAtPos(s, s.Str, QSP_FIELDDELIM_CHAR))
+    if (qspParseChar(&s, QSP_FIELDDELIM_CHAR))
     {
-        s.Str += QSP_STATIC_LEN(QSP_FIELDDELIM);
         if (qspIsEmpty(s))
         {
             *errorCode = QSP_ERR_INCORRECTNAME;
