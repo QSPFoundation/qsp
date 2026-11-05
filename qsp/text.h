@@ -185,11 +185,12 @@
         return (pos >= str.Str && pos < str.End && qspIsInClass(*pos, charClass));
     }
 
-    INLINE void qspSkipSpaces(QSPString *s)
+    INLINE QSP_BOOL qspSkipSpaces(QSPString *s)
     {
         QSP_CHAR *pos = s->Str, *end = s->End;
         while (pos < end && qspIsInClass(*pos, QSP_CHAR_SPACE)) ++pos;
         s->Str = pos;
+        return (pos != end);
     }
 
     INLINE QSPString qspDelSpc(QSPString s)
@@ -202,8 +203,7 @@
 
     INLINE QSP_BOOL qspIsAnyString(QSPString s)
     {
-        qspSkipSpaces(&s);
-        return (s.Str != s.End);
+        return qspSkipSpaces(&s);
     }
 
     INLINE QSP_BIGINT qspParseUnsignedNumber(QSPString *s)
@@ -225,7 +225,7 @@
         return num;
     }
 
-    INLINE QSPString qspParseName(QSPString *s, int delimClass)
+    INLINE QSPString qspParseToDelim(QSPString *s, int delimClass)
     {
         QSP_CHAR *startPos = s->Str, *pos = startPos, *end = s->End;
         while (pos < end && !qspIsInClass(*pos, delimClass)) ++pos;
@@ -476,6 +476,23 @@
             return QSP_TRUE;
         }
         return QSP_FALSE;
+    }
+
+    INLINE void qspAddBufQuotedText(QSPBufString *dest, QSPString val, QSPString quote)
+    {
+        QSP_CHAR *pos;
+        int quoteLen = qspStrLen(quote);
+        qspAddBufText(dest, quote);
+        while ((pos = qspStrStr(val, quote)))
+        {
+            /* Quote in text gets doubled */
+            pos += quoteLen;
+            qspAddBufText(dest, qspStringFromPair(val.Str, pos));
+            qspAddBufText(dest, quote);
+            val.Str = pos;
+        }
+        qspAddBufText(dest, val);
+        qspAddBufText(dest, quote);
     }
 
     INLINE void qspAddBufChar(QSPBufString *dest, QSP_CHAR ch)

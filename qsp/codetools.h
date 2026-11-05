@@ -135,6 +135,7 @@
     int qspCollectLabels(QSPLineOfCode *lines, int linesCount, QSPCodeLabel **labels);
     void qspFreeLabels(QSPCodeLabel *labels, int count);
     QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch);
+    QSP_BOOL qspUnquoteToNewText(QSPString *s, QSPString *text);
     QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated);
     void qspPrepareStringToExecution(QSPString *str);
     QSPCodeBlock *qspPreprocessData(QSPString data);

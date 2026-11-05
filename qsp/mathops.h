@@ -154,7 +154,6 @@
     /* External functions */
     void qspInitMath(void);
     void qspTerminateMath(void);
-    QSPString qspGetString(QSPString *expr);
     QSPMathExpression *qspCompileMathExpression(QSPString s);
     void qspFreeMathExpression(QSPMathExpression *expression);
     QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex);

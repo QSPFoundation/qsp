@@ -31,7 +31,7 @@ INLINE QSPCachedArg *qspCopyToNewArgs(QSPCachedArg *foundArgs, QSP_TINYINT argsC
 INLINE void qspFreeArg(QSPCachedArg *arg);
 INLINE void qspFreeArgs(QSPCachedArg *args, int count);
 INLINE void qspFreeLineOfCode(QSPLineOfCode *line);
-INLINE QSP_CHAR *qspSkipQuotedString(QSP_CHAR *pos, QSP_CHAR *endPos);
+INLINE QSP_CHAR *qspSkipQuotedString(QSPString s);
 INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 
@@ -247,7 +247,7 @@ INLINE QSPCachedArg *qspNewUserCallArgs(QSPString s, QSP_TINYINT *argsCount, QSP
     QSPString name;
     QSPCachedArg foundArgs[QSP_MAXSTATARGS];
     qspSkipSpaces(&s);
-    name = qspParseName(&s, QSP_CHAR_DELIM);
+    name = qspParseToDelim(&s, QSP_CHAR_DELIM);
     if (qspIsEmpty(name))
     {
         *errorCode = QSP_ERR_SYNTAX;
@@ -342,7 +342,7 @@ INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TI
     target->FieldsCount = 0;
     target->DynamicFields = 0;
     target->DynamicCount = 0;
-    target->Name = qspParseName(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
+    target->Name = qspParseToDelim(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
     name = qspPrepareVarName(target->Name, &nameHash); /* validates the name */
     if (qspIsEmpty(name))
     {
@@ -378,8 +378,7 @@ INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TI
 
 INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT argsCount, QSP_TINYINT statCode, QSPString s, QSP_TINYINT *errorCode)
 {
-    qspSkipSpaces(&s);
-    if (!qspIsEmpty(s))
+    if (qspSkipSpaces(&s))
     {
         if (*s.Str == QSP_LRBRACK_CHAR) /* arguments might be specified using parentheses */
         {
@@ -426,8 +425,7 @@ INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT arg
                     break;
                 }
                 s.Str = pos + QSP_STATIC_LEN(QSP_COMMA);
-                qspSkipSpaces(&s);
-                if (qspIsEmpty(s))
+                if (!qspSkipSpaces(&s))
                 {
                     *errorCode = QSP_ERR_SYNTAX;
                     break;
@@ -464,8 +462,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     line->IsMultiline = QSP_FALSE;
     line->StatsCount = 0;
     line->Stats = 0;
-    qspSkipSpaces(&str);
-    if (qspIsEmpty(str)) return;
+    if (!qspSkipSpaces(&str)) return;
     statInd = 0;
     statDelimPos = paramPos = 0;
     statCode = qspGetStatCode(str, &paramPos);
@@ -831,19 +828,44 @@ void qspFreeLabels(QSPCodeLabel *labels, int count)
     }
 }
 
-INLINE QSP_CHAR *qspSkipQuotedString(QSP_CHAR *pos, QSP_CHAR *endPos)
+INLINE QSP_CHAR *qspSkipQuotedString(QSPString s)
 {
-    QSP_CHAR quote = *pos;
-    while (++pos < endPos)
+    QSP_CHAR *pos = s.Str, quote = *pos;
+    while (++pos < s.End)
     {
         if (*pos == quote)
         {
             ++pos;
-            if (pos >= endPos || *pos != quote) break;
+            if (pos >= s.End || *pos != quote) return pos;
         }
     }
-    /* It's either past the closing quote or past the last valid position */
-    return pos;
+    return 0;
+}
+
+QSP_BOOL qspUnquoteToNewText(QSPString *s, QSPString *text)
+{
+    QSPString quoted;
+    QSP_CHAR quote, *dest, *pos, *end;
+    end = qspSkipQuotedString(*s);
+    if (!end)
+    {
+        qspSetError(QSP_ERR_QUOTNOTFOUND);
+        return QSP_FALSE;
+    }
+    /* Take everything inside quotes */
+    quote = *(s->Str);
+    quoted = qspStringFromPair(s->Str + 1, end - 1);
+    s->Str = end;
+    /* Process escaped quotes */
+    dest = (QSP_CHAR *)malloc(qspStrLen(quoted) * sizeof(QSP_CHAR));
+    text->Str = dest;
+    for (pos = quoted.Str; pos < quoted.End; ++pos, ++dest)
+    {
+        *dest = *pos;
+        if (*pos == quote) ++pos;
+    }
+    text->End = dest;
+    return QSP_TRUE;
 }
 
 QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
@@ -854,7 +876,7 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            pos = qspSkipQuotedString(pos, txt.End);
+            if (!(pos = qspSkipQuotedString(qspStringFromPair(pos, txt.End)))) break;
             continue;
         }
         switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
@@ -899,7 +921,7 @@ QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            pos = qspSkipQuotedString(pos, lastPos + 1);
+            if (!(pos = qspSkipQuotedString(qspStringFromPair(pos, lastPos + 1)))) break;
             continue;
         }
         switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
@@ -942,7 +964,7 @@ void qspPrepareStringToExecution(QSPString *str)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT)) /* we have to keep strings untouched */
         {
-            pos = qspSkipQuotedString(pos, endPos);
+            if (!(pos = qspSkipQuotedString(qspStringFromPair(pos, endPos)))) break;
             continue;
         }
         switch (*pos)

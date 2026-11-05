@@ -410,38 +410,6 @@ INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr)
     return QSP_OP_UNKNOWN;
 }
 
-QSPString qspGetString(QSPString *expr)
-{
-    QSPString text, res;
-    QSP_CHAR *dest, *pos = expr->Str, *endPos = expr->End, quote = *pos;
-    int len, doubledQuotesCount = 0;
-    while (1)
-    {
-        if (++pos >= endPos)
-        {
-            qspSetError(QSP_ERR_QUOTNOTFOUND);
-            return qspNullString;
-        }
-        if (*pos == quote)
-        {
-            ++pos;
-            if (pos >= endPos || *pos != quote) break;
-            ++doubledQuotesCount;
-        }
-    }
-    text = qspStringFromPair(expr->Str + 1, pos - 1);
-    expr->Str = pos;
-    len = qspStrLen(text) - doubledQuotesCount;
-    dest = (QSP_CHAR *)malloc(len * sizeof(QSP_CHAR));
-    res = qspStringFromLen(dest, len);
-    for (pos = text.Str; pos < text.End; ++pos, ++dest)
-    {
-        *dest = *pos;
-        if (*pos == quote) ++pos; /* skip the second quote */
-    }
-    return res;
-}
-
 INLINE QSPString qspGetCodeBlock(QSPString *expr)
 {
     QSP_CHAR *endPos, *startPos = expr->Str;
@@ -871,8 +839,7 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
             else if (qspIsInClass(*s.Str, QSP_CHAR_QUOT))
             {
                 code = s;
-                name = qspGetString(&s);
-                if (qspErrorNum) break;
+                if (!qspUnquoteToNewText(&s, &name)) break;
                 code.End = s.Str; /* code of a computed name */
                 qspSkipSpaces(&s);
                 if (levels[opSp].OpCode == QSP_OP_RECORD && qspParseFieldValueDelim(&s)) /* field name in quotes */
@@ -975,8 +942,7 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
             else if (*s.Str == QSP_LSBRACK_CHAR) /* a tuple */
             {
                 s.Str += QSP_STATIC_LEN(QSP_LSBRACK);
-                qspSkipSpaces(&s);
-                if (!qspIsEmpty(s) && *s.Str == QSP_RSBRACK_CHAR)
+                if (qspSkipSpaces(&s) && *s.Str == QSP_RSBRACK_CHAR)
                 {
                     s.Str += QSP_STATIC_LEN(QSP_RSBRACK);
                     if (!qspAppendOperationToCompiled(expression, QSP_OP_TUPLE, 0)) break;
@@ -993,7 +959,7 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
             {
                 s.Str += QSP_STATIC_LEN(QSP_USERFUNC);
                 qspSkipSpaces(&s);
-                name = qspParseName(&s, QSP_CHAR_DELIM);
+                name = qspParseToDelim(&s, QSP_CHAR_DELIM);
                 if (qspIsEmpty(name))
                 {
                     qspSetError(QSP_ERR_SYNTAX);
@@ -1024,7 +990,7 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
             }
             else if (!qspIsInClass(*s.Str, QSP_CHAR_DELIM))
             {
-                name = qspParseName(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
+                name = qspParseToDelim(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
                 if (qspIsEmpty(name))
                 {
                     qspSetError(QSP_ERR_SYNTAX);
@@ -1072,8 +1038,7 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                     if (!qspIsEmpty(s) && *s.Str == QSP_LSBRACK_CHAR)
                     {
                         s.Str += QSP_STATIC_LEN(QSP_LSBRACK);
-                        qspSkipSpaces(&s);
-                        if (!qspIsEmpty(s) && *s.Str == QSP_RSBRACK_CHAR)
+                        if (qspSkipSpaces(&s) && *s.Str == QSP_RSBRACK_CHAR)
                         {
                             s.Str += QSP_STATIC_LEN(QSP_RSBRACK);
                             if (!qspAppendValueToCompiled(expression, QSP_OP_INLINELASTARRITEM, v))

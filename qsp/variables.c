@@ -972,20 +972,19 @@ QSP_BOOL qspParseFieldName(QSPString *s, QSPField *field, QSPString *code)
     {
         QSP_TINYINT fieldType = qspGetVarType(*s);
         s->Str = namePos;
-        name = qspGetString(s);
-        if (qspErrorNum) return QSP_FALSE;
+        if (!qspUnquoteToNewText(s, &name)) return QSP_FALSE;
         if (!qspInitQuotedField(field, name, fieldType))
         {
             qspFreeString(&name);
             return QSP_FALSE;
         }
         qspFreeString(&name);
-        *code = (field->NameIndex < 0 ? qspStringFromPair(namePos, s->Str) : qspNullString);
+        *code = qspStringFromPair(namePos, s->Str);
         return QSP_TRUE;
     }
     /* Plain name with its own type prefix */
     *code = qspNullString;
-    name = qspParseName(s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
+    name = qspParseToDelim(s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
     return qspInitPlainField(field, name);
 }
 
