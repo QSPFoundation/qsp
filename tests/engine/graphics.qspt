@@ -1,0 +1,33 @@
+// Ported from qsp-wasm-engine tests/engine/graphics.test.ts
+
+@test VIEW with path
+@src
+VIEW '1.png'
+@run
+@expect event view 1.png
+
+// An empty path is logged without the text
+@test VIEW without path
+@src
+VIEW
+@run
+@expect event view
+
+@test REFINT
+@exec REFINT
+@expect count 1 main_changed
+@expect count 1 stats_changed
+@expect count 1 actions_changed
+@expect count 1 objects_changed
+
+@test RGB
+@src
+x = RGB(16, 32, 64)
+@run
+@expect x => -12574704
+
+@test RGB with alpha
+@src
+x = RGB(16, 32, 64, 128)
+@run
+@expect x => -2143281136

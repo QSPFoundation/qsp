@@ -1,0 +1,15 @@
+// Ported from qsp-wasm-engine tests/engine/debug.test.ts
+
+@test should report every line in loc when debug is on
+@src
+'first line'
+      a = 10
+'third line'
+@debug 1
+@run
+@debug 0
+@expect events
+debug test:1:-1 'first line'
+debug test:2:-1 A = 10
+debug test:3:-1 'third line'
+main_changed first line\r\nthird line\r\n

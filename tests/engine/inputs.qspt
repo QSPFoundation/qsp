@@ -1,0 +1,66 @@
+// Ported from qsp-wasm-engine tests/engine/inputs.test.ts
+// Panels are the QSP_WIN_* flags: 1 - main, 2 - stats, 4 - actions, 8 - objects, 16 - user input, 32 - view
+
+@test SHOWINPUT should toggle user cmd visibility
+@src
+SHOWINPUT 0
+@run
+@expect event panel_visibility 16 0
+@exec SHOWINPUT 1
+@expect event panel_visibility 16 1
+
+@test USER_TEXT should return text from user cmd
+@set-input works
+@src
+$text = USER_TEXT
+@run
+@expect $text => 'works'
+
+@test USRTXT should return text from user cmd
+@set-input works
+@src
+$text = USRTXT
+@run
+@expect $text => 'works'
+
+@test CMDCLEAR should clear user input
+@set-input works
+@src
+$textBefore = USRTXT & CMDCLEAR & $textAfter = USRTXT
+@run
+@expect event user_input
+@expect $textBefore => 'works'
+@expect $textAfter => ''
+
+@test CMDCLR should clear user input
+@set-input works
+@src
+$textBefore = USRTXT & CMDCLR & $textAfter = USRTXT
+@run
+@expect event user_input
+@expect $textBefore => 'works'
+@expect $textAfter => ''
+
+@test CLS should clear user input
+@set-input works
+@src
+$textBefore = USRTXT & CLS & $textAfter = USRTXT
+@run
+@expect event user_input
+@expect $textBefore => 'works'
+@expect $textAfter => ''
+
+// The engine forces the update of every window before it asks for the input
+@test INPUT should interrupt execution flow and receive entered text
+@reply input Answer
+@src
+*p '1' & $text = $input('Question?') & *p '2'
+@run
+@expect events
+main_changed 1
+stats_changed
+actions_changed []
+objects_changed []
+input Question?
+main_changed 12
+@expect $text => 'Answer'

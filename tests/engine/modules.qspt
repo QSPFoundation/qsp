@@ -1,0 +1,66 @@
+// Ported from qsp-wasm-engine tests/engine/modules.test.ts
+// The second argument of the OPENGAME callback is "new game": 1 for OPENQST, 0 for INCLIB.
+// Callbacks are synchronous: the code after SAVEGAME / OPENGAME runs right away.
+
+// The game isn't found, so OPENQST restarts the current game and stops the code
+@test OPENQST
+@src
+x = 1 & OPENQST '1.qsp' & x = 2
+@run
+@expect event open_game 1.qsp 1
+@expect x => 1
+
+@test INCLIB should add module
+@module 1.qsp
+# other
+---
+@src
+x = 1 & INCLIB '1.qsp' & x = 2
+@run
+@expect event open_game 1.qsp 0
+@exec has_other = loc('other')
+@expect x => 2
+@expect has_other => 1
+
+@test FREELIB
+@module 1.qsp
+# other
+---
+@src
+l = loc('other') & INCLIB '1.qsp'
+@run
+@expect l => 0
+@expect event open_game 1.qsp 0
+@exec l = loc('other')
+@expect l => 1
+@exec FREELIB
+@exec l = loc('other')
+@expect l => 0
+
+@test SAVEGAME with save name
+@src
+x = 1 & SAVEGAME '1.sav' & x = 2
+@run
+@expect event save_game 1.sav
+@expect x => 2
+
+@test SAVEGAME without save name
+@src
+x = 1 & SAVEGAME & x = 2
+@run
+@expect event save_game
+@expect x => 2
+
+@test OPENGAME with save name
+@src
+x = 1 & OPENGAME '1.sav' & x = 2
+@run
+@expect event load_save 1.sav
+@expect x => 2
+
+@test OPENGAME without save name
+@src
+x = 1 & OPENGAME & x = 2
+@run
+@expect event load_save
+@expect x => 2

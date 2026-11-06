@@ -1,0 +1,93 @@
+// Ported from qsp-wasm-engine tests/engine/menu.test.ts
+// The host answers -1 (nothing selected) unless the test sets "@reply menu N"
+
+@test MENU should trigger showing menu
+@src
+
+$stone[0]='Take stone:takestone'
+$stone[1]='Throw stone:throwstone'
+menu '$stone'
+
+@run
+@expect event menu [Take stone; Throw stone]
+
+@test MENU should trigger showing menu without $ in name
+@src
+
+$stone[0]='Take stone:takestone'
+$stone[1]='Throw stone:throwstone'
+menu 'stone'
+
+@run
+@expect event menu [Take stone; Throw stone]
+
+@test MENU should trigger showing menu with icon
+@src
+
+$stone[0]='Take stone:takestone:1.png'
+menu '$stone'
+
+@run
+@expect event menu [Take stone|1.png]
+
+@test MENU stops on first empty item
+@src
+
+$stone[0]='Take stone:takestone'
+$stone[2]='Take stone:takestone'
+menu '$stone'
+
+@run
+@expect event menu [Take stone]
+
+@test MENU should support separator as -:-
+@src
+
+$stone[0]='Take stone:takestone'
+$stone[1]='-:-'
+$stone[2]='Throw stone:throwstone'
+menu '$stone'
+
+@run
+@expect event menu [Take stone; -; Throw stone]
+
+@test corresponding location should be called when menu item is selected
+@reply menu 1
+@src
+
+$stone[0]='Take stone:takestone'
+$stone[1]='Throw stone:throwstone'
+menu '$stone'
+---
+# takestone
+p 'taken'
+---
+# throwstone
+p 'thrown'
+
+@run
+@expect event menu [Take stone; Throw stone]
+@expect event stats_changed thrown
+
+@test index(1 based) of selected item should be passed into processing loc
+@reply menu 1
+@src
+
+$stone[0]='Take stone:stone'
+$stone[1]='Throw stone:stone'
+menu '$stone'
+---
+# stone
+r = args[0]
+
+@run
+@expect r => 2
+
+@test name can contain : as searching for : starts from end
+@src
+
+$stone[0]='Take: stone:takestone:'
+menu 'stone'
+
+@run
+@expect event menu [Take: stone]

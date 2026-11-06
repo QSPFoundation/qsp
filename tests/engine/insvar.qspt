@@ -1,0 +1,173 @@
+// INSVAR 'name', value[, index[, new index]]: inserts or moves an item of an array (4073cb4)
+// Not in qsp-wasm-engine, the expectations follow the comments in qspStatementInsVar.
+
+// ------------------------------------------------------------
+// Positions
+
+@test INSVAR: without an index adds the last item
+@src
+a[] = 1 & a[] = 2
+insvar 'a', 9
+@run
+@expect arrpack('a') => [1, 2, 9]
+
+@test INSVAR: inserts at a position
+@src
+a[] = 1 & a[] = 2 & a[] = 3
+insvar 'a', 9, 1
+@run
+@expect arrpack('a') => [1, 9, 2, 3]
+
+@test INSVAR: inserts at the first position
+@src
+a[] = 1 & a[] = 2
+insvar 'a', 9, 0
+@run
+@expect arrpack('a') => [9, 1, 2]
+
+@test INSVAR: position beyond the end fills the gap with undefined values
+@src
+a[] = 1
+insvar 'a', 9, 3
+@run
+@expect arrpack('a') => [1, ?, ?, 9]
+
+@test INSVAR: negative position does nothing
+@src
+a[] = 1
+insvar 'a', 9, -1
+insvar 'a', 9, 0, -1
+@run
+@expect arrpack('a') => [1]
+
+@test INSVAR: moves an item up to a new position and replaces its value
+@src
+a[] = 1 & a[] = 2 & a[] = 3
+insvar 'a', 9, 2, 0
+@run
+@expect arrpack('a') => [9, 1, 2]
+
+@test INSVAR: moves an item down to a new position and replaces its value
+@src
+a[] = 1 & a[] = 2 & a[] = 3 & a[] = 4
+insvar 'a', 9, 0, 2
+@run
+@expect arrpack('a') => [2, 3, 9, 4]
+
+@test INSVAR: moving to the same position replaces the value
+@src
+a[] = 1 & a[] = 2
+insvar 'a', 9, 1, 1
+@run
+@expect arrpack('a') => [1, 9]
+
+@test INSVAR: moving a missing item inserts a new one
+@src
+a[] = 1 & a[] = 2
+insvar 'a', 9, 5, 0
+@run
+@expect arrpack('a') => [9, 1, 2]
+
+@test INSVAR: creates a new array
+@src
+insvar 'fresh', 7, 2
+@run
+@expect arrpack('fresh') => [?, ?, 7]
+
+// ------------------------------------------------------------
+// Keys
+
+@test INSVAR: a key without a new position works like SETVAR
+@src
+a['x'] = 1 & a['y'] = 2
+insvar 'a', 9, 'y'
+insvar 'a', 8, 'z'
+@run
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[1, 9, 8], 'x', 'y', 'z']
+
+@test INSVAR: a string with a number is a key, not a position
+@src
+a[] = 1 & a[] = 2
+insvar 'a', 9, '0'
+@run
+@expect [arrpack('a'), a['0']] => [[1, 2, 9], 9]
+
+@test INSVAR: moves the item of a key, the keys follow their items
+@src
+a['x'] = 1 & a['y'] = 2 & a['z'] = 3
+insvar 'a', 9, 'z', 0
+@run
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[9, 1, 2], 'z', 'x', 'y']
+@expect [a['x'], a['y'], a['z']] => [1, 2, 9]
+
+@test INSVAR: inserts a new key at a position
+@src
+a['x'] = 1 & a['y'] = 2
+insvar 'a', 9, 'n', 1
+@run
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[1, 9, 2], 'x', 'n', 'y']
+@expect [a['n'], a['y']] => [9, 2]
+
+@test INSVAR: inserts a new key beyond the end
+@src
+a['x'] = 1
+insvar 'a', 9, 'n', 3
+@run
+@expect [arrpack('a'), $arrkey('a', 3), a['n'], arrsize('a')] => [[1, ?, ?, 9], 'n', 9, 4]
+
+@test INSVAR: insertion at a position keeps the keys of the moved items
+@src
+a['x'] = 1 & a['y'] = 2
+insvar 'a', 9, 0
+@run
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[9, 1, 2], ?, 'x', 'y']
+@expect [a['x'], a['y']] => [1, 2]
+
+@test INSVAR: keyed & keyless items move together
+@src
+a['a'] = 1 & a[] = 2 & a['c'] = 3 & a[] = 4
+insvar 'a', 9, 3, 1
+@run
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2), $arrkey('a', 3)] => [[1, 9, 2, 3], 'a', ?, ?, 'c']
+@expect [a['a'], a['c']] => [1, 3]
+
+@test INSVAR: tuple keys
+@src
+insvar 'a', 1, [1, 'k']
+insvar 'a', 2, [1, 'k'], 0
+@run
+@expect [arrpack('a'), a[[1, 'k']]] => [[2], 2]
+
+// ------------------------------------------------------------
+// Types, scopes & errors
+
+@test INSVAR: the value is converted to the type of the variable
+@src
+$s[] = 'a'
+insvar '$s', 5
+@run
+@expect arrpack('$s') => ['a', '5']
+
+@test INSVAR: a value that can't be converted is an error
+@src
+n[] = 1
+insvar '#n', 'x'
+@run
+@expect error TYPEMISMATCH
+@expect arrpack('n') => [1]
+
+@test INSVAR: works with local variables
+@src
+local a
+a[] = 1
+insvar 'a', 9, 0
+x = arrpack('a')
+@run
+@expect x => [9, 1]
+@expect arrpack('a') => []
+
+@test INSVAR: requires a name & a value
+@src
+insvar 'a'
+@run
+@expect error ARGSCOUNT

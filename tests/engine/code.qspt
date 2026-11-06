@@ -1,0 +1,53 @@
+// Ported from qsp-wasm-engine tests/engine/code.test.ts
+
+@test long line split
+@src
+
+t = 1
+tort = 0
+if t _
+   or _
+   t:
+  $type = 'new'
+else
+  $type = 'old'
+end
+
+@run
+@expect $type => 'new'
+
+@test statement argument gets converted to string
+@src
+ msg 567
+@run
+@expect event msg 567
+
+@test statement argument gets converted to number
+@src
+ wait '567'
+@run
+@expect event wait 567
+
+@test statement argument cant be converted to number
+@src
+ wait 'sdsd'
+@run
+@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) WAIT 'sdsd'
+
+@test function argument gets converted to string
+@src
+ $x = replace(123456, 456, 34)
+@run
+@expect $x => '12334'
+
+@test function argument gets converted to number
+@src
+ x = rgb('12', '234', 32)
+@run
+@expect x => -14620148
+
+@test function argument cant be converted to number
+@src
+ x = rgb('123', '65sd', 56)
+@run
+@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) X = RGB('123', '65sd', 56)

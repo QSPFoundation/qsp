@@ -1,0 +1,222 @@
+// Ported from qsp-wasm-engine tests/engine/base-functions.test.ts
+// Range checks are written as QSP expressions over 200 draws
+
+@test $QSPVER
+@src
+$ver = $QSPVER
+@reply version 5.9.0
+@run
+@expect event version
+@expect $ver => '5.9.0'
+
+@test QSPVER platform
+@src
+$ver = $QSPVER('platform')
+@reply version qspider
+@run
+@expect event version platform
+@expect $ver => 'qspider'
+
+@test $CURLOC
+@src
+
+gt 'other'
+---
+#other
+$cloc = $CURLOC
+@run
+@expect $cloc => 'other'
+
+@test MAX: returning max number
+@src
+res = MAX(1,2,5,2,0)
+@run
+@expect res => 5
+
+@test MAX: returning max number from variables
+@src
+a = 1 & b = 5 & c = 3 & res = MAX(a,b,c)
+@run
+@expect res => 5
+
+@test MAX: returning max from array when called with 1 param
+@src
+a[0] = 1 & a[1] = 5 & a[3] = 2 & res = MAX('a')
+@run
+@expect res => 5
+
+@test MAX: returning max from array with holes
+@src
+a[0] = 1 & a[3] = 5 & a[5] = 2 & res = MAX('a')
+@run
+@expect res => 5
+
+@test MAX: return lexicographically bigger string
+@src
+$res = MAX('aa','zz','ab')
+@run
+@expect $res => 'zz'
+
+@test MAX: return lexicographically bigger string from array
+@src
+$b[0] = 'aa' & $b[1] = 'zz' & $b[2] = 'ab' & $res = MAX('$b')
+@run
+@expect $res => 'zz'
+
+@test MAX: return lexicographically bigger string from array with holes
+@src
+$b[0] = 'aa' & $b[3] = 'zz' & $b[5] = 'ab' & $res = MAX('$b')
+@run
+@expect $res => 'zz'
+
+@test MAX: return lexicographically bigger string from mixed array
+@src
+$b[0] = 'a' & b[1] = 77 & $b[2] = 'rx' & b[3] = 66 & $b[4] = 'n' & $res = MAX('$b')
+@run
+@expect $res => 'rx'
+
+// wasm: MAX('b'); since d938a28 a name without a prefix takes the type of the array items,
+// a mixed array gives a type mismatch, so the numeric items are selected with '#b'
+@test MAX: return max from mixed array
+@src
+$b[0] = 'dd' & b[1] = 77 & $b[2] = 'yy' & b[3] = 86 & $b[4] = ' ' & res = MAX('#b')
+@run
+@expect res => 86
+
+@test MAX: mixed array without a type prefix is a type mismatch
+@src
+$b[0] = 'dd' & b[1] = 77 & res = MAX('b')
+@run
+@expect error TYPEMISMATCH
+
+@test MAX: ignores numbers when search for string
+@src
+$b[0] = '33' & b[1] = 77 & $b[2] = '44' & b[3] = 66 & $b[4] = '22' & $res = MAX('$b')
+@run
+@expect $res => '44'
+
+// wasm: MAX('b'), see above
+@test MAX: ignores strings when search for number
+@src
+$b[0] = '999' & b[1] = 66 & $b[2] = '99' & b[3] = 50 & res = MAX('#b')
+@run
+@expect res => 66
+
+@test MIN: returning min number
+@src
+res = MIN(2,1,5,2)
+@run
+@expect res => 1
+
+@test MIN: returning min number from variables
+@src
+a = 1 & b = 5 & c = 3 & res = MIN(a,b,c)
+@run
+@expect res => 1
+
+@test MIN: returning min from array when called with 1 param
+@src
+a[0] = 3 & a[1] = 5 & a[2] = 2 & res = MIN('a')
+@run
+@expect res => 2
+
+@test MIN: return lexicographically smaller string
+@src
+$res = MIN('aa','zz','ab')
+@run
+@expect $res => 'aa'
+
+@test MIN: return lexicographically smaller string from array
+@src
+$b[0] = 'aa' & $b[1] = 'zz' & $b[2] = 'ab' & $res = MIN('$b')
+@run
+@expect $res => 'aa'
+
+@test MIN: returning 0 from array with holes
+@src
+a[0] = 1 & a[3] = 5 & a[5] = 2 & res = MIN('a')
+@run
+@expect res => 0
+
+@test MIN: return empty string from array with holes
+@src
+$b[0] = 'aa' & $b[3] = 'zz' & $b[5] = 'ab' & $res = MIN('$b')
+@run
+@expect $res => ''
+
+@test MIN: return lexicographically smaller string from mixed array
+@src
+$b[0] = 'tt' & b[1] = 77 & $b[2] = 'gg' & b[3] = 66 & $b[4] = 'qq' & $res = MIN('$b')
+@run
+@expect $res => 'gg'
+
+// wasm: MIN('b'), see MAX above
+@test MIN: return min from mixed array
+@src
+$b[0] = 'a' & b[1] = 86 & $b[2] = 'kk' & b[3] = 77 & $b[4] = '' & res = MIN('#b')
+@run
+@expect res => 77
+
+@test MIN: ignores numbers when search for string
+@src
+$b[0] = '33' & b[1] = 11 & $b[2] = '44' & b[3] = 14 & $b[4] = '22' & $res = MIN('$b')
+@run
+@expect $res => '22'
+
+// wasm: MIN('b'), see MAX above
+@test MIN: ignores strings when search for number
+@src
+$b[0] = '9' & b[1] = 66 & $b[2] = '40' & b[3] = 50 & res = MIN('#b')
+@run
+@expect res => 50
+
+@test RND
+@src
+i = 0 & lo = 10000 & hi = -1
+:l
+r = RND
+if r < lo: lo = r
+if r > hi: hi = r
+i += 1
+if i < 200: jump 'l'
+@run
+@expect lo >= 1 and hi <= 1000 => 1
+
+@test RAND
+@src
+i = 0 & lo = 100 & hi = -100
+:l
+r = RAND(1, 4)
+if r < lo: lo = r
+if r > hi: hi = r
+i += 1
+if i < 200: jump 'l'
+@run
+@expect lo => 1
+@expect hi => 4
+
+@test RAND reversed
+@src
+i = 0 & lo = 100 & hi = -100
+:l
+r = RAND(4, 1)
+if r < lo: lo = r
+if r > hi: hi = r
+i += 1
+if i < 200: jump 'l'
+@run
+@expect lo => 1
+@expect hi => 4
+
+@test RAND without second param
+@src
+i = 0 & lo = 100 & hi = -100
+:l
+r = RAND 2
+if r < lo: lo = r
+if r > hi: hi = r
+i += 1
+if i < 200: jump 'l'
+@run
+@expect lo => 1
+@expect hi => 2

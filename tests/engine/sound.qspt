@@ -1,0 +1,56 @@
+// Ported from qsp-wasm-engine tests/engine/sound.test.ts
+// Callbacks of the C API are synchronous, so instead of "PLAY should pause flow until released"
+// the test checks that the flow goes on after the callback returns
+
+@test PLAY should trigger sound playing with defined volume
+@src
+PLAY 'sound/music.mp3',50
+@run
+@expect event play_file sound/music.mp3 50
+
+@test PLAY should trigger sound playing with 100% volume by default
+@src
+PLAY 'sound/music.mp3'
+@run
+@expect event play_file sound/music.mp3 100
+
+@test PLAY doesn't pause the flow
+@src
+PLAY 'sound/music.mp3' & p 'after play'
+@run
+@expect events
+play_file sound/music.mp3 100
+stats_changed after play
+
+@test ISPLAY resolves to playing status
+@reply isplay 1
+@src
+playing = ISPLAY('test.mp3')
+@run
+@expect event is_play test.mp3
+@expect playing => 1
+
+@test CLOSE should trigger stopping file
+@src
+PLAY 'test.mp3' & CLOSE 'test.mp3'
+@run
+@expect event close_file test.mp3
+
+@test CLOSE should not be triggered if no file started playing
+@src
+CLOSE 'test.mp3'
+@run
+@expect no-event close_file
+
+// An empty name stops every file
+@test CLOSE ALL should trigger stopping sound
+@src
+PLAY 'test.mp3' & CLOSE ALL
+@run
+@expect event close_file
+
+@test CLOSE ALL should not be triggered when no file was played
+@src
+CLOSE ALL
+@run
+@expect no-event close_file

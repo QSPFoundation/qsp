@@ -1,0 +1,138 @@
+// Ported from qsp-wasm-engine tests/engine/system-locations.test.ts
+
+@test $ONGLOAD
+@src
+
+x = 2
+$ONGLOAD = 'gload'
+---
+# gload
+x = 1
+
+@run
+@save s
+@load-save s
+@expect x => 1
+
+@test $ONGSAVE
+@src
+
+x = 2
+$ONGSAVE = 'gsave'
+---
+# gsave
+x = 1
+
+@run
+@save s
+@expect x => 1
+
+@test $ONOBJADD
+@src
+
+$ONOBJADD = 'objadd'
+addobj 'test', '1.png'
+---
+# objadd
+$name = $args[0]
+$image = $args[1]
+
+@run
+@expect $name => 'test'
+@expect $image => '1.png'
+
+@test $ONOBJDEL
+@src
+
+$ONOBJDEL = 'objdel'
+addobj 'test', '1.png'
+delobj 'test'
+---
+# objdel
+$name = $args[0]
+
+@run
+@expect $name => 'test'
+
+@test $ONOBJSEL
+@src
+
+$ONOBJSEL = 'objsel'
+addobj 'test'
+addobj 'test1'
+---
+# objsel
+$name = $selobj
+
+@run
+@select-obj 1
+@expect $name => 'test1'
+
+@test $ONNEWLOC
+@src
+
+$ONNEWLOC = 'newloc'
+gt 'other'
+---
+# newloc
+pl 'newloc'
+$cur = $curloc
+---
+# other
+pl 'other'
+
+@run
+@expect event stats_changed other\r\nnewloc\r\n
+@expect $cur => 'other'
+
+@test $ONNEWLOC should receive args on actual location
+@src
+
+$ONNEWLOC = 'newloc'
+gt 'other', 'test', 1
+---
+# newloc
+$args_0 = $args[0]
+args_1 = args[1]
+---
+# other
+
+@run
+@expect $args_0 => 'test'
+@expect args_1 => 1
+
+@test $ONACTSEL
+@src
+
+$ONACTSEL = 'actsel'
+act '1': 1
+act '2': 2
+---
+# actsel
+$sel = $SELACT
+
+@run
+@select-act 1
+@expect $sel => '2'
+@select-act 0
+@expect $sel => '1'
+@exec $sel = ''
+@select-act -1
+@expect $sel => ''
+
+@test $USERCOM
+@src
+
+    x = 1
+    $USERCOM = 'usercom'
+---
+# usercom
+x = 2
+$text = $user_text
+
+@run
+@expect x => 1
+@set-input test
+@user-input
+@expect x => 2
+@expect $text => 'test'
