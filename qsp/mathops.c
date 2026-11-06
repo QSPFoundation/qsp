@@ -38,10 +38,11 @@ INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName);
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr);
 INLINE QSPString qspGetCodeBlock(QSPString *expr);
 INLINE QSP_BOOL qspParseRecordName(QSPString *s, QSPField *field, QSPString *code);
-INLINE QSP_BOOL qspPushOperationToStack(QSPMathLevel *levels, int *opSp, QSP_TINYINT opCode);
+INLINE QSPMathLevel *qspPushOperationToStack(QSPMathLevel *levels, int *opSp, QSP_TINYINT opCode);
 INLINE int qspStoreValue(QSPMathExpression *expression, QSPVariant v);
-INLINE QSPMathCompiledOp *qspAppendValueToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSPVariant v);
 INLINE QSPMathCompiledOp *qspAppendOperationToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSP_TINYINT argsCount);
+INLINE QSPMathCompiledOp *qspAppendValueToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSPVariant v);
+INLINE QSPMathCompiledOp *qspAppendVarItemToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, int nameIndex, QSP_TINYINT varType);
 INLINE QSP_BOOL qspStartFormatPart(QSPMathExpression *expression, QSP_TINYINT *partsCount);
 INLINE QSP_BOOL qspAppendFormatText(QSPMathExpression *expression, QSPString text, QSP_TINYINT *partsCount);
 INLINE QSP_BOOL qspAppendFormatToCompiled(QSPMathExpression *expression, QSPString text);
@@ -434,17 +435,19 @@ INLINE QSP_BOOL qspParseRecordName(QSPString *s, QSPField *field, QSPString *cod
     return QSP_TRUE;
 }
 
-INLINE QSP_BOOL qspPushOperationToStack(QSPMathLevel *levels, int *opSp, QSP_TINYINT opCode)
+INLINE QSPMathLevel *qspPushOperationToStack(QSPMathLevel *levels, int *opSp, QSP_TINYINT opCode)
 {
+    QSPMathLevel *level;
     if (*opSp >= QSP_MATHSTACKSIZE - 1)
     {
         qspSetError(QSP_ERR_COMPLEXEXPRESSION);
-        return QSP_FALSE;
+        return 0;
     }
     ++(*opSp);
-    levels[*opSp].OpCode = opCode;
-    levels[*opSp].ArgsCount = (opCode < QSP_OP_FIRSTFUNCTION ? qspOps[opCode].MinArgsCount : 0);
-    return QSP_TRUE;
+    level = levels + *opSp;
+    level->OpCode = opCode;
+    level->ArgsCount = (opCode < QSP_OP_FIRSTFUNCTION ? qspOps[opCode].MinArgsCount : 0);
+    return level;
 }
 
 INLINE int qspStoreValue(QSPMathExpression *expression, QSPVariant v)
@@ -458,28 +461,6 @@ INLINE int qspStoreValue(QSPMathExpression *expression, QSPVariant v)
     expression->Values[valueIndex] = v;
     ++expression->ValsCount;
     return valueIndex;
-}
-
-INLINE QSPMathCompiledOp *qspAppendValueToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSPVariant v)
-{
-    QSPMathCompiledOp *compiledOp;
-    int opIndex = expression->ItemsCount;
-    if (opIndex >= QSP_MAXMATHITEMS)
-    {
-        qspSetError(QSP_ERR_COMPLEXEXPRESSION);
-        return 0;
-    }
-    if (opIndex >= expression->ItemsCapacity)
-    {
-        expression->ItemsCapacity = opIndex + 16;
-        expression->CompItems = (QSPMathCompiledOp *)realloc(expression->CompItems, expression->ItemsCapacity * sizeof(QSPMathCompiledOp));
-    }
-    compiledOp = expression->CompItems + opIndex;
-    compiledOp->OpCode = opCode;
-    compiledOp->ArgsCount = 0;
-    compiledOp->ValueIndex = (unsigned short)qspStoreValue(expression, v);
-    ++expression->ItemsCount;
-    return compiledOp;
 }
 
 /* N.B. We can safely add operations with the highest priority directly to the output w/o intermediate stack */
@@ -501,6 +482,23 @@ INLINE QSPMathCompiledOp *qspAppendOperationToCompiled(QSPMathExpression *expres
     compiledOp->OpCode = opCode;
     compiledOp->ArgsCount = argsCount;
     ++expression->ItemsCount;
+    return compiledOp;
+}
+
+INLINE QSPMathCompiledOp *qspAppendValueToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSPVariant v)
+{
+    QSPMathCompiledOp *compiledOp = qspAppendOperationToCompiled(expression, opCode, 0);
+    if (!compiledOp) return 0;
+    compiledOp->ValueIndex = (unsigned short)qspStoreValue(expression, v);
+    return compiledOp;
+}
+
+INLINE QSPMathCompiledOp *qspAppendVarItemToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, int nameIndex, QSP_TINYINT varType)
+{
+    QSPMathCompiledOp *compiledOp = qspAppendOperationToCompiled(expression, opCode, qspOps[opCode].MinArgsCount);
+    if (!compiledOp) return 0;
+    compiledOp->NameIndex = nameIndex;
+    compiledOp->VarType = varType;
     return compiledOp;
 }
 
@@ -620,7 +618,7 @@ INLINE QSP_BOOL qspAppendTupleToCompiled(QSPMathExpression *expression, QSPMathL
 INLINE QSP_TINYINT qspGetFieldsOpCode(QSPMathExpression *expression, int groupEnd, QSP_TINYINT *varType)
 {
     *varType = QSP_TYPE_UNDEF;
-    if (expression->ItemsCount != groupEnd) /* a parenthesized value is read as a whole */
+    if (expression->ItemsCount != groupEnd) /* parenthesized value is read as a whole */
     {
         QSPMathCompiledOp *lastOp = expression->CompItems + expression->ItemsCount - 1;
         switch (lastOp->OpCode)
@@ -629,7 +627,7 @@ INLINE QSP_TINYINT qspGetFieldsOpCode(QSPMathExpression *expression, int groupEn
         case QSP_OP_INLINELASTARRITEM:
         case QSP_OP_INLINEINDEXEDARRITEM:
             /* Fields of array item are read in place */
-            *varType = qspGetVarType(QSP_STR(expression->Values[lastOp->ValueIndex]));
+            *varType = lastOp->VarType;
             return QSP_OP_INLINEFIELD;
         }
     }
@@ -665,13 +663,12 @@ INLINE QSP_BOOL qspAppendFieldsToCompiled(QSPMathExpression *expression, QSP_TIN
 INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSPString s)
 {
     QSPVariant v;
-    QSPString name;
-    QSPMathCompiledOp *compiledOp;
-    QSPMathLevel levels[QSP_MATHSTACKSIZE]; /* pending operations */
+    QSPMathLevel *level, levels[QSP_MATHSTACKSIZE]; /* pending operations */
     QSPField field, fields[QSP_MAXMATHOPARGS];
-    QSPString code, dynamicNames[QSP_MAXMATHOPARGS];
+    QSPString name, plainName, code, dynamicNames[QSP_MAXMATHOPARGS];
     QSP_TINYINT opCode, varType, fieldsOp;
-    int fieldsCount, opSp = -1, groupEnd = -1; /* specifies where the last parenthesized value ends */
+    unsigned int nameHash;
+    int nameIndex, fieldsCount, opSp = -1, groupEnd = -1; /* specifies where the last parenthesized value ends */
     QSP_BOOL waitForOperator = QSP_FALSE;
     if (!qspPushOperationToStack(levels, &opSp, QSP_OP_START)) return QSP_FALSE;
     while (1)
@@ -756,9 +753,7 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                 if (levels[opSp].OpCode == QSP_OP_INLINEINDEXEDARRITEM)
                 {
                     /* The index is complete, the name waited on the stack */
-                    compiledOp = qspAppendOperationToCompiled(expression, QSP_OP_INLINEINDEXEDARRITEM, 1);
-                    if (!compiledOp) break;
-                    compiledOp->ValueIndex = levels[opSp].ValueIndex;
+                    if (!qspAppendVarItemToCompiled(expression, QSP_OP_INLINEINDEXEDARRITEM, levels[opSp].NameIndex, levels[opSp].VarType)) break;
                     --opSp;
                 }
                 break;
@@ -893,8 +888,9 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                 else
                 {
                     if (!qspPushOperationToStack(levels, &opSp, QSP_OP_OPENSQUAREBRACKET)) break;
-                    if (!qspPushOperationToStack(levels, &opSp, QSP_OP_RECORD)) break; /* brackets might hold field names */
-                    levels[opSp].Fields = qspNullTuple;
+                    level = qspPushOperationToStack(levels, &opSp, QSP_OP_RECORD); /* brackets might hold field names */
+                    if (!level) break;
+                    level->Fields = qspNullTuple;
                 }
             }
             else if (qspParseChar(&s, QSP_USERFUNC_CHAR)) /* a user function call */
@@ -917,8 +913,9 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                 /* Add a function call */
                 if (qspParseChar(&s, QSP_LRBRACK_CHAR))
                 {
-                    if (!qspPushOperationToStack(levels, &opSp, QSP_OP_FUNC)) break;
-                    ++levels[opSp].ArgsCount; /* added the function name already */
+                    level = qspPushOperationToStack(levels, &opSp, QSP_OP_FUNC);
+                    if (!level) break;
+                    ++level->ArgsCount; /* added the function name already */
                     if (!qspPushOperationToStack(levels, &opSp, QSP_OP_OPENROUNDBRACKET)) break;
                 }
                 else
@@ -998,8 +995,9 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                             if (qspOps[opCode].MinArgsCount)
                             {
                                 /* The function has single argument */
-                                if (!qspPushOperationToStack(levels, &opSp, opCode)) break;
-                                ++levels[opSp].ArgsCount;
+                                level = qspPushOperationToStack(levels, &opSp, opCode);
+                                if (!level) break;
+                                ++level->ArgsCount;
                             }
                             else
                             {
@@ -1016,38 +1014,35 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                     }
                     else
                     {
-                        v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_VARREF);
+                        plainName = qspPrepareVarName(name, &nameHash); /* validates the name */
+                        if (qspIsEmpty(plainName))
+                        {
+                            qspSetError(QSP_ERR_INCORRECTVARNAME);
+                            break;
+                        }
+                        nameIndex = qspGetExactNameIndex(plainName, nameHash, QSP_TRUE);
+                        varType = qspGetVarType(name);
                         if (qspParseChar(&s, QSP_LSBRACK_CHAR))
                         {
                             qspSkipSpaces(&s);
                             if (qspParseChar(&s, QSP_RSBRACK_CHAR))
                             {
-                                if (!qspAppendValueToCompiled(expression, QSP_OP_INLINELASTARRITEM, v))
-                                {
-                                    qspFreeVariant(&v);
-                                    break;
-                                }
+                                if (!qspAppendVarItemToCompiled(expression, QSP_OP_INLINELASTARRITEM, nameIndex, varType)) break;
                                 waitForOperator = QSP_TRUE;
                             }
                             else
                             {
-                                /* The operation gets appended after its index, so the name waits on the stack */
-                                if (!qspPushOperationToStack(levels, &opSp, QSP_OP_INLINEINDEXEDARRITEM))
-                                {
-                                    qspFreeVariant(&v);
-                                    break;
-                                }
-                                levels[opSp].ValueIndex = (unsigned short)qspStoreValue(expression, v);
+                                /* The operation gets appended after its index, so the variable waits on the stack */
+                                level = qspPushOperationToStack(levels, &opSp, QSP_OP_INLINEINDEXEDARRITEM);
+                                if (!level) break;
+                                level->NameIndex = nameIndex;
+                                level->VarType = varType;
                                 if (!qspPushOperationToStack(levels, &opSp, QSP_OP_OPENSQUAREBRACKET)) break;
                             }
                         }
                         else
                         {
-                            if (!qspAppendValueToCompiled(expression, QSP_OP_INLINEFIRSTARRITEM, v))
-                            {
-                                qspFreeVariant(&v);
-                                break;
-                            }
+                            if (!qspAppendVarItemToCompiled(expression, QSP_OP_INLINEFIRSTARRITEM, nameIndex, varType)) break;
                             waitForOperator = QSP_TRUE;
                         }
                     }
@@ -1228,18 +1223,17 @@ INLINE QSPVariant qspCalculateDynamicInlineFieldValue(QSPMathExpression *express
     QSPField *fields;
     QSPVariant res = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     QSPMathCompiledOp *baseItem = expression->CompItems + argIndices[0];
-    QSPString varName = QSP_STR(expression->Values[baseItem->ValueIndex]);
     QSPTuple names = QSP_TUPLE(expression->Values[item->ValueIndex]);
     fields = (QSPField *)qspAllocateMemory(names.FieldsCount * sizeof(QSPField));
     switch (baseItem->OpCode)
     {
     case QSP_OP_INLINEFIRSTARRITEM:
         if (qspCalculateDynamicNames(expression, names, argIndices + 1, fields))
-            qspGetFirstVarFieldValue(varName, fields, names.FieldsCount, &res);
+            qspGetFirstVarFieldValue(baseItem->NameIndex, baseItem->VarType, fields, names.FieldsCount, &res);
         break;
     case QSP_OP_INLINELASTARRITEM:
         if (qspCalculateDynamicNames(expression, names, argIndices + 1, fields))
-            qspGetLastVarFieldValue(varName, fields, names.FieldsCount, &res);
+            qspGetLastVarFieldValue(baseItem->NameIndex, baseItem->VarType, fields, names.FieldsCount, &res);
         break;
     default: /* QSP_OP_INLINEINDEXEDARRITEM */
         {
@@ -1247,7 +1241,7 @@ INLINE QSPVariant qspCalculateDynamicInlineFieldValue(QSPMathExpression *express
             QSPVariant index = qspCalculateArgumentValue(expression, argIndices[0] - 1, QSP_TYPE_UNDEF);
             if (qspLocationState != oldLocationState) break;
             if (qspCalculateDynamicNames(expression, names, argIndices + 1, fields))
-                qspGetVarFieldValueByIndex(varName, index, fields, names.FieldsCount, &res);
+                qspGetVarFieldValueByIndex(baseItem->NameIndex, baseItem->VarType, index, fields, names.FieldsCount, &res);
             qspFreeVariant(&index);
             break;
         }
@@ -1274,22 +1268,21 @@ INLINE QSPVariant qspCalculateInlineFieldValue(QSPMathExpression *expression, QS
     /* Fields of the array item get read in place */
     QSPVariant res = qspGetEmptyVariant(QSP_TYPE_UNDEF);
     QSPMathCompiledOp *baseItem = expression->CompItems + baseIndex;
-    QSPString varName = QSP_STR(expression->Values[baseItem->ValueIndex]);
     QSPTuple names = QSP_TUPLE(expression->Values[item->ValueIndex]);
     switch (baseItem->OpCode)
     {
     case QSP_OP_INLINEFIRSTARRITEM:
-        qspGetFirstVarFieldValue(varName, names.Fields, names.FieldsCount, &res);
+        qspGetFirstVarFieldValue(baseItem->NameIndex, baseItem->VarType, names.Fields, names.FieldsCount, &res);
         break;
     case QSP_OP_INLINELASTARRITEM:
-        qspGetLastVarFieldValue(varName, names.Fields, names.FieldsCount, &res);
+        qspGetLastVarFieldValue(baseItem->NameIndex, baseItem->VarType, names.Fields, names.FieldsCount, &res);
         break;
     default: /* QSP_OP_INLINEINDEXEDARRITEM */
         {
             int oldLocationState = qspLocationState;
             QSPVariant index = qspCalculateArgumentValue(expression, baseIndex - 1, QSP_TYPE_UNDEF);
             if (qspLocationState != oldLocationState) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-            qspGetVarFieldValueByIndex(varName, index, names.Fields, names.FieldsCount, &res);
+            qspGetVarFieldValueByIndex(baseItem->NameIndex, baseItem->VarType, index, names.Fields, names.FieldsCount, &res);
             qspFreeVariant(&index);
             break;
         }
@@ -1450,7 +1443,7 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex) /* th
                 QSPVariant index = qspCalculateArgumentValue(expression, argIndices[0], QSP_TYPE_UNDEF);
                 if (qspLocationState != oldLocationState)
                     return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-                qspGetVarValueByIndex(QSP_STR(expression->Values[item->ValueIndex]), index, &tos);
+                qspGetVarValueByIndex(item->NameIndex, item->VarType, index, &tos);
                 qspFreeVariant(&index);
                 if (qspLocationState != oldLocationState)
                     return qspGetEmptyVariant(QSP_TYPE_UNDEF);
@@ -1492,10 +1485,10 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex) /* th
         switch (argsCount)
         {
         case 1:
-            qspGetFirstVarValue(QSP_STR(args[0]), &tos);
+            qspGetVarValueByName(QSP_STR(args[0]), qspNumVariant(0), &tos);
             break;
         case 2:
-            qspGetVarValueByIndex(QSP_STR(args[0]), args[1], &tos);
+            qspGetVarValueByName(QSP_STR(args[0]), args[1], &tos);
             break;
         default:
             qspGetVarFieldValueByPath(QSP_STR(args[0]), args[1], QSP_TUPLE(args[2]), &tos);
@@ -1503,10 +1496,10 @@ QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex) /* th
         }
         break;
     case QSP_OP_INLINEFIRSTARRITEM:
-        qspGetFirstVarValue(QSP_STR(expression->Values[item->ValueIndex]), &tos);
+        qspGetFirstVarValue(item->NameIndex, item->VarType, &tos);
         break;
     case QSP_OP_INLINELASTARRITEM:
-        qspGetLastVarValue(QSP_STR(expression->Values[item->ValueIndex]), &tos);
+        qspGetLastVarValue(item->NameIndex, item->VarType, &tos);
         break;
     case QSP_OP_ADD:
         qspAutoConvertCombine(args, args + 1, QSP_ADD_CHAR, &tos);
@@ -1798,7 +1791,7 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
     int arrIndex;
     QSPVariant *value;
     QSPString typePrefix;
-    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_REF_GET);
+    QSPVar *var = qspVarReferenceByName(QSP_STR(args[0]), QSP_REF_GET);
     if (!var) return;
     arrIndex = (count >= 2 ? qspGetVarItemIndex(var, args[1], QSP_FALSE) : 0);
     value = ((arrIndex >= 0 && arrIndex < var->ValsCount) ? var->Values + arrIndex : 0);
@@ -1836,7 +1829,7 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 INLINE void qspFunctionArrKey(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int arrIndex;
-    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_REF_GET);
+    QSPVar *var = qspVarReferenceByName(QSP_STR(args[0]), QSP_REF_GET);
     if (!var) return;
     arrIndex = (count == 2 ? QSP_TOINT(QSP_NUM(args[1])) : 0);
     if (arrIndex >= 0 && arrIndex < var->ValsCount)
@@ -1876,7 +1869,7 @@ INLINE void qspFunctionArrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 INLINE void qspFunctionArrPack(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int startInd, maxCount;
-    QSPVar *var = qspVarReference(QSP_STR(args[0]), QSP_REF_GET);
+    QSPVar *var = qspVarReferenceByName(QSP_STR(args[0]), QSP_REF_GET);
     if (!var) return;
     startInd = (count >= 2 ? QSP_TOINT(QSP_NUM(args[1])) : 0);
     maxCount = (count == 3 ? QSP_TOINT(QSP_NUM(args[2])) : var->ValsCount);

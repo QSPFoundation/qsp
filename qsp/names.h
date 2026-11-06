@@ -23,6 +23,7 @@
     extern QSPName qspNullName;
 
     /* External functions */
+    int qspGetExactNameIndex(QSPString name, unsigned int nameHash, QSP_BOOL toIntern);
     int qspGetNameIndex(QSPString name, QSP_BOOL toIntern);
     QSPString qspGetNameText(int nameIndex);
     void qspAdvanceNamesGeneration(void);

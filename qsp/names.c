@@ -118,13 +118,17 @@ INLINE int qspFindExactName(QSPString name, unsigned int nameHash)
     return -1;
 }
 
+int qspGetExactNameIndex(QSPString name, unsigned int nameHash, QSP_BOOL toIntern)
+{
+    /* The name has to be uppercased */
+    return (toIntern ? qspInternExactName(name, nameHash) : qspFindExactName(name, nameHash));
+}
+
 int qspGetNameIndex(QSPString name, QSP_BOOL toIntern)
 {
     int nameIndex;
-    unsigned int nameHash;
     QSPString upperName = qspUpperText(name);
-    nameHash = qspGetTextHash(upperName);
-    nameIndex = (toIntern ? qspInternExactName(upperName, nameHash) : qspFindExactName(upperName, nameHash));
+    nameIndex = qspGetExactNameIndex(upperName, qspGetTextHash(upperName), toIntern);
     qspFreeNewString(&upperName, &name);
     return nameIndex;
 }

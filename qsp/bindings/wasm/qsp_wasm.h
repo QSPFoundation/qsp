@@ -86,7 +86,7 @@
     QSP_WASM_EXPORT QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count);
     QSP_WASM_EXPORT QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind);
     QSP_WASM_EXPORT QSP_BOOL QSPGetVarValue(QSP_CHAR *name, int ind, QSPVariant *value, QSPVariant *key);
-    /* Names */
+    /* Names: the name index is valid only while the current world is loaded */
     QSP_WASM_EXPORT int QSPGetNameIndex(QSP_CHAR *name, QSP_BOOL toCreate);
     QSP_WASM_EXPORT void QSPGetName(int nameIndex, QSPString *name);
     /* Sanitizer builds */

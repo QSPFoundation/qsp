@@ -41,7 +41,8 @@
 
     typedef struct
     {
-        QSPString Name;
+        int NameIndex;
+        QSP_TINYINT VarType; /* type prefix of the name */
         QSPCachedArg Index;
         QSPString Path; /* text of the field path */
         QSPField *Fields; /* 0 until the first evaluation */

@@ -70,6 +70,7 @@ INLINE void qspRestoreCurrentIncludes(void);
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS);
 INLINE QSP_BOOL qspSkipLines(int totalLinesCount, int linesToSkip, int *index);
 INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, int *index, QSP_BOOL isUCS, int *value);
+INLINE QSP_BOOL qspCheckVarNameAndSkipLine(QSPString *strs, int totalLinesCount, int *index, QSP_BOOL isUCS);
 INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUCS);
 
 INLINE int qspCRC(void *data, int len)
@@ -347,10 +348,10 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     slot = qspGlobalVars.VarSlots;
     for (i = QSP_SLOTSCOUNT(qspGlobalVars.Capacity); i > 0; --i, ++slot)
     {
-        if (slot->Name.Str)
+        if (slot->NameIndex)
         {
             var = qspGetVarFromSlot(slot);
-            qspAppendEncodedStrVal(&bufString, slot->Name, isUCS);
+            qspAppendEncodedStrVal(&bufString, qspGetNameText(slot->NameIndex), isUCS);
             qspAppendEncodedIntVal(&bufString, var->ValsCount, isUCS);
             for (j = 0; j < var->ValsCount; ++j)
                 qspAppendEncodedVariant(&bufString, var->Values[j], isUCS);
@@ -386,6 +387,20 @@ INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, 
 {
     if (*index >= totalLinesCount) return QSP_FALSE;
     *value = qspReadEncodedIntVal(strs[*index], isUCS);
+    return qspSkipLines(totalLinesCount, 1, index);
+}
+
+INLINE QSP_BOOL qspCheckVarNameAndSkipLine(QSPString *strs, int totalLinesCount, int *index, QSP_BOOL isUCS)
+{
+    QSPString name;
+    if (*index >= totalLinesCount) return QSP_FALSE;
+    name = qspDecodeString(strs[*index], isUCS);
+    if (qspIsEmpty(qspPrepareVarName(name, 0)))
+    {
+        qspFreeString(&name);
+        return QSP_FALSE;
+    }
+    qspFreeString(&name);
     return qspSkipLines(totalLinesCount, 1, index);
 }
 
@@ -468,7 +483,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     for (i = 0; i < count; ++i)
     {
         /* variable's name */
-        if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
+        if (!qspCheckVarNameAndSkipLine(strs, strsCount, &ind, isUCS)) return QSP_FALSE;
         /* values count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &varValuesCount)) return QSP_FALSE;
         if (varValuesCount < 0) return QSP_FALSE;

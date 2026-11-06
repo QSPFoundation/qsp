@@ -263,6 +263,11 @@
         return qspFinalizeHash(hash);
     }
 
+    INLINE unsigned int qspGetIndexHash(int index)
+    {
+        return qspFinalizeHash((unsigned int)index * 2654435761u);
+    }
+
     INLINE void qspLowerStr(QSPString *str)
     {
         QSP_CHAR *pos = str->Str, *end = str->End;

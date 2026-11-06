@@ -18,7 +18,6 @@
     #define QSP_MAXLOCALVARS 500
     #define QSP_VARSGLOBALCAPACITY 512
     #define QSP_VARSLOCALCAPACITY 8
-    #define QSP_VARSNAMECHARSPERVAR 4
     #define QSP_VARSSCOPECHUNKSIZE 128
     #define QSP_VARSKEYSCAPACITY 4 /* has to be a power of 2 */
 
@@ -52,8 +51,7 @@
 
     typedef struct
     {
-        QSPString Name; /* points into the scope's Names, Str is 0 for an empty slot */
-        unsigned int NameHash;
+        int NameIndex; /* 0 for an empty slot */
         QSP_BOOL IsRef;
         union
         {
@@ -64,12 +62,9 @@
 
     typedef struct
     {
-        QSPVarSlot *VarSlots; /* hash table by names, QSP_SLOTSCOUNT(Capacity) slots */
+        QSPVarSlot *VarSlots; /* hash table by name indices, QSP_SLOTSCOUNT(Capacity) slots */
         int VarsCount;
         int Capacity; /* has to be a power of 2 */
-        QSP_CHAR *Names;
-        int NamesLen;
-        int NamesCapacity;
     } QSPVarsScope;
 
     typedef struct QSPVarsScopeChunk_s QSPVarsScopeChunk;
@@ -110,22 +105,24 @@
     void qspClearVars(QSPVarsScope *scope);
     void qspClearLocalVarsScopes(QSPVarsScopeChunk *chunk);
     void qspClearAllVars(QSP_BOOL toInit);
+    void qspRegisterSpecialVariables(void);
     QSPVar *qspAddVarToScope(QSPVarsScope *scope, QSPString name);
     QSPVarsScope *qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspApplyResult(QSPVariant *res);
     QSPVarsScopeChunk *qspSaveLocalVarsAndRestoreGlobals(void);
     void qspRestoreSavedLocalVars(QSPVarsScopeChunk *chunk);
-    QSPVarSlot *qspVarSlotReference(QSPString name, QSP_TINYINT mode);
+    QSPVarSlot *qspVarSlotReferenceByName(QSPString name, QSP_TINYINT mode);
     QSPVarKey *qspAddVarKey(QSPVar *var, unsigned int hash, int valIndex);
     int qspGetVarKeyIndex(QSPVar *var, int valIndex);
     int qspGetVarItemIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate);
-    void qspGetVarValueByIndex(QSPString varName, QSPVariant index, QSPVariant *res);
-    void qspGetFirstVarValue(QSPString varName, QSPVariant *res);
-    void qspGetLastVarValue(QSPString varName, QSPVariant *res);
-    void qspGetVarFieldValueByIndex(QSPString varName, QSPVariant index, QSPField *fields, int count, QSPVariant *res);
-    void qspGetFirstVarFieldValue(QSPString varName, QSPField *fields, int count, QSPVariant *res);
-    void qspGetLastVarFieldValue(QSPString varName, QSPField *fields, int count, QSPVariant *res);
+    void qspGetVarValueByIndex(int nameIndex, QSP_TINYINT varType, QSPVariant index, QSPVariant *res);
+    void qspGetFirstVarValue(int nameIndex, QSP_TINYINT varType, QSPVariant *res);
+    void qspGetLastVarValue(int nameIndex, QSP_TINYINT varType, QSPVariant *res);
+    void qspGetVarFieldValueByIndex(int nameIndex, QSP_TINYINT varType, QSPVariant index, QSPField *fields, int count, QSPVariant *res);
+    void qspGetFirstVarFieldValue(int nameIndex, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *res);
+    void qspGetLastVarFieldValue(int nameIndex, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *res);
+    void qspGetVarValueByName(QSPString varName, QSPVariant index, QSPVariant *res);
     QSP_BOOL qspGetFieldNameIndex(QSPString name, QSP_TINYINT mode, int *nameIndex);
     QSP_BOOL qspInitPlainField(QSPField *field, QSPString name);
     QSP_BOOL qspInitQuotedField(QSPField *field, QSPString name, QSP_TINYINT fieldType);
@@ -242,17 +239,16 @@
         return (slot->IsRef ? &slot->Data.Shared->Var : &slot->Data.Var);
     }
 
-    INLINE QSPVar *qspVarReference(QSPString name, QSP_TINYINT mode)
+    INLINE QSPVar *qspVarReferenceByName(QSPString name, QSP_TINYINT mode)
     {
-        QSPVarSlot *slot = qspVarSlotReference(name, mode);
+        QSPVarSlot *slot = qspVarSlotReferenceByName(name, mode);
         return (slot ? qspGetVarFromSlot(slot) : 0);
     }
 
     INLINE QSPVarSlot qspGetUnknownVarSlot(void)
     {
         QSPVarSlot slot;
-        slot.Name = qspNullString;
-        slot.NameHash = 0;
+        slot.NameIndex = 0;
         slot.IsRef = QSP_FALSE;
         qspInitVarData(&slot.Data.Var);
         return slot;

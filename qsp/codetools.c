@@ -333,7 +333,8 @@ INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, Q
 
 INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TINYINT *errorCode)
 {
-    QSPString name;
+    QSPString name, plainName;
+    unsigned int nameHash;
     s = qspDelSpc(s);
     target->Index.Type = QSP_ARG_NONE;
     target->Path = qspNullString;
@@ -341,13 +342,15 @@ INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TI
     target->FieldsCount = 0;
     target->DynamicFields = 0;
     target->DynamicCount = 0;
-    target->Name = qspParseToDelim(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
-    name = qspPrepareVarName(target->Name, 0); /* validates the name */
-    if (qspIsEmpty(name))
+    name = qspParseToDelim(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
+    plainName = qspPrepareVarName(name, &nameHash); /* validates the name */
+    if (qspIsEmpty(plainName))
     {
         *errorCode = QSP_ERR_INCORRECTVARNAME;
         return;
     }
+    target->NameIndex = qspGetExactNameIndex(plainName, nameHash, QSP_TRUE);
+    target->VarType = qspGetVarType(name);
     qspSkipSpaces(&s);
     if (qspIsCharAtPos(s, s.Str, QSP_LSBRACK_CHAR))
     {
@@ -1201,9 +1204,8 @@ QSP_BOOL qspParseTargetFields(QSPCachedTarget *target)
     QSPCachedArg args[QSP_MAXMATHOPARGS];
     QSPString path, dynamicNames[QSP_MAXMATHOPARGS];
     int i, fieldsCount, dynamicCount;
-    QSP_TINYINT varType = qspGetVarType(target->Name); /* name is never empty here */
     path = target->Path;
-    fieldsCount = qspParseFieldsPath(&path, varType, fields, dynamicNames);
+    fieldsCount = qspParseFieldsPath(&path, target->VarType, fields, dynamicNames);
     if (fieldsCount < 0) return QSP_FALSE;
     if (!qspIsEmpty(path))
     {

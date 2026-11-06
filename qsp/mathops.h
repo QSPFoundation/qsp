@@ -43,14 +43,17 @@
     {
         QSP_TINYINT OpCode;
         QSP_TINYINT ArgsCount;
+        QSP_TINYINT VarType; /* type prefix of the variable */
         unsigned short ValueIndex; /* for operations with a value */
+        int NameIndex; /* for operations with a variable */
     } QSPMathCompiledOp;
 
     typedef struct
     {
         QSP_TINYINT OpCode;
         QSP_TINYINT ArgsCount;
-        unsigned short ValueIndex; /* operand value for the operation */
+        QSP_TINYINT VarType; /* type prefix of the variable */
+        int NameIndex; /* variable of the operation */
         QSPTuple Fields; /* field names of a tuple */
     } QSPMathLevel;
 
