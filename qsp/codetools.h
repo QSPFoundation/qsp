@@ -144,7 +144,7 @@
     QSPCodeBlock *qspGetCachedCodeBlock(QSPString s);
     QSP_BOOL qspParseTargetFields(QSPCachedTarget *target);
     QSP_BOOL qspCalculateTargetFields(QSPCachedTarget *target, QSPField *fields, QSP_TINYINT mode);
-    QSPVariant qspCalculateArgValue(QSPCachedArg *arg);
+    QSP_BOOL qspCalculateArgValue(QSPCachedArg *arg, QSPVariant *res);
 
     INLINE QSPCodeBlock *qspNewCodeBlock(QSPLineOfCode *lines, int linesCount)
     {

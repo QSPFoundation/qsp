@@ -389,13 +389,10 @@ QSP_TINYINT qspGetStatArgs(QSPCachedStat *stat, QSPCachedArg *statArgs, QSPVaria
     QSP_TINYINT argsCount = stat->ArgsCount;
     if (argsCount > 0)
     {
-        QSP_TINYINT argIndex, *statArgsTypes;
-        int oldLocationState = qspLocationState;
-        statArgsTypes = qspStats[stat->Stat].ArgsTypes;
+        QSP_TINYINT argIndex, *statArgsTypes = qspStats[stat->Stat].ArgsTypes;
         for (argIndex = 0; argIndex < argsCount; ++argIndex)
         {
-            args[argIndex] = qspCalculateTypedArgValue(statArgs + argIndex, statArgsTypes[argIndex]);
-            if (qspLocationState != oldLocationState)
+            if (!qspCalculateTypedArgValue(statArgs + argIndex, statArgsTypes[argIndex], args + argIndex))
             {
                 qspFreeVariants(args, argIndex);
                 return 0;
@@ -806,7 +803,8 @@ INLINE QSP_BOOL qspStatementIf(QSPLineOfCode *line, int startStat, int endStat, 
 
 INLINE QSP_BOOL qspCheckCondition(QSPCachedArg *condition)
 {
-    QSPVariant condValue = qspCalculateTypedArgValue(condition, QSP_TYPE_BOOL);
+    QSPVariant condValue;
+    if (!qspCalculateTypedArgValue(condition, QSP_TYPE_BOOL, &condValue)) return QSP_FALSE;
     return QSP_ISTRUE(QSP_NUM(condValue));
 }
 

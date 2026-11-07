@@ -159,7 +159,7 @@
     void qspTerminateMath(void);
     QSPMathExpression *qspCompileMathExpression(QSPString s);
     void qspFreeMathExpression(QSPMathExpression *expression);
-    QSPVariant qspCalculateValue(QSPMathExpression *expression, int itemIndex);
+    QSP_BOOL qspCalculateValue(QSPMathExpression *expression, int itemIndex, QSPVariant *res);
     QSPVariant qspCalculateExprValue(QSPString expr);
 
 #endif

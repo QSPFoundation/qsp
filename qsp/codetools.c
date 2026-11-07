@@ -1241,7 +1241,6 @@ QSP_BOOL qspCalculateTargetFields(QSPCachedTarget *target, QSPField *fields, QSP
 {
     QSPVariant name;
     QSPField *fieldsEnd;
-    int oldLocationState;
     QSPCachedArg *fieldArg = target->DynamicFields;
     if (!fieldArg)
     {
@@ -1249,14 +1248,12 @@ QSP_BOOL qspCalculateTargetFields(QSPCachedTarget *target, QSPField *fields, QSP
         return QSP_FALSE;
     }
     memcpy(fields, target->Fields, target->FieldsCount * sizeof(QSPField));
-    oldLocationState = qspLocationState;
     fieldsEnd = fields + target->FieldsCount;
     while (fields < fieldsEnd)
     {
         if (fields->NameIndex < 0)
         {
-            name = qspCalculateTypedArgValue(fieldArg, QSP_TYPE_STR);
-            if (qspLocationState != oldLocationState) return QSP_FALSE;
+            if (!qspCalculateTypedArgValue(fieldArg, QSP_TYPE_STR, &name)) return QSP_FALSE;
             if (!qspGetFieldNameIndex(QSP_STR(name), mode, &fields->NameIndex))
             {
                 qspFreeVariant(&name);
@@ -1270,28 +1267,31 @@ QSP_BOOL qspCalculateTargetFields(QSPCachedTarget *target, QSPField *fields, QSP
     return QSP_TRUE;
 }
 
-QSPVariant qspCalculateArgValue(QSPCachedArg *arg)
+QSP_BOOL qspCalculateArgValue(QSPCachedArg *arg, QSPVariant *res)
 {
     switch (arg->Type)
     {
     case QSP_ARG_COMPILED:
-        return qspCalculateValue(arg->Data.Expression, arg->Data.Expression->ItemsCount - 1);
+        return qspCalculateValue(arg->Data.Expression, arg->Data.Expression->ItemsCount - 1, res);
     case QSP_ARG_NUMBER:
-        return qspNumVariant(arg->Data.Number);
+        *res = qspNumVariant(arg->Data.Number);
+        return QSP_TRUE;
     case QSP_ARG_STRING:
-        return qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_STR);
+        *res = qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_STR);
+        return QSP_TRUE;
     case QSP_ARG_CODE:
-        return qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_CODE);
+        *res = qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_CODE);
+        return QSP_TRUE;
     case QSP_ARG_EXPRESSION:
         {
             /* The text is compiled on the first evaluation */
             QSPMathExpression *expression = qspCompileMathExpression(arg->Data.Text);
-            if (!expression) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+            if (!expression) return QSP_FALSE;
             arg->Data.Expression = expression;
             arg->Type = QSP_ARG_COMPILED;
-            return qspCalculateValue(expression, expression->ItemsCount - 1);
+            return qspCalculateValue(expression, expression->ItemsCount - 1, res);
         }
     }
     qspSetError(QSP_ERR_INTERNAL);
-    return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+    return QSP_FALSE;
 }

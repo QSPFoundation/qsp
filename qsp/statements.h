@@ -129,16 +129,16 @@
     void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
     void qspExecStringAsCode(QSPString s);
 
-    INLINE QSPVariant qspCalculateTypedArgValue(QSPCachedArg *arg, QSP_TINYINT type)
+    INLINE QSP_BOOL qspCalculateTypedArgValue(QSPCachedArg *arg, QSP_TINYINT type, QSPVariant *res)
     {
-        QSPVariant res = qspCalculateArgValue(arg);
-        if (QSP_ISDEF(type) && !qspConvertVariantTo(&res, type))
+        if (!qspCalculateArgValue(arg, res)) return QSP_FALSE;
+        if (QSP_ISDEF(type) && !qspConvertVariantTo(res, type))
         {
             qspSetError(QSP_ERR_TYPEMISMATCH);
-            qspFreeVariant(&res);
-            return qspGetEmptyVariant(QSP_TYPE_UNDEF);
+            qspFreeVariant(res);
+            return QSP_FALSE;
         }
-        return res;
+        return QSP_TRUE;
     }
 
 #endif
