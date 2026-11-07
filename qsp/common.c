@@ -64,7 +64,7 @@ void qspInitRuntime(unsigned int seed)
     qspInitVarTypes();
     qspInitSymbolClasses();
     qspInitStackAllocator();
-    qspInitVarsScope(&qspGlobalVars, QSP_VARSGLOBALCAPACITY);
+    qspInitVars();
     qspPrepareExecution(QSP_TRUE);
     qspMemClear(QSP_TRUE);
     qspInitCallbacks();
@@ -75,7 +75,7 @@ void qspInitRuntime(unsigned int seed)
 void qspTerminateRuntime(void)
 {
     qspMemClear(QSP_FALSE);
-    qspClearVarsScope(&qspGlobalVars); /* completely destroy the global scope */
+    qspTerminateVars();
     qspUpdateLocation(&qspRealCurLoc, 0);
     qspTerminateWorld();
     qspClearNames(QSP_FALSE);
@@ -91,8 +91,7 @@ void qspPrepareExecution(QSP_BOOL toInit)
     if (!qspIsInCallback)
     {
         /* Reset local variables & switch to the global scope */
-        qspClearLocalVarsScopes(qspCurrentLocalVars);
-        qspCurrentLocalVars = 0;
+        qspClearLocalVars();
         /* Reset location call depth */
         qspCurLocCallDepth = 0;
     }

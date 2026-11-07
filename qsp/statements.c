@@ -684,33 +684,33 @@ QSP_BOOL qspExecCode(QSPCodeBlock *code, int startLine, int endLine, QSP_BOOL to
 QSP_BOOL qspExecCodeBlockWithLocals(QSPCodeBlock *code, int startLine, int endLine, QSP_BOOL toTrackLines, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
-    int oldLocationState = qspLocationState;
-    qspAllocateLocalScope();
+    int oldLocationState, oldLocalScopeBase = qspAllocateLocalScope();
 
+    oldLocationState = qspLocationState;
     toExit = qspExecCode(code, startLine, endLine, toTrackLines, jumpTo);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
 
-    qspReleaseLastLocalScope();
+    qspReleaseLocalScope(oldLocalScopeBase);
     return toExit;
 }
 
 INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
-    int oldLocationState = qspLocationState;
-    qspAllocateLocalScope();
+    int oldLocationState, oldLocalScopeBase = qspAllocateLocalScope();
 
+    oldLocationState = qspLocationState;
     toExit = qspExecString(line, startStat, endStat, jumpTo);
     if (qspLocationState != oldLocationState) return QSP_FALSE;
 
-    qspReleaseLastLocalScope();
+    qspReleaseLocalScope(oldLocalScopeBase);
     return toExit;
 }
 
 void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     QSPCodeBlock *code;
-    qspAllocateLocalScopeWithArgs(args, count, QSP_TRUE);
+    int oldLocalScopeBase = qspAllocateLocalScopeWithArgs(args, count, QSP_TRUE);
 
     code = qspGetCachedCodeBlock(s);
     if (code)
@@ -724,7 +724,7 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
     }
 
     if (res && !qspApplyResult(res)) return;
-    qspReleaseLastLocalScope();
+    qspReleaseLocalScope(oldLocalScopeBase);
 }
 
 void qspExecStringAsCode(QSPString s)
@@ -813,7 +813,7 @@ INLINE QSP_BOOL qspCheckCondition(QSPCachedArg *condition)
 INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, int endStat, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
-    int oldLocationState;
+    int oldLocationState, oldLocalScopeBase;
     QSPCachedLoop *loop;
     QSPCachedStat *stat = line->Stats + startStat;
     if (startStat == endStat - 1)
@@ -821,7 +821,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
         qspSetError(QSP_ERR_CODENOTFOUND);
         return QSP_FALSE;
     }
-    qspAllocateLocalScope();
+    oldLocalScopeBase = qspAllocateLocalScope();
 
     /* Execute loop initialization */
     loop = stat->Data.Loop;
@@ -850,7 +850,7 @@ INLINE QSP_BOOL qspStatementSinglelineLoop(QSPLineOfCode *line, int startStat, i
             }
         }
     }
-    qspReleaseLastLocalScope();
+    qspReleaseLocalScope(oldLocalScopeBase);
     return toExit;
 }
 
@@ -858,10 +858,10 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPCodeBlock *code, int lineInd, int e
     QSP_BOOL toTrackLines, QSPString *jumpTo)
 {
     QSP_BOOL toExit;
-    int oldLocationState;
+    int oldLocationState, oldLocalScopeBase;
     QSPCachedLoop *loop;
     QSPLineOfCode *line = code->Lines + lineInd;
-    qspAllocateLocalScope();
+    oldLocalScopeBase = qspAllocateLocalScope();
 
     /* Execute loop initialization */
     loop = line->Stats->Data.Loop;
@@ -911,7 +911,7 @@ INLINE QSP_BOOL qspStatementMultilineLoop(QSPCodeBlock *code, int lineInd, int e
             }
         }
     }
-    qspReleaseLastLocalScope();
+    qspReleaseLocalScope(oldLocalScopeBase);
     return toExit;
 }
 
@@ -1017,7 +1017,7 @@ INLINE void qspStatementClear(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUS
         break;
     case QSP_STAT_KILLALL:
         /* The order is important here */
-        qspClearAllVars(QSP_FALSE);
+        qspKillGlobalVars();
         qspClearAllObjectsWithEvents();
         break;
     case QSP_STAT_FREELIB:

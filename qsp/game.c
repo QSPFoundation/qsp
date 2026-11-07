@@ -344,9 +344,9 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         qspAppendEncodedIntVal(&bufString, qspCurObjsGroups[i].UpdatedFields, isUCS);
         qspAppendEncodedIntVal(&bufString, qspCurObjsGroups[i].ObjsCount, isUCS);
     }
-    qspAppendEncodedIntVal(&bufString, qspGlobalVars.VarsCount, isUCS);
-    slot = qspGlobalVars.VarSlots;
-    for (i = QSP_SLOTSCOUNT(qspGlobalVars.Capacity); i > 0; --i, ++slot)
+    qspAppendEncodedIntVal(&bufString, qspGlobalVarsCount, isUCS);
+    slot = qspGlobalVarsSlots;
+    for (i = QSP_SLOTSCOUNT(qspGlobalVarsCapacity); i > 0; --i, ++slot)
     {
         if (slot->NameIndex)
         {
@@ -595,7 +595,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     for (i = 0; i < varsCount; ++i)
     {
         varName = qspDecodeString(strs[ind++], isUCS);
-        var = qspAddVarToScope(&qspGlobalVars, varName);
+        var = qspAddGlobalVar(varName);
         qspFreeString(&varName);
         valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
         if (valsCount)
