@@ -913,7 +913,7 @@ static const char *errorName(int num)
         "INTERNAL", "DIVBYZERO", "TYPEMISMATCH", "LOCCALLDEPTH", "COMPLEXEXPRESSION",
         "CANTLOADFILE", "GAMENOTLOADED", "COLONNOTFOUND", "ENDNOTFOUND", "CANTINCFILE",
         "CANTADDACTION", "CANTADDOBJECT", "CANTADDMENUITEM", "LOCNOTFOUND", "LABELNOTFOUND",
-        "INCORRECTNAME", "QUOTNOTFOUND", "BRACKETNOTFOUND", "SYNTAX", "UNKNOWNACTION",
+        "INCORRECTVARNAME", "INCORRECTFIELDNAME", "DUPLICATEFIELD", "QUOTNOTFOUND", "BRACKETNOTFOUND", "SYNTAX", "UNKNOWNACTION",
         "ARGSCOUNT", "TOOMANYVARS", "INCORRECTREGEXP", "CODENOTFOUND", "LOOPWHILENOTFOUND"
     };
     static char buf[32];
@@ -992,6 +992,27 @@ static void formatString(StrBuf *sb, QSPString s)
     free(text.Data);
 }
 
+static const char FIELD_NAME_DELIMS[] = " \t&'\"()[]{}=!<>+-/*\\,:;^@?.";
+
+static int isPlainFieldName(QSPString name)
+{
+    const QSP_CHAR *c;
+    if (name.Str == name.End) return 0;
+    if ((*name.Str >= '0' && *name.Str <= '9') || *name.Str == '$' || *name.Str == '#' || *name.Str == '%') return 0;
+    for (c = name.Str; c < name.End; ++c)
+        if (*c < 128 && strchr(FIELD_NAME_DELIMS, (char)*c)) return 0;
+    return 1;
+}
+
+static void formatFieldName(StrBuf *sb, QSPString name)
+{
+    if (isPlainFieldName(name))
+        addEscaped(sb, name);
+    else
+        formatString(sb, name);
+    sbAdd(sb, ": ");
+}
+
 static void formatVariant(StrBuf *sb, const QSPVariant *v)
 {
     int i;
@@ -1002,10 +1023,12 @@ static void formatVariant(StrBuf *sb, const QSPVariant *v)
         break;
     case QSP_TYPE_TUPLE:
         sbAdd(sb, "[");
-        for (i = 0; i < v->Val.Tuple.ValsCount; ++i)
+        for (i = 0; i < v->Val.Tuple.FieldsCount; ++i)
         {
+            const QSPField *field = v->Val.Tuple.Fields + i;
             if (i) sbAdd(sb, ", ");
-            formatVariant(sb, v->Val.Tuple.Vals + i);
+            if (field->NameIndex > 0) formatFieldName(sb, QSPGetName(field->NameIndex));
+            formatVariant(sb, &field->Value);
         }
         sbAdd(sb, "]");
         break;
@@ -1018,7 +1041,51 @@ static void formatVariant(StrBuf *sb, const QSPVariant *v)
     }
 }
 
-/* Parses a literal: a number, a string in single quotes ('' is a quote), a tuple [a, b] or ? */
+static int parseFieldName(const char **str, StrBuf *out)
+{
+    const char *s = *str, *start;
+    char *unescaped;
+    QSP_CHAR *qName;
+    StrBuf name = {0};
+    while (*s == ' ') ++s;
+    if (*s == '\'')
+    {
+        for (++s; *s; ++s)
+        {
+            if (*s == '\'')
+            {
+                if (s[1] != '\'') break;
+                ++s;
+            }
+            sbAddN(&name, s, 1);
+        }
+        if (!*s++)
+        {
+            free(name.Data);
+            return 0;
+        }
+    }
+    else
+    {
+        for (start = s; *s && !strchr(FIELD_NAME_DELIMS, *s) && *s != ']'; ++s);
+        sbAddN(&name, start, s - start);
+    }
+    while (*s == ' ') ++s;
+    if (*s != ':')
+    {
+        free(name.Data);
+        return 1; /* no name, the item is the value */
+    }
+    unescaped = unescape(sbStr(&name));
+    qName = toQsp(unescaped);
+    formatFieldName(out, QSPStringFromC(qName));
+    free(qName);
+    free(unescaped);
+    free(name.Data);
+    *str = s + 1;
+    return 1;
+}
+
 static int parseLiteral(const char **str, StrBuf *out)
 {
     const char *s = *str;
@@ -1062,7 +1129,7 @@ static int parseLiteral(const char **str, StrBuf *out)
             {
                 if (!isFirst) sbAdd(out, ", ");
                 isFirst = 0;
-                if (!parseLiteral(&s, out)) return 0;
+                if (!parseFieldName(&s, out) || !parseLiteral(&s, out)) return 0;
                 while (*s == ' ') ++s;
                 if (*s == ',')
                 {
