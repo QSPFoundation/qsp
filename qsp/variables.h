@@ -46,18 +46,18 @@
     {
         QSPVarData Data;
         int RefsCount;
-    } QSPSharedVar;
+    } QSPSharedVarData;
 
     typedef struct
     {
-        int NameIndex; /* 0 for an empty slot */
+        int NameIndex; /* 0 for an empty entry */
         int LocalIndex; /* previous or the last local variable with the same name (index in qspLocalVars, 1-based), 0 for none */
-        int GlobalIndex; /* global slot of the name for local variables (index in qspGlobalVarsSlots, 1-based), 0 in table slots */
+        int GlobalIndex; /* global var of the name for local variables (index in qspGlobalVars, 1-based) */
         QSP_BOOL IsRef;
         union
         {
             QSPVarData Own;
-            QSPSharedVar *Shared;
+            QSPSharedVarData *Shared;
         } Data;
     } QSPVar;
 
@@ -76,7 +76,7 @@
     };
 
     extern QSPVar qspNullVar;
-    extern QSPVar *qspGlobalVarsSlots; /* hash table by name indices, QSP_SLOTSCOUNT(qspGlobalVarsCapacity) slots */
+    extern QSPVar *qspGlobalVars; /* hash table by name indices, QSP_SLOTSCOUNT(qspGlobalVarsCapacity) entries */
     extern int qspGlobalVarsCount;
     extern int qspGlobalVarsCapacity; /* has to be a power of 2 */
 
@@ -92,7 +92,7 @@
     void qspRegisterSpecialVariables(void);
     int qspAllocateLocalScope(void);
     void qspReleaseLocalScope(int oldLocalScopeBase);
-    QSPVar *qspAddGlobalVarByName(QSPString name);
+    QSPVarData *qspAddGlobalVarByName(QSPString name);
     int qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspApplyResult(QSPVariant *res);
@@ -219,27 +219,6 @@
             free(varData->KeysSlots);
         }
         qspInitVarData(varData);
-    }
-
-    INLINE void qspReleaseSharedVar(QSPSharedVar *sharedVar)
-    {
-        if (--sharedVar->RefsCount == 0)
-        {
-            qspEmptyVarData(&sharedVar->Data);
-            free(sharedVar);
-        }
-    }
-
-    INLINE void qspResetVar(QSPVar *var)
-    {
-        if (var->IsRef)
-        {
-            qspReleaseSharedVar(var->Data.Shared);
-            var->IsRef = QSP_FALSE;
-            qspInitVarData(&var->Data.Own);
-        }
-        else
-            qspEmptyVarData(&var->Data.Own);
     }
 
     INLINE QSPVarData *qspGetVarData(QSPVar *var)
