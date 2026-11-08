@@ -231,33 +231,28 @@ INLINE QSPVar *qspGetEmptyGlobalVar(int nameIndex)
 
 INLINE void qspRebuildGlobalVars(int newCapacity)
 {
-    int oldSlotsCount = QSP_SLOTSCOUNT(qspGlobalVarsCapacity);
-    QSPVar *oldVars = qspGlobalVars;
+    QSPVar *var, *oldVar, *oldVars = qspGlobalVars;
+    int i, prevLocalIndex, newGlobalIndex, oldSlotsCount = QSP_SLOTSCOUNT(qspGlobalVarsCapacity);
     qspGlobalVarsCapacity = newCapacity;
     qspGlobalVars = qspNewVars(QSP_SLOTSCOUNT(newCapacity));
-    if (oldVars)
+    for (i = 0, oldVar = oldVars; i < oldSlotsCount; ++i, ++oldVar)
     {
-        int i, prevLocalIndex, newGlobalIndex;
-        QSPVar *var, *oldVar = oldVars;
-        for (i = 0; i < oldSlotsCount; ++i, ++oldVar)
+        if (oldVar->NameIndex)
         {
-            if (oldVar->NameIndex)
+            var = qspGetEmptyGlobalVar(oldVar->NameIndex);
+            *var = *oldVar;
+            /* Update global index for the local variables */
+            newGlobalIndex = (int)(var - qspGlobalVars) + 1;
+            prevLocalIndex = var->LocalIndex;
+            while (prevLocalIndex)
             {
-                var = qspGetEmptyGlobalVar(oldVar->NameIndex);
-                *var = *oldVar;
-                /* Update global index for the local variables */
-                newGlobalIndex = (int)(var - qspGlobalVars) + 1;
+                var = qspLocalVars + prevLocalIndex - 1;
+                var->GlobalIndex = newGlobalIndex;
                 prevLocalIndex = var->LocalIndex;
-                while (prevLocalIndex)
-                {
-                    var = qspLocalVars + prevLocalIndex - 1;
-                    var->GlobalIndex = newGlobalIndex;
-                    prevLocalIndex = var->LocalIndex;
-                }
             }
         }
-        free(oldVars);
     }
+    free(oldVars);
 }
 
 INLINE QSPVar *qspCreateGlobalVar(int nameIndex)

@@ -27,7 +27,7 @@ int qspCurLocCallDepth = 0;
 INLINE QSPLocName *qspNewLocNames(int capacity);
 INLINE QSPLocName *qspGetLocSlot(QSPString name, unsigned int nameHash);
 INLINE QSPLocName *qspGetEmptyLocSlot(unsigned int nameHash);
-INLINE void qspRebuildLocs(int newCapacity, int locsCount);
+INLINE void qspRebuildLocs(int newCapacity);
 INLINE void qspAddBaseDescAndActions(QSPLocation *loc);
 INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc);
 
@@ -57,19 +57,19 @@ INLINE QSPLocName *qspGetEmptyLocSlot(unsigned int nameHash)
     return slot;
 }
 
-INLINE void qspRebuildLocs(int newCapacity, int locsCount)
+INLINE void qspRebuildLocs(int newCapacity)
 {
     QSPLocName *slot, *oldSlot, *oldSlots = qspLocsNames;
     int i, oldSlotsCount = QSP_SLOTSCOUNT(qspLocsCapacity);
     qspLocsCapacity = newCapacity;
     qspLocs = (QSPLocation **)realloc(qspLocs, newCapacity * sizeof(QSPLocation *));
     qspLocsNames = qspNewLocNames(QSP_SLOTSCOUNT(newCapacity));
-    /* Keep the names of the first locsCount locations */
+    /* Keep the names of the first qspLocsCount locations */
     for (i = 0, oldSlot = oldSlots; i < oldSlotsCount; ++i, ++oldSlot)
     {
         if (oldSlot->Name.Str)
         {
-            if (oldSlot->Index < locsCount)
+            if (oldSlot->Index < qspLocsCount)
             {
                 /* This location is still in the world */
                 slot = qspGetEmptyLocSlot(oldSlot->NameHash);
@@ -107,7 +107,7 @@ void qspTruncateWorld(int locsCount)
         qspReleaseLocation(qspLocs[i]);
     }
     qspLocsCount = locsCount;
-    qspRebuildLocs(qspLocsCapacity, locsCount); /* drops the names of the removed locations */
+    qspRebuildLocs(qspLocsCapacity); /* drops the names of the removed locations */
 }
 
 void qspFreeLocation(QSPLocation *loc)
@@ -143,7 +143,7 @@ QSPLocation *qspAddLocation(QSPString name)
         qspFreeString(&upperName);
         return 0;
     }
-    if (qspLocsCount >= qspLocsCapacity) qspRebuildLocs(qspLocsCapacity * 2, qspLocsCount);
+    if (qspLocsCount >= qspLocsCapacity) qspRebuildLocs(qspLocsCapacity * 2);
     /* Create a new location */
     loc = (QSPLocation *)malloc(sizeof(QSPLocation));
     loc->Name = qspCopyToNewText(name);
