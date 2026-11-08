@@ -1,5 +1,6 @@
 // INSVAR 'name', value[, index[, new index]]: inserts or moves an item of an array (4073cb4)
 // Not in qsp-wasm-engine, the expectations follow the comments in qspStatementInsVar.
+// Since 2ba9aac ARRPACK turns the string keys into the field names of the tuple (in upper case).
 
 // ------------------------------------------------------------
 // Positions
@@ -83,21 +84,21 @@ a['x'] = 1 & a['y'] = 2
 insvar 'a', 9, 'y'
 insvar 'a', 8, 'z'
 @run
-@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[1, 9, 8], 'x', 'y', 'z']
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[X: 1, Y: 9, Z: 8], 'x', 'y', 'z']
 
 @test INSVAR: a string with a number is a key, not a position
 @src
 a[] = 1 & a[] = 2
 insvar 'a', 9, '0'
 @run
-@expect [arrpack('a'), a['0']] => [[1, 2, 9], 9]
+@expect [arrpack('a'), a['0']] => [[1, 2, '0': 9], 9]
 
 @test INSVAR: moves the item of a key, the keys follow their items
 @src
 a['x'] = 1 & a['y'] = 2 & a['z'] = 3
 insvar 'a', 9, 'z', 0
 @run
-@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[9, 1, 2], 'z', 'x', 'y']
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[Z: 9, X: 1, Y: 2], 'z', 'x', 'y']
 @expect [a['x'], a['y'], a['z']] => [1, 2, 9]
 
 @test INSVAR: inserts a new key at a position
@@ -105,7 +106,7 @@ insvar 'a', 9, 'z', 0
 a['x'] = 1 & a['y'] = 2
 insvar 'a', 9, 'n', 1
 @run
-@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[1, 9, 2], 'x', 'n', 'y']
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[X: 1, N: 9, Y: 2], 'x', 'n', 'y']
 @expect [a['n'], a['y']] => [9, 2]
 
 @test INSVAR: inserts a new key beyond the end
@@ -113,14 +114,14 @@ insvar 'a', 9, 'n', 1
 a['x'] = 1
 insvar 'a', 9, 'n', 3
 @run
-@expect [arrpack('a'), $arrkey('a', 3), a['n'], arrsize('a')] => [[1, ?, ?, 9], 'n', 9, 4]
+@expect [arrpack('a'), $arrkey('a', 3), a['n'], arrsize('a')] => [[X: 1, ?, ?, N: 9], 'n', 9, 4]
 
 @test INSVAR: insertion at a position keeps the keys of the moved items
 @src
 a['x'] = 1 & a['y'] = 2
 insvar 'a', 9, 0
 @run
-@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[9, 1, 2], ?, 'x', 'y']
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2)] => [[9, X: 1, Y: 2], ?, 'x', 'y']
 @expect [a['x'], a['y']] => [1, 2]
 
 @test INSVAR: keyed & keyless items move together
@@ -128,7 +129,7 @@ insvar 'a', 9, 0
 a['a'] = 1 & a[] = 2 & a['c'] = 3 & a[] = 4
 insvar 'a', 9, 3, 1
 @run
-@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2), $arrkey('a', 3)] => [[1, 9, 2, 3], 'a', ?, ?, 'c']
+@expect [arrpack('a'), $arrkey('a', 0), $arrkey('a', 1), $arrkey('a', 2), $arrkey('a', 3)] => [[A: 1, 9, 2, C: 3], 'a', ?, ?, 'c']
 @expect [a['a'], a['c']] => [1, 3]
 
 @test INSVAR: tuple keys

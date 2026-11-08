@@ -380,7 +380,8 @@ res = isnum(['55a'])
 %a = [2,3]
       $res = STR(%a)
 @run
-@expect $res => '[2,3]'
+// wasm: '[2,3]'; since 650870d the items of a tuple are separated with ", "
+@expect $res => '[2, 3]'
 
 @test STR: ['55'] = ['55']
 @src
@@ -462,7 +463,8 @@ $a, $b = func('other')
 
         menu 'a'
 @run
-@expect event menu [item 6; 6666|1.jpg; ['tuple','test']]
+// wasm: ['tuple','test'], see STR above
+@expect event menu [item 6; 6666|1.jpg; ['tuple', 'test']]
 
 @test it errors out on more than 20 elements
 @src
