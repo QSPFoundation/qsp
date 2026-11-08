@@ -130,6 +130,9 @@
     QSP_EXTERN QSP_BOOL QSPConvertValueToString(QSPVariant value, QSP_CHAR *buf, int bufSize);
     QSP_EXTERN QSP_BOOL QSPGetNumVarValue(QSPString name, int ind, QSP_BIGINT *res);
     QSP_EXTERN QSP_BOOL QSPGetStrVarValue(QSPString name, int ind, QSP_CHAR *buf, int bufSize);
+    /* Names: the name index is valid only while the current world is loaded */
+    QSP_EXTERN int QSPGetNameIndex(QSPString name, QSP_BOOL toCreate);
+    QSP_EXTERN QSPString QSPGetName(int nameIndex);
 
     #ifdef __cplusplus
     }

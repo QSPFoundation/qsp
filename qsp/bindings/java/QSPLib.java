@@ -15,7 +15,9 @@ public abstract class QSPLib {
         LOCNOTFOUND,
         ENDNOTFOUND,
         LABELNOTFOUND,
-        INCORRECTNAME,
+        INCORRECTVARNAME,
+        INCORRECTFIELDNAME,
+        DUPLICATEFIELD,
         QUOTNOTFOUND,
         BRACKNOTFOUND,
         BRACKSNOTFOUND,
@@ -91,6 +93,7 @@ public abstract class QSPLib {
         public long num;
         public String str;
         public Variant[] tuple;
+        public String[] names; /* field names (null for unnamed item), null when no item has a name */
 
         public Variant() {
             this.type = UNDEF;
@@ -109,6 +112,12 @@ public abstract class QSPLib {
         public Variant(Variant... tuple) {
             this.type = TUPLE;
             this.tuple = tuple;
+        }
+
+        public Variant(String[] names, Variant[] tuple) {
+            this.type = TUPLE;
+            this.tuple = tuple;
+            this.names = names;
         }
     }
 

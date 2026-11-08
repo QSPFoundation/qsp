@@ -37,6 +37,7 @@ void qspInitSymbolClasses(void)
     qspFillSymbolClass(QSP_CHAR_SIMPLEOP, QSP_ADD QSP_SUB QSP_DIV QSP_MUL);
     qspFillSymbolClass(QSP_CHAR_LBRACKET, QSP_LCODE QSP_LRBRACK QSP_LSBRACK);
     qspFillSymbolClass(QSP_CHAR_TYPEPREFIX, QSP_TUPLETYPE QSP_NUMTYPE QSP_STRTYPE);
+    qspFillSymbolClass(QSP_CHAR_FIELDREF, QSP_FIELDDELIM);
 }
 
 QSP_CHAR *qspStringToC(QSPString s)
@@ -177,8 +178,7 @@ QSP_BOOL qspIsStrNumber(QSPString s)
     else
         return QSP_FALSE;
     s.Str = pos;
-    qspSkipSpaces(&s);
-    return qspIsEmpty(s);
+    return !qspSkipSpaces(&s);
 }
 
 QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid)
@@ -213,8 +213,7 @@ QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid)
         if (isValid) *isValid = QSP_FALSE;
         return 0;
     }
-    qspSkipSpaces(&s);
-    if (!qspIsEmpty(s))
+    if (qspSkipSpaces(&s))
     {
         if (isValid) *isValid = QSP_FALSE;
         return 0;

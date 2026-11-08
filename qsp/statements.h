@@ -7,6 +7,8 @@
 
 #include "declarations.h"
 #include "codetools.h"
+#include "errors.h"
+#include "variant.h"
 
 #ifndef QSP_STATSDEFINES
     #define QSP_STATSDEFINES
@@ -126,5 +128,17 @@
     QSP_BOOL qspExecCodeBlockWithLocals(QSPCodeBlock *code, int startLine, int endLine, QSP_BOOL toTrackLines, QSPString *jumpTo);
     void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, QSPVariant *res);
     void qspExecStringAsCode(QSPString s);
+
+    INLINE QSP_BOOL qspCalculateTypedArgValue(QSPCachedArg *arg, QSP_TINYINT type, QSPVariant *res)
+    {
+        if (!qspCalculateArgValue(arg, res)) return QSP_FALSE;
+        if (QSP_ISDEF(type) && !qspConvertVariantTo(res, type))
+        {
+            qspSetError(QSP_ERR_TYPEMISMATCH);
+            qspFreeVariant(res);
+            return QSP_FALSE;
+        }
+        return QSP_TRUE;
+    }
 
 #endif

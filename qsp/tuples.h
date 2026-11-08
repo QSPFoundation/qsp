@@ -13,21 +13,60 @@
 
     #define QSP_TUPLEDISPLAY_START QSP_LSBRACK
     #define QSP_TUPLEDISPLAY_END QSP_RSBRACK
-    #define QSP_TUPLEDISPLAY_DELIM QSP_COMMA
+    #define QSP_TUPLEDISPLAY_DELIM QSP_COMMA QSP_FMT(" ")
+    #define QSP_TUPLEDISPLAY_FIELDDELIM QSP_FIELDVALUEDELIM QSP_FMT(" ")
 
     extern QSPTuple qspNullTuple;
 
     /* External functions */
+    QSPTuple qspNewTuple(int count);
+    void qspFreeTupleFields(QSPField *fields, int count);
     void qspFreeTuple(QSPTuple *tuple);
     QSP_BOOL qspIsTupleNumber(QSPTuple tuple);
     QSP_BIGINT qspTupleToNum(QSPTuple tuple, QSP_BOOL *isValid);
     QSPTuple qspCopyToNewTuple(QSPVariant *values, int count);
     QSPTuple qspMoveToNewTuple(QSPVariant *values, int count);
-    QSPTuple qspMergeToNewTuple(QSPVariant *list1, int count1, QSPVariant *list2, int count2);
+    QSPTuple qspCopyFieldsToNewTuple(QSPField *fields, int count);
+    QSPTuple qspMoveFieldsToNewTuple(QSPField *fields, int count);
+    QSPTuple qspAppendValueToNewTuple(QSPTuple *tuple, QSPVariant *value);
+    QSPTuple qspPrependValueToNewTuple(QSPTuple *tuple, QSPVariant *value);
+    QSPTuple qspMergeToNewTuple(QSPTuple *first, QSPTuple *second);
+    void qspReserveTupleItems(QSPTuple *tuple, int count);
+    QSPVariant *qspReserveTupleFieldValueByPath(QSPVariant *value, QSPField *fields, int count);
+    void qspRemoveTupleField(QSPTuple *tuple, int nameIndex);
+    QSPVariant *qspGetTupleFieldValueByPath(QSPVariant *value, QSPField *fields, int count);
     int qspTupleValueCompare(QSPTuple tuple, QSPVariant *value);
     int qspTuplesCompare(QSPTuple first, QSPTuple second);
     QSP_BOOL qspTuplesEqual(QSPTuple first, QSPTuple second);
     void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res);
+
+    INLINE int qspGetTupleFieldIndex(QSPTuple tuple, int nameIndex)
+    {
+        if (nameIndex > 0)
+        {
+            int i;
+            for (i = 0; i < tuple.FieldsCount; ++i)
+                if (tuple.Fields[i].NameIndex == nameIndex) return i;
+        }
+        return -1;
+    }
+
+    INLINE QSPVariant *qspGetTupleFieldValue(QSPTuple tuple, int nameIndex)
+    {
+        int fieldIndex = qspGetTupleFieldIndex(tuple, nameIndex);
+        return (fieldIndex >= 0 ? &tuple.Fields[fieldIndex].Value : 0);
+    }
+
+    INLINE QSP_BOOL qspTupleHasNames(QSPTuple tuple)
+    {
+        QSPField *item = tuple.Fields, *itemsEnd = item + tuple.FieldsCount;
+        while (item < itemsEnd)
+        {
+            if (item->NameIndex > 0) return QSP_TRUE;
+            ++item;
+        }
+        return QSP_FALSE;
+    }
 
     INLINE QSPString qspGetTupleAsString(QSPTuple tuple)
     {

@@ -67,6 +67,12 @@
     #define QSP_UNDEFTYPE    QSP_FMT("?")
     QSP_DEFINE_SPECIAL_CHAR(QSP_UNDEFTYPE,   QSP_FMT('?'))
 
+    #define QSP_FIELDDELIM   QSP_FMT(".")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_FIELDDELIM,  QSP_FMT('.'))
+
+    #define QSP_FIELDVALUEDELIM QSP_FMT(":")
+    QSP_DEFINE_SPECIAL_CHAR(QSP_FIELDVALUEDELIM, QSP_FMT(':'))
+
     #define QSP_LABEL        QSP_FMT(":")
     QSP_DEFINE_SPECIAL_CHAR(QSP_LABEL,       QSP_FMT(':'))
 
@@ -81,7 +87,6 @@
     #define QSP_DIGITS       QSP_FMT("0123456789")
     #define QSP_QUOTS        QSP_FMT("'\"")
     #define QSP_DEFQUOT      QSP_FMT("'")
-    #define QSP_ESCDEFQUOT   QSP_FMT("''")
     #define QSP_SPACES       QSP_FMT(" \t\r\n")
 
     #define QSP_STATDELIM    QSP_FMT("&")

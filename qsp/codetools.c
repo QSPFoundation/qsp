@@ -6,6 +6,7 @@
  */
 
 #include "codetools.h"
+#include "errors.h"
 #include "statements.h"
 #include "text.h"
 #include "variables.h"
@@ -21,7 +22,7 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
 INLINE QSPCachedLoop *qspNewLoop(QSPString s, QSPString lineStr, QSP_TINYINT *errorCode);
 INLINE QSPCachedArg *qspNewUserCallArgs(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
 INLINE QSPCachedAct *qspNewAct(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
-INLINE QSPCachedArg *qspNewSingleArg(QSPString s, QSP_TINYINT *argsCount);
+INLINE QSPCachedArg *qspNewSingleArg(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
 INLINE QSPCachedArg *qspNewRegularArgs(QSP_TINYINT statCode, QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode);
 INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, QSP_TINYINT *errorCode);
 INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TINYINT *errorCode);
@@ -30,7 +31,7 @@ INLINE QSPCachedArg *qspCopyToNewArgs(QSPCachedArg *foundArgs, QSP_TINYINT argsC
 INLINE void qspFreeArg(QSPCachedArg *arg);
 INLINE void qspFreeArgs(QSPCachedArg *args, int count);
 INLINE void qspFreeLineOfCode(QSPLineOfCode *line);
-INLINE QSP_CHAR *qspSkipQuotedString(QSP_CHAR *pos, QSP_CHAR *endPos);
+INLINE QSP_CHAR *qspSkipQuotedString(QSPString s);
 INLINE QSP_BOOL qspAppendLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *strBuf, QSPLineOfCode *line);
 
@@ -133,7 +134,7 @@ INLINE void qspInitStatData(QSPCachedStat *stat, QSPString s, QSPString lineStr)
     case QSP_STAT_IMPLICITSTATEMENT:
     case QSP_STAT_IF:
     case QSP_STAT_ELSEIF:
-        stat->Data.Args = qspNewSingleArg(s, &stat->ArgsCount);
+        stat->Data.Args = qspNewSingleArg(s, &stat->ArgsCount, &stat->ErrorCode);
         break;
     default:
         stat->Data.Args = qspNewRegularArgs(stat->Stat, s, &stat->ArgsCount, &stat->ErrorCode);
@@ -146,7 +147,7 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
     int targetsCount;
     QSPCachedTarget targets[QSP_MAXSTATARGS];
     QSPCachedAssignment *assignment;
-    QSPString names = s, value = qspNullString;
+    QSPString names = s, value;
     QSP_CHAR operation = 0, *equalPos = qspDelimPos(s, QSP_EQUAL_CHAR);
     if (equalPos)
     {
@@ -162,6 +163,11 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
             *errorCode = QSP_ERR_SYNTAX; /* LOCAL & ALIAS don't support compound operations */
             return 0;
         }
+        if (!qspIsAnyString(value))
+        {
+            *errorCode = QSP_ERR_SYNTAX; /* missing value */
+            return 0;
+        }
     }
     else if (statCode != QSP_STAT_LOCAL)
     {
@@ -175,9 +181,9 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
         int i;
         for (i = 0; i < targetsCount; ++i)
         {
-            if (targets[i].Index.Type != QSP_ARG_NONE)
+            if (targets[i].Index.Type != QSP_ARG_NONE || targets[i].Path.Str)
             {
-                *errorCode = QSP_ERR_SYNTAX; /* ALIAS doesn't support indices */
+                *errorCode = QSP_ERR_SYNTAX; /* ALIAS doesn't support indices or fields */
                 return 0;
             }
         }
@@ -187,7 +193,10 @@ INLINE QSPCachedAssignment *qspNewAssignment(QSP_TINYINT statCode, QSPString s, 
     memcpy(assignment->Targets, targets, targetsCount * sizeof(QSPCachedTarget));
     assignment->TargetsCount = targetsCount;
     assignment->Operation = operation;
-    qspInitArg(&assignment->Value, value);
+    if (equalPos)
+        qspInitArg(&assignment->Value, value);
+    else
+        assignment->Value.Type = QSP_ARG_NONE; /* no value */
     return assignment;
 }
 
@@ -220,6 +229,11 @@ INLINE QSPCachedLoop *qspNewLoop(QSPString s, QSPString lineStr, QSP_TINYINT *er
             return 0;
         }
     }
+    if (!qspIsAnyString(condition))
+    {
+        *errorCode = QSP_ERR_SYNTAX; /* WHILE without condition */
+        return 0;
+    }
     loop = (QSPCachedLoop *)malloc(sizeof(QSPCachedLoop));
     qspInitLineOfCode(&loop->Initializer, qspStringFromPair(s.Str, whilePos), 0);
     qspInitLineOfCode(&loop->Iterator, iterator, 0);
@@ -233,7 +247,7 @@ INLINE QSPCachedArg *qspNewUserCallArgs(QSPString s, QSP_TINYINT *argsCount, QSP
     QSPString name;
     QSPCachedArg foundArgs[QSP_MAXSTATARGS];
     qspSkipSpaces(&s);
-    name = qspParseName(&s);
+    name = qspParseToDelim(&s, QSP_CHAR_DELIM);
     if (qspIsEmpty(name))
     {
         *errorCode = QSP_ERR_SYNTAX;
@@ -260,9 +274,15 @@ INLINE QSPCachedAct *qspNewAct(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT 
     return act;
 }
 
-INLINE QSPCachedArg *qspNewSingleArg(QSPString s, QSP_TINYINT *argsCount)
+INLINE QSPCachedArg *qspNewSingleArg(QSPString s, QSP_TINYINT *argsCount, QSP_TINYINT *errorCode)
 {
-    QSPCachedArg *args = (QSPCachedArg *)malloc(sizeof(QSPCachedArg));
+    QSPCachedArg *args;
+    if (!qspIsAnyString(s))
+    {
+        *errorCode = QSP_ERR_SYNTAX; /* missing value */
+        return 0;
+    }
+    args = (QSPCachedArg *)malloc(sizeof(QSPCachedArg));
     qspInitArg(args, s); /* the whole text is the argument */
     *argsCount = 1;
     return args;
@@ -313,44 +333,53 @@ INLINE int qspInitAssignmentTargets(QSPCachedTarget *targets, QSPString names, Q
 
 INLINE void qspInitAssignmentTarget(QSPCachedTarget *target, QSPString s, QSP_TINYINT *errorCode)
 {
+    QSPString name, plainName;
     unsigned int nameHash;
-    QSP_CHAR *nameEnd, *indexEnd;
-    QSPString name;
     s = qspDelSpc(s);
-    nameEnd = qspStrCharClass(s, QSP_CHAR_DELIM);
-    if (nameEnd)
+    target->Index.Type = QSP_ARG_NONE;
+    target->Path = qspNullString;
+    target->Fields = 0;
+    target->FieldsCount = 0;
+    target->DynamicFields = 0;
+    target->DynamicCount = 0;
+    name = qspParseToDelim(&s, QSP_CHAR_DELIM | QSP_CHAR_FIELDREF);
+    plainName = qspPrepareVarName(name, &nameHash); /* validates the name */
+    if (qspIsEmpty(plainName))
     {
-        QSPString rest = qspStringFromPair(nameEnd, s.End);
-        target->Name = qspStringFromPair(s.Str, nameEnd);
-        qspSkipSpaces(&rest);
-        if (!qspIsCharAtPos(rest, rest.Str, QSP_LSBRACK_CHAR))
-        {
-            *errorCode = QSP_ERR_INCORRECTNAME;
-            return;
-        }
-        indexEnd = qspDelimPos(rest, QSP_RSBRACK_CHAR);
+        *errorCode = QSP_ERR_INCORRECTVARNAME;
+        return;
+    }
+    target->NameIndex = qspGetExactNameIndex(plainName, nameHash, QSP_TRUE);
+    target->VarType = qspGetVarType(name);
+    qspSkipSpaces(&s);
+    if (qspIsCharAtPos(s, s.Str, QSP_LSBRACK_CHAR))
+    {
+        QSP_CHAR *indexEnd = qspDelimPos(s, QSP_RSBRACK_CHAR);
         if (!indexEnd)
         {
             *errorCode = QSP_ERR_BRACKETNOTFOUND;
             return;
         }
-        qspInitArg(&target->Index, qspStringFromPair(rest.Str + QSP_STATIC_LEN(QSP_LSBRACK), indexEnd));
+        qspInitArg(&target->Index, qspStringFromPair(s.Str + QSP_STATIC_LEN(QSP_LSBRACK), indexEnd));
+        s.Str = indexEnd + QSP_STATIC_LEN(QSP_RSBRACK);
+        qspSkipSpaces(&s);
     }
-    else
+    if (qspParseChar(&s, QSP_FIELDDELIM_CHAR))
     {
-        target->Name = s; /* the name only */
-        target->Index.Type = QSP_ARG_NONE;
+        if (qspIsEmpty(s))
+        {
+            *errorCode = QSP_ERR_INCORRECTFIELDNAME;
+            return;
+        }
+        target->Path = s; /* parsed on the first evaluation */
     }
-
-    name = qspPrepareVarName(target->Name, &nameHash); /* validates the name */
-    if (qspIsEmpty(name))
-        *errorCode = QSP_ERR_INCORRECTNAME;
+    else if (!qspIsEmpty(s))
+        *errorCode = QSP_ERR_INCORRECTVARNAME;
 }
 
 INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT argsCount, QSP_TINYINT statCode, QSPString s, QSP_TINYINT *errorCode)
 {
-    qspSkipSpaces(&s);
-    if (!qspIsEmpty(s))
+    if (qspSkipSpaces(&s))
     {
         if (*s.Str == QSP_LRBRACK_CHAR) /* arguments might be specified using parentheses */
         {
@@ -370,6 +399,7 @@ INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT arg
         if (!qspIsEmpty(s))
         {
             QSP_CHAR *pos;
+            QSPString arg;
             while (1)
             {
                 if (argsCount >= qspStats[statCode].MaxArgsCount)
@@ -380,7 +410,13 @@ INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT arg
                 pos = qspDelimPos(s, QSP_COMMA_CHAR);
                 if (pos)
                 {
-                    qspInitArg(foundArgs + argsCount, qspStringFromPair(s.Str, pos));
+                    arg = qspStringFromPair(s.Str, pos);
+                    if (!qspIsAnyString(arg))
+                    {
+                        *errorCode = QSP_ERR_SYNTAX; /* missing argument */
+                        break;
+                    }
+                    qspInitArg(foundArgs + argsCount, arg);
                     ++argsCount;
                 }
                 else
@@ -390,8 +426,7 @@ INLINE QSP_TINYINT qspAppendRegularArgs(QSPCachedArg *foundArgs, QSP_TINYINT arg
                     break;
                 }
                 s.Str = pos + QSP_STATIC_LEN(QSP_COMMA);
-                qspSkipSpaces(&s);
-                if (qspIsEmpty(s))
+                if (!qspSkipSpaces(&s))
                 {
                     *errorCode = QSP_ERR_SYNTAX;
                     break;
@@ -428,8 +463,7 @@ void qspInitLineOfCode(QSPLineOfCode *line, QSPString str, int lineNum)
     line->IsMultiline = QSP_FALSE;
     line->StatsCount = 0;
     line->Stats = 0;
-    qspSkipSpaces(&str);
-    if (qspIsEmpty(str)) return;
+    if (!qspSkipSpaces(&str)) return;
     statInd = 0;
     statDelimPos = paramPos = 0;
     statCode = qspGetStatCode(str, &paramPos);
@@ -684,7 +718,15 @@ INLINE void qspFreeLineOfCode(QSPLineOfCode *line)
                     QSPCachedAssignment *assignment = stat->Data.Assignment;
                     qspFreeArg(&assignment->Value);
                     for (j = assignment->TargetsCount, target = assignment->Targets; j > 0; --j, ++target)
+                    {
                         qspFreeArg(&target->Index);
+                        if (target->Fields) free(target->Fields);
+                        if (target->DynamicFields)
+                        {
+                            qspFreeArgs(target->DynamicFields, target->DynamicCount);
+                            free(target->DynamicFields);
+                        }
+                    }
                     free(assignment->Targets);
                     free(assignment);
                 }
@@ -787,19 +829,44 @@ void qspFreeLabels(QSPCodeLabel *labels, int count)
     }
 }
 
-INLINE QSP_CHAR *qspSkipQuotedString(QSP_CHAR *pos, QSP_CHAR *endPos)
+INLINE QSP_CHAR *qspSkipQuotedString(QSPString s)
 {
-    QSP_CHAR quote = *pos;
-    while (++pos < endPos)
+    QSP_CHAR *pos = s.Str, quote = *pos;
+    while (++pos < s.End)
     {
         if (*pos == quote)
         {
             ++pos;
-            if (pos >= endPos || *pos != quote) break;
+            if (pos >= s.End || *pos != quote) return pos;
         }
     }
-    /* It's either past the closing quote or past the last valid position */
-    return pos;
+    return 0;
+}
+
+QSP_BOOL qspUnquoteToNewText(QSPString *s, QSPString *text)
+{
+    QSPString quoted;
+    QSP_CHAR quote, *dest, *pos, *end;
+    end = qspSkipQuotedString(*s);
+    if (!end)
+    {
+        qspSetError(QSP_ERR_QUOTNOTFOUND);
+        return QSP_FALSE;
+    }
+    /* Take everything inside quotes */
+    quote = *(s->Str);
+    quoted = qspStringFromPair(s->Str + 1, end - 1);
+    s->Str = end;
+    /* Process escaped quotes */
+    dest = (QSP_CHAR *)malloc(qspStrLen(quoted) * sizeof(QSP_CHAR));
+    text->Str = dest;
+    for (pos = quoted.Str; pos < quoted.End; ++pos, ++dest)
+    {
+        *dest = *pos;
+        if (*pos == quote) ++pos;
+    }
+    text->End = dest;
+    return QSP_TRUE;
 }
 
 QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
@@ -810,7 +877,7 @@ QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            pos = qspSkipQuotedString(pos, txt.End);
+            if (!(pos = qspSkipQuotedString(qspStringFromPair(pos, txt.End)))) break;
             continue;
         }
         switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
@@ -855,7 +922,7 @@ QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT))
         {
-            pos = qspSkipQuotedString(pos, lastPos + 1);
+            if (!(pos = qspSkipQuotedString(qspStringFromPair(pos, lastPos + 1)))) break;
             continue;
         }
         switch (*pos) /* allow interleaving brackets like "([)]" because the actual validation happens during code execution */
@@ -898,7 +965,7 @@ void qspPrepareStringToExecution(QSPString *str)
     {
         if (qspIsInClass(*pos, QSP_CHAR_QUOT)) /* we have to keep strings untouched */
         {
-            pos = qspSkipQuotedString(pos, endPos);
+            if (!(pos = qspSkipQuotedString(qspStringFromPair(pos, endPos)))) break;
             continue;
         }
         switch (*pos)
@@ -1131,24 +1198,100 @@ QSPCodeBlock *qspGetCachedCodeBlock(QSPString s)
     return block->Code;
 }
 
-QSPVariant qspCalculateArgValue(QSPCachedArg *arg)
+QSP_BOOL qspParseTargetFields(QSPCachedTarget *target)
 {
-    QSPMathExpression *expression;
+    QSPField fields[QSP_MAXMATHOPARGS];
+    QSPCachedArg args[QSP_MAXMATHOPARGS];
+    QSPString path, dynamicNames[QSP_MAXMATHOPARGS];
+    int i, fieldsCount, dynamicCount;
+    path = target->Path;
+    fieldsCount = qspParseFieldsPath(&path, target->VarType, fields, dynamicNames);
+    if (fieldsCount < 0) return QSP_FALSE;
+    if (!qspIsEmpty(path))
+    {
+        qspSetError(QSP_ERR_INCORRECTFIELDNAME);
+        return QSP_FALSE;
+    }
+    /* Prepare code of dynamic names */
+    dynamicCount = 0;
+    for (i = 0; i < fieldsCount; ++i)
+    {
+        if (fields[i].NameIndex < 0)
+        {
+            qspInitArg(args + dynamicCount, dynamicNames[i]);
+            ++dynamicCount;
+        }
+    }
+    if (fieldsCount)
+    {
+        target->FieldsCount = fieldsCount;
+        target->Fields = (QSPField *)malloc(fieldsCount * sizeof(QSPField));
+        memcpy(target->Fields, fields, fieldsCount * sizeof(QSPField));
+    }
+    if (dynamicCount)
+    {
+        target->DynamicCount = dynamicCount;
+        target->DynamicFields = (QSPCachedArg *)malloc(dynamicCount * sizeof(QSPCachedArg));
+        memcpy(target->DynamicFields, args, dynamicCount * sizeof(QSPCachedArg));
+    }
+    return QSP_TRUE;
+}
+
+QSP_BOOL qspCalculateTargetFields(QSPCachedTarget *target, QSPField *fields, QSP_TINYINT mode)
+{
+    QSPVariant name;
+    QSPField *fieldsEnd;
+    QSPCachedArg *fieldArg = target->DynamicFields;
+    if (!fieldArg)
+    {
+        qspSetError(QSP_ERR_INTERNAL);
+        return QSP_FALSE;
+    }
+    memcpy(fields, target->Fields, target->FieldsCount * sizeof(QSPField));
+    fieldsEnd = fields + target->FieldsCount;
+    while (fields < fieldsEnd)
+    {
+        if (fields->NameIndex < 0)
+        {
+            if (!qspCalculateTypedArgValue(fieldArg, QSP_TYPE_STR, &name)) return QSP_FALSE;
+            if (!qspGetFieldNameIndex(QSP_STR(name), mode, &fields->NameIndex))
+            {
+                qspFreeVariant(&name);
+                return QSP_FALSE;
+            }
+            qspFreeVariant(&name);
+            ++fieldArg;
+        }
+        ++fields;
+    }
+    return QSP_TRUE;
+}
+
+QSP_BOOL qspCalculateArgValue(QSPCachedArg *arg, QSPVariant *res)
+{
     switch (arg->Type)
     {
     case QSP_ARG_COMPILED:
-        return qspCalculateValue(arg->Data.Expression, arg->Data.Expression->ItemsCount - 1);
+        return qspCalculateValue(arg->Data.Expression, arg->Data.Expression->ItemsCount - 1, res);
     case QSP_ARG_NUMBER:
-        return qspNumVariant(arg->Data.Number);
+        *res = qspNumVariant(arg->Data.Number);
+        return QSP_TRUE;
     case QSP_ARG_STRING:
-        return qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_STR);
+        *res = qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_STR);
+        return QSP_TRUE;
     case QSP_ARG_CODE:
-        return qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_CODE);
+        *res = qspStrVariant(qspCopyToNewText(arg->Data.Text), QSP_TYPE_CODE);
+        return QSP_TRUE;
+    case QSP_ARG_EXPRESSION:
+        {
+            /* The text is compiled on the first evaluation */
+            QSPMathExpression *expression = qspCompileMathExpression(arg->Data.Text);
+            if (!expression) return QSP_FALSE;
+            arg->Data.Expression = expression;
+            arg->Type = QSP_ARG_COMPILED;
+            return qspCalculateValue(expression, expression->ItemsCount - 1, res);
+        }
     }
-    /* The text is compiled on the first evaluation, it stays until the compilation succeeds */
-    expression = qspCompileMathExpression(arg->Data.Text);
-    if (!expression) return qspGetEmptyVariant(QSP_TYPE_UNDEF);
-    arg->Data.Expression = expression;
-    arg->Type = QSP_ARG_COMPILED;
-    return qspCalculateValue(expression, expression->ItemsCount - 1);
+    qspSetError(QSP_ERR_INTERNAL);
+    return QSP_FALSE;
 }

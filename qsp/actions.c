@@ -44,23 +44,21 @@ INLINE int qspActIndex(QSPString name)
     {
         int i;
         QSPBufString buf;
-        QSPString bufName;
-        name = qspCopyToNewText(name);
-        qspUpperStr(&name);
+        QSPString bufName, upperName = qspUpperText(name);
         buf = qspNewBufString(0, 64);
         for (i = 0; i < qspCurActsCount; ++i)
         {
             qspUpdateBufString(&buf, qspCurActions[i].Desc);
             bufName = qspBufStringToString(buf);
             qspUpperStr(&bufName);
-            if (qspStrsEqual(bufName, name))
+            if (qspStrsEqual(bufName, upperName))
             {
-                qspFreeString(&name);
+                qspFreeNewString(&upperName, &name);
                 qspFreeBufString(&buf);
                 return i;
             }
         }
-        qspFreeString(&name);
+        qspFreeNewString(&upperName, &name);
         qspFreeBufString(&buf);
     }
     return -1;
@@ -123,18 +121,14 @@ QSPString qspGetAllActionsAsCode(void)
     curAct = qspCurActions;
     for (i = qspCurActsCount; i > 0; --i, ++curAct)
     {
-        qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ") QSP_DEFQUOT));
-        temp = qspReplaceText(curAct->Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
-        qspAddBufText(&res, temp);
-        qspFreeNewString(&temp, &curAct->Desc);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ACT ")));
+        qspAddBufQuotedText(&res, curAct->Desc, QSP_STATIC_STR(QSP_DEFQUOT));
         if (curAct->Image.Str)
         {
-            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(",") QSP_DEFQUOT));
-            temp = qspReplaceText(curAct->Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
-            qspAddBufText(&res, temp);
-            qspFreeNewString(&temp, &curAct->Image);
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT(",")));
+            qspAddBufQuotedText(&res, curAct->Image, QSP_STATIC_STR(QSP_DEFQUOT));
         }
-        qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(":")));
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT(":")));
         count = curAct->OnPressLinesCount;
         if (count == 1 && qspIsAnyString(curAct->OnPressCode->Lines[curAct->OnPressStartLine].Str))
             qspAddBufText(&res, curAct->OnPressCode->Lines[curAct->OnPressStartLine].Str);

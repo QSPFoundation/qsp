@@ -36,14 +36,14 @@ INLINE void qspFreeMenuLocs(QSPString *locs, int count)
 
 void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
-    QSPVar *var;
+    QSPVarData *varData;
     QSPVariant *curItem;
     int ind, itemsCount, maxItems;
     QSPListItem menuItems[QSP_MAXMENUITEMS];
     QSPString menuLocs[QSP_MAXMENUITEMS], itemName, itemLocation, itemImage, str;
     QSPTuple tuple;
     QSP_CHAR *pos, *pos2;
-    if (!((var = qspVarReference(QSP_STR(args[0]), QSP_VARREF_GET)))) return;
+    if (!((varData = qspVarDataReferenceByName(QSP_STR(args[0]), QSP_REF_GET)))) return;
     if (count >= 2)
     {
         ind = QSP_TOINT(QSP_NUM(args[1]));
@@ -59,7 +59,7 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     else
         maxItems = QSP_MAXMENUITEMS;
     itemsCount = 0;
-    for (curItem = var->Values + ind; ind < var->ValsCount; ++ind, ++curItem)
+    for (curItem = varData->Values + ind; ind < varData->ValsCount; ++ind, ++curItem)
     {
         if (itemsCount == maxItems) break;
         itemName = itemLocation = itemImage = qspNullString;
@@ -69,14 +69,14 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
             break; /* stops collecting items */
         case QSP_TYPE_TUPLE:
             tuple = QSP_PTUPLE(curItem);
-            if (tuple.ValsCount < 2) break;
-            if (tuple.ValsCount >= 3)
+            if (tuple.FieldsCount < 2) break;
+            if (tuple.FieldsCount >= 3)
             {
-                itemImage = qspGetVariantAsString(&tuple.Vals[2]);
+                itemImage = qspGetVariantAsString(&tuple.Fields[2].Value);
                 if (!qspIsAnyString(itemImage)) qspClearText(&itemImage);
             }
-            itemName = qspGetVariantAsString(&tuple.Vals[0]);
-            itemLocation = qspGetVariantAsString(&tuple.Vals[1]);
+            itemName = qspGetVariantAsString(&tuple.Fields[0].Value);
+            itemLocation = qspGetVariantAsString(&tuple.Fields[1].Value);
             break;
         case QSP_TYPE_STR:
             str = QSP_PSTR(curItem);

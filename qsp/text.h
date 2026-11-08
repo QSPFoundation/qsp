@@ -26,7 +26,8 @@
         QSP_CHAR_DELIM = 1 << 3, /* delimiters */
         QSP_CHAR_SIMPLEOP = 1 << 4, /* simple math operations */
         QSP_CHAR_LBRACKET = 1 << 5, /* opening brackets of an expression */
-        QSP_CHAR_TYPEPREFIX = 1 << 6 /* type prefix */
+        QSP_CHAR_TYPEPREFIX = 1 << 6, /* type prefix */
+        QSP_CHAR_FIELDREF = 1 << 7 /* field delimiter */
     };
 
     typedef struct
@@ -184,11 +185,12 @@
         return (pos >= str.Str && pos < str.End && qspIsInClass(*pos, charClass));
     }
 
-    INLINE void qspSkipSpaces(QSPString *s)
+    INLINE QSP_BOOL qspSkipSpaces(QSPString *s)
     {
         QSP_CHAR *pos = s->Str, *end = s->End;
         while (pos < end && qspIsInClass(*pos, QSP_CHAR_SPACE)) ++pos;
         s->Str = pos;
+        return (pos != end);
     }
 
     INLINE QSPString qspDelSpc(QSPString s)
@@ -201,8 +203,7 @@
 
     INLINE QSP_BOOL qspIsAnyString(QSPString s)
     {
-        qspSkipSpaces(&s);
-        return (s.Str != s.End);
+        return qspSkipSpaces(&s);
     }
 
     INLINE QSP_BIGINT qspParseUnsignedNumber(QSPString *s)
@@ -224,12 +225,19 @@
         return num;
     }
 
-    INLINE QSPString qspParseName(QSPString *s)
+    INLINE QSPString qspParseToDelim(QSPString *s, int delimClass)
     {
         QSP_CHAR *startPos = s->Str, *pos = startPos, *end = s->End;
-        while (pos < end && !qspIsInClass(*pos, QSP_CHAR_DELIM)) ++pos;
+        while (pos < end && !qspIsInClass(*pos, delimClass)) ++pos;
         s->Str = pos;
         return qspStringFromPair(startPos, pos);
+    }
+
+    INLINE QSP_BOOL qspParseChar(QSPString *s, QSP_CHAR ch)
+    {
+        if (qspIsEmpty(*s) || *(s->Str) != ch) return QSP_FALSE;
+        ++s->Str;
+        return QSP_TRUE;
     }
 
     INLINE unsigned int qspAddValueToHash(unsigned int hash, unsigned int value)
@@ -255,6 +263,11 @@
         return qspFinalizeHash(hash);
     }
 
+    INLINE unsigned int qspGetIndexHash(int index)
+    {
+        return qspFinalizeHash((unsigned int)index * 2654435761u);
+    }
+
     INLINE void qspLowerStr(QSPString *str)
     {
         QSP_CHAR *pos = str->Str, *end = str->End;
@@ -273,6 +286,28 @@
             *pos = (QSP_CHAR)QSP_CHRUPR(*pos);
             ++pos;
         }
+    }
+
+    INLINE QSPString qspUpperText(QSPString txt)
+    {
+        /* The text itself when it's uppercase already, otherwise its uppercased copy */
+        QSP_CHAR ch, *pos = txt.Str, *end = txt.End;
+        while (pos < end)
+        {
+            ch = (QSP_CHAR)QSP_CHRUPR(*pos);
+            if (ch != *pos)
+            {
+                /* Previous text is uppercase already */
+                QSPString rest, res = qspCopyToNewText(txt);
+                pos = res.Str + (pos - txt.Str);
+                *pos = ch;
+                rest = qspStringFromPair(pos + 1, res.End);
+                qspUpperStr(&rest);
+                return res;
+            }
+            ++pos;
+        }
+        return txt;
     }
 
     INLINE int qspStrsPartCompare(QSPString str, QSPString part)
@@ -453,6 +488,23 @@
             return QSP_TRUE;
         }
         return QSP_FALSE;
+    }
+
+    INLINE void qspAddBufQuotedText(QSPBufString *dest, QSPString val, QSPString quote)
+    {
+        QSP_CHAR *pos;
+        int quoteLen = qspStrLen(quote);
+        qspAddBufText(dest, quote);
+        while ((pos = qspStrStr(val, quote)))
+        {
+            /* Quote in text gets doubled */
+            pos += quoteLen;
+            qspAddBufText(dest, qspStringFromPair(val.Str, pos));
+            qspAddBufText(dest, quote);
+            val.Str = pos;
+        }
+        qspAddBufText(dest, val);
+        qspAddBufText(dest, quote);
     }
 
     INLINE void qspAddBufChar(QSPBufString *dest, QSP_CHAR ch)

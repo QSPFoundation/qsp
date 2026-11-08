@@ -89,6 +89,7 @@ set(QSP_SOURCES
 	qsp/memory.c qsp/memory.h
 	qsp/memwatch.c qsp/memwatch.h
 	qsp/menu.c qsp/menu.h
+	qsp/names.c qsp/names.h
 	qsp/objects.c qsp/objects.h
 	qsp/playlist.c qsp/playlist.h
 	qsp/regexp.c qsp/regexp.h

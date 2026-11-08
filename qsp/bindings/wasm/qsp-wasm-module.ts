@@ -30,7 +30,11 @@ export enum QspWindow {
 
 // Values (qsp.h): undefined, tuple, number (incl. bool), string (incl. code & varref)
 export type QspVariableValue = string | number | QspTuple | undefined;
-export type QspTuple = Array<QspVariableValue>;
+// Items of a tuple may have names (the fields of a record, stored uppercase):
+// names[i] is the name of item i or undefined, the property is missing when no item has a name
+export interface QspTuple extends Array<QspVariableValue> {
+  names?: Array<string | undefined>;
+}
 // A key of an array item: a string, a tuple or a number (position of the item)
 export type QspVariableKey = string | number | QspTuple;
 
@@ -150,6 +154,9 @@ export interface QspWasmModule {
   _QSPGetVarValuesCount(name: CharsPtr, count: IntPtr): Bool;
   _QSPGetVarIndexByKey(name: CharsPtr, key: VariantPtr, index: IntPtr): Bool; // index -1 if none
   _QSPGetVarValue(name: CharsPtr, index: number, value: VariantPtr | 0, key: VariantPtr | 0): Bool;
+  // Tuple items hold the indices of their names (0 for no name), the names are uppercase
+  _QSPGetNameIndex(name: CharsPtr, toCreate: Bool): number;
+  _QSPGetName(index: number, res: StringPtr): void;
 
   _QSPExecString(code: CharsPtr, toRefreshUI: Bool): Bool;
   _QSPCalculateStrExpression(

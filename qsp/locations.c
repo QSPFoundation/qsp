@@ -27,7 +27,7 @@ int qspCurLocCallDepth = 0;
 INLINE QSPLocName *qspNewLocNames(int capacity);
 INLINE QSPLocName *qspGetLocSlot(QSPString name, unsigned int nameHash);
 INLINE QSPLocName *qspGetEmptyLocSlot(unsigned int nameHash);
-INLINE void qspResizeLocs(int newCapacity, int locsCount);
+INLINE void qspRebuildLocs(int newCapacity, int locsCount);
 INLINE void qspAddBaseDescAndActions(QSPLocation *loc);
 INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc);
 
@@ -57,7 +57,7 @@ INLINE QSPLocName *qspGetEmptyLocSlot(unsigned int nameHash)
     return slot;
 }
 
-INLINE void qspResizeLocs(int newCapacity, int locsCount)
+INLINE void qspRebuildLocs(int newCapacity, int locsCount)
 {
     QSPLocName *slot, *oldSlot, *oldSlots = qspLocsNames;
     int i, oldSlotsCount = QSP_SLOTSCOUNT(qspLocsCapacity);
@@ -107,7 +107,7 @@ void qspTruncateWorld(int locsCount)
         qspReleaseLocation(qspLocs[i]);
     }
     qspLocsCount = locsCount;
-    qspResizeLocs(qspLocsCapacity, locsCount); /* drops the names of the removed locations */
+    qspRebuildLocs(qspLocsCapacity, locsCount); /* drops the names of the removed locations */
 }
 
 void qspFreeLocation(QSPLocation *loc)
@@ -143,7 +143,7 @@ QSPLocation *qspAddLocation(QSPString name)
         qspFreeString(&upperName);
         return 0;
     }
-    if (qspLocsCount >= qspLocsCapacity) qspResizeLocs(qspLocsCapacity * 2, qspLocsCount);
+    if (qspLocsCount >= qspLocsCapacity) qspRebuildLocs(qspLocsCapacity * 2, qspLocsCount);
     /* Create a new location */
     loc = (QSPLocation *)malloc(sizeof(QSPLocation));
     loc->Name = qspCopyToNewText(name);
@@ -170,10 +170,9 @@ QSPLocation *qspLocByName(QSPString name)
         if (!qspIsEmpty(name))
         {
             QSPLocName *slot;
-            name = qspCopyToNewText(name);
-            qspUpperStr(&name);
-            slot = qspGetLocSlot(name, qspGetTextHash(name));
-            qspFreeString(&name);
+            QSPString upperName = qspUpperText(name);
+            slot = qspGetLocSlot(upperName, qspGetTextHash(upperName));
+            qspFreeNewString(&upperName, &name);
             if (slot->Name.Str) return qspLocs[slot->Index];
         }
     }
@@ -281,77 +280,74 @@ INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc)
 
 void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res)
 {
-    int oldLocationState;
+    int oldLocalScopeBase, oldLocationState;
     QSPLocation *loc = qspLocByName(name);
     if (!loc)
     {
         qspSetError(QSP_ERR_LOCNOTFOUND);
         return;
     }
-    qspAllocateLocalScopeWithArgs(args, argsCount, toMoveArgs);
+    oldLocalScopeBase = qspAllocateLocalScopeWithArgs(args, argsCount, toMoveArgs);
 
     oldLocationState = qspLocationState;
     qspExecLocation(loc, QSP_FALSE);
     if (qspLocationState != oldLocationState) return;
 
     if (res && !qspApplyResult(res)) return;
-    qspReleaseLastLocalScope();
+    qspReleaseLocalScope(oldLocalScopeBase);
 }
 
 void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount)
 {
-    QSPVar *var;
+    QSPVarData *varData;
     QSPString locName;
-    QSPVarsScopeChunk *savedLocalVars;
-    int ind, oldLocationState;
-    /* Restore global variables */
-    savedLocalVars = qspSaveLocalVarsAndRestoreGlobals();
+    int oldLocalVarsBase, ind, oldLocationState;
+    /* Hide local variables */
+    oldLocalVarsBase = qspHideLocalVars();
     /* We execute all locations specified in the array */
     oldLocationState = qspLocationState;
     ind = 0;
     while (1)
     {
         /* The variable might be updated during the previous code execution */
-        if (!((var = qspVarReference(name, QSP_VARREF_GET))))
+        if (!((varData = qspVarDataReferenceByName(name, QSP_REF_GET))))
         {
-            qspClearLocalVarsScopes(savedLocalVars);
+            qspClearHiddenLocalVars(oldLocalVarsBase);
             return;
         }
-        if (ind >= var->ValsCount) break;
-        if (!QSP_ISSTR(var->Values[ind].Type)) break;
-        locName = QSP_STR(var->Values[ind]);
+        if (ind >= varData->ValsCount) break;
+        if (!QSP_ISSTR(varData->Values[ind].Type)) break;
+        locName = QSP_STR(varData->Values[ind]);
         if (!qspIsAnyString(locName)) break;
         qspExecLocByNameWithArgs(locName, args, argsCount, QSP_FALSE, 0);
         if (qspLocationState != oldLocationState)
         {
-            qspClearLocalVarsScopes(savedLocalVars);
+            qspClearHiddenLocalVars(oldLocalVarsBase);
             return;
         }
         ++ind;
     }
-    /* Restore the local scope */
-    qspRestoreSavedLocalVars(savedLocalVars);
+    qspRestoreHiddenLocalVars(oldLocalVarsBase);
 }
 
 void qspNavigateToLocation(QSPLocation *loc, QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT argsCount)
 {
-    int oldLocationState;
+    int oldLocalScopeBase, oldLocationState;
     qspUpdateLocation(&qspCurLoc, loc);
     /* Restore global variables */
-    qspClearLocalVarsScopes(qspCurrentLocalVars);
-    qspCurrentLocalVars = 0;
+    qspClearLocalVars();
     /* We assign global ARGS here */
     if (!qspSetArgs(args, argsCount, QSP_FALSE)) return;
 
     qspClearAllActions(QSP_FALSE);
     ++qspLocationState;
     if (toChangeDesc) ++qspFullRefreshCount;
-    qspAllocateLocalScope();
+    oldLocalScopeBase = qspAllocateLocalScope();
 
     oldLocationState = qspLocationState;
     qspExecLocation(loc, toChangeDesc);
     if (qspLocationState != oldLocationState) return;
 
-    qspReleaseLastLocalScope();
+    qspReleaseLocalScope(oldLocalScopeBase);
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_NEWLOC), args, argsCount);
 }

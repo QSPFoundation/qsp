@@ -41,8 +41,14 @@
 
     typedef struct
     {
-        QSPString Name;
+        int NameIndex;
+        QSP_TINYINT VarType; /* type prefix of the name */
         QSPCachedArg Index;
+        QSPString Path; /* text of the field path */
+        QSPField *Fields; /* 0 until the first evaluation */
+        QSPCachedArg *DynamicFields; /* computed field names */
+        int FieldsCount;
+        int DynamicCount;
     } QSPCachedTarget;
 
     typedef struct
@@ -130,12 +136,15 @@
     int qspCollectLabels(QSPLineOfCode *lines, int linesCount, QSPCodeLabel **labels);
     void qspFreeLabels(QSPCodeLabel *labels, int count);
     QSP_CHAR *qspDelimPos(QSPString txt, QSP_CHAR ch);
+    QSP_BOOL qspUnquoteToNewText(QSPString *s, QSPString *text);
     QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated);
     void qspPrepareStringToExecution(QSPString *str);
     QSPCodeBlock *qspPreprocessData(QSPString data);
     void qspClearAllCodeBlocks(QSP_BOOL toInit);
     QSPCodeBlock *qspGetCachedCodeBlock(QSPString s);
-    QSPVariant qspCalculateArgValue(QSPCachedArg *arg);
+    QSP_BOOL qspParseTargetFields(QSPCachedTarget *target);
+    QSP_BOOL qspCalculateTargetFields(QSPCachedTarget *target, QSPField *fields, QSP_TINYINT mode);
+    QSP_BOOL qspCalculateArgValue(QSPCachedArg *arg, QSPVariant *res);
 
     INLINE QSPCodeBlock *qspNewCodeBlock(QSPLineOfCode *lines, int linesCount)
     {

@@ -80,10 +80,9 @@ INLINE int qspGetObjsGroupIndex(QSPString objName)
     if (qspCurObjsGroupsCount)
     {
         QSPObjsGroup *objsGroup;
-        objName = qspCopyToNewText(objName);
-        qspUpperStr(&objName);
-        objsGroup = (QSPObjsGroup *)bsearch(&objName, qspCurObjsGroups, qspCurObjsGroupsCount, sizeof(QSPObjsGroup), qspObjsGroupCompare);
-        qspFreeString(&objName);
+        QSPString upperName = qspUpperText(objName);
+        objsGroup = (QSPObjsGroup *)bsearch(&upperName, qspCurObjsGroups, qspCurObjsGroupsCount, sizeof(QSPObjsGroup), qspObjsGroupCompare);
+        qspFreeNewString(&upperName, &objName);
         if (objsGroup) return (int)(objsGroup - qspCurObjsGroups);
     }
     return -1;
@@ -215,12 +214,11 @@ INLINE void qspClearObjectsByNameWithEvents(QSPString objName, int maxObjects)
     if (maxObjects > 0 && qspCurObjsCount)
     {
         QSPBufString buf;
-        QSPString bufName;
+        QSPString bufName, upperName;
         int i, objsCount = 0, objsBufSize = 4;
         QSPString *objNames = (QSPString *)malloc(objsBufSize * sizeof(QSPString));
         /* Prepare the name */
-        objName = qspCopyToNewText(objName);
-        qspUpperStr(&objName);
+        upperName = qspUpperText(objName);
         /* Fill the list with objects to remove */
         buf = qspNewBufString(0, 32);
         i = 0;
@@ -229,7 +227,7 @@ INLINE void qspClearObjectsByNameWithEvents(QSPString objName, int maxObjects)
             qspUpdateBufString(&buf, qspCurObjects[i].Name);
             bufName = qspBufStringToString(buf);
             qspUpperStr(&bufName);
-            if (qspStrsEqual(bufName, objName))
+            if (qspStrsEqual(bufName, upperName))
             {
                 /* Add object to the notification list */
                 if (objsCount >= objsBufSize)
@@ -244,7 +242,7 @@ INLINE void qspClearObjectsByNameWithEvents(QSPString objName, int maxObjects)
             }
             ++i;
         }
-        qspFreeString(&objName);
+        qspFreeNewString(&upperName, &objName);
         qspFreeBufString(&buf);
         qspSendObjectsRemovalNotifications(objNames, objsCount);
         qspFreeStrs(objNames, objsCount);
@@ -362,24 +360,19 @@ QSPString qspGetAllObjectsAsCode(void)
     int i;
     QSPObj *curObj;
     QSPObjsGroup *curObjsGroup;
-    QSPString temp;
     QSPBufString res = qspNewBufString(0, 256);
     /* Add objects */
     curObj = qspCurObjects;
     for (i = qspCurObjsCount; i > 0; --i, ++curObj)
     {
-        qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ADDOBJ ") QSP_DEFQUOT));
-        temp = qspReplaceText(curObj->Name, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
-        qspAddBufText(&res, temp);
-        qspFreeNewString(&temp, &curObj->Name);
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("ADDOBJ ")));
+        qspAddBufQuotedText(&res, curObj->Name, QSP_STATIC_STR(QSP_DEFQUOT));
         if (curObj->Image.Str)
         {
-            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(", ") QSP_DEFQUOT));
-            temp = qspReplaceText(curObj->Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
-            qspAddBufText(&res, temp);
-            qspFreeNewString(&temp, &curObj->Image);
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT(", ")));
+            qspAddBufQuotedText(&res, curObj->Image, QSP_STATIC_STR(QSP_DEFQUOT));
         }
-        qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_STRSDELIM));
+        qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM));
     }
     /* Update object groups */
     curObjsGroup = qspCurObjsGroups;
@@ -388,22 +381,16 @@ QSPString qspGetAllObjectsAsCode(void)
         /* Check for updates since object groups exist even for unmodified objects */
         if (curObjsGroup->UpdatedFields)
         {
-            qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("MODOBJ ") QSP_DEFQUOT));
-            temp = qspReplaceText(curObjsGroup->Name, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
-            qspAddBufText(&res, temp);
-            qspFreeNewString(&temp, &curObjsGroup->Name);
-            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(", ") QSP_DEFQUOT));
-            temp = qspReplaceText(curObjsGroup->Desc, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
-            qspAddBufText(&res, temp);
-            qspFreeNewString(&temp, &curObjsGroup->Desc);
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT("MODOBJ ")));
+            qspAddBufQuotedText(&res, curObjsGroup->Name, QSP_STATIC_STR(QSP_DEFQUOT));
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT(", ")));
+            qspAddBufQuotedText(&res, curObjsGroup->Desc, QSP_STATIC_STR(QSP_DEFQUOT));
             if (curObjsGroup->UpdatedFields & QSP_OBJUPDATED_IMAGE)
             {
-                qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_FMT(", ") QSP_DEFQUOT));
-                temp = qspReplaceText(curObjsGroup->Image, QSP_STATIC_STR(QSP_DEFQUOT), QSP_STATIC_STR(QSP_ESCDEFQUOT), INT_MAX, QSP_TRUE);
-                qspAddBufText(&res, temp);
-                qspFreeNewString(&temp, &curObjsGroup->Image);
+                qspAddBufText(&res, QSP_STATIC_STR(QSP_FMT(", ")));
+                qspAddBufQuotedText(&res, curObjsGroup->Image, QSP_STATIC_STR(QSP_DEFQUOT));
             }
-            qspAddBufText(&res, QSP_STATIC_STR(QSP_DEFQUOT QSP_STRSDELIM));
+            qspAddBufText(&res, QSP_STATIC_STR(QSP_STRSDELIM));
         }
     }
     return qspBufStringToString(res);

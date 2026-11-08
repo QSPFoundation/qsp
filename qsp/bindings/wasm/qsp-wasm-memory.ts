@@ -29,6 +29,7 @@ export const POINTER_SIZE = 4;
 const CHAR_SIZE = 2; // UTF-16 code units, the same as JS strings
 const VARIANT_SIZE = POINTER_SIZE * 3; // QSPVariant: 2-word union + type byte, padded
 const STRING_SIZE = POINTER_SIZE * 2; // QSPString { Str, End }
+const FIELD_SIZE = POINTER_SIZE + VARIANT_SIZE; // QSPField { NameIndex, Value }, a tuple item
 const LIST_ITEM_SIZE = STRING_SIZE * 2; // QSPListItem
 const OBJECT_ITEM_SIZE = STRING_SIZE * 3; // QSPObjectItem
 const LINE_INFO_SIZE = POINTER_SIZE + STRING_SIZE; // QSPLineInfo { LineNum, Line }
@@ -50,8 +51,12 @@ export function allocVariantPointer(module: QspWasmModule): VariantPtr {
   return module._malloc(VARIANT_SIZE) as number as VariantPtr;
 }
 
-function variantAt(items: Ptr, index: number): VariantPtr {
-  return (items + index * VARIANT_SIZE) as number as VariantPtr;
+function fieldAt(items: Ptr, index: number): IntPtr {
+  return (items + index * FIELD_SIZE) as number as IntPtr; // QSPField { NameIndex, Value }
+}
+
+function fieldValueAt(items: Ptr, index: number): VariantPtr {
+  return (fieldAt(items, index) + POINTER_SIZE) as number as VariantPtr;
 }
 
 export function allocErrorInfoPointer(module: QspWasmModule): ErrorPtr {
@@ -341,14 +346,31 @@ export function withVariantWrite<T>(
   return result;
 }
 
+// The names of the items come along when any item has one
 function readTuple(module: QspWasmModule, variant: VariantPtr): QspTuple {
   const values: QspTuple = [];
+  const names: Array<string | undefined> = [];
   const list = derefPointer(module, variant);
   const count = readInt(module, movePointer(variant));
+  let hasNames = false;
   for (let i = 0; i < count; ++i) {
-    values.push(readVariant(module, variantAt(list, i)));
+    const name = readFieldName(module, readInt(module, fieldAt(list, i)));
+    if (name) hasNames = true;
+    names.push(name || undefined);
+    values.push(readVariant(module, fieldValueAt(list, i)));
   }
+  if (hasNames) values.names = names;
   return values;
+}
+
+// A tuple item holds the index of its name in the engine's table (0 for no name)
+function readFieldName(module: QspWasmModule, nameIndex: number): string {
+  if (!nameIndex) return '';
+  const ptr = module._malloc(STRING_SIZE) as number as StringPtr;
+  module._QSPGetName(nameIndex, ptr);
+  const name = readString(module, ptr);
+  freePointer(module, ptr);
+  return name;
 }
 
 // Strings and tuple items are allocated, freeVariantData frees them
@@ -366,14 +388,24 @@ function writeVariant(module: QspWasmModule, variant: VariantPtr, value: QspVari
     module.HEAPU32[(variant >> 2) + 1] = str + length;
     module.HEAP8[variant + POINTER_SIZE * 2] = QSP_TYPE_STR;
   } else {
-    const items = module._malloc(VARIANT_SIZE * value.length);
+    // The engine uppercases & looks up the names of the items (an unknown name matches nothing)
+    const items = module._malloc(FIELD_SIZE * value.length);
+    module.HEAPU8.fill(0, items, items + FIELD_SIZE * value.length); // unnamed items
     for (let i = 0; i < value.length; ++i) {
-      writeVariant(module, variantAt(items, i), value[i]);
+      const name = value.names && value.names[i];
+      if (name) writeFieldName(module, fieldAt(items, i), name);
+      writeVariant(module, fieldValueAt(items, i), value[i]);
     }
     module.HEAPU32[variant >> 2] = items;
     module.HEAP32[(variant >> 2) + 1] = value.length;
     module.HEAP8[variant + POINTER_SIZE * 2] = QSP_TYPE_TUPLE;
   }
+}
+
+function writeFieldName(module: QspWasmModule, field: IntPtr, name: string): void {
+  const str = writeString(module, name);
+  module.HEAP32[field >> 2] = module._QSPGetNameIndex(str, 0);
+  freePointer(module, str);
 }
 
 function freeVariantData(module: QspWasmModule, variant: VariantPtr): void {
@@ -385,7 +417,7 @@ function freeVariantData(module: QspWasmModule, variant: VariantPtr): void {
       const items = derefPointer(module, variant);
       const count = readInt(module, movePointer(variant));
       for (let i = 0; i < count; ++i) {
-        freeVariantData(module, variantAt(items, i));
+        freeVariantData(module, fieldValueAt(items, i));
       }
       freePointer(module, items);
       break;

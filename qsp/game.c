@@ -14,6 +14,7 @@
 #include "errors.h"
 #include "locations.h"
 #include "mathops.h"
+#include "names.h"
 #include "objects.h"
 #include "playlist.h"
 #include "statements.h"
@@ -69,6 +70,7 @@ INLINE void qspRestoreCurrentIncludes(void);
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS);
 INLINE QSP_BOOL qspSkipLines(int totalLinesCount, int linesToSkip, int *index);
 INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, int *index, QSP_BOOL isUCS, int *value);
+INLINE QSP_BOOL qspCheckVarNameAndSkipLine(QSPString *strs, int totalLinesCount, int *index, QSP_BOOL isUCS);
 INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUCS);
 
 INLINE int qspCRC(void *data, int len)
@@ -211,6 +213,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     {
         qspClearAllIncludes(QSP_FALSE);
         qspTruncateWorld(0); /* clear the world */
+        qspAdvanceNamesGeneration(); /* names are used by preprocessed code */
     }
     oldLocsCount = qspLocsCount;
     ind = (isLatestFormat ? 4 : 30);
@@ -266,10 +269,10 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     QSPLocation *loc;
     QSPString locName;
     QSPBufString bufString;
-    QSPVarSlot *slot;
     QSPVar *var;
+    QSPVarData *varData;
     QSP_BIGINT msecsCount;
-    int i, j, dataSize, oldLocationState = qspLocationState;
+    int i, j, varsCount, dataSize, oldLocationState = qspLocationState;
     /* Call ONGSAVE without local variables */
     qspExecLocByVarNameWithArgs(QSP_STATIC_STR(QSP_LOC_GAMETOBESAVED), 0, 0);
     if (qspLocationState != oldLocationState)
@@ -341,22 +344,33 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         qspAppendEncodedIntVal(&bufString, qspCurObjsGroups[i].UpdatedFields, isUCS);
         qspAppendEncodedIntVal(&bufString, qspCurObjsGroups[i].ObjsCount, isUCS);
     }
-    qspAppendEncodedIntVal(&bufString, qspGlobalVars.VarsCount, isUCS);
-    slot = qspGlobalVars.VarSlots;
-    for (i = QSP_SLOTSCOUNT(qspGlobalVars.Capacity); i > 0; --i, ++slot)
+    /* We don't save empty variables */
+    varsCount = 0;
+    var = qspGlobalVars;
+    for (i = QSP_SLOTSCOUNT(qspGlobalVarsCapacity); i > 0; --i, ++var)
     {
-        if (slot->Name.Str)
+        if (var->NameIndex && qspGetVarData(var)->ValsCount)
+            ++varsCount;
+    }
+    qspAppendEncodedIntVal(&bufString, varsCount, isUCS);
+    var = qspGlobalVars;
+    for (i = QSP_SLOTSCOUNT(qspGlobalVarsCapacity); i > 0; --i, ++var)
+    {
+        if (var->NameIndex)
         {
-            var = qspGetVarFromSlot(slot);
-            qspAppendEncodedStrVal(&bufString, slot->Name, isUCS);
-            qspAppendEncodedIntVal(&bufString, var->ValsCount, isUCS);
-            for (j = 0; j < var->ValsCount; ++j)
-                qspAppendEncodedVariant(&bufString, var->Values[j], isUCS);
-            qspAppendEncodedIntVal(&bufString, var->KeysCount, isUCS);
-            for (j = 0; j < var->KeysCount; ++j)
+            varData = qspGetVarData(var);
+            if (varData->ValsCount)
             {
-                qspAppendEncodedIntVal(&bufString, var->Keys[j].Index, isUCS);
-                qspAppendEncodedVariant(&bufString, var->Keys[j].Key, isUCS);
+                qspAppendEncodedStrVal(&bufString, qspGetNameText(var->NameIndex), isUCS);
+                qspAppendEncodedIntVal(&bufString, varData->ValsCount, isUCS);
+                for (j = 0; j < varData->ValsCount; ++j)
+                    qspAppendEncodedVariant(&bufString, varData->Values[j], isUCS);
+                qspAppendEncodedIntVal(&bufString, varData->KeysCount, isUCS);
+                for (j = 0; j < varData->KeysCount; ++j)
+                {
+                    qspAppendEncodedIntVal(&bufString, varData->Keys[j].Index, isUCS);
+                    qspAppendEncodedVariant(&bufString, varData->Keys[j].Key, isUCS);
+                }
             }
         }
     }
@@ -384,6 +398,20 @@ INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, 
 {
     if (*index >= totalLinesCount) return QSP_FALSE;
     *value = qspReadEncodedIntVal(strs[*index], isUCS);
+    return qspSkipLines(totalLinesCount, 1, index);
+}
+
+INLINE QSP_BOOL qspCheckVarNameAndSkipLine(QSPString *strs, int totalLinesCount, int *index, QSP_BOOL isUCS)
+{
+    QSPString name;
+    if (*index >= totalLinesCount) return QSP_FALSE;
+    name = qspDecodeString(strs[*index], isUCS);
+    if (qspIsEmpty(qspPrepareVarName(name, 0)))
+    {
+        qspFreeString(&name);
+        return QSP_FALSE;
+    }
+    qspFreeString(&name);
     return qspSkipLines(totalLinesCount, 1, index);
 }
 
@@ -466,7 +494,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     for (i = 0; i < count; ++i)
     {
         /* variable's name */
-        if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
+        if (!qspCheckVarNameAndSkipLine(strs, strsCount, &ind, isUCS)) return QSP_FALSE;
         /* values count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &varValuesCount)) return QSP_FALSE;
         if (varValuesCount < 0) return QSP_FALSE;
@@ -498,7 +526,7 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
 
 QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
 {
-    QSPVar *var;
+    QSPVarData *varData;
     QSPVarKey *varKey;
     QSPLineOfCode *lines;
     QSPVariant key;
@@ -578,15 +606,16 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     for (i = 0; i < varsCount; ++i)
     {
         varName = qspDecodeString(strs[ind++], isUCS);
-        var = qspAddVarToScope(&qspGlobalVars, varName);
+        varData = qspAddGlobalVarByName(varName);
         qspFreeString(&varName);
+        qspEmptyVarData(varData); /* make sure the variable is empty */
         valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
         if (valsCount)
         {
-            var->ValsCapacity = var->ValsCount = valsCount;
-            var->Values = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
+            varData->ValsCapacity = varData->ValsCount = valsCount;
+            varData->Values = (QSPVariant *)malloc(valsCount * sizeof(QSPVariant));
             for (j = 0; j < valsCount; ++j)
-                qspReadEncodedVariant(strs, count, &ind, isUCS, var->Values + j);
+                qspReadEncodedVariant(strs, count, &ind, isUCS, varData->Values + j);
         }
         valsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
         for (j = 0; j < valsCount; ++j)
@@ -595,7 +624,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
             qspReadEncodedVariant(strs, count, &ind, isUCS, &key);
             if (QSP_ISDEF(key.Type)) /* an undefined key means no key */
             {
-                varKey = qspAddVarKey(var, qspGetVariantKeyHash(&key), index);
+                varKey = qspAddVarKey(varData, qspGetVariantKeyHash(&key), index);
                 varKey->Key = key;
             }
         }

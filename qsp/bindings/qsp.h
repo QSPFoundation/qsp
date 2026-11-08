@@ -25,7 +25,9 @@
         QSP_ERR_CANTADDMENUITEM,
         QSP_ERR_LOCNOTFOUND,
         QSP_ERR_LABELNOTFOUND,
-        QSP_ERR_INCORRECTNAME,
+        QSP_ERR_INCORRECTVARNAME,
+        QSP_ERR_INCORRECTFIELDNAME,
+        QSP_ERR_DUPLICATEFIELD,
         QSP_ERR_QUOTNOTFOUND,
         QSP_ERR_BRACKETNOTFOUND,
         QSP_ERR_SYNTAX,
@@ -134,11 +136,12 @@
     #define QSP_PTUPLE(a) (a)->Val.Tuple
 
     typedef struct QSPVariant_s QSPVariant;
+    typedef struct QSPField_s QSPField;
 
     typedef struct
     {
-        QSPVariant *Vals;
-        int ValsCount;
+        QSPField *Fields;
+        int FieldsCount;
     } QSPTuple;
 
     typedef struct
@@ -157,6 +160,12 @@
         } Val;
         QSP_TINYINT Type;
     } QSPVariant;
+
+    typedef struct QSPField_s
+    {
+        int NameIndex; /* name in interned names, 0 for no name, -1 for unknown name */
+        QSPVariant Value;
+    } QSPField;
 
     typedef struct
     {
