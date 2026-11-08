@@ -1,0 +1,260 @@
+// Named fields of tuples: [name: value], value.field (caeb458, 2ba9aac, d45914f)
+// Not in qsp-wasm-engine, the expectations follow the grammar & the code of the engine.
+// The field names are case insensitive and kept in upper case.
+
+// ------------------------------------------------------------
+// Literals
+
+@test FIELDS: a tuple literal with named fields
+@src
+%t = [name: 'Bob', age: 30, 5]
+$s = $str(%t)
+@run
+@expect %t => [NAME: 'Bob', AGE: 30, 5]
+@expect $s => '[NAME: ''Bob'', AGE: 30, 5]'
+
+@test FIELDS: names that aren't plain names are quoted
+@src
+%t = ['hello world': 1]
+$s = $str(%t)
+@run
+@expect %t => ['HELLO WORLD': 1]
+@expect $s => '[''HELLO WORLD'': 1]'
+
+@test FIELDS: a duplicate name is an error
+@src
+%t = [a: 1, A: 2]
+@run
+@expect error DUPLICATEFIELD
+
+@test FIELDS: an empty name is an error
+@src
+%t = ['': 1]
+@run
+@expect error INCORRECTFIELDNAME
+
+// ------------------------------------------------------------
+// Reading
+
+@test FIELDS: reading fields
+@src
+%t = [name: 'Bob', age: 30]
+$n = t.name
+a = t.age
+@run
+@expect [$n, a] => ['Bob', 30]
+
+@test FIELDS: names are case insensitive
+@src
+%t = [Name: 1]
+x = t.NAME + t.name
+@run
+@expect x => 2
+
+@test FIELDS: quoted & dynamic names
+@src
+%t = [abc: 1, 'a b': 2]
+$k = 'abc'
+x = t."<<$k>>"
+y = t.'a b'
+z = t."a<<' '>>b"
+@run
+@expect [x, y, z] => [1, 2, 2]
+
+@test FIELDS: spaces around the dot
+@src
+%t = [a: 1]
+x = t . a
+@run
+@expect x => 1
+
+@test FIELDS: a missing field reads as the empty value
+@src
+%t = [a: 1]
+x = t.missing
+$s = t.$missing
+@run
+@expect [x, $s] => [?, '']
+
+@test FIELDS: the type prefix of a field filters the value like for variables
+@src
+%t = [name: 'Bob', age: 30]
+$n = t.$name
+x = t.#name
+a = t.#age
+@run
+@expect [$n, x, a] => ['Bob', 0, 30]
+
+@test FIELDS: the type prefix of the variable applies to the value of the field
+@src
+%t = [name: 'Bob']
+$n = $t.$name
+x = %t.name
+@run
+@expect [$n, x] => ['Bob', []]
+
+@test FIELDS: different type prefixes of the variable and the field are an error
+@src
+%t = [name: 'Bob']
+$n = %t.$name
+@run
+@expect error INCORRECTFIELDNAME
+
+@test FIELDS: a name starting with a digit is an error
+@src
+%t = [1, 2]
+x = t.1
+@run
+@expect error INCORRECTFIELDNAME
+
+@test FIELDS: nested fields
+@src
+%t = [pos: [x: 1, y: 2]]
+y = t.pos.y
+@run
+@expect y => 2
+
+@test FIELDS: fields of array items
+@src
+%arr[0] = [a: 1]
+x = arr[0].a
+@run
+@expect x => 1
+
+// ------------------------------------------------------------
+// Writing
+
+@test FIELDS: assigning existing, new & nested fields
+@src
+%t = [a: 1]
+t.a = 5
+t.b = 'new'
+t.c.d = 7
+@run
+@expect %t => [A: 5, B: 'new', C: [D: 7]]
+
+@test FIELDS: compound assignment
+@src
+%t = [a: 1]
+t.a += 10
+@run
+@expect %t => [A: 11]
+
+@test FIELDS: assigning a field turns a value into a tuple
+@src
+x = 5
+x.a = 1
+@run
+@expect %x => [A: 1]
+
+@test FIELDS: assigning a field of an array item
+@src
+%arr[0] = [a: 1]
+arr[0].a = 9
+@run
+@expect %arr[0] => [A: 9]
+
+@test FIELDS: a local variable with a field
+@game
+# start
+--
+# test
+gs 'f'
+--
+# f
+local t.a = 1
+r = t
+--
+@run
+@expect r => [A: 1]
+
+// ------------------------------------------------------------
+// Operations
+
+@test FIELDS: equality compares the names & the order
+@src
+r1 = ([a: 1] = [a: 1])
+r2 = ([a: 1] = [b: 1])
+r3 = ([a: 1] = [1])
+r4 = ([a: 1, b: 2] = [b: 2, a: 1])
+@run
+@expect [r1, r2, r3, r4] => [1, 0, 0, 0]
+
+@test FIELDS: comparison uses the names
+@src
+r = ([a: 1] < [b: 1])
+@run
+@expect r => 1
+
+@test FIELDS: arithmetic keeps the names
+@src
+%x = [a: 5] + 1
+@run
+@expect %x => [A: 6]
+
+@test FIELDS: LEN counts the fields
+@src
+n = len([a: 1, b: 2])
+@run
+@expect n => 2
+
+// ------------------------------------------------------------
+// Arrays
+
+@test FIELDS: ARRPACK turns the string keys into the names
+@src
+a['x'] = 1 & a[] = 2
+%t = arrpack('a')
+@run
+@expect %t => [X: 1, 2]
+
+@test FIELDS: UNPACKARR turns the names into the keys
+@src
+unpackarr 'b', [k: 5, 6]
+@run
+@expect [$arrkey('b', 0), b['k'], b[1], arrsize('b')] => ['K', 5, 6, 2]
+
+@test FIELDS: ARRITEM & ARRTYPE take the path of the fields
+@src
+%a[0] = [p: [q: 3], r: 'x']
+x = arritem('a', 0, ['p', 'q'])
+$t1 = arrtype('a', 0, ['r'])
+$t2 = arrtype('a', 0, ['p'])
+@run
+@expect [x, $t1, $t2] => [3, '$', '%']
+
+@test FIELDS: SETVAR & KILLVAR take the path of the fields
+@src
+%a[0] = [p: [q: 3], s: 2]
+setvar 'a', 9, 0, ['p', 'q']
+killvar 'a', 0, ['s']
+setvar 'a', 1, 0, ['new', 'deep']
+@run
+@expect %a[0] => [P: [Q: 9], NEW: [DEEP: 1]]
+
+// ------------------------------------------------------------
+// Saves & old code
+
+@test FIELDS: saves keep the names
+@src
+%t = [n: 1, 'x y': [m: 2]]
+@run
+@save s1
+@exec killvar 't'
+@load-save s1
+@expect %t => [N: 1, 'X Y': [M: 2]]
+
+@test FIELDS: names with dots of old code are fields of one variable
+@src
+db.a = 1
+db.b = 2
+db.b += 1
+@run
+@expect [db.a, db.b, %db] => [1, 3, [A: 1, B: 3]]
+
+@test FIELDS: a name with a dot isn't a variable name in strings
+@src
+db.count = 1
+n = arrsize('db.count')
+@run
+@expect error INCORRECTVARNAME
