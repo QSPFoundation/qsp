@@ -46,7 +46,7 @@ void qspInitRuntime(unsigned int seed)
 
     qspNullString = qspStringFromPair(0, 0);
     qspNullTuple = qspCopyToNewTuple(0, 0);
-    qspNullVarSlot = qspGetUnknownVarSlot();
+    qspNullVar = qspGetUnknownVar();
     qspNullName = qspGetNullName();
 
     qspIsDebug = QSP_FALSE;

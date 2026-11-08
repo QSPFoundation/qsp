@@ -233,10 +233,10 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 
 QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
 {
-    QSPVar *var = qspVarByName(qspStringFromC(name));
-    if (var)
+    QSPVarData *varData = qspVarDataByName(qspStringFromC(name));
+    if (varData)
     {
-        *count = var->ValsCount;
+        *count = varData->ValsCount;
         return QSP_TRUE;
     }
     *count = 0;
@@ -245,11 +245,11 @@ QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
 
 QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
 {
-    QSPVar *var = qspVarByName(qspStringFromC(name));
-    if (var)
+    QSPVarData *varData = qspVarDataByName(qspStringFromC(name));
+    if (varData)
     {
-        int arrIndex = qspGetVarItemIndex(var, *key, QSP_FALSE);
-        if (arrIndex >= 0 && arrIndex < var->ValsCount)
+        int arrIndex = qspGetVarItemIndex(varData, *key, QSP_FALSE);
+        if (arrIndex >= 0 && arrIndex < varData->ValsCount)
         {
             *ind = arrIndex;
             return QSP_TRUE;
@@ -262,14 +262,14 @@ QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
 /* Both the value & the key are optional */
 QSP_BOOL QSPGetVarValue(QSP_CHAR *name, int ind, QSPVariant *value, QSPVariant *key)
 {
-    QSPVar *var = qspVarByName(qspStringFromC(name));
-    if (var && ind >= 0 && ind < var->ValsCount)
+    QSPVarData *varData = qspVarDataByName(qspStringFromC(name));
+    if (varData && ind >= 0 && ind < varData->ValsCount)
     {
-        if (value) *value = var->Values[ind];
+        if (value) *value = varData->Values[ind];
         if (key)
         {
-            int keyIndex = qspGetVarKeyIndex(var, ind);
-            *key = (keyIndex >= 0 ? var->Keys[keyIndex].Key : qspGetEmptyVariant(QSP_TYPE_UNDEF));
+            int keyIndex = qspGetVarKeyIndex(varData, ind);
+            *key = (keyIndex >= 0 ? varData->Keys[keyIndex].Key : qspGetEmptyVariant(QSP_TYPE_UNDEF));
         }
         return QSP_TRUE;
     }

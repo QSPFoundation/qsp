@@ -36,14 +36,14 @@ INLINE void qspFreeMenuLocs(QSPString *locs, int count)
 
 void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
-    QSPVar *var;
+    QSPVarData *varData;
     QSPVariant *curItem;
     int ind, itemsCount, maxItems;
     QSPListItem menuItems[QSP_MAXMENUITEMS];
     QSPString menuLocs[QSP_MAXMENUITEMS], itemName, itemLocation, itemImage, str;
     QSPTuple tuple;
     QSP_CHAR *pos, *pos2;
-    if (!((var = qspVarReferenceByName(QSP_STR(args[0]), QSP_REF_GET)))) return;
+    if (!((varData = qspVarDataReferenceByName(QSP_STR(args[0]), QSP_REF_GET)))) return;
     if (count >= 2)
     {
         ind = QSP_TOINT(QSP_NUM(args[1]));
@@ -59,7 +59,7 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     else
         maxItems = QSP_MAXMENUITEMS;
     itemsCount = 0;
-    for (curItem = var->Values + ind; ind < var->ValsCount; ++ind, ++curItem)
+    for (curItem = varData->Values + ind; ind < varData->ValsCount; ++ind, ++curItem)
     {
         if (itemsCount == maxItems) break;
         itemName = itemLocation = itemImage = qspNullString;

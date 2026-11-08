@@ -1767,10 +1767,10 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
     int arrIndex;
     QSPVariant *value;
     QSPString typePrefix;
-    QSPVar *var = qspVarReferenceByName(QSP_STR(args[0]), QSP_REF_GET);
-    if (!var) return;
-    arrIndex = (count >= 2 ? qspGetVarItemIndex(var, args[1], QSP_FALSE) : 0);
-    value = ((arrIndex >= 0 && arrIndex < var->ValsCount) ? var->Values + arrIndex : 0);
+    QSPVarData *varData = qspVarDataReferenceByName(QSP_STR(args[0]), QSP_REF_GET);
+    if (!varData) return;
+    arrIndex = (count >= 2 ? qspGetVarItemIndex(varData, args[1], QSP_FALSE) : 0);
+    value = ((arrIndex >= 0 && arrIndex < varData->ValsCount) ? varData->Values + arrIndex : 0);
     if (count == 3)
     {
         /* Extract the specified fields anyway to raise an error if they are wrong */
@@ -1805,15 +1805,15 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 INLINE void qspFunctionArrKey(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int arrIndex;
-    QSPVar *var = qspVarReferenceByName(QSP_STR(args[0]), QSP_REF_GET);
-    if (!var) return;
+    QSPVarData *varData = qspVarDataReferenceByName(QSP_STR(args[0]), QSP_REF_GET);
+    if (!varData) return;
     arrIndex = (count == 2 ? QSP_TOINT(QSP_NUM(args[1])) : 0);
-    if (arrIndex >= 0 && arrIndex < var->ValsCount)
+    if (arrIndex >= 0 && arrIndex < varData->ValsCount)
     {
-        int keyIndex = qspGetVarKeyIndex(var, arrIndex);
+        int keyIndex = qspGetVarKeyIndex(varData, arrIndex);
         if (keyIndex >= 0)
         {
-            qspCopyToNewVariant(res, &var->Keys[keyIndex].Key);
+            qspCopyToNewVariant(res, &varData->Keys[keyIndex].Key);
             return;
         }
     }
@@ -1845,11 +1845,11 @@ INLINE void qspFunctionArrComp(QSPVariant *args, QSP_TINYINT count, QSPVariant *
 INLINE void qspFunctionArrPack(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int startInd, maxCount;
-    QSPVar *var = qspVarReferenceByName(QSP_STR(args[0]), QSP_REF_GET);
-    if (!var) return;
+    QSPVarData *varData = qspVarDataReferenceByName(QSP_STR(args[0]), QSP_REF_GET);
+    if (!varData) return;
     startInd = (count >= 2 ? QSP_TOINT(QSP_NUM(args[1])) : 0);
-    maxCount = (count == 3 ? QSP_TOINT(QSP_NUM(args[2])) : var->ValsCount);
-    QSP_PTUPLE(res) = qspCopyArrayToNewTuple(var, startInd, maxCount);
+    maxCount = (count == 3 ? QSP_TOINT(QSP_NUM(args[2])) : varData->ValsCount);
+    QSP_PTUPLE(res) = qspCopyArrayToNewTuple(varData, startInd, maxCount);
 }
 
 INLINE void qspFunctionMin(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)

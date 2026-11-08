@@ -299,7 +299,7 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT args
 
 void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount)
 {
-    QSPVar *var;
+    QSPVarData *varData;
     QSPString locName;
     int oldLocalVarsBase, ind, oldLocationState;
     /* Hide local variables */
@@ -310,14 +310,14 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
     while (1)
     {
         /* The variable might be updated during the previous code execution */
-        if (!((var = qspVarReferenceByName(name, QSP_REF_GET))))
+        if (!((varData = qspVarDataReferenceByName(name, QSP_REF_GET))))
         {
             qspClearHiddenLocalVars(oldLocalVarsBase);
             return;
         }
-        if (ind >= var->ValsCount) break;
-        if (!QSP_ISSTR(var->Values[ind].Type)) break;
-        locName = QSP_STR(var->Values[ind]);
+        if (ind >= varData->ValsCount) break;
+        if (!QSP_ISSTR(varData->Values[ind].Type)) break;
+        locName = QSP_STR(varData->Values[ind]);
         if (!qspIsAnyString(locName)) break;
         qspExecLocByNameWithArgs(locName, args, argsCount, QSP_FALSE, 0);
         if (qspLocationState != oldLocationState)

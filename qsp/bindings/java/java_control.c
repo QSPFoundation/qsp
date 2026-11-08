@@ -408,24 +408,24 @@ JNIEXPORT void JNICALL Java_com_libqsp_jni_QSPLib_showWindow(JNIEnv *env, jobjec
 JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarValuesCount(JNIEnv *env, jobject api, jstring name)
 {
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarByName(varName);
+    QSPVarData *varData = qspVarDataByName(varName);
     qspFreeString(&varName);
-    if (var) return var->ValsCount;
+    if (varData) return varData->ValsCount;
     return 0;
 }
 /* Get index of an item by key */
 JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByKey(JNIEnv *env, jobject api, jstring name, jobject key)
 {
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarByName(varName);
+    QSPVarData *varData = qspVarDataByName(varName);
     qspFreeString(&varName);
-    if (var)
+    if (varData)
     {
         int arrIndex;
         QSPVariant index = qspFromJavaVariant(env, key);
-        arrIndex = qspGetVarItemIndex(var, index, QSP_FALSE);
+        arrIndex = qspGetVarItemIndex(varData, index, QSP_FALSE);
         qspFreeVariant(&index);
-        if (arrIndex >= 0 && arrIndex < var->ValsCount) return arrIndex;
+        if (arrIndex >= 0 && arrIndex < varData->ValsCount) return arrIndex;
     }
     return -1;
 }
@@ -433,13 +433,13 @@ JNIEXPORT jint JNICALL Java_com_libqsp_jni_QSPLib_getVarIndexByKey(JNIEnv *env, 
 JNIEXPORT jobject JNICALL Java_com_libqsp_jni_QSPLib_getVarValue(JNIEnv *env, jobject api, jstring name, jint ind)
 {
     QSPString varName = qspFromJavaString(env, name);
-    QSPVar *var = qspVarByName(varName);
+    QSPVarData *varData = qspVarDataByName(varName);
     qspFreeString(&varName);
-    if (var && ind >= 0 && ind < var->ValsCount)
+    if (varData && ind >= 0 && ind < varData->ValsCount)
     {
-        int keyIndex = qspGetVarKeyIndex(var, ind);
-        QSPVariant key = (keyIndex >= 0 ? var->Keys[keyIndex].Key : qspGetEmptyVariant(QSP_TYPE_UNDEF));
-        return qspToJavaVarItem(env, var->Values + ind, &key);
+        int keyIndex = qspGetVarKeyIndex(varData, ind);
+        QSPVariant key = (keyIndex >= 0 ? varData->Keys[keyIndex].Key : qspGetEmptyVariant(QSP_TYPE_UNDEF));
+        return qspToJavaVarItem(env, varData->Values + ind, &key);
     }
     return 0;
 }
