@@ -75,7 +75,6 @@
         QSP_REF_GETSILENTLY /* no errors reported */
     };
 
-    extern QSPVar qspNullVar;
     extern QSPVar *qspGlobalVars; /* hash table by name indices, QSP_SLOTSCOUNT(qspGlobalVarsCapacity) entries */
     extern int qspGlobalVarsCount;
     extern int qspGlobalVarsCapacity; /* has to be a power of 2 */
@@ -230,17 +229,6 @@
     {
         QSPVar *var = qspVarReferenceByName(name, mode);
         return (var ? qspGetVarData(var) : 0);
-    }
-
-    INLINE QSPVar qspGetUnknownVar(void)
-    {
-        QSPVar var;
-        var.NameIndex = 0;
-        var.LocalIndex = 0;
-        var.GlobalIndex = 0;
-        var.IsRef = QSP_FALSE;
-        qspInitVarData(&var.Data.Own);
-        return var;
     }
 
 #endif

@@ -16,10 +16,11 @@
 #include "regexp.h"
 #include "statements.h"
 
-QSPVar qspNullVar;
 QSPVar *qspGlobalVars = 0;
 int qspGlobalVarsCount = 0;
 int qspGlobalVarsCapacity = 0;
+
+static QSPVar qspNullVar;
 
 /* Special variables */
 static int qspArgsNameIndex = 0;
@@ -37,6 +38,7 @@ QSP_TINYINT qspSpecToBaseTypeTable[128];
 INLINE int qspValuePositionsAscCompare(const void *arg1, const void *arg2);
 INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2);
 INLINE QSP_BOOL qspGetArrayValsType(QSPVarData *varData, QSP_TINYINT *valsType);
+INLINE void qspInitVar(QSPVar *var, int nameIndex);
 INLINE QSPVar *qspNewVars(int capacity);
 INLINE QSPVar *qspGetGlobalVar(int nameIndex, QSP_BOOL toCreate);
 INLINE QSPVar *qspGetEmptyGlobalVar(int nameIndex);
@@ -44,10 +46,10 @@ INLINE void qspRebuildGlobalVars(int newCapacity);
 INLINE QSPVar *qspCreateGlobalVar(int nameIndex);
 INLINE QSPVar *qspCreateLocalVar(QSPVar *globalVar);
 INLINE void qspReleaseLocalVars(int varsBase);
-INLINE void qspReleaseSharedVarData(QSPSharedVarData *sharedVar);
+INLINE void qspReleaseSharedVarData(QSPSharedVarData *sharedData);
 INLINE void qspResetVar(QSPVar *var);
 INLINE QSPSharedVarData *qspShareVarByName(QSPString name);
-INLINE void qspMoveReferenceToVar(QSPVar *var, QSPSharedVarData *sharedVar);
+INLINE void qspMoveReferenceToVar(QSPVar *var, QSPSharedVarData *sharedData);
 INLINE QSPVar *qspAddLocalVar(int nameIndex);
 INLINE void qspInitVarValues(QSPVarData *varData, QSPVariant *vals, int count, QSP_BOOL toMove);
 INLINE QSPVar *qspVarReference(int nameIndex, QSP_TINYINT mode);
@@ -121,6 +123,15 @@ INLINE QSP_BOOL qspGetArrayValsType(QSPVarData *varData, QSP_TINYINT *valsType)
     return QSP_TRUE;
 }
 
+INLINE void qspInitVar(QSPVar *var, int nameIndex)
+{
+    var->NameIndex = nameIndex;
+    var->LocalIndex = 0;
+    var->GlobalIndex = 0;
+    var->IsRef = QSP_FALSE;
+    qspInitVarData(&var->Data.Own);
+}
+
 INLINE QSPVar *qspNewVars(int capacity)
 {
     QSPVar *vars = (QSPVar *)malloc(capacity * sizeof(QSPVar));
@@ -130,6 +141,7 @@ INLINE QSPVar *qspNewVars(int capacity)
 
 void qspInitVars(void)
 {
+    qspInitVar(&qspNullVar, 0);
     qspGlobalVarsCount = 0;
     qspGlobalVarsCapacity = QSP_VARSGLOBALCAPACITY;
     qspGlobalVars = qspNewVars(QSP_SLOTSCOUNT(qspGlobalVarsCapacity));
@@ -254,21 +266,17 @@ INLINE QSPVar *qspCreateGlobalVar(int nameIndex)
     if (qspGlobalVarsCount >= qspGlobalVarsCapacity)
         qspRebuildGlobalVars(qspGlobalVarsCapacity * 2);
     var = qspGetEmptyGlobalVar(nameIndex);
-    var->NameIndex = nameIndex;
-    var->LocalIndex = 0;
-    var->GlobalIndex = 0;
-    var->IsRef = QSP_FALSE;
-    qspInitVarData(&var->Data.Own);
+    qspInitVar(var, nameIndex);
     ++qspGlobalVarsCount;
     return var;
 }
 
-INLINE void qspReleaseSharedVarData(QSPSharedVarData *sharedVar)
+INLINE void qspReleaseSharedVarData(QSPSharedVarData *sharedData)
 {
-    if (--sharedVar->RefsCount == 0)
+    if (--sharedData->RefsCount == 0)
     {
-        qspEmptyVarData(&sharedVar->Data);
-        free(sharedVar);
+        qspEmptyVarData(&sharedData->Data);
+        free(sharedData);
     }
 }
 
@@ -286,29 +294,29 @@ INLINE void qspResetVar(QSPVar *var)
 
 INLINE QSPSharedVarData *qspShareVarByName(QSPString name)
 {
-    QSPSharedVarData *sharedVar;
+    QSPSharedVarData *sharedData;
     QSPVar *var = qspVarReferenceByName(name, QSP_REF_GETORCREATE);
     if (!var) return 0;
     if (var->IsRef)
-        sharedVar = var->Data.Shared;
+        sharedData = var->Data.Shared;
     else
     {
-        sharedVar = (QSPSharedVarData *)malloc(sizeof(QSPSharedVarData));
-        qspMoveVarData(&sharedVar->Data, &var->Data.Own);
-        sharedVar->RefsCount = 1;
+        sharedData = (QSPSharedVarData *)malloc(sizeof(QSPSharedVarData));
+        qspMoveVarData(&sharedData->Data, &var->Data.Own);
+        sharedData->RefsCount = 1;
         var->IsRef = QSP_TRUE;
-        var->Data.Shared = sharedVar;
+        var->Data.Shared = sharedData;
     }
-    ++sharedVar->RefsCount; /* reference for the caller */
-    return sharedVar;
+    ++sharedData->RefsCount; /* reference for the caller */
+    return sharedData;
 }
 
-INLINE void qspMoveReferenceToVar(QSPVar *var, QSPSharedVarData *sharedVar)
+INLINE void qspMoveReferenceToVar(QSPVar *var, QSPSharedVarData *sharedData)
 {
     /* The var owns the reference */
     qspResetVar(var);
     var->IsRef = QSP_TRUE;
-    var->Data.Shared = sharedVar;
+    var->Data.Shared = sharedData;
 }
 
 INLINE QSPVar *qspCreateLocalVar(QSPVar *globalVar)
@@ -422,21 +430,21 @@ int qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove)
 
 QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove)
 {
-    QSPVarData *varArgs = qspVarDataReference(qspArgsNameIndex, QSP_REF_GETORCREATE);
-    if (!varArgs) return QSP_FALSE;
+    QSPVarData *varData = qspVarDataReference(qspArgsNameIndex, QSP_REF_GETORCREATE);
+    if (!varData) return QSP_FALSE;
 
-    qspEmptyVarData(varArgs);
-    qspInitVarValues(varArgs, args, count, toMove);
+    qspEmptyVarData(varData);
+    qspInitVarValues(varData, args, count, toMove);
     return QSP_TRUE;
 }
 
 QSP_BOOL qspApplyResult(QSPVariant *res)
 {
-    QSPVarData *varRes = qspVarDataReference(qspResultNameIndex, QSP_REF_GET);
-    if (!varRes) return QSP_FALSE;
+    QSPVarData *varData = qspVarDataReference(qspResultNameIndex, QSP_REF_GET);
+    if (!varData) return QSP_FALSE;
 
-    if (varRes->ValsCount)
-        qspCopyToNewVariant(res, varRes->Values);
+    if (varData->ValsCount)
+        qspCopyToNewVariant(res, varData->Values);
     else
         qspInitVariant(res, QSP_TYPE_UNDEF);
     return QSP_TRUE;
