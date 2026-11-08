@@ -18,7 +18,6 @@
     #define QSP_MAXLOCALVARS 500
     #define QSP_VARSGLOBALCAPACITY 512 /* has to be a power of 2 */
     #define QSP_VARSLOCALCAPACITY 64
-    #define QSP_VARSBINDINGSCAPACITY 64
     #define QSP_VARSKEYSCAPACITY 4 /* has to be a power of 2 */
 
     #define QSP_VAR_ARGS QSP_FMT("ARGS")
@@ -52,6 +51,8 @@
     typedef struct
     {
         int NameIndex; /* 0 for an empty slot */
+        int LocalIndex; /* previous or the last local variable with the same name (index in qspLocalVars, 1-based), 0 for none */
+        int GlobalIndex; /* global slot of the name for local variables (index in qspGlobalVarsSlots, 1-based), 0 in table slots */
         QSP_BOOL IsRef;
         union
         {
@@ -59,12 +60,6 @@
             QSPSharedVar *Shared;
         } Data;
     } QSPVarSlot;
-
-    typedef struct
-    {
-        QSPVarSlot Slot;
-        int PreviousBinding; /* previous local variable with the same name (index in qspLocalVars, 1-based) */
-    } QSPLocalVar;
 
     typedef struct
     {
@@ -91,19 +86,19 @@
     void qspInitVarTypes(void);
     void qspInitVars(void);
     void qspTerminateVars(void);
-    void qspKillGlobalVars(void);
+    void qspClearGlobalVars(void);
     void qspClearLocalVars(void);
     void qspClearAllVars(QSP_BOOL toInit);
     void qspRegisterSpecialVariables(void);
     int qspAllocateLocalScope(void);
     void qspReleaseLocalScope(int oldLocalScopeBase);
-    QSPVar *qspAddGlobalVar(QSPString name);
+    QSPVarSlot *qspAddGlobalVar(QSPString name);
     int qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
     QSP_BOOL qspApplyResult(QSPVariant *res);
-    int qspSaveLocalVarsAndRestoreGlobals(void);
-    void qspRestoreSavedLocalVars(int oldLocalVarsBase);
-    void qspClearSavedLocalVars(int oldLocalVarsBase);
+    int qspHideLocalVars(void);
+    void qspRestoreHiddenLocalVars(int oldLocalVarsBase);
+    void qspClearHiddenLocalVars(int oldLocalVarsBase);
     QSPVarSlot *qspVarSlotReferenceByName(QSPString name, QSP_TINYINT mode);
     QSPVarKey *qspAddVarKey(QSPVar *var, unsigned int hash, int valIndex);
     int qspGetVarKeyIndex(QSPVar *var, int valIndex);
@@ -226,6 +221,27 @@
         qspInitVarData(var);
     }
 
+    INLINE void qspReleaseSharedVar(QSPSharedVar *sharedVar)
+    {
+        if (--sharedVar->RefsCount == 0)
+        {
+            qspEmptyVar(&sharedVar->Var);
+            free(sharedVar);
+        }
+    }
+
+    INLINE void qspEmptyVarSlot(QSPVarSlot *slot)
+    {
+        if (slot->IsRef)
+        {
+            qspReleaseSharedVar(slot->Data.Shared);
+            slot->IsRef = QSP_FALSE;
+            qspInitVarData(&slot->Data.Var);
+        }
+        else
+            qspEmptyVar(&slot->Data.Var);
+    }
+
     INLINE QSPVar *qspGetVarFromSlot(QSPVarSlot *slot)
     {
         return (slot->IsRef ? &slot->Data.Shared->Var : &slot->Data.Var);
@@ -241,6 +257,8 @@
     {
         QSPVarSlot slot;
         slot.NameIndex = 0;
+        slot.LocalIndex = 0;
+        slot.GlobalIndex = 0;
         slot.IsRef = QSP_FALSE;
         qspInitVarData(&slot.Data.Var);
         return slot;

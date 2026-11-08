@@ -1015,7 +1015,7 @@ INLINE void qspStatementClear(QSPVariant *QSP_UNUSED(args), QSP_TINYINT QSP_UNUS
         break;
     case QSP_STAT_KILLALL:
         /* The order is important here */
-        qspKillGlobalVars();
+        qspClearGlobalVars();
         qspClearAllObjectsWithEvents();
         break;
     case QSP_STAT_FREELIB:

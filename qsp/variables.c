@@ -26,12 +26,10 @@ static int qspArgsNameIndex = 0;
 static int qspResultNameIndex = 0;
 
 /* Local variables */
-static QSPLocalVar *qspLocalVars = 0; /* all local variables */
+static QSPVarSlot *qspLocalVars = 0; /* all local variables */
 static int qspLocalVarsCount = 0;
 static int qspLocalVarsCapacity = 0;
 static int qspLocalScopeBase = 0; /* defines the current local scope (index in qspLocalVars) */
-static int *qspLocalBindings = 0; /* last local variables (index in qspLocalVars) by name index: 1-based, 0 for none */
-static int qspLocalBindingsCapacity = 0;
 static int qspLocalVarsBase = 0; /* local variables below it are hidden from the running code */
 
 QSP_TINYINT qspSpecToBaseTypeTable[128];
@@ -40,15 +38,12 @@ INLINE int qspValuePositionsAscCompare(const void *arg1, const void *arg2);
 INLINE int qspValuePositionsDescCompare(const void *arg1, const void *arg2);
 INLINE QSP_BOOL qspGetArrayValsType(QSPVar *var, QSP_TINYINT *valsType);
 INLINE QSPVarSlot *qspNewVarSlots(int capacity);
-INLINE void qspClearGlobalVars(void);
-INLINE QSPVarSlot *qspGetGlobalVarSlot(int nameIndex);
+INLINE QSPVarSlot *qspGetGlobalVarSlot(int nameIndex, QSP_BOOL toCreate);
 INLINE QSPVarSlot *qspGetEmptyGlobalVarSlot(int nameIndex);
-INLINE void qspResizeGlobalVars(int newCapacity);
+INLINE void qspRebuildGlobalVars(int newCapacity);
 INLINE QSPVarSlot *qspCreateGlobalVar(int nameIndex);
-INLINE QSPVarSlot *qspCreateLocalVar(int nameIndex);
+INLINE QSPVarSlot *qspCreateLocalVar(QSPVarSlot *globalVar);
 INLINE void qspReleaseLocalVars(int varsBase);
-INLINE void qspReleaseSharedVar(QSPSharedVar *sharedVar);
-INLINE void qspEmptyVarSlot(QSPVarSlot *slot);
 INLINE QSPSharedVar *qspShareVarByName(QSPString name);
 INLINE void qspMoveReferenceToVarSlot(QSPVarSlot *slot, QSPSharedVar *sharedVar);
 INLINE QSPVarSlot *qspAddLocalVar(int nameIndex);
@@ -126,10 +121,8 @@ INLINE QSP_BOOL qspGetArrayValsType(QSPVar *var, QSP_TINYINT *valsType)
 
 INLINE QSPVarSlot *qspNewVarSlots(int capacity)
 {
-    int i;
     QSPVarSlot *slots = (QSPVarSlot *)malloc(capacity * sizeof(QSPVarSlot));
-    for (i = 0; i < capacity; ++i)
-        slots[i].NameIndex = 0;
+    memset(slots, 0, capacity * sizeof(QSPVarSlot));
     return slots;
 }
 
@@ -137,14 +130,11 @@ void qspInitVars(void)
 {
     qspGlobalVarsCount = 0;
     qspGlobalVarsCapacity = QSP_VARSGLOBALCAPACITY;
-    qspGlobalVarsSlots = qspNewVarSlots(QSP_SLOTSCOUNT(QSP_VARSGLOBALCAPACITY));
+    qspGlobalVarsSlots = qspNewVarSlots(QSP_SLOTSCOUNT(qspGlobalVarsCapacity));
     qspLocalVarsCount = 0;
     qspLocalVarsCapacity = QSP_VARSLOCALCAPACITY;
-    qspLocalVars = (QSPLocalVar *)malloc(QSP_VARSLOCALCAPACITY * sizeof(QSPLocalVar));
+    qspLocalVars = (QSPVarSlot *)malloc(qspLocalVarsCapacity * sizeof(QSPVarSlot));
     qspLocalScopeBase = 0;
-    qspLocalBindingsCapacity = QSP_VARSBINDINGSCAPACITY;
-    qspLocalBindings = (int *)malloc(QSP_VARSBINDINGSCAPACITY * sizeof(int));
-    memset(qspLocalBindings, 0, QSP_VARSBINDINGSCAPACITY * sizeof(int));
     qspLocalVarsBase = 0;
 }
 
@@ -155,30 +145,13 @@ void qspTerminateVars(void)
     qspClearGlobalVars();
     free(qspGlobalVarsSlots);
     free(qspLocalVars);
-    free(qspLocalBindings);
 }
 
-INLINE void qspClearGlobalVars(void)
-{
-    /* Remove all variables & keep the slots */
-    QSPVarSlot *slot = qspGlobalVarsSlots;
-    while (qspGlobalVarsCount > 0)
-    {
-        if (slot->NameIndex)
-        {
-            qspEmptyVarSlot(slot);
-            slot->NameIndex = 0;
-            --qspGlobalVarsCount;
-        }
-        ++slot;
-    }
-}
-
-void qspKillGlobalVars(void)
+void qspClearGlobalVars(void)
 {
     /* Remove all global variables, variables referenced by aliases get emptied */
-    QSPVarSlot *slot = qspGlobalVarsSlots;
     int count = qspGlobalVarsCount;
+    QSPVarSlot *slot = qspGlobalVarsSlots;
     while (count > 0)
     {
         if (slot->NameIndex)
@@ -187,15 +160,20 @@ void qspKillGlobalVars(void)
                 qspEmptyVar(&slot->Data.Shared->Var);
             else
             {
+                /* Keep the slot if local variables reference it */
                 qspEmptyVarSlot(slot);
-                slot->NameIndex = 0;
-                --qspGlobalVarsCount;
+                if (!slot->LocalIndex)
+                {
+                    slot->NameIndex = 0;
+                    --qspGlobalVarsCount;
+                }
             }
             --count;
         }
         ++slot;
     }
-    if (qspGlobalVarsCount) qspResizeGlobalVars(qspGlobalVarsCapacity);
+    /* Removed slots break references of the rest, so we need to rebuild them */
+    if (qspGlobalVarsCount) qspRebuildGlobalVars(qspGlobalVarsCapacity);
 }
 
 void qspClearLocalVars(void)
@@ -220,12 +198,13 @@ void qspRegisterSpecialVariables(void)
     qspResultNameIndex = qspGetNameIndex(QSP_STATIC_STR(QSP_VAR_RESULT), QSP_TRUE);
 }
 
-INLINE QSPVarSlot *qspGetGlobalVarSlot(int nameIndex)
+INLINE QSPVarSlot *qspGetGlobalVarSlot(int nameIndex, QSP_BOOL toCreate)
 {
     QSPVarSlot *slot;
     int mask = QSP_SLOTSMASK(qspGlobalVarsCapacity), ind = (int)(qspGetIndexHash(nameIndex) & mask);
     while ((slot = qspGlobalVarsSlots + ind)->NameIndex && slot->NameIndex != nameIndex)
         ind = (ind + 1) & mask;
+    if (toCreate && !slot->NameIndex) return qspCreateGlobalVar(nameIndex);
     return slot;
 }
 
@@ -236,7 +215,7 @@ INLINE QSPVarSlot *qspGetEmptyGlobalVarSlot(int nameIndex)
     return qspGlobalVarsSlots + ind;
 }
 
-INLINE void qspResizeGlobalVars(int newCapacity)
+INLINE void qspRebuildGlobalVars(int newCapacity)
 {
     int oldSlotsCount = QSP_SLOTSCOUNT(qspGlobalVarsCapacity);
     QSPVarSlot *oldSlots = qspGlobalVarsSlots;
@@ -244,7 +223,7 @@ INLINE void qspResizeGlobalVars(int newCapacity)
     qspGlobalVarsSlots = qspNewVarSlots(QSP_SLOTSCOUNT(newCapacity));
     if (oldSlots)
     {
-        int i;
+        int i, prevLocalIndex, newGlobalIndex;
         QSPVarSlot *slot, *oldSlot = oldSlots;
         for (i = 0; i < oldSlotsCount; ++i, ++oldSlot)
         {
@@ -252,6 +231,15 @@ INLINE void qspResizeGlobalVars(int newCapacity)
             {
                 slot = qspGetEmptyGlobalVarSlot(oldSlot->NameIndex);
                 *slot = *oldSlot;
+                /* Update global index for the local variables */
+                newGlobalIndex = (int)(slot - qspGlobalVarsSlots) + 1;
+                prevLocalIndex = slot->LocalIndex;
+                while (prevLocalIndex)
+                {
+                    slot = qspLocalVars + prevLocalIndex - 1;
+                    slot->GlobalIndex = newGlobalIndex;
+                    prevLocalIndex = slot->LocalIndex;
+                }
             }
         }
         free(oldSlots);
@@ -262,34 +250,15 @@ INLINE QSPVarSlot *qspCreateGlobalVar(int nameIndex)
 {
     QSPVarSlot *slot;
     if (qspGlobalVarsCount >= qspGlobalVarsCapacity)
-        qspResizeGlobalVars(qspGlobalVarsCapacity * 2);
+        qspRebuildGlobalVars(qspGlobalVarsCapacity * 2);
     slot = qspGetEmptyGlobalVarSlot(nameIndex);
     slot->NameIndex = nameIndex;
+    slot->LocalIndex = 0;
+    slot->GlobalIndex = 0;
     slot->IsRef = QSP_FALSE;
     qspInitVarData(&slot->Data.Var);
     ++qspGlobalVarsCount;
     return slot;
-}
-
-INLINE void qspReleaseSharedVar(QSPSharedVar *sharedVar)
-{
-    if (--sharedVar->RefsCount == 0)
-    {
-        qspEmptyVar(&sharedVar->Var);
-        free(sharedVar);
-    }
-}
-
-INLINE void qspEmptyVarSlot(QSPVarSlot *slot)
-{
-    if (slot->IsRef)
-    {
-        qspReleaseSharedVar(slot->Data.Shared);
-        slot->IsRef = QSP_FALSE;
-        qspInitVarData(&slot->Data.Var);
-    }
-    else
-        qspEmptyVar(&slot->Data.Var);
 }
 
 INLINE QSPSharedVar *qspShareVarByName(QSPString name)
@@ -319,41 +288,35 @@ INLINE void qspMoveReferenceToVarSlot(QSPVarSlot *slot, QSPSharedVar *sharedVar)
     slot->Data.Shared = sharedVar;
 }
 
-INLINE QSPVarSlot *qspCreateLocalVar(int nameIndex)
+INLINE QSPVarSlot *qspCreateLocalVar(QSPVarSlot *globalVar)
 {
-    QSPLocalVar *localVar;
+    QSPVarSlot *localVar;
     if (qspLocalVarsCount >= qspLocalVarsCapacity)
     {
         qspLocalVarsCapacity *= 2;
-        qspLocalVars = (QSPLocalVar *)realloc(qspLocalVars, qspLocalVarsCapacity * sizeof(QSPLocalVar));
-    }
-    if (nameIndex >= qspLocalBindingsCapacity)
-    {
-        int newCapacity = qspLocalBindingsCapacity;
-        while (newCapacity <= nameIndex) newCapacity *= 2;
-        qspLocalBindings = (int *)realloc(qspLocalBindings, newCapacity * sizeof(int));
-        memset(qspLocalBindings + qspLocalBindingsCapacity, 0, (newCapacity - qspLocalBindingsCapacity) * sizeof(int));
-        qspLocalBindingsCapacity = newCapacity;
+        qspLocalVars = (QSPVarSlot *)realloc(qspLocalVars, qspLocalVarsCapacity * sizeof(QSPVarSlot));
     }
     localVar = qspLocalVars + qspLocalVarsCount;
-    localVar->Slot.NameIndex = nameIndex;
-    localVar->Slot.IsRef = QSP_FALSE;
-    qspInitVarData(&localVar->Slot.Data.Var);
-    localVar->PreviousBinding = qspLocalBindings[nameIndex];
-    qspLocalBindings[nameIndex] = ++qspLocalVarsCount; /* 1-based */
-    return &localVar->Slot;
+    localVar->NameIndex = globalVar->NameIndex;
+    localVar->LocalIndex = globalVar->LocalIndex;
+    localVar->GlobalIndex = (int)(globalVar - qspGlobalVarsSlots) + 1;
+    localVar->IsRef = QSP_FALSE;
+    qspInitVarData(&localVar->Data.Var);
+    globalVar->LocalIndex = ++qspLocalVarsCount; /* 1-based */
+    return localVar;
 }
 
 INLINE void qspReleaseLocalVars(int varsBase)
 {
     /* Restore previous bindings in reverse order */
-    QSPLocalVar *localVar = qspLocalVars + qspLocalVarsCount;
+    QSPVarSlot *globalVar, *localVar = qspLocalVars + qspLocalVarsCount - 1;
     while (qspLocalVarsCount > varsBase)
     {
-        --localVar;
-        qspEmptyVarSlot(&localVar->Slot);
-        qspLocalBindings[localVar->Slot.NameIndex] = localVar->PreviousBinding;
+        globalVar = qspGlobalVarsSlots + localVar->GlobalIndex - 1;
+        globalVar->LocalIndex = localVar->LocalIndex;
+        qspEmptyVarSlot(localVar);
         --qspLocalVarsCount;
+        --localVar;
     }
 }
 
@@ -373,8 +336,9 @@ void qspReleaseLocalScope(int oldLocalScopeBase)
 INLINE QSPVarSlot *qspAddLocalVar(int nameIndex)
 {
     /* Check if the variable already exists in the current scope */
-    int binding = (nameIndex < qspLocalBindingsCapacity ? qspLocalBindings[nameIndex] : 0);
-    if (binding > qspLocalScopeBase) return &qspLocalVars[binding - 1].Slot;
+    QSPVarSlot *globalVar = qspGetGlobalVarSlot(nameIndex, QSP_FALSE);
+    if (globalVar->LocalIndex > qspLocalScopeBase)
+        return qspLocalVars + globalVar->LocalIndex - 1;
 
     /* It doesn't exist yet, so we have to add it */
     if (qspLocalVarsCount - qspLocalScopeBase >= QSP_MAXLOCALVARS)
@@ -382,12 +346,13 @@ INLINE QSPVarSlot *qspAddLocalVar(int nameIndex)
         qspSetError(QSP_ERR_TOOMANYVARS);
         return 0;
     }
-    return qspCreateLocalVar(nameIndex);
+    if (!globalVar->NameIndex)
+        globalVar = qspCreateGlobalVar(nameIndex);
+    return qspCreateLocalVar(globalVar);
 }
 
-QSPVar *qspAddGlobalVar(QSPString name)
+QSPVarSlot *qspAddGlobalVar(QSPString name)
 {
-    QSPVarSlot *slot;
     unsigned int nameHash;
     name = qspPrepareVarName(name, &nameHash); /* validates the name */
     if (qspIsEmpty(name))
@@ -395,8 +360,7 @@ QSPVar *qspAddGlobalVar(QSPString name)
         qspSetError(QSP_ERR_INCORRECTVARNAME);
         return 0;
     }
-    slot = qspCreateGlobalVar(qspGetExactNameIndex(name, nameHash, QSP_TRUE));
-    return &slot->Data.Var;
+    return qspGetGlobalVarSlot(qspGetExactNameIndex(name, nameHash, QSP_TRUE), QSP_TRUE);
 }
 
 INLINE void qspInitVarValues(QSPVar *var, QSPVariant *vals, int count, QSP_BOOL toMove)
@@ -424,10 +388,10 @@ int qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove)
     QSPVarSlot *slot;
     int oldLocalScopeBase = qspAllocateLocalScope();
 
-    slot = qspCreateLocalVar(qspArgsNameIndex);
+    slot = qspCreateLocalVar(qspGetGlobalVarSlot(qspArgsNameIndex, QSP_TRUE));
     qspInitVarValues(&slot->Data.Var, args, count, toMove);
 
-    qspCreateLocalVar(qspResultNameIndex);
+    qspCreateLocalVar(qspGetGlobalVarSlot(qspResultNameIndex, QSP_TRUE));
     return oldLocalScopeBase;
 }
 
@@ -453,20 +417,20 @@ QSP_BOOL qspApplyResult(QSPVariant *res)
     return QSP_TRUE;
 }
 
-int qspSaveLocalVarsAndRestoreGlobals(void)
+int qspHideLocalVars(void)
 {
     int oldLocalVarsBase = qspLocalVarsBase;
     qspLocalVarsBase = qspLocalVarsCount;
     return oldLocalVarsBase;
 }
 
-void qspRestoreSavedLocalVars(int oldLocalVarsBase)
+void qspRestoreHiddenLocalVars(int oldLocalVarsBase)
 {
     /* Local scopes should be released already */
     qspLocalVarsBase = oldLocalVarsBase;
 }
 
-void qspClearSavedLocalVars(int oldLocalVarsBase)
+void qspClearHiddenLocalVars(int oldLocalVarsBase)
 {
     qspLocalVarsBase = oldLocalVarsBase;
     qspClearLocalVars();
@@ -474,16 +438,14 @@ void qspClearSavedLocalVars(int oldLocalVarsBase)
 
 INLINE QSPVarSlot *qspVarSlotReference(int nameIndex, QSP_TINYINT mode)
 {
-    QSPVarSlot *slot;
-    if (nameIndex < qspLocalBindingsCapacity)
+    QSPVarSlot *slot = qspGetGlobalVarSlot(nameIndex, QSP_FALSE);
+    if (slot->NameIndex)
     {
-        int binding = qspLocalBindings[nameIndex];
-        if (binding > qspLocalVarsBase) return &qspLocalVars[binding - 1].Slot;
+        /* Local variable with this name hides the global one */
+        if (slot->LocalIndex > qspLocalVarsBase)
+            return qspLocalVars + slot->LocalIndex - 1;
+        return slot;
     }
-
-    /* Check the global scope */
-    slot = qspGetGlobalVarSlot(nameIndex);
-    if (slot->NameIndex) return slot;
 
     if (mode == QSP_REF_GETORCREATE)
     {
@@ -820,9 +782,12 @@ int qspGetVarItemIndex(QSPVar *var, QSPVariant index, QSP_BOOL toCreate)
     }
     if (toCreate)
     {
-        QSPVarKey *key = qspAddVarKey(var, hash, var->ValsCount); /* point to the new array item */
+        /* The key points to a new array item */
+        QSPVarKey *key = qspAddVarKey(var, hash, var->ValsCount);
         qspCopyToNewVariant(&key->Key, &index);
-        return var->ValsCount;
+        /* Make sure the item exists */
+        qspReserveVarItem(var, key->Index);
+        return key->Index;
     }
     return -1;
 }
@@ -1892,5 +1857,5 @@ void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
             qspEmptyVar(var);
     }
     else
-        qspKillGlobalVars();
+        qspClearGlobalVars();
 }
