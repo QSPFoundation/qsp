@@ -503,6 +503,7 @@ QSP {
                             | "insvar"
                             | "killvar"
                             | "copyarr"
+                            | "movearr"
                             | "sortarr"
                             | "scanstr"
                             | "unpackarr"
