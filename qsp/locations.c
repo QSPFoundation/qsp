@@ -130,7 +130,7 @@ QSPLocation *qspAddLocation(QSPString name)
     int nameIndex;
     name = qspDelSpc(name);
     nameIndex = qspGetNameIndex(name, QSP_TRUE);
-    if (!nameIndex) return 0;
+    if (!nameIndex) return 0; /* empty names aren't allowed */
     slot = qspGetLocSlot(nameIndex);
     if (slot->NameIndex) return 0;
     if (qspLocsCount >= qspLocsCapacity)
@@ -155,10 +155,12 @@ QSPLocation *qspAddLocation(QSPString name)
 
 QSPLocation *qspLocByName(QSPString name)
 {
+    int nameIndex;
     name = qspDelSpc(name);
-    if (!qspIsEmpty(name))
+    nameIndex = qspGetNameIndex(name, QSP_FALSE);
+    if (nameIndex > 0) /* empty names aren't allowed */
     {
-        QSPLocSlot *slot = qspGetLocSlot(qspGetNameIndex(name, QSP_FALSE));
+        QSPLocSlot *slot = qspGetLocSlot(nameIndex);
         if (slot->NameIndex) return qspLocs[slot->Index];
     }
     return 0;
