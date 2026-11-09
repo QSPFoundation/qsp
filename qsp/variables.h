@@ -75,7 +75,6 @@
         QSP_REF_GETSILENTLY /* no errors reported */
     };
 
-    extern QSPVar qspNullVar;
     extern QSPVar *qspGlobalVars; /* hash table by name indices, QSP_SLOTSCOUNT(qspGlobalVarsCapacity) entries */
     extern int qspGlobalVarsCount;
     extern int qspGlobalVarsCapacity; /* has to be a power of 2 */
@@ -132,7 +131,7 @@
     void qspStatementSetVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementInsVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
-    void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
+    void qspStatementMoveArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
@@ -230,17 +229,6 @@
     {
         QSPVar *var = qspVarReferenceByName(name, mode);
         return (var ? qspGetVarData(var) : 0);
-    }
-
-    INLINE QSPVar qspGetUnknownVar(void)
-    {
-        QSPVar var;
-        var.NameIndex = 0;
-        var.LocalIndex = 0;
-        var.GlobalIndex = 0;
-        var.IsRef = QSP_FALSE;
-        qspInitVarData(&var.Data.Own);
-        return var;
     }
 
 #endif

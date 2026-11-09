@@ -8,10 +8,8 @@
 #include "names.h"
 #include "text.h"
 
-QSPName qspNullName;
-
 static QSPName *qspNames = 0; /* entry 0 is the empty name */
-static int qspNamesEntriesCount = 0;
+static int qspNamesEntriesCount = 0; /* used names entries */
 static int qspNamesCapacity = 0; /* has to be a power of 2 */
 static int *qspNamesSlots = 0; /* hash table by names, QSP_SLOTSCOUNT(qspNamesCapacity) slots */
 static int qspNamesFreeIndex = 1; /* search for a free entry starts here */
@@ -63,15 +61,8 @@ INLINE void qspRebuildNamesSlots(void)
 
 INLINE void qspResizeNames(int newCapacity)
 {
-    if (qspNamesCapacity)
-        qspNames = (QSPName *)realloc(qspNames, newCapacity * sizeof(QSPName));
-    else
-    {
-        qspNames = (QSPName *)malloc(newCapacity * sizeof(QSPName));
-        *qspNames = qspNullName; /* entry 0 is the empty name */
-        qspNamesEntriesCount = 1;
-    }
     qspNamesCapacity = newCapacity;
+    qspNames = (QSPName *)realloc(qspNames, newCapacity * sizeof(QSPName));
     qspNamesSlots = (int *)realloc(qspNamesSlots, QSP_SLOTSCOUNT(newCapacity) * sizeof(int));
     qspRebuildNamesSlots();
 }
@@ -82,11 +73,6 @@ INLINE int qspInternExactName(QSPString name, unsigned int nameHash)
     QSPName *entry;
     int *slot, nameIndex;
     if (qspIsEmpty(name)) return 0;
-    if (qspNamesEntriesCount >= qspNamesCapacity)
-    {
-        int newCapacity = (qspNamesCapacity ? qspNamesCapacity * 2 : QSP_NAMESCAPACITY);
-        qspResizeNames(newCapacity);
-    }
     slot = qspGetNameSlot(name, nameHash);
     if (*slot)
     {
@@ -97,7 +83,14 @@ INLINE int qspInternExactName(QSPString name, unsigned int nameHash)
         ++qspNamesFreeIndex;
     nameIndex = qspNamesFreeIndex++;
     if (nameIndex == qspNamesEntriesCount)
+    {
+        if (qspNamesEntriesCount >= qspNamesCapacity)
+        {
+            qspResizeNames(qspNamesCapacity * 2);
+            slot = qspGetEmptyNameSlot(nameHash);
+        }
         ++qspNamesEntriesCount;
+    }
     *slot = nameIndex;
     entry = qspNames + nameIndex;
     entry->Name = qspCopyToNewText(name);
@@ -109,12 +102,10 @@ INLINE int qspInternExactName(QSPString name, unsigned int nameHash)
 INLINE int qspFindExactName(QSPString name, unsigned int nameHash)
 {
     /* The name has to be uppercased */
+    int *slot;
     if (qspIsEmpty(name)) return 0;
-    if (qspNamesCapacity)
-    {
-        int *slot = qspGetNameSlot(name, nameHash);
-        if (*slot) return *slot;
-    }
+    slot = qspGetNameSlot(name, nameHash);
+    if (*slot) return *slot;
     return -1;
 }
 
@@ -148,7 +139,7 @@ void qspAdvanceNamesGeneration(void)
 void qspReleaseNamesGeneration(void)
 {
     /* Nothing holds the names of the previous generations once the state of the game is cleared */
-    if (qspNamesCapacity && qspReleasedGeneration != qspNamesGeneration)
+    if (qspReleasedGeneration != qspNamesGeneration)
     {
         int i;
         QSPName *entry;
@@ -166,21 +157,26 @@ void qspReleaseNamesGeneration(void)
     }
 }
 
-void qspClearNames(QSP_BOOL toInit)
+void qspInitNames(void)
 {
-    if (!toInit && qspNamesCapacity)
-    {
-        int i;
-        for (i = 0; i < qspNamesEntriesCount; ++i)
-            qspFreeString(&qspNames[i].Name);
-        free(qspNames);
-        free(qspNamesSlots);
-    }
-    qspNames = 0;
-    qspNamesEntriesCount = 0;
-    qspNamesCapacity = 0;
-    qspNamesSlots = 0;
+    qspNamesCapacity = QSP_NAMESCAPACITY;
+    qspNames = (QSPName *)malloc(qspNamesCapacity * sizeof(QSPName));
+    qspNames->Name = qspNullString; /* 0 is the empty name */
+    qspNames->NameHash = 0;
+    qspNames->Generation = 0;
+    qspNamesEntriesCount = 1;
+    qspNamesSlots = (int *)malloc(QSP_SLOTSCOUNT(qspNamesCapacity) * sizeof(int));
+    memset(qspNamesSlots, 0, QSP_SLOTSCOUNT(qspNamesCapacity) * sizeof(int));
     qspNamesFreeIndex = 1;
     qspNamesGeneration = 0;
     qspReleasedGeneration = 0;
+}
+
+void qspTerminateNames(void)
+{
+    int i;
+    for (i = 0; i < qspNamesEntriesCount; ++i)
+        qspFreeString(&qspNames[i].Name);
+    free(qspNames);
+    free(qspNamesSlots);
 }

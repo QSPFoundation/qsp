@@ -220,7 +220,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     for (i = 0; i < locsCount; ++i)
     {
         str = qspDecodeString(strs[ind++], isUCS);
-        curLoc = qspAddLocation(str); /* the first location with a name wins */
+        curLoc = qspAddLocation(str); /* the first location with the name wins */
         qspFreeString(&str);
         if (curLoc)
         {

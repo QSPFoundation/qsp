@@ -46,8 +46,6 @@ void qspInitRuntime(unsigned int seed)
 
     qspNullString = qspStringFromPair(0, 0);
     qspNullTuple = qspCopyToNewTuple(0, 0);
-    qspNullVar = qspGetUnknownVar();
-    qspNullName = qspGetNullName();
 
     qspIsDebug = QSP_FALSE;
     qspLocationState = 0;
@@ -57,7 +55,7 @@ void qspInitRuntime(unsigned int seed)
     qspCurLoc = 0;
     qspTimerInterval = 0;
     qspCurWindowsDisplayState = QSP_WIN_MAIN | QSP_WIN_VARS | QSP_WIN_ACTS | QSP_WIN_OBJS | QSP_WIN_INPUT;
-    qspClearNames(QSP_TRUE);
+    qspInitNames();
     qspInitWorld();
 
     qspSetSeed(seed);
@@ -78,7 +76,7 @@ void qspTerminateRuntime(void)
     qspTerminateVars();
     qspUpdateLocation(&qspRealCurLoc, 0);
     qspTerminateWorld();
-    qspClearNames(QSP_FALSE);
+    qspTerminateNames();
     qspTerminateMath();
     qspTerminateStackAllocator();
     qspResetError(QSP_FALSE);

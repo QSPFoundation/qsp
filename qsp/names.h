@@ -20,23 +20,13 @@
         int Generation;
     } QSPName;
 
-    extern QSPName qspNullName;
-
     /* External functions */
     int qspGetExactNameIndex(QSPString name, unsigned int nameHash, QSP_BOOL toIntern);
     int qspGetNameIndex(QSPString name, QSP_BOOL toIntern);
     QSPString qspGetNameText(int nameIndex);
     void qspAdvanceNamesGeneration(void);
     void qspReleaseNamesGeneration(void);
-    void qspClearNames(QSP_BOOL toInit);
-
-    INLINE QSPName qspGetNullName(void)
-    {
-        QSPName name;
-        name.Name = qspNullString;
-        name.NameHash = 0;
-        name.Generation = 0;
-        return name;
-    }
+    void qspInitNames(void);
+    void qspTerminateNames(void);
 
 #endif
