@@ -1377,19 +1377,36 @@ INLINE void qspMoveArray(QSPVarData *dest, QSPVarData *src, int start, int count
     memmove(src->Values + start, src->Values + start + itemsToMove, (src->ValsCount - start) * sizeof(QSPVariant));
     if (keysCount > 0)
     {
-        /* Move keys, the following keys get shifted */
-        int capacity = QSP_VARSKEYSCAPACITY;
-        QSPVarKey *destKey, *srcKey = src->Keys + keyIndex;
-        while (capacity < keysCount) capacity *= 2;
-        qspResizeVarKeys(dest, capacity);
-        for (i = 0; i < keysCount; ++i, ++srcKey)
+        if (keysCount == src->KeysCount)
         {
-            destKey = qspAddVarKey(dest, srcKey->Hash, srcKey->Index - start);
-            qspMoveToNewVariant(&destKey->Key, &srcKey->Key);
+            /* Move all keys */
+            for (i = 0; i < keysCount; ++i)
+                src->Keys[i].Index -= start;
+            dest->Keys = src->Keys;
+            dest->KeysSlots = src->KeysSlots;
+            dest->KeysCount = keysCount;
+            dest->KeysCapacity = src->KeysCapacity;
+            src->Keys = 0;
+            src->KeysSlots = 0;
+            src->KeysCount = 0;
+            src->KeysCapacity = 0;
         }
-        src->KeysCount -= keysCount;
-        memmove(src->Keys + keyIndex, src->Keys + keyIndex + keysCount, (src->KeysCount - keyIndex) * sizeof(QSPVarKey));
-        qspRebuildVarKeysSlots(src);
+        else
+        {
+            /* Move keys, the following keys get shifted */
+            int capacity = QSP_VARSKEYSCAPACITY;
+            QSPVarKey *destKey, *srcKey = src->Keys + keyIndex;
+            while (capacity < keysCount) capacity *= 2;
+            qspResizeVarKeys(dest, capacity);
+            for (i = 0; i < keysCount; ++i, ++srcKey)
+            {
+                destKey = qspAddVarKey(dest, srcKey->Hash, srcKey->Index - start);
+                qspMoveToNewVariant(&destKey->Key, &srcKey->Key);
+            }
+            src->KeysCount -= keysCount;
+            memmove(src->Keys + keyIndex, src->Keys + keyIndex + keysCount, (src->KeysCount - keyIndex) * sizeof(QSPVarKey));
+            qspRebuildVarKeysSlots(src);
+        }
     }
     /* Items of the following keys get shifted */
     for (i = keyIndex; i < src->KeysCount; ++i)
@@ -1840,7 +1857,7 @@ void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_
     qspMoveTupleToArray(dest, src, startInd, maxCount);
 }
 
-void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
+void qspStatementMoveArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
 {
     QSPVarData *dest, *src;
     if (!((dest = qspVarDataReferenceByName(QSP_STR(args[0]), QSP_REF_GETORCREATE)))) return;
@@ -1849,20 +1866,15 @@ void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
     {
         int startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
         int maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->ValsCount);
-        qspCopyArray(dest, src, startInd, maxCount);
-    }
-}
-
-void qspStatementMoveArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
-{
-    QSPVarData *dest, *src;
-    if (!((dest = qspVarDataReferenceByName(QSP_STR(args[0]), QSP_REF_GETORCREATE)))) return;
-    if (!((src = qspVarDataReferenceByName(QSP_STR(args[1]), QSP_REF_GET)))) return;
-    if (dest != src)
-    {
-        int startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
-        int maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->ValsCount);
-        qspMoveArray(dest, src, startInd, maxCount);
+        switch (extArg)
+        {
+        case QSP_STAT_COPYARR:
+            qspCopyArray(dest, src, startInd, maxCount);
+            break;
+        case QSP_STAT_MOVEARR:
+            qspMoveArray(dest, src, startInd, maxCount);
+            break;
+        }
     }
 }
 
