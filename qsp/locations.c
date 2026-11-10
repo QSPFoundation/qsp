@@ -311,7 +311,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
     while (1)
     {
         /* The variable might be updated during the previous code execution */
-        if (!((varData = qspVarDataReferenceByName(name, QSP_REF_GET))))
+        if (!((varData = qspVarDataByName(name, QSP_REF_GET, 0))))
         {
             qspClearHiddenLocalVars(oldLocalVarsBase);
             return;

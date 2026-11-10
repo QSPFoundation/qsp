@@ -233,7 +233,7 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 
 QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
 {
-    QSPVarData *varData = qspVarDataByName(qspStringFromC(name));
+    QSPVarData *varData = qspVarDataByAnyName(qspStringFromC(name), QSP_REF_GETSILENTLY, 0);
     if (varData)
     {
         *count = varData->ValsCount;
@@ -245,7 +245,7 @@ QSP_BOOL QSPGetVarValuesCount(QSP_CHAR *name, int *count)
 
 QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
 {
-    QSPVarData *varData = qspVarDataByName(qspStringFromC(name));
+    QSPVarData *varData = qspVarDataByAnyName(qspStringFromC(name), QSP_REF_GETSILENTLY, 0);
     if (varData)
     {
         int arrIndex = qspGetVarItemIndex(varData, *key, QSP_FALSE);
@@ -262,7 +262,7 @@ QSP_BOOL QSPGetVarIndexByKey(QSP_CHAR *name, QSPVariant *key, int *ind)
 /* Both the value & the key are optional */
 QSP_BOOL QSPGetVarValue(QSP_CHAR *name, int ind, QSPVariant *value, QSPVariant *key)
 {
-    QSPVarData *varData = qspVarDataByName(qspStringFromC(name));
+    QSPVarData *varData = qspVarDataByAnyName(qspStringFromC(name), QSP_REF_GETSILENTLY, 0);
     if (varData && ind >= 0 && ind < varData->ValsCount)
     {
         if (value) *value = varData->Values[ind];

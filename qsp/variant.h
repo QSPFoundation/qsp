@@ -17,6 +17,7 @@
     void qspAppendVariantToString(QSPVariant *val, QSPBufString *res);
     QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid);
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
+    QSP_BOOL qspGetLiteralAsRef(QSPVariant *val, QSP_TINYINT type, QSPVariant *res);
     void qspConvertLiteralTo(QSPVariant *val, QSP_TINYINT type);
     int qspVariantsCompare(QSPVariant *first, QSPVariant *second);
     QSP_BOOL qspVariantsEqual(QSPVariant *first, QSPVariant *second);
@@ -92,6 +93,15 @@
         return ret;
     }
 
+    INLINE QSPVariant qspVarRefVariant(int nameIndex, QSP_TINYINT varType)
+    {
+        QSPVariant ret;
+        ret.Type = QSP_TYPE_VARREF;
+        QSP_INDEX(ret) = nameIndex;
+        QSP_VARTYPE(ret) = varType;
+        return ret;
+    }
+
     INLINE QSPVariant qspTupleVariant(QSPTuple value)
     {
         QSPVariant ret;
@@ -116,8 +126,9 @@
         case QSP_TYPE_STR:
             QSP_PSTR(dest) = qspCopyToNewText(QSP_PSTR(src));
             break;
+        case QSP_TYPE_VARREF:
         case QSP_TYPE_LOCREF:
-            QSP_PINDEX(dest) = QSP_PINDEX(src);
+            dest->Val.Ref = src->Val.Ref;
             break;
         default:
             qspInitVariant(dest, src->Type); /* shouldn't happen */
