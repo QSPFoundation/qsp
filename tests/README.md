@@ -58,6 +58,7 @@ action of the test.
 | `@reply menu N` | queues the item index chosen in `MENU` (`-1` closes the menu) |
 | `@reply isplay 0/1` | queues a reply to the "is playing" callback |
 | `@clock N` | sets the clock of the host to `N` milliseconds; the clock starts at 0 with the test and can't go back. The callback returns the time passed since its previous call, so `MSECSCOUNT` gives the time since the start of the test or since the last restart of the game |
+| `@init-game CODE` | the `INITGAME` callback executes `CODE` with `QSPExecString`; an error stops the call that started the game |
 | `@watch-msg NAME` | every `MSG` callback also records the event `read NAME => VALUE`, the variable is read with `QSPGetVarValue` while the callback runs (`$NAME`, `#NAME`, `%NAME` give the typed view) |
 
 ### Actions
@@ -125,6 +126,7 @@ Callbacks are recorded with the names used by qsp-wasm-engine:
 `user_input [TEXT]`, `input TEXT`, `version [PARAM]`, `menu [...]`,
 `wait N`, `timer N`, `play_file FILE VOLUME`, `is_play FILE`,
 `close_file [FILE]`, `panel_visibility TYPE 0/1`, `open_game FILE IS_NEW`,
+`init_game IS_NEW`,
 `save_game [FILE]`, `load_save [FILE]`, `debug LOC:LINE:ACT CODE`,
 `error NAME`. An argument in brackets is omitted when it's empty.
 `panel_visibility` passes the `QSP_WIN_*` flags. The refresh callback

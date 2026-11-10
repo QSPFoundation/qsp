@@ -455,6 +455,7 @@ static struct
     long ClockReported; /* the time at the previous call of the callback */
     char **MsgWatches; /* variables read while the MSG callback runs */
     int MsgWatchesCount;
+    char *InitGameCode; /* code executed by the INITGAME callback */
 
     SaveSlot *Saves;
     int SavesCount;
@@ -759,6 +760,20 @@ static int cbGetMsCount(void)
     return (int)passed;
 }
 
+static void cbInitGame(QSP_BOOL isNewGame)
+{
+    char buf[64];
+    snprintf(buf, sizeof(buf), "init_game %d", isNewGame ? 1 : 0);
+    addEvent(buf);
+    if (T.InitGameCode)
+    {
+        /* An error stops the call that started the game, that call reports it */
+        QSP_CHAR *qStr = toQsp(T.InitGameCode);
+        QSPExecString(QSPStringFromC(qStr), QSP_FALSE);
+        free(qStr);
+    }
+}
+
 static void loadGame(Game *game, QSP_BOOL isNewGame);
 static void afterCall(QSP_BOOL isOk);
 
@@ -911,6 +926,7 @@ static void setCallbacks(void)
     QSPSetCallback(QSP_CALL_SETINPUTSTRTEXT, (QSP_CALLBACK)cbSetInput);
     QSPSetCallback(QSP_CALL_SYSTEM, (QSP_CALLBACK)cbSystem);
     QSPSetCallback(QSP_CALL_OPENGAME, (QSP_CALLBACK)cbOpenGame);
+    QSPSetCallback(QSP_CALL_INITGAME, (QSP_CALLBACK)cbInitGame);
     QSPSetCallback(QSP_CALL_OPENGAMESTATUS, (QSP_CALLBACK)cbOpenSave);
     QSPSetCallback(QSP_CALL_SAVEGAMESTATUS, (QSP_CALLBACK)cbSaveGame);
     QSPSetCallback(QSP_CALL_SLEEP, (QSP_CALLBACK)cbSleep);
@@ -1248,6 +1264,8 @@ static void resetEngine(void)
     freeStrings(&T.InputReplies, &T.InputRepliesCount);
     freeStrings(&T.VersionReplies, &T.VersionRepliesCount);
     freeStrings(&T.MsgWatches, &T.MsgWatchesCount);
+    free(T.InitGameCode);
+    T.InitGameCode = 0;
     T.MenuRepliesCount = 0;
     T.IsPlayRepliesCount = 0;
     T.Clock = T.ClockReported = 0;
@@ -1578,6 +1596,16 @@ static void runCommand(const char *line, char **block, int blockCount)
                 T.ClockReported);
         else
             T.Clock = now;
+    }
+    else if ((arg = command(line, "@init-game")))
+    {
+        if (!*arg)
+            fail("expected '@init-game CODE'");
+        else
+        {
+            free(T.InitGameCode);
+            T.InitGameCode = xstrdup(arg);
+        }
     }
     /* Other actions */
     else if ((arg = command(line, "@set-input")))

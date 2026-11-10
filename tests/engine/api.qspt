@@ -14,6 +14,7 @@ view
 close_file
 panel_visibility 32 0
 panel_visibility 31 1
+init_game 1
 
 @test events without listeners: $QSPVER with a parameter and no answer is empty
 @src
