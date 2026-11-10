@@ -78,7 +78,6 @@ end
         :end
       end
 @run
-@expect #x => 0
 @expect x => ?
 @select-act 0
 @exec-act

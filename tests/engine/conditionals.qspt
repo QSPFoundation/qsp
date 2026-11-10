@@ -662,7 +662,6 @@ if abcd = 3: k1 = 34
 end
 
 @run
-@expect #k1 => 0
 @expect k1 => ?
 @expect k2 => 35
 

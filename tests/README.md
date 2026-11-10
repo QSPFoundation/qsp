@@ -106,9 +106,9 @@ removed). `VALUE` is a QSP literal: a number, a string in single quotes
 (`''` is a quote, `\n`, `\r`, `\\` are escapes), a tuple `[1, 'a']` or the
 undefined value `?`. The type has to match: a name without a prefix gives
 the value as it is, so `x => ?` checks that `x` has no value.
-`readVariable('x')` of qsp-wasm-engine reads the numeric view of a
-variable, it's written here as `#x => 0`; `readVariable('$x')` is
-`$x => ''`.
+`readVariable('x')` of qsp-wasm-engine reads the value as it is, it's
+written here as `x => ?` for a missing value; `readVariable('#x')` is
+`#x => 0`, `readVariable('$x')` is `$x => ''`.
 
 ### Events
 

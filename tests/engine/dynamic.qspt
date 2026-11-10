@@ -62,8 +62,6 @@
 @expect after_2 => 4
 @expect $in_0 => 'other'
 @expect in_1 => 3
-// wasm: readVariable('in_2') is 0, it reads the numeric view of the missing argument
-@expect #in_2 => 0
 @expect in_2 => ?
 
 @test DYNEVAL: returning number result
@@ -121,7 +119,6 @@ after_result = result
 @expect after_2 => 4
 @expect $in_0 => 'other'
 @expect in_1 => 3
-@expect #in_2 => 0
 @expect in_2 => ?
 @expect dyn_result => 10
 @expect after_result => 5
