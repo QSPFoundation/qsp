@@ -28,7 +28,7 @@ export enum QspWindow {
   ALL = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5),
 }
 
-// Values (qsp.h): undefined, tuple, number (incl. bool), string (incl. code & varref)
+// Values (qsp.h): undefined, tuple, number (incl. bool), string (incl. code); references never reach a host
 export type QspVariableValue = string | number | QspTuple | undefined;
 // Items of a tuple may have names (the fields of a record, stored uppercase):
 // names[i] is the name of item i or undefined, the property is missing when no item has a name

@@ -641,12 +641,12 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         qspFreeString(&locName);
         return QSP_FALSE;
     }
-    qspUpdateLocation(&qspCurLoc, qspLocByName(locName));
+    qspUpdateLocation(&qspCurLoc, qspGetLocByName(locName));
     qspFreeString(&locName);
     for (i = 0; i < actsCount; ++i)
     {
         if (i < qspCurActsCount)
-            qspUpdateLocation(&qspCurActions[i].Location, qspLocByName(actsLocs[i]));
+            qspUpdateLocation(&qspCurActions[i].Location, qspGetLocByName(actsLocs[i]));
         qspFreeString(actsLocs + i);
     }
     /* Execute callbacks to update the current state */

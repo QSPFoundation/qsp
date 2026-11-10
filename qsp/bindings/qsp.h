@@ -78,14 +78,16 @@
     enum
     {
         QSP_TYPE_TERM = -1, /* not used for values */
-        QSP_TYPE_UNDEF = 0, /* undefined value acts as the empty value of the type it's used as */
+        QSP_TYPE_UNDEF = 0, /* undefined value acts as the empty value of any type */
         QSP_TYPE_TUPLE = 1,
         QSP_TYPE_NUM = 2,
         QSP_TYPE_BOOL = 3,
         QSP_TYPE_STR = 4,
         QSP_TYPE_CODE = 5,
-        QSP_TYPE_VARREF = 6,
-        QSP_TYPE_DEFINED_TYPES /* represents the number of defined values */
+        QSP_TYPE_DEFINED_VALUES, /* the number of value types */
+        QSP_TYPE_VARREF = QSP_TYPE_DEFINED_VALUES,
+        QSP_TYPE_LOCREF,
+        QSP_TYPE_DEFINED_TYPES /* the total number of types */
     };
 
     #define QSP_TRUE 1
@@ -119,10 +121,12 @@
         /* BOOL */   QSP_TYPE_NUM,
         /* STRING */ QSP_TYPE_STR,
         /* CODE */   QSP_TYPE_STR,
-        /* VARREF */ QSP_TYPE_STR
+        /* VARREF */ QSP_TYPE_VARREF,
+        /* LOCREF */ QSP_TYPE_LOCREF
     };
 
     #define QSP_ISDEF(a) ((a) != QSP_TYPE_UNDEF)
+    #define QSP_ISVALUE(a) ((a) >= 0 && (a) < QSP_TYPE_DEFINED_VALUES)
     #define QSP_ISTUPLE(a) (qspBaseTypeTable[a] == QSP_TYPE_TUPLE)
     #define QSP_ISNUM(a) (qspBaseTypeTable[a] == QSP_TYPE_NUM)
     #define QSP_ISSTR(a) (qspBaseTypeTable[a] == QSP_TYPE_STR)
@@ -131,9 +135,13 @@
     #define QSP_STR(a) (a).Val.Str
     #define QSP_NUM(a) (a).Val.Num
     #define QSP_TUPLE(a) (a).Val.Tuple
+    #define QSP_INDEX(a) (a).Val.Ref.Index
+    #define QSP_VARTYPE(a) (a).Val.Ref.VarType
     #define QSP_PSTR(a) (a)->Val.Str
     #define QSP_PNUM(a) (a)->Val.Num
     #define QSP_PTUPLE(a) (a)->Val.Tuple
+    #define QSP_PINDEX(a) (a)->Val.Ref.Index
+    #define QSP_PVARTYPE(a) (a)->Val.Ref.VarType
 
     typedef struct QSPVariant_s QSPVariant;
     typedef struct QSPField_s QSPField;
@@ -156,6 +164,11 @@
         {
             QSPString Str;
             QSP_BIGINT Num;
+            struct
+            {
+                int Index;
+                QSP_TINYINT VarType;
+            } Ref;
             QSPTuple Tuple;
         } Val;
         QSP_TINYINT Type;

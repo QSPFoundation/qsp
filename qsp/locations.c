@@ -153,17 +153,25 @@ QSPLocation *qspAddLocation(QSPString name)
     return loc;
 }
 
-QSPLocation *qspLocByName(QSPString name)
+int qspGetLocNameIndex(QSPString name, QSP_BOOL toIntern)
 {
-    int nameIndex;
     name = qspDelSpc(name);
-    nameIndex = qspGetNameIndex(name, QSP_FALSE);
+    return qspGetNameIndex(name, toIntern);
+}
+
+QSPLocation *qspGetLoc(int nameIndex)
+{
     if (nameIndex > 0) /* empty names aren't allowed */
     {
         QSPLocSlot *slot = qspGetLocSlot(nameIndex);
         if (slot->NameIndex) return qspLocs[slot->Index];
     }
     return 0;
+}
+
+QSPLocation *qspGetLocByName(QSPString name)
+{
+    return qspGetLoc(qspGetLocNameIndex(name, QSP_FALSE));
 }
 
 INLINE void qspAddBaseDescAndActions(QSPLocation *loc)
@@ -265,10 +273,10 @@ INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc)
     --qspCurLocCallDepth;
 }
 
-void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res)
+void qspExecLocWithArgs(int nameIndex, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res)
 {
     int oldLocalScopeBase, oldLocationState;
-    QSPLocation *loc = qspLocByName(name);
+    QSPLocation *loc = qspGetLoc(nameIndex);
     if (!loc)
     {
         qspSetError(QSP_ERR_LOCNOTFOUND);
@@ -284,6 +292,12 @@ void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT args
     qspReleaseLocalScope(oldLocalScopeBase);
 }
 
+void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res)
+{
+    int nameIndex = qspGetLocNameIndex(name, QSP_FALSE);
+    qspExecLocWithArgs(nameIndex, args, argsCount, toMoveArgs, res);
+}
+
 void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount)
 {
     QSPVarData *varData;
@@ -297,7 +311,7 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
     while (1)
     {
         /* The variable might be updated during the previous code execution */
-        if (!((varData = qspVarDataReferenceByName(name, QSP_REF_GET))))
+        if (!((varData = qspVarDataByName(name, QSP_REF_GET, 0))))
         {
             qspClearHiddenLocalVars(oldLocalVarsBase);
             return;

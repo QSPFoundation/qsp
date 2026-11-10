@@ -35,6 +35,7 @@
         QSP_TINYINT ResType;
         QSP_TINYINT MinArgsCount;
         QSP_TINYINT MaxArgsCount;
+        QSP_TINYINT IsTyped;
         QSP_TINYINT ArgsTypes[QSP_MAXMATHOPARGS];
         QSP_FUNCTION Func;
     } QSPMathOperation;
