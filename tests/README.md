@@ -33,9 +33,9 @@ of the line. Commands marked as *block* take the following lines up to the
 next `@`-line as their text; `@@` at the start of a block line stands for a
 literal `@`, trailing empty lines and `//` lines are not part of the block.
 
-The engine is reinitialized (`QSPTerminate`/`QSPInit`) for every test;
-the game is built from the definitions and loaded right before the first
-action of the test.
+The engine is reinitialized (`QSPTerminate`/`QSPInit` with the seed 0)
+for every test; the game is built from the definitions and loaded right
+before the first action of the test.
 
 ### Test and game definition
 
@@ -73,6 +73,9 @@ action of the test.
 | `@select-act N` / `@exec-act` | `QSPSetSelActionIndex` / `QSPExecuteSelActionCode` |
 | `@select-obj N` | `QSPSetSelObjectIndex` |
 | `@restart` | `QSPRestartGame` |
+| `@seed N` | creates a new engine with `QSPInit(N)`: the game is loaded again, the state of the old engine is lost, the events and the slots of the saves are kept |
+| `@remember NAME EXPR` | keeps the number `EXPR` in the runner, it outlives `@seed` |
+| `@recall NAME` | assigns the remembered number to the variable `NAME` of the engine |
 | `@save NAME` / `@load-save NAME` | `QSPSaveGameAsData` / `QSPOpenSavedGameFromData` into/from an in-memory slot |
 | `@save-file FILE` / `@load-file FILE` | the same with a file in the current directory (the file is written only when the save succeeds) |
 | `@debug 0/1` | `QSPEnableDebugMode` |

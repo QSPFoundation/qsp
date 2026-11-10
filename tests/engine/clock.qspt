@@ -1,0 +1,62 @@
+// Ported from qsp-wasm-engine tests/engine/clock.test.ts
+// Every restart runs the start location, which draws r. The values depend on the build (QSP_USE_BIGINT
+// changes the generator), so the tests compare two engines: @seed creates a new one, @remember keeps the
+// values of the old one
+
+@test the same seed gives the same rand values in two engines, whatever the clock
+@seed 42
+@game
+# start
+r = rand(1, 1000000000)
+@restart
+@remember first r
+@seed 42
+@clock 3600000
+@restart
+@recall first
+@expect r = first => 1
+
+@test restarts continue the sequence, which the same seed reproduces
+@seed 42
+@game
+# start
+r = rand(1, 1000000000)
+@restart
+@remember first r
+@restart
+@remember second r
+@seed 42
+@restart
+@recall first
+@expect r = first => 1
+@restart
+@recall second
+@expect r = second => 1
+@expect first <> second => 1
+
+@test another seed gives other rand values
+@seed 42
+@game
+# start
+r = rand(1, 1000000000)
+@restart
+@remember first r
+@restart
+@remember second r
+@seed 43
+@restart
+@remember other_first r
+@restart
+@recall first
+@recall second
+@recall other_first
+@expect [other_first, r] <> [first, second] => 1
+
+@test msecscount follows the clock
+@clock 5000
+@game
+# start
+@restart
+@clock 6500
+@exec n = msecscount
+@expect n => 1500

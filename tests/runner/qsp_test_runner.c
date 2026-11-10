@@ -456,6 +456,9 @@ static struct
     char **MsgWatches; /* variables read while the MSG callback runs */
     int MsgWatchesCount;
     char *InitGameCode; /* code executed by the INITGAME callback */
+    char **RememberedNames; /* numbers kept by @remember, they outlive the engine */
+    char **RememberedValues;
+    int RememberedCount;
 
     SaveSlot *Saves;
     int SavesCount;
@@ -1245,12 +1248,17 @@ static void freeStrings(char ***items, int *count)
     *count = 0;
 }
 
+static void initEngine(unsigned int seed)
+{
+    QSPTerminate();
+    QSPInit(seed);
+    setCallbacks();
+}
+
 static void resetEngine(void)
 {
     int i;
-    QSPTerminate();
-    QSPInit(RAND_SEED);
-    setCallbacks();
+    initEngine(RAND_SEED);
     freeGame(&T.Main);
     for (i = 0; i < T.ModulesCount; ++i) freeGame(T.Modules + i);
     free(T.Modules);
@@ -1266,6 +1274,9 @@ static void resetEngine(void)
     freeStrings(&T.MsgWatches, &T.MsgWatchesCount);
     free(T.InitGameCode);
     T.InitGameCode = 0;
+    i = T.RememberedCount;
+    freeStrings(&T.RememberedNames, &i);
+    freeStrings(&T.RememberedValues, &T.RememberedCount);
     T.MenuRepliesCount = 0;
     T.IsPlayRepliesCount = 0;
     T.Clock = T.ClockReported = 0;
@@ -1404,6 +1415,73 @@ static void expectValue(const char *arg)
     free(actual);
     free(expected.Data);
     free(expr);
+}
+
+static int findRemembered(const char *name)
+{
+    int i;
+    for (i = 0; i < T.RememberedCount; ++i)
+        if (!strcmp(T.RememberedNames[i], name)) return i;
+    return -1;
+}
+
+/* @remember NAME EXPR */
+static void rememberValue(const char *arg)
+{
+    const char *expr = arg;
+    char *name, *value;
+    long num;
+    int ind;
+    while (*expr && *expr != ' ' && *expr != '\t') ++expr;
+    if (expr == arg || !*skipSpaces(expr))
+    {
+        fail("expected '@remember NAME EXPR'");
+        return;
+    }
+    name = xmalloc(expr - arg + 1);
+    memcpy(name, arg, expr - arg);
+    name[expr - arg] = 0;
+    ensureGameLoaded();
+    if (!evalExpr(skipSpaces(expr), &value))
+        fail("%s: evaluation failed with %s", skipSpaces(expr), value);
+    else if (!parseInteger(value, &num, 0))
+        fail("%s: expected a number, got %s", skipSpaces(expr), value);
+    else if ((ind = findRemembered(name)) >= 0)
+    {
+        free(T.RememberedValues[ind]);
+        T.RememberedValues[ind] = value;
+        value = 0;
+    }
+    else
+    {
+        T.RememberedNames = xrealloc(T.RememberedNames, (T.RememberedCount + 1) * sizeof(char *));
+        T.RememberedValues = xrealloc(T.RememberedValues, (T.RememberedCount + 1) * sizeof(char *));
+        T.RememberedNames[T.RememberedCount] = name;
+        T.RememberedValues[T.RememberedCount++] = value;
+        return;
+    }
+    free(value);
+    free(name);
+}
+
+/* @recall NAME: assigns the remembered number to the variable NAME of the engine */
+static void recallValue(const char *name)
+{
+    int ind = findRemembered(name);
+    StrBuf sb = {0};
+    QSP_CHAR *qCode;
+    if (ind < 0)
+    {
+        fail("'%s' isn't remembered", name);
+        return;
+    }
+    checkNoPendingError();
+    ensureGameLoaded();
+    sbAddf(&sb, "%s = %s", name, T.RememberedValues[ind]);
+    qCode = toQsp(sbStr(&sb));
+    afterCall(QSPExecString(QSPStringFromC(qCode), QSP_FALSE));
+    free(qCode);
+    free(sb.Data);
 }
 
 static int countEvents(const char *prefix, int isExact)
@@ -1597,6 +1675,22 @@ static void runCommand(const char *line, char **block, int blockCount)
         else
             T.Clock = now;
     }
+    else if ((arg = command(line, "@seed")))
+    {
+        long seed;
+        if (!parseInteger(arg, &seed, 0) || seed < 0 || (unsigned long)seed > UINT_MAX)
+            fail("expected '@seed N' with N from 0 to %u", UINT_MAX);
+        else
+        {
+            checkNoPendingError();
+            initEngine((unsigned int)seed);
+            T.IsGameLoaded = 0; /* the new engine loads the game again, the state of the old one is lost */
+        }
+    }
+    else if ((arg = command(line, "@remember")))
+        rememberValue(arg);
+    else if ((arg = command(line, "@recall")))
+        recallValue(arg);
     else if ((arg = command(line, "@init-game")))
     {
         if (!*arg)
