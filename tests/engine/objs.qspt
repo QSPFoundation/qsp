@@ -183,3 +183,28 @@ ADDOBJ 'first' & ADDOBJ 'second'
 @expect $obj => 'second'
 @exec UNSEL & $obj = $SELOBJ
 @expect $obj => ''
+
+// ------------------------------------------------------------
+// Not in qsp-wasm-engine: MODOBJ & the titles of the objects
+
+@test MODOBJ: the title is shown when it differs from the name
+@src
+addobj 'sword' & addobj 'shield'
+modobj 'sword', 'Great sword', 'img.png'
+@run
+@expect objs [sword|img.png => Great sword; shield]
+
+@test MODOBJ: a title with the same text as the name isn't shown
+@src
+addobj 'sword'
+modobj 'sword', 'sword'
+@run
+@expect objs [sword]
+
+@test MODOBJ: RESETOBJ restores the title & the image
+@src
+addobj 'sword'
+modobj 'sword', 'Great sword', 'img.png'
+resetobj 'sword'
+@run
+@expect objs [sword]

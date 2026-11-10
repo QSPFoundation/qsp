@@ -509,6 +509,12 @@ static int shiftInt(int *items, int *count, int defValue)
 /* ------------------------------------------------------------ */
 /* Callbacks: every call becomes an event named like in qsp-wasm-engine */
 
+static int isSameStr(QSPString s1, QSPString s2)
+{
+    size_t len = (size_t)(s1.End - s1.Str);
+    return len == (size_t)(s2.End - s2.Str) && (!len || !memcmp(s1.Str, s2.Str, len * sizeof(QSP_CHAR)));
+}
+
 static void addListItem(StrBuf *sb, QSPString name, QSPString image)
 {
     addEscaped(sb, name);
@@ -543,8 +549,8 @@ static void listState(StrBuf *sb, int isActions)
         {
             if (i) sbAdd(sb, "; ");
             addListItem(sb, items[i].Name, items[i].Image);
-            /* The title is shown only when it differs from the name (MODOBJ) */
-            if (items[i].Title.Str != items[i].Name.Str)
+            /* The title is shown only when its text differs from the name (MODOBJ) */
+            if (!isSameStr(items[i].Title, items[i].Name))
             {
                 sbAdd(sb, " => ");
                 addEscaped(sb, items[i].Title);
