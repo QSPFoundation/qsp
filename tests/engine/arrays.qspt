@@ -1,6 +1,6 @@
 // Ported from qsp-wasm-engine tests/engine/arrays.test.ts
-// readVariable*('x') of qsp-wasm-engine reads the numeric view, so a missing value is written as
-// "#x[i] => 0"; '$x' reads the string view, written as "$x[i] => ''".
+// readVariable*('x') of qsp-wasm-engine reads the value as it is (c0c49a6), so a missing value is
+// written as "x[i] => ?"; '#x' reads the numeric view, "#x[i] => 0", '$x' the string view, "$x[i] => ''".
 // readVariableByIndex() takes the position in the array, readVariableByKey() the text key.
 
 @test overriding string value with number
@@ -56,7 +56,7 @@ a = 1 & $b = "xx"
 @expect a => 1
 @expect $b => 'xx'
 @exec killvar
-@expect #a => 0
+@expect a => ?
 @expect $b => ''
 
 @test killvar whole number array
@@ -66,8 +66,8 @@ a[0] = 1 & a[1] = 2
 @expect a[0] => 1
 @expect a[1] => 2
 @exec killvar 'a'
-@expect #a[0] => 0
-@expect #a[1] => 0
+@expect a[0] => ?
+@expect a[1] => ?
 
 @test killvar whole string array
 @src
@@ -89,7 +89,7 @@ a[0] = 1 & a[1] = 2 & a[2] = 3
 @exec killvar 'a', 1
 @expect a[0] => 1
 @expect a[1] => 3
-@expect #a[2] => 0
+@expect a[2] => ?
 
 @test killvar array index in string array
 @src
@@ -110,7 +110,7 @@ a['test'] = 1 & a['other'] = 2
 @expect a['test'] => 1
 @expect a['other'] => 2
 @exec killvar 'a', 'test'
-@expect #a['test'] => 0
+@expect a['test'] => ?
 @expect a['other'] => 2
 
 @test killvar array key in string array
@@ -130,14 +130,16 @@ a = 1 & $b = "xx"
 @expect a => 1
 @expect $b => 'xx'
 @exec killall
-@expect #a => 0
+@expect a => ?
 @expect $b => ''
 
 @test copyarr whole numeric array
 @src
 a[0] = 1 & a[1] = 2 & a[2] = 3
 @run
-@expect #b[0] => 0
+@expect b[0] => ?
+@expect b[1] => ?
+@expect b[2] => ?
 @exec copyarr 'b', 'a'
 @expect a[0] => 1
 @expect a[1] => 2
@@ -163,13 +165,16 @@ $a[0] = "aa" & $a[1] = "bb" & $a[2] = "cc"
 @src
 a[0] = 1 & a[1] = 2 & a[2] = 3
 @run
+@expect b[0] => ?
+@expect b[1] => ?
+@expect b[2] => ?
 @exec copyarr 'b', 'a', 1
 @expect a[0] => 1
 @expect a[1] => 2
 @expect a[2] => 3
 @expect b[0] => 2
 @expect b[1] => 3
-@expect #b[2] => 0
+@expect b[2] => ?
 
 // wasm: the second test is also named "copyarr with start index in numeric array"
 @test copyarr with start index in string array
@@ -188,13 +193,16 @@ $a[0] = "aa" & $a[1] = "bb" & $a[2] = "cc"
 @src
 a[0] = 1 & a[1] = 2 & a[2] = 3
 @run
+@expect b[0] => ?
+@expect b[1] => ?
+@expect b[2] => ?
 @exec copyarr 'b', 'a', 1, 1
 @expect a[0] => 1
 @expect a[1] => 2
 @expect a[2] => 3
 @expect b[0] => 2
-@expect #b[1] => 0
-@expect #b[2] => 0
+@expect b[1] => ?
+@expect b[2] => ?
 
 @test copyarr with count in string array
 @src
@@ -215,8 +223,9 @@ a[0] = 1 & $a[1] = 'a' & a[2] = 3
 @expect a[0] => 1
 @expect $a[1] => 'a'
 @expect a[2] => 3
-@expect #b[0] => 0
+@expect b[0] => ?
 @expect $b[1] => ''
+@expect b[2] => ?
 @exec copyarr 'b', 'a'
 @expect a[0] => 1
 @expect $a[1] => 'a'
@@ -409,11 +418,61 @@ $arr[1,3]="zz" & $res = arritem('$arr', [1,3])
 @run
 @expect $res => 'zz'
 
+@test ARRITEM: finding first element when index is omitted
+@src
+arr[0] = 7 & arr[1] = 8 & res = arritem('arr')
+@run
+@expect res => 7
+
+// wasm: the variable is $str, an expression reads $STR as the function
+@test ARRITEM: type prefix of array name converts the value
+@src
+arr[1] = 5 & $s = arritem('$arr', 1) & num = arritem('arr', 1)
+@run
+@expect $s => ''
+@expect num => 5
+
+@test ARRKEY: returning string key of element
+@src
+arr['first'] = 1 & $key = arrkey('arr', 0)
+@run
+@expect $key => 'first'
+
+@test ARRKEY: returning tuple key of element
+@src
+arr[1,3] = 256 & %key = arrkey('arr', 0)
+@run
+@expect %key => [1, 3]
+
+@test ARRKEY: returning key of first element when index is omitted
+@src
+arr['first'] = 1 & arr['second'] = 2 & $key = arrkey('arr')
+@run
+@expect $key => 'first'
+
+@test ARRKEY: type prefix of array name is ignored
+@src
+arr['first'] = 1 & $key = arrkey('$arr', 0)
+@run
+@expect $key => 'first'
+
+@test ARRKEY: returning empty value for element without key
+@src
+arr['first'] = 1 & arr[5] = 2 & $key = arrkey('arr', 1)
+@run
+@expect $key => ''
+
+@test ARRKEY: returning empty value for missing element
+@src
+arr['first'] = 1 & $key = arrkey('arr', 9)
+@run
+@expect $key => ''
+
 @test negative index
 @src
 arr[0] = 123 & x = arr[-1] & arr[-1] = 234 & y = arr[0]
 @run
-@expect #x => 0
+@expect x => ?
 @expect y => 123
 
 @test tuple index numbers
