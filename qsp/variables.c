@@ -53,6 +53,8 @@ INLINE void qspMoveReferenceToVar(QSPVar *var, QSPSharedVarData *sharedData);
 INLINE QSPVar *qspAddLocalVar(int nameIndex);
 INLINE void qspInitVarValues(QSPVarData *varData, QSPVariant *vals, int count, QSP_BOOL toMove);
 INLINE QSPVar *qspVarReference(int nameIndex, QSP_TINYINT mode);
+INLINE QSPVar *qspVarReferenceByName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType);
+INLINE QSPVar *qspVarReferenceByArg(QSPVariant *arg, QSP_TINYINT mode, QSP_TINYINT *varType);
 INLINE QSPVarData *qspVarData(int nameIndex, QSP_TINYINT mode);
 INLINE int *qspGetVarKeySlot(QSPVarData *varData, QSPVariant *key, unsigned int hash);
 INLINE int *qspGetEmptyVarKeySlot(QSPVarData *varData, unsigned int hash);
@@ -495,35 +497,29 @@ INLINE QSPVarData *qspVarData(int nameIndex, QSP_TINYINT mode)
     return (var ? qspGetVarData(var) : 0);
 }
 
-QSPVar *qspVarReferenceByName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType)
+INLINE QSPVar *qspVarReferenceByName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType)
 {
     int nameIndex;
     unsigned int nameHash;
-    QSPString plainName = qspPrepareVarName(name, &nameHash); /* validates the name */
+    QSPString upperName, plainName;
+    name = qspDelSpc(name);
+    upperName = qspUpperText(name);
+    plainName = qspPrepareVarName(upperName, &nameHash); /* validates the name */
     if (qspIsEmpty(plainName))
     {
+        qspFreeNewString(&upperName, &name);
         if (mode != QSP_REF_GETSILENTLY)
             qspSetError(QSP_ERR_INCORRECTVARNAME);
         return 0;
     }
-    if (varType) *varType = qspGetVarType(name);
+    if (varType) *varType = qspGetVarType(upperName);
     nameIndex = qspGetExactNameIndex(plainName, nameHash, (mode == QSP_REF_GETORCREATE));
+    qspFreeNewString(&upperName, &name);
     if (nameIndex < 0) return &qspNullVar;
     return qspVarReference(nameIndex, mode);
 }
 
-QSPVar *qspVarReferenceByAnyName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType)
-{
-    QSPVar *var;
-    QSPString upperName;
-    name = qspDelSpc(name);
-    upperName = qspUpperText(name);
-    var = qspVarReferenceByName(upperName, mode, varType);
-    qspFreeNewString(&upperName, &name);
-    return var;
-}
-
-QSPVar *qspVarReferenceByArg(QSPVariant *arg, QSP_TINYINT mode, QSP_TINYINT *varType)
+INLINE QSPVar *qspVarReferenceByArg(QSPVariant *arg, QSP_TINYINT mode, QSP_TINYINT *varType)
 {
     switch (QSP_BASETYPE(arg->Type))
     {
@@ -531,12 +527,24 @@ QSPVar *qspVarReferenceByArg(QSPVariant *arg, QSP_TINYINT mode, QSP_TINYINT *var
         if (varType) *varType = QSP_PVARTYPE(arg);
         return qspVarReference(QSP_PINDEX(arg), mode);
     case QSP_TYPE_STR:
-        return qspVarReferenceByAnyName(QSP_PSTR(arg), mode, varType);
+        return qspVarReferenceByName(QSP_PSTR(arg), mode, varType);
     default:
         if (mode != QSP_REF_GETSILENTLY)
             qspSetError(QSP_ERR_INCORRECTVARNAME);
         return 0;
     }
+}
+
+QSPVarData *qspVarDataByName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType)
+{
+    QSPVar *var = qspVarReferenceByName(name, mode, varType);
+    return (var ? qspGetVarData(var) : 0);
+}
+
+QSPVarData *qspVarDataByArg(QSPVariant *arg, QSP_TINYINT mode, QSP_TINYINT *varType)
+{
+    QSPVar *var = qspVarReferenceByArg(arg, mode, varType);
+    return (var ? qspGetVarData(var) : 0);
 }
 
 int qspGetVarNameIndex(QSPString name, QSP_TINYINT *varType)
@@ -1158,7 +1166,7 @@ void qspGetVarFieldValueByArg(QSPVariant *arg, QSPVariant index, QSPTuple path, 
 
 QSPString qspGetVarStrValue(QSPString name, int valIndex)
 {
-    QSPVarData *varData = qspVarDataByAnyName(name, QSP_REF_GETSILENTLY, 0);
+    QSPVarData *varData = qspVarDataByName(name, QSP_REF_GETSILENTLY, 0);
     if (varData && valIndex >= 0 && valIndex < varData->ValsCount)
         return qspGetVariantAsString(varData->Values + valIndex);
     return qspNullString;
@@ -1166,7 +1174,7 @@ QSPString qspGetVarStrValue(QSPString name, int valIndex)
 
 QSP_BIGINT qspGetVarNumValue(QSPString name, int valIndex)
 {
-    QSPVarData *varData = qspVarDataByAnyName(name, QSP_REF_GETSILENTLY, 0);
+    QSPVarData *varData = qspVarDataByName(name, QSP_REF_GETSILENTLY, 0);
     if (varData && valIndex >= 0 && valIndex < varData->ValsCount)
         return qspGetVariantAsNum(varData->Values + valIndex, 0);
     return 0;

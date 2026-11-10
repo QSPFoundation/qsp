@@ -98,9 +98,8 @@
     int qspHideLocalVars(void);
     void qspRestoreHiddenLocalVars(int oldLocalVarsBase);
     void qspClearHiddenLocalVars(int oldLocalVarsBase);
-    QSPVar *qspVarReferenceByName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType);
-    QSPVar *qspVarReferenceByArg(QSPVariant *arg, QSP_TINYINT mode, QSP_TINYINT *varType);
-    QSPVar *qspVarReferenceByAnyName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType);
+    QSPVarData *qspVarDataByName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType);
+    QSPVarData *qspVarDataByArg(QSPVariant *arg, QSP_TINYINT mode, QSP_TINYINT *varType);
     int qspGetVarNameIndex(QSPString name, QSP_TINYINT *varType);
     int qspGetLiteralVarNameIndex(QSPVariant *val, QSP_TINYINT *varType);
     QSPVarKey *qspAddVarKey(QSPVarData *varData, unsigned int hash, int valIndex);
@@ -226,24 +225,6 @@
     INLINE QSPVarData *qspGetVarData(QSPVar *var)
     {
         return (var->IsRef ? &var->Data.Shared->Data : &var->Data.Own);
-    }
-
-    INLINE QSPVarData *qspVarDataByName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType)
-    {
-        QSPVar *var = qspVarReferenceByName(name, mode, varType);
-        return (var ? qspGetVarData(var) : 0);
-    }
-
-    INLINE QSPVarData *qspVarDataByArg(QSPVariant *arg, QSP_TINYINT mode, QSP_TINYINT *varType)
-    {
-        QSPVar *var = qspVarReferenceByArg(arg, mode, varType);
-        return (var ? qspGetVarData(var) : 0);
-    }
-
-    INLINE QSPVarData *qspVarDataByAnyName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType)
-    {
-        QSPVar *var = qspVarReferenceByAnyName(name, mode, varType);
-        return (var ? qspGetVarData(var) : 0);
     }
 
 #endif
