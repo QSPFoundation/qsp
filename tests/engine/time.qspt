@@ -4,16 +4,16 @@
 @src
 WAIT 1000
 @run
-@expect event wait 1000
+@expect-event wait 1000
 
 // WAIT refreshes the UI with isRedraw on, so every window is reported
 @test WAIT should pause execution
 @src
 pl 'before wait' & WAIT 1000 & p 'after wait'
 @run
-@expect event stats_changed before wait\r\n
-@expect event wait 1000
-@expect event stats_changed before wait\r\nafter wait
+@expect-event stats_changed before wait\r\n
+@expect-event wait 1000
+@expect-event stats_changed before wait\r\nafter wait
 
 // The host reports the time passed since the previous call
 @test MSECSCOUNT should return msec passed from game start
@@ -29,7 +29,7 @@ res = MSECSCOUNT
 @src
 SETTIMER 100
 @run
-@expect event timer 100
+@expect-event timer 100
 
 @test counter location should be called
 @src
@@ -41,9 +41,9 @@ p 'works'
 
 @run
 @counter
-@expect event stats_changed works
+@expect-event stats_changed works
 @counter
-@expect event stats_changed worksworks
+@expect-event stats_changed worksworks
 
 @test several counters should be supported
 @src
@@ -59,4 +59,4 @@ p ' & works other'
 
 @run
 @counter
-@expect event stats_changed works & works other
+@expect-event stats_changed works & works other

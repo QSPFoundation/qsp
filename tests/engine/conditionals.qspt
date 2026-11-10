@@ -674,7 +674,7 @@ else
   k1 = 25
 
 @run
-@expect error ENDNOTFOUND (location 'test', line 2, local 2, action -1) IF ABCD = 3:
+@expect-error ENDNOTFOUND (location 'test', line 2, local 2, action -1) IF ABCD = 3:
 
 @test nested multi line if without end shows error
 @src
@@ -687,7 +687,7 @@ if abc <> 3:
 end
 
 @run
-@expect error ENDNOTFOUND (location 'test', line 3, local 3, action -1) IF ABC <> 3:
+@expect-error ENDNOTFOUND (location 'test', line 3, local 3, action -1) IF ABC <> 3:
 
 @test end in single line if shows error
 @src
@@ -695,7 +695,7 @@ end
         if abcd=3: k1=34 else k1=25 end
 
 @run
-@expect error UNKNOWNACTION (location 'test', line 2, local 2, action -1) IF ABCD=3: K1=34 ELSE K1=25 END
+@expect-error UNKNOWNACTION (location 'test', line 2, local 2, action -1) IF ABCD=3: K1=34 ELSE K1=25 END
 
 @test multiline if requires colon
 @src
@@ -704,7 +704,7 @@ end
         end
 
 @run
-@expect error COLONNOTFOUND (location 'test', line 2, local 2, action -1) IF 0
+@expect-error COLONNOTFOUND (location 'test', line 2, local 2, action -1) IF 0
 
 @test multiline elseif requires colon
 @src
@@ -714,7 +714,7 @@ end
         end
 
 @run
-@expect error COLONNOTFOUND (location 'test', line 3, local 3, action -1) ELSEIF 3
+@expect-error COLONNOTFOUND (location 'test', line 3, local 3, action -1) ELSEIF 3
 
 @test multiline else if requires colon
 @src
@@ -724,4 +724,4 @@ end
         end
 
 @run
-@expect error COLONNOTFOUND (location 'test', line 3, local 3, action -1) ELSE IF 3
+@expect-error COLONNOTFOUND (location 'test', line 3, local 3, action -1) ELSE IF 3

@@ -9,7 +9,7 @@ $stone[1]='Throw stone:throwstone'
 menu '$stone'
 
 @run
-@expect event menu [Take stone; Throw stone]
+@expect-event menu [Take stone; Throw stone]
 
 @test MENU should trigger showing menu without $ in name
 @src
@@ -19,7 +19,7 @@ $stone[1]='Throw stone:throwstone'
 menu 'stone'
 
 @run
-@expect event menu [Take stone; Throw stone]
+@expect-event menu [Take stone; Throw stone]
 
 @test MENU should trigger showing menu with icon
 @src
@@ -28,7 +28,7 @@ $stone[0]='Take stone:takestone:1.png'
 menu '$stone'
 
 @run
-@expect event menu [Take stone|1.png]
+@expect-event menu [Take stone|1.png]
 
 @test MENU stops on first empty item
 @src
@@ -38,7 +38,7 @@ $stone[2]='Take stone:takestone'
 menu '$stone'
 
 @run
-@expect event menu [Take stone]
+@expect-event menu [Take stone]
 
 @test MENU should support separator as -:-
 @src
@@ -49,7 +49,7 @@ $stone[2]='Throw stone:throwstone'
 menu '$stone'
 
 @run
-@expect event menu [Take stone; -; Throw stone]
+@expect-event menu [Take stone; -; Throw stone]
 
 @test corresponding location should be called when menu item is selected
 @reply menu 1
@@ -66,8 +66,8 @@ p 'taken'
 p 'thrown'
 
 @run
-@expect event menu [Take stone; Throw stone]
-@expect event stats_changed thrown
+@expect-event menu [Take stone; Throw stone]
+@expect-event stats_changed thrown
 
 @test index(1 based) of selected item should be passed into processing loc
 @reply menu 1
@@ -90,4 +90,4 @@ $stone[0]='Take: stone:takestone:'
 menu 'stone'
 
 @run
-@expect event menu [Take: stone]
+@expect-event menu [Take: stone]

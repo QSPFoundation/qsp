@@ -6,7 +6,7 @@
 $ver = $QSPVER
 @reply version 5.9.0
 @run
-@expect event version
+@expect-event version
 @expect $ver => '5.9.0'
 
 @test QSPVER platform
@@ -14,14 +14,14 @@ $ver = $QSPVER
 $ver = $QSPVER('platform')
 @reply version qspider
 @run
-@expect event version platform
+@expect-event version platform
 @expect $ver => 'qspider'
 
 @test $QSPVER without an answer returns the version of the engine
 @src
 $ver = $QSPVER
 @run
-@expect event version
+@expect-event version
 @expect $ver => '5.9.6'
 
 @test $CURLOC
@@ -94,7 +94,7 @@ $b[0] = 'dd' & b[1] = 77 & $b[2] = 'yy' & b[3] = 86 & $b[4] = ' ' & res = MAX('#
 @src
 $b[0] = 'a' & b[1] = 1 & res = MAX('b')
 @run
-@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) $B[0] = 'a' & B[1] = 1 & RES = MAX('b')
+@expect-error TYPEMISMATCH (location 'test', line 1, local 1, action -1) $B[0] = 'a' & B[1] = 1 & RES = MAX('b')
 
 @test MAX: ignores numbers when search for string
 @src
@@ -168,7 +168,7 @@ $b[0] = 'a' & b[1] = 86 & $b[2] = 'kk' & b[3] = 77 & $b[4] = '' & res = MIN('#b'
 @src
 $b[0] = 'a' & b[1] = 1 & res = MIN('b')
 @run
-@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) $B[0] = 'a' & B[1] = 1 & RES = MIN('b')
+@expect-error TYPEMISMATCH (location 'test', line 1, local 1, action -1) $B[0] = 'a' & B[1] = 1 & RES = MIN('b')
 
 @test MIN: ignores numbers when search for string
 @src

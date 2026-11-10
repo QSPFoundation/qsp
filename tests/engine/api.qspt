@@ -4,10 +4,10 @@
 @src
 showobjs 0
 @run
-@expect event panel_visibility 8 0
+@expect-event panel_visibility 8 0
 @clear-events
 @restart
-@expect events
+@expect-events
 timer 500
 user_input
 view
@@ -19,5 +19,5 @@ panel_visibility 31 1
 @src
 $ver = $qspver('param')
 @run
-@expect event version param
+@expect-event version param
 @expect $ver => ''

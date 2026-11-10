@@ -91,4 +91,4 @@ end
         loop while 0
         end
 @run
-@expect error COLONNOTFOUND (location 'test', line 2, local 2, action -1) LOOP WHILE 0
+@expect-error COLONNOTFOUND (location 'test', line 2, local 2, action -1) LOOP WHILE 0

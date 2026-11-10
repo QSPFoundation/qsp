@@ -4,14 +4,14 @@
 @src
 msg 'works'
 @run
-@expect event msg works
+@expect-event msg works
 
 // The engine forces the update of every window before it shows the message
 @test msg should stop execution flow
 @src
 *p '1' & msg 'works' & *p '2'
 @run
-@expect events
+@expect-events
 main_changed 1
 stats_changed
 actions_changed []

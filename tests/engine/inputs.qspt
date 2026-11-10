@@ -5,9 +5,9 @@
 @src
 SHOWINPUT 0
 @run
-@expect event panel_visibility 16 0
+@expect-event panel_visibility 16 0
 @exec SHOWINPUT 1
-@expect event panel_visibility 16 1
+@expect-event panel_visibility 16 1
 
 @test USER_TEXT should return text from user cmd
 @set-input works
@@ -28,7 +28,7 @@ $text = USRTXT
 @src
 $textBefore = USRTXT & CMDCLEAR & $textAfter = USRTXT
 @run
-@expect event user_input
+@expect-event user_input
 @expect $textBefore => 'works'
 @expect $textAfter => ''
 
@@ -37,7 +37,7 @@ $textBefore = USRTXT & CMDCLEAR & $textAfter = USRTXT
 @src
 $textBefore = USRTXT & CMDCLR & $textAfter = USRTXT
 @run
-@expect event user_input
+@expect-event user_input
 @expect $textBefore => 'works'
 @expect $textAfter => ''
 
@@ -46,7 +46,7 @@ $textBefore = USRTXT & CMDCLR & $textAfter = USRTXT
 @src
 $textBefore = USRTXT & CLS & $textAfter = USRTXT
 @run
-@expect event user_input
+@expect-event user_input
 @expect $textBefore => 'works'
 @expect $textAfter => ''
 
@@ -56,7 +56,7 @@ $textBefore = USRTXT & CLS & $textAfter = USRTXT
 @src
 *p '1' & $text = $input('Question?') & *p '2'
 @run
-@expect events
+@expect-events
 main_changed 1
 stats_changed
 actions_changed []
@@ -69,5 +69,5 @@ main_changed 12
 @src
 $text = 'before' & $text = $input('Question?')
 @run
-@expect event input Question?
+@expect-event input Question?
 @expect $text => ''

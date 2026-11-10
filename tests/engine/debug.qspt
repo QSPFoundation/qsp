@@ -8,7 +8,7 @@
 @debug 1
 @run
 @debug 0
-@expect events
+@expect-events
 debug test:1:-1 'first line'
 debug test:2:-1 A = 10
 debug test:3:-1 'third line'

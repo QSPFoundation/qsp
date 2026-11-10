@@ -20,7 +20,7 @@
         dynamic $code, 'asdfg'
 
 @run
-@expect event main_changed qwerty\r\nasdfg\r\n
+@expect-event main_changed qwerty\r\nasdfg\r\n
 
 @test DYNAMIC: curly braces evaluate expressions when dynamic is called
 @src
@@ -33,7 +33,7 @@
         dynamic $code, 'asdfg'
 
 @run
-@expect event main_changed asdfg\r\nasdfg\r\n
+@expect-event main_changed asdfg\r\nasdfg\r\n
 
 @test DYNAMIC: args should be isolated from location
 @src
@@ -87,7 +87,7 @@
 dyneval("code = 123 + 890")
 code
 @run
-@expect event main_changed 123\r\n1013\r\n
+@expect-event main_changed 123\r\n1013\r\n
 
 @test DYNEVAL: args should be isolated from locations
 @src

@@ -82,7 +82,7 @@ $cur = $curloc
 pl 'other'
 
 @run
-@expect event stats_changed other\r\nnewloc\r\n
+@expect-event stats_changed other\r\nnewloc\r\n
 @expect $cur => 'other'
 
 @test $ONNEWLOC should receive args on actual location

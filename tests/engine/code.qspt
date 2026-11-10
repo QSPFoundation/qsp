@@ -43,19 +43,19 @@ a = 1 && b = 2 & & c = 3
 @src
  msg 567
 @run
-@expect event msg 567
+@expect-event msg 567
 
 @test statement argument gets converted to number
 @src
  wait '567'
 @run
-@expect event wait 567
+@expect-event wait 567
 
 @test statement argument cant be converted to number
 @src
  wait 'sdsd'
 @run
-@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) WAIT 'sdsd'
+@expect-error TYPEMISMATCH (location 'test', line 1, local 1, action -1) WAIT 'sdsd'
 
 @test function argument gets converted to string
 @src
@@ -73,4 +73,4 @@ a = 1 && b = 2 & & c = 3
 @src
  x = rgb('123', '65sd', 56)
 @run
-@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) X = RGB('123', '65sd', 56)
+@expect-error TYPEMISMATCH (location 'test', line 1, local 1, action -1) X = RGB('123', '65sd', 56)

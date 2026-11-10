@@ -4,21 +4,21 @@
 @src
 p 'works'
 @run
-@expect events
+@expect-events
 stats_changed works
 
 @test pl should print text with line break
 @src
 pl 'works'
 @run
-@expect events
+@expect-events
 stats_changed works\r\n
 
 @test nl should print text with line break in front
 @src
 nl 'works'
 @run
-@expect events
+@expect-events
 stats_changed \r\nworks
 
 @test CLEAR should clear stats description
@@ -26,7 +26,7 @@ stats_changed \r\nworks
 p 'works'
 @run
 @exec CLEAR
-@expect events
+@expect-events
 stats_changed works
 stats_changed
 
@@ -35,7 +35,7 @@ stats_changed
 p 'works'
 @run
 @exec CLR
-@expect events
+@expect-events
 stats_changed works
 stats_changed
 
@@ -44,8 +44,8 @@ stats_changed
 p 'works'
 @run
 @exec CLS
-@expect count 2 stats_changed
-@expect event stats_changed
+@expect-count 2 stats_changed
+@expect-event stats_changed
 
 @test $STATTXT should return text from stats panel
 @src
@@ -63,6 +63,6 @@ p 'works' & $text = $STATTXT()
 @src
 SHOWSTAT 0
 @run
-@expect event panel_visibility 2 0
+@expect-event panel_visibility 2 0
 @exec SHOWSTAT 1
-@expect event panel_visibility 2 1
+@expect-event panel_visibility 2 1

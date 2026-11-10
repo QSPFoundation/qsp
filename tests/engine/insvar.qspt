@@ -154,7 +154,7 @@ insvar '$s', 5
 n[] = 1
 insvar '#n', 'x'
 @run
-@expect error TYPEMISMATCH
+@expect-error TYPEMISMATCH
 @expect arrpack('n') => [1]
 
 @test INSVAR: works with local variables
@@ -171,4 +171,4 @@ x = arrpack('a')
 @src
 insvar 'a'
 @run
-@expect error ARGSCOUNT
+@expect-error ARGSCOUNT

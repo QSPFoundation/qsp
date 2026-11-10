@@ -16,14 +16,14 @@ act '2': x
 $gt_location = $curloc
 
 @exec gt 'test'
-@expect event main_changed main
-@expect event stats_changed stats
-@expect event actions_changed [1]
+@expect-event main_changed main
+@expect-event stats_changed stats
+@expect-event actions_changed [1]
 @expect $location => 'test'
 @exec GOTO 'target', 1, 'test'
-@expect event main_changed target main
-@expect event stats_changed stats\r\ntarget stats
-@expect event actions_changed [2]
+@expect-event main_changed target main
+@expect-event stats_changed stats\r\ntarget stats
+@expect-event actions_changed [2]
 @expect args[0] => 1
 @expect $args[1] => 'test'
 @expect $gt_location => 'target'
@@ -43,14 +43,14 @@ act '2': x
 $gt_location = $curloc
 
 @exec gt 'test'
-@expect event main_changed main
-@expect event stats_changed stats
-@expect event actions_changed [1]
+@expect-event main_changed main
+@expect-event stats_changed stats
+@expect-event actions_changed [1]
 @expect $location => 'test'
 @exec GT 'target', 1, 'test'
-@expect event main_changed target main
-@expect event stats_changed stats\r\ntarget stats
-@expect event actions_changed [2]
+@expect-event main_changed target main
+@expect-event stats_changed stats\r\ntarget stats
+@expect-event actions_changed [2]
 @expect args[0] => 1
 @expect $args[1] => 'test'
 @expect $gt_location => 'target'
@@ -70,14 +70,14 @@ act '2': x
 $xgt_location = $curloc
 
 @exec gt 'test'
-@expect event main_changed main
-@expect event stats_changed stats
-@expect event actions_changed [1]
+@expect-event main_changed main
+@expect-event stats_changed stats
+@expect-event actions_changed [1]
 @expect $location => 'test'
 @exec XGOTO 'target', 1, 'test'
-@expect event main_changed main\r\ntarget main
-@expect event stats_changed stats\r\ntarget stats
-@expect event actions_changed [2]
+@expect-event main_changed main\r\ntarget main
+@expect-event stats_changed stats\r\ntarget stats
+@expect-event actions_changed [2]
 @expect args[0] => 1
 @expect $args[1] => 'test'
 @expect $xgt_location => 'target'
@@ -97,14 +97,14 @@ act '2': x
 $xgt_location = $curloc
 
 @exec gt 'test'
-@expect event main_changed main
-@expect event stats_changed stats
-@expect event actions_changed [1]
+@expect-event main_changed main
+@expect-event stats_changed stats
+@expect-event actions_changed [1]
 @expect $location => 'test'
 @exec XGT 'target', 1, 'test'
-@expect event main_changed main\r\ntarget main
-@expect event stats_changed stats\r\ntarget stats
-@expect event actions_changed [2]
+@expect-event main_changed main\r\ntarget main
+@expect-event stats_changed stats\r\ntarget stats
+@expect-event actions_changed [2]
 @expect args[0] => 1
 @expect $args[1] => 'test'
 @expect $xgt_location => 'target'
@@ -126,14 +126,14 @@ first = args[0]
 $second = $args[1]
 
 @exec gt 'test'
-@expect event main_changed main
-@expect event stats_changed stats
-@expect event actions_changed [1]
+@expect-event main_changed main
+@expect-event stats_changed stats
+@expect-event actions_changed [1]
 @expect $location => 'test'
 @exec GOSUB 'target', 1, 'test'
-@expect event main_changed main\r\ntarget main
-@expect event stats_changed stats\r\ntarget stats
-@expect event actions_changed [1; 2]
+@expect-event main_changed main\r\ntarget main
+@expect-event stats_changed stats\r\ntarget stats
+@expect-event actions_changed [1; 2]
 @expect first => 1
 @expect $second => 'test'
 @expect $gs_location => 'test'
@@ -155,14 +155,14 @@ first = args[0]
 $second = $args[1]
 
 @exec gt 'test'
-@expect event main_changed main
-@expect event stats_changed stats
-@expect event actions_changed [1]
+@expect-event main_changed main
+@expect-event stats_changed stats
+@expect-event actions_changed [1]
 @expect $location => 'test'
 @exec GS 'target', 1, 'test'
-@expect event main_changed main\r\ntarget main
-@expect event stats_changed stats\r\ntarget stats
-@expect event actions_changed [1; 2]
+@expect-event main_changed main\r\ntarget main
+@expect-event stats_changed stats\r\ntarget stats
+@expect-event actions_changed [1; 2]
 @expect first => 1
 @expect $second => 'test'
 @expect $gs_location => 'test'
@@ -182,13 +182,13 @@ first = args[0]
 $second = $args[1]
 
 @run
-@expect event main_changed main
-@expect event stats_changed stats
-@expect event actions_changed [1]
+@expect-event main_changed main
+@expect-event stats_changed stats
+@expect-event actions_changed [1]
 @exec func('target', 1, 'test')
-@expect event main_changed main\r\ntarget main
-@expect event stats_changed stats\r\ntarget stats
-@expect event actions_changed [1; 2]
+@expect-event main_changed main\r\ntarget main
+@expect-event stats_changed stats\r\ntarget stats
+@expect-event actions_changed [1; 2]
 @expect first => 1
 @expect $second => 'test'
 

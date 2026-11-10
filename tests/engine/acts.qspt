@@ -5,21 +5,21 @@
 @src
 SHOWACTS 0
 @run
-@expect event panel_visibility 4 0
+@expect-event panel_visibility 4 0
 @exec SHOWACTS 1
-@expect event panel_visibility 4 1
+@expect-event panel_visibility 4 1
 
 @test single line ACT
 @src
 act '1': p 1
 @run
-@expect event actions_changed [1]
+@expect-event actions_changed [1]
 
 @test single line ACT with image
 @src
 act '1', '1.png': p 1
 @run
-@expect event actions_changed [1|1.png]
+@expect-event actions_changed [1|1.png]
 
 @test multi line ACT
 @src
@@ -27,7 +27,7 @@ act '1':
   p 1
 end
 @run
-@expect event actions_changed [1]
+@expect-event actions_changed [1]
 
 @test multi line ACT with image
 @src
@@ -35,16 +35,16 @@ act '1', '1.png':
   p 1
 end
 @run
-@expect event actions_changed [1|1.png]
+@expect-event actions_changed [1|1.png]
 
 @test ACTs with same name are ignored
 @src
 act '1': p 1
 @run
-@expect event actions_changed [1]
+@expect-event actions_changed [1]
 @clear-events
 @exec act '1': p 1
-@expect no-event actions_changed
+@expect-no-event actions_changed
 
 @test executing action
 @src
@@ -52,25 +52,25 @@ act '1': p 'a'
 @run
 @select-act 0
 @exec-act
-@expect event stats_changed a
+@expect-event stats_changed a
 
 @test DELACT should delete action
 @src
 act '1': p 1
 @run
-@expect event actions_changed [1]
+@expect-event actions_changed [1]
 @clear-events
 @exec DELACT '1'
-@expect event actions_changed []
+@expect-event actions_changed []
 
 @test DEL ACT should delete action
 @src
 act '1': p 1
 @run
-@expect event actions_changed [1]
+@expect-event actions_changed [1]
 @clear-events
 @exec DEL ACT '1'
-@expect event actions_changed []
+@expect-event actions_changed []
 
 @test $CURACTS should return acts list as code
 @src
@@ -83,7 +83,7 @@ end
 p $CURACTS
 
 @run
-@expect event stats_changed ACT '1': P '1'\r\nACT '2':\r\nP '2'\r\nP '3'\r\nEND\r\n
+@expect-event stats_changed ACT '1': P '1'\r\nACT '2':\r\nP '2'\r\nP '3'\r\nEND\r\n
 
 @test actions can be restored from CURACTS
 @src
@@ -95,13 +95,13 @@ act '2':
 end
 $acts = $CURACTS
 @run
-@expect event actions_changed [1; 2]
+@expect-event actions_changed [1; 2]
 @clear-events
 @exec CLA
-@expect event actions_changed []
+@expect-event actions_changed []
 @clear-events
 @exec dynamic $acts
-@expect event actions_changed [1; 2]
+@expect-event actions_changed [1; 2]
 
 @test $SELACT should return currently selected action
 @src
@@ -115,19 +115,19 @@ act '1': p 1
 @src
 act '1': p 1
 @run
-@expect event actions_changed [1]
+@expect-event actions_changed [1]
 @clear-events
 @exec CLA
-@expect event actions_changed []
+@expect-event actions_changed []
 
 @test CLS should clear list of actions
 @src
 act '1': p 1
 @run
-@expect event actions_changed [1]
+@expect-event actions_changed [1]
 @clear-events
 @exec CLS
-@expect event actions_changed []
+@expect-event actions_changed []
 
 @test multi line act supports comments
 @src
@@ -150,4 +150,4 @@ end
         end
 
 @run
-@expect error COLONNOTFOUND (location 'test', line 2, local 2, action -1) ACT 'test'
+@expect-error COLONNOTFOUND (location 'test', line 2, local 2, action -1) ACT 'test'

@@ -362,8 +362,8 @@ end
 @select-act 0
 @exec-act
 @expect $last_loc_test1 => 'value 2'
-@expect event save_game test.sav
-@expect event save_cancelled
+@expect-event save_game test.sav
+@expect-event save_cancelled
 @expect $last_loc_test2 => ''
 @expect $glob_test1 => 'value'
 @expect $glob_test2 => 'value'
@@ -414,7 +414,7 @@ act '1': $a & $args[0]
 @exec gt 'test'
 @select-act 0
 @exec-act
-@expect event main_changed \r\nbb\r\n
+@expect-event main_changed \r\nbb\r\n
 
 @test local variables inside actions
 @src
@@ -430,15 +430,15 @@ end
 @run
 @select-act 0
 @exec-act
-@expect event main_changed lii\r\n
+@expect-event main_changed lii\r\n
 @select-act 1
 @exec-act
-@expect event main_changed lii\r\nii\r\n
+@expect-event main_changed lii\r\nii\r\n
 
 @test local variables available with flow stop in callbacks
 @watch-msg $i
 @src
 local $i="ii" & msg ''
 @run
-@expect event read $i => 'ii'
+@expect-event read $i => 'ii'
 @expect $i => ''

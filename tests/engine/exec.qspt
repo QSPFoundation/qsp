@@ -4,13 +4,13 @@
 @src
 exec('test')
 @run
-@expect event system_cmd test
+@expect-event system_cmd test
 
 @test should update ui on call
 @src
 *p 'before' & exec('test') & *p '-after'
 @run
-@expect events
+@expect-events
 main_changed before
 system_cmd test
 main_changed before-after

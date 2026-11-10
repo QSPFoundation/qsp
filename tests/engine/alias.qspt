@@ -401,7 +401,7 @@ gs 'f'
 alias u, w = 'a'
 --
 @run
-@expect error ARGSCOUNT
+@expect-error ARGSCOUNT
 
 @test ALIAS: an incorrect variable name
 @game
@@ -414,22 +414,22 @@ gs 'f'
 alias y = '1bad'
 --
 @run
-@expect error INCORRECTVARNAME
+@expect-error INCORRECTVARNAME
 
 @test ALIAS: indices are a syntax error
 @src
 alias y[1] = 'a'
 @run
-@expect error SYNTAX
+@expect-error SYNTAX
 
 @test ALIAS: compound operations are a syntax error
 @src
 alias y += 'a'
 @run
-@expect error SYNTAX
+@expect-error SYNTAX
 
 @test ALIAS: requires a value
 @src
 alias y
 @run
-@expect error SYNTAX
+@expect-error SYNTAX

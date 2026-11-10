@@ -464,14 +464,14 @@ $a, $b = func('other')
         menu 'a'
 @run
 // wasm: ['tuple','test'], see STR above
-@expect event menu [item 6; 6666|1.jpg; ['tuple', 'test']]
+@expect-event menu [item 6; 6666|1.jpg; ['tuple', 'test']]
 
 @test it errors out on more than 20 elements
 @src
 
       %a = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"]
 @run
-@expect error ARGSCOUNT (location 'test', line 2, local 2, action -1) %A = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"]
+@expect-error ARGSCOUNT (location 'test', line 2, local 2, action -1) %A = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"]
 
 @test can grow over 20 elements with concatenation
 @src

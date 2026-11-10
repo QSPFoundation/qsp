@@ -574,4 +574,4 @@ $res = $arr[1,3]
 
         SORTARR('$a')
 @run
-@expect error TYPEMISMATCH (location 'test', line 7, local 7, action -1) SORTARR('$a')
+@expect-error TYPEMISMATCH (location 'test', line 7, local 7, action -1) SORTARR('$a')

@@ -25,13 +25,13 @@ $s = $str(%t)
 @src
 %t = [a: 1, A: 2]
 @run
-@expect error DUPLICATEFIELD
+@expect-error DUPLICATEFIELD
 
 @test FIELDS: an empty name is an error
 @src
 %t = ['': 1]
 @run
-@expect error INCORRECTFIELDNAME
+@expect-error INCORRECTFIELDNAME
 
 // ------------------------------------------------------------
 // Reading
@@ -98,14 +98,14 @@ x = %t.name
 %t = [name: 'Bob']
 $n = %t.$name
 @run
-@expect error INCORRECTFIELDNAME
+@expect-error INCORRECTFIELDNAME
 
 @test FIELDS: a name starting with a digit is an error
 @src
 %t = [1, 2]
 x = t.1
 @run
-@expect error INCORRECTFIELDNAME
+@expect-error INCORRECTFIELDNAME
 
 @test FIELDS: nested fields
 @src
@@ -257,4 +257,4 @@ db.b += 1
 db.count = 1
 n = arrsize('db.count')
 @run
-@expect error INCORRECTVARNAME
+@expect-error INCORRECTVARNAME

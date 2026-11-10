@@ -1319,6 +1319,21 @@ static const char *command(const char *line, const char *name)
     return skipSpaces(line + len);
 }
 
+/* Parses a whole number: the rest of the text has to be empty, or separated with spaces if REST is given */
+static int parseInteger(const char *s, long *n, const char **rest)
+{
+    char *end;
+    if (!((*s >= '0' && *s <= '9') || ((*s == '-' || *s == '+') && s[1] >= '0' && s[1] <= '9'))) return 0;
+    *n = strtol(s, &end, 10);
+    if (rest)
+    {
+        if (*end && *end != ' ' && *end != '\t') return 0;
+        *rest = skipSpaces(end);
+        return 1;
+    }
+    return !*skipSpaces(end);
+}
+
 static void expectText(const char *what, QSPString actual, const char *expected)
 {
     StrBuf sb = {0};
@@ -1331,6 +1346,12 @@ static void expectText(const char *what, QSPString actual, const char *expected)
 static void expectList(const char *what, int isActions, const char *expected)
 {
     StrBuf sb = {0};
+    size_t len = strlen(expected);
+    if (len < 2 || expected[0] != '[' || expected[len - 1] != ']')
+    {
+        fail("%s: expected a list '[...]', got '%s'", what, expected);
+        return;
+    }
     listState(&sb, isActions);
     if (strcmp(sbStr(&sb), expected))
         fail("%s: expected %s, got %s", what, expected, sbStr(&sb));
@@ -1344,7 +1365,7 @@ static void expectValue(const char *arg)
     StrBuf expected = {0};
     if (!sep)
     {
-        fail("expected 'EXPR => VALUE'");
+        fail("expected '@expect EXPR => VALUE' (the other checks are '@expect-...' commands)");
         return;
     }
     literal = sep + 4;
@@ -1588,68 +1609,86 @@ static void runCommand(const char *line, char **block, int blockCount)
         QSPEnableDebugMode(atoi(arg) != 0);
     else if ((arg = command(line, "@clear-events")))
         clearEvents();
-    /* Expectations */
+    /* Expectations: "@expect" checks a value, the other checks have their own commands,
+       so a variable named like a check (count, main...) is just a variable */
     else if ((arg = command(line, "@expect")))
+        expectValue(arg);
+    else if ((arg = command(line, "@expect-main")))
+        expectText("main", QSPGetMainDesc(), arg);
+    else if ((arg = command(line, "@expect-stat")))
+        expectText("stat", QSPGetVarsDesc(), arg);
+    else if ((arg = command(line, "@expect-acts")))
+        expectList("actions", 1, arg);
+    else if ((arg = command(line, "@expect-objs")))
+        expectList("objects", 0, arg);
+    else if ((arg = command(line, "@expect-selact")) || (arg = command(line, "@expect-selobj")))
     {
-        const char *value;
-        if ((value = command(arg, "main")))
-            expectText("main", QSPGetMainDesc(), value);
-        else if ((value = command(arg, "stat")))
-            expectText("stat", QSPGetVarsDesc(), value);
-        else if ((value = command(arg, "acts")))
-            expectList("actions", 1, value);
-        else if ((value = command(arg, "objs")))
-            expectList("objects", 0, value);
-        else if ((value = command(arg, "selact")))
+        int isAction = !strncmp(line, "@expect-selact", 14);
+        long n;
+        if (!parseInteger(arg, &n, 0))
+            fail("expected '%s N'", isAction ? "@expect-selact" : "@expect-selobj");
+        else
         {
-            if (QSPGetSelActionIndex() != atoi(value))
-                fail("selected action: expected %d, got %d", atoi(value), QSPGetSelActionIndex());
+            int actual = (isAction ? QSPGetSelActionIndex() : QSPGetSelObjectIndex());
+            if (actual != n) fail("selected %s: expected %ld, got %d", isAction ? "action" : "object", n, actual);
         }
-        else if ((value = command(arg, "selobj")))
+    }
+    else if ((arg = command(line, "@expect-curloc")))
+    {
+        char *actual;
+        if (!evalExpr("$CURLOC", &actual))
+            fail("current location: evaluation failed with %s", actual);
+        else
         {
-            if (QSPGetSelObjectIndex() != atoi(value))
-                fail("selected object: expected %d, got %d", atoi(value), QSPGetSelObjectIndex());
+            StrBuf expected = {0};
+            QSP_CHAR *qValue = toQsp(arg);
+            formatString(&expected, QSPStringFromC(qValue));
+            if (strcmp(actual, sbStr(&expected)))
+                fail("current location: expected %s, got %s", sbStr(&expected), actual);
+            free(qValue);
+            free(expected.Data);
         }
-        else if ((value = command(arg, "curloc")))
+        free(actual);
+    }
+    else if ((arg = command(line, "@expect-error")))
+    {
+        if (!*arg)
+            fail("expected '@expect-error NAME'");
+        else
+            expectError(arg);
+    }
+    else if ((arg = command(line, "@expect-event")))
+    {
+        if (!*arg)
+            fail("expected '@expect-event TEXT'");
+        else if (!countEvents(arg, 1))
+            fail("expected event '%s'", arg);
+    }
+    else if ((arg = command(line, "@expect-no-event")))
+    {
+        if (!*arg)
+            fail("expected '@expect-no-event PREFIX'");
+        else if (countEvents(arg, 0))
+            fail("unexpected event '%s...'", arg);
+    }
+    else if ((arg = command(line, "@expect-count")))
+    {
+        long n;
+        const char *prefix;
+        if (!parseInteger(arg, &n, &prefix) || !*prefix)
+            fail("expected '@expect-count N PREFIX'");
+        else
         {
-            char *actual;
-            if (!evalExpr("$CURLOC", &actual))
-                fail("current location: evaluation failed with %s", actual);
-            else
-            {
-                StrBuf expected = {0};
-                QSP_CHAR *qValue = toQsp(value);
-                formatString(&expected, QSPStringFromC(qValue));
-                if (strcmp(actual, sbStr(&expected)))
-                    fail("current location: expected %s, got %s", sbStr(&expected), actual);
-                free(qValue);
-                free(expected.Data);
-            }
-            free(actual);
-        }
-        else if ((value = command(arg, "error")))
-            expectError(value);
-        else if ((value = command(arg, "event")))
-        {
-            if (!countEvents(value, 1)) fail("expected event '%s'", value);
-        }
-        else if ((value = command(arg, "no-event")))
-        {
-            if (countEvents(value, 0)) fail("unexpected event '%s...'", value);
-        }
-        else if ((value = command(arg, "count")))
-        {
-            /* @expect count N PREFIX */
-            char *end;
-            long n = strtol(value, &end, 10);
-            const char *prefix = skipSpaces(end);
             int actual = countEvents(prefix, 0);
             if (actual != n) fail("expected %ld events '%s...', got %d", n, prefix, actual);
         }
-        else if ((value = command(arg, "events")))
-            expectEvents(block, blockCount);
+    }
+    else if ((arg = command(line, "@expect-events")))
+    {
+        if (*arg)
+            fail("'@expect-events' takes the events as a block");
         else
-            expectValue(arg);
+            expectEvents(block, blockCount);
     }
     else if ((arg = command(line, "@skip")))
         T.IsSkipped = 1;
@@ -1660,10 +1699,8 @@ static void runCommand(const char *line, char **block, int blockCount)
 /* Commands that take the following lines (till the next @-line) as a block */
 static int isBlockCommand(const char *line)
 {
-    const char *arg = command(line, "@expect");
     return command(line, "@src") || command(line, "@game") || command(line, "@module") ||
-        command(line, "@desc") || command(line, "@action") ||
-        (arg && command(arg, "events"));
+        command(line, "@desc") || command(line, "@action") || command(line, "@expect-events");
 }
 
 /* ------------------------------------------------------------ */

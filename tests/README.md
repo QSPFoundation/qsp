@@ -82,7 +82,7 @@ cancelled by `$ONGSAVE` (it moved to another location) is recorded as the
 event `save_cancelled`.
 
 An error of the engine is recorded as the event `error NAME` and must be
-consumed with `@expect error`; an unconsumed error fails the test at the
+consumed with `@expect-error`; an unconsumed error fails the test at the
 next action or at the end of the test. `NAME` is the `QSP_ERR_*` name
 without the prefix.
 
@@ -91,14 +91,21 @@ without the prefix.
 | Command | Checks |
 |---|---|
 | `@expect EXPR => VALUE` | value of a QSP expression, see below |
-| `@expect main TEXT` / `@expect stat TEXT` | main / additional description (escaped) |
-| `@expect acts [a; b\|img]` / `@expect objs [...]` | current actions / objects; an object shows ` => TITLE` when its title differs from the name |
-| `@expect selact N` / `@expect selobj N` | selected action / object |
-| `@expect curloc NAME` | current location (`$CURLOC`) |
-| `@expect error NAME [(location 'L', line N, local N, action A) LINE]` | the pending error, by name or with its position: `line` is the top-level line, `local` the line of the actual code, `LINE` its text (a prefix of the description is enough) |
-| `@expect event TEXT` / `@expect no-event PREFIX` | an event was / no event starting with `PREFIX` was recorded |
-| `@expect count N PREFIX` | number of events starting with `PREFIX` |
-| `@expect events` *(block)* | the exact list of recorded events |
+| `@expect-main TEXT` / `@expect-stat TEXT` | main / additional description (escaped) |
+| `@expect-acts [a; b\|img]` / `@expect-objs [...]` | current actions / objects; an object shows ` => TITLE` when its title differs from the name |
+| `@expect-selact N` / `@expect-selobj N` | selected action / object |
+| `@expect-curloc NAME` | current location (`$CURLOC`) |
+| `@expect-error NAME [(location 'L', line N, local N, action A) LINE]` | the pending error, by name or with its position: `line` is the top-level line, `local` the line of the actual code, `LINE` its text (a prefix of the description is enough) |
+| `@expect-event TEXT` / `@expect-no-event PREFIX` | an event was / no event starting with `PREFIX` was recorded |
+| `@expect-count N PREFIX` | number of events starting with `PREFIX` |
+| `@expect-events` *(block)* | the exact list of recorded events |
+
+The arguments are checked strictly: a number has to be a whole integer,
+a list has to be in brackets, `@expect-event`, `@expect-no-event`,
+`@expect-error` and `@expect-count` need a non-empty text, and
+`@expect-events` takes no argument. A malformed check fails the test.
+`@expect` itself is always an expression check, so `@expect count => 2`
+reads the variable `count`.
 
 `@expect EXPR => VALUE` evaluates `QSPT_EXPECT_RESULT = (EXPR)` with
 `QSPExecString` and compares the stored value (then the variable is
