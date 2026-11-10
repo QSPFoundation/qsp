@@ -12,6 +12,7 @@ option(QSP_BUILD_TESTS "Build the test runner and register the tests with CTest"
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 include(FetchContent)
+include(CheckLibraryExists)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
@@ -112,6 +113,11 @@ if (WIN32)
 	target_compile_definitions(qsp PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 target_link_libraries(qsp PRIVATE oniguruma::onig)
+
+check_library_exists(m floor "" QSP_HAVE_LIBM)
+if (QSP_HAVE_LIBM)
+	target_link_libraries(qsp PRIVATE m)
+endif()
 
 if (BUILD_JAVA)
 	add_subdirectory(qsp/bindings/java)
