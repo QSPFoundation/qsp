@@ -78,7 +78,7 @@
     enum
     {
         QSP_TYPE_TERM = -1, /* not used for values */
-        QSP_TYPE_UNDEF = 0, /* undefined value acts as the empty value of the type it's used as */
+        QSP_TYPE_UNDEF = 0, /* undefined value acts as the empty value of any type */
         QSP_TYPE_TUPLE = 1,
         QSP_TYPE_NUM = 2,
         QSP_TYPE_BOOL = 3,
