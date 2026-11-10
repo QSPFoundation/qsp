@@ -65,14 +65,14 @@
 a = 2 & %a = ()
 @run
 @expect %a => []
-@expect #a => 0
+@expect a => []
 
 @test empty tuple with brackets
 @src
 a = 2 & %a = []
 @run
 @expect %a => []
-@expect #a => 0
+@expect a => []
 
 @test nested tuple with single item
 @src
@@ -132,7 +132,7 @@ a = 2 & %a = []
 @run
 @expect $b => 'a'
 @expect $c => 'c'
-@expect #d => 0
+@expect d => ?
 @expect $f => ''
 @expect %rest => []
 
@@ -404,7 +404,7 @@ res = isnum(['55a'])
         killvar 'b', [1,2]
         res = b[1, 2]
 @run
-@expect #res => 0
+@expect res => ?
 
 @test it should return tuple size
 @src
