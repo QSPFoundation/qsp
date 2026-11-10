@@ -11,14 +11,12 @@
 
 #include <limits.h>
 #include <stdarg.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "qsp_default.h"
 
-#define MAX_TEXT (64 * 1024)
 #define MAX_LIST_ITEMS 1000
 #define SAVE_BUF_SIZE (64 * 1024)
 #define RESULT_VAR "QSPT_EXPECT_RESULT"
@@ -631,9 +629,7 @@ static void formatVariant(StrBuf *sb, const QSPVariant *v);
 static void readVariable(StrBuf *sb, const char *name)
 {
     QSPVariant value, empty;
-    QSP_CHAR *qName = toQsp(*name == '$' || *name == '#' || *name == '%' ? name + 1 : name), *pos;
-    for (pos = qName; *pos; ++pos)
-        if (*pos >= 'a' && *pos <= 'z') *pos -= 'a' - 'A';
+    QSP_CHAR *qName = toQsp(*name == '$' || *name == '#' || *name == '%' ? name + 1 : name);
     QSPGetVarValue(QSPStringFromC(qName), 0, &value, 0);
     memset(&empty, 0, sizeof(empty));
     switch (*name)

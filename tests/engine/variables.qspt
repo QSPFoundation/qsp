@@ -442,3 +442,11 @@ local $i="ii" & msg ''
 @run
 @expect-event read $i => 'ii'
 @expect $i => ''
+
+// ------------------------------------------------------------
+// Not in qsp-wasm-engine
+
+@test QSPGetVarValue ignores the case of the name
+@watch-msg $myVar
+@exec $MYVAR = 'v' & msg ''
+@expect-event read $myVar => 'v'
