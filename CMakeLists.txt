@@ -143,8 +143,8 @@ install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/cmake"
 )
 
 if (QSP_BUILD_TESTS)
-	if (BUILD_JAVA)
-		message(FATAL_ERROR "The tests use the default binding, turn BUILD_JAVA off to build them")
+	if (BUILD_JAVA OR BUILD_WASM)
+		message(FATAL_ERROR "The tests use the default binding, turn BUILD_JAVA or BUILD_WASM off to build them")
 	endif()
 	enable_testing()
 	add_subdirectory(tests)
