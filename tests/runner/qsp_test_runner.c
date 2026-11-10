@@ -17,7 +17,6 @@
 
 #include "qsp_default.h"
 
-#define MAX_LINE 4096
 #define MAX_TEXT (64 * 1024)
 #define MAX_LIST_ITEMS 1000
 #define SAVE_BUF_SIZE (64 * 1024)
@@ -84,12 +83,21 @@ static void sbAdd(StrBuf *sb, const char *s)
 
 static void sbAddf(StrBuf *sb, const char *fmt, ...)
 {
-    char buf[MAX_LINE];
+    int len;
     va_list args;
     va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    len = vsnprintf(0, 0, fmt, args);
     va_end(args);
-    sbAdd(sb, buf);
+    if (len <= 0) return;
+    if (sb->Len + len + 1 > sb->Size)
+    {
+        sb->Size = (sb->Len + len + 1) * 2;
+        sb->Data = xrealloc(sb->Data, sb->Size);
+    }
+    va_start(args, fmt);
+    vsnprintf(sb->Data + sb->Len, len + 1, fmt, args);
+    va_end(args);
+    sb->Len += len;
 }
 
 static void sbClear(StrBuf *sb)
@@ -1661,29 +1669,51 @@ static int isBlockCommand(const char *line)
 /* ------------------------------------------------------------ */
 /* Reading scenario files */
 
-static char **readLines(const char *fileName, int *count)
+/* Reads the lines of any length without the line breaks, returns 0 if the file can't be read */
+static int readLines(const char *fileName, char ***lines, int *count)
 {
     FILE *f = fopen(fileName, "rb");
-    char **lines = 0, buf[MAX_LINE];
-    int n = 0;
+    StrBuf line = {0};
+    int ch, n = 0;
     if (!f) return 0;
-    while (fgets(buf, sizeof(buf), f))
+    *lines = 0;
+    do
     {
-        size_t len = strlen(buf);
-        while (len && (buf[len - 1] == '\n' || buf[len - 1] == '\r')) buf[--len] = 0;
-        lines = xrealloc(lines, (n + 1) * sizeof(char *));
-        lines[n++] = xstrdup(buf);
-    }
+        ch = getc(f);
+        if (ch == '\n' || (ch == EOF && line.Len))
+        {
+            while (line.Len && line.Data[line.Len - 1] == '\r') line.Data[--line.Len] = 0;
+            *lines = xrealloc(*lines, (n + 1) * sizeof(char *));
+            (*lines)[n++] = sbTake(&line);
+        }
+        else if (ch != EOF)
+        {
+            char c = (char)ch;
+            sbAddN(&line, &c, 1);
+        }
+    } while (ch != EOF);
+    free(line.Data);
     fclose(f);
     *count = n;
-    return lines;
+    return 1;
+}
+
+static void formatError(const char *fileName, int lineNum, const char *message, const char *line)
+{
+    if (T.TestName && !T.IsSkipped && !T.IsFailed)
+        fail("%s: %s", message, line);
+    else
+    {
+        fprintf(stderr, "%s:%d: %s: %s\n", fileName, lineNum, message, line);
+        if (T.TestName) T.IsFailed = 1;
+    }
 }
 
 static int runFile(const char *fileName)
 {
-    int count, i, j;
-    char **lines = readLines(fileName, &count);
-    if (!lines)
+    int count, i, j, isOk = 1;
+    char **lines;
+    if (!readLines(fileName, &lines, &count))
     {
         fprintf(stderr, "can't read %s\n", fileName);
         return 0;
@@ -1696,8 +1726,9 @@ static int runFile(const char *fileName)
         if (!line[0] || (line[0] == '/' && line[1] == '/')) continue;
         if (line[0] != '@')
         {
-            fprintf(stderr, "%s:%d: unexpected line outside of a block: %s\n", fileName, i + 1, line);
-            return 0;
+            formatError(fileName, i + 1, "unexpected line outside of a block", line);
+            isOk = 0;
+            break;
         }
         if ((arg = command(line, "@test")))
         {
@@ -1706,8 +1737,9 @@ static int runFile(const char *fileName)
         }
         if (!T.TestName)
         {
-            fprintf(stderr, "%s:%d: command before @test\n", fileName, i + 1);
-            return 0;
+            formatError(fileName, i + 1, "command before @test", line);
+            isOk = 0;
+            break;
         }
         if (isBlockCommand(line))
         {
@@ -1732,7 +1764,7 @@ static int runFile(const char *fileName)
     finishTest();
     for (i = 0; i < count; ++i) free(lines[i]);
     free(lines);
-    return 1;
+    return isOk;
 }
 
 int main(int argc, char **argv)
