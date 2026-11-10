@@ -1,10 +1,10 @@
 // Ported from qsp-wasm-engine tests/engine/variables.test.ts
-// readVariable('x') of qsp-wasm-engine reads the numeric view of the variable, so a missing value
-// is written here as "#x => 0"; a name without a prefix checks the exact value ("x => ?")
+// readVariable('x') of qsp-wasm-engine reads the value as it is (c0c49a6), so a missing value is
+// written here as "x => ?"; '#x' reads the numeric view ("#x => 0")
 
-@test default number value
-@expect #not_defined => 0
+@test default value without type prefix
 @expect not_defined => ?
+@expect #not_defined => 0
 
 @test default string value
 @expect $not_defined => ''
@@ -37,9 +37,8 @@ money = 100
 @src
 money[2] = 100
 @run
-@expect #money[0] => 0
-@expect #money[1] => 0
 @expect money[0] => ?
+@expect money[1] => ?
 @expect money[2] => 100
 
 @test assignment to array item by string index
@@ -91,7 +90,7 @@ a, $b, $c, d, %e = 3, 'test'
 @expect a => 3
 @expect $b => 'test'
 @expect $c => ''
-@expect #d => 0
+@expect d => ?
 @expect %e => []
 
 @test local without assignment
@@ -104,9 +103,9 @@ if 1:
 end
 a_old, $b_old, c_old = a, $b, c
 @run
-@expect #a_new => 0
+@expect a_new => ?
 @expect $b_new => ''
-@expect #c_new => 0
+@expect c_new => ?
 @expect a_old => 1
 @expect $b_old => 'old'
 @expect c_old => 2
@@ -143,7 +142,7 @@ a_old, $b_old, $c_old, d_old = a, $b, $c, d
 @expect a_new => 3
 @expect $b_new => 'test'
 @expect $c_new => ''
-@expect #d_new => 0
+@expect d_new => ?
 @expect a_old => 1
 @expect $b_old => 'old'
 @expect $c_old => 'oldest'
@@ -178,7 +177,7 @@ new_num, $new_str = a, $a
 local $a, a, $A = 'test', 3, 'new'
 new_num, $new_str = a, $a
 @run
-@expect #new_num => 0
+@expect new_num => 'new'
 @expect $new_str => 'new'
 
 @test multi assignment with the same array
@@ -198,9 +197,42 @@ if 1:
   killvar
 end
 @run
-@expect #a => 0
+@expect a => ?
 @expect $b => ''
-@expect #c => 0
+@expect c => ?
+
+// wasm: the variable is $str here & in the next test, an expression reads $STR as the function
+@test variable without type prefix keeps the type of assigned value
+@src
+a = 'text' & $type = arrtype('a') & $s = a
+@run
+@exec a = 5 & $type2 = arrtype('a')
+@expect $type => '$'
+@expect $s => 'text'
+@expect $type2 => '#'
+
+@test type prefix on read converts value of another type to empty value
+@src
+a = 5 & $s = $a & %tuple = %a & $b = 'text' & num = #b
+@run
+@expect $s => ''
+@expect %tuple => []
+@expect num => 0
+
+@test killvar without arguments keeps local variables
+@src
+
+a = 1 & $b = 'test'
+if 1:
+  local a, $b = 5, 'local'
+  killvar
+  local_a = a & $local_b = $b
+end
+@run
+@expect local_a => 5
+@expect $local_b => 'local'
+@expect a => ?
+@expect $b => ''
 
 @test variable swap
 @src
