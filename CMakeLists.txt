@@ -11,6 +11,7 @@ option(USE_INSTALLED_ONIGURUMA "Use system-wide oniguruma library instead of bun
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 include(FetchContent)
+include(CheckLibraryExists)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
