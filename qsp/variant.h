@@ -119,6 +119,9 @@
         case QSP_TYPE_LOCREF:
             QSP_PINDEX(dest) = QSP_PINDEX(src);
             break;
+        default:
+            qspInitVariant(dest, src->Type); /* shouldn't happen */
+            break;
         }
     }
 

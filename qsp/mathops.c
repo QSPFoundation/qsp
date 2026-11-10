@@ -1087,7 +1087,8 @@ INLINE void qspConvertLiteralArgs(QSPMathExpression *expression)
                 arg = expression->CompItems + argIndex;
                 if (arg->OpCode == QSP_OP_VALUE)
                     qspConvertLiteralTo(expression->Values + arg->ValueIndex, argsTypes[i]);
-                argIndex = qspSkipMathValue(expression, argIndex);
+                if (i > 0)
+                    argIndex = qspSkipMathValue(expression, argIndex);
             }
         }
     }
@@ -1672,6 +1673,9 @@ INLINE void qspFunctionLen(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPV
     case QSP_TYPE_STR:
         QSP_PNUM(res) = qspStrLen(QSP_STR(args[0]));
         break;
+    default:
+        qspSetError(QSP_ERR_INTERNAL);
+        return;
     }
 }
 
@@ -1691,6 +1695,9 @@ INLINE void qspFunctionIsNum(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QS
     case QSP_TYPE_STR:
         QSP_PNUM(res) = QSP_TOBOOL(qspIsStrNumber(QSP_STR(args[0])));
         break;
+    default:
+        qspSetError(QSP_ERR_INTERNAL);
+        return;
     }
 }
 
@@ -1827,6 +1834,9 @@ INLINE void qspFunctionArrType(QSPVariant *args, QSP_TINYINT count, QSPVariant *
     case QSP_TYPE_STR:
         typePrefix = QSP_STATIC_STR(QSP_STRTYPE);
         break;
+    default:
+        qspSetError(QSP_ERR_INTERNAL);
+        return;
     }
     QSP_PSTR(res) = qspCopyToNewText(typePrefix);
 }

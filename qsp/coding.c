@@ -423,6 +423,8 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
         if (ind >= strsCount) return QSP_FALSE;
         QSP_PNUM(val) = qspReadEncodedIntVal(strs[ind++], isUCS2);
         break;
+    default:
+        return QSP_FALSE;
     }
     val->Type = (QSP_TINYINT)type;
     *curIndex = ind;

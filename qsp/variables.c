@@ -1673,6 +1673,9 @@ INLINE void qspSetTargetsValues(QSPCachedAssignment *assignment, QSPVariant *val
                 return;
         }
         break;
+    default:
+        qspSetError(QSP_ERR_INTERNAL);
+        return;
     }
 }
 
