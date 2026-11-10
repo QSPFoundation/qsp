@@ -9,6 +9,7 @@
  * Ported from the runner of qsp-legacy and adapted to the 5.9 API.
  */
 
+#include <limits.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -452,7 +453,8 @@ static struct
     int MenuRepliesCount;
     int IsPlayReplies[64];
     int IsPlayRepliesCount;
-    int MsCount;
+    long Clock; /* the time of the host in milliseconds, set by @clock */
+    long ClockReported; /* the time at the previous call of the callback */
     char **MsgWatches; /* variables read while the MSG callback runs */
     int MsgWatchesCount;
 
@@ -754,8 +756,11 @@ static void cbSetTimer(int msecs)
 
 static int cbGetMsCount(void)
 {
-    /* Not logged: the engine asks for the time all the time */
-    return T.MsCount;
+    /* Not logged: the engine asks for the time all the time.
+       The engine sums the results, so the callback returns the time passed since its previous call */
+    long passed = T.Clock - T.ClockReported;
+    T.ClockReported = T.Clock;
+    return (int)passed;
 }
 
 static void loadGame(Game *game, QSP_BOOL isNewGame);
@@ -1249,7 +1254,7 @@ static void resetEngine(void)
     freeStrings(&T.MsgWatches, &T.MsgWatchesCount);
     T.MenuRepliesCount = 0;
     T.IsPlayRepliesCount = 0;
-    T.MsCount = 0;
+    T.Clock = T.ClockReported = 0;
     for (i = 0; i < T.SavesCount; ++i)
     {
         free(T.Saves[i].Name);
@@ -1566,10 +1571,17 @@ static void runCommand(const char *line, char **block, int blockCount)
             else
                 T.IsPlayReplies[T.IsPlayRepliesCount++] = atoi(value);
         }
-        else if ((value = command(arg, "mscount")))
-            T.MsCount = atoi(value);
         else
             fail("unknown reply '%s'", arg);
+    }
+    else if ((arg = command(line, "@clock")))
+    {
+        long now;
+        if (!parseInteger(arg, &now, 0) || now < T.ClockReported || now - T.ClockReported > INT_MAX)
+            fail("expected '@clock N': the time in milliseconds, not before %ld and at most INT_MAX after it",
+                T.ClockReported);
+        else
+            T.Clock = now;
     }
     /* Other actions */
     else if ((arg = command(line, "@set-input")))

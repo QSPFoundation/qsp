@@ -57,7 +57,7 @@ action of the test.
 | `@reply version TEXT` | queues a reply to the version callback (`$QSPVER`) |
 | `@reply menu N` | queues the item index chosen in `MENU` (`-1` closes the menu) |
 | `@reply isplay 0/1` | queues a reply to the "is playing" callback |
-| `@reply mscount N` | value returned by `MSECSCOUNT` |
+| `@clock N` | sets the clock of the host to `N` milliseconds; the clock starts at 0 with the test and can't go back. The callback returns the time passed since its previous call, so `MSECSCOUNT` gives the time since the start of the test or since the last restart of the game |
 | `@watch-msg NAME` | every `MSG` callback also records the event `read NAME => VALUE`, the variable is read with `QSPGetVarValue` while the callback runs (`$NAME`, `#NAME`, `%NAME` give the typed view) |
 
 ### Actions

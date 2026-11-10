@@ -15,15 +15,36 @@ pl 'before wait' & WAIT 1000 & p 'after wait'
 @expect-event wait 1000
 @expect-event stats_changed before wait\r\nafter wait
 
-// The host reports the time passed since the previous call
+// @clock sets the time of the host, it starts at 0 with the test like the time of the engine
 @test MSECSCOUNT should return msec passed from game start
 @src
 res = MSECSCOUNT
 @run
 @expect res => 0
-@reply mscount 2000
+@clock 2000
 @exec res = MSECSCOUNT
 @expect res => 2000
+
+@test MSECSCOUNT: the time doesn't go on between two reads with the same clock
+@clock 2000
+@exec first = MSECSCOUNT & second = MSECSCOUNT
+@expect first => 2000
+@expect second => 2000
+@clock 4500
+@exec third = MSECSCOUNT
+@expect third => 4500
+
+@test MSECSCOUNT: the restart counts from zero
+@src
+res = MSECSCOUNT
+@run
+@clock 3000
+@exec res = MSECSCOUNT
+@expect res => 3000
+@restart
+@clock 3700
+@exec res = MSECSCOUNT
+@expect res => 700
 
 @test SETTIMER should change counter frequency
 @src
