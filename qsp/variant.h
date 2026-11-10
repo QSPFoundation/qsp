@@ -17,6 +17,7 @@
     void qspAppendVariantToString(QSPVariant *val, QSPBufString *res);
     QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid);
     QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type);
+    void qspConvertLiteralTo(QSPVariant *val, QSP_TINYINT type);
     int qspVariantsCompare(QSPVariant *first, QSPVariant *second);
     QSP_BOOL qspVariantsEqual(QSPVariant *first, QSPVariant *second);
     QSP_BOOL qspVariantKeysEqual(QSPVariant *first, QSPVariant *second);
@@ -83,6 +84,14 @@
         return ret;
     }
 
+    INLINE QSPVariant qspLocRefVariant(int nameIndex)
+    {
+        QSPVariant ret;
+        ret.Type = QSP_TYPE_LOCREF;
+        QSP_INDEX(ret) = nameIndex;
+        return ret;
+    }
+
     INLINE QSPVariant qspTupleVariant(QSPTuple value)
     {
         QSPVariant ret;
@@ -106,6 +115,9 @@
             break;
         case QSP_TYPE_STR:
             QSP_PSTR(dest) = qspCopyToNewText(QSP_PSTR(src));
+            break;
+        case QSP_TYPE_LOCREF:
+            QSP_PINDEX(dest) = QSP_PINDEX(src);
             break;
         }
     }

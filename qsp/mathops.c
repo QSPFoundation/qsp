@@ -51,6 +51,7 @@ INLINE QSP_BOOL qspAppendTupleToCompiled(QSPMathExpression *expression, QSPMathL
 INLINE QSP_TINYINT qspGetFieldsOpCode(QSPMathExpression *expression, int groupEnd, QSP_TINYINT *varType);
 INLINE QSP_BOOL qspAppendFieldsToCompiled(QSPMathExpression *expression, QSP_TINYINT opCode, QSPField *fields, QSPString *dynamicNames, int count);
 INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSPString s);
+INLINE void qspConvertLiteralArgs(QSPMathExpression *expression);
 INLINE int qspSkipMathValue(QSPMathExpression *expression, int itemIndex);
 INLINE QSP_BOOL qspCalculateArgumentValue(QSPMathExpression *expression, int itemIndex, QSP_TINYINT type, QSPVariant *res);
 INLINE QSP_BOOL qspCalculateFormatValue(QSPMathExpression *expression, int *argIndices, QSP_TINYINT argsCount, QSPVariant *res);
@@ -91,11 +92,12 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
     qspOps[opCode].ResType = resType;
     qspOps[opCode].MinArgsCount = minArgs;
     qspOps[opCode].MaxArgsCount = (QSP_TINYINT)maxArgs;
+    qspOps[opCode].IsTyped = QSP_FALSE;
     if (maxArgs > 0)
     {
         int i;
         va_list marker;
-        QSP_BOOL isFinished = QSP_FALSE;
+        QSP_BOOL isTyped = QSP_FALSE, isFinished = QSP_FALSE;
         QSP_TINYINT lastType = QSP_TYPE_UNDEF;
         va_start(marker, maxArgs);
         for (i = 0; i < maxArgs; ++i)
@@ -109,8 +111,10 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
                     lastType = curType;
             }
             qspOps[opCode].ArgsTypes[i] = lastType;
+            isTyped = isTyped || QSP_ISDEF(lastType);
         }
         va_end(marker);
+        qspOps[opCode].IsTyped = isTyped;
     }
 }
 
@@ -257,12 +261,12 @@ void qspInitMath(void)
     qspAddOperation(QSP_OP_STRFIND, 30, qspFunctionStrFind, QSP_TYPE_STR, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
     qspAddOperation(QSP_OP_STRPOS, 30, qspFunctionStrPos, QSP_TYPE_NUM, 2, 3, QSP_TYPE_STR, QSP_TYPE_STR, QSP_TYPE_NUM);
 
-    qspAddOperation(QSP_OP_FUNC, 30, qspFunctionFunc, QSP_TYPE_UNDEF, 1, QSP_MAXMATHOPARGS, QSP_TYPE_STR, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
+    qspAddOperation(QSP_OP_FUNC, 30, qspFunctionFunc, QSP_TYPE_UNDEF, 1, QSP_MAXMATHOPARGS, QSP_TYPE_LOCREF, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
     qspAddOperation(QSP_OP_DYNEVAL, 30, qspFunctionDynEval, QSP_TYPE_UNDEF, 1, QSP_MAXMATHOPARGS, QSP_TYPE_CODE, QSP_TYPE_UNDEF, QSP_TYPE_TERM);
 
-    qspAddOperation(QSP_OP_LOC, 11, 0, QSP_TYPE_BOOL, 1, 1, QSP_TYPE_STR);
+    qspAddOperation(QSP_OP_LOC, 11, 0, QSP_TYPE_BOOL, 1, 1, QSP_TYPE_LOCREF);
     qspAddOperation(QSP_OP_CURLOC, 30, 0, QSP_TYPE_STR, 0, 0);
-    qspAddOperation(QSP_OP_DESC, 30, qspFunctionDesc, QSP_TYPE_STR, 1, 1, QSP_TYPE_STR);
+    qspAddOperation(QSP_OP_DESC, 30, qspFunctionDesc, QSP_TYPE_STR, 1, 1, QSP_TYPE_LOCREF);
 
     qspAddOperation(QSP_OP_MAINTEXT, 30, 0, QSP_TYPE_STR, 0, 0);
     qspAddOperation(QSP_OP_STATTEXT, 30, 0, QSP_TYPE_STR, 0, 0);
@@ -904,7 +908,7 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                 }
                 qspSkipSpaces(&s);
                 /* Add the loc name */
-                v = qspStrVariant(qspCopyToNewText(name), QSP_TYPE_STR);
+                v = qspLocRefVariant(qspGetLocNameIndex(name, QSP_TRUE));
                 if (!qspAppendValueToCompiled(expression, QSP_OP_VALUE, v))
                 {
                     qspFreeVariant(&v);
@@ -1065,6 +1069,30 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
     return QSP_FALSE;
 }
 
+INLINE void qspConvertLiteralArgs(QSPMathExpression *expression)
+{
+    /* Convert literal arguments to the required types in advance */
+    int i, itemIndex, argIndex;
+    QSP_TINYINT itemOpCode, *argsTypes;
+    QSPMathCompiledOp *arg, *item = expression->CompItems;
+    for (itemIndex = 0; itemIndex < expression->ItemsCount; ++itemIndex, ++item)
+    {
+        itemOpCode = item->OpCode;
+        if (qspOps[itemOpCode].IsTyped)
+        {
+            argsTypes = qspOps[itemOpCode].ArgsTypes;
+            argIndex = itemIndex - 1; /* the last argument */
+            for (i = item->ArgsCount - 1; i >= 0; --i)
+            {
+                arg = expression->CompItems + argIndex;
+                if (arg->OpCode == QSP_OP_VALUE)
+                    qspConvertLiteralTo(expression->Values + arg->ValueIndex, argsTypes[i]);
+                argIndex = qspSkipMathValue(expression, argIndex);
+            }
+        }
+    }
+}
+
 QSPMathExpression *qspCompileMathExpression(QSPString s)
 {
     QSPMathExpression *expression = (QSPMathExpression *)malloc(sizeof(QSPMathExpression));
@@ -1079,6 +1107,7 @@ QSPMathExpression *qspCompileMathExpression(QSPString s)
         qspFreeMathExpression(expression);
         return 0;
     }
+    qspConvertLiteralArgs(expression);
     /* Release the spare capacity */
     if (expression->ItemsCount < expression->ItemsCapacity)
     {
@@ -1533,7 +1562,7 @@ QSP_BOOL qspCalculateValue(QSPMathExpression *expression, int itemIndex, QSPVari
         break;
     /* Embedded functions -------------------------------------------------------------- */
     case QSP_OP_LOC:
-        QSP_PNUM(res) = QSP_TOBOOL(qspLocByName(QSP_STR(args[0])) != 0);
+        QSP_PNUM(res) = QSP_TOBOOL(qspGetLoc(QSP_INDEX(args[0])) != 0);
         break;
     case QSP_OP_OBJ:
         QSP_PNUM(res) = QSP_TOBOOL(qspObjsCountByName(QSP_STR(args[0])) > 0);
@@ -1935,7 +1964,7 @@ INLINE void qspFunctionRGB(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 
 INLINE void qspFunctionDesc(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
-    QSPLocation *loc = qspLocByName(QSP_STR(args[0]));
+    QSPLocation *loc = qspGetLoc(QSP_INDEX(args[0]));
     if (!loc)
     {
         qspSetError(QSP_ERR_LOCNOTFOUND);
@@ -1963,7 +1992,7 @@ INLINE void qspFunctionIsPlay(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), Q
 
 INLINE void qspFunctionFunc(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    qspExecLocByNameWithArgs(QSP_STR(args[0]), args + 1, count - 1, QSP_TRUE, res);
+    qspExecLocWithArgs(QSP_INDEX(args[0]), args + 1, count - 1, QSP_TRUE, res);
 }
 
 INLINE void qspFunctionDynEval(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)

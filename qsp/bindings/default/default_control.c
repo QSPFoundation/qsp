@@ -77,14 +77,14 @@ int QSPGetLocationNames(QSPString *locNames, int namesBufSize)
 /* Get base description of the specified location */
 QSPString QSPGetLocationDesc(QSPString locName)
 {
-    QSPLocation *loc = qspLocByName(locName);
+    QSPLocation *loc = qspGetLocByName(locName);
     if (loc) return loc->Desc;
     return qspNullString;
 }
 /* Get base actions of the specified location */
 int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBufSize)
 {
-    QSPLocation *loc = qspLocByName(locName);
+    QSPLocation *loc = qspGetLocByName(locName);
     if (loc)
     {
         int i;
@@ -100,7 +100,7 @@ int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBu
 /* Get code of the base action of the specified location */
 int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPLineInfo *lines, int linesBufSize)
 {
-    QSPLocation *loc = qspLocByName(locName);
+    QSPLocation *loc = qspGetLocByName(locName);
     if (loc && actionIndex >= 0 && actionIndex < loc->ActionsCount)
     {
         QSPCodeBlock *code = loc->Actions[actionIndex].OnPressCode;
@@ -111,7 +111,7 @@ int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPLineInfo *li
 /* Get code of the specified location */
 int QSPGetLocationCode(QSPString locName, QSPLineInfo *lines, int linesBufSize)
 {
-    QSPLocation *loc = qspLocByName(locName);
+    QSPLocation *loc = qspGetLocByName(locName);
     if (loc)
     {
         QSPCodeBlock *code = loc->OnVisitCode;

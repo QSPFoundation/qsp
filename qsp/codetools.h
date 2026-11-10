@@ -25,7 +25,8 @@
         QSP_ARG_COMPILED, /* the compiled expression */
         QSP_ARG_NUMBER,
         QSP_ARG_STRING, /* the text between the quotes, without doubled quotes & subexpressions */
-        QSP_ARG_CODE /* the text between the brackets */
+        QSP_ARG_CODE, /* the text between the brackets */
+        QSP_ARG_LOCREF /* location name index */
     };
 
     typedef struct
@@ -35,6 +36,7 @@
             QSPString Text; /* QSP_ARG_EMPTY, QSP_ARG_EXPRESSION, QSP_ARG_STRING, QSP_ARG_CODE */
             QSPMathExpression *Expression; /* QSP_ARG_COMPILED */
             QSP_BIGINT Number; /* QSP_ARG_NUMBER */
+            int Index; /* QSP_ARG_LOCREF */
         } Data;
         QSP_TINYINT Type; /* selects the member of Data */
     } QSPCachedArg;

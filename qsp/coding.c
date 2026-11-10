@@ -383,7 +383,7 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
     int type, ind = *curIndex;
     if (ind >= strsCount) return QSP_FALSE;
     type = qspReadEncodedIntVal(strs[ind++], isUCS2);
-    if (type < 0 || type >= QSP_TYPE_DEFINED_TYPES) return QSP_FALSE; /* unsupported value type */
+    if (!QSP_ISVALUE(type)) return QSP_FALSE; /* unsupported value type */
     switch (QSP_BASETYPE(type))
     {
     case QSP_TYPE_UNDEF:

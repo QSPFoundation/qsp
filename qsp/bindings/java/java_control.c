@@ -153,7 +153,7 @@ QSPVariant qspFromJavaVariant(JNIEnv *env, jobject variant)
 {
     QSPVariant res;
     jint type = (variant ? (*env)->GetIntField(env, variant, qspVariantTypeField) : QSP_TYPE_UNDEF);
-    if (type >= 0 && type < QSP_TYPE_DEFINED_TYPES)
+    if (QSP_ISVALUE(type))
         qspInitVariant(&res, (QSP_TINYINT)type);
     else
         qspInitVariant(&res, QSP_TYPE_UNDEF);
