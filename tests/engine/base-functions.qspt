@@ -17,6 +17,13 @@ $ver = $QSPVER('platform')
 @expect event version platform
 @expect $ver => 'qspider'
 
+@test $QSPVER without an answer returns the version of the engine
+@src
+$ver = $QSPVER
+@run
+@expect event version
+@expect $ver => '5.9.6'
+
 @test $CURLOC
 @src
 
@@ -83,11 +90,11 @@ $b[0] = 'dd' & b[1] = 77 & $b[2] = 'yy' & b[3] = 86 & $b[4] = ' ' & res = MAX('#
 @run
 @expect res => 86
 
-@test MAX: mixed array without a type prefix is a type mismatch
+@test MAX: mixed array without type prefix shows error
 @src
-$b[0] = 'dd' & b[1] = 77 & res = MAX('b')
+$b[0] = 'a' & b[1] = 1 & res = MAX('b')
 @run
-@expect error TYPEMISMATCH
+@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) $B[0] = 'a' & B[1] = 1 & RES = MAX('b')
 
 @test MAX: ignores numbers when search for string
 @src
@@ -157,6 +164,12 @@ $b[0] = 'a' & b[1] = 86 & $b[2] = 'kk' & b[3] = 77 & $b[4] = '' & res = MIN('#b'
 @run
 @expect res => 77
 
+@test MIN: mixed array without type prefix shows error
+@src
+$b[0] = 'a' & b[1] = 1 & res = MIN('b')
+@run
+@expect error TYPEMISMATCH (location 'test', line 1, local 1, action -1) $B[0] = 'a' & B[1] = 1 & RES = MIN('b')
+
 @test MIN: ignores numbers when search for string
 @src
 $b[0] = '33' & b[1] = 11 & $b[2] = '44' & b[3] = 14 & $b[4] = '22' & $res = MIN('$b')
@@ -220,3 +233,15 @@ if i < 200: jump 'l'
 @run
 @expect lo => 1
 @expect hi => 2
+
+@test RAND with mean stays within range
+@src
+i = 0 & lo = 100 & hi = -100
+:l
+r = RAND(1, 10, 5)
+if r < lo: lo = r
+if r > hi: hi = r
+i += 1
+if i < 200: jump 'l'
+@run
+@expect lo >= 1 and hi <= 10 => 1
