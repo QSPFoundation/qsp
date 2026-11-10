@@ -77,14 +77,14 @@ int QSPGetLocationNames(QSPString *locNames, int namesBufSize)
 /* Get base description of the specified location */
 QSPString QSPGetLocationDesc(QSPString locName)
 {
-    QSPLocation *loc = qspLocByName(locName);
+    QSPLocation *loc = qspGetLocByName(locName);
     if (loc) return loc->Desc;
     return qspNullString;
 }
 /* Get base actions of the specified location */
 int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBufSize)
 {
-    QSPLocation *loc = qspLocByName(locName);
+    QSPLocation *loc = qspGetLocByName(locName);
     if (loc)
     {
         int i;
@@ -100,7 +100,7 @@ int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBu
 /* Get code of the base action of the specified location */
 int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPLineInfo *lines, int linesBufSize)
 {
-    QSPLocation *loc = qspLocByName(locName);
+    QSPLocation *loc = qspGetLocByName(locName);
     if (loc && actionIndex >= 0 && actionIndex < loc->ActionsCount)
     {
         QSPCodeBlock *code = loc->Actions[actionIndex].OnPressCode;
@@ -111,7 +111,7 @@ int QSPGetLocationActionCode(QSPString locName, int actionIndex, QSPLineInfo *li
 /* Get code of the specified location */
 int QSPGetLocationCode(QSPString locName, QSPLineInfo *lines, int linesBufSize)
 {
-    QSPLocation *loc = qspLocByName(locName);
+    QSPLocation *loc = qspGetLocByName(locName);
     if (loc)
     {
         QSPCodeBlock *code = loc->OnVisitCode;
@@ -261,7 +261,7 @@ void QSPShowWindow(int type, QSP_BOOL toShow)
 /* Get the number of items in an array */
 QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 {
-    QSPVarData *varData = qspVarDataByName(name);
+    QSPVarData *varData = qspVarDataByName(name, QSP_REF_GETSILENTLY, 0);
     if (varData)
     {
         *count = varData->ValsCount;
@@ -273,7 +273,7 @@ QSP_BOOL QSPGetVarValuesCount(QSPString name, int *count)
 /* Get index of an item by key */
 QSP_BOOL QSPGetVarIndexByKey(QSPString name, QSPVariant key, int *ind)
 {
-    QSPVarData *varData = qspVarDataByName(name);
+    QSPVarData *varData = qspVarDataByName(name, QSP_REF_GETSILENTLY, 0);
     if (varData)
     {
         int arrIndex = qspGetVarItemIndex(varData, key, QSP_FALSE);
@@ -289,7 +289,7 @@ QSP_BOOL QSPGetVarIndexByKey(QSPString name, QSPVariant key, int *ind)
 /* Get value & key of the specified array item, both are optional */
 QSP_BOOL QSPGetVarValue(QSPString name, int ind, QSPVariant *value, QSPVariant *key)
 {
-    QSPVarData *varData = qspVarDataByName(name);
+    QSPVarData *varData = qspVarDataByName(name, QSP_REF_GETSILENTLY, 0);
     if (varData && ind >= 0 && ind < varData->ValsCount)
     {
         if (value) *value = varData->Values[ind];

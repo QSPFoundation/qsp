@@ -7,24 +7,25 @@
 
 #include "variant.h"
 #include "errors.h"
+#include "locations.h"
 #include "mathops.h"
 #include "text.h"
 #include "tuples.h"
+#include "variables.h"
 
-static const QSP_BOOL qspTypeConversionTable[QSP_TYPE_DEFINED_TYPES][QSP_TYPE_DEFINED_TYPES] =
+static const QSP_BOOL qspTypeConversionTable[QSP_TYPE_DEFINED_VALUES][QSP_TYPE_DEFINED_TYPES] =
 {
-    /*             UNDEF      TUPLE     NUMBER     BOOL      STRING     CODE      VARREF */
-    /* UNDEF */  { QSP_FALSE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
-    /* TUPLE */  { QSP_FALSE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
-    /* NUMBER */ { QSP_FALSE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
-    /* BOOL */   { QSP_FALSE, QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
-    /* STRING */ { QSP_FALSE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_TRUE },
-    /* CODE */   { QSP_FALSE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE },
-    /* VARREF */ { QSP_FALSE, QSP_TRUE, QSP_TRUE,  QSP_TRUE, QSP_FALSE, QSP_TRUE, QSP_TRUE },
+    /*                UNDEF      TUPLE      NUMBER     BOOL       STRING     CODE       VARREF     LOCREF */
+    /* UNDEF */  { QSP_FALSE, QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_FALSE, QSP_TRUE },
+    /* TUPLE */  { QSP_FALSE, QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_FALSE, QSP_TRUE },
+    /* NUMBER */ { QSP_FALSE, QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_FALSE, QSP_TRUE },
+    /* BOOL */   { QSP_FALSE, QSP_TRUE,  QSP_FALSE, QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_FALSE, QSP_TRUE },
+    /* STRING */ { QSP_FALSE, QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_FALSE, QSP_TRUE },
+    /* CODE */   { QSP_FALSE, QSP_TRUE,  QSP_TRUE,  QSP_TRUE,  QSP_FALSE, QSP_TRUE,  QSP_FALSE, QSP_TRUE },
 };
 
 INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res);
-INLINE QSPString qspGetVariantAsVarRef(QSPVariant *val);
+INLINE int qspGetVariantAsLocRef(QSPVariant *val, QSP_BOOL toIntern);
 INLINE QSP_BOOL qspGetVariantAsBool(QSPVariant *val);
 INLINE int qspEmptyValueCompare(QSPVariant *value);
 INLINE unsigned int qspAddVariantToKeyHash(unsigned int hash, QSPVariant *val);
@@ -64,6 +65,9 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
                 res->Type = QSP_TYPE_STR;
             }
             break;
+        default:
+            qspSetError(QSP_ERR_INTERNAL);
+            return QSP_FALSE;
         }
         break;
     case QSP_TYPE_NUM:
@@ -90,8 +94,14 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
         case QSP_TYPE_NUM:
             *res = qspNumVariant(QSP_PNUM(arg1) + QSP_PNUM(arg2));
             break;
+        default:
+            qspSetError(QSP_ERR_INTERNAL);
+            return QSP_FALSE;
         }
         break;
+    default:
+        qspSetError(QSP_ERR_INTERNAL);
+        return QSP_FALSE;
     }
     return QSP_TRUE;
 }
@@ -132,21 +142,22 @@ void qspAppendVariantToString(QSPVariant *val, QSPBufString *res)
     }
 }
 
-INLINE QSPString qspGetVariantAsVarRef(QSPVariant *val)
+INLINE int qspGetVariantAsLocRef(QSPVariant *val, QSP_BOOL toIntern)
 {
     switch (QSP_BASETYPE(val->Type))
     {
     case QSP_TYPE_TUPLE:
     case QSP_TYPE_NUM:
-        return qspGetVariantAsString(val); /* return invalid variable name */
-    case QSP_TYPE_STR:
         {
-            QSPString result = qspCopyToNewText(qspDelSpc(QSP_PSTR(val)));
-            qspUpperStr(&result);
-            return result;
+            QSPString name = qspGetVariantAsString(val);
+            int nameIndex = qspGetLocNameIndex(name, toIntern);
+            qspFreeString(&name);
+            return nameIndex;
         }
+    case QSP_TYPE_STR:
+        return qspGetLocNameIndex(QSP_PSTR(val), toIntern);
     }
-    return qspNullString;
+    return 0;
 }
 
 QSP_BIGINT qspGetVariantAsNum(QSPVariant *val, QSP_BOOL *isValid)
@@ -184,9 +195,11 @@ INLINE QSP_BOOL qspGetVariantAsBool(QSPVariant *val)
 
 QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
 {
-    /* NB: val->Type can be QSP_TYPE_UNDEF */
-    if (val->Type != type && qspTypeConversionTable[val->Type][type])
+    if (val->Type != type)
     {
+        if (!QSP_ISVALUE(val->Type)) return QSP_FALSE; /* non-value converts to nothing */
+        if (!qspTypeConversionTable[val->Type][type]) return QSP_TRUE; /* conversion isn't necessary */
+
         if (QSP_ISDEF(val->Type)) /* an undefined value already holds the empty payload of any type */
         {
             switch (type)
@@ -218,11 +231,11 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
                     QSP_PSTR(val) = result;
                     break;
                 }
-            case QSP_TYPE_VARREF:
+            case QSP_TYPE_LOCREF:
                 {
-                    QSPString result = qspGetVariantAsVarRef(val);
+                    int result = qspGetVariantAsLocRef(val, QSP_FALSE);
                     qspFreeVariant(val);
-                    QSP_PSTR(val) = result;
+                    QSP_PINDEX(val) = result;
                     break;
                 }
             }
@@ -230,6 +243,54 @@ QSP_BOOL qspConvertVariantTo(QSPVariant *val, QSP_TINYINT type)
         val->Type = type;
     }
     return QSP_TRUE;
+}
+
+QSP_BOOL qspGetLiteralAsRef(QSPVariant *val, QSP_TINYINT type, QSPVariant *res)
+{
+    switch (type)
+    {
+    case QSP_TYPE_VARREF:
+        {
+            QSP_TINYINT varType;
+            int nameIndex = qspGetLiteralVarNameIndex(val, &varType);
+            if (nameIndex >= 0)
+            {
+                *res = qspVarRefVariant(nameIndex, varType);
+                return QSP_TRUE;
+            }
+            break;
+        }
+    case QSP_TYPE_LOCREF:
+        *res = qspLocRefVariant(qspGetVariantAsLocRef(val, QSP_TRUE));
+        return QSP_TRUE;
+    }
+    return QSP_FALSE;
+}
+
+void qspConvertLiteralTo(QSPVariant *val, QSP_TINYINT type)
+{
+    if (val->Type != type)
+    {
+        switch (type)
+        {
+        case QSP_TYPE_UNDEF: /* any type allowed */
+            break;
+        case QSP_TYPE_VARREF:
+        case QSP_TYPE_LOCREF:
+            {
+                QSPVariant ref;
+                if (qspGetLiteralAsRef(val, type, &ref))
+                {
+                    qspFreeVariant(val);
+                    *val = ref;
+                }
+                break;
+            }
+        default:
+            qspConvertVariantTo(val, type);
+            break;
+        }
+    }
 }
 
 INLINE int qspEmptyValueCompare(QSPVariant *value)
@@ -382,6 +443,9 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
             QSP_PSTR(res) = qspGetVariantAsString(arg2);
             res->Type = QSP_TYPE_STR;
             break;
+        default:
+            qspSetError(QSP_ERR_INTERNAL);
+            return;
         }
         break;
     case QSP_TYPE_TUPLE:
@@ -397,6 +461,9 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
         case QSP_TYPE_STR:
             *res = qspTupleVariant(qspAppendValueToNewTuple(&QSP_PTUPLE(arg1), arg2));
             break;
+        default:
+            qspSetError(QSP_ERR_INTERNAL);
+            return;
         }
         break;
     case QSP_TYPE_NUM:
@@ -418,8 +485,14 @@ void qspAutoConvertAppend(QSPVariant *arg1, QSPVariant *arg2, QSPVariant *res)
             QSP_PSTR(res) = qspConcatText(QSP_PSTR(arg1), QSP_PSTR(arg2));
             res->Type = QSP_TYPE_STR;
             break;
+        default:
+            qspSetError(QSP_ERR_INTERNAL);
+            return;
         }
         break;
+    default:
+        qspSetError(QSP_ERR_INTERNAL);
+        return;
     }
 }
 
@@ -532,6 +605,9 @@ void qspMultiplyVariantByNum(QSPVariant *val, QSP_BIGINT num, QSPVariant *res)
         QSP_PNUM(res) = num * QSP_PNUM(val);
         res->Type = QSP_TYPE_NUM;
         break;
+    default:
+        qspSetError(QSP_ERR_INTERNAL);
+        return;
     }
 }
 

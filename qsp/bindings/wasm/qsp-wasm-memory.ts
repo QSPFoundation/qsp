@@ -41,7 +41,6 @@ const QSP_TYPE_NUM = 2;
 const QSP_TYPE_BOOL = 3;
 const QSP_TYPE_STR = 4;
 const QSP_TYPE_CODE = 5;
-const QSP_TYPE_VARREF = 6;
 
 export function allocPointer(module: QspWasmModule): IntPtr {
   return module._malloc(POINTER_SIZE) as number as IntPtr;
@@ -325,7 +324,6 @@ export function readVariant(module: QspWasmModule, variant: VariantPtr): QspVari
       return readInt(module, variant);
     case QSP_TYPE_STR:
     case QSP_TYPE_CODE:
-    case QSP_TYPE_VARREF:
       return readString(module, variant as number as StringPtr);
     case QSP_TYPE_UNDEF:
     default:

@@ -75,7 +75,6 @@
         QSP_REF_GETSILENTLY /* no errors reported */
     };
 
-    extern QSPVar qspNullVar;
     extern QSPVar *qspGlobalVars; /* hash table by name indices, QSP_SLOTSCOUNT(qspGlobalVarsCapacity) entries */
     extern int qspGlobalVarsCount;
     extern int qspGlobalVarsCapacity; /* has to be a power of 2 */
@@ -99,7 +98,10 @@
     int qspHideLocalVars(void);
     void qspRestoreHiddenLocalVars(int oldLocalVarsBase);
     void qspClearHiddenLocalVars(int oldLocalVarsBase);
-    QSPVar *qspVarReferenceByName(QSPString name, QSP_TINYINT mode);
+    QSPVarData *qspVarDataByName(QSPString name, QSP_TINYINT mode, QSP_TINYINT *varType);
+    QSPVarData *qspVarDataByArg(QSPVariant *arg, QSP_TINYINT mode, QSP_TINYINT *varType);
+    int qspGetVarNameIndex(QSPString name, QSP_TINYINT *varType);
+    int qspGetLiteralVarNameIndex(QSPVariant *val, QSP_TINYINT *varType);
     QSPVarKey *qspAddVarKey(QSPVarData *varData, unsigned int hash, int valIndex);
     int qspGetVarKeyIndex(QSPVarData *varData, int valIndex);
     int qspGetVarItemIndex(QSPVarData *varData, QSPVariant index, QSP_BOOL toCreate);
@@ -109,22 +111,21 @@
     void qspGetVarFieldValueByIndex(int nameIndex, QSP_TINYINT varType, QSPVariant index, QSPField *fields, int count, QSPVariant *res);
     void qspGetFirstVarFieldValue(int nameIndex, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *res);
     void qspGetLastVarFieldValue(int nameIndex, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *res);
-    void qspGetVarValueByName(QSPString varName, QSPVariant index, QSPVariant *res);
+    void qspGetVarValueByArg(QSPVariant *arg, QSPVariant index, QSPVariant *res);
     QSP_BOOL qspGetFieldNameIndex(QSPString name, QSP_TINYINT mode, int *nameIndex);
     QSP_BOOL qspInitPlainField(QSPField *field, QSPString name);
     QSP_BOOL qspInitQuotedField(QSPField *field, QSPString name, QSP_TINYINT fieldType);
     QSP_BOOL qspParseFieldName(QSPString *s, QSPField *field, QSPString *code);
     int qspParseFieldsPath(QSPString *s, QSP_TINYINT varType, QSPField *fields, QSPString *dynamicNames);
     int qspGetFieldsFromPath(QSPTuple path, QSPField *fields, QSP_TINYINT mode);
-    void qspGetVarFieldValueByPath(QSPString varName, QSPVariant index, QSPTuple path, QSPVariant *res);
-    QSPVarData *qspVarDataByName(QSPString name);
+    void qspGetVarFieldValueByArg(QSPVariant *arg, QSPVariant index, QSPTuple path, QSPVariant *res);
     QSPString qspGetVarStrValue(QSPString name, int valIndex);
     QSP_BIGINT qspGetVarNumValue(QSPString name, int valIndex);
     QSPTuple qspCopyArrayToNewTuple(QSPVarData *src, int start, int count);
-    int qspArraySize(QSPString varName);
-    int qspArrayPos(QSPString varName, QSPVariant *val, int ind);
-    int qspArrayPosRegExp(QSPString varName, QSPString regExpStr, int ind);
-    QSPVariant qspArrayMinMaxItem(QSPString varName, QSP_BOOL isMin);
+    int qspArraySizeByArg(QSPVariant *arg);
+    int qspArrayPosByArg(QSPVariant *arg, QSPVariant *val, int ind);
+    int qspArrayPosRegExpByArg(QSPVariant *arg, QSPString regExpStr, int ind);
+    QSPVariant qspArrayMinMaxItemByArg(QSPVariant *arg, QSP_BOOL isMin);
     /* Statements */
     void qspStatementSetVarsValues(QSPCachedStat *stat);
     void qspStatementLocal(QSPCachedStat *stat);
@@ -132,7 +133,7 @@
     void qspStatementSetVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementInsVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
-    void qspStatementCopyArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
+    void qspStatementMoveArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementSortArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
     void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg);
@@ -224,23 +225,6 @@
     INLINE QSPVarData *qspGetVarData(QSPVar *var)
     {
         return (var->IsRef ? &var->Data.Shared->Data : &var->Data.Own);
-    }
-
-    INLINE QSPVarData *qspVarDataReferenceByName(QSPString name, QSP_TINYINT mode)
-    {
-        QSPVar *var = qspVarReferenceByName(name, mode);
-        return (var ? qspGetVarData(var) : 0);
-    }
-
-    INLINE QSPVar qspGetUnknownVar(void)
-    {
-        QSPVar var;
-        var.NameIndex = 0;
-        var.LocalIndex = 0;
-        var.GlobalIndex = 0;
-        var.IsRef = QSP_FALSE;
-        qspInitVarData(&var.Data.Own);
-        return var;
     }
 
 #endif

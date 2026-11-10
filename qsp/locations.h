@@ -12,7 +12,7 @@
     #define QSP_LOCSDEFINES
 
     #define QSP_MAXLOCCALLDEPTH 2000
-    #define QSP_LOCSCAPACITY 32
+    #define QSP_LOCSCAPACITY 32 /* has to be a power of 2 */
 
     typedef struct
     {
@@ -33,15 +33,13 @@
 
     typedef struct
     {
-        QSPString Name;
-        unsigned int NameHash;
+        int NameIndex; /* 0 for empty slot */
         int Index;
-    } QSPLocName;
+    } QSPLocSlot;
 
     extern QSPLocation **qspLocs;
     extern int qspLocsCount;
     extern int qspLocsCapacity;
-    extern QSPLocName *qspLocsNames; /* hash table by names */
     extern QSPLocation *qspCurLoc;
     extern int qspLocationState; /* allows to check if we have to terminate execution of the code */
     extern int qspFullRefreshCount;
@@ -53,7 +51,10 @@
     void qspTruncateWorld(int locsCount);
     void qspFreeLocation(QSPLocation *loc);
     QSPLocation *qspAddLocation(QSPString name);
-    QSPLocation *qspLocByName(QSPString name);
+    int qspGetLocNameIndex(QSPString name, QSP_BOOL toIntern);
+    QSPLocation *qspGetLoc(int nameIndex);
+    QSPLocation *qspGetLocByName(QSPString name);
+    void qspExecLocWithArgs(int nameIndex, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res);
     void qspExecLocByNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res);
     void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT argsCount);
     void qspNavigateToLocation(QSPLocation *loc, QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT argsCount);

@@ -87,7 +87,6 @@ public abstract class QSPLib {
         public static final int BOOL   = 3;
         public static final int STR    = 4;
         public static final int CODE   = 5;
-        public static final int VARREF = 6;
 
         public int type;
         public long num;
