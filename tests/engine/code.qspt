@@ -16,6 +16,29 @@ end
 @run
 @expect $type => 'new'
 
+@test long line split with tab before marker
+@src
+
+t = 1
+if t	_
+   or	_
+   t:
+  $type = 'new'
+else
+  $type = 'old'
+end
+
+@run
+@expect $type => 'new'
+
+@test empty statements between separators are allowed
+@src
+a = 1 && b = 2 & & c = 3
+@run
+@expect a => 1
+@expect b => 2
+@expect c => 3
+
 @test statement argument gets converted to string
 @src
  msg 567

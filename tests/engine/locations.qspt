@@ -270,6 +270,21 @@ $second = $args[1]
 @expect first => 1
 @expect $second => 'test'
 
+@test user func shorthand with space after @
+@src
+
+@@ target(1, 'test')
+x = @ target(2, 'other')
+---
+# target
+first = args[0]
+$second = $args[1]
+result = args[0] * 10
+@run
+@expect first => 2
+@expect $second => 'other'
+@expect x => 20
+
 @test user func shorthand RESULT
 @src
 

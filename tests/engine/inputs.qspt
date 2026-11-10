@@ -64,3 +64,10 @@ objects_changed []
 input Question?
 main_changed 12
 @expect $text => 'Answer'
+
+@test INPUT without an answer returns an empty string
+@src
+$text = 'before' & $text = $input('Question?')
+@run
+@expect event input Question?
+@expect $text => ''

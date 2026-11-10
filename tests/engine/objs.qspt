@@ -138,6 +138,14 @@ ADDOBJ 'first' & ADDOBJ 'second' & count = COUNTOBJ
 @run
 @expect count => 2
 
+@test COUNTOBJ with name should return number of objects with that name
+@src
+ADDOBJ 'first' & ADDOBJ 'second' & ADDOBJ 'first'
+@run
+@exec count = COUNTOBJ('first') & missing = COUNTOBJ('third')
+@expect count => 2
+@expect missing => 0
+
 @test $GETOBJ should return object name at position
 @src
 ADDOBJ 'first' & ADDOBJ 'second' & $first = $GETOBJ(1)
