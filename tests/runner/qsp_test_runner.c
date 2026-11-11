@@ -454,6 +454,7 @@ static struct
     long ClockReported; /* the time at the previous call of the callback */
     char **MsgWatches; /* variables read while the MSG callback runs */
     int MsgWatchesCount;
+    int IsMsgStateWatched; /* the MSG callback records the current location & the execution state */
     char *InitGameCode; /* code executed by the INITGAME callback */
     char **RememberedNames; /* numbers kept by @remember, they outlive the engine */
     char **RememberedValues;
@@ -652,16 +653,23 @@ static void cbRefresh(QSP_BOOL isForced, QSP_BOOL QSP_UNUSED_isNewDesc)
     refreshState(isForced);
 }
 
+/* QSPGetCurStateData: LOCATION:LINE:ACTION, where the engine executes code */
+static void addCurState(StrBuf *sb)
+{
+    QSPString loc = {0, 0};
+    int actIndex = 0, line = 0;
+    QSPGetCurStateData(&loc, &actIndex, &line);
+    addEscaped(sb, loc);
+    sbAddf(sb, ":%d:%d", line, actIndex);
+}
+
 static void cbDebug(QSPString str)
 {
     /* debug LOCATION:LINE:ACTION CODE */
     StrBuf sb = {0};
-    QSPString loc = {0, 0};
-    int actIndex = 0, line = 0;
-    QSPGetCurStateData(&loc, &actIndex, &line);
     sbAdd(&sb, "debug ");
-    addEscaped(&sb, loc);
-    sbAddf(&sb, ":%d:%d ", line, actIndex);
+    addCurState(&sb);
+    sbAdd(&sb, " ");
     addEscaped(&sb, str);
     addEvent(sbStr(&sb));
     free(sb.Data);
@@ -698,6 +706,16 @@ static void cbMsg(QSPString str)
         StrBuf sb = {0};
         sbAddf(&sb, "read %s => ", T.MsgWatches[i]);
         readVariable(&sb, T.MsgWatches[i]);
+        addEvent(sbStr(&sb));
+        free(sb.Data);
+    }
+    if (T.IsMsgStateWatched)
+    {
+        StrBuf sb = {0};
+        sbAdd(&sb, "state curloc=");
+        addEscaped(&sb, QSPGetCurLocation());
+        sbAdd(&sb, " exec=");
+        addCurState(&sb);
         addEvent(sbStr(&sb));
         free(sb.Data);
     }
@@ -1312,6 +1330,7 @@ static void resetEngine(void)
     freeStrings(&T.InputReplies, &T.InputRepliesCount);
     freeStrings(&T.VersionReplies, &T.VersionRepliesCount);
     freeStrings(&T.MsgWatches, &T.MsgWatchesCount);
+    T.IsMsgStateWatched = 0;
     free(T.InitGameCode);
     T.InitGameCode = 0;
     i = T.RememberedCount;
@@ -1849,6 +1868,13 @@ static void runCommand(const char *line, char **block, int blockCount)
         T.MsgWatches = xrealloc(T.MsgWatches, (T.MsgWatchesCount + 1) * sizeof(char *));
         T.MsgWatches[T.MsgWatchesCount++] = xstrdup(arg);
     }
+    else if ((arg = command(line, "@watch-msg-state")))
+    {
+        if (*arg)
+            fail("'@watch-msg-state' takes no argument");
+        else
+            T.IsMsgStateWatched = 1;
+    }
     else if ((arg = command(line, "@debug")))
         QSPEnableDebugMode(atoi(arg) != 0);
     else if ((arg = command(line, "@clear-events")))
@@ -1929,21 +1955,16 @@ static void runCommand(const char *line, char **block, int blockCount)
         }
     }
     else if ((arg = command(line, "@expect-curloc")))
+        expectText("current location", QSPGetCurLocation(), arg);
+    else if ((arg = command(line, "@expect-state")))
     {
-        char *actual;
-        if (!evalExpr("$CURLOC", &actual))
-            fail("current location: evaluation failed with %s", actual);
-        else
-        {
-            StrBuf expected = {0};
-            QSP_CHAR *qValue = toQsp(arg);
-            formatString(&expected, QSPStringFromC(qValue));
-            if (strcmp(actual, sbStr(&expected)))
-                fail("current location: expected %s, got %s", sbStr(&expected), actual);
-            free(qValue);
-            free(expected.Data);
-        }
-        free(actual);
+        StrBuf sb = {0};
+        addCurState(&sb);
+        if (!*arg)
+            fail("expected '@expect-state LOCATION:LINE:ACTION'");
+        else if (strcmp(sbStr(&sb), arg))
+            fail("execution state: expected '%s', got '%s'", arg, sbStr(&sb));
+        free(sb.Data);
     }
     else if ((arg = command(line, "@expect-error")))
     {

@@ -59,6 +59,7 @@ before the first action of the test.
 | `@reply isplay 0/1` | queues a reply to the "is playing" callback |
 | `@clock N` | sets the clock of the host to `N` milliseconds; the clock starts at 0 with the test and can't go back. The callback returns the time passed since its previous call, so `MSECSCOUNT` gives the time since the start of the test or since the last restart of the game |
 | `@init-game CODE` | the `INITGAME` callback executes `CODE` with `QSPExecString`; an error stops the call that started the game |
+| `@watch-msg-state` | every `MSG` callback also records the event `state curloc=LOC exec=LOCATION:LINE:ACTION` with `QSPGetCurLocation` & `QSPGetCurStateData` |
 | `@watch-msg NAME` | every `MSG` callback also records the event `read NAME => VALUE`, the variable is read with `QSPGetVarValue` while the callback runs (`$NAME`, `#NAME`, `%NAME` give the typed view) |
 
 ### Actions
@@ -98,7 +99,8 @@ without the prefix.
 | `@expect-main TEXT` / `@expect-stat TEXT` | main / additional description (escaped) |
 | `@expect-acts [a; b\|img]` / `@expect-objs [...]` | current actions / objects; an object shows ` => TITLE` when its title differs from the name |
 | `@expect-selact N` / `@expect-selobj N` | selected action / object |
-| `@expect-curloc NAME` | current location (`$CURLOC`) |
+| `@expect-curloc NAME` | `QSPGetCurLocation`: the current location (`$CURLOC`), not the location executing code |
+| `@expect-state LOCATION:LINE:ACTION` | `QSPGetCurStateData`: where the engine executes code, `:0:-1` when it's idle |
 | `@expect-error NAME [(location 'L', line N, local N, action A) LINE]` | the pending error, by name or with its position: `line` is the top-level line, `local` the line of the actual code, `LINE` its text (a prefix of the description is enough) |
 | `@expect-event TEXT` / `@expect-no-event PREFIX` | an event was / no event starting with `PREFIX` was recorded |
 | `@expect-count N PREFIX` | number of events starting with `PREFIX` |
