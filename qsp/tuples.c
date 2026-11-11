@@ -412,7 +412,7 @@ void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
             qspAddBufText(res, QSP_STATIC_STR(QSP_TUPLEDISPLAY_FIELDDELIM));
         }
         value = &item->Value;
-        switch (QSP_BASETYPE(value->Type))
+        switch (value->Type)
         {
         case QSP_TYPE_UNDEF:
             qspAddBufText(res, QSP_STATIC_STR(QSP_UNDEFTYPE));
@@ -421,10 +421,16 @@ void qspAppendTupleToString(QSPTuple tuple, QSPBufString *res)
             qspAppendTupleToString(QSP_PTUPLE(value), res);
             break;
         case QSP_TYPE_NUM:
+        case QSP_TYPE_BOOL:
             qspAddBufText(res, qspNumToStr(buf, QSP_PNUM(value)));
             break;
         case QSP_TYPE_STR:
             qspAddBufQuotedText(res, QSP_PSTR(value), QSP_STATIC_STR(QSP_DEFQUOT));
+            break;
+        case QSP_TYPE_CODE:
+            qspAddBufText(res, QSP_STATIC_STR(QSP_LCODE));
+            qspAddBufText(res, QSP_PSTR(value));
+            qspAddBufText(res, QSP_STATIC_STR(QSP_RCODE));
             break;
         }
         if (++item == itemsEnd) break;
