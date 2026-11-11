@@ -17,7 +17,6 @@
 
 #include "qsp_default.h"
 
-#define MAX_LIST_ITEMS 1000
 #define SAVE_BUF_SIZE (64 * 1024)
 #define RESULT_VAR "QSPT_EXPECT_RESULT"
 #define RAND_SEED 0
@@ -537,26 +536,36 @@ static void addListItem(StrBuf *sb, QSPString name, QSPString image)
     }
 }
 
-static void listState(StrBuf *sb, int isActions)
+enum
+{
+    LIST_ACTS, /* QSPGetActions */
+    LIST_OBJS, /* QSPGetObjects */
+    LIST_LOCS, /* QSPGetLocationNames */
+    LIST_LOC_ACTS /* QSPGetLocationActions */
+};
+
+/* The engine returns the number of the items & fills at most the size of the buffer,
+   so the first call gets the number and the second one gets the items.
+   A missing location (-1) is shown as "none" */
+static void listState(StrBuf *sb, int kind, const char *locName)
 {
     int i, count;
-    sbAdd(sb, "[");
-    if (isActions)
+    QSP_CHAR *qLoc = toQsp(locName ? locName : "");
+    QSPString loc = QSPStringFromC(qLoc);
+    switch (kind)
     {
-        QSPListItem items[MAX_LIST_ITEMS];
-        count = QSPGetActions(items, MAX_LIST_ITEMS);
-        if (count > MAX_LIST_ITEMS) count = MAX_LIST_ITEMS;
-        for (i = 0; i < count; ++i)
-        {
-            if (i) sbAdd(sb, "; ");
-            addListItem(sb, items[i].Name, items[i].Image);
-        }
+    case LIST_ACTS: count = QSPGetActions(0, 0); break;
+    case LIST_OBJS: count = QSPGetObjects(0, 0); break;
+    case LIST_LOCS: count = QSPGetLocationNames(0, 0); break;
+    default: count = QSPGetLocationActions(loc, 0, 0); break;
     }
-    else
+    if (count < 0)
+        sbAdd(sb, "none");
+    else if (kind == LIST_OBJS)
     {
-        QSPObjectItem items[MAX_LIST_ITEMS];
-        count = QSPGetObjects(items, MAX_LIST_ITEMS);
-        if (count > MAX_LIST_ITEMS) count = MAX_LIST_ITEMS;
+        QSPObjectItem *items = xmalloc((count + 1) * sizeof(*items));
+        QSPGetObjects(items, count);
+        sbAdd(sb, "[");
         for (i = 0; i < count; ++i)
         {
             if (i) sbAdd(sb, "; ");
@@ -568,8 +577,39 @@ static void listState(StrBuf *sb, int isActions)
                 addEscaped(sb, items[i].Title);
             }
         }
+        sbAdd(sb, "]");
+        free(items);
     }
-    sbAdd(sb, "]");
+    else if (kind == LIST_LOCS)
+    {
+        QSPString *names = xmalloc((count + 1) * sizeof(*names));
+        QSPGetLocationNames(names, count);
+        sbAdd(sb, "[");
+        for (i = 0; i < count; ++i)
+        {
+            if (i) sbAdd(sb, "; ");
+            addEscaped(sb, names[i]);
+        }
+        sbAdd(sb, "]");
+        free(names);
+    }
+    else
+    {
+        QSPListItem *items = xmalloc((count + 1) * sizeof(*items));
+        if (kind == LIST_ACTS)
+            QSPGetActions(items, count);
+        else
+            QSPGetLocationActions(loc, items, count);
+        sbAdd(sb, "[");
+        for (i = 0; i < count; ++i)
+        {
+            if (i) sbAdd(sb, "; ");
+            addListItem(sb, items[i].Name, items[i].Image);
+        }
+        sbAdd(sb, "]");
+        free(items);
+    }
+    free(qLoc);
 }
 
 static void eventWithText(const char *name, QSPString text, int isNullable)
@@ -586,12 +626,12 @@ static void eventWithText(const char *name, QSPString text, int isNullable)
     free(sb.Data);
 }
 
-static void eventWithList(const char *name, int isActions)
+static void eventWithList(const char *name, int kind)
 {
     StrBuf sb = {0};
     sbAdd(&sb, name);
     sbAdd(&sb, " ");
-    listState(&sb, isActions);
+    listState(&sb, kind, 0);
     addEvent(sbStr(&sb));
     free(sb.Data);
 }
@@ -602,8 +642,8 @@ static void refreshState(QSP_BOOL isForced)
     int changed = QSPGetWindowsChangedState();
     if (isForced || (changed & QSP_WIN_MAIN)) eventWithText("main_changed", QSPGetMainDesc(), 1);
     if (isForced || (changed & QSP_WIN_VARS)) eventWithText("stats_changed", QSPGetVarsDesc(), 1);
-    if (isForced || (changed & QSP_WIN_ACTS)) eventWithList("actions_changed", 1);
-    if (isForced || (changed & QSP_WIN_OBJS)) eventWithList("objects_changed", 0);
+    if (isForced || (changed & QSP_WIN_ACTS)) eventWithList("actions_changed", LIST_ACTS);
+    if (isForced || (changed & QSP_WIN_OBJS)) eventWithList("objects_changed", LIST_OBJS);
 }
 
 static void cbRefresh(QSP_BOOL isForced, QSP_BOOL QSP_UNUSED_isNewDesc)
@@ -1373,19 +1413,93 @@ static void expectText(const char *what, QSPString actual, const char *expected)
     free(sb.Data);
 }
 
-static void expectList(const char *what, int isActions, const char *expected)
+static void expectList(const char *what, int kind, const char *locName, const char *expected)
 {
     StrBuf sb = {0};
     size_t len = strlen(expected);
-    if (len < 2 || expected[0] != '[' || expected[len - 1] != ']')
+    if ((len < 2 || expected[0] != '[' || expected[len - 1] != ']') &&
+        !(kind == LIST_LOC_ACTS && !strcmp(expected, "none")))
     {
         fail("%s: expected a list '[...]', got '%s'", what, expected);
         return;
     }
-    listState(&sb, isActions);
+    listState(&sb, kind, locName);
     if (strcmp(sbStr(&sb), expected))
         fail("%s: expected %s, got %s", what, expected, sbStr(&sb));
     free(sb.Data);
+}
+
+enum
+{
+    CODE_LOC, /* QSPGetLocationCode */
+    CODE_LOC_ACT, /* QSPGetLocationActionCode */
+    CODE_ACT /* QSPGetActionCode */
+};
+
+static int getCode(int kind, QSPString loc, int index, QSPLineInfo *lines, int size)
+{
+    switch (kind)
+    {
+    case CODE_LOC: return QSPGetLocationCode(loc, lines, size);
+    case CODE_LOC_ACT: return QSPGetLocationActionCode(loc, index, lines, size);
+    default: return QSPGetActionCode(index, lines, size);
+    }
+}
+
+/* The lines of code are compared with the block: "N: CODE" (escaped), or "none" when the engine returns -1 */
+static void expectCode(const char *what, int kind, const char *locName, int index, char **block, int blockCount)
+{
+    QSP_CHAR *qLoc = toQsp(locName ? locName : "");
+    QSPString loc = QSPStringFromC(qLoc);
+    int i, count = getCode(kind, loc, index, 0, 0);
+    char **actual;
+    int actualCount = (count < 0 ? 1 : count);
+    actual = xmalloc((actualCount + 1) * sizeof(char *));
+    if (count < 0)
+        actual[0] = xstrdup("none");
+    else
+    {
+        QSPLineInfo *lines = xmalloc((count + 1) * sizeof(*lines));
+        getCode(kind, loc, index, lines, count);
+        for (i = 0; i < count; ++i)
+        {
+            StrBuf sb = {0};
+            sbAddf(&sb, "%d:", lines[i].LineNum);
+            if (!isEmptyStr(lines[i].Line))
+            {
+                sbAdd(&sb, " ");
+                addEscaped(&sb, lines[i].Line);
+            }
+            actual[i] = sbTake(&sb);
+        }
+        free(lines);
+    }
+    for (i = 0; i < actualCount && i < blockCount && !strcmp(actual[i], block[i]); ++i);
+    if (i < actualCount || i < blockCount)
+    {
+        if (actualCount != blockCount)
+            fail("%s: expected %d lines, got %d", what, blockCount, actualCount);
+        else
+            fail("%s: line #%d: expected '%s', got '%s'", what, i + 1, block[i], actual[i]);
+        fprintf(stderr, "  got:\n");
+        for (i = 0; i < actualCount; ++i) fprintf(stderr, "    %s\n", actual[i]);
+    }
+    for (i = 0; i < actualCount; ++i) free(actual[i]);
+    free(actual);
+    free(qLoc);
+}
+
+/* Splits "LOC REST": the name of the location is the first word */
+static char *takeWord(const char *arg, const char **rest)
+{
+    const char *end = arg;
+    char *word;
+    while (*end && *end != ' ' && *end != '\t') ++end;
+    word = xmalloc(end - arg + 1);
+    memcpy(word, arg, end - arg);
+    word[end - arg] = 0;
+    *rest = skipSpaces(end);
+    return word;
 }
 
 static void expectValue(const char *arg)
@@ -1748,9 +1862,60 @@ static void runCommand(const char *line, char **block, int blockCount)
     else if ((arg = command(line, "@expect-stat")))
         expectText("stat", QSPGetVarsDesc(), arg);
     else if ((arg = command(line, "@expect-acts")))
-        expectList("actions", 1, arg);
+        expectList("actions", LIST_ACTS, 0, arg);
     else if ((arg = command(line, "@expect-objs")))
-        expectList("objects", 0, arg);
+        expectList("objects", LIST_OBJS, 0, arg);
+    else if ((arg = command(line, "@expect-locs")))
+    {
+        ensureGameLoaded();
+        expectList("locations", LIST_LOCS, 0, arg);
+    }
+    else if ((arg = command(line, "@expect-loc-acts")) || (arg = command(line, "@expect-loc-desc")))
+    {
+        int isActions = !strncmp(line, "@expect-loc-acts", 16);
+        const char *rest;
+        char *loc = takeWord(arg, &rest);
+        ensureGameLoaded();
+        if (!*loc)
+            fail(isActions ? "expected '@expect-loc-acts LOC [...]'" : "expected '@expect-loc-desc LOC TEXT'");
+        else if (isActions)
+            expectList("location actions", LIST_LOC_ACTS, loc, rest);
+        else
+        {
+            QSP_CHAR *qLoc = toQsp(loc);
+            expectText("location description", QSPGetLocationDesc(QSPStringFromC(qLoc)), rest);
+            free(qLoc);
+        }
+        free(loc);
+    }
+    else if ((arg = command(line, "@expect-loc-code")))
+    {
+        ensureGameLoaded();
+        if (!*arg)
+            fail("expected '@expect-loc-code LOC'");
+        else
+            expectCode("location code", CODE_LOC, arg, 0, block, blockCount);
+    }
+    else if ((arg = command(line, "@expect-loc-act-code")))
+    {
+        const char *rest;
+        char *loc = takeWord(arg, &rest);
+        long n;
+        ensureGameLoaded();
+        if (!*loc || !parseInteger(rest, &n, 0))
+            fail("expected '@expect-loc-act-code LOC N'");
+        else
+            expectCode("location action code", CODE_LOC_ACT, loc, (int)n, block, blockCount);
+        free(loc);
+    }
+    else if ((arg = command(line, "@expect-act-code")))
+    {
+        long n;
+        if (!parseInteger(arg, &n, 0))
+            fail("expected '@expect-act-code N'");
+        else
+            expectCode("action code", CODE_ACT, 0, (int)n, block, blockCount);
+    }
     else if ((arg = command(line, "@expect-selact")) || (arg = command(line, "@expect-selobj")))
     {
         int isAction = !strncmp(line, "@expect-selact", 14);
@@ -1830,7 +1995,8 @@ static void runCommand(const char *line, char **block, int blockCount)
 static int isBlockCommand(const char *line)
 {
     return command(line, "@src") || command(line, "@game") || command(line, "@module") ||
-        command(line, "@desc") || command(line, "@action") || command(line, "@expect-events");
+        command(line, "@desc") || command(line, "@action") || command(line, "@expect-events") ||
+        command(line, "@expect-loc-code") || command(line, "@expect-loc-act-code") || command(line, "@expect-act-code");
 }
 
 /* ------------------------------------------------------------ */

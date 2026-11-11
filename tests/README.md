@@ -103,6 +103,18 @@ without the prefix.
 | `@expect-event TEXT` / `@expect-no-event PREFIX` | an event was / no event starting with `PREFIX` was recorded |
 | `@expect-count N PREFIX` | number of events starting with `PREFIX` |
 | `@expect-events` *(block)* | the exact list of recorded events |
+| `@expect-locs [a; b]` | `QSPGetLocationNames` |
+| `@expect-loc-acts LOC [a; b\|img]` | `QSPGetLocationActions`: the base actions of a location, `none` for a missing location |
+| `@expect-loc-desc LOC TEXT` | `QSPGetLocationDesc` (escaped) |
+| `@expect-loc-code LOC` *(block)* | `QSPGetLocationCode`, see below |
+| `@expect-loc-act-code LOC N` *(block)* | `QSPGetLocationActionCode`: the code of the base action `N` |
+| `@expect-act-code N` *(block)* | `QSPGetActionCode`: the code of the current action `N` |
+
+The checks of the code compare the lines with the block, a line is
+`NUM: CODE` (escaped, `NUM:` for an empty line), `NUM` is the number of the
+line as the errors give it. The block `none` stands for the answer -1 of
+the engine: no location, no action or no code. The lists are read
+completely: the runner asks the engine for the number of the items first.
 
 The arguments are checked strictly: a number has to be a whole integer,
 a list has to be in brackets, `@expect-event`, `@expect-no-event`,
