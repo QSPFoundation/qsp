@@ -105,6 +105,10 @@ without the prefix.
 | `@expect-event TEXT` / `@expect-no-event PREFIX` | an event was / no event starting with `PREFIX` was recorded |
 | `@expect-count N PREFIX` | number of events starting with `PREFIX` |
 | `@expect-events` *(block)* | the exact list of recorded events |
+| `@expect-size NAME N` | `QSPGetVarValuesCount` |
+| `@expect-index NAME KEY => N` | `QSPGetVarIndexByKey`, `KEY` is a QSP expression, `-1` when the key isn't found |
+| `@expect-item NAME INDEX => VALUE [key KEY]` | `QSPGetVarValue` of the item with its key (`key` is left out when the item has no key); a type prefix of the name gives the typed view of the value |
+| `@expect-name NAME [TEXT]` | `QSPGetName` of `QSPGetNameIndex` without creating the name: the interned text, empty for a name the game never used |
 | `@expect-locs [a; b]` | `QSPGetLocationNames` |
 | `@expect-loc-acts LOC [a; b\|img]` | `QSPGetLocationActions`: the base actions of a location, `none` for a missing location |
 | `@expect-loc-desc LOC TEXT` | `QSPGetLocationDesc` (escaped) |

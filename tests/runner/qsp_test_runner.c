@@ -677,12 +677,18 @@ static void cbDebug(QSPString str)
 
 static void formatVariant(StrBuf *sb, const QSPVariant *v);
 
-/* Reads a variable with QSPGetVarValue, a type prefix of the name gives the typed view */
-static void readVariable(StrBuf *sb, const char *name)
+static const char *withoutTypePrefix(const char *name)
 {
-    QSPVariant value, empty;
-    QSP_CHAR *qName = toQsp(*name == '$' || *name == '#' || *name == '%' ? name + 1 : name);
-    QSPGetVarValue(QSPStringFromC(qName), 0, &value, 0);
+    return (*name == '$' || *name == '#' || *name == '%' ? name + 1 : name);
+}
+
+/* Reads an item with QSPGetVarValue, a type prefix of the name gives the typed view of the value;
+   with withKey set, the key of the item is added as " key KEY" */
+static void readItem(StrBuf *sb, const char *name, int index, int withKey)
+{
+    QSPVariant value, key, empty;
+    QSP_CHAR *qName = toQsp(withoutTypePrefix(name));
+    QSPGetVarValue(QSPStringFromC(qName), index, &value, &key);
     memset(&empty, 0, sizeof(empty));
     switch (*name)
     {
@@ -694,7 +700,17 @@ static void readVariable(StrBuf *sb, const char *name)
         formatVariant(sb, &empty);
     else
         formatVariant(sb, &value);
+    if (withKey && QSP_ISDEF(key.Type))
+    {
+        sbAdd(sb, " key ");
+        formatVariant(sb, &key);
+    }
     free(qName);
+}
+
+static void readVariable(StrBuf *sb, const char *name)
+{
+    readItem(sb, name, 0, 0);
 }
 
 static void cbMsg(QSPString str)
@@ -1264,33 +1280,43 @@ static void execSilently(const char *code)
     free(qCode);
 }
 
-/* Evaluates the expression through a temporary variable to keep the type of the value */
-static int evalExpr(const char *expr, char **res)
+/* Evaluates the expression through a temporary variable to keep the type of the value.
+   The value stays valid till the variable is removed with killResult; on an error, the name of the error is given */
+static int evalValue(const char *expr, QSPVariant *value, char **errorText)
 {
     StrBuf sb = {0};
-    QSPVariant value, key;
-    QSP_CHAR *qName;
+    QSP_CHAR *qCode, *qName;
     int isOk;
     sbAddf(&sb, "%s = (%s)", RESULT_VAR, expr);
-    {
-        QSP_CHAR *qCode = toQsp(sbStr(&sb));
-        isOk = QSPExecString(QSPStringFromC(qCode), QSP_FALSE);
-        free(qCode);
-    }
-    sbClear(&sb);
+    qCode = toQsp(sbStr(&sb));
+    isOk = QSPExecString(QSPStringFromC(qCode), QSP_FALSE);
+    free(qCode);
+    free(sb.Data);
     if (!isOk)
     {
         QSPErrorInfo info = QSPGetLastErrorData();
-        free(sb.Data);
-        *res = xstrdup(errorName(info.ErrorNum));
+        *errorText = xstrdup(errorName(info.ErrorNum));
         return 0;
     }
     qName = toQsp(RESULT_VAR);
-    QSPGetVarValue(QSPStringFromC(qName), 0, &value, &key);
-    formatVariant(&sb, &value);
+    QSPGetVarValue(QSPStringFromC(qName), 0, value, 0);
     free(qName);
-    *res = sbTake(&sb);
+    return 1;
+}
+
+static void killResult(void)
+{
     execSilently("killvar '" RESULT_VAR "'");
+}
+
+static int evalExpr(const char *expr, char **res)
+{
+    StrBuf sb = {0};
+    QSPVariant value;
+    if (!evalValue(expr, &value, res)) return 0;
+    formatVariant(&sb, &value);
+    *res = sbTake(&sb);
+    killResult();
     return 1;
 }
 
@@ -1548,6 +1574,112 @@ static void expectValue(const char *arg)
     free(actual);
     free(expected.Data);
     free(expr);
+}
+
+/* @expect-size NAME N: QSPGetVarValuesCount */
+static void expectSize(const char *arg)
+{
+    const char *rest;
+    char *name = takeWord(arg, &rest);
+    long n;
+    if (!*name || !parseInteger(rest, &n, 0))
+        fail("expected '@expect-size NAME N'");
+    else
+    {
+        QSP_CHAR *qName = toQsp(withoutTypePrefix(name));
+        int count;
+        QSPGetVarValuesCount(QSPStringFromC(qName), &count);
+        if (count != n) fail("%s: expected %ld items, got %d", name, n, count);
+        free(qName);
+    }
+    free(name);
+}
+
+/* @expect-index NAME KEY => N: QSPGetVarIndexByKey, KEY is a QSP expression */
+static void expectIndex(const char *arg)
+{
+    const char *rest, *sep = 0, *s;
+    char *name = takeWord(arg, &rest), *key = 0, *errorText;
+    long n;
+    QSPVariant value;
+    for (s = rest; (s = strstr(s, " => ")); ++s) sep = s;
+    if (!*name || !sep || sep == rest || !parseInteger(sep + 4, &n, 0))
+        fail("expected '@expect-index NAME KEY => N'");
+    else
+    {
+        key = xmalloc(sep - rest + 1);
+        memcpy(key, rest, sep - rest);
+        key[sep - rest] = 0;
+        ensureGameLoaded();
+        if (!evalValue(key, &value, &errorText))
+        {
+            fail("%s: evaluation failed with %s", key, errorText);
+            free(errorText);
+        }
+        else
+        {
+            QSP_CHAR *qName = toQsp(withoutTypePrefix(name));
+            int index;
+            QSPGetVarIndexByKey(QSPStringFromC(qName), value, &index);
+            killResult();
+            if (index != n) fail("%s[%s]: expected the index %ld, got %d", name, key, n, index);
+            free(qName);
+        }
+    }
+    free(key);
+    free(name);
+}
+
+/* @expect-item NAME INDEX => VALUE [key KEY]: QSPGetVarValue with the key of the item */
+static void expectItem(const char *arg)
+{
+    const char *rest, *literal;
+    char *name = takeWord(arg, &rest);
+    long n;
+    StrBuf expected = {0}, actual = {0};
+    if (!*name || !parseInteger(rest, &n, &literal) || strncmp(literal, "=> ", 3))
+        fail("expected '@expect-item NAME INDEX => VALUE [key KEY]'");
+    else
+    {
+        int isOk;
+        literal += 3;
+        isOk = parseLiteral(&literal, &expected);
+        literal = skipSpaces(literal);
+        if (isOk && !strncmp(literal, "key ", 4))
+        {
+            literal += 4;
+            sbAdd(&expected, " key ");
+            isOk = parseLiteral(&literal, &expected);
+        }
+        if (!isOk || *skipSpaces(literal))
+            fail("incorrect value '%s'", rest);
+        else
+        {
+            readItem(&actual, name, (int)n, 1);
+            if (strcmp(sbStr(&actual), sbStr(&expected)))
+                fail("%s[%ld]: expected %s, got %s", name, n, sbStr(&expected), sbStr(&actual));
+        }
+    }
+    free(actual.Data);
+    free(expected.Data);
+    free(name);
+}
+
+/* @expect-name NAME [TEXT]: QSPGetName of QSPGetNameIndex without creating the name, empty for an unknown name */
+static void expectName(const char *arg)
+{
+    const char *rest;
+    char *name = takeWord(arg, &rest);
+    if (!*name)
+        fail("expected '@expect-name NAME [TEXT]'");
+    else
+    {
+        QSP_CHAR *qName = toQsp(name);
+        ensureGameLoaded();
+        expectText(name, QSPGetName(QSPGetNameIndex(QSPStringFromC(qName), QSP_FALSE)), rest);
+        free(qName);
+    }
+    free(name);
 }
 
 static int findRemembered(const char *name)
@@ -1954,6 +2086,14 @@ static void runCommand(const char *line, char **block, int blockCount)
             if (actual != n) fail("selected %s: expected %ld, got %d", isAction ? "action" : "object", n, actual);
         }
     }
+    else if ((arg = command(line, "@expect-size")))
+        expectSize(arg);
+    else if ((arg = command(line, "@expect-index")))
+        expectIndex(arg);
+    else if ((arg = command(line, "@expect-item")))
+        expectItem(arg);
+    else if ((arg = command(line, "@expect-name")))
+        expectName(arg);
     else if ((arg = command(line, "@expect-curloc")))
         expectText("current location", QSPGetCurLocation(), arg);
     else if ((arg = command(line, "@expect-state")))
