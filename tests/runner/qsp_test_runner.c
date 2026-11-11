@@ -18,6 +18,7 @@
 #include "qsp_default.h"
 
 #define SAVE_BUF_SIZE (64 * 1024)
+#define CALC_BUF_SIZE (32 * 1024)
 #define RESULT_VAR "QSPT_EXPECT_RESULT"
 #define RAND_SEED 0
 
@@ -455,6 +456,7 @@ static struct
     char **MsgWatches; /* variables read while the MSG callback runs */
     int MsgWatchesCount;
     int IsMsgStateWatched; /* the MSG callback records the current location & the execution state */
+    int CalcBufferSize; /* the buffer of QSPCalculateStrExpression, set by @calc-buffer */
     char *InitGameCode; /* code executed by the INITGAME callback */
     char **RememberedNames; /* numbers kept by @remember, they outlive the engine */
     char **RememberedValues;
@@ -1357,6 +1359,7 @@ static void resetEngine(void)
     freeStrings(&T.VersionReplies, &T.VersionRepliesCount);
     freeStrings(&T.MsgWatches, &T.MsgWatchesCount);
     T.IsMsgStateWatched = 0;
+    T.CalcBufferSize = 0;
     free(T.InitGameCode);
     T.InitGameCode = 0;
     i = T.RememberedCount;
@@ -1682,6 +1685,69 @@ static void expectName(const char *arg)
     free(name);
 }
 
+/* @expect-calc-str EXPR => VALUE / @expect-calc-num EXPR => VALUE: QSPCalculateStrExpression /
+   QSPCalculateNumExpression, VALUE is "?" when the call fails; an error of the engine is left pending */
+static void expectCalc(const char *arg, int isNumeric)
+{
+    const char *sep = 0, *s, *literal;
+    StrBuf expected = {0}, actual = {0};
+    for (s = arg; (s = strstr(s, " => ")); ++s) sep = s;
+    literal = (sep ? sep + 4 : 0);
+    if (!sep || sep == arg || !parseLiteral(&literal, &expected) || *skipSpaces(literal))
+        fail(isNumeric ? "expected '@expect-calc-num EXPR => VALUE'" : "expected '@expect-calc-str EXPR => VALUE'");
+    else
+    {
+        char *expr = xmalloc(sep - arg + 1);
+        QSP_CHAR *qExpr;
+        QSP_BOOL isOk;
+        memcpy(expr, arg, sep - arg);
+        expr[sep - arg] = 0;
+        qExpr = toQsp(expr);
+        checkNoPendingError();
+        ensureGameLoaded();
+        if (isNumeric)
+        {
+            QSP_BIGINT res = 0;
+            isOk = QSPCalculateNumExpression(QSPStringFromC(qExpr), &res, QSP_TRUE);
+            if (isOk) sbAddf(&actual, "%lld", (long long)res);
+        }
+        else
+        {
+            int size = (T.CalcBufferSize > 0 ? T.CalcBufferSize : CALC_BUF_SIZE);
+            QSP_CHAR *buf = xmalloc(size * sizeof(QSP_CHAR));
+            isOk = QSPCalculateStrExpression(QSPStringFromC(qExpr), buf, size, QSP_TRUE);
+            if (isOk) formatString(&actual, QSPStringFromC(buf));
+            free(buf);
+        }
+        if (!isOk)
+        {
+            sbAdd(&actual, "?");
+            /* A value that isn't a number fails the numeric call without an error */
+            if (QSPGetLastErrorData().ErrorNum) afterCall(QSP_FALSE);
+        }
+        if (strcmp(sbStr(&actual), sbStr(&expected)))
+            fail("%s: expected %s, got %s", expr, sbStr(&expected), sbStr(&actual));
+        free(qExpr);
+        free(expr);
+    }
+    free(actual.Data);
+    free(expected.Data);
+}
+
+/* @expect-error-desc NAME TEXT: QSPGetErrorDesc */
+static void expectErrorDesc(const char *arg)
+{
+    const char *rest;
+    char *name = takeWord(arg, &rest);
+    int code;
+    for (code = 0; code < 1000 && strcmp(errorName(code), name); ++code);
+    if (!*name || code == 1000)
+        fail("expected '@expect-error-desc NAME TEXT' with the name of an error");
+    else
+        expectText(name, QSPGetErrorDesc(code), rest);
+    free(name);
+}
+
 static int findRemembered(const char *name)
 {
     int i;
@@ -2000,6 +2066,14 @@ static void runCommand(const char *line, char **block, int blockCount)
         T.MsgWatches = xrealloc(T.MsgWatches, (T.MsgWatchesCount + 1) * sizeof(char *));
         T.MsgWatches[T.MsgWatchesCount++] = xstrdup(arg);
     }
+    else if ((arg = command(line, "@calc-buffer")))
+    {
+        long size;
+        if (!parseInteger(arg, &size, 0) || size < 1 || size > INT_MAX / (long)sizeof(QSP_CHAR))
+            fail("expected '@calc-buffer N' with N > 0");
+        else
+            T.CalcBufferSize = (int)size;
+    }
     else if ((arg = command(line, "@watch-msg-state")))
     {
         if (*arg)
@@ -2086,6 +2160,14 @@ static void runCommand(const char *line, char **block, int blockCount)
             if (actual != n) fail("selected %s: expected %ld, got %d", isAction ? "action" : "object", n, actual);
         }
     }
+    else if ((arg = command(line, "@expect-calc-str")))
+        expectCalc(arg, 0);
+    else if ((arg = command(line, "@expect-calc-num")))
+        expectCalc(arg, 1);
+    else if ((arg = command(line, "@expect-version")))
+        expectText("version", QSPGetVersion(), arg);
+    else if ((arg = command(line, "@expect-error-desc")))
+        expectErrorDesc(arg);
     else if ((arg = command(line, "@expect-size")))
         expectSize(arg);
     else if ((arg = command(line, "@expect-index")))

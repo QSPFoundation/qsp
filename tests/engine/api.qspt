@@ -22,3 +22,116 @@ $ver = $qspver('param')
 @run
 @expect-event version param
 @expect $ver => ''
+
+@test should read version
+@expect-version 5.9.6
+
+@test events without listeners: QSPGetVersion is the answer of $QSPVER without a listener
+@src
+$v = $qspver
+@run
+@expect $v => '5.9.6'
+@expect-version 5.9.6
+
+// The evaluation of expressions: the code of the original beforeEach() is the location test
+
+@test expression evaluation: should evaluate string expressions
+@src
+numVar = 10
+$strVar = 'hello'
+%arrVar[0] = 5
+%arrVar[1] = 15
+@run
+@expect-calc-str $strVar + " world" => 'hello world'
+
+@test expression evaluation: should evaluate numeric expressions
+@src
+numVar = 10
+@run
+@expect-calc-num numVar * 2 => 20
+
+@test expression evaluation: should evaluate complex string expressions
+@src
+$strVar = 'hello'
+@run
+@expect-calc-str $ucase($strVar) + " " + $lcase("WORLD") => 'HELLO world'
+
+@test expression evaluation: should evaluate complex numeric expressions
+@src
+numVar = 10
+@run
+@expect-calc-num (numVar + 5) * 2 - 10 => 20
+
+@test expression evaluation: should handle array access in expressions
+@src
+%arrVar[0] = 5
+%arrVar[1] = 15
+@run
+@expect-calc-num %arrVar[0] + %arrVar[1] => 20
+
+@test expression evaluation: invalid expressions in QSPCalculateStrExpression
+@expect-calc-str invalid syntax [ => ?
+@expect-error UNKNOWNACTION (location '', line 0, local 0, action -1)
+
+@test expression evaluation: invalid expressions in QSPCalculateNumExpression
+@expect-calc-num invalid syntax [ => ?
+@expect-error UNKNOWNACTION (location '', line 0, local 0, action -1)
+
+// The original cuts at the 32K buffer of the wrapper; the buffer is the host's, so a small one is enough
+@test expression evaluation: the result is cut to the buffer
+@calc-buffer 5
+@expect-calc-str 'abcdefgh' => 'abcd'
+
+@test expression evaluation: should return tuples as strings
+@expect-calc-str [1, 'a'] => '[1, ''a'']'
+
+@test expression evaluation: should handle empty string expression
+@expect-calc-str "" => ''
+
+@test selection getters: should get selected action index
+@src
+act 'Action 1': end
+act 'Action 2': end
+addobj 'Object 1'
+addobj 'Object 2'
+@run
+@expect-selact -1
+@select-act 1
+@expect-selact 1
+@select-act 0
+@expect-selact 0
+
+@test selection getters: should get selected object index
+@src
+act 'Action 1': end
+act 'Action 2': end
+addobj 'Object 1'
+addobj 'Object 2'
+@run
+@expect-selobj -1
+@select-obj 1
+@expect-selobj 1
+@select-obj 0
+@expect-selobj 0
+
+@test utility functions: should get error descriptions
+@expect-error-desc DIVBYZERO Division by zero!
+
+// Not ported: the compiled date (any text) and QSPShowWindow (the original only checks that it doesn't throw)
+
+// ------------------------------------------------------------
+// Not in qsp-wasm-engine
+
+@test expression evaluation: a string isn't a number for QSPCalculateNumExpression, without an error
+@expect-calc-num 'abc' => ?
+@expect-calc-num '12' => 12
+
+@test expression evaluation: the expression executes the code of the functions
+@src
+---
+# f
+counter += 1
+result = counter * 10
+@run
+@expect-calc-num @f + @f => 30
+@expect counter => 2

@@ -59,6 +59,7 @@ before the first action of the test.
 | `@reply isplay 0/1` | queues a reply to the "is playing" callback |
 | `@clock N` | sets the clock of the host to `N` milliseconds; the clock starts at 0 with the test and can't go back. The callback returns the time passed since its previous call, so `MSECSCOUNT` gives the time since the start of the test or since the last restart of the game |
 | `@init-game CODE` | the `INITGAME` callback executes `CODE` with `QSPExecString`; an error stops the call that started the game |
+| `@calc-buffer N` | the size of the buffer of `QSPCalculateStrExpression` in characters with the final zero (32K by default) |
 | `@watch-msg-state` | every `MSG` callback also records the event `state curloc=LOC exec=LOCATION:LINE:ACTION` with `QSPGetCurLocation` & `QSPGetCurStateData` |
 | `@watch-msg NAME` | every `MSG` callback also records the event `read NAME => VALUE`, the variable is read with `QSPGetVarValue` while the callback runs (`$NAME`, `#NAME`, `%NAME` give the typed view) |
 
@@ -105,6 +106,9 @@ without the prefix.
 | `@expect-event TEXT` / `@expect-no-event PREFIX` | an event was / no event starting with `PREFIX` was recorded |
 | `@expect-count N PREFIX` | number of events starting with `PREFIX` |
 | `@expect-events` *(block)* | the exact list of recorded events |
+| `@expect-calc-str EXPR => VALUE` / `@expect-calc-num EXPR => VALUE` | `QSPCalculateStrExpression` / `QSPCalculateNumExpression` (they execute code like an action); `VALUE` is `?` when the call fails, an error of the engine is left pending |
+| `@expect-version TEXT` | `QSPGetVersion` |
+| `@expect-error-desc NAME TEXT` | `QSPGetErrorDesc` of the error `NAME` |
 | `@expect-size NAME N` | `QSPGetVarValuesCount` |
 | `@expect-index NAME KEY => N` | `QSPGetVarIndexByKey`, `KEY` is a QSP expression, `-1` when the key isn't found |
 | `@expect-item NAME INDEX => VALUE [key KEY]` | `QSPGetVarValue` of the item with its key (`key` is left out when the item has no key); a type prefix of the name gives the typed view of the value |
