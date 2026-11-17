@@ -934,9 +934,7 @@ INLINE void qspGetVarItemValue(QSPVarData *varData, int valIndex, QSP_TINYINT va
 
 INLINE void qspGetVarItemFieldValue(QSPVarData *varData, int valIndex, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *res)
 {
-    /* The type prefix of the name or the last field specifies the type of the value */
     QSPVariant *value = ((valIndex >= 0 && valIndex < varData->ValsCount) ? varData->Values + valIndex : 0);
-    if (count && !QSP_ISDEF(varType)) varType = fields[count - 1].Value.Type;
     value = qspGetTupleFieldValueByPath(value, fields, count);
     qspInitVariantFrom(res, value, varType);
 }
@@ -1241,7 +1239,6 @@ INLINE void qspSetVarItemFieldValue(QSPVarData *varData, int valIndex, QSPField 
 INLINE void qspSetVarFieldValue(QSPVarData *varData, QSPVariant index, QSP_TINYINT varType, QSPField *fields, int count, QSPVariant *val, QSP_CHAR op)
 {
     int arrIndex = -1;
-    if (count && !QSP_ISDEF(varType)) varType = fields[count - 1].Value.Type;
     if (op != QSP_EQUAL_CHAR)
     {
         /* Replace the value with its combination with the current value */

@@ -40,8 +40,10 @@ void qspSetCallback(int type, QSP_CALLBACK func)
 
 void qspCallDebug(QSPString str)
 {
+    static QSP_BOOL isInDebugger = QSP_FALSE;
+
     /* Jump into the debugger */
-    if (qspCallbacks[QSP_CALL_DEBUG])
+    if (qspCallbacks[QSP_CALL_DEBUG] && !isInDebugger)
     {
         QSPCallState state;
         JNIEnv *javaEnv = qspGetJniEnv();
@@ -49,7 +51,9 @@ void qspCallDebug(QSPString str)
 
         qspPrepareCallback(&state, QSP_FALSE);
 
+        isInDebugger = QSP_TRUE;
         (*javaEnv)->CallVoidMethod(javaEnv, qspApiObject, qspCallbacks[QSP_CALL_DEBUG], jniStr);
+        isInDebugger = QSP_FALSE;
         (*javaEnv)->DeleteLocalRef(javaEnv, jniStr);
 
         qspFinalizeCallback(&state, QSP_TRUE);

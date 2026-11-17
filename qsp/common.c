@@ -74,7 +74,7 @@ void qspTerminateRuntime(void)
 {
     qspMemClear(QSP_FALSE);
     qspTerminateVars();
-    qspUpdateLocation(&qspRealCurLoc, 0);
+    qspUpdateLocation(&qspRunLoc, 0);
     qspTerminateWorld();
     qspTerminateNames();
     qspTerminateMath();
@@ -92,16 +92,15 @@ void qspPrepareExecution(QSP_BOOL toInit)
         qspClearLocalVars();
         /* Reset location call depth */
         qspCurLocCallDepth = 0;
+        /* Reset the execution state */
+        qspUpdateLocation(&qspRunLoc, 0);
+        qspRunActIndex = -1;
+        qspIntRunTopLineNum = 0;
+        qspRunCode = 0;
+        qspRunLine = 0;
+        /* Reset the state of changes */
+        qspCurWindowsChangedState = 0;
     }
-
-    /* Reset the execution state */
-    qspUpdateLocation(&qspRealCurLoc, 0);
-    qspRealActIndex = -1;
-    qspRealLineNum = 0;
-    qspRealLine = 0;
-
-    /* Reset the state of changes */
-    qspCurWindowsChangedState = 0;
 }
 
 void qspMemClear(QSP_BOOL toInit)

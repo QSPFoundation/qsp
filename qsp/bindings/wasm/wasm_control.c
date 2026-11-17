@@ -57,11 +57,19 @@ void QSPEnableDebugMode(QSP_BOOL isDebug)
     qspIsDebug = isDebug;
 }
 
-void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum)
+void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum, int *intLineNum)
 {
-    *loc = (qspRealCurLoc ? qspRealCurLoc->Name : qspNullString);
-    *actIndex = qspRealActIndex;
-    *lineNum = qspRealLineNum;
+    *loc = (qspRunLoc ? qspRunLoc->Name : qspNullString);
+    *actIndex = qspRunActIndex;
+    *lineNum = qspGetTopLineNum();
+    *intLineNum = qspGetIntLineNum();
+}
+
+int QSPGetCurStateCode(QSPLineInfo *lines, int linesBufSize)
+{
+    QSPCodeBlock *code = qspRunCode;
+    if (code) return qspGetLinesInfo(code->Lines, code->LinesCount, lines, linesBufSize);
+    return -1;
 }
 
 int QSPGetLocationNames(QSPString *locNames, int namesBufSize)
@@ -385,6 +393,7 @@ void QSPGetErrorDesc(int errorNum, QSPString *desc)
 
 QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame)
 {
+    qspPrepareExecution(QSP_FALSE);
     return qspOpenGame((void *)data, dataSize, isNewGame);
 }
 

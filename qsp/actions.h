@@ -24,6 +24,7 @@
         int OnPressLinesCount;
         QSPLocation *Location;
         int ActIndex;
+        int TopLineNum;
     } QSPCurAct;
 
     extern QSPCurAct qspCurActions[QSP_MAXACTIONS];

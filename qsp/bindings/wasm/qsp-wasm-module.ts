@@ -120,7 +120,13 @@ export interface QspWasmModule {
   _QSPGetCompiledDateTime(res: StringPtr): void;
 
   _QSPEnableDebugMode(isDebug: Bool): void;
-  _QSPGetCurStateData(loc: StringPtr, actIndex: IntPtr, lineNum: IntPtr): void;
+  _QSPGetCurStateData(
+    loc: StringPtr,
+    actIndex: IntPtr,
+    lineNum: IntPtr,
+    intLineNum: IntPtr,
+  ): void;
+  _QSPGetCurStateCode(lines: Ptr, bufSize: number): number; // -1 if no code runs
   _QSPGetLocationNames(locNames: StringPtr, bufSize: number): number;
   _QSPGetLocationDesc(name: CharsPtr, res: StringPtr): void;
   // -1 if there is no location

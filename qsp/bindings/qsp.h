@@ -200,8 +200,8 @@
         QSPString LocName; /* location name */
         int ActIndex; /* index of the base action */
         int TopLineNum; /* top-level line within the game code */
-        int IntLineNum; /* line number of the actual code */
-        QSPString IntLine; /* line of the actual code */
+        int IntLineNum; /* line within the internal code, 0 for top-level code */
+        QSPString IntLine; /* the executing line */
     } QSPErrorInfo;
 
     typedef struct

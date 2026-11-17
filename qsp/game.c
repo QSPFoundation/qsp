@@ -226,7 +226,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
         {
             curLoc->Desc = qspDecodeString(strs[ind++], isUCS);
             str = qspDecodeString(strs[ind++], isUCS);
-            curLoc->OnVisitCode = qspPreprocessData(str);
+            curLoc->OnVisitCode = qspPreprocessData(str, QSP_TRUE);
             qspFreeString(&str);
         }
         else
@@ -243,7 +243,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
                     curAct->Image = (isLatestFormat ? qspDecodeString(strs[ind++], isUCS) : qspNullString);
                     curAct->Desc = qspDecodeString(strs[ind++], isUCS);
                     str = qspDecodeString(strs[ind++], isUCS);
-                    curAct->OnPressCode = qspPreprocessData(str);
+                    curAct->OnPressCode = qspPreprocessData(str, QSP_TRUE);
                     qspFreeString(&str);
                 }
             }
@@ -253,10 +253,7 @@ QSP_BOOL qspOpenGame(void *data, int dataSize, QSP_BOOL isNewGame)
     }
     qspFreeStrs(strs, count);
     if (isNewGame)
-    {
         qspQstCRC = crc;
-        qspUpdateLocation(&qspRealCurLoc, 0);
-    }
     else
         qspCurIncLocsCount += qspLocsCount - oldLocsCount;
     return QSP_TRUE;
@@ -319,15 +316,20 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
         qspAppendEncodedStrVal(&bufString, qspCurActions[i].Desc, isUCS);
         qspAppendEncodedStrVal(&bufString, qspCurActions[i].Image, isUCS);
         qspAppendEncodedIntVal(&bufString, qspCurActions[i].OnPressLinesCount, isUCS);
-        for (j = 0; j < qspCurActions[i].OnPressLinesCount; ++j)
+        if (qspCurActions[i].OnPressLinesCount)
         {
-            line = qspCurActions[i].OnPressCode->Lines + qspCurActions[i].OnPressStartLine + j;
-            qspAppendEncodedStrVal(&bufString, line->Str, isUCS);
-            qspAppendEncodedIntVal(&bufString, line->LineNum, isUCS);
+            line = qspCurActions[i].OnPressCode->Lines + qspCurActions[i].OnPressStartLine;
+            for (j = 0; j < qspCurActions[i].OnPressLinesCount; ++j, ++line)
+            {
+                qspAppendEncodedStrVal(&bufString, line->Str, isUCS);
+                qspAppendEncodedIntVal(&bufString, line->LineNum, isUCS);
+            }
+            qspAppendEncodedIntVal(&bufString, qspCurActions[i].OnPressCode->IsTopLevel, isUCS);
         }
         loc = qspCurActions[i].Location;
         qspAppendEncodedStrVal(&bufString, (loc ? loc->Name : qspNullString), isUCS);
         qspAppendEncodedIntVal(&bufString, qspCurActions[i].ActIndex, isUCS);
+        qspAppendEncodedIntVal(&bufString, qspCurActions[i].TopLineNum, isUCS);
     }
     qspAppendEncodedIntVal(&bufString, qspCurObjsCount, isUCS);
     for (i = 0; i < qspCurObjsCount; ++i)
@@ -455,17 +457,25 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
         /* lines of code count */
         if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &groupsCount)) return QSP_FALSE;
         if (groupsCount < 0) return QSP_FALSE;
-        /* lines */
-        for (j = 0; j < groupsCount; ++j)
+        if (groupsCount)
         {
-            /* line of code */
+            /* lines */
+            for (j = 0; j < groupsCount; ++j)
+            {
+                /* line of code */
+                if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
+                /* line number */
+                if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &temp)) return QSP_FALSE;
+                if (temp < 0) return QSP_FALSE;
+            }
+            /* top-level flag */
             if (!qspSkipLines(strsCount, 1, &ind)) return QSP_FALSE;
-            /* line number */
-            if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &temp)) return QSP_FALSE;
-            if (temp < 0) return QSP_FALSE;
         }
         /* action's location + source index */
         if (!qspSkipLines(strsCount, 2, &ind)) return QSP_FALSE;
+        /* action's top-level line */
+        if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &temp)) return QSP_FALSE;
+        if (temp < 0) return QSP_FALSE;
     }
     /* qspCurObjsCount */
     if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
@@ -533,7 +543,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     QSPString *strs, actsLocs[QSP_MAXACTIONS], varName, locName, gameString;
     QSP_BIGINT msecsCount;
     int i, j, ind, count, varsCount, valsCount, index, actsCount, oldLocationState;
-    QSP_BOOL isUCS = (dataSize >= 2 && *((unsigned char *)data + 1) == 0);
+    QSP_BOOL isTopLevel, isUCS = (dataSize >= 2 && *((unsigned char *)data + 1) == 0);
     gameString = qspStringFromFileData(data, dataSize, isUCS);
     count = qspSplitStr(gameString, QSP_STATIC_STR(QSP_STRSDELIM), &strs);
     qspFreeString(&gameString);
@@ -578,7 +588,8 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
                 qspInitLineOfCode(lines + j, qspDecodeString(strs[ind++], isUCS), 0);
                 lines[j].LineNum = qspReadEncodedIntVal(strs[ind++], isUCS);
             }
-            qspCurActions[i].OnPressCode = qspNewCodeBlock(lines, valsCount);
+            isTopLevel = (qspReadEncodedIntVal(strs[ind++], isUCS) != 0);
+            qspCurActions[i].OnPressCode = qspNewCodeBlock(lines, valsCount, isTopLevel);
         }
         else
             qspCurActions[i].OnPressCode = 0;
@@ -586,6 +597,7 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
         qspCurActions[i].Location = 0;
         actsLocs[i] = qspDecodeString(strs[ind++], isUCS);
         qspCurActions[i].ActIndex = qspReadEncodedIntVal(strs[ind++], isUCS);
+        qspCurActions[i].TopLineNum = qspReadEncodedIntVal(strs[ind++], isUCS);
     }
     qspCurObjsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
     for (i = 0; i < qspCurObjsCount; ++i)

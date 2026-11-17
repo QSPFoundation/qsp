@@ -1018,7 +1018,7 @@ INLINE void qspAppendLastLineToResult(QSPString str, int lineNum, QSPBufString *
     qspInitLineOfCode(line, lineStr, lineNum);
 }
 
-QSPCodeBlock *qspPreprocessData(QSPString data)
+QSPCodeBlock *qspPreprocessData(QSPString data, QSP_BOOL isTopLevel)
 {
     QSPLineOfCode *lines;
     QSPBufString combinedBuf, strBuf;
@@ -1136,7 +1136,7 @@ QSPCodeBlock *qspPreprocessData(QSPString data)
     qspFreeBufString(&strBuf);
     ++linesCount;
 
-    return qspNewCodeBlock(lines, linesCount);
+    return qspNewCodeBlock(lines, linesCount, isTopLevel);
 }
 
 void qspClearAllCodeBlocks(QSP_BOOL toInit)
@@ -1166,7 +1166,7 @@ QSPCodeBlock *qspGetCachedCodeBlock(QSPString s)
     int i, blocksCount;
     if (qspIsEmpty(s)) return 0;
     if (qspStrLen(s) > QSP_MAXCACHEDCODELEN) /* too long to cache */
-        return qspPreprocessData(s);
+        return qspPreprocessData(s, QSP_FALSE);
     /* Find a correct bucket by hash value */
     bucket = qspCachedCodeBlocks + qspGetTextHash(s) % QSP_CACHEDCODEBUCKETS;
     /* Search for existing item in the bucket */
@@ -1195,7 +1195,7 @@ QSPCodeBlock *qspGetCachedCodeBlock(QSPString s)
         bucket->BlockToEvict = (bucket->BlockToEvict + 1) % QSP_MAXCACHEDCODEBUCKETSIZE;
     }
     /* Preprocess the new code */
-    block->Code = qspPreprocessData(s);
+    block->Code = qspPreprocessData(s, QSP_FALSE);
     block->Text = qspCopyToNewText(s);
     qspAcquireCodeBlock(block->Code);
     return block->Code;
@@ -1227,6 +1227,7 @@ QSP_BOOL qspParseTargetFields(QSPCachedTarget *target)
     }
     if (fieldsCount)
     {
+        if (!QSP_ISDEF(target->VarType)) target->VarType = fields[fieldsCount - 1].Value.Type;
         target->FieldsCount = fieldsCount;
         target->Fields = (QSPField *)malloc(fieldsCount * sizeof(QSPField));
         memcpy(target->Fields, fields, fieldsCount * sizeof(QSPField));

@@ -32,12 +32,16 @@ void qspSetCallback(int type, QSP_CALLBACK func)
 
 void qspCallDebug(QSPString str)
 {
+    static QSP_BOOL isInDebugger = QSP_FALSE;
+
     /* Jump into the debugger */
-    if (qspCallbacks[QSP_CALL_DEBUG])
+    if (qspCallbacks[QSP_CALL_DEBUG] && !isInDebugger)
     {
         QSPCallState state;
         qspPrepareCallback(&state, QSP_FALSE);
+        isInDebugger = QSP_TRUE;
         qspCallbacks[QSP_CALL_DEBUG](str);
+        isInDebugger = QSP_FALSE;
         qspFinalizeCallback(&state, QSP_TRUE);
     }
 }

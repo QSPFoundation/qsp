@@ -49,10 +49,17 @@ void qspInitCallbacks(void)
 
 void qspCallDebug(QSPString str)
 {
-    QSPCallState state;
-    qspPrepareCallback(&state, QSP_FALSE);
-    qspWasmHostDebug(str.Str, QSP_WASM_STRBYTES(str));
-    qspFinalizeCallback(&state, QSP_TRUE);
+    static QSP_BOOL isInDebugger = QSP_FALSE;
+
+    if (!isInDebugger)
+    {
+        QSPCallState state;
+        qspPrepareCallback(&state, QSP_FALSE);
+        isInDebugger = QSP_TRUE;
+        qspWasmHostDebug(str.Str, QSP_WASM_STRBYTES(str));
+        isInDebugger = QSP_FALSE;
+        qspFinalizeCallback(&state, QSP_TRUE);
+    }
 }
 
 void qspCallSetTimer(int msecs)

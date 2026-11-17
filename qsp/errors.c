@@ -12,10 +12,23 @@
 int qspErrorNum = 0;
 QSPErrorInfo qspLastError;
 
-QSPLocation *qspRealCurLoc = 0;
-int qspRealActIndex = -1;
-int qspRealLineNum = 0;
-QSPLineOfCode *qspRealLine = 0;
+QSPLocation *qspRunLoc = 0;
+int qspRunActIndex = -1;
+int qspIntRunTopLineNum = 0;
+QSPCodeBlock *qspRunCode = 0;
+QSPLineOfCode *qspRunLine = 0;
+
+int qspGetTopLineNum(void)
+{
+    if (!qspRunLine) return 0;
+    return (qspRunCode->IsTopLevel ? qspRunLine->LineNum : qspIntRunTopLineNum);
+}
+
+int qspGetIntLineNum(void)
+{
+    if (!qspRunLine) return 0;
+    return (qspRunCode->IsTopLevel ? 0 : qspRunLine->LineNum);
+}
 
 void qspSetError(int num)
 {
@@ -26,24 +39,19 @@ void qspSetError(int num)
         qspErrorNum = num;
         qspLastError.ErrorNum = num;
         qspLastError.ErrorDesc = qspGetErrorDesc(num);
-        qspLastError.ActIndex = qspRealActIndex;
-        qspLastError.TopLineNum = qspRealLineNum;
+        qspLastError.ActIndex = qspRunActIndex;
+        qspLastError.TopLineNum = qspGetTopLineNum();
+        qspLastError.IntLineNum = qspGetIntLineNum();
 
-        if (qspRealCurLoc)
-            qspUpdateText(&qspLastError.LocName, qspRealCurLoc->Name);
+        if (qspRunLoc)
+            qspUpdateText(&qspLastError.LocName, qspRunLoc->Name);
         else
             qspClearText(&qspLastError.LocName);
 
-        if (qspRealLine)
-        {
-            qspLastError.IntLineNum = qspRealLine->LineNum;
-            qspUpdateText(&qspLastError.IntLine, qspRealLine->Str);
-        }
+        if (qspRunLine)
+            qspUpdateText(&qspLastError.IntLine, qspRunLine->Str);
         else
-        {
-            qspLastError.IntLineNum = 0;
             qspClearText(&qspLastError.IntLine);
-        }
     }
 }
 

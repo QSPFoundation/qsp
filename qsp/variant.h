@@ -149,6 +149,15 @@
         qspInitVariant(dest, baseType);
     }
 
+    INLINE void qspApplyTypePrefix(QSPVariant *val, QSP_TINYINT baseType)
+    {
+        if (QSP_ISDEF(baseType) && QSP_BASETYPE(val->Type) != baseType)
+        {
+            qspFreeVariant(val);
+            qspInitVariant(val, baseType);
+        }
+    }
+
     INLINE void qspMoveToNewVariant(QSPVariant *dest, QSPVariant *src)
     {
         dest->Val = src->Val;
