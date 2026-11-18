@@ -1314,11 +1314,9 @@ INLINE void qspMoveTupleToArray(QSPVarData *dest, QSPTuple *src, int start, int 
     /* Clear the dest array anyway */
     qspEmptyVarData(dest);
     /* Validate parameters */
-    if (count <= 0) return;
-    if (start < 0) start = 0;
-    itemsToMove = src->FieldsCount - start;
+    start = qspClampNum(start, 0, src->FieldsCount);
+    itemsToMove = qspClampNum(count, 0, src->FieldsCount - start);
     if (itemsToMove <= 0) return;
-    if (count < itemsToMove) itemsToMove = count;
     /* Move tuple items, field names become text keys */
     dest->ValsCapacity = dest->ValsCount = itemsToMove;
     dest->Values = (QSPVariant *)malloc(itemsToMove * sizeof(QSPVariant));
@@ -1350,11 +1348,9 @@ INLINE void qspCopyArray(QSPVarData *dest, QSPVarData *src, int start, int count
     /* Clear the dest array anyway */
     qspEmptyVarData(dest);
     /* Validate parameters */
-    if (count <= 0) return;
-    if (start < 0) start = 0;
-    itemsToCopy = src->ValsCount - start;
+    start = qspClampNum(start, 0, src->ValsCount);
+    itemsToCopy = qspClampNum(count, 0, src->ValsCount - start);
     if (itemsToCopy <= 0) return;
-    if (count < itemsToCopy) itemsToCopy = count;
     /* Copy array values */
     dest->ValsCapacity = dest->ValsCount = itemsToCopy;
     dest->Values = (QSPVariant *)malloc(itemsToCopy * sizeof(QSPVariant));
@@ -1400,11 +1396,9 @@ INLINE void qspMoveArray(QSPVarData *dest, QSPVarData *src, int start, int count
     /* Clear the dest array anyway */
     qspEmptyVarData(dest);
     /* Validate parameters */
-    if (count <= 0) return;
-    if (start < 0) start = 0;
-    itemsToMove = src->ValsCount - start;
+    start = qspClampNum(start, 0, src->ValsCount);
+    itemsToMove = qspClampNum(count, 0, src->ValsCount - start);
     if (itemsToMove <= 0) return;
-    if (count < itemsToMove) itemsToMove = count;
     if (itemsToMove == src->ValsCount)
     {
         /* Move everything */
@@ -1463,11 +1457,9 @@ QSPTuple qspCopyArrayToNewTuple(QSPVarData *src, int start, int count)
     int itemsToCopy, keyIndex, keysCount;
     QSPTuple tuple;
     /* Validate parameters */
-    if (count <= 0) return qspNullTuple;
-    if (start < 0) start = 0;
-    itemsToCopy = src->ValsCount - start;
+    start = qspClampNum(start, 0, src->ValsCount);
+    itemsToCopy = qspClampNum(count, 0, src->ValsCount - start);
     if (itemsToCopy <= 0) return qspNullTuple;
-    if (count < itemsToCopy) itemsToCopy = count;
     tuple = qspCopyToNewTuple(src->Values + start, itemsToCopy);
     /* String keys of the copied items become field names */
     keyIndex = qspGetVarKeyLowerBound(src, start);

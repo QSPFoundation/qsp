@@ -1720,15 +1720,12 @@ INLINE void qspFunctionStrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *r
 
 INLINE void qspFunctionInstr(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    int beg;
+    int beg, len = qspStrLen(QSP_STR(args[0]));
     if (count == 2)
         beg = 0;
     else
-    {
-        beg = QSP_TOINT(QSP_NUM(args[2]) - 1);
-        if (beg < 0) beg = 0;
-    }
-    if (beg < qspStrLen(QSP_STR(args[0])))
+        beg = qspClampNum(QSP_NUM(args[2]) - 1, 0, len);
+    if (beg < len)
     {
         QSP_CHAR *foundPos;
         QSPString subString = QSP_STR(args[0]);
@@ -1745,17 +1742,11 @@ INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
     int len = qspStrLen(QSP_STR(args[0]));
     if (len > 0)
     {
-        int beg = QSP_TOINT(QSP_NUM(args[1]) - 1);
-        if (beg < 0) beg = 0;
+        int beg = qspClampNum(QSP_NUM(args[1]) - 1, 0, len);
         len -= beg;
         if (len > 0)
         {
-            if (count == 3)
-            {
-                int subLen = QSP_TOINT(QSP_NUM(args[2]));
-                if (subLen < len)
-                    len = (subLen > 0 ? subLen : 0);
-            }
+            if (count == 3) len = qspClampNum(QSP_NUM(args[2]), 0, len);
             QSP_PSTR(res) = qspCopyToNewText(qspStringFromLen(QSP_STR(args[0]).Str + beg, len));
             return;
         }
