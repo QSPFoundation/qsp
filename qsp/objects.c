@@ -52,7 +52,7 @@ INLINE int qspObjsGroupFloorCompare(const void *name, const void *compareTo)
 
 void qspClearAllObjects(QSP_BOOL toInit)
 {
-    if (!toInit && qspCurObjsCount)
+    if (!toInit)
     {
         int i;
         QSPObj *curObj;
@@ -68,7 +68,7 @@ void qspClearAllObjects(QSP_BOOL toInit)
             qspFreeString(&curObjsGroup->Desc);
             qspFreeString(&curObjsGroup->Image);
         }
-        qspCurWindowsChangedState |= QSP_WIN_OBJS;
+        if (qspCurObjsCount) qspCurWindowsChangedState |= QSP_WIN_OBJS;
     }
     qspCurObjsCount = 0;
     qspCurObjsGroupsCount = 0;

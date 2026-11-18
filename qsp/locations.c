@@ -239,6 +239,7 @@ INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc)
             {
                 qspUpdateLocation(&qspRunLoc, 0);
                 qspRestoreRunState(&oldState);
+                --qspCurLocCallDepth;
                 return;
             }
         }
@@ -248,6 +249,7 @@ INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc)
     {
         qspUpdateLocation(&qspRunLoc, 0);
         qspRestoreRunState(&oldState);
+        --qspCurLocCallDepth;
         return;
     }
     /* Execute the code */
@@ -260,7 +262,6 @@ INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc)
     /* Restore the old state */
     qspUpdateLocation(&qspRunLoc, 0);
     qspRestoreRunState(&oldState);
-    if (qspLocationState != oldLocationState) return;
     --qspCurLocCallDepth;
 }
 
