@@ -13,6 +13,7 @@
     typedef struct
     {
         int LocationState;
+        int NamesGeneration;
         QSP_BOOL IsInCallback;
     } QSPCallState;
 

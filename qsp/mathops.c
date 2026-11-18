@@ -29,12 +29,11 @@ int qspOpsNamesCounts[QSP_MATHOPSLEVELS];
 int qspOpMaxLen = 0;
 
 INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTION func, QSP_TINYINT resType, QSP_TINYINT minArgs, int maxArgs, ...);
-INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT type, int level);
-INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BOOL isFunc);
+INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BOOL hasTypePrefix);
 INLINE int qspMathOpsCompare(const void *opName1, const void *opName2);
 INLINE int qspMathOpStringFullCompare(const void *name, const void *compareTo);
 INLINE int qspMathOpStringCompare(const void *name, const void *compareTo);
-INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName);
+INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName, QSP_TINYINT *varType);
 INLINE QSP_TINYINT qspOperatorOpCode(QSPString *expr);
 INLINE QSPString qspGetCodeBlock(QSPString *expr);
 INLINE QSP_BOOL qspParseRecordName(QSPString *s, QSPField *field, QSPString *code);
@@ -93,12 +92,12 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
     qspOps[opCode].ResType = resType;
     qspOps[opCode].MinArgsCount = minArgs;
     qspOps[opCode].MaxArgsCount = (QSP_TINYINT)maxArgs;
-    qspOps[opCode].IsTyped = QSP_FALSE;
+    qspOps[opCode].HasTypedArgs = QSP_FALSE;
     if (maxArgs > 0)
     {
         int i;
         va_list marker;
-        QSP_BOOL isTyped = QSP_FALSE, isFinished = QSP_FALSE;
+        QSP_BOOL hasTypedArgs = QSP_FALSE, isFinished = QSP_FALSE;
         QSP_TINYINT lastType = QSP_TYPE_UNDEF;
         va_start(marker, maxArgs);
         for (i = 0; i < maxArgs; ++i)
@@ -112,58 +111,24 @@ INLINE void qspAddOperation(QSP_TINYINT opCode, QSP_TINYINT priority, QSP_FUNCTI
                     lastType = curType;
             }
             qspOps[opCode].ArgsTypes[i] = lastType;
-            isTyped = isTyped || QSP_ISDEF(lastType);
+            hasTypedArgs = hasTypedArgs || QSP_ISDEF(lastType);
         }
         va_end(marker);
-        qspOps[opCode].IsTyped = isTyped;
+        qspOps[opCode].HasTypedArgs = hasTypedArgs;
     }
 }
 
-INLINE void qspAddSingleOpName(QSP_TINYINT opCode, QSPString opName, QSP_TINYINT type, int level)
+INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BOOL hasTypePrefix)
 {
-    int itemInd;
-    QSPBufString buf = qspNewBufString(0, 16);
-    switch (QSP_BASETYPE(type))
-    {
-    case QSP_TYPE_TUPLE:
-        qspAddBufText(&buf, QSP_STATIC_STR(QSP_TUPLETYPE));
-        break;
-    case QSP_TYPE_NUM:
-        qspAddBufText(&buf, QSP_STATIC_STR(QSP_NUMTYPE));
-        break;
-    case QSP_TYPE_STR:
-        qspAddBufText(&buf, QSP_STATIC_STR(QSP_STRTYPE));
-        break;
-    }
-    qspAddBufText(&buf, opName);
-    if (buf.Len > qspOpMaxLen) qspOpMaxLen = buf.Len;
+    int itemInd, nameLen;
+    QSPString name = qspStringFromC(opName);
+    nameLen = qspStrLen(name);
+    if (nameLen > qspOpMaxLen) qspOpMaxLen = nameLen;
 
     itemInd = qspOpsNamesCounts[level]++;
-    qspOpsNames[level][itemInd].Name = qspBufStringToString(buf);
+    qspOpsNames[level][itemInd].Name = qspCopyToNewText(name);
     qspOpsNames[level][itemInd].Code = opCode;
-}
-
-INLINE void qspAddOpName(QSP_TINYINT opCode, QSP_CHAR *opName, int level, QSP_BOOL isFunc)
-{
-    QSPString name = qspStringFromC(opName);
-    /* Add the base name */
-    qspAddSingleOpName(opCode, name, QSP_TYPE_UNDEF, level);
-    if (isFunc)
-    {
-        QSP_TINYINT type = qspOps[opCode].ResType;
-        if (QSP_ISDEF(type))
-        {
-            /* Add type-specific name */
-            qspAddSingleOpName(opCode, name, type, level);
-        }
-        else
-        {
-            /* Add all possible type-specific names */
-            qspAddSingleOpName(opCode, name, QSP_TYPE_TUPLE, level);
-            qspAddSingleOpName(opCode, name, QSP_TYPE_NUM, level);
-            qspAddSingleOpName(opCode, name, QSP_TYPE_STR, level);
-        }
-    }
+    qspOpsNames[level][itemInd].HasTypePrefix = hasTypePrefix;
 }
 
 INLINE int qspMathOpsCompare(const void *opName1, const void *opName2)
@@ -384,17 +349,34 @@ void qspTerminateMath(void)
     }
 }
 
-INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName)
+INLINE QSP_TINYINT qspFunctionOpCode(QSPString funName, QSP_TINYINT *varType)
 {
+    QSPMathOpName *name;
+    QSPString plainName = funName;
+    if (qspIsEmpty(plainName)) return QSP_OP_UNKNOWN;
+    if (qspIsInClass(*plainName.Str, QSP_CHAR_TYPEPREFIX)) ++plainName.Str; /* skip the type prefix */
+    if (qspIsEmpty(plainName)) return QSP_OP_UNKNOWN;
+
     /* All functions are in one group because we compare full names */
-    QSPMathOpName *name = (QSPMathOpName *)bsearch(
-        &funName,
+    name = (QSPMathOpName *)bsearch(
+        &plainName,
         qspOpsNames[QSP_MATHOPSLEVELS - 1],
         qspOpsNamesCounts[QSP_MATHOPSLEVELS - 1],
         sizeof(QSPMathOpName),
         qspMathOpStringFullCompare);
 
-    if (name) return name->Code;
+    if (name)
+    {
+        QSP_TINYINT resType, type = qspGetVarType(funName);
+        if (QSP_ISDEF(type))
+        {
+            if (!name->HasTypePrefix) return QSP_OP_UNKNOWN;
+            resType = QSP_BASETYPE(qspOps[name->Code].ResType);
+            if (QSP_ISDEF(resType) && type != resType) return QSP_OP_UNKNOWN;
+        }
+        *varType = type;
+        return name->Code;
+    }
     return QSP_OP_UNKNOWN;
 }
 
@@ -991,10 +973,9 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
                 }
                 else
                 {
-                    opCode = qspFunctionOpCode(name);
+                    opCode = qspFunctionOpCode(name, &varType);
                     if (opCode >= QSP_OP_FIRSTFUNCTION)
                     {
-                        varType = qspGetVarType(name);
                         if (qspParseChar(&s, QSP_LRBRACK_CHAR))
                         {
                             if (!qspPushOperationToStack(levels, &opSp, opCode, varType)) break;
@@ -1081,7 +1062,7 @@ INLINE void qspConvertLiteralArgs(QSPMathExpression *expression)
     for (itemIndex = 0; itemIndex < expression->ItemsCount; ++itemIndex, ++item)
     {
         itemOpCode = item->OpCode;
-        if (qspOps[itemOpCode].IsTyped)
+        if (qspOps[itemOpCode].HasTypedArgs)
         {
             argsTypes = qspOps[itemOpCode].ArgsTypes;
             argIndex = itemIndex - 1; /* the last argument */

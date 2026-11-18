@@ -26,6 +26,7 @@
     typedef struct
     {
         QSP_TINYINT Code;
+        QSP_BOOL HasTypePrefix;
         QSPString Name;
     } QSPMathOpName;
 
@@ -35,8 +36,8 @@
         QSP_TINYINT ResType;
         QSP_TINYINT MinArgsCount;
         QSP_TINYINT MaxArgsCount;
-        QSP_TINYINT IsTyped;
         QSP_TINYINT ArgsTypes[QSP_MAXMATHOPARGS];
+        QSP_BOOL HasTypedArgs;
         QSP_FUNCTION Func;
     } QSPMathOperation;
 
