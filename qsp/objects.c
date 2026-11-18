@@ -270,10 +270,7 @@ INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int obj
         qspSetError(QSP_ERR_CANTADDOBJECT);
         return;
     }
-    if (objInd < 0)
-        objInd = 0;
-    else if (objInd > qspCurObjsCount)
-        objInd = qspCurObjsCount;
+    objInd = qspClampNum(objInd, 0, qspCurObjsCount);
     if (qspCurSelObject >= objInd) qspCurSelObject = -1;
     /* Update object group */
     groupIndex = qspGetObjsGroupIndex(objName);

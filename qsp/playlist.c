@@ -95,10 +95,7 @@ INLINE void qspPlayFile(QSPString file, int volume, QSP_BOOL toAddToPlayList)
 {
     int oldLocationState;
     if (!qspIsAnyString(file)) return;
-    if (volume < 0)
-        volume = 0;
-    else if (volume > 100)
-        volume = 100;
+    volume = qspClampNum(volume, 0, 100);
     oldLocationState = qspLocationState;
     if (qspPLFilesCount == QSP_MAXPLFILES)
     {
