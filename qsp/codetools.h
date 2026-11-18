@@ -83,7 +83,7 @@
         int LinesToElse; /* lines to skip to reach the next ELSE branch within multiline block */
         QSPCachedStat *Stats;
         int StatsCount;
-        QSP_TINYINT IsMultiline;
+        QSP_BOOL IsMultiline;
     } QSPLineOfCode;
 
     typedef struct QSPCachedLoop_s

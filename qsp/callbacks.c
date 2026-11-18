@@ -7,11 +7,9 @@
 
 #include "declarations.h"
 #include "callbacks.h"
-#include "actions.h"
 #include "errors.h"
 #include "locations.h"
 #include "names.h"
-#include "objects.h"
 
 QSP_CALLBACK qspCallbacks[QSP_CALL_DUMMY];
 QSP_BOOL qspIsInCallback = QSP_FALSE;
