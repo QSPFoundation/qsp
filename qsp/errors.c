@@ -90,6 +90,7 @@ QSPString qspGetErrorDesc(int errorNum)
     case QSP_ERR_CANTADDACTION: str = QSP_STATIC_STR(QSP_FMT("Can't add action!")); break;
     case QSP_ERR_CANTADDOBJECT: str = QSP_STATIC_STR(QSP_FMT("Can't add object!")); break;
     case QSP_ERR_CANTADDMENUITEM: str = QSP_STATIC_STR(QSP_FMT("Can't add menu item!")); break;
+    case QSP_ERR_CANTPLAYFILE: str = QSP_STATIC_STR(QSP_FMT("Can't play file!")); break;
     case QSP_ERR_LOCNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Location not found!")); break;
     case QSP_ERR_LABELNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Label not found!")); break;
     case QSP_ERR_INCORRECTVARNAME: str = QSP_STATIC_STR(QSP_FMT("Incorrect variable name!")); break;

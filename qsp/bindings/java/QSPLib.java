@@ -26,6 +26,7 @@ public abstract class QSPLib {
         ARGSCOUNT,
         CANTADDOBJECT,
         CANTADDMENUITEM,
+        CANTPLAYFILE,
         TOOMANYVARS,
         INCORRECTREGEXP,
         CODENOTFOUND,

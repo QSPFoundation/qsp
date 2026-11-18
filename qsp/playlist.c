@@ -8,6 +8,7 @@
 #include "playlist.h"
 #include "callbacks.h"
 #include "common.h"
+#include "errors.h"
 #include "locations.h"
 #include "text.h"
 
@@ -97,11 +98,15 @@ INLINE void qspPlayFile(QSPString file, int volume, QSP_BOOL toAddToPlayList)
     if (!qspIsAnyString(file)) return;
     volume = qspClampNum(volume, 0, 100);
     oldLocationState = qspLocationState;
-    if (qspPLFilesCount == QSP_MAXPLFILES)
+    if (toAddToPlayList && qspPLFilesCount == QSP_MAXPLFILES)
     {
         qspRefreshPlayList();
         if (qspLocationState != oldLocationState) return;
-        if (qspPLFilesCount == QSP_MAXPLFILES) return;
+        if (qspPLFilesCount == QSP_MAXPLFILES)
+        {
+            qspSetError(QSP_ERR_CANTPLAYFILE);
+            return;
+        }
     }
     qspCallPlayFile(file, volume);
     if (qspLocationState != oldLocationState) return;
