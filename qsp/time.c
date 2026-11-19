@@ -7,6 +7,7 @@
 
 #include "time.h"
 #include "callbacks.h"
+#include "common.h"
 
 QSP_BIGINT qspMSCount = 0;
 
@@ -18,6 +19,7 @@ void qspResetTime(QSP_BIGINT msecs)
 
 QSP_BIGINT qspGetTime(void)
 {
-    if ((qspMSCount += qspCallGetMSCount()) < 0) qspMSCount = 0;
+    qspMSCount = qspAddNums(qspMSCount, qspCallGetMSCount());
+    if (qspMSCount < 0) qspMSCount = 0;
     return qspMSCount;
 }

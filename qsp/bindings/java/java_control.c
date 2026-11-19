@@ -72,8 +72,8 @@ INLINE QSP_BIGINT qspFromJavaNum(jlong num)
 {
     if (num > (jlong)QSP_MAX_BIGINT)
         return (QSP_BIGINT)QSP_MAX_BIGINT;
-    if (num < -(jlong)QSP_MAX_BIGINT)
-        return -(QSP_BIGINT)QSP_MAX_BIGINT;
+    if (num < (jlong)QSP_MIN_BIGINT)
+        return QSP_MIN_BIGINT;
     return (QSP_BIGINT)num;
 }
 

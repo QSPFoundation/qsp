@@ -265,12 +265,12 @@ INLINE void qspAddObjectWithEvent(QSPString objName, QSPString objImage, int obj
     int groupIndex;
     QSPObj *obj;
     QSPVariant addedObjProps[2];
+    if (objInd < 0 || objInd > qspCurObjsCount) return;
     if (qspCurObjsCount == QSP_MAXOBJECTS)
     {
         qspSetError(QSP_ERR_CANTADDOBJECT);
         return;
     }
-    objInd = qspClampNum(objInd, 0, qspCurObjsCount);
     if (qspCurSelObject >= objInd) qspCurSelObject = -1;
     /* Update object group */
     groupIndex = qspGetObjsGroupIndex(objName);
@@ -419,14 +419,14 @@ QSP_BOOL qspGetObjectInfoByIndex(int index, QSPObjectItem *info)
 
 void qspStatementAddObject(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
-    if (count >= 2)
+    QSPString objImage = (count >= 2 && qspIsAnyString(QSP_STR(args[1]))) ? QSP_STR(args[1]) : qspNullString;
+    if (count == 3)
     {
-        QSPString objImage = (qspIsAnyString(QSP_STR(args[1])) ? QSP_STR(args[1]) : qspNullString);
-        int objInd = (count == 3 ? QSP_TOINT(QSP_NUM(args[2]) - 1) : qspCurObjsCount);
-        qspAddObjectWithEvent(QSP_STR(args[0]), objImage, objInd);
+        int objPos = qspClampNum(QSP_NUM(args[2]), 1, qspCurObjsCount + 1);
+        qspAddObjectWithEvent(QSP_STR(args[0]), objImage, objPos - 1);
     }
     else
-        qspAddObjectWithEvent(QSP_STR(args[0]), qspNullString, qspCurObjsCount);
+        qspAddObjectWithEvent(QSP_STR(args[0]), objImage, qspCurObjsCount);
 }
 
 void qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
@@ -442,8 +442,8 @@ void qspStatementDelObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
     case QSP_STAT_KILLOBJ:
         if (count)
         {
-            int objInd = QSP_TOINT(QSP_NUM(args[0]) - 1);
-            qspRemoveObjectByIndexWithEvent(objInd);
+            int objPos = qspClampNum(QSP_NUM(args[0]), 0, qspCurObjsCount + 1);
+            qspRemoveObjectByIndexWithEvent(objPos - 1);
         }
         else
             qspClearAllObjectsWithEvents();

@@ -101,12 +101,14 @@
         typedef long long QSP_BIGINT;
         typedef unsigned long long QSP_UBIGINT;
         #define QSP_MAX_BIGINT (((unsigned long long)-1) >> 1)
+        #define QSP_MIN_BIGINT (-(QSP_BIGINT)QSP_MAX_BIGINT - 1)
         #define QSP_MAX_BIGINT_LEN 20 /* don't forget about sign */
         #define QSP_TOINT(x) qspToInt(x)
     #else
         typedef int QSP_BIGINT;
         typedef unsigned int QSP_UBIGINT;
         #define QSP_MAX_BIGINT (((unsigned int)-1) >> 1)
+        #define QSP_MIN_BIGINT (-(QSP_BIGINT)QSP_MAX_BIGINT - 1)
         #define QSP_MAX_BIGINT_LEN 12 /* don't forget about sign */
         #define QSP_TOINT(x) (x)
     #endif

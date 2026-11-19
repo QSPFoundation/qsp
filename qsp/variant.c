@@ -6,6 +6,7 @@
  */
 
 #include "variant.h"
+#include "common.h"
 #include "errors.h"
 #include "locations.h"
 #include "mathops.h"
@@ -56,7 +57,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
             if (qspCanConvertToNum(arg1))
             {
                 qspConvertVariantTo(arg1, QSP_TYPE_NUM);
-                *res = qspNumVariant(QSP_PNUM(arg1) + QSP_PNUM(arg2));
+                *res = qspNumVariant(qspAddNums(QSP_PNUM(arg1), QSP_PNUM(arg2)));
             }
             else
             {
@@ -82,7 +83,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
             if (qspCanConvertToNum(arg2))
             {
                 qspConvertVariantTo(arg2, QSP_TYPE_NUM);
-                *res = qspNumVariant(QSP_PNUM(arg1) + QSP_PNUM(arg2));
+                *res = qspNumVariant(qspAddNums(QSP_PNUM(arg1), QSP_PNUM(arg2)));
             }
             else
             {
@@ -92,7 +93,7 @@ INLINE QSP_BOOL qspSumSimpleVariants(QSPVariant *arg1, QSPVariant *arg2, QSPVari
             }
             break;
         case QSP_TYPE_NUM:
-            *res = qspNumVariant(QSP_PNUM(arg1) + QSP_PNUM(arg2));
+            *res = qspNumVariant(qspAddNums(QSP_PNUM(arg1), QSP_PNUM(arg2)));
             break;
         default:
             qspSetError(QSP_ERR_INTERNAL);
@@ -561,10 +562,10 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
     switch (op)
     {
     case QSP_SUB_CHAR:
-        QSP_PNUM(res) = QSP_PNUM(arg1) - QSP_PNUM(arg2);
+        QSP_PNUM(res) = qspSubtractNums(QSP_PNUM(arg1), QSP_PNUM(arg2));
         break;
     case QSP_MUL_CHAR:
-        QSP_PNUM(res) = QSP_PNUM(arg1) * QSP_PNUM(arg2);
+        QSP_PNUM(res) = qspMultiplyNums(QSP_PNUM(arg1), QSP_PNUM(arg2));
         break;
     case QSP_DIV_CHAR:
         if (QSP_PNUM(arg2) == 0)
@@ -572,7 +573,7 @@ QSP_BOOL qspAutoConvertCombine(QSPVariant *arg1, QSPVariant *arg2, QSP_CHAR op, 
             qspSetError(QSP_ERR_DIVBYZERO);
             return QSP_FALSE;
         }
-        QSP_PNUM(res) = QSP_PNUM(arg1) / QSP_PNUM(arg2);
+        QSP_PNUM(res) = qspDivideNums(QSP_PNUM(arg1), QSP_PNUM(arg2));
         break;
     default:
         qspSetError(QSP_ERR_UNKNOWNACTION);
@@ -602,7 +603,7 @@ void qspMultiplyVariantByNum(QSPVariant *val, QSP_BIGINT num, QSPVariant *res)
             qspSetError(QSP_ERR_TYPEMISMATCH);
             return;
         }
-        QSP_PNUM(res) = num * QSP_PNUM(val);
+        QSP_PNUM(res) = qspMultiplyNums(num, QSP_PNUM(val));
         res->Type = QSP_TYPE_NUM;
         break;
     default:

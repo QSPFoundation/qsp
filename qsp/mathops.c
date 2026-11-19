@@ -795,15 +795,18 @@ INLINE QSP_BOOL qspAppendExpressionToCompiled(QSPMathExpression *expression, QSP
             }
             else if (qspIsInClass(*s.Str, QSP_CHAR_DIGIT))
             {
-                v = qspNumVariant(qspParseUnsignedNumber(&s));
                 switch (levels[opSp].OpCode)
                 {
                 case QSP_OP_NEGATION:
-                    QSP_NUM(v) = -QSP_NUM(v);
+                    v = qspNumVariant(qspParseNumber(&s, QSP_TRUE));
                     --opSp;
                     break;
                 case QSP_OP_AFFIRMATION:
+                    v = qspNumVariant(qspParseNumber(&s, QSP_FALSE));
                     --opSp;
+                    break;
+                default:
+                    v = qspNumVariant(qspParseNumber(&s, QSP_FALSE));
                     break;
                 }
                 if (!qspAppendValueToCompiled(expression, QSP_OP_VALUE, v)) break;
@@ -1496,7 +1499,7 @@ QSP_BOOL qspCalculateValue(QSPMathExpression *expression, int itemIndex, QSPVari
             qspSetError(QSP_ERR_DIVBYZERO);
             break;
         }
-        QSP_PNUM(res) = QSP_NUM(args[0]) % QSP_NUM(args[1]);
+        QSP_PNUM(res) = qspModNums(QSP_NUM(args[0]), QSP_NUM(args[1]));
         break;
     case QSP_OP_NEGATION:
         qspMultiplyVariantByNum(args, -1, res);
@@ -1720,16 +1723,14 @@ INLINE void qspFunctionStrPos(QSPVariant *args, QSP_TINYINT count, QSPVariant *r
 
 INLINE void qspFunctionInstr(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
-    int beg, len = qspStrLen(QSP_STR(args[0]));
-    if (count == 2)
-        beg = 0;
-    else
-        beg = qspClampNum(QSP_NUM(args[2]) - 1, 0, len);
-    if (beg < len)
+    int len = qspStrLen(QSP_STR(args[0]));
+    QSP_BIGINT start = (count == 3 ? QSP_NUM(args[2]) : 1);
+    if (start < 1) start = 1;
+    if (start <= len)
     {
         QSP_CHAR *foundPos;
         QSPString subString = QSP_STR(args[0]);
-        subString.Str += beg;
+        subString.Str += start - 1;
         foundPos = qspStrStr(subString, QSP_STR(args[1]));
         QSP_PNUM(res) = (foundPos ? (int)(foundPos - QSP_STR(args[0]).Str) + 1 : 0);
     }
@@ -1740,18 +1741,17 @@ INLINE void qspFunctionInstr(QSPVariant *args, QSP_TINYINT count, QSPVariant *re
 INLINE void qspFunctionMid(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     int len = qspStrLen(QSP_STR(args[0]));
-    if (len > 0)
+    QSP_BIGINT start = QSP_NUM(args[1]);
+    if (start < 1) start = 1;
+    if (start <= len)
     {
-        int beg = qspClampNum(QSP_NUM(args[1]) - 1, 0, len);
+        int beg = start - 1;
         len -= beg;
-        if (len > 0)
-        {
-            if (count == 3) len = qspClampNum(QSP_NUM(args[2]), 0, len);
-            QSP_PSTR(res) = qspCopyToNewText(qspStringFromLen(QSP_STR(args[0]).Str + beg, len));
-            return;
-        }
+        if (count == 3) len = qspClampNum(QSP_NUM(args[2]), 0, len);
+        QSP_PSTR(res) = qspCopyToNewText(qspStringFromLen(QSP_STR(args[0]).Str + beg, len));
     }
-    QSP_PSTR(res) = qspNullString;
+    else
+        QSP_PSTR(res) = qspNullString;
 }
 
 INLINE void qspFunctionReplace(QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
@@ -1947,9 +1947,9 @@ INLINE void qspFunctionDesc(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSP
 
 INLINE void qspFunctionGetObj(QSPVariant *args, QSP_TINYINT QSP_UNUSED(count), QSPVariant *res)
 {
-    int index = QSP_TOINT(QSP_NUM(args[0]) - 1);
-    if (index >= 0 && index < qspCurObjsCount)
-        QSP_PSTR(res) = qspCopyToNewText(qspCurObjects[index].Name);
+    QSP_BIGINT objPos = QSP_NUM(args[0]);
+    if (objPos >= 1 && objPos <= qspCurObjsCount)
+        QSP_PSTR(res) = qspCopyToNewText(qspCurObjects[objPos - 1].Name);
     else
         QSP_PSTR(res) = qspNullString;
 }
