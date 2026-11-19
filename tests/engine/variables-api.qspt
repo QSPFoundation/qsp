@@ -1,0 +1,212 @@
+// Ported from qsp-wasm-engine tests/api/variable-reading.test.ts & tests/api/records.test.ts:
+// the reading through the API. readVariableByIndex is @expect-item, readVariableByKey is @expect-index
+// followed by @expect-item, readVariableSize is @expect-size.
+// Not ported: the cache of the wrapper, the name with spaces around it (the runner splits the words)
+
+@test should read numeric variable by index
+@src
+test[2] = 254
+@run
+@expect-item test 2 => 254
+
+@test should read numeric variable by key
+@src
+test[0] = 11 & test['test'] = 254
+@run
+@expect-index test 'test' => 1
+@expect-item test 1 => 254 key 'test'
+
+@test should read numeric variable by cyrillic key
+@src
+test[0] = 11 & test['тест'] = 254
+@run
+@expect-index test 'тест' => 1
+@expect-item test 1 => 254 key 'тест'
+
+@test should read numeric variable in cyrillic
+@src
+тест = 254
+@run
+@expect-item тест 0 => 254
+
+@test should read string variable by index
+@src
+$test[2] = '254'
+@run
+@expect-item $test 2 => '254'
+
+@test should read string variable by key
+@src
+$test['s'] = '254' & $test['test'] = '252'
+@run
+@expect-index $test 'test' => 1
+@expect-item $test 1 => '252' key 'test'
+
+@test should read string variable by cyrillic key
+@src
+$test['dd'] = '254' & $test['тест'] = '252'
+@run
+@expect-index $test 'тест' => 1
+@expect-item $test 1 => '252' key 'тест'
+
+@test should read string variable in cyrillic
+@src
+$тест = '254'
+@run
+@expect-item $тест 0 => '254'
+
+@test should read tuple variable by index
+@src
+%test[1] = ['b']
+@run
+@expect-item %test 1 => ['b']
+
+@test should read tuple variable by key
+@src
+%test['s'] = ['b']
+@run
+@expect-index %test 's' => 0
+@expect-item %test 0 => ['b'] key 's'
+
+@test should read variable size
+@src
+test[100] = 1
+@run
+@expect-size test 101
+
+@test type prefix: should read stored value as is without prefix
+@src
+$test[0] = 'abc' & test[1] = 254 & %test[2] = [1, 'a']
+@run
+@expect-item test 0 => 'abc'
+@expect-item test 1 => 254
+@expect-item test 2 => [1, 'a']
+
+@test type prefix: should return undefined for missing values without prefix
+@src
+test[2] = 1
+@run
+@expect-item missing 0 => ?
+@expect-item test 0 => ?
+@expect-item test 5 => ?
+
+@test type prefix: should convert value to the prefix type
+@src
+test = 254 & $s = 'abc'
+@run
+@expect-item #test 0 => 254
+@expect-item $test 0 => ''
+@expect-item %test 0 => []
+@expect-item #s 0 => 0
+@expect-item $s 0 => 'abc'
+
+@test type prefix: should return empty values of the prefix type for missing values
+@src
+@run
+@expect-item #missing 0 => 0
+@expect-item $missing 0 => ''
+@expect-item %missing 0 => []
+
+@test keys: should read variable by tuple key
+@src
+test[1, 'a'] = 254
+@run
+@expect-index test [1, 'a'] => 0
+@expect-item test 0 => 254 key [1, 'a']
+
+@test keys: should read variable by numeric key as position
+@src
+test[3] = 254
+@run
+@expect-index test 3 => 3
+@expect-item test 3 => 254
+
+@test keys: should return undefined for missing key
+@src
+test['a'] = 254
+@run
+@expect-index test 'b' => -1
+
+@test keys: should read index by key
+@src
+test['a'] = 1 & test[1, 2] = 2 & test[5] = 3
+@run
+@expect-index test 'a' => 0
+@expect-index test [1, 2] => 1
+@expect-index test 5 => 5
+@expect-index test 'missing' => -1
+@expect-index test 9 => -1
+@expect-index missing 'a' => -1
+
+@test keys: should read item with its key
+@src
+$test['a'] = 'first' & test[1, 2] = 2 & test[5] = 3
+@run
+@expect-item test 0 => 'first' key 'a'
+@expect-item test 1 => 2 key [1, 2]
+@expect-item test 5 => 3
+@expect-item test 9 => ?
+
+@test keys: should read item value with the prefix type
+@src
+test['a'] = 254
+@run
+@expect-item $test 0 => '' key 'a'
+
+@test records: reads the field names with the tuple
+@src
+%r = [hp: 10, 'sword', mp: 3]
+@run
+@expect-item %r 0 => [HP: 10, 'sword', MP: 3]
+
+@test records: has no names for a plain tuple
+@src
+%t = [1, 'a']
+@run
+@expect-item %t 0 => [1, 'a']
+
+@test records: reads nested records
+@src
+%r = [pos: [x: 1, y: 2], 'tag']
+@run
+@expect-item %r 0 => [POS: [X: 1, Y: 2], 'tag']
+
+@test records: reads a field written through the dot syntax
+@src
+%r = [hp: 10] & r.hp = 42 & r.mp = 7
+@run
+@expect-item %r 0 => [HP: 42, MP: 7]
+
+@test records: finds an item by a key with names, distinct from the unnamed key
+@src
+test[[hp: 1]] = 254 & test[[1]] = 11
+@run
+@expect-index test [hp: 1] => 0
+@expect-item test 0 => 254 key [HP: 1]
+@expect-index test [1] => 1
+@expect-item test 1 => 11 key [1]
+
+// The original builds a key with a name the game never used: the C API can't make such a key,
+// QSPGetNameIndex doesn't find the name and doesn't create it
+@test records: a name the game never used has no index
+@src
+test[[hp: 1]] = 254
+@run
+@expect-name hp HP
+@expect-name unknownname
+@expect-name unknownname
+
+@test records: returns the key with its names from the item
+@src
+test[[hp: 1, 'x']] = 254
+@run
+@expect-item test 0 => 254 key [HP: 1, 'x']
+
+@test records: reads variables by a name in any case
+@src
+test = 5 & $name = 'abc'
+@run
+@expect-item TEST 0 => 5
+@expect-item Test 0 => 5
+@expect-item $Name 0 => 'abc'
+@expect-size TeSt 1

@@ -1,0 +1,173 @@
+// Ported from qsp-wasm-engine tests/api/location-data-retrieval.test.ts
+// The code is compared as "LINE: CODE" lines, the engine upper-cases the code outside of strings;
+// "none" is the answer -1 of the engine (no location, no action or no code)
+// Not ported: the lists bigger than the buffer of the wrapper; the runner asks the engine for the number
+// of the items first, so every check reads the whole list
+
+@test getLocationsList should return all location names
+@src
+*p 'main location'
+---
+# second
+*p 'second location'
+---
+# third
+*p 'third location'
+@run
+@expect-locs [start; test; second; third]
+
+@test getLocationCode should return location source code
+@src
+*p 'main location'
+x = 1
+$name = 'test'
+---
+# second
+*p 'second location'
+y = 2
+@run
+@expect-loc-code test
+1: *P 'main location'
+2: X = 1
+3: $NAME = 'test'
+@expect-loc-code second
+1: *P 'second location'
+2: Y = 2
+
+@test getLocationActions should return base actions for a location
+@game
+# test
+--
+@action test | test | test.png
+x = 1
+$name = 'test'
+@action test | test2 | test.png
+x = 2
+$name = 'test'
+@expect-loc-acts test [test|test.png; test2|test.png]
+@expect-loc-acts nonexistent none
+
+@test getLocationActionCode should work with location base actions
+@game
+# test
+--
+@action test | test | test.png
+x = 1
+$name = 'test'
+@action test | test2 | test.png
+x = 2
+$name = 'test'
+@expect-loc-act-code test 0
+1: X = 1
+2: $NAME = 'test'
+@expect-loc-act-code test 1
+1: X = 2
+2: $NAME = 'test'
+
+@test getLocationCode should return empty array for non-existent location
+@src
+*p 'test'
+@run
+@expect-loc-code nonexistent
+none
+
+@test getLocationActionCode should return empty array for non-existent action
+@src
+@run
+@expect-loc-act-code test 5
+none
+
+@test should read list of locations (debug)
+@src
+@run
+@expect-locs [start; test]
+
+@test should read location code (debug)
+@src
+'first line'
+
+act 'first act':
+  'something'
+end
+@run
+@expect-loc-code test
+1: 'first line'
+2:
+3: ACT 'first act':
+4: 'something'
+5: END
+
+@test returns code lines with the engine's line numbers
+@src
+x = 1 + _
+  2
+z = 3
+y = 1 / 0
+@run
+@expect-error DIVBYZERO (location 'test', line 4, local 4, action -1) Y = 1 / 0
+@expect-loc-code test
+1: X = 1 + 2
+3: Z = 3
+4: Y = 1 / 0
+
+@test a string on several lines keeps the number of its first line
+@src
+$s = 'a
+b'
+z = 3
+@run
+@expect-loc-code test
+1: $S = 'a\r\nb'
+3: Z = 3
+
+@test returns the code of a current action
+@src
+x = 0
+act 'A': x = 1
+act 'B':
+  x = 2
+end
+@run
+@expect-act-code 0
+2:  X = 1
+@expect-act-code 1
+4: X = 2
+@expect-act-code 2
+none
+@expect-act-code -1
+none
+
+@test getLocationDescription should return description for location with static description
+@game
+# testloc
+--
+@desc testloc
+This is a test location
+with multiple lines
+@expect-loc-desc testloc This is a test location\r\nwith multiple lines
+
+@test getLocationDescription should handle location with no description
+@game
+# emptyloc
+--
+@expect-loc-desc emptyloc
+
+@test getLocationDescription should handle non-existent location
+@src
+'test'
+@run
+@expect-loc-desc nonexistent
+
+// ------------------------------------------------------------
+// Not in qsp-wasm-engine
+
+@test a location without code has no code, a base action without code has no code either
+@game
+# empty
+--
+@action empty | act
+@expect-loc-code empty
+none
+@expect-loc-act-code empty 0
+none
+@expect-loc-acts empty [act]

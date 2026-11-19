@@ -1,0 +1,339 @@
+// Ported from qsp-wasm-engine tests/engine/strings.test.ts
+
+@test string compare: 'ac' = 'ac' -> 1
+@src
+res = 'ac' = 'ac'
+@run
+@expect res => 1
+
+@test string compare: 'ac' = 'ab' -> 0
+@src
+res = 'ac' = 'ab'
+@run
+@expect res => 0
+
+@test string compare: 'bc' > 'ac' -> 1
+@src
+res = 'bc' > 'ac'
+@run
+@expect res => 1
+
+@test string compare: 'ac' > 'ab' -> 1
+@src
+res = 'ac' > 'ab'
+@run
+@expect res => 1
+
+@test string compare: 'b'  > 'ab' -> 1
+@src
+res = 'b'  > 'ab'
+@run
+@expect res => 1
+
+@test string compare: 'ab' > 'a' -> 1
+@src
+res = 'ab' > 'a'
+@run
+@expect res => 1
+
+@test subexpression
+@src
+i = 1 & $res = 'i=<<i>>'
+@run
+@expect $res => 'i=1'
+
+@test nested subexpressions
+@src
+i = 1 & $a['_1'] = 'here' & $res = 's=<<$a["_<<i>>"]>>'
+@run
+@expect $res => 's=here'
+
+@test LEN
+@src
+res = LEN("тест")
+@run
+@expect res => 4
+
+@test $MID: cutting middle part of a string
+@src
+$res = $MID('abcd', 2, 2)
+@run
+@expect $res => 'bc'
+
+@test $MID: cutting string to end
+@src
+$res = $MID('abcd', 3)
+@run
+@expect $res => 'cd'
+
+@test $MID: cutting string from start
+@src
+$res = $MID('abcd', 1, 2)
+@run
+@expect $res => 'ab'
+
+@test $MID: returns empty string if index bigger string start
+@src
+$res = $MID('abcd', 5, 2)
+@run
+@expect $res => ''
+
+@test UCASE
+@src
+$res = $UCASE('TexT#')
+@run
+@expect $res => 'TEXT#'
+
+@test UCASE cyrillic
+@src
+$res = $UCASE('Привет, Алиса!')
+@run
+@expect $res => 'ПРИВЕТ, АЛИСА!'
+
+@test LCASE
+@src
+$res = $LCASE('TexT#')
+@run
+@expect $res => 'text#'
+
+@test LCASE cyrillic
+@src
+$res = $lcase('Привет, Алиса!')
+@run
+@expect $res => 'привет, алиса!'
+
+@test TRIM
+@src
+$res = $TRIM(' TRIM TEST ')
+@run
+@expect $res => 'TRIM TEST'
+
+@test $REPLACE: replaces string
+@src
+$res = $REPLACE('test', 'e', 's')
+@run
+@expect $res => 'tsst'
+
+@test $REPLACE: replaces all occurrences
+@src
+$res = $REPLACE('test', 't', '34')
+@run
+@expect $res => '34es34'
+
+@test $REPLACE: returns initial string if replacement not found
+@src
+$res = $REPLACE('test', '1', '2')
+@run
+@expect $res => 'test'
+
+@test $REPLACE: removes occurrences if last parm not provided
+@src
+$res = $REPLACE('test', 't')
+@run
+@expect $res => 'es'
+
+@test $REPLACE: works with cyrillic
+@src
+$res = $REPLACE('Привет, Алиса!', 'Алиса', 'Катя')
+@run
+@expect $res => 'Привет, Катя!'
+
+@test INSTR: INSTR('ABCDefgh','BC',1) -> 2
+@src
+res = INSTR('ABCDefgh','BC',1)
+@run
+@expect res => 2
+
+@test INSTR: INSTR('ABCDefgh','Be',1) -> 0
+@src
+res = INSTR('ABCDefgh','Be',1)
+@run
+@expect res => 0
+
+@test INSTR: INSTR('abcdef','abc') -> 1
+@src
+res = INSTR('abcdef','abc')
+@run
+@expect res => 1
+
+@test INSTR: INSTR('abcdef','abd') -> 0
+@src
+res = INSTR('abcdef','abd')
+@run
+@expect res => 0
+
+@test ISNUM("9999") -> 1
+@src
+res = ISNUM("9999")
+@run
+@expect res => 1
+
+@test ISNUM(" 9999 ") -> 1
+@src
+res = ISNUM(" 9999 ")
+@run
+@expect res => 1
+
+@test ISNUM(" -888") -> 1
+@src
+res = ISNUM(" -888")
+@run
+@expect res => 1
+
+@test ISNUM("777a6") -> 0
+@src
+res = ISNUM("777a6")
+@run
+@expect res => 0
+
+@test ISNUM("") -> 0
+@src
+res = ISNUM("")
+@run
+@expect res => 0
+
+@test VAL with number in string
+@src
+res = VAL('123')
+@run
+@expect res => 123
+
+@test VAL with mixed string
+@src
+res = VAL('123a')
+@run
+@expect res => 0
+
+@test VAL with empty string
+@src
+res = VAL('')
+@run
+@expect res => 0
+
+@test STR
+@src
+$res = STR(123)
+@run
+@expect $res => '123'
+
+@test STRFIND: STRFIND(' идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 0) ->
+@src
+$res = STRFIND(' идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 0)
+@run
+@expect $res => ''
+
+@test STRFIND: STRFIND('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 1) -> идти
+@src
+$res = STRFIND('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 1)
+@run
+@expect $res => 'идти'
+
+@test STRFIND: STRFIND('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 2) -> к
+@src
+$res = STRFIND('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 2)
+@run
+@expect $res => 'к'
+
+@test STRFIND: STRFIND('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 3) -> пещере
+@src
+$res = STRFIND('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 3)
+@run
+@expect $res => 'пещере'
+
+@test STRFIND: STRFIND('идти к дому', 'к\s(\S+)', 0) -> к дому
+@src
+$res = STRFIND('идти к дому', 'к\s(\S+)', 0)
+@run
+@expect $res => 'к дому'
+
+@test STRFIND: STRFIND('идти к дому', 'к\s(\S+)') -> к дому
+@src
+$res = STRFIND('идти к дому', 'к\s(\S+)')
+@run
+@expect $res => 'к дому'
+
+@test STRFIND: STRFIND('идти к дому', 'к\s(\S+)', 1) -> дому
+@src
+$res = STRFIND('идти к дому', 'к\s(\S+)', 1)
+@run
+@expect $res => 'дому'
+
+@test STRFIND: STRFIND('идти к своему дому', 'к\s(\S+)', 1) -> своему
+@src
+$res = STRFIND('идти к своему дому', 'к\s(\S+)', 1)
+@run
+@expect $res => 'своему'
+
+@test STRCOMP: STRCOMP(' идти к пещере', '^(\S+)\s(\S+)\s(\S+)$') -> 0
+@src
+res = STRCOMP(' идти к пещере', '^(\S+)\s(\S+)\s(\S+)$')
+@run
+@expect res => 0
+
+@test STRCOMP: STRCOMP('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$') -> 1
+@src
+res = STRCOMP('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$')
+@run
+@expect res => 1
+
+@test STRPOS: STRPOS(' идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 0) -> 0
+@src
+res = STRPOS(' идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 0)
+@run
+@expect res => 0
+
+@test STRPOS: STRPOS('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 1) -> 1
+@src
+res = STRPOS('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 1)
+@run
+@expect res => 1
+
+@test STRPOS: STRPOS('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 2) -> 6
+@src
+res = STRPOS('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 2)
+@run
+@expect res => 6
+
+@test STRPOS: STRPOS('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 3) -> 8
+@src
+res = STRPOS('идти к пещере', '^(\S+)\s(\S+)\s(\S+)$', 3)
+@run
+@expect res => 8
+
+@test STRPOS: STRPOS('идти к пещере', '^(\S+)\s(\S+)(\s(\S+))?$', 4) -> 8
+@src
+res = STRPOS('идти к пещере', '^(\S+)\s(\S+)(\s(\S+))?$', 4)
+@run
+@expect res => 8
+
+@test STRPOS: STRPOS('идти к дому', 'к\s(\S+)', 0) -> 6
+@src
+res = STRPOS('идти к дому', 'к\s(\S+)', 0)
+@run
+@expect res => 6
+
+@test STRPOS: STRPOS('идти к дому', 'к\s(\S+)') -> 6
+@src
+res = STRPOS('идти к дому', 'к\s(\S+)')
+@run
+@expect res => 6
+
+@test STRPOS: STRPOS('идти к дому', 'к\s(\S+)', 1) -> 8
+@src
+res = STRPOS('идти к дому', 'к\s(\S+)', 1)
+@run
+@expect res => 8
+
+@test STRPOS: STRPOS('идти к своему дому', 'к\s(\S+)', 1) -> 8
+@src
+res = STRPOS('идти к своему дому', 'к\s(\S+)', 1)
+@run
+@expect res => 8
+
+@test SCANSTR: extracting tokens from string
+@src
+scanstr '$s', 'ffff|bbbb|ccccc', '[^|]+'
+@run
+@expect $s[0] => 'ffff'
+@expect $s[1] => 'bbbb'
+@expect $s[2] => 'ccccc'

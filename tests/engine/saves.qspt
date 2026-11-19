@@ -1,0 +1,53 @@
+// Saves into files: @save-file / @load-file write and read the files in the current directory
+
+@test @save-file / @load-file restore the state of the game
+@src
+
+x = 1
+$s = 'text'
+arr[1] = 10
+addobj 'sword'
+act 'go': x = 3
+
+@run
+@save-file saves-state.sav
+@exec x = 2 & $s = '' & killvar 'arr' & killobj & delact 'go'
+@load-file saves-state.sav
+@expect x => 1
+@expect $s => 'text'
+@expect arr[1] => 10
+@expect-objs [sword]
+@expect-acts [go]
+
+@test @load-file runs $ONGLOAD
+@src
+
+$ONGLOAD = 'gload'
+x = 1
+---
+# gload
+loaded = 1
+
+@run
+@save-file saves-ongload.sav
+@load-file saves-ongload.sav
+@expect loaded => 1
+
+@test @save-file: a save cancelled by $ONGSAVE doesn't overwrite the file
+@src
+
+x = 1
+---
+# gsave
+gt 'other'
+---
+# other
+
+@run
+@save-file saves-cancelled.sav
+@exec x = 2 & $ONGSAVE = 'gsave'
+@save-file saves-cancelled.sav
+@expect-event save_cancelled
+@load-file saves-cancelled.sav
+@expect x => 1
+@expect $ONGSAVE => ''

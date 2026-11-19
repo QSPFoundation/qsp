@@ -1,0 +1,48 @@
+// Ported from qsp-wasm-engine tests/api/current-location.test.ts
+// @expect-curloc reads QSPGetCurLocation, @expect-state reads QSPGetCurStateData as LOCATION:LINE:ACTION;
+// @watch-msg-state records both while the MSG callback runs: "state curloc=LOC exec=LOCATION:LINE:ACTION"
+
+@test getCurrentLocation reads $CURLOC, not the location executing code
+@game
+# start
+--
+# hall
+gs 'helper'
+--
+# helper
+msg 'in helper'
+--
+@watch-msg-state
+@exec x = 1
+@expect-curloc
+@restart
+@expect-curloc start
+@exec gt 'hall'
+@expect-event state curloc=hall exec=helper:1:-1
+@expect-curloc hall
+@expect $curloc => 'hall'
+
+@test getCurrentState points at the statement waiting in a dialog
+@watch-msg-state
+@src
+x = 1
+msg 'hi'
+@run
+@expect-event state curloc= exec=test:2:-1
+@expect-state :0:-1
+
+// ------------------------------------------------------------
+// Not in qsp-wasm-engine
+
+@test getCurrentState gives the index of the base action in a dialog
+@watch-msg-state
+@game
+# start
+--
+@action start | act
+x = 1
+msg 'in action'
+@restart
+@select-act 0
+@exec-act
+@expect-event state curloc=start exec=start:2:0

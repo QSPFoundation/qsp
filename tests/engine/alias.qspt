@@ -1,0 +1,435 @@
+// ALIAS name[, name...] = 'variable'[, 'variable'...]: local names that share the arrays of other variables (b87c2d8)
+// Not in qsp-wasm-engine, the expectations follow qspStatementAlias.
+// Note: P is a statement, the tests don't use it as a name.
+
+// ------------------------------------------------------------
+// Sharing
+
+@test ALIAS: writes go to the original variable
+@game
+# start
+--
+# test
+x = 1
+gs 'f'
+--
+# f
+alias y = 'x'
+y = 5
+y[1] = 6
+--
+@run
+@expect arrpack('x') => [5, 6]
+
+@test ALIAS: reads see the original variable with its keys
+@game
+# start
+--
+# test
+$s[0] = 'a' & $s['k'] = 'b'
+gs 'f'
+--
+# f
+alias t = '$s'
+$r = $t['k'] + $t[0]
+n = arrsize('t')
+--
+@run
+@expect [$r, n] => ['ba', 2]
+
+@test ALIAS: several names
+@game
+# start
+--
+# test
+a = 1 & b = 2
+gs 'f'
+--
+# f
+alias u, w = 'a', 'b'
+u += 10
+w += 20
+--
+@run
+@expect [a, b] => [11, 22]
+
+@test ALIAS: the names can come in a tuple
+@game
+# start
+--
+# test
+a = 1 & b = 2
+gs 'f'
+--
+# f
+alias u, w = ['a', 'b']
+u = 11
+w = 22
+--
+@run
+@expect [a, b] => [11, 22]
+
+@test ALIAS: the names are resolved before the aliases exist
+@game
+# start
+--
+# test
+a = 1 & b = 2
+gs 'f'
+--
+# f
+alias a, b = 'b', 'a'
+a = 100
+--
+@run
+@expect [a, b] => [1, 100]
+
+@test ALIAS: creates a missing variable
+@game
+# start
+--
+# test
+gs 'f'
+--
+# f
+alias y = 'brandnew'
+y = 1
+--
+@run
+@expect brandnew => 1
+
+@test ALIAS: type prefixes of the names don't matter
+@game
+# start
+--
+# test
+$s = 'a' & n = 1
+gs 'f'
+--
+# f
+alias $t = 'n'
+$t = 'x'
+alias u = '$s'
+$r = $u
+--
+@run
+@expect [n, $r] => ['x', 'a']
+
+// ------------------------------------------------------------
+// Scopes
+
+@test ALIAS: the alias is local
+@game
+# start
+--
+# test
+gs 'f'
+x = 3
+--
+# f
+alias y = 'x'
+y = 1
+--
+@run
+@expect [x, arrsize('y')] => [3, 0]
+
+@test ALIAS: at the top level of a location
+@src
+x = 1
+alias y = 'x'
+y = 7
+@run
+@expect [x, y] => [7, ?]
+
+@test ALIAS: an alias of an alias
+@game
+# start
+--
+# test
+x = 1
+gs 'f'
+--
+# f
+alias y = 'x'
+gs 'g'
+--
+# g
+alias z = 'y'
+z = 9
+--
+@run
+@expect x => 9
+
+@test ALIAS: a local variable of the caller
+@game
+# start
+--
+# test
+local v = 1
+gs 'f'
+w = v
+--
+# f
+alias y = 'v'
+y = 2
+--
+@run
+@expect w => 2
+
+@test ALIAS: the same name as the variable
+@game
+# start
+--
+# test
+x = 1
+gs 'f'
+--
+# f
+alias x = 'x'
+x = 4
+--
+@run
+@expect x => 4
+
+@test ALIAS: a new alias replaces the old one in the same scope
+@game
+# start
+--
+# test
+a = 1 & b = 2
+gs 'f'
+--
+# f
+alias y = 'a'
+alias y = 'b'
+y = 10
+--
+@run
+@expect [a, b] => [1, 10]
+
+@test ALIAS: replaces a local variable of the same scope
+@game
+# start
+--
+# test
+x = 1
+gs 'f'
+--
+# f
+local y = 5
+alias y = 'x'
+y = 8
+--
+@run
+@expect x => 8
+
+@test ALIAS: LOCAL with the same name in the same scope keeps the alias
+@game
+# start
+--
+# test
+x = 1
+gs 'f'
+--
+# f
+alias y = 'x'
+local y = 5
+--
+@run
+@expect x => 5
+
+@test ALIAS: LOCAL in a nested scope hides the alias
+@game
+# start
+--
+# test
+x = 1
+gs 'f'
+--
+# f
+alias y = 'x'
+gs 'g'
+--
+# g
+local y = 5
+--
+@run
+@expect x => 1
+
+@test ALIAS: ARGS & RESULT
+@game
+# start
+--
+# test
+x = 1
+gs 'f', 2
+r = func('g')
+--
+# f
+alias args = 'x'
+args[0] = 7
+--
+# g
+alias result = 'q'
+result = 3
+--
+@run
+@expect [x, r, q] => [7, 3, 3]
+
+@test ALIAS: in DYNAMIC, loops & actions
+@game
+# start
+x = 1
+act 'a':
+  alias y = 'x'
+  y = 5
+end
+--
+# test
+gs 'f'
+--
+# f
+dynamic "alias y = 'z' & y = 6"
+loop local i = 0 while i < 3 step i += 1:
+  alias y = 'v<<i>>'
+  y = i + 10
+end
+--
+@run
+@expect [z, v0, v1, v2] => [6, 10, 11, 12]
+@run start
+@select-act 0
+@exec-act
+@expect x => 5
+
+// ------------------------------------------------------------
+// Array statements & saves
+
+@test ALIAS: array statements work through the alias
+@game
+# start
+--
+# test
+x[] = 3 & x[] = 1 & x[] = 2
+gs 'f'
+--
+# f
+alias y = 'x'
+sortarr 'y'
+insvar 'y', 9, 0
+--
+@run
+@expect arrpack('x') => [9, 1, 2, 3]
+
+@test ALIAS: KILLVAR through the alias clears the shared array
+@game
+# start
+--
+# test
+x[] = 1 & x[] = 2
+gs 'f'
+--
+# f
+alias y = 'x'
+killvar 'y'
+--
+@run
+@expect arrpack('x') => []
+
+@test ALIAS: KILLVAR of the original clears the alias too
+@game
+# start
+--
+# test
+x = 1
+gs 'f'
+--
+# f
+alias y = 'x'
+killvar 'x'
+r = y
+--
+@run
+@expect [r, x] => [?, ?]
+
+@test ALIAS: KILLVAR of all variables empties the aliased variables, the alias stays
+@game
+# start
+--
+# test
+x = 1
+gs 'f'
+--
+# f
+alias y = 'x'
+killvar
+r = x
+y = 5
+--
+@run
+@expect [r, x] => [?, 5]
+
+@test ALIAS: a save keeps the values, not the aliases
+@game
+# start
+--
+# test
+x = 1
+gs 'f'
+--
+# f
+alias y = 'x'
+y = 2
+savegame 'slot'
+y = 3
+--
+@run
+@load-save slot
+@expect x => 2
+
+// ------------------------------------------------------------
+// Errors
+
+@test ALIAS: the number of names has to match
+@game
+# start
+--
+# test
+gs 'f'
+--
+# f
+alias u, w = 'a'
+--
+@run
+@expect-error ARGSCOUNT
+
+@test ALIAS: an incorrect variable name
+@game
+# start
+--
+# test
+gs 'f'
+--
+# f
+alias y = '1bad'
+--
+@run
+@expect-error INCORRECTVARNAME
+
+@test ALIAS: indices are a syntax error
+@src
+alias y[1] = 'a'
+@run
+@expect-error SYNTAX
+
+@test ALIAS: compound operations are a syntax error
+@src
+alias y += 'a'
+@run
+@expect-error SYNTAX
+
+@test ALIAS: requires a value
+@src
+alias y
+@run
+@expect-error SYNTAX

@@ -1,0 +1,57 @@
+// Ported from qsp-wasm-engine tests/engine/init-game.test.ts
+// The INITGAME callback is recorded as "init_game 1" for a new game and "init_game 0" for a loaded save
+
+@test should be triggered when the game is restarted
+@src
+x = 1
+@run
+@expect-no-event init_game
+@restart
+@expect-count 1 init_game
+@expect-event init_game 1
+
+@test should be triggered when a saved game is loaded
+@src
+x = 1
+@run
+@save s
+@load-save s
+@expect-count 1 init_game
+@expect-event init_game 0
+
+// The callback is synchronous, so the code of @init-game runs before $ONGLOAD
+@test should make the engine wait for the promise returned by the listener
+@init-game prepared = 1
+@src
+
+$ongload = 'loaded' & x = 1
+---
+# loaded
+seen = prepared
+
+@run
+@save s
+@load-save s
+@expect seen => 1
+
+// ------------------------------------------------------------
+// Not in qsp-wasm-engine
+
+@test the code of the callback runs after the state is reset by the restart
+@init-game prepared = x + 1
+@game
+# start
+x = 10
+@exec x = 5
+@restart
+@expect prepared => 1
+@expect x => 10
+
+@test an error in the callback stops the restart
+@init-game x = 1 / 0
+@game
+# start
+started = 1
+@restart
+@expect-error DIVBYZERO
+@expect started => ?
