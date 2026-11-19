@@ -376,13 +376,21 @@ INLINE QSPVar *qspAddLocalVar(int nameIndex)
         return 0;
     }
     if (!globalVar->NameIndex)
+    {
+        if (qspGlobalVarsCount >= QSP_MAXGLOBALVARS)
+        {
+            qspSetError(QSP_ERR_TOOMANYVARS);
+            return 0;
+        }
         globalVar = qspCreateGlobalVar(nameIndex);
+    }
     return qspCreateLocalVar(globalVar);
 }
 
 QSPVarData *qspAddGlobalVarByName(QSPString name)
 {
     QSPVar *var;
+    int nameIndex;
     unsigned int nameHash;
     name = qspPrepareVarName(name, &nameHash); /* validates the name */
     if (qspIsEmpty(name))
@@ -390,7 +398,8 @@ QSPVarData *qspAddGlobalVarByName(QSPString name)
         qspSetError(QSP_ERR_INCORRECTVARNAME);
         return 0;
     }
-    var = qspGetGlobalVar(qspGetExactNameIndex(name, nameHash, QSP_TRUE), QSP_TRUE);
+    nameIndex = qspGetExactNameIndex(name, nameHash, QSP_TRUE);
+    var = qspGetGlobalVar(nameIndex, QSP_TRUE);
     return qspGetVarData(var);
 }
 
