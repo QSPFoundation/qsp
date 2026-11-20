@@ -80,7 +80,7 @@ QSPString qspGetErrorDesc(int errorNum)
     case QSP_ERR_INTERNAL: str = QSP_STATIC_STR(QSP_FMT("Internal error!")); break;
     case QSP_ERR_DIVBYZERO: str = QSP_STATIC_STR(QSP_FMT("Division by zero!")); break;
     case QSP_ERR_TYPEMISMATCH: str = QSP_STATIC_STR(QSP_FMT("Type mismatch!")); break;
-    case QSP_ERR_LOCCALLDEPTH: str = QSP_STATIC_STR(QSP_FMT("Maximum location call depth exceeded!")); break;
+    case QSP_ERR_CALLDEPTH: str = QSP_STATIC_STR(QSP_FMT("Maximum call depth exceeded!")); break;
     case QSP_ERR_COMPLEXEXPRESSION: str = QSP_STATIC_STR(QSP_FMT("Expression too complex!")); break;
     case QSP_ERR_CANTLOADFILE: str = QSP_STATIC_STR(QSP_FMT("Can't load file!")); break;
     case QSP_ERR_GAMENOTLOADED: str = QSP_STATIC_STR(QSP_FMT("Game not loaded!")); break;

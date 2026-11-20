@@ -2,31 +2,30 @@ package com.libqsp.jni;
 
 public abstract class QSPLib {
     public enum Error {
-        DIVBYZERO, /* = 10 */
+        INTERNAL, /* = 10 */
+        DIVBYZERO,
         TYPEMISMATCH,
-        STACKOVERFLOW,
-        TOOMANYITEMS,
+        CALLDEPTH,
+        COMPLEXEXPRESSION,
         CANTLOADFILE,
         GAMENOTLOADED,
         COLONNOTFOUND,
+        ENDNOTFOUND,
         CANTINCFILE,
         CANTADDACTION,
-        EQNOTFOUND,
+        CANTADDOBJECT,
+        CANTADDMENUITEM,
+        CANTPLAYFILE,
         LOCNOTFOUND,
-        ENDNOTFOUND,
         LABELNOTFOUND,
         INCORRECTVARNAME,
         INCORRECTFIELDNAME,
         DUPLICATEFIELD,
         QUOTNOTFOUND,
-        BRACKNOTFOUND,
-        BRACKSNOTFOUND,
+        BRACKETNOTFOUND,
         SYNTAX,
         UNKNOWNACTION,
         ARGSCOUNT,
-        CANTADDOBJECT,
-        CANTADDMENUITEM,
-        CANTPLAYFILE,
         TOOMANYVARS,
         INCORRECTREGEXP,
         CODENOTFOUND,
@@ -134,7 +133,7 @@ public abstract class QSPLib {
     }
 
     public class ErrorInfo {
-        public int errorNum; /* Error.ordinal() */
+        public int errorNum; /* Error.ordinal() + 10 */
         public String errorDesc;
         public String locName; /* location name */
         public int actIndex; /* index of the base action */

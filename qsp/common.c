@@ -90,8 +90,8 @@ void qspPrepareExecution(QSP_BOOL toInit)
     {
         /* Reset local variables & switch to the global scope */
         qspClearLocalVars();
-        /* Reset location call depth */
-        qspCurLocCallDepth = 0;
+        /* Reset call depth */
+        qspCurCallDepth = 0;
         /* Reset the execution state */
         qspUpdateLocation(&qspRunLoc, 0);
         qspRunActIndex = -1;
@@ -174,14 +174,7 @@ INLINE QSP_UBIGINT qspRand(void)
 QSP_BIGINT qspUniformRand(QSP_BIGINT min, QSP_BIGINT max)
 {
     QSP_UBIGINT count;
-    if (min == max)
-        return min;
-    if (min > max)
-    {
-        QSP_BIGINT temp = min;
-        min = max;
-        max = temp;
-    }
+    if (min >= max) return min;
     count = (QSP_UBIGINT)max - (QSP_UBIGINT)min + 1; /* might wrap to 0 */
     if (count > 0)
         return (QSP_BIGINT)((QSP_UBIGINT)min + qspRand() % count);
@@ -291,14 +284,7 @@ QSP_BIGINT qspNormalRand(QSP_BIGINT min, QSP_BIGINT max, QSP_BIGINT mean)
     Simulation from the Tail of the Univariate and Multivariate Normal Distribution
     */
     double realMin, realMax, realMean, a, b, res, sigma, leftDist, rightDist, maxDist;
-    if (min == max)
-        return min;
-    if (min > max)
-    {
-        QSP_BIGINT temp = min;
-        min = max;
-        max = temp;
-    }
+    if (min >= max) return min;
 
     realMin = (double)min;
     realMax = (double)max;

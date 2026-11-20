@@ -74,7 +74,7 @@ void qspAddAction(QSPString name, QSPString imgPath, QSPCodeBlock *code, int sta
         return;
     }
     act = qspCurActions + qspCurActsCount++;
-    act->Image = (qspIsAnyString(imgPath) ? qspCopyToNewText(imgPath) : qspNullString);
+    act->Image = qspCopyToNewText(imgPath);
     act->Desc = qspCopyToNewText(name);
     if (end > start)
     {
@@ -188,7 +188,7 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
             lastPos += QSP_STATIC_LEN(QSP_COLONDELIM); /* include the last colon */
         act->OnPressCode = qspNewSinglelineCodeBlock(qspStringFromPair(firstPos, lastPos), line->LineNum, qspRunCode->IsTopLevel);
     }
-    if (argsCount == 2)
+    if (argsCount == 2 && qspIsAnyString(QSP_STR(args[1])))
         qspAddAction(QSP_STR(args[0]), QSP_STR(args[1]), act->OnPressCode, 0, 1);
     else
         qspAddAction(QSP_STR(args[0]), qspNullString, act->OnPressCode, 0, 1);
@@ -203,7 +203,7 @@ void qspStatementMultilineAddAct(QSPCodeBlock *code, int lineInd, int endLine)
     QSPLineOfCode *line = code->Lines + lineInd;
     argsCount = qspGetStatArgs(line->Stats, line->Stats->Data.Act->Args, args);
     if (qspLocationState != oldLocationState) return;
-    if (argsCount == 2)
+    if (argsCount == 2 && qspIsAnyString(QSP_STR(args[1])))
         qspAddAction(QSP_STR(args[0]), QSP_STR(args[1]), code, lineInd + 1, endLine);
     else
         qspAddAction(QSP_STR(args[0]), qspNullString, code, lineInd + 1, endLine);

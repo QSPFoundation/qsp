@@ -468,7 +468,7 @@ void qspStatementResetObj(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     if (count)
     {
         groupIndex = qspGetObjsGroupIndex(QSP_STR(args[0]));
-        if (groupIndex >= 0) qspResetObjsGroupByIndex(groupIndex);
+        qspResetObjsGroupByIndex(groupIndex);
     }
     else
     {

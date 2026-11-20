@@ -699,7 +699,13 @@ INLINE QSP_BOOL qspExecStringWithLocals(QSPLineOfCode *line, int startStat, int 
 void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT count, QSPVariant *res)
 {
     QSPCodeBlock *code;
-    int oldLocalScopeBase = qspAllocateLocalScopeWithArgs(args, count, QSP_TRUE);
+    int oldLocalScopeBase;
+    if (qspCurCallDepth >= QSP_MAXCALLDEPTH)
+    {
+        qspSetError(QSP_ERR_CALLDEPTH);
+        return;
+    }
+    oldLocalScopeBase = qspAllocateLocalScopeWithArgs(args, count, QSP_TRUE);
 
     code = qspGetCachedCodeBlock(s);
     if (code)
@@ -710,7 +716,9 @@ void qspExecStringAsCodeWithArgs(QSPString s, QSPVariant *args, QSP_TINYINT coun
         qspIntRunTopLineNum = qspGetTopLineNum();
         qspRunCode = code;
         oldLocationState = qspLocationState;
+        ++qspCurCallDepth;
         qspExecCode(code, 0, code->LinesCount, 0);
+        --qspCurCallDepth;
         qspRunLine = oldLine; /* the executed code can be released */
         qspRunCode = oldCode;
         qspIntRunTopLineNum = oldIntRunTopLineNum;

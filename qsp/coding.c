@@ -380,7 +380,8 @@ INLINE QSP_BOOL qspReadEncodedField(QSPString *strs, int strsCount, int *curInde
 
 QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QSP_BOOL isUCS2, QSPVariant *val)
 {
-    int type, ind = *curIndex;
+    QSP_BIGINT type;
+    int ind = *curIndex;
     if (ind >= strsCount) return QSP_FALSE;
     type = qspReadEncodedIntVal(strs[ind++], isUCS2);
     if (!QSP_ISVALUE(type)) return QSP_FALSE; /* unsupported value type */
@@ -391,10 +392,10 @@ QSP_BOOL qspReadEncodedVariant(QSPString *strs, int strsCount, int *curIndex, QS
         break;
     case QSP_TYPE_TUPLE:
         {
-            int itemsCount;
+            QSP_BIGINT itemsCount;
             if (ind >= strsCount) return QSP_FALSE;
             itemsCount = qspReadEncodedIntVal(strs[ind++], isUCS2);
-            if (itemsCount < 0) return QSP_FALSE;
+            if (itemsCount < 0 || itemsCount > strsCount - ind) return QSP_FALSE;
             if (itemsCount)
             {
                 int i;

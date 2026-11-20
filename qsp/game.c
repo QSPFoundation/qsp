@@ -65,6 +65,7 @@ static const unsigned int qspCRCTable[256] =
 };
 
 INLINE int qspCRC(void *, int);
+INLINE int qspSearchIncFile(QSPString file);
 INLINE void qspIncludeGameFile(QSPString s);
 INLINE void qspRestoreCurrentIncludes(void);
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS);
@@ -97,15 +98,22 @@ void qspClearAllIncludes(QSP_BOOL toInit)
     qspCurIncLocsCount = 0;
 }
 
-INLINE void qspIncludeGameFile(QSPString s)
+INLINE int qspSearchIncFile(QSPString file)
 {
-    int i, oldLocationState;
-    if (!qspIsAnyString(s)) return;
+    int i;
     for (i = 0; i < qspCurIncFilesCount; ++i)
     {
-        if (qspStrsEqual(qspCurIncFiles[i], s))
-            return;
+        if (qspStrsEqual(qspCurIncFiles[i], file))
+            return i;
     }
+    return -1;
+}
+
+INLINE void qspIncludeGameFile(QSPString s)
+{
+    int oldLocationState;
+    if (!qspIsAnyString(s)) return;
+    if (qspSearchIncFile(s) >= 0) return;
     if (qspCurIncFilesCount == QSP_MAXINCFILES)
     {
         qspSetError(QSP_ERR_CANTINCFILE);
@@ -114,17 +122,28 @@ INLINE void qspIncludeGameFile(QSPString s)
     oldLocationState = qspLocationState;
     qspCallOpenGame(s, QSP_FALSE);
     if (qspLocationState != oldLocationState) return;
+    /* The host could include new files */
+    if (qspSearchIncFile(s) >= 0) return;
+    if (qspCurIncFilesCount == QSP_MAXINCFILES)
+    {
+        qspSetError(QSP_ERR_CANTINCFILE);
+        return;
+    }
     qspCurIncFiles[qspCurIncFilesCount++] = qspCopyToNewText(s);
 }
 
 INLINE void qspRestoreCurrentIncludes(void)
 {
-    int i, oldLocationState = qspLocationState;
-    for (i = 0; i < qspCurIncFilesCount; ++i)
+    QSPString *files;
+    int i, count = qspCurIncFilesCount, oldLocationState = qspLocationState;
+    /* Copy files, the host can change the includes */
+    qspCopyStrs(&files, qspCurIncFiles, 0, count);
+    for (i = 0; i < count; ++i)
     {
-        qspCallOpenGame(qspCurIncFiles[i], QSP_FALSE);
-        if (qspLocationState != oldLocationState) return;
+        qspCallOpenGame(files[i], QSP_FALSE);
+        if (qspLocationState != oldLocationState) break;
     }
+    qspFreeStrs(files, count);
 }
 
 QSP_BOOL qspRestartGame(QSP_BOOL toReset)
@@ -165,7 +184,8 @@ QSP_BOOL qspRestartGame(QSP_BOOL toReset)
 
 INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS)
 {
-    int i, ind, locsCount, actsCount;
+    int i, ind;
+    QSP_BIGINT locsCount, actsCount;
     QSP_BOOL isLatestFormat = qspStrsEqual(strs[0], QSP_STATIC_STR(QSP_GAMEID));
     ind = (isLatestFormat ? 4 : 30);
     if (ind >= count) return QSP_FALSE;
@@ -177,7 +197,6 @@ INLINE QSP_BOOL qspCheckGame(QSPString *strs, int count, QSP_BOOL isUCS)
         if ((ind += 3) >= count) return QSP_FALSE;
         if (isLatestFormat)
         {
-            if (ind >= count) return QSP_FALSE;
             actsCount = qspReadEncodedIntVal(strs[ind++], isUCS);
             if (actsCount < 0 || actsCount > QSP_MAXACTIONS) return QSP_FALSE;
         }
@@ -398,8 +417,11 @@ INLINE QSP_BOOL qspSkipLines(int totalLinesCount, int linesToSkip, int *index)
 
 INLINE QSP_BOOL qspGetIntValueAndSkipLine(QSPString *strs, int totalLinesCount, int *index, QSP_BOOL isUCS, int *value)
 {
+    QSP_BIGINT num;
     if (*index >= totalLinesCount) return QSP_FALSE;
-    *value = qspReadEncodedIntVal(strs[*index], isUCS);
+    num = qspReadEncodedIntVal(strs[*index], isUCS);
+    *value = QSP_TOINT(num);
+    if (*value != num) return QSP_FALSE;
     return qspSkipLines(totalLinesCount, 1, index);
 }
 
@@ -421,18 +443,22 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
 {
     QSPVariant val;
     int i, j, ind, count, groupsCount, varValuesCount, keyIndex, temp, selAction, selObject;
-    ind = 12;
+    ind = 4;
     if (ind >= strsCount) return QSP_FALSE;
     if (!qspStrsEqual(strs[0], QSP_STATIC_STR(QSP_SAVEDGAMEID)) ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_GAMEMINVER)) < 0 ||
         qspStrsCompare(strs[1], QSP_STATIC_STR(QSP_VER)) > 0) return QSP_FALSE;
     if (QSP_ISFALSE(qspGetVarNumValue(QSP_STATIC_STR(QSP_VAR_DEBUG), 0)))
     {
-        temp = qspReadEncodedIntVal(strs[2], isUCS);
-        if (temp != qspQstCRC) return QSP_FALSE;
+        QSP_BIGINT savedCRC = qspReadEncodedIntVal(strs[2], isUCS);
+        if (savedCRC != qspQstCRC) return QSP_FALSE;
     }
-    selAction = qspReadEncodedIntVal(strs[4], isUCS); /* qspCurSelAction */
-    selObject = qspReadEncodedIntVal(strs[5], isUCS); /* qspCurSelObject */
+    /* qspCurSelAction */
+    if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &selAction)) return QSP_FALSE;
+    /* qspCurSelObject */
+    if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &selObject)) return QSP_FALSE;
+    /* view path, input, main desc, vars desc, location, windows state */
+    if (!qspSkipLines(strsCount, 6, &ind)) return QSP_FALSE;
     /* qspTimerInterval */
     if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &temp)) return QSP_FALSE;
     if (temp < 0) return QSP_FALSE;

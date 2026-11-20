@@ -48,7 +48,6 @@
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);
     void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end);
-    void qspReverseStrs(QSPString *strs, int count);
     void qspFreeStrs(QSPString *strs, int count);
     QSP_BOOL qspIsStrNumber(QSPString s);
     QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid);

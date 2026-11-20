@@ -435,14 +435,11 @@ int qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove)
     return oldLocalScopeBase;
 }
 
-QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove)
+void qspSetArgs(QSPVariant *args, int count)
 {
-    QSPVarData *varData = qspVarData(qspArgsNameIndex, QSP_REF_GETORCREATE);
-    if (!varData) return QSP_FALSE;
-
+    QSPVarData *varData = qspGetVarData(qspGetGlobalVar(qspArgsNameIndex, QSP_TRUE));
     qspEmptyVarData(varData);
-    qspInitVarValues(varData, args, count, toMove);
-    return QSP_TRUE;
+    qspInitVarValues(varData, args, count, QSP_FALSE);
 }
 
 QSP_BOOL qspApplyResult(QSPVariant *res)
@@ -1316,22 +1313,21 @@ INLINE void qspSetTargetValue(QSPCachedTarget *target, QSPVariant *val, QSP_CHAR
 
 INLINE void qspMoveTupleToArray(QSPVarData *dest, QSPTuple *src, int start, int count)
 {
-    int i, itemsToMove, keysCount;
+    int i, keysCount;
     QSPVariant keyVal;
     QSPVarKey *key;
     QSPField *field;
+    /* Validate parameters */
+    if (start < 0 || count < 0 || count > src->FieldsCount - start) return;
     /* Clear the dest array anyway */
     qspEmptyVarData(dest);
-    /* Validate parameters */
-    start = qspClampNum(start, 0, src->FieldsCount);
-    itemsToMove = qspClampNum(count, 0, src->FieldsCount - start);
-    if (itemsToMove <= 0) return;
+    if (!count) return;
     /* Move tuple items, field names become text keys */
-    dest->ValsCapacity = dest->ValsCount = itemsToMove;
-    dest->Values = (QSPVariant *)malloc(itemsToMove * sizeof(QSPVariant));
+    dest->ValsCapacity = dest->ValsCount = count;
+    dest->Values = (QSPVariant *)malloc(count * sizeof(QSPVariant));
     field = src->Fields + start;
     keysCount = 0;
-    for (i = 0; i < itemsToMove; ++i)
+    for (i = 0; i < count; ++i)
         if (field[i].NameIndex > 0) ++keysCount;
     if (keysCount)
     {
@@ -1339,7 +1335,7 @@ INLINE void qspMoveTupleToArray(QSPVarData *dest, QSPTuple *src, int start, int 
         while (capacity < keysCount) capacity *= 2;
         qspResizeVarKeys(dest, capacity);
     }
-    for (i = 0; i < itemsToMove; ++i, ++field)
+    for (i = 0; i < count; ++i, ++field)
     {
         qspMoveToNewVariant(dest->Values + i, &field->Value);
         if (field->NameIndex > 0)
@@ -1353,21 +1349,20 @@ INLINE void qspMoveTupleToArray(QSPVarData *dest, QSPTuple *src, int start, int 
 
 INLINE void qspCopyArray(QSPVarData *dest, QSPVarData *src, int start, int count)
 {
-    int i, itemsToCopy, keyIndex, keysCount;
+    int i, keyIndex, keysCount;
+    /* Validate parameters */
+    if (start < 0 || count < 0 || count > src->ValsCount - start) return;
     /* Clear the dest array anyway */
     qspEmptyVarData(dest);
-    /* Validate parameters */
-    start = qspClampNum(start, 0, src->ValsCount);
-    itemsToCopy = qspClampNum(count, 0, src->ValsCount - start);
-    if (itemsToCopy <= 0) return;
+    if (!count) return;
     /* Copy array values */
-    dest->ValsCapacity = dest->ValsCount = itemsToCopy;
-    dest->Values = (QSPVariant *)malloc(itemsToCopy * sizeof(QSPVariant));
-    for (i = 0; i < itemsToCopy; ++i)
+    dest->ValsCapacity = dest->ValsCount = count;
+    dest->Values = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+    for (i = 0; i < count; ++i)
         qspCopyToNewVariant(dest->Values + i, src->Values + start + i);
     /* Copy keys of the copied items, they stay ordered */
     keyIndex = qspGetVarKeyLowerBound(src, start);
-    keysCount = qspGetVarKeyLowerBound(src, start + itemsToCopy) - keyIndex;
+    keysCount = qspGetVarKeyLowerBound(src, start + count) - keyIndex;
     if (keysCount > 0)
     {
         QSPVarKey *destKey, *srcKey = src->Keys + keyIndex;
@@ -1401,14 +1396,13 @@ INLINE void qspCopyArray(QSPVarData *dest, QSPVarData *src, int start, int count
 
 INLINE void qspMoveArray(QSPVarData *dest, QSPVarData *src, int start, int count)
 {
-    int i, itemsToMove, keyIndex, keysCount;
+    int i, keyIndex, keysCount;
+    /* Validate parameters */
+    if (start < 0 || count < 0 || count > src->ValsCount - start) return;
     /* Clear the dest array anyway */
     qspEmptyVarData(dest);
-    /* Validate parameters */
-    start = qspClampNum(start, 0, src->ValsCount);
-    itemsToMove = qspClampNum(count, 0, src->ValsCount - start);
-    if (itemsToMove <= 0) return;
-    if (itemsToMove == src->ValsCount)
+    if (!count) return;
+    if (count == src->ValsCount)
     {
         /* Move everything */
         qspMoveVarData(dest, src);
@@ -1416,13 +1410,13 @@ INLINE void qspMoveArray(QSPVarData *dest, QSPVarData *src, int start, int count
     }
     /* Get key range of the moved items */
     keyIndex = qspGetVarKeyLowerBound(src, start);
-    keysCount = qspGetVarKeyLowerBound(src, start + itemsToMove) - keyIndex;
+    keysCount = qspGetVarKeyLowerBound(src, start + count) - keyIndex;
     /* Move array values, the following values get shifted */
-    dest->ValsCapacity = dest->ValsCount = itemsToMove;
-    dest->Values = (QSPVariant *)malloc(itemsToMove * sizeof(QSPVariant));
-    src->ValsCount -= itemsToMove;
-    memcpy(dest->Values, src->Values + start, itemsToMove * sizeof(QSPVariant));
-    memmove(src->Values + start, src->Values + start + itemsToMove, (src->ValsCount - start) * sizeof(QSPVariant));
+    dest->ValsCapacity = dest->ValsCount = count;
+    dest->Values = (QSPVariant *)malloc(count * sizeof(QSPVariant));
+    src->ValsCount -= count;
+    memcpy(dest->Values, src->Values + start, count * sizeof(QSPVariant));
+    memmove(src->Values + start, src->Values + start + count, (src->ValsCount - start) * sizeof(QSPVariant));
     if (keysCount > 0)
     {
         if (keysCount == src->KeysCount)
@@ -1458,21 +1452,20 @@ INLINE void qspMoveArray(QSPVarData *dest, QSPVarData *src, int start, int count
     }
     /* Items of the following keys get shifted */
     for (i = keyIndex; i < src->KeysCount; ++i)
-        src->Keys[i].Index -= itemsToMove;
+        src->Keys[i].Index -= count;
 }
 
 QSPTuple qspCopyArrayToNewTuple(QSPVarData *src, int start, int count)
 {
-    int itemsToCopy, keyIndex, keysCount;
+    int keyIndex, keysCount;
     QSPTuple tuple;
     /* Validate parameters */
-    start = qspClampNum(start, 0, src->ValsCount);
-    itemsToCopy = qspClampNum(count, 0, src->ValsCount - start);
-    if (itemsToCopy <= 0) return qspNullTuple;
-    tuple = qspCopyToNewTuple(src->Values + start, itemsToCopy);
+    if (start < 0 || count < 0 || count > src->ValsCount - start) return qspNullTuple;
+    tuple = qspCopyToNewTuple(src->Values + start, count);
+    if (!count) return tuple;
     /* String keys of the copied items become field names */
     keyIndex = qspGetVarKeyLowerBound(src, start);
-    keysCount = qspGetVarKeyLowerBound(src, start + itemsToCopy) - keyIndex;
+    keysCount = qspGetVarKeyLowerBound(src, start + count) - keyIndex;
     if (keysCount > 0)
     {
         QSPVarKey *key;
@@ -1564,7 +1557,9 @@ int qspArrayPosByArg(QSPVariant *arg, QSPVariant *val, int ind)
 {
     QSP_TINYINT varType;
     QSPVariant defaultValue, *curValue;
-    QSPVarData *varData = qspVarDataByArg(arg, QSP_REF_GET, &varType);
+    QSPVarData *varData;
+    if (ind < 0) return -1;
+    varData = qspVarDataByArg(arg, QSP_REF_GET, &varType);
     if (!varData) return -1;
     if (!qspConvertVariantTo(val, varType))
     {
@@ -1572,7 +1567,6 @@ int qspArrayPosByArg(QSPVariant *arg, QSPVariant *val, int ind)
         return -1;
     }
     defaultValue = qspGetEmptyVariant(QSP_BASETYPE(val->Type));
-    if (ind < 0) ind = 0;
     while (ind < varData->ValsCount)
     {
         curValue = varData->Values + ind;
@@ -1587,12 +1581,13 @@ int qspArrayPosRegExpByArg(QSPVariant *arg, QSPString regExpStr, int ind)
 {
     QSPVariant defaultValue, *curValue;
     QSPRegExp *regExp;
-    QSPVarData *varData = qspVarDataByArg(arg, QSP_REF_GET, 0);
+    QSPVarData *varData;
+    if (ind < 0) return -1;
+    varData = qspVarDataByArg(arg, QSP_REF_GET, 0);
     if (!varData) return -1;
     regExp = qspRegExpGetCompiled(regExpStr);
     if (!regExp) return -1;
     defaultValue = qspGetEmptyVariant(QSP_TYPE_STR);
-    if (ind < 0) ind = 0;
     while (ind < varData->ValsCount)
     {
         curValue = varData->Values + ind;
@@ -1890,14 +1885,20 @@ void qspStatementInsVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNU
 
 void qspStatementUnpackArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))
 {
-    int startInd, maxCount;
+    int startInd, itemsCount;
     QSPTuple *src;
     QSPVarData *dest = qspVarDataByArg(args, QSP_REF_GETORCREATE, 0);
     if (!dest) return;
     src = &QSP_TUPLE(args[1]);
-    startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
-    maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->FieldsCount);
-    qspMoveTupleToArray(dest, src, startInd, maxCount);
+    if (count >= 3)
+        startInd = qspClampNum(QSP_NUM(args[2]), 0, src->FieldsCount);
+    else
+        startInd = 0;
+    if (count == 4)
+        itemsCount = qspClampNum(QSP_NUM(args[3]), 0, src->FieldsCount - startInd);
+    else
+        itemsCount = src->FieldsCount - startInd;
+    qspMoveTupleToArray(dest, src, startInd, itemsCount);
 }
 
 void qspStatementMoveArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg)
@@ -1907,15 +1908,22 @@ void qspStatementMoveArr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT extArg
     if (!((src = qspVarDataByArg(args + 1, QSP_REF_GET, 0)))) return;
     if (dest != src)
     {
-        int startInd = (count >= 3 ? QSP_TOINT(QSP_NUM(args[2])) : 0);
-        int maxCount = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : src->ValsCount);
+        int startInd, itemsCount;
+        if (count >= 3)
+            startInd = qspClampNum(QSP_NUM(args[2]), 0, src->ValsCount);
+        else
+            startInd = 0;
+        if (count == 4)
+            itemsCount = qspClampNum(QSP_NUM(args[3]), 0, src->ValsCount - startInd);
+        else
+            itemsCount = src->ValsCount - startInd;
         switch (extArg)
         {
         case QSP_STAT_COPYARR:
-            qspCopyArray(dest, src, startInd, maxCount);
+            qspCopyArray(dest, src, startInd, itemsCount);
             break;
         case QSP_STAT_MOVEARR:
-            qspMoveArray(dest, src, startInd, maxCount);
+            qspMoveArray(dest, src, startInd, itemsCount);
             break;
         }
     }
@@ -1945,6 +1953,7 @@ void qspStatementScanStr(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
     if (!regExp) return;
     text = QSP_STR(args[1]);
     groupInd = (count == 4 ? QSP_TOINT(QSP_NUM(args[3])) : 0);
+    if (groupInd < 0) groupInd = 0;
     qspEmptyVarData(varData); /* clear the dest array anyway */
     foundString.Type = QSP_TYPE_STR;
     curInd = 0;
@@ -1980,20 +1989,17 @@ void qspStatementKillVar(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UN
                 fieldsCount = qspGetFieldsFromPath(QSP_TUPLE(args[2]), fields, QSP_REF_GET);
                 if (fieldsCount < 0) return;
             }
-            if (arrIndex >= 0 && arrIndex < varData->ValsCount)
+            if (!fieldsCount)
             {
-                if (fieldsCount)
-                {
-                    /* The last field is the one that was specified */
-                    QSPVariant *value = qspGetTupleFieldValueByPath(varData->Values + arrIndex, fields, fieldsCount - 1);
-                    if (value && QSP_ISTUPLE(value->Type))
-                        qspRemoveTupleField(&QSP_PTUPLE(value), fields[fieldsCount - 1].NameIndex);
-                }
-                else
-                {
-                    /* Empty path removes the item itself */
-                    qspRemoveVarItem(varData, arrIndex);
-                }
+                /* Empty path removes the item itself */
+                qspRemoveVarItem(varData, arrIndex);
+            }
+            else if (arrIndex >= 0 && arrIndex < varData->ValsCount)
+            {
+                /* The last field is the one that was specified */
+                QSPVariant *value = qspGetTupleFieldValueByPath(varData->Values + arrIndex, fields, fieldsCount - 1);
+                if (value && QSP_ISTUPLE(value->Type))
+                    qspRemoveTupleField(&QSP_PTUPLE(value), fields[fieldsCount - 1].NameIndex);
             }
         }
         else

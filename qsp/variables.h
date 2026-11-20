@@ -93,7 +93,7 @@
     void qspReleaseLocalScope(int oldLocalScopeBase);
     QSPVarData *qspAddGlobalVarByName(QSPString name);
     int qspAllocateLocalScopeWithArgs(QSPVariant *args, int count, QSP_BOOL toMove);
-    QSP_BOOL qspSetArgs(QSPVariant *args, int count, QSP_BOOL toMove);
+    void qspSetArgs(QSPVariant *args, int count);
     QSP_BOOL qspApplyResult(QSPVariant *res);
     int qspHideLocalVars(void);
     void qspRestoreHiddenLocalVars(int oldLocalVarsBase);
