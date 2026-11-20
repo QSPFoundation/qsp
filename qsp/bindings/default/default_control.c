@@ -60,11 +60,19 @@ void QSPEnableDebugMode(QSP_BOOL isDebug)
     qspIsDebug = isDebug;
 }
 /* Get current execution state */
-void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum)
+void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum, int *intLineNum)
 {
-    *loc = (qspRealCurLoc ? qspRealCurLoc->Name : qspNullString);
-    *actIndex = qspRealActIndex;
-    *lineNum = qspRealLineNum;
+    *loc = (qspRunLoc ? qspRunLoc->Name : qspNullString);
+    *actIndex = qspRunActIndex;
+    *lineNum = qspGetTopLineNum();
+    *intLineNum = qspGetIntLineNum();
+}
+/* Get currently executed code */
+int QSPGetCurStateCode(QSPLineInfo *lines, int linesBufSize)
+{
+    QSPCodeBlock *code = qspRunCode;
+    if (code) return qspGetLinesInfo(code->Lines, code->LinesCount, lines, linesBufSize);
+    return -1;
 }
 /* Get names of all locations */
 int QSPGetLocationNames(QSPString *locNames, int namesBufSize)
@@ -447,7 +455,7 @@ QSPString QSPGetErrorDesc(int errorNum)
 /* Load game from data */
 QSP_BOOL QSPLoadGameWorldFromData(const void *data, int dataSize, QSP_BOOL isNewGame)
 {
-    /* We don't execute any game code here */
+    qspPrepareExecution(QSP_FALSE);
     return qspOpenGame((void *)data, dataSize, isNewGame);
 }
 /* Save game state to a buffer */

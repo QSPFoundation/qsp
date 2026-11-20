@@ -74,13 +74,23 @@ void qspAddAction(QSPString name, QSPString imgPath, QSPCodeBlock *code, int sta
         return;
     }
     act = qspCurActions + qspCurActsCount++;
-    act->Image = (qspIsAnyString(imgPath) ? qspCopyToNewText(imgPath) : qspNullString);
+    act->Image = qspCopyToNewText(imgPath);
     act->Desc = qspCopyToNewText(name);
-    act->OnPressCode = code;
-    act->OnPressStartLine = start;
-    act->OnPressLinesCount = end - start;
-    act->Location = qspRealCurLoc;
-    act->ActIndex = qspRealActIndex;
+    if (end > start)
+    {
+        act->OnPressCode = code;
+        act->OnPressStartLine = start;
+        act->OnPressLinesCount = end - start;
+    }
+    else
+    {
+        act->OnPressCode = 0;
+        act->OnPressStartLine = 0;
+        act->OnPressLinesCount = 0;
+    }
+    act->Location = qspRunLoc;
+    act->ActIndex = qspRunActIndex;
+    act->TopLineNum = qspGetTopLineNum();
     if (act->OnPressCode) qspAcquireCodeBlock(act->OnPressCode);
     if (act->Location) qspAcquireLocation(act->Location);
     qspCurWindowsChangedState |= QSP_WIN_ACTS;
@@ -91,23 +101,23 @@ void qspExecAction(int ind)
     if (ind >= 0 && ind < qspCurActsCount)
     {
         /* Keep the current location context here (don't reset special vars) */
-        QSPLineOfCode *oldLine;
         QSPCurAct *act = qspCurActions + ind;
-        QSPLocation *loc = act->Location;
         QSPCodeBlock *code = act->OnPressCode;
-        /* Switch the current state */
-        qspUpdateLocation(&qspRealCurLoc, loc);
-        qspRealActIndex = act->ActIndex;
         if (code)
         {
+            QSPRunState oldState;
             /* The code can release the action */
-            if (loc) qspAcquireLocation(loc);
             qspAcquireCodeBlock(code);
-            oldLine = qspRealLine;
-            qspExecCodeBlockWithLocals(code, act->OnPressStartLine, act->OnPressStartLine + act->OnPressLinesCount, QSP_TRUE, 0);
-            qspRealLine = oldLine;
+            /* Switch the current state */
+            qspSaveRunState(&oldState);
+            qspUpdateLocation(&qspRunLoc, act->Location);
+            qspRunActIndex = act->ActIndex;
+            qspIntRunTopLineNum = act->TopLineNum;
+            qspRunCode = code;
+            qspExecCodeBlockWithLocals(code, act->OnPressStartLine, act->OnPressStartLine + act->OnPressLinesCount, 0);
+            qspUpdateLocation(&qspRunLoc, 0);
+            qspRestoreRunState(&oldState);
             qspReleaseCodeBlock(code);
-            if (loc) qspReleaseLocation(loc);
         }
     }
 }
@@ -176,9 +186,9 @@ void qspStatementSinglelineAddAct(QSPLineOfCode *line, int statPos, int endPos)
         lastPos = line->Str.Str + line->Stats[endPos - 1].EndPos;
         if (qspIsCharAtPos(line->Str, lastPos, QSP_COLONDELIM_CHAR))
             lastPos += QSP_STATIC_LEN(QSP_COLONDELIM); /* include the last colon */
-        act->OnPressCode = qspNewSinglelineCodeBlock(qspStringFromPair(firstPos, lastPos), line->LineNum);
+        act->OnPressCode = qspNewSinglelineCodeBlock(qspStringFromPair(firstPos, lastPos), line->LineNum, qspRunCode->IsTopLevel);
     }
-    if (argsCount == 2)
+    if (argsCount == 2 && qspIsAnyString(QSP_STR(args[1])))
         qspAddAction(QSP_STR(args[0]), QSP_STR(args[1]), act->OnPressCode, 0, 1);
     else
         qspAddAction(QSP_STR(args[0]), qspNullString, act->OnPressCode, 0, 1);
@@ -193,7 +203,7 @@ void qspStatementMultilineAddAct(QSPCodeBlock *code, int lineInd, int endLine)
     QSPLineOfCode *line = code->Lines + lineInd;
     argsCount = qspGetStatArgs(line->Stats, line->Stats->Data.Act->Args, args);
     if (qspLocationState != oldLocationState) return;
-    if (argsCount == 2)
+    if (argsCount == 2 && qspIsAnyString(QSP_STR(args[1])))
         qspAddAction(QSP_STR(args[0]), QSP_STR(args[1]), code, lineInd + 1, endLine);
     else
         qspAddAction(QSP_STR(args[0]), qspNullString, code, lineInd + 1, endLine);

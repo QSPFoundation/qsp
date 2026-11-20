@@ -13,8 +13,7 @@ static int qspNamesEntriesCount = 0; /* used names entries */
 static int qspNamesCapacity = 0; /* has to be a power of 2 */
 static int *qspNamesSlots = 0; /* hash table by names, QSP_SLOTSCOUNT(qspNamesCapacity) slots */
 static int qspNamesFreeIndex = 1; /* search for a free entry starts here */
-static int qspNamesGeneration = 0; /* current generation */
-static int qspReleasedGeneration = 0; /* generation of the last release */
+int qspNamesGeneration = 0; /* current generation */
 
 INLINE int *qspGetNameSlot(QSPString name, unsigned int nameHash);
 INLINE int *qspGetEmptyNameSlot(unsigned int nameHash);
@@ -139,21 +138,27 @@ void qspAdvanceNamesGeneration(void)
 void qspReleaseNamesGeneration(void)
 {
     /* Nothing holds the names of the previous generations once the state of the game is cleared */
-    if (qspReleasedGeneration != qspNamesGeneration)
+    QSPName *entry;
+    int i, releasedCount = 0, curGeneration = qspNamesGeneration, nextGeneration = curGeneration + 1;
+    for (i = 0, entry = qspNames; i < qspNamesEntriesCount; ++i, ++entry)
     {
-        int i;
-        QSPName *entry;
-        for (i = 0, entry = qspNames; i < qspNamesEntriesCount; ++i, ++entry)
+        if (entry->Name.Str)
         {
-            if (entry->Name.Str && entry->Generation != qspNamesGeneration)
+            if (entry->Generation == curGeneration)
+                entry->Generation = nextGeneration; /* move to the new generation */
+            else
             {
                 qspFreeString(&entry->Name);
                 entry->Name = qspNullString;
+                ++releasedCount;
             }
         }
+    }
+    qspNamesGeneration = nextGeneration;
+    if (releasedCount)
+    {
         qspNamesFreeIndex = 1;
         qspRebuildNamesSlots();
-        qspReleasedGeneration = qspNamesGeneration;
     }
 }
 
@@ -169,7 +174,6 @@ void qspInitNames(void)
     memset(qspNamesSlots, 0, QSP_SLOTSCOUNT(qspNamesCapacity) * sizeof(int));
     qspNamesFreeIndex = 1;
     qspNamesGeneration = 0;
-    qspReleasedGeneration = 0;
 }
 
 void qspTerminateNames(void)

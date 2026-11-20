@@ -45,19 +45,13 @@ void qspStatementShowMenu(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_U
     QSP_CHAR *pos, *pos2;
     if (!((varData = qspVarDataByArg(args, QSP_REF_GET, 0)))) return;
     if (count >= 2)
-    {
-        ind = QSP_TOINT(QSP_NUM(args[1]));
-        if (ind < 0) ind = 0;
-    }
+        ind = qspClampNum(QSP_NUM(args[1]), 0, varData->ValsCount);
     else
         ind = 0;
     if (count == 3)
-    {
-        maxItems = QSP_TOINT(QSP_NUM(args[2]));
-        if (maxItems < 0) maxItems = 0;
-    }
+        maxItems = qspClampNum(QSP_NUM(args[2]), 0, varData->ValsCount);
     else
-        maxItems = QSP_MAXMENUITEMS;
+        maxItems = varData->ValsCount;
     itemsCount = 0;
     for (curItem = varData->Values + ind; ind < varData->ValsCount; ++ind, ++curItem)
     {

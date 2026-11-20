@@ -6,8 +6,6 @@
  */
 
 #include "declarations.h"
-#include "codetools.h"
-#include "locations.h"
 
 #ifndef QSP_CALLSDEFINES
     #define QSP_CALLSDEFINES
@@ -15,12 +13,8 @@
     typedef struct
     {
         int LocationState;
+        int NamesGeneration;
         QSP_BOOL IsInCallback;
-        QSP_TINYINT WindowsChangedState;
-        QSPLocation *RealCurLoc;
-        int RealActIndex;
-        int RealLineNum;
-        QSPLineOfCode *RealLine;
     } QSPCallState;
 
     extern QSP_CALLBACK qspCallbacks[QSP_CALL_DUMMY];

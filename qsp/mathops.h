@@ -26,6 +26,7 @@
     typedef struct
     {
         QSP_TINYINT Code;
+        QSP_BOOL HasTypePrefix;
         QSPString Name;
     } QSPMathOpName;
 
@@ -35,8 +36,8 @@
         QSP_TINYINT ResType;
         QSP_TINYINT MinArgsCount;
         QSP_TINYINT MaxArgsCount;
-        QSP_TINYINT IsTyped;
         QSP_TINYINT ArgsTypes[QSP_MAXMATHOPARGS];
+        QSP_BOOL HasTypedArgs;
         QSP_FUNCTION Func;
     } QSPMathOperation;
 
@@ -44,7 +45,7 @@
     {
         QSP_TINYINT OpCode;
         QSP_TINYINT ArgsCount;
-        QSP_TINYINT VarType; /* type prefix of the variable */
+        QSP_TINYINT VarType; /* type prefix of the variable / the call / the fields */
         unsigned short ValueIndex; /* for operations with a value */
         int NameIndex; /* for operations with a variable */
     } QSPMathCompiledOp;
@@ -53,7 +54,7 @@
     {
         QSP_TINYINT OpCode;
         QSP_TINYINT ArgsCount;
-        QSP_TINYINT VarType; /* type prefix of the variable */
+        QSP_TINYINT VarType; /* type prefix of the variable / the call */
         int NameIndex; /* variable of the operation */
         QSPTuple Fields; /* field names of a tuple */
     } QSPMathLevel;

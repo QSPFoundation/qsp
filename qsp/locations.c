@@ -23,7 +23,7 @@ int qspLocsCapacity = 0;
 QSPLocation *qspCurLoc = 0;
 int qspLocationState = 0;
 int qspFullRefreshCount = 0;
-int qspCurLocCallDepth = 0;
+int qspCurCallDepth = 0;
 
 static QSPLocSlot *qspLocsSlots = 0; /* hash table by names, QSP_SLOTSCOUNT(qspLocsCapacity) slots */
 
@@ -196,7 +196,7 @@ INLINE void qspAddBaseDescAndActions(QSPLocation *loc)
     for (i = 0, curAct = loc->Actions; i < loc->ActionsCount; ++i, ++curAct)
     {
         if (qspIsEmpty(curAct->Desc)) break;
-        qspRealActIndex = i;
+        qspRunActIndex = i;
         text = qspFormatText(curAct->Desc);
         if (qspLocationState != oldLocationState)
         {
@@ -204,7 +204,10 @@ INLINE void qspAddBaseDescAndActions(QSPLocation *loc)
             return;
         }
         endLine = (curAct->OnPressCode ? curAct->OnPressCode->LinesCount : 0);
-        qspAddAction(text, curAct->Image, curAct->OnPressCode, 0, endLine);
+        if (qspIsAnyString(curAct->Image))
+            qspAddAction(text, curAct->Image, curAct->OnPressCode, 0, endLine);
+        else
+            qspAddAction(text, qspNullString, curAct->OnPressCode, 0, endLine);
         qspFreeString(&text);
         if (qspLocationState != oldLocationState) return;
     }
@@ -212,32 +215,16 @@ INLINE void qspAddBaseDescAndActions(QSPLocation *loc)
 
 INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc)
 {
-    QSPLineOfCode *oldLine;
-    QSPLocation *oldLoc;
-    int oldActIndex, oldLineNum, oldLocationState;
-    if (qspCurLocCallDepth >= QSP_MAXLOCCALLDEPTH)
-    {
-        qspSetError(QSP_ERR_LOCCALLDEPTH);
-        return;
-    }
-    ++qspCurLocCallDepth;
-    oldLocationState = qspLocationState;
-    /* Remember the previous state to restore it after internal calls */
-    oldLoc = qspRealCurLoc;
-    oldActIndex = qspRealActIndex;
-    oldLineNum = qspRealLineNum;
-    oldLine = qspRealLine;
+    QSPRunState oldState;
+    int oldLocationState = qspLocationState;
     /* Switch the current state */
-    qspUpdateLocation(&qspRealCurLoc, loc);
-    qspRealActIndex = -1;
-    qspRealLineNum = 0;
-    qspRealLine = 0;
+    qspSaveRunState(&oldState);
+    qspUpdateLocation(&qspRunLoc, loc);
     if (toChangeDesc && qspCurDesc.Len > 0)
     {
         qspClearBufString(&qspCurDesc);
         qspCurWindowsChangedState |= QSP_WIN_MAIN;
     }
-    qspAcquireLocation(loc);
     if (qspIsDebug)
     {
         /* Trigger debugger only if we have base description or base actions */
@@ -246,7 +233,8 @@ INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc)
             qspCallDebug(qspNullString);
             if (qspLocationState != oldLocationState)
             {
-                qspReleaseLocation(loc);
+                qspUpdateLocation(&qspRunLoc, 0);
+                qspRestoreRunState(&oldState);
                 return;
             }
         }
@@ -254,23 +242,20 @@ INLINE void qspExecLocation(QSPLocation *loc, QSP_BOOL toChangeDesc)
     qspAddBaseDescAndActions(loc);
     if (qspLocationState != oldLocationState)
     {
-        qspReleaseLocation(loc);
+        qspUpdateLocation(&qspRunLoc, 0);
+        qspRestoreRunState(&oldState);
         return;
     }
     /* Execute the code */
     if (loc->OnVisitCode)
     {
-        qspRealActIndex = -1;
-        qspExecCode(loc->OnVisitCode, 0, loc->OnVisitCode->LinesCount, QSP_TRUE, 0);
+        qspRunActIndex = -1;
+        qspRunCode = loc->OnVisitCode;
+        qspExecCode(loc->OnVisitCode, 0, loc->OnVisitCode->LinesCount, 0);
     }
-    qspRealLine = oldLine; /* the executed lines can be released */
-    qspReleaseLocation(loc);
-    if (qspLocationState != oldLocationState) return;
     /* Restore the old state */
-    qspRealLineNum = oldLineNum;
-    qspRealActIndex = oldActIndex;
-    qspUpdateLocation(&qspRealCurLoc, oldLoc);
-    --qspCurLocCallDepth;
+    qspUpdateLocation(&qspRunLoc, 0);
+    qspRestoreRunState(&oldState);
 }
 
 void qspExecLocWithArgs(int nameIndex, QSPVariant *args, QSP_TINYINT argsCount, QSP_BOOL toMoveArgs, QSPVariant *res)
@@ -282,10 +267,17 @@ void qspExecLocWithArgs(int nameIndex, QSPVariant *args, QSP_TINYINT argsCount, 
         qspSetError(QSP_ERR_LOCNOTFOUND);
         return;
     }
+    if (qspCurCallDepth >= QSP_MAXCALLDEPTH)
+    {
+        qspSetError(QSP_ERR_CALLDEPTH);
+        return;
+    }
     oldLocalScopeBase = qspAllocateLocalScopeWithArgs(args, argsCount, toMoveArgs);
 
     oldLocationState = qspLocationState;
+    ++qspCurCallDepth;
     qspExecLocation(loc, QSP_FALSE);
+    --qspCurCallDepth;
     if (qspLocationState != oldLocationState) return;
 
     if (res && !qspApplyResult(res)) return;
@@ -334,11 +326,16 @@ void qspExecLocByVarNameWithArgs(QSPString name, QSPVariant *args, QSP_TINYINT a
 void qspNavigateToLocation(QSPLocation *loc, QSP_BOOL toChangeDesc, QSPVariant *args, QSP_TINYINT argsCount)
 {
     int oldLocalScopeBase, oldLocationState;
+    if (qspCurCallDepth >= QSP_MAXCALLDEPTH)
+    {
+        qspSetError(QSP_ERR_CALLDEPTH);
+        return;
+    }
     qspUpdateLocation(&qspCurLoc, loc);
     /* Restore global variables */
     qspClearLocalVars();
     /* We assign global ARGS here */
-    if (!qspSetArgs(args, argsCount, QSP_FALSE)) return;
+    qspSetArgs(args, argsCount);
 
     qspClearAllActions(QSP_FALSE);
     ++qspLocationState;
@@ -346,7 +343,9 @@ void qspNavigateToLocation(QSPLocation *loc, QSP_BOOL toChangeDesc, QSPVariant *
     oldLocalScopeBase = qspAllocateLocalScope();
 
     oldLocationState = qspLocationState;
+    ++qspCurCallDepth;
     qspExecLocation(loc, toChangeDesc);
+    --qspCurCallDepth;
     if (qspLocationState != oldLocationState) return;
 
     qspReleaseLocalScope(oldLocalScopeBase);

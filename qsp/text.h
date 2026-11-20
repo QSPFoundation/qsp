@@ -48,7 +48,6 @@
     QSPString qspJoinStrs(QSPString *s, int count, QSPString delim);
     int qspSplitStr(QSPString str, QSPString delim, QSPString **res);
     void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end);
-    void qspReverseStrs(QSPString *strs, int count);
     void qspFreeStrs(QSPString *strs, int count);
     QSP_BOOL qspIsStrNumber(QSPString s);
     QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid);
@@ -206,13 +205,17 @@
         return qspSkipSpaces(&s);
     }
 
-    INLINE QSP_BIGINT qspParseUnsignedNumber(QSPString *s)
+    INLINE QSP_BIGINT qspParseNumber(QSPString *s, QSP_BOOL isNegative)
     {
-        /* Too big numbers get the max value */
+        /* Too big numbers get the limit */
         int digit;
-        QSP_BIGINT num = 0, maxNum = QSP_MAX_BIGINT;
+        QSP_UBIGINT maxNum, num = 0;
         QSP_CHAR *pos = s->Str, *end = s->End;
-        while (pos < end && qspIsInClass(*pos, QSP_CHAR_DIGIT))
+        if (isNegative)
+            maxNum = -(QSP_UBIGINT)QSP_MIN_BIGINT;
+        else
+            maxNum = QSP_MAX_BIGINT;
+        while (pos < end && *pos >= QSP_FMT('0') && *pos <= QSP_FMT('9'))
         {
             digit = *pos - QSP_FMT('0');
             if (num >= maxNum / 10 && num > (maxNum - digit) / 10) /* small numbers need only the 1st check */
@@ -222,7 +225,8 @@
             ++pos;
         }
         s->Str = pos;
-        return num;
+        if (isNegative) num = -num;
+        return (QSP_BIGINT)num;
     }
 
     INLINE QSPString qspParseToDelim(QSPString *s, int delimClass)

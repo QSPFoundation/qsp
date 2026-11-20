@@ -40,7 +40,7 @@
     typedef struct
     {
         int NameIndex;
-        QSP_TINYINT VarType; /* type prefix of the name */
+        QSP_TINYINT VarType; /* type prefix of the name or the last field */
         QSPCachedArg Index;
         QSPString Path; /* text of the field path */
         QSPField *Fields; /* 0 until the first evaluation */
@@ -83,7 +83,7 @@
         int LinesToElse; /* lines to skip to reach the next ELSE branch within multiline block */
         QSPCachedStat *Stats;
         int StatsCount;
-        QSP_TINYINT IsMultiline;
+        QSP_BOOL IsMultiline;
     } QSPLineOfCode;
 
     typedef struct QSPCachedLoop_s
@@ -103,6 +103,7 @@
     {
         QSPLineOfCode *Lines;
         int LinesCount;
+        QSP_BOOL IsTopLevel;
         QSPCodeLabel *Labels;
         int LabelsCount;
         int RefsCount;
@@ -137,29 +138,30 @@
     QSP_BOOL qspUnquoteToNewText(QSPString *s, QSPString *text);
     QSP_CHAR *qspKeywordPos(QSPString txt, QSPString str, QSP_BOOL isIsolated);
     void qspPrepareStringToExecution(QSPString *str);
-    QSPCodeBlock *qspPreprocessData(QSPString data);
+    QSPCodeBlock *qspPreprocessData(QSPString data, QSP_BOOL isTopLevel);
     void qspClearAllCodeBlocks(QSP_BOOL toInit);
     QSPCodeBlock *qspGetCachedCodeBlock(QSPString s);
     QSP_BOOL qspParseTargetFields(QSPCachedTarget *target);
     QSP_BOOL qspCalculateTargetFields(QSPCachedTarget *target, QSPField *fields, QSP_TINYINT mode);
     QSP_BOOL qspCalculateArgValue(QSPCachedArg *arg, QSPVariant *res);
 
-    INLINE QSPCodeBlock *qspNewCodeBlock(QSPLineOfCode *lines, int linesCount)
+    INLINE QSPCodeBlock *qspNewCodeBlock(QSPLineOfCode *lines, int linesCount, QSP_BOOL isTopLevel)
     {
         QSPCodeBlock *code = (QSPCodeBlock *)malloc(sizeof(QSPCodeBlock));
         code->Lines = lines;
         code->LinesCount = linesCount;
+        code->IsTopLevel = isTopLevel;
         code->LabelsCount = qspCollectLabels(lines, linesCount, &code->Labels);
         code->RefsCount = 1;
         return code;
     }
 
-    INLINE QSPCodeBlock *qspNewSinglelineCodeBlock(QSPString str, int lineNum)
+    INLINE QSPCodeBlock *qspNewSinglelineCodeBlock(QSPString str, int lineNum, QSP_BOOL isTopLevel)
     {
         QSPLineOfCode *line = (QSPLineOfCode *)malloc(sizeof(QSPLineOfCode));
         qspInitLineOfCode(line, qspCopyToNewText(str), lineNum); /* the line takes the copy */
         line->IsMultiline = QSP_FALSE; /* a part of a single-line statement */
-        return qspNewCodeBlock(line, 1);
+        return qspNewCodeBlock(line, 1, isTopLevel);
     }
 
     INLINE void qspAcquireCodeBlock(QSPCodeBlock *code)

@@ -7,11 +7,9 @@
 
 #include "declarations.h"
 #include "callbacks.h"
-#include "actions.h"
-#include "common.h"
 #include "errors.h"
 #include "locations.h"
-#include "objects.h"
+#include "names.h"
 
 QSP_CALLBACK qspCallbacks[QSP_CALL_DUMMY];
 QSP_BOOL qspIsInCallback = QSP_FALSE;
@@ -19,15 +17,8 @@ QSP_BOOL qspIsInCallback = QSP_FALSE;
 void qspPrepareCallback(QSPCallState *state, QSP_BOOL toRefreshUI)
 {
     state->LocationState = qspLocationState;
+    state->NamesGeneration = qspNamesGeneration;
     state->IsInCallback = qspIsInCallback;
-    /* Save the state of changes */
-    state->WindowsChangedState = qspCurWindowsChangedState;
-    /* Save the execution state */
-    state->RealCurLoc = qspRealCurLoc;
-    state->RealActIndex = qspRealActIndex;
-    state->RealLineNum = qspRealLineNum;
-    state->RealLine = qspRealLine;
-    if (state->RealCurLoc) qspAcquireLocation(state->RealCurLoc);
     /* Switch to the callback mode */
     qspIsInCallback = QSP_TRUE;
 
@@ -38,23 +29,13 @@ QSP_BOOL qspFinalizeCallback(QSPCallState *state, QSP_BOOL toResetLocationState)
 {
     /* Restore the previous mode */
     qspIsInCallback = state->IsInCallback;
-    /* Restore the execution state */
-    /* It's still fine to restore old values even when a new game was started
-     * because we exit the old code & reset the state anyway */
-    if (qspRealCurLoc) qspReleaseLocation(qspRealCurLoc);
-    qspRealCurLoc = state->RealCurLoc; /* takes over the saved reference */
-    qspRealActIndex = state->RealActIndex;
-    qspRealLineNum = state->RealLineNum;
-    qspRealLine = state->RealLine;
-    /* Restore the state of changes without resetting the current state */
-    qspCurWindowsChangedState = (QSP_TINYINT)(qspCurWindowsChangedState | state->WindowsChangedState);
 
     if (qspLocationState != state->LocationState)
     {
         if (toResetLocationState)
         {
-            /* Reset the location state */
-            qspLocationState = state->LocationState;
+            if (qspNamesGeneration == state->NamesGeneration) /* don't execute code with outdated names */
+                qspLocationState = state->LocationState;
             qspResetError(QSP_FALSE);
         }
         return QSP_FALSE;

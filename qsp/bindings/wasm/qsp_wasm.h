@@ -41,7 +41,8 @@
     QSP_WASM_EXPORT void QSPGetCompiledDateTime(QSPString *dateTime);
     /* Debugging */
     QSP_WASM_EXPORT void QSPEnableDebugMode(QSP_BOOL isDebug);
-    QSP_WASM_EXPORT void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum);
+    QSP_WASM_EXPORT void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum, int *intLineNum);
+    QSP_WASM_EXPORT int QSPGetCurStateCode(QSPLineInfo *lines, int linesBufSize);
     QSP_WASM_EXPORT int QSPGetLocationNames(QSPString *locNames, int namesBufSize);
     QSP_WASM_EXPORT void QSPGetLocationDesc(QSP_CHAR *locName, QSPString *desc);
     QSP_WASM_EXPORT int QSPGetLocationActions(QSP_CHAR *locName, QSPListItem *actions, int actionsBufSize);

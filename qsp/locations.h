@@ -11,7 +11,7 @@
 #ifndef QSP_LOCSDEFINES
     #define QSP_LOCSDEFINES
 
-    #define QSP_MAXLOCCALLDEPTH 2000
+    #define QSP_MAXCALLDEPTH 2000
     #define QSP_LOCSCAPACITY 32 /* has to be a power of 2 */
 
     typedef struct
@@ -43,7 +43,7 @@
     extern QSPLocation *qspCurLoc;
     extern int qspLocationState; /* allows to check if we have to terminate execution of the code */
     extern int qspFullRefreshCount;
-    extern int qspCurLocCallDepth;
+    extern int qspCurCallDepth;
 
     /* External functions */
     void qspInitWorld(void);

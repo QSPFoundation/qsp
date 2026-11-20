@@ -72,8 +72,8 @@ INLINE QSP_BIGINT qspFromJavaNum(jlong num)
 {
     if (num > (jlong)QSP_MAX_BIGINT)
         return (QSP_BIGINT)QSP_MAX_BIGINT;
-    if (num < -(jlong)QSP_MAX_BIGINT)
-        return -(QSP_BIGINT)QSP_MAX_BIGINT;
+    if (num < (jlong)QSP_MIN_BIGINT)
+        return QSP_MIN_BIGINT;
     return (QSP_BIGINT)num;
 }
 
@@ -248,16 +248,19 @@ JNIEXPORT jobject JNICALL Java_com_libqsp_jni_QSPLib_getCurrentState(JNIEnv *env
     QSPString locName;
     jobject jniExecutionState = (*env)->AllocObject(env, qspExecutionStateClass);
 
-    locName = (qspRealCurLoc ? qspRealCurLoc->Name : qspNullString);
+    locName = (qspRunLoc ? qspRunLoc->Name : qspNullString);
 
     fieldId = (*env)->GetFieldID(env, qspExecutionStateClass , "loc", "Ljava/lang/String;");
     (*env)->SetObjectField(env, jniExecutionState, fieldId, qspToJavaString(env, locName));
 
     fieldId = (*env)->GetFieldID(env, qspExecutionStateClass , "actIndex", "I");
-    (*env)->SetIntField(env, jniExecutionState, fieldId, qspRealActIndex);
+    (*env)->SetIntField(env, jniExecutionState, fieldId, qspRunActIndex);
 
     fieldId = (*env)->GetFieldID(env, qspExecutionStateClass , "lineNum", "I");
-    (*env)->SetIntField(env, jniExecutionState, fieldId, qspRealLineNum);
+    (*env)->SetIntField(env, jniExecutionState, fieldId, qspGetTopLineNum());
+
+    fieldId = (*env)->GetFieldID(env, qspExecutionStateClass , "intLineNum", "I");
+    (*env)->SetIntField(env, jniExecutionState, fieldId, qspGetIntLineNum());
 
     return jniExecutionState;
 }
@@ -619,6 +622,7 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_loadGameWorldFromFD(JNIEnv
         close(nativeFd);
         return QSP_FALSE;
     }
+    qspPrepareExecution(QSP_FALSE);
     res = qspOpenQuestFromFILE(f, isNewGame);
     fclose(f);
     return res;
@@ -672,10 +676,13 @@ JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_openSavedGameFromFD(JNIEnv
 /* Load game from data */
 JNIEXPORT jboolean JNICALL Java_com_libqsp_jni_QSPLib_loadGameWorldFromData(JNIEnv *env, jobject api, jbyteArray data, jboolean isNewGame)
 {
-    /* We don't execute any game code here */
-    jint dataSize = (*env)->GetArrayLength(env, data);
-    jbyte *arrayData = (*env)->GetByteArrayElements(env, data, 0);
-    QSP_BOOL res = qspOpenGame(arrayData, dataSize, isNewGame);
+    QSP_BOOL res;
+    jint dataSize;
+    jbyte *arrayData;
+    qspPrepareExecution(QSP_FALSE);
+    dataSize = (*env)->GetArrayLength(env, data);
+    arrayData = (*env)->GetByteArrayElements(env, data, 0);
+    res = qspOpenGame(arrayData, dataSize, isNewGame);
     (*env)->ReleaseByteArrayElements(env, data, arrayData, JNI_ABORT);
     return res;
 }

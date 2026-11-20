@@ -49,10 +49,17 @@ void qspInitCallbacks(void)
 
 void qspCallDebug(QSPString str)
 {
-    QSPCallState state;
-    qspPrepareCallback(&state, QSP_FALSE);
-    qspWasmHostDebug(str.Str, QSP_WASM_STRBYTES(str));
-    qspFinalizeCallback(&state, QSP_TRUE);
+    static QSP_BOOL isInDebugger = QSP_FALSE;
+
+    if (!isInDebugger)
+    {
+        QSPCallState state;
+        qspPrepareCallback(&state, QSP_FALSE);
+        isInDebugger = QSP_TRUE;
+        qspWasmHostDebug(str.Str, QSP_WASM_STRBYTES(str));
+        isInDebugger = QSP_FALSE;
+        qspFinalizeCallback(&state, QSP_TRUE);
+    }
 }
 
 void qspCallSetTimer(int msecs)
@@ -241,9 +248,7 @@ QSPString qspCallVersion(QSPString param)
         qspFreeString(&res);
         return qspNullString;
     }
-    if (!(qspIsEmpty(res) && qspIsEmpty(param))) return res;
-    qspFreeString(&res);
-    return qspCopyToNewText(QSP_STATIC_STR(QSP_VER));
+    return res;
 }
 
 #endif

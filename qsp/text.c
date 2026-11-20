@@ -52,10 +52,10 @@ QSP_CHAR *qspStringToC(QSPString s)
 
 QSPString qspConcatText(QSPString val1, QSPString val2)
 {
-    QSPString res;
     int firstLen = qspStrLen(val1), secondLen = qspStrLen(val2), destLen = firstLen + secondLen;
     if (destLen)
     {
+        QSPString res;
         QSP_CHAR *dest = (QSP_CHAR *)malloc(destLen * sizeof(QSP_CHAR));
         if (firstLen)
             memcpy(dest, val1.Str, firstLen * sizeof(QSP_CHAR));
@@ -63,12 +63,9 @@ QSPString qspConcatText(QSPString val1, QSPString val2)
             memcpy(dest + firstLen, val2.Str, secondLen * sizeof(QSP_CHAR));
         res.Str = dest;
         res.End = dest + destLen;
+        return res;
     }
-    else
-    {
-        res.Str = res.End = 0; /* assign the null string */
-    }
-    return res;
+    return qspNullString;
 }
 
 QSPString qspJoinStrs(QSPString *s, int count, QSPString delim)
@@ -125,24 +122,6 @@ void qspCopyStrs(QSPString **dest, QSPString *src, int start, int end)
         *dest = 0;
 }
 
-void qspReverseStrs(QSPString *strs, int count)
-{
-    if (count > 1)
-    {
-        QSPString temp;
-        int start = 0;
-        int end = count - 1;
-        while (start < end)
-        {
-            temp = strs[start];
-            strs[start] = strs[end];
-            strs[end] = temp;
-            ++start;
-            --end;
-        }
-    }
-}
-
 void qspFreeStrs(QSPString *strs, int count)
 {
     if (strs)
@@ -168,12 +147,12 @@ QSP_BOOL qspIsStrNumber(QSPString s)
     }
     else
         return QSP_FALSE;
-    if (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT))
+    if (pos < s.End && *pos >= QSP_FMT('0') && *pos <= QSP_FMT('9'))
     {
         do
         {
             ++pos;
-        } while (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT));
+        } while (pos < s.End && *pos >= QSP_FMT('0') && *pos <= QSP_FMT('9'));
     }
     else
         return QSP_FALSE;
@@ -203,10 +182,10 @@ QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid)
         if (isValid) *isValid = QSP_TRUE;
         return 0;
     }
-    if (pos < s.End && qspIsInClass(*pos, QSP_CHAR_DIGIT))
+    if (pos < s.End && *pos >= QSP_FMT('0') && *pos <= QSP_FMT('9'))
     {
         s.Str = pos;
-        num = qspParseUnsignedNumber(&s);
+        num = qspParseNumber(&s, isNeg);
     }
     else
     {
@@ -219,24 +198,26 @@ QSP_BIGINT qspStrToNum(QSPString s, QSP_BOOL *isValid)
         return 0;
     }
     if (isValid) *isValid = QSP_TRUE;
-    if (isNeg) return -num;
     return num;
 }
 
 QSPString qspNumToStr(QSP_CHAR *buf, QSP_BIGINT val)
 {
+    QSP_UBIGINT num;
     QSP_CHAR temp, *last, *str = buf, *first = str;
     if (val < 0)
     {
         *str++ = QSP_NEGATION_CHAR;
-        val = -val;
+        num = -(QSP_UBIGINT)val;
         ++first;
     }
+    else
+        num = val;
     do
     {
-        *str++ = (QSP_CHAR)(val % 10 + QSP_FMT('0'));
-        val /= 10;
-    } while (val > 0);
+        *str++ = (QSP_CHAR)(num % 10 + QSP_FMT('0'));
+        num /= 10;
+    } while (num > 0);
     last = str--;
     while (first < str)
     {

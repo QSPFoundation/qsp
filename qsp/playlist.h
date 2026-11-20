@@ -10,12 +10,15 @@
 #ifndef QSP_PLAYLISTDEFINES
     #define QSP_PLAYLISTDEFINES
 
-    #define QSP_PLVOLUMEDELIM QSP_FMT("*")
-    QSP_DEFINE_SPECIAL_CHAR(QSP_PLVOLUMEDELIM, QSP_FMT('*'))
-
     #define QSP_MAXPLFILES 500
 
-    extern QSPString qspPLFiles[QSP_MAXPLFILES];
+    typedef struct
+    {
+        QSPString Name;
+        int Volume;
+    } QSPPlayListFile;
+
+    extern QSPPlayListFile qspPLFiles[QSP_MAXPLFILES];
     extern int qspPLFilesCount;
 
     /* External functions */

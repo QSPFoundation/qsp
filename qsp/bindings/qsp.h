@@ -13,7 +13,7 @@
         QSP_ERR_INTERNAL = 10,
         QSP_ERR_DIVBYZERO,
         QSP_ERR_TYPEMISMATCH,
-        QSP_ERR_LOCCALLDEPTH,
+        QSP_ERR_CALLDEPTH,
         QSP_ERR_COMPLEXEXPRESSION,
         QSP_ERR_CANTLOADFILE,
         QSP_ERR_GAMENOTLOADED,
@@ -23,6 +23,7 @@
         QSP_ERR_CANTADDACTION,
         QSP_ERR_CANTADDOBJECT,
         QSP_ERR_CANTADDMENUITEM,
+        QSP_ERR_CANTPLAYFILE,
         QSP_ERR_LOCNOTFOUND,
         QSP_ERR_LABELNOTFOUND,
         QSP_ERR_INCORRECTVARNAME,
@@ -100,12 +101,14 @@
         typedef long long QSP_BIGINT;
         typedef unsigned long long QSP_UBIGINT;
         #define QSP_MAX_BIGINT (((unsigned long long)-1) >> 1)
+        #define QSP_MIN_BIGINT (-(QSP_BIGINT)QSP_MAX_BIGINT - 1)
         #define QSP_MAX_BIGINT_LEN 20 /* don't forget about sign */
         #define QSP_TOINT(x) qspToInt(x)
     #else
         typedef int QSP_BIGINT;
         typedef unsigned int QSP_UBIGINT;
         #define QSP_MAX_BIGINT (((unsigned int)-1) >> 1)
+        #define QSP_MIN_BIGINT (-(QSP_BIGINT)QSP_MAX_BIGINT - 1)
         #define QSP_MAX_BIGINT_LEN 12 /* don't forget about sign */
         #define QSP_TOINT(x) (x)
     #endif
@@ -200,8 +203,8 @@
         QSPString LocName; /* location name */
         int ActIndex; /* index of the base action */
         int TopLineNum; /* top-level line within the game code */
-        int IntLineNum; /* line number of the actual code */
-        QSPString IntLine; /* line of the actual code */
+        int IntLineNum; /* line within the internal code, 0 for top-level code */
+        QSPString IntLine; /* the executing line */
     } QSPErrorInfo;
 
     typedef struct

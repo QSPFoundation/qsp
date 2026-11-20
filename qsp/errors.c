@@ -12,10 +12,23 @@
 int qspErrorNum = 0;
 QSPErrorInfo qspLastError;
 
-QSPLocation *qspRealCurLoc = 0;
-int qspRealActIndex = -1;
-int qspRealLineNum = 0;
-QSPLineOfCode *qspRealLine = 0;
+QSPLocation *qspRunLoc = 0;
+int qspRunActIndex = -1;
+int qspIntRunTopLineNum = 0;
+QSPCodeBlock *qspRunCode = 0;
+QSPLineOfCode *qspRunLine = 0;
+
+int qspGetTopLineNum(void)
+{
+    if (!qspRunLine) return 0;
+    return (qspRunCode->IsTopLevel ? qspRunLine->LineNum : qspIntRunTopLineNum);
+}
+
+int qspGetIntLineNum(void)
+{
+    if (!qspRunLine) return 0;
+    return (qspRunCode->IsTopLevel ? 0 : qspRunLine->LineNum);
+}
 
 void qspSetError(int num)
 {
@@ -26,24 +39,19 @@ void qspSetError(int num)
         qspErrorNum = num;
         qspLastError.ErrorNum = num;
         qspLastError.ErrorDesc = qspGetErrorDesc(num);
-        qspLastError.ActIndex = qspRealActIndex;
-        qspLastError.TopLineNum = qspRealLineNum;
+        qspLastError.ActIndex = qspRunActIndex;
+        qspLastError.TopLineNum = qspGetTopLineNum();
+        qspLastError.IntLineNum = qspGetIntLineNum();
 
-        if (qspRealCurLoc)
-            qspUpdateText(&qspLastError.LocName, qspRealCurLoc->Name);
+        if (qspRunLoc)
+            qspUpdateText(&qspLastError.LocName, qspRunLoc->Name);
         else
             qspClearText(&qspLastError.LocName);
 
-        if (qspRealLine)
-        {
-            qspLastError.IntLineNum = qspRealLine->LineNum;
-            qspUpdateText(&qspLastError.IntLine, qspRealLine->Str);
-        }
+        if (qspRunLine)
+            qspUpdateText(&qspLastError.IntLine, qspRunLine->Str);
         else
-        {
-            qspLastError.IntLineNum = 0;
             qspClearText(&qspLastError.IntLine);
-        }
     }
 }
 
@@ -72,7 +80,7 @@ QSPString qspGetErrorDesc(int errorNum)
     case QSP_ERR_INTERNAL: str = QSP_STATIC_STR(QSP_FMT("Internal error!")); break;
     case QSP_ERR_DIVBYZERO: str = QSP_STATIC_STR(QSP_FMT("Division by zero!")); break;
     case QSP_ERR_TYPEMISMATCH: str = QSP_STATIC_STR(QSP_FMT("Type mismatch!")); break;
-    case QSP_ERR_LOCCALLDEPTH: str = QSP_STATIC_STR(QSP_FMT("Maximum location call depth exceeded!")); break;
+    case QSP_ERR_CALLDEPTH: str = QSP_STATIC_STR(QSP_FMT("Maximum call depth exceeded!")); break;
     case QSP_ERR_COMPLEXEXPRESSION: str = QSP_STATIC_STR(QSP_FMT("Expression too complex!")); break;
     case QSP_ERR_CANTLOADFILE: str = QSP_STATIC_STR(QSP_FMT("Can't load file!")); break;
     case QSP_ERR_GAMENOTLOADED: str = QSP_STATIC_STR(QSP_FMT("Game not loaded!")); break;
@@ -82,6 +90,7 @@ QSPString qspGetErrorDesc(int errorNum)
     case QSP_ERR_CANTADDACTION: str = QSP_STATIC_STR(QSP_FMT("Can't add action!")); break;
     case QSP_ERR_CANTADDOBJECT: str = QSP_STATIC_STR(QSP_FMT("Can't add object!")); break;
     case QSP_ERR_CANTADDMENUITEM: str = QSP_STATIC_STR(QSP_FMT("Can't add menu item!")); break;
+    case QSP_ERR_CANTPLAYFILE: str = QSP_STATIC_STR(QSP_FMT("Can't play file!")); break;
     case QSP_ERR_LOCNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Location not found!")); break;
     case QSP_ERR_LABELNOTFOUND: str = QSP_STATIC_STR(QSP_FMT("Label not found!")); break;
     case QSP_ERR_INCORRECTVARNAME: str = QSP_STATIC_STR(QSP_FMT("Incorrect variable name!")); break;

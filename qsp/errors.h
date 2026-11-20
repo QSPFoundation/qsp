@@ -12,17 +12,52 @@
 #ifndef QSP_ERRSDEFINES
     #define QSP_ERRSDEFINES
 
+    typedef struct
+    {
+        QSPLocation *Loc;
+        int ActIndex;
+        int IntTopLineNum;
+        QSPCodeBlock *Code;
+        QSPLineOfCode *Line;
+    } QSPRunState;
+
     extern int qspErrorNum;
     extern QSPErrorInfo qspLastError;
 
-    extern QSPLocation *qspRealCurLoc;
-    extern int qspRealActIndex; /* points to the base action */
-    extern int qspRealLineNum; /* points to the top-level line within the game code */
-    extern QSPLineOfCode *qspRealLine; /* contains the internal details */
+    extern QSPLocation *qspRunLoc;
+    extern int qspRunActIndex; /* points to the base action */
+    extern int qspIntRunTopLineNum; /* top-level line that executes the internal code */
+    extern QSPCodeBlock *qspRunCode; /* the executing code */
+    extern QSPLineOfCode *qspRunLine; /* the executing line */
 
     /* External functions */
+    int qspGetTopLineNum(void);
+    int qspGetIntLineNum(void);
     void qspSetError(int num);
     void qspResetError(QSP_BOOL toInit);
     QSPString qspGetErrorDesc(int errorNum);
+
+    INLINE void qspSaveRunState(QSPRunState *state)
+    {
+        state->Loc = qspRunLoc; /* transfers ownership */
+        state->ActIndex = qspRunActIndex;
+        state->IntTopLineNum = qspIntRunTopLineNum;
+        state->Code = qspRunCode;
+        state->Line = qspRunLine;
+        qspRunLoc = 0;
+        qspRunActIndex = -1;
+        qspIntRunTopLineNum = 0;
+        qspRunCode = 0;
+        qspRunLine = 0;
+    }
+
+    INLINE void qspRestoreRunState(QSPRunState *state)
+    {
+        qspRunLoc = state->Loc; /* transfers ownership */
+        qspRunActIndex = state->ActIndex;
+        qspIntRunTopLineNum = state->IntTopLineNum;
+        qspRunCode = state->Code;
+        qspRunLine = state->Line;
+    }
 
 #endif

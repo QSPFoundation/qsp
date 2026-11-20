@@ -52,4 +52,38 @@
         return val;
     }
 
+    INLINE QSP_BIGINT qspClampNum(QSP_BIGINT value, QSP_BIGINT min, QSP_BIGINT max)
+    {
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
+    INLINE QSP_BIGINT qspAddNums(QSP_BIGINT num1, QSP_BIGINT num2)
+    {
+        return (QSP_BIGINT)((QSP_UBIGINT)num1 + (QSP_UBIGINT)num2);
+    }
+
+    INLINE QSP_BIGINT qspSubtractNums(QSP_BIGINT num1, QSP_BIGINT num2)
+    {
+        return (QSP_BIGINT)((QSP_UBIGINT)num1 - (QSP_UBIGINT)num2);
+    }
+
+    INLINE QSP_BIGINT qspMultiplyNums(QSP_BIGINT num1, QSP_BIGINT num2)
+    {
+        return (QSP_BIGINT)((QSP_UBIGINT)num1 * (QSP_UBIGINT)num2);
+    }
+
+    INLINE QSP_BIGINT qspDivideNums(QSP_BIGINT num1, QSP_BIGINT num2)
+    {
+        if (num2 == -1) return (QSP_BIGINT)(-(QSP_UBIGINT)num1);
+        return num1 / num2;
+    }
+
+    INLINE QSP_BIGINT qspModNums(QSP_BIGINT num1, QSP_BIGINT num2)
+    {
+        if (num2 == -1) return 0;
+        return num1 % num2;
+    }
+
 #endif

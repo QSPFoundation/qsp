@@ -87,11 +87,10 @@ QSP_CHAR *qspRegExpStrSearch(QSPRegExp *exp, QSPString str, QSP_CHAR *startPos, 
     onigStart = (startPos ? (OnigUChar *)startPos : onigBeg); /* allows correct searching within the whole string */
     if (onig_search(exp->CompiledExp, onigBeg, onigEnd, onigStart, onigEnd, onigReg, ONIG_OPTION_NONE) >= 0)
     {
-        int pos = (groupInd > 0 ? groupInd : 0);
-        if (pos < onigReg->num_regs && onigReg->beg[pos] >= 0)
+        if (groupInd >= 0 && groupInd < onigReg->num_regs && onigReg->beg[groupInd] >= 0)
         {
-            foundPos = str.Str + (onigReg->beg[pos] / sizeof(QSP_CHAR));
-            if (foundLen) *foundLen = (int)((onigReg->end[pos] - onigReg->beg[pos]) / sizeof(QSP_CHAR));
+            foundPos = str.Str + (onigReg->beg[groupInd] / sizeof(QSP_CHAR));
+            if (foundLen) *foundLen = (int)((onigReg->end[groupInd] - onigReg->beg[groupInd]) / sizeof(QSP_CHAR));
         }
     }
     if (foundLen && !foundPos) *foundLen = 0;

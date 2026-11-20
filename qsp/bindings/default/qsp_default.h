@@ -80,7 +80,8 @@
     QSP_EXTERN QSPString QSPGetCompiledDateTime(void);
     /* Debugging */
     QSP_EXTERN void QSPEnableDebugMode(QSP_BOOL isDebug);
-    QSP_EXTERN void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum);
+    QSP_EXTERN void QSPGetCurStateData(QSPString *loc, int *actIndex, int *lineNum, int *intLineNum);
+    QSP_EXTERN int QSPGetCurStateCode(QSPLineInfo *lines, int linesBufSize);
     QSP_EXTERN int QSPGetLocationNames(QSPString *locNames, int namesBufSize);
     QSP_EXTERN QSPString QSPGetLocationDesc(QSPString locName);
     QSP_EXTERN int QSPGetLocationActions(QSPString locName, QSPListItem *actions, int actionsBufSize);
