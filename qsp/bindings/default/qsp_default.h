@@ -7,14 +7,24 @@
 
 #include <stddef.h>
 
+#ifdef __linux__
+    #include <uchar.h>
+#endif
+
 #ifndef QSP_DEFAULTDEFINES
     #define QSP_DEFAULTDEFINES
 
     static int qspEndiannessTestValue = 1;
 
     #ifdef _UNICODE
-        typedef wchar_t QSP_CHAR;
-        #define QSP_FMT2(x) L##x
+        #ifdef __linux__
+            typedef char16_t QSP_CHAR;
+            #define QSP_FMT2(x) u##x
+        #else
+            typedef wchar_t QSP_CHAR;
+            #define QSP_FMT2(x) L##x
+        #endif
+
         #define QSP_FMT(x) QSP_FMT2(x)
 
         #define QSP_ONIG_ENC ((*(unsigned char *)&(qspEndiannessTestValue) == 1) ? \
