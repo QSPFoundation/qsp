@@ -12,12 +12,14 @@
 #include "locations.h"
 #include "text.h"
 
-QSPString qspPLFiles[QSP_MAXPLFILES];
+QSPPlayListFile qspPLFiles[QSP_MAXPLFILES];
 int qspPLFilesCount = 0;
 
 INLINE int qspSearchPlayList(QSPString file);
-INLINE void qspAddToPlayList(QSPString file, int volume);
+INLINE QSP_BOOL qspAddToPlayList(QSPString file, int volume);
 INLINE void qspRemoveFromPlayList(QSPString file);
+INLINE int qspCopyPlayListFiles(QSPPlayListFile **files);
+INLINE void qspFreePlayListFiles(QSPPlayListFile *files, int count);
 INLINE void qspPlayFile(QSPString file, int volume, QSP_BOOL toAddToPlayList);
 
 void qspClearPlayList(QSP_BOOL toInit)
@@ -26,48 +28,73 @@ void qspClearPlayList(QSP_BOOL toInit)
     {
         int i;
         for (i = 0; i < qspPLFilesCount; ++i)
-            qspFreeString(qspPLFiles + i);
+            qspFreeString(&qspPLFiles[i].Name);
     }
     qspPLFilesCount = 0;
 }
 
 INLINE int qspSearchPlayList(QSPString file)
 {
-    int i, fileLen = qspStrLen(file);
+    int i;
     for (i = 0; i < qspPLFilesCount; ++i)
     {
-        if (!qspStrsPartCompare(qspPLFiles[i], file))
-        {
-            /* The current item is prefixed with the file */
-            if (qspStrLen(qspPLFiles[i]) == fileLen || qspIsCharAtPos(qspPLFiles[i], qspPLFiles[i].Str + fileLen, QSP_PLVOLUMEDELIM_CHAR))
-                return i;
-        }
+        if (qspStrsEqual(qspPLFiles[i].Name, file))
+            return i;
     }
     return -1;
 }
 
-INLINE void qspAddToPlayList(QSPString file, int volume)
+INLINE QSP_BOOL qspAddToPlayList(QSPString file, int volume)
 {
-    QSPBufString fileBuf = qspNewBufString(0, 8);
-    qspAddBufText(&fileBuf, file);
-    if (volume != 100)
+    int fileIndex = qspSearchPlayList(file);
+    if (fileIndex < 0)
     {
-        QSP_CHAR buf[QSP_MAX_BIGINT_LEN];
-        qspAddBufText(&fileBuf, QSP_STATIC_STR(QSP_PLVOLUMEDELIM));
-        qspAddBufText(&fileBuf, qspNumToStr(buf, volume));
+        if (qspPLFilesCount == QSP_MAXPLFILES) return QSP_FALSE;
+        fileIndex = qspPLFilesCount++;
+        qspPLFiles[fileIndex].Name = qspCopyToNewText(file);
     }
-    qspPLFiles[qspPLFilesCount++] = qspBufStringToString(fileBuf);
+    qspPLFiles[fileIndex].Volume = volume;
+    return QSP_TRUE;
 }
 
 INLINE void qspRemoveFromPlayList(QSPString file)
 {
     int fileIndex = qspSearchPlayList(file);
-    while (fileIndex >= 0)
+    if (fileIndex >= 0)
     {
-        qspFreeString(qspPLFiles + fileIndex);
+        qspFreeString(&qspPLFiles[fileIndex].Name);
         --qspPLFilesCount;
-        memmove(qspPLFiles + fileIndex, qspPLFiles + fileIndex + 1, (qspPLFilesCount - fileIndex) * sizeof(QSPString));
-        fileIndex = qspSearchPlayList(file);
+        memmove(qspPLFiles + fileIndex, qspPLFiles + fileIndex + 1, (qspPLFilesCount - fileIndex) * sizeof(QSPPlayListFile));
+    }
+}
+
+INLINE int qspCopyPlayListFiles(QSPPlayListFile **files)
+{
+    int count = qspPLFilesCount;
+    if (count)
+    {
+        int i;
+        QSPPlayListFile *destFiles = (QSPPlayListFile *)malloc(count * sizeof(QSPPlayListFile));
+        for (i = 0; i < count; ++i)
+        {
+            destFiles[i].Name = qspCopyToNewText(qspPLFiles[i].Name);
+            destFiles[i].Volume = qspPLFiles[i].Volume;
+        }
+        *files = destFiles;
+    }
+    else
+        *files = 0;
+    return count;
+}
+
+INLINE void qspFreePlayListFiles(QSPPlayListFile *files, int count)
+{
+    if (files)
+    {
+        QSPPlayListFile *curFile;
+        for (curFile = files; count > 0; --count, ++curFile)
+            qspFreeString(&curFile->Name);
+        free(files);
     }
 }
 
@@ -75,78 +102,50 @@ INLINE void qspPlayFile(QSPString file, int volume, QSP_BOOL toAddToPlayList)
 {
     if (!qspIsAnyString(file)) return;
     if (volume < 0 || volume > 100) return;
-    if (toAddToPlayList)
+    if (toAddToPlayList && !qspAddToPlayList(file, volume))
     {
-        if (qspPLFilesCount == QSP_MAXPLFILES && qspSearchPlayList(file) < 0)
+        int oldLocationState = qspLocationState;
+        qspRefreshPlayList();
+        if (qspLocationState != oldLocationState) return;
+        if (!qspAddToPlayList(file, volume))
         {
-            int oldLocationState = qspLocationState;
-            qspRefreshPlayList();
-            if (qspLocationState != oldLocationState) return;
-            if (qspPLFilesCount == QSP_MAXPLFILES)
-            {
-                qspSetError(QSP_ERR_CANTPLAYFILE);
-                return;
-            }
+            qspSetError(QSP_ERR_CANTPLAYFILE);
+            return;
         }
-        qspRemoveFromPlayList(file);
-        qspAddToPlayList(file, volume);
     }
     qspCallPlayFile(file, volume);
 }
 
 void qspPlayPLFiles(void)
 {
-    QSP_CHAR *pos;
-    QSPString volumeStr, *files;
-    int i, count, volume, oldLocationState = qspLocationState;
+    QSPPlayListFile *files;
+    int i, count, oldLocationState = qspLocationState;
     qspCallCloseFile(qspNullString);
     if (qspLocationState != oldLocationState) return;
     /* Copy files, the host can change the playlist */
-    count = qspPLFilesCount;
-    qspCopyStrs(&files, qspPLFiles, 0, count);
+    count = qspCopyPlayListFiles(&files);
     for (i = 0; i < count; ++i)
     {
-        pos = qspStrLastChar(files[i], QSP_PLVOLUMEDELIM_CHAR);
-        if (pos)
-        {
-            volumeStr = qspStringFromPair(pos + QSP_STATIC_LEN(QSP_PLVOLUMEDELIM), files[i].End);
-            volume = qspClampNum(qspStrToNum(volumeStr, 0), 0, 100);
-            qspPlayFile(qspStringFromPair(files[i].Str, pos), volume, QSP_FALSE);
-        }
-        else
-            qspPlayFile(files[i], 100, QSP_FALSE);
+        qspPlayFile(files[i].Name, files[i].Volume, QSP_FALSE);
         if (qspLocationState != oldLocationState) break;
     }
-    qspFreeStrs(files, count);
+    qspFreePlayListFiles(files, count);
 }
 
 void qspRefreshPlayList(void)
 {
-    int count = qspPLFilesCount;
-    if (count)
+    QSPPlayListFile *files;
+    QSP_BOOL isPlaying;
+    int i, count, oldLocationState = qspLocationState;
+    /* Copy files, the host can change the playlist */
+    count = qspCopyPlayListFiles(&files);
+    for (i = 0; i < count; ++i)
     {
-        int i, oldLocationState;
-        QSP_BOOL isPlaying;
-        QSP_CHAR *pos;
-        QSPString *files, curFile;
-        /* Copy files, the host can change the playlist */
-        qspCopyStrs(&files, qspPLFiles, 0, count);
-        oldLocationState = qspLocationState;
-        for (i = 0; i < count; ++i)
-        {
-            pos = qspStrLastChar(files[i], QSP_PLVOLUMEDELIM_CHAR);
-            curFile = (pos ? qspStringFromPair(files[i].Str, pos) : files[i]);
-            if (qspIsAnyString(curFile))
-            {
-                isPlaying = qspCallIsPlayingFile(curFile);
-                if (qspLocationState != oldLocationState) break;
-                if (!isPlaying) qspRemoveFromPlayList(curFile);
-            }
-            else
-                qspRemoveFromPlayList(curFile);
-        }
-        qspFreeStrs(files, count);
+        isPlaying = qspCallIsPlayingFile(files[i].Name);
+        if (qspLocationState != oldLocationState) break;
+        if (!isPlaying) qspRemoveFromPlayList(files[i].Name);
     }
+    qspFreePlayListFiles(files, count);
 }
 
 void qspStatementPlayFile(QSPVariant *args, QSP_TINYINT count, QSP_TINYINT QSP_UNUSED(extArg))

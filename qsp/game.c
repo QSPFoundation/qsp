@@ -325,7 +325,10 @@ QSP_BOOL qspSaveGameStatus(void *buf, int *bufSize, QSP_BOOL isUCS)
     qspAppendEncodedIntVal(&bufString, qspTimerInterval, isUCS);
     qspAppendEncodedIntVal(&bufString, qspPLFilesCount, isUCS);
     for (i = 0; i < qspPLFilesCount; ++i)
-        qspAppendEncodedStrVal(&bufString, qspPLFiles[i], isUCS);
+    {
+        qspAppendEncodedStrVal(&bufString, qspPLFiles[i].Name, isUCS);
+        qspAppendEncodedIntVal(&bufString, qspPLFiles[i].Volume, isUCS);
+    }
     qspAppendEncodedIntVal(&bufString, qspCurIncFilesCount, isUCS);
     for (i = 0; i < qspCurIncFilesCount; ++i)
         qspAppendEncodedStrVal(&bufString, qspCurIncFiles[i], isUCS);
@@ -465,8 +468,8 @@ INLINE QSP_BOOL qspCheckGameStatus(QSPString *strs, int strsCount, QSP_BOOL isUC
     /* qspPLFilesCount */
     if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
     if (count < 0 || count > QSP_MAXPLFILES) return QSP_FALSE;
-    /* files */
-    if (!qspSkipLines(strsCount, count, &ind)) return QSP_FALSE;
+    /* files: name + volume */
+    if (!qspSkipLines(strsCount, 2 * count, &ind)) return QSP_FALSE;
     /* qspCurIncFilesCount */
     if (!qspGetIntValueAndSkipLine(strs, strsCount, &ind, isUCS, &count)) return QSP_FALSE;
     if (count < 0 || count > QSP_MAXINCFILES) return QSP_FALSE;
@@ -596,7 +599,10 @@ QSP_BOOL qspOpenGameStatus(void *data, int dataSize)
     qspPLFilesCount = qspReadEncodedIntVal(strs[13], isUCS);
     ind = 14;
     for (i = 0; i < qspPLFilesCount; ++i)
-        qspPLFiles[i] = qspDecodeString(strs[ind++], isUCS);
+    {
+        qspPLFiles[i].Name = qspDecodeString(strs[ind++], isUCS);
+        qspPLFiles[i].Volume = qspReadEncodedIntVal(strs[ind++], isUCS);
+    }
     qspCurIncFilesCount = qspReadEncodedIntVal(strs[ind++], isUCS);
     for (i = 0; i < qspCurIncFilesCount; ++i)
         qspCurIncFiles[i] = qspDecodeString(strs[ind++], isUCS);
